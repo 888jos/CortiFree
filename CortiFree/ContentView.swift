@@ -8,14 +8,151 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedTab: Tab = .home
+    @ObservedObject private var soundPlayer = SoundPlayer.shared
+    @StateObject private var planetSettings = PlanetSettings.shared
+    @State private var isScrolling = false
+    @State private var scrollTimer: Timer?
+
+    enum Tab {
+        case home
+        case tasks
+        case library
+        case profile
+    }
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        ZStack(alignment: .bottom) {
+            // Content
+            Group {
+                switch selectedTab {
+                case .home:
+                    HomeView(isScrolling: $isScrolling, scrollTimer: $scrollTimer)
+                case .tasks:
+                    TasksView()
+                case .library:
+                    LibraryView()
+                case .profile:
+                    ProfileView()
+                }
+            }
+
+            // Custom Tab Bar - Smart hide/show on scroll
+            CustomTabBar(selectedTab: $selectedTab, themeColor: planetSettings.selectedPlanet.themeColor)
+                .offset(y: isScrolling ? 100 : 0)
+                .animation(.easeInOut(duration: 0.3), value: isScrolling)
+
+            // Mini Player (if playing) - positioned above TabBar
+            if soundPlayer.currentExercise != nil {
+                VStack(spacing: 8) {
+                    Spacer()
+                    MiniPlayer()
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, isScrolling ? 8 : 88)
+                }
+                .animation(.easeInOut(duration: 0.3), value: isScrolling)
+            }
         }
-        .padding()
+        .ignoresSafeArea(.keyboard)
+    }
+}
+
+// MARK: - Custom Tab Bar
+
+struct CustomTabBar: View {
+    @Binding var selectedTab: ContentView.Tab
+    let themeColor: Color
+
+    var body: some View {
+        HStack(spacing: 0) {
+            TabBarButton(
+                icon: "house.fill",
+                title: "Accueil",
+                isSelected: selectedTab == .home,
+                themeColor: themeColor
+            ) {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedTab = .home
+                }
+            }
+
+            TabBarButton(
+                icon: "checkmark.circle.fill",
+                title: "Tâches",
+                isSelected: selectedTab == .tasks,
+                themeColor: themeColor
+            ) {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedTab = .tasks
+                }
+            }
+
+            TabBarButton(
+                icon: "book.fill",
+                title: "Librairie",
+                isSelected: selectedTab == .library,
+                themeColor: themeColor
+            ) {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedTab = .library
+                }
+            }
+
+            TabBarButton(
+                icon: "person.fill",
+                title: "Profil",
+                isSelected: selectedTab == .profile,
+                themeColor: themeColor
+            ) {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedTab = .profile
+                }
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 12)
+        .frame(height: 72)
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(Color(hex: "1A1B3A"))
+                .shadow(color: .black.opacity(0.3), radius: 10, y: -5)
+        )
+        .padding(.horizontal, 24)
+        .padding(.bottom, 8)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+struct TabBarButton: View {
+    let icon: String
+    let title: String
+    let isSelected: Bool
+    let themeColor: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            action()
+        }) {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.custom("Poppins-SemiBold", size: 20))
+                    .foregroundColor(isSelected ? themeColor : .white.opacity(0.4))
+
+                Text(title)
+                    .font(.custom("Poppins-Medium", size: 10))
+                    .foregroundColor(isSelected ? themeColor : .white.opacity(0.4))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? themeColor.opacity(0.1) : .clear)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

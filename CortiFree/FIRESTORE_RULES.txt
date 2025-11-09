@@ -1,0 +1,117 @@
+====================================
+RÈGLES FIRESTORE À CONFIGURER
+====================================
+
+Va sur Firebase Console: https://console.firebase.google.com
+1. Sélectionne ton projet CortiFree
+2. Va dans "Firestore Database"
+3. Clique sur l'onglet "Règles" (Rules)
+4. Copie-colle les règles ci-dessous
+5. Clique sur "Publier" (Publish)
+
+====================================
+RÈGLES À COPIER:
+====================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Fonction helper pour vérifier l'authentification
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Fonction helper pour vérifier que c'est le propriétaire
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Collection: users
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Sous-collection: journalEntries (entrées de journal)
+      match /journalEntries/{entryId} {
+        allow read, write, delete: if isOwner(userId);
+        allow create: if isSignedIn() && request.auth.uid == userId;
+      }
+
+      // Sous-collection: tasks (tâches de l'utilisateur)
+      match /tasks/{taskId} {
+        allow read, write, delete: if isOwner(userId);
+        allow create: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
+    // Collection: tasks
+    match /tasks/{taskId} {
+      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Collection: journal (entrées de journal)
+    match /journal/{entryId} {
+      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Collection: dailyTodos (nouvelles to-dos)
+    match /dailyTodos/{todoId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Collection: meditations
+    match /meditations/{meditationId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Collection: exercises
+    match /exercises/{exerciseId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Par défaut: bloquer tout accès non spécifié
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+====================================
+EXPLICATION:
+====================================
+
+Ces règles permettent à chaque utilisateur authentifié de:
+- Créer, lire, modifier et supprimer ses propres données
+- Empêcher l'accès aux données des autres utilisateurs
+- Bloquer tout accès si l'utilisateur n'est pas connecté
+
+La collection "dailyTodos" est maintenant accessible pour:
+- CREATE: si l'utilisateur est connecté ET que le userId dans les données correspond
+- READ: si l'utilisateur est connecté ET que c'est ses propres todos
+- UPDATE: si l'utilisateur est connecté ET que c'est ses propres todos
+- DELETE: si l'utilisateur est connecté ET que c'est ses propres todos
+
+====================================
+TEST:
+====================================
+
+Après avoir publié les règles:
+1. Lance l'app
+2. Connecte-toi (ou crée un compte)
+3. Va dans l'onglet To-Do du journal
+4. Essaie d'ajouter une tâche
+5. Ça devrait fonctionner maintenant!
+
+Si tu as encore des erreurs, vérifie:
+- Que tu es bien connecté (regarde dans ProfileView)
+- Que Firebase Authentication est activé dans la console
+- Que l'email/password est activé comme méthode de connexion
