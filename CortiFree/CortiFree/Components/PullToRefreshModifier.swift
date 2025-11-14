@@ -32,12 +32,12 @@ struct PullToRefreshModifier: ViewModifier {
                     // Main content
                     content
                         .anchorPreference(
-                            key: ScrollOffsetPreferenceKey.self,
+                            key: PullToRefreshScrollOffsetKey.self,
                             value: .top
                         ) { geometry[$0].y }
                 }
             }
-            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
+            .onPreferenceChange(PullToRefreshScrollOffsetKey.self) { offset in
                 if !isRefreshing {
                     pullDistance = min(max(0, offset), maxDistance)
 
@@ -169,8 +169,8 @@ struct PullToRefreshIndicator: View {
     }
 }
 
-// Preference key for tracking scroll offset
-struct ScrollOffsetPreferenceKey: PreferenceKey {
+// Preference key for tracking scroll offset in pull to refresh
+struct PullToRefreshScrollOffsetKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
