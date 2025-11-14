@@ -1,0 +1,346 @@
+{
+  "routines": [
+    {
+      "id": "reduce-anxiety",
+      "title": "Réduire mon anxiété",
+      "objective": "Calmer les tensions internes et les pensées en boucle",
+      "planet": "Terre",
+      "description": "Programme de 8 semaines pour réduire l'anxiété avec des exercices de respiration, méditation et journaling",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z",
+      "weeks": {
+        "week_1": {
+          "title": "Fondations de la respiration",
+          "focus": "Apprendre les bases de la cohérence cardiaque",
+          "daily_tasks": [
+            {
+              "day": 1,
+              "tasks": [
+                {
+                  "id": "task_1",
+                  "title": "Respiration 4-7-8",
+                  "exercise_id": "breathing_4_7_8",
+                  "moment": "morning",
+                  "xp_reward": 15,
+                  "is_mandatory": true
+                },
+                {
+                  "id": "task_2",
+                  "title": "Scan corporel rapide",
+                  "exercise_id": "body_scan_quick",
+                  "moment": "afternoon",
+                  "xp_reward": 10,
+                  "is_mandatory": true
+                },
+                {
+                  "id": "task_3",
+                  "title": "Journal des pensées anxieuses",
+                  "exercise_id": "anxiety_journal",
+                  "moment": "evening",
+                  "xp_reward": 20,
+                  "is_mandatory": false
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "improve-sleep",
+      "title": "Améliorer mon sommeil",
+      "objective": "Réussir à s'endormir plus facilement",
+      "planet": "Saturne",
+      "description": "Programme de 8 semaines pour améliorer la qualité du sommeil",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "increase-focus",
+      "title": "Augmenter ma concentration",
+      "objective": "Moins se disperser, rester focus",
+      "planet": "Mercure",
+      "description": "Programme de 8 semaines pour améliorer la concentration",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "manage-fatigue",
+      "title": "Gérer ma fatigue mentale",
+      "objective": "Éviter l'épuisement cérébral",
+      "planet": "Jupiter",
+      "description": "Programme de 8 semaines pour gérer la fatigue mentale",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "reduce-tension",
+      "title": "Baisser ma tension physique",
+      "objective": "Décrisper le corps, apaiser",
+      "planet": "Mars",
+      "description": "Programme de 8 semaines pour réduire les tensions physiques",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "regain-control",
+      "title": "Reprendre le contrôle",
+      "objective": "Sortir de l'état de saturation",
+      "planet": "Uranus",
+      "description": "Programme de 8 semaines pour reprendre le contrôle",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "recharge-energy",
+      "title": "Recharger mon énergie",
+      "objective": "Retrouver du tonus mental",
+      "planet": "Soleil",
+      "description": "Programme de 8 semaines pour recharger l'énergie",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "manage-emotions",
+      "title": "Gérer mes émotions",
+      "objective": "Reconnaître, nommer, réguler",
+      "planet": "Neptune",
+      "description": "Programme de 8 semaines pour mieux gérer les émotions",
+      "duration_weeks": 8,
+      "tasks_per_day": 20,
+      "created_at": "2025-11-09T00:00:00Z"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "breathing_4_7_8",
+      "title": "Respiration 4-7-8",
+      "type": "breathing",
+      "description": "Technique de respiration pour calmer rapidement l'anxiété",
+      "duration_seconds": 180,
+      "difficulty": "beginner",
+      "xp_reward": 15,
+      "instructions": [
+        "Installez-vous confortablement",
+        "Inspirez par le nez pendant 4 secondes",
+        "Retenez votre respiration pendant 7 secondes",
+        "Expirez par la bouche pendant 8 secondes",
+        "Répétez pendant 3 minutes"
+      ],
+      "parameters": {
+        "inhale_duration": 4,
+        "hold_duration": 7,
+        "exhale_duration": 8,
+        "cycles": 8
+      },
+      "tags": ["anxiety", "stress", "beginner"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "breathing_coherence",
+      "title": "Cohérence Cardiaque 5-5",
+      "type": "breathing",
+      "description": "Respiration 5 secondes in, 5 secondes out pour la cohérence cardiaque",
+      "duration_seconds": 300,
+      "difficulty": "beginner",
+      "xp_reward": 20,
+      "instructions": [
+        "Asseyez-vous confortablement, dos droit",
+        "Inspirez par le nez pendant 5 secondes",
+        "Expirez par le nez ou la bouche pendant 5 secondes",
+        "Continuez pendant 5 minutes (30 cycles)"
+      ],
+      "parameters": {
+        "inhale_duration": 5,
+        "exhale_duration": 5,
+        "cycles": 30
+      },
+      "tags": ["coherence", "stress", "beginner"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "body_scan_quick",
+      "title": "Scan Corporel Rapide",
+      "type": "meditation",
+      "description": "Scan rapide du corps pour détecter les tensions",
+      "duration_seconds": 180,
+      "difficulty": "beginner",
+      "xp_reward": 10,
+      "instructions": [
+        "Fermez les yeux",
+        "Scannez mentalement votre corps de la tête aux pieds",
+        "Notez les zones de tension sans jugement",
+        "Respirez dans ces zones pour les détendre"
+      ],
+      "tags": ["meditation", "body_awareness", "beginner"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "anxiety_journal",
+      "title": "Journal des Pensées Anxieuses",
+      "type": "journaling",
+      "description": "Écriture libre des pensées qui génèrent de l'anxiété",
+      "duration_seconds": 300,
+      "difficulty": "beginner",
+      "xp_reward": 20,
+      "instructions": [
+        "Prenez votre journal",
+        "Écrivez toutes les pensées anxieuses sans filtre",
+        "Identifiez les pensées récurrentes",
+        "Notez une pensée alternative positive pour chacune"
+      ],
+      "tags": ["journaling", "anxiety", "cognitive"],
+      "created_at": "2025-11-09T00:00:00Z"
+    }
+  ],
+  "meditation_supports": [
+    {
+      "id": "forest_sounds",
+      "title": "Sons de Forêt",
+      "description": "Ambiance naturelle de forêt pour la méditation",
+      "audio_file": "forest.mp3",
+      "duration_seconds": 600,
+      "category": "nature",
+      "tags": ["nature", "relaxation"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "ocean_waves",
+      "title": "Vagues de l'Océan",
+      "description": "Bruit des vagues pour relaxation profonde",
+      "audio_file": "ocean.mp3",
+      "duration_seconds": 600,
+      "category": "nature",
+      "tags": ["nature", "relaxation", "sleep"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "rain_sounds",
+      "title": "Pluie Douce",
+      "description": "Son de pluie pour concentration et relaxation",
+      "audio_file": "rain.mp3",
+      "duration_seconds": 600,
+      "category": "nature",
+      "tags": ["nature", "focus", "relaxation"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "fire_crackling",
+      "title": "Feu de Cheminée",
+      "description": "Crépitement du feu pour ambiance chaleureuse",
+      "audio_file": "fire.mp3",
+      "duration_seconds": 600,
+      "category": "nature",
+      "tags": ["nature", "comfort", "relaxation"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "night_ambiance",
+      "title": "Nuit Étoilée",
+      "description": "Sons de la nuit pour sommeil profond",
+      "audio_file": "night.mp3",
+      "duration_seconds": 600,
+      "category": "nature",
+      "tags": ["nature", "sleep", "relaxation"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "stream_water",
+      "title": "Ruisseau",
+      "description": "Eau qui coule doucement",
+      "audio_file": "stream.mp3",
+      "duration_seconds": 600,
+      "category": "nature",
+      "tags": ["nature", "relaxation"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "wind_sounds",
+      "title": "Vent Léger",
+      "description": "Bruit du vent dans les arbres",
+      "audio_file": "wind.mp3",
+      "duration_seconds": 600,
+      "category": "nature",
+      "tags": ["nature", "relaxation"],
+      "created_at": "2025-11-09T00:00:00Z"
+    },
+    {
+      "id": "white_noise",
+      "title": "Bruit Blanc",
+      "description": "Bruit blanc pour concentration",
+      "audio_file": "whitenoise.mp3",
+      "duration_seconds": 600,
+      "category": "ambient",
+      "tags": ["focus", "concentration"],
+      "created_at": "2025-11-09T00:00:00Z"
+    }
+  ],
+  "onboarding_questions": [
+    {
+      "id": "stress_level",
+      "question": "Sur une échelle de 1 à 10, comment évaluez-vous votre niveau de stress actuel ?",
+      "type": "scale",
+      "min_value": 1,
+      "max_value": 10,
+      "order": 1
+    },
+    {
+      "id": "sleep_quality",
+      "question": "Comment dormez-vous en ce moment ?",
+      "type": "multiple_choice",
+      "options": [
+        "Très bien, je dors profondément",
+        "Bien, avec quelques réveils",
+        "Difficilement, je me réveille souvent",
+        "Très mal, je souffre d'insomnie"
+      ],
+      "order": 2
+    },
+    {
+      "id": "main_symptoms",
+      "question": "Quels sont vos principaux symptômes ? (plusieurs choix possibles)",
+      "type": "checkbox",
+      "options": [
+        "Anxiété / Pensées en boucle",
+        "Fatigue mentale / Épuisement",
+        "Difficultés de concentration",
+        "Tensions physiques / Douleurs",
+        "Problèmes de sommeil",
+        "Irritabilité",
+        "Baisse de motivation"
+      ],
+      "order": 3
+    },
+    {
+      "id": "experience_meditation",
+      "question": "Avez-vous déjà pratiqué la méditation ou des exercices de respiration ?",
+      "type": "multiple_choice",
+      "options": [
+        "Non, jamais",
+        "Oui, quelques fois",
+        "Oui, régulièrement",
+        "Oui, je pratique quotidiennement"
+      ],
+      "order": 4
+    },
+    {
+      "id": "available_time",
+      "question": "Combien de temps pouvez-vous consacrer par jour à votre bien-être ?",
+      "type": "multiple_choice",
+      "options": [
+        "5-10 minutes",
+        "10-20 minutes",
+        "20-30 minutes",
+        "Plus de 30 minutes"
+      ],
+      "order": 5
+    }
+  ]
+}

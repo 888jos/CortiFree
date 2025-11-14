@@ -1,0 +1,1401 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "total_tasks": 59,
+    "categories": 8,
+    "created": "2025-11-10",
+    "description": "Base de données complète des tâches CortiFree avec progression hebdomadaire"
+  },
+  
+  "progression_system": {
+    "description": "Les tâches deviennent progressivement plus difficiles au fil des semaines",
+    "week_1_2": {
+      "difficulty": "Débutant",
+      "duration": "3-7 min",
+      "focus": "Établir les bases et créer l'habitude quotidienne"
+    },
+    "week_3_4": {
+      "difficulty": "Débutant-Intermédiaire",
+      "duration": "5-10 min",
+      "focus": "Approfondir la pratique et introduire de nouvelles techniques"
+    },
+    "week_5_6": {
+      "difficulty": "Intermédiaire",
+      "duration": "8-15 min",
+      "focus": "Intensifier et varier les exercices"
+    },
+    "week_7_9": {
+      "difficulty": "Intermédiaire-Avancé",
+      "duration": "10-20 min",
+      "focus": "Maîtrise et personnalisation de la routine"
+    }
+  },
+
+  "categories": [
+    {
+      "id": "breathing",
+      "name": "Respiration",
+      "icon": "wind",
+      "color": "#3498DB",
+      "description": "Techniques de respiration pour calmer l'esprit et réguler le système nerveux",
+      "tasks": [
+        {
+          "id": "breathing_abdominal",
+          "title": "Respiration abdominale profonde",
+          "icon": "lungs.fill",
+          "category": "breathing",
+          "difficulty": "Débutant",
+          "duration_minutes": 3,
+          "xp": 10,
+          "tags": ["base", "relaxation", "débutant"],
+          "best_for": ["Tous", "Première pratique"],
+          "when_to_use": "Matin, soir, ou moment de stress",
+          "description": "Respiration lente et profonde par le ventre pour activer le système nerveux parasympathique",
+          "why_it_works": "La respiration abdominale stimule le nerf vague, réduisant instantanément le cortisol (hormone du stress) de 15-20%. Elle active la réponse de relaxation du corps.",
+          "instructions": [
+            "Assieds-toi confortablement, dos droit",
+            "Place une main sur ton ventre",
+            "Inspire lentement par le nez en gonflant le ventre (compte 4)",
+            "Expire lentement par la bouche en rentrant le ventre (compte 6)",
+            "Répète pendant 3 minutes"
+          ],
+          "scientific_reference": "Étude Harvard Medical School (2018): 3 min de respiration abdominale réduit le cortisol de 18%"
+        },
+        {
+          "id": "breathing_4_7_8",
+          "title": "Respiration 4-7-8",
+          "icon": "waveform.path.ecg",
+          "category": "breathing",
+          "difficulty": "Débutant",
+          "duration_minutes": 5,
+          "xp": 15,
+          "tags": ["anxiété", "sommeil", "populaire"],
+          "best_for": ["Anxiété", "Insomnie", "Crises d'angoisse"],
+          "when_to_use": "Avant de dormir ou pendant une crise d'anxiété",
+          "description": "Technique du Dr. Andrew Weil pour calmer le système nerveux en quelques minutes",
+          "why_it_works": "Le ratio 4-7-8 force une expiration longue qui active massivement le système parasympathique. Ralentit le rythme cardiaque de 10-15 bpm en 2 minutes. Utilisé par l'US Navy.",
+          "instructions": [
+            "Inspire par le nez en comptant 4",
+            "Retiens ta respiration en comptant 7",
+            "Expire complètement par la bouche en comptant 8",
+            "Répète le cycle 4-8 fois",
+            "Fais 2-3 cycles pour commencer"
+          ],
+          "scientific_reference": "Dr. Andrew Weil - Technique validée pour réduire l'anxiété en moins de 5 minutes"
+        },
+        {
+          "id": "breathing_coherence",
+          "title": "Cohérence cardiaque 5-5",
+          "icon": "heart.text.square.fill",
+          "category": "breathing",
+          "difficulty": "Débutant",
+          "duration_minutes": 7,
+          "xp": 20,
+          "tags": ["stress", "quotidien", "star", "cliniquement prouvé"],
+          "best_for": ["Stress quotidien", "Régulation émotionnelle", "Performance"],
+          "when_to_use": "3x par jour : matin, midi, soir (idéal)",
+          "description": "La technique la plus étudiée scientifiquement pour réguler le stress et les émotions",
+          "why_it_works": "5 secondes inspiration + 5 secondes expiration = 6 respirations/min = fréquence de résonance du cœur. Synchronise cœur et cerveau. Réduit le cortisol de 23% en 5 min. Effets durent 4-6h.",
+          "instructions": [
+            "Assieds-toi confortablement",
+            "Inspire par le nez pendant 5 secondes",
+            "Expire par la bouche pendant 5 secondes",
+            "Continue pendant 5 minutes (environ 30 cycles)",
+            "Fais-le 3x par jour pour effets optimaux"
+          ],
+          "scientific_reference": "HeartMath Institute - Plus de 300 études peer-reviewed. Utilisé par l'armée, hôpitaux, entreprises Fortune 500"
+        },
+        {
+          "id": "breathing_slow_6_6",
+          "title": "Respiration lente 6-6",
+          "icon": "moon.zzz.fill",
+          "category": "breathing",
+          "difficulty": "Débutant",
+          "duration_minutes": 7,
+          "xp": 20,
+          "tags": ["sommeil", "relaxation profonde"],
+          "best_for": ["Préparation au sommeil", "Insomnie"],
+          "when_to_use": "30 minutes avant le coucher",
+          "description": "Respiration ultra-lente pour préparer le corps au sommeil profond",
+          "why_it_works": "Respirer à 5 cycles/min (6-6) active les ondes alpha dans le cerveau, état de transition vers le sommeil. Augmente la mélatonine naturelle de 32%.",
+          "instructions": [
+            "Allonge-toi dans ton lit",
+            "Inspire lentement pendant 6 secondes",
+            "Expire lentement pendant 6 secondes",
+            "Concentre-toi uniquement sur ta respiration",
+            "Continue jusqu'à sentir la somnolence"
+          ],
+          "scientific_reference": "Stanford Sleep Lab (2019): Respiration lente pré-sommeil réduit latence d'endormissement de 37%"
+        },
+        {
+          "id": "breathing_triangle",
+          "title": "Triangle Breathing 4-4-4",
+          "icon": "triangle.fill",
+          "category": "breathing",
+          "difficulty": "Débutant",
+          "duration_minutes": 5,
+          "xp": 15,
+          "tags": ["relaxation", "simple"],
+          "best_for": ["Relaxation rapide", "Débutants"],
+          "when_to_use": "Pause détente rapide",
+          "description": "Respiration triangulaire simple pour se relaxer rapidement",
+          "why_it_works": "Pattern régulier et simple qui calme le mental par sa prévisibilité. Idéal pour débutants.",
+          "instructions": [
+            "Inspire pendant 4 secondes",
+            "Retiens pendant 4 secondes",
+            "Expire pendant 4 secondes",
+            "Recommence immédiatement",
+            "Répète 8-10 cycles"
+          ],
+          "scientific_reference": "Technique utilisée en thérapie cognitive pour ancrage attentionnel"
+        },
+        {
+          "id": "breathing_box",
+          "title": "Box Breathing 4-4-4-4",
+          "icon": "square.fill",
+          "category": "breathing",
+          "difficulty": "Intermédiaire",
+          "duration_minutes": 7,
+          "xp": 25,
+          "tags": ["stress aigu", "performance", "militaire"],
+          "best_for": ["Stress intense", "Performance sous pression", "Focus"],
+          "when_to_use": "Avant présentation, examen, situation stressante",
+          "description": "Technique des Navy SEALs pour garder son calme dans l'extrême",
+          "why_it_works": "Utilisée par les forces spéciales pour maintenir performance sous stress extrême. Augmente l'oxygénation du cerveau de 24% et améliore la prise de décision de 34%.",
+          "instructions": [
+            "Inspire pendant 4 secondes",
+            "Retiens pendant 4 secondes",
+            "Expire pendant 4 secondes",
+            "Retiens poumons vides pendant 4 secondes",
+            "Répète 5-10 minutes"
+          ],
+          "scientific_reference": "US Navy SEALs training protocol - Réduit anxiété de performance de 43%"
+        },
+        {
+          "id": "breathing_kapalabhati",
+          "title": "Kapalabhati",
+          "icon": "flame.fill",
+          "category": "breathing",
+          "difficulty": "Avancé",
+          "duration_minutes": 5,
+          "xp": 30,
+          "tags": ["énergie", "réveil", "yoga"],
+          "best_for": ["Boost d'énergie matinal", "Fatigue", "Concentration"],
+          "when_to_use": "Le matin pour se réveiller",
+          "description": "Respiration du feu yogique pour une explosion d'énergie instantanée",
+          "why_it_works": "Expirations rapides et puissantes augmentent l'oxygène sanguin de 18% et stimulent le système sympathique. Boost de dopamine et noradrénaline. Énergie dure 2-3h.",
+          "instructions": [
+            "Assieds-toi dos droit",
+            "Inspire normalement",
+            "Expire puissamment par le nez (abdomen se contracte)",
+            "Laisse l'inspiration se faire passivement",
+            "Fais 30 expirations rapides, puis respire normalement 30 sec",
+            "Répète 3 rounds"
+          ],
+          "scientific_reference": "Yoga pranayama - Augmente énergie perçue de 64% et vigilance de 41%"
+        },
+        {
+          "id": "breathing_bhastrika",
+          "title": "Bhastrika (Soufflet)",
+          "icon": "wind.snow",
+          "category": "breathing",
+          "difficulty": "Avancé",
+          "duration_minutes": 5,
+          "xp": 30,
+          "tags": ["énergie intense", "avancé", "yoga"],
+          "best_for": ["Fatigue extrême", "Motivation", "Performance"],
+          "when_to_use": "Matin ou avant activité nécessitant énergie",
+          "description": "Respiration du soufflet - encore plus puissante que Kapalabhati",
+          "why_it_works": "Inspirations ET expirations puissantes. Hyperventilation contrôlée qui booste oxygénation cellulaire de 28%. Libération massive d'endorphines.",
+          "instructions": [
+            "Assieds-toi dos droit",
+            "Inspire ET expire puissamment par le nez",
+            "Rythme rapide (1 cycle/seconde)",
+            "Fais 20-30 cycles, puis respire normalement",
+            "Répète 3 rounds",
+            "⚠️ Arrête si vertiges"
+          ],
+          "scientific_reference": "Pranayama avancé - Utilisé par yogis pour préparer méditations longues"
+        }
+      ]
+    },
+    {
+      "id": "meditation",
+      "name": "Méditation",
+      "icon": "brain.head.profile",
+      "color": "#9B59B6",
+      "description": "Méditations guidées pour cultiver la conscience, la paix intérieure et la clarté mentale",
+      "tasks": [
+        {
+          "id": "meditation_breath_awareness",
+          "title": "Respiration consciente",
+          "icon": "circle.dotted",
+          "category": "meditation",
+          "difficulty": "Débutant",
+          "duration_minutes": 3,
+          "xp": 10,
+          "tags": ["débutant", "simple", "introduction"],
+          "best_for": ["Premier pas en méditation", "Calme rapide"],
+          "when_to_use": "N'importe quand pour se recentrer",
+          "description": "Observer simplement sa respiration naturelle sans la modifier",
+          "why_it_works": "Ancre l'attention dans le présent. 3 min suffisent pour réduire l'activité de l'amygdale (centre de la peur) de 12%. Base de toute pratique méditative.",
+          "instructions": [
+            "Assieds-toi confortablement",
+            "Ferme les yeux",
+            "Observe ta respiration naturelle",
+            "Quand ton esprit part, ramène-le gentiment",
+            "Continue 3 minutes"
+          ],
+          "scientific_reference": "UCLA Mindfulness Research - 3 min suffisent pour effets mesurables sur l'amygdale"
+        },
+        {
+          "id": "meditation_body_scan_short",
+          "title": "Body Scan express",
+          "icon": "figure.arms.open",
+          "category": "meditation",
+          "difficulty": "Débutant",
+          "duration_minutes": 5,
+          "xp": 15,
+          "tags": ["tensions", "relaxation", "corps"],
+          "best_for": ["Tensions physiques", "Stress corporel"],
+          "when_to_use": "Quand tu sens des tensions dans le corps",
+          "description": "Scanner mentalement ton corps pour relâcher les tensions",
+          "why_it_works": "Reconnexion corps-esprit. Réduit tensions musculaires de 34% en 5 min. Améliore conscience corporelle (crucial pour gérer anxiété).",
+          "instructions": [
+            "Allonge-toi ou assieds-toi",
+            "Ferme les yeux",
+            "Porte attention à tes pieds, détends-les",
+            "Remonte progressivement : jambes, ventre, torse, bras, visage",
+            "Relâche chaque zone consciemment"
+          ],
+          "scientific_reference": "MBSR Program (Jon Kabat-Zinn) - Body scan réduit douleur chronique de 28%"
+        },
+        {
+          "id": "meditation_mindfulness",
+          "title": "Mindfulness de base",
+          "icon": "leaf.fill",
+          "category": "meditation",
+          "difficulty": "Débutant",
+          "duration_minutes": 8,
+          "xp": 20,
+          "tags": ["pleine conscience", "pensées", "fondamental"],
+          "best_for": ["Observer ses pensées", "Ruminations", "Anxiété"],
+          "when_to_use": "Quotidien - matin ou soir",
+          "description": "Observer ses pensées comme des nuages qui passent, sans s'y attacher",
+          "why_it_works": "8 semaines de pratique quotidienne augmentent la matière grise dans l'hippocampe de 5% et réduisent l'amygdale de 4%. Améliore régulation émotionnelle de 48%.",
+          "instructions": [
+            "Assieds-toi en silence",
+            "Observe ta respiration",
+            "Quand une pensée arrive, note 'pensée'",
+            "Laisse-la partir comme un nuage",
+            "Reviens à la respiration",
+            "Répète sans jugement"
+          ],
+          "scientific_reference": "Harvard Medical School (2011) - 8 semaines de mindfulness modifient structure cérébrale"
+        },
+        {
+          "id": "meditation_grounding",
+          "title": "Ancrage corporel / Grounding",
+          "icon": "anchor.fill",
+          "category": "meditation",
+          "difficulty": "Débutant",
+          "duration_minutes": 8,
+          "xp": 20,
+          "tags": ["anxiété", "crise", "ancrage", "urgent"],
+          "best_for": ["Crises d'angoisse", "Anxiété intense", "Dissociation"],
+          "when_to_use": "En cas de crise ou déconnexion du présent",
+          "description": "Technique 5-4-3-2-1 pour revenir instantanément dans le moment présent",
+          "why_it_works": "Sollicite les 5 sens pour court-circuiter la boucle anxieuse. Ramène du cortex préfrontal (pensée) vers le sensoriel (présent). Stoppe attaque panique en 3-5 min dans 78% des cas.",
+          "instructions": [
+            "Nomme 5 choses que tu vois",
+            "Nomme 4 choses que tu touches",
+            "Nomme 3 choses que tu entends",
+            "Nomme 2 choses que tu sens (odorat)",
+            "Nomme 1 chose que tu goûtes",
+            "Respire profondément"
+          ],
+          "scientific_reference": "Technique validée en TCC pour gestion crises d'angoisse - Efficacité 78%"
+        },
+        {
+          "id": "meditation_safe_place",
+          "title": "Visualisation lieu sûr",
+          "icon": "house.fill",
+          "category": "meditation",
+          "difficulty": "Intermédiaire",
+          "duration_minutes": 10,
+          "xp": 25,
+          "tags": ["visualisation", "sécurité", "calme"],
+          "best_for": ["Anxiété anticipatoire", "Besoin de refuge mental"],
+          "when_to_use": "Quand tu as besoin de te sentir en sécurité",
+          "description": "Créer un lieu mental de paix et sécurité absolue",
+          "why_it_works": "Le cerveau ne distingue pas parfaitement réel et imaginé. Visualiser un lieu sûr active les mêmes zones que d'y être réellement. Réduit cortisol de 19%.",
+          "instructions": [
+            "Ferme les yeux",
+            "Imagine un lieu où tu te sens parfaitement en sécurité",
+            "Ajoute des détails : couleurs, sons, odeurs, température",
+            "Ressens la sécurité dans ton corps",
+            "Reste dans ce lieu 10 minutes",
+            "Tu peux y revenir quand tu veux"
+          ],
+          "scientific_reference": "Technique EMDR - Utilisée en trauma therapy pour créer ressource interne"
+        },
+        {
+          "id": "meditation_self_compassion",
+          "title": "Auto-compassion",
+          "icon": "heart.circle.fill",
+          "category": "meditation",
+          "difficulty": "Intermédiaire",
+          "duration_minutes": 10,
+          "xp": 25,
+          "tags": ["compassion", "bienveillance", "estime de soi"],
+          "best_for": ["Autocritique", "Perfectionnisme", "Culpabilité"],
+          "when_to_use": "Après échec, erreur ou moment difficile",
+          "description": "Cultiver la bienveillance envers soi-même comme envers un ami cher",
+          "why_it_works": "Auto-compassion réduit anxiété de 34%, dépression de 51% et augmente bien-être de 47%. Plus puissant que l'estime de soi (qui dépend de conditions externes).",
+          "instructions": [
+            "Pense à une difficulté actuelle",
+            "Pose ta main sur ton cœur",
+            "Dis-toi : 'C'est un moment difficile, je souffre'",
+            "Reconnais : 'La souffrance fait partie de l'humanité'",
+            "Dis-toi : 'Puis-je être bienveillant(e) envers moi-même'",
+            "Respire avec cette intention"
+          ],
+          "scientific_reference": "Dr. Kristin Neff - Auto-compassion plus efficace que estime de soi pour bien-être mental"
+        },
+        {
+          "id": "meditation_focus",
+          "title": "Méditation focus/clarté",
+          "icon": "scope",
+          "category": "meditation",
+          "difficulty": "Intermédiaire",
+          "duration_minutes": 12,
+          "xp": 30,
+          "tags": ["concentration", "performance", "clarté"],
+          "best_for": ["Concentration", "Procrastination", "Brouillard mental"],
+          "when_to_use": "Avant travail important ou décision majeure",
+          "description": "Entraîner l'attention comme un muscle pour améliorer concentration",
+          "why_it_works": "12 min de méditation focus augmentent capacité attentionnelle de 16% immédiatement. Pratique régulière améliore concentration de 42% en 8 semaines.",
+          "instructions": [
+            "Choisis un point focal (respiration, son, objet)",
+            "Concentre toute ton attention dessus",
+            "Dès que ton esprit dérive, note 'distraction'",
+            "Ramène gentiment l'attention",
+            "Répète ce processus",
+            "C'est normal de dériver 100 fois"
+          ],
+          "scientific_reference": "University of Washington - 12 min de méditation focus améliore performance cognitive de 16%"
+        },
+        {
+          "id": "meditation_sleep",
+          "title": "Méditation sommeil / Yoga Nidra",
+          "icon": "bed.double.fill",
+          "category": "meditation",
+          "difficulty": "Avancé",
+          "duration_minutes": 20,
+          "xp": 40,
+          "tags": ["sommeil", "insomnie", "profond"],
+          "best_for": ["Insomnie sévère", "Sommeil profond", "Récupération"],
+          "when_to_use": "Au lit, juste avant de dormir",
+          "description": "Yoga Nidra - le 'sommeil yogique' pour relaxation la plus profonde possible",
+          "why_it_works": "Yoga Nidra = relaxation 4x plus profonde que sommeil normal. 30 min = 2h de sommeil réparateur. Active ondes thêta (même état que sommeil profond) tout en restant conscient. Taux de succès 89% pour insomnie.",
+          "instructions": [
+            "Allonge-toi sur le dos",
+            "Ne bouge plus du tout",
+            "Suis la voix guidée",
+            "Scanner corps avec conscience profonde",
+            "Si tu t'endors = parfait",
+            "Sinon tu atteins relaxation extrême"
+          ],
+          "scientific_reference": "Satyananda Yoga - Yoga Nidra utilisé pour traiter PTSD et insomnie chronique"
+        }
+      ]
+    },
+    {
+      "id": "journal",
+      "name": "Journal",
+      "icon": "book.closed.fill",
+      "color": "#E67E22",
+      "description": "Écriture thérapeutique pour clarifier pensées, émotions et cultiver gratitude",
+      "tasks": [
+        {
+          "id": "journal_free",
+          "title": "Journal libre",
+          "icon": "pencil.and.list.clipboard",
+          "category": "journal",
+          "difficulty": "Débutant",
+          "duration_minutes": 5,
+          "xp": 10,
+          "tags": ["libre", "expression", "catharsis"],
+          "best_for": ["Exprimer ce qu'on ressent", "Vider son esprit"],
+          "when_to_use": "Quand tu sens confusion ou besoin d'exprimer",
+          "description": "Écrire librement tout ce qui te passe par la tête sans filtre",
+          "why_it_works": "Écriture expressive réduit anxiété de 28% en libérant pensées de la mémoire de travail. Clarifie émotions et réduit ruminations. 3-5 min suffisent.",
+          "instructions": [
+            "Ouvre ton journal",
+            "Écris sans t'arrêter pendant 5 min",
+            "Aucun filtre, aucun jugement",
+            "Grammaire et orthographe = pas important",
+            "Laisse sortir tout ce qui vient",
+            "Relis ou pas, comme tu veux"
+          ],
+          "scientific_reference": "Dr. James Pennebaker - Écriture expressive réduit anxiété de 28% et améliore santé physique"
+        },
+        {
+          "id": "journal_todo",
+          "title": "To-Do / Intentions",
+          "icon": "checklist",
+          "category": "journal",
+          "difficulty": "Débutant",
+          "duration_minutes": 3,
+          "xp": 10,
+          "tags": ["planification", "intentions", "matin"],
+          "best_for": ["Clarté matinale", "Organisation", "Focus"],
+          "when_to_use": "Le matin pour préparer sa journée",
+          "description": "Écrire ses 3 priorités du jour et son intention principale",
+          "why_it_works": "Planifier réduit anxiété anticipatoire de 41% et augmente accomplissement de 33%. Le cerveau adore la clarté. 3 priorités = sweet spot (pas trop, pas trop peu).",
+          "instructions": [
+            "Note tes 3 priorités du jour",
+            "1 tâche DOIT être faite",
+            "2 autres = bonus si temps",
+            "Écris ton intention : 'Aujourd'hui je veux être...'",
+            "Visualise ta journée idéale 30 sec"
+          ],
+          "scientific_reference": "Productivity research - 3 priorités quotidiennes augmentent accomplissement de 33%"
+        },
+        {
+          "id": "journal_gratitude",
+          "title": "Gratitude",
+          "icon": "sparkles",
+          "category": "journal",
+          "difficulty": "Débutant",
+          "duration_minutes": 3,
+          "xp": 15,
+          "tags": ["gratitude", "bonheur", "positif"],
+          "best_for": ["Humeur négative", "Perspective", "Bonheur"],
+          "when_to_use": "Matin ou soir - idéalement quotidien",
+          "description": "Noter 3 choses pour lesquelles tu es reconnaissant(e) aujourd'hui",
+          "why_it_works": "21 jours de gratitude quotidienne augmentent bonheur de 25% durablement. Rewire le cerveau vers biais de positivité. Réduit dépression de 34% en 6 semaines. Technique validée par psychologie positive.",
+          "instructions": [
+            "Note 3 choses positives de ta journée",
+            "Peuvent être minuscules (café chaud, sourire)",
+            "Écris POURQUOI tu es reconnaissant(e)",
+            "Ressens la gratitude 10 secondes",
+            "Fait tous les jours = transformationnel"
+          ],
+          "scientific_reference": "Dr. Robert Emmons - Gratitude quotidienne augmente bonheur de 25% en 10 semaines"
+        },
+        {
+          "id": "journal_day_review",
+          "title": "Bilan de journée",
+          "icon": "moon.stars.fill",
+          "category": "journal",
+          "difficulty": "Débutant",
+          "duration_minutes": 5,
+          "xp": 15,
+          "tags": ["réflexion", "apprentissage", "soir"],
+          "best_for": ["Clore sa journée", "Apprendre", "Progression"],
+          "when_to_use": "Le soir avant de dormir",
+          "description": "Réfléchir sur sa journée : succès, difficultés, apprentissages",
+          "why_it_works": "Réflexion quotidienne améliore apprentissage de 23% et croissance personnelle de 47%. Permet de 'déposer' sa journée pour mieux dormir. Réduit ruminations nocturnes de 52%.",
+          "instructions": [
+            "Qu'est-ce qui a bien marché aujourd'hui ?",
+            "Qu'est-ce qui a été difficile ?",
+            "Qu'est-ce que j'ai appris ?",
+            "De quoi suis-je fier(e) ?",
+            "Demain, je veux améliorer quoi ?"
+          ],
+          "scientific_reference": "Reflective practice - Améliore performance et bien-être de 47% (Harvard Business Review)"
+        },
+        {
+          "id": "journal_emotions",
+          "title": "Journal émotions",
+          "icon": "face.smiling.fill",
+          "category": "journal",
+          "difficulty": "Débutant",
+          "duration_minutes": 5,
+          "xp": 15,
+          "tags": ["émotions", "conscience", "TCC"],
+          "best_for": ["Comprendre ses émotions", "Anxiété", "Régulation"],
+          "when_to_use": "Quand émotion forte ou confusion émotionnelle",
+          "description": "Identifier et nommer précisément ce qu'on ressent et où dans le corps",
+          "why_it_works": "Nommer une émotion réduit son intensité de 30-40% (labeling effect). Activer cortex préfrontal désactive amygdale. Base de la régulation émotionnelle en TCC.",
+          "instructions": [
+            "Comment je me sens ? (1-10)",
+            "Quelle(s) émotion(s) ? (anxiété, tristesse, colère, joie...)",
+            "Où dans mon corps ? (ventre, poitrine, gorge...)",
+            "Qu'est-ce qui a déclenché ça ?",
+            "De quoi ai-je besoin maintenant ?"
+          ],
+          "scientific_reference": "UCLA (Lieberman 2007) - Nommer émotions réduit activation amygdale de 40%"
+        }
+      ]
+    },
+    {
+      "id": "movement",
+      "name": "Mouvement",
+      "icon": "figure.run",
+      "color": "#E74C3C",
+      "description": "Exercices physiques doux à intenses pour libérer tensions et énergiser le corps",
+      "tasks": [
+        {
+          "id": "movement_stretch_gentle",
+          "title": "Étirements doux",
+          "icon": "figure.flexibility",
+          "category": "movement",
+          "difficulty": "Débutant",
+          "duration_minutes": 5,
+          "xp": 15,
+          "tags": ["étirements", "réveil", "détente"],
+          "best_for": ["Réveil matinal", "Tensions légères", "Débutants"],
+          "when_to_use": "Au réveil ou après position assise prolongée",
+          "description": "Étirements lents et doux pour réveiller le corps en douceur",
+          "why_it_works": "Étirements augmentent flux sanguin de 18%, libèrent endorphines et réduisent tensions musculaires. 5 min suffisent pour effet bien-être.",
+          "instructions": [
+            "Étire-toi lentement, respire profondément",
+            "Cou : rotations douces",
+            "Épaules : rouler avant/arrière",
+            "Dos : torsions assises",
+            "Jambes : toucher orteils (sans forcer)",
+            "Maintiens chaque étirement 20-30 sec"
+          ],
+          "scientific_reference": "5 min d'étirements augmentent énergie perçue de 22% (Sports Medicine)"
+        },
+        {
+          "id": "movement_stretch_full",
+          "title": "Étirements complets",
+          "icon": "figure.cooldown",
+          "category": "movement",
+          "difficulty": "Débutant",
+          "duration_minutes": 10,
+          "xp": 20,
+          "tags": ["mobilité", "complet", "tous muscles"],
+          "best_for": ["Mobilité complète", "Après sport", "Récupération"],
+          "when_to_use": "Quotidien ou après exercice",
+          "description": "Routine complète d'étirements pour tout le corps",
+          "why_it_works": "Routine complète améliore mobilité de 31% en 4 semaines, réduit douleurs chroniques de 38% et prévient blessures de 45%.",
+          "instructions": [
+            "Commence par le haut : cou, épaules",
+            "Descends : bras, dos, torse",
+            "Hanches, cuisses, mollets",
+            "Respire profondément dans chaque pose",
+            "Ne force jamais, reste dans le confort",
+            "10 min de toi chaque jour"
+          ],
+          "scientific_reference": "10 min quotidiens d'étirements réduisent douleurs chroniques de 38%"
+        },
+        {
+          "id": "movement_yoga_flow",
+          "title": "Yoga flow débutant",
+          "icon": "figure.yoga",
+          "category": "movement",
+          "difficulty": "Débutant",
+          "duration_minutes": 10,
+          "xp": 25,
+          "tags": ["yoga", "fluidité", "équilibre"],
+          "best_for": ["Connexion corps-esprit", "Stress", "Souplesse"],
+          "when_to_use": "Matin ou soir selon besoins",
+          "description": "Enchaînement fluide de postures de yoga pour débutants",
+          "why_it_works": "Yoga réduit anxiété de 36%, dépression de 40% et améliore qualité sommeil de 55%. Combine mouvement, respiration et méditation.",
+          "instructions": [
+            "Commence en montagne (debout, centré)",
+            "Salutation au soleil simplifiée",
+            "Chien tête en bas",
+            "Guerrier 1 et 2",
+            "Posture de l'enfant",
+            "Respire avec chaque mouvement"
+          ],
+          "scientific_reference": "Meta-analyse (2020) - Yoga réduit anxiété de 36% et dépression de 40%"
+        },
+        {
+          "id": "movement_walk",
+          "title": "Marche rapide",
+          "icon": "figure.walk",
+          "category": "movement",
+          "difficulty": "Débutant",
+          "duration_minutes": 15,
+          "xp": 25,
+          "tags": ["cardio", "accessible", "extérieur"],
+          "best_for": ["Cardio doux", "Énergie", "Clarté mentale"],
+          "when_to_use": "Pause déjeuner ou matin",
+          "description": "Marche dynamique pour activer le système cardiovasculaire",
+          "why_it_works": "15 min de marche rapide libère endorphines, réduit anxiété de 26%, améliore créativité de 60% et booste énergie pour 2h.",
+          "instructions": [
+            "Marche d'un bon pas (comme si tu étais légèrement en retard)",
+            "Balance les bras",
+            "Respire profondément",
+            "Dehors si possible (bonus nature)",
+            "Sans écran, juste marcher",
+            "Observe autour de toi"
+          ],
+          "scientific_reference": "Stanford - 15 min de marche augmentent créativité de 60%"
+        },
+        {
+          "id": "movement_mobility",
+          "title": "Mobilité articulaire",
+          "icon": "figure.disc.sports",
+          "category": "movement",
+          "difficulty": "Intermédiaire",
+          "duration_minutes": 7,
+          "xp": 20,
+          "tags": ["mobilité", "articulations", "prévention"],
+          "best_for": ["Raideurs", "Prévention blessures", "Souplesse"],
+          "when_to_use": "Avant exercice ou le matin",
+          "description": "Mouvements circulaires pour lubrifier et assouplir les articulations",
+          "why_it_works": "Mobilité quotidienne réduit douleurs articulaires de 47%, améliore amplitude de 23% et prévient blessures. Critique après 30 ans.",
+          "instructions": [
+            "Rotations des chevilles (10 chaque)",
+            "Cercles des genoux (10 chaque direction)",
+            "Rotations des hanches (10)",
+            "Cercles des bras (10 avant, 10 arrière)",
+            "Rotations du cou (5 chaque côté)",
+            "Mouvements lents et contrôlés"
+          ],
+          "scientific_reference": "Mobilité quotidienne réduit raideur de 47% et blessures de 52%"
+        },
+        {
+          "id": "movement_pushups",
+          "title": "Pompes",
+          "icon": "arrow.up.and.down",
+          "category": "movement",
+          "difficulty": "Tous niveaux",
+          "duration_minutes": 3,
+          "xp": 20,
+          "tags": ["force", "haut du corps", "progression"],
+          "best_for": ["Force", "Confiance", "Accomplissement"],
+          "when_to_use": "Matin ou après-midi",
+          "description": "Exercice de force pour haut du corps - adaptable selon niveau",
+          "why_it_works": "Exercice de force libère testostérone et hormone de croissance, boost confiance et discipline. Progression mesurable = motivation.",
+          "instructions": [
+            "Débutant : Pompes contre mur (15 reps)",
+            "Intermédiaire : Pompes sur genoux (10 reps)",
+            "Avancé : Pompes classiques (10-20 reps)",
+            "Garde corps droit, descends contrôlé",
+            "Respire : expire en montant",
+            "Fais 2-3 séries avec 30 sec repos"
+          ],
+          "scientific_reference": "Exercices de force améliorent humeur de 24% et estime de soi de 37%"
+        },
+        {
+          "id": "movement_squats",
+          "title": "Squats",
+          "icon": "arrow.up.and.down.circle",
+          "category": "movement",
+          "difficulty": "Tous niveaux",
+          "duration_minutes": 3,
+          "xp": 20,
+          "tags": ["force", "jambes", "fonctionnel"],
+          "best_for": ["Force jambes", "Énergie", "Fonctionnel"],
+          "when_to_use": "N'importe quand, même au bureau",
+          "description": "Roi des exercices - squats pour force et mobilité des jambes",
+          "why_it_works": "Active les plus gros muscles du corps. Booste métabolisme, libère hormone de croissance, améliore posture et équilibre.",
+          "instructions": [
+            "Pieds largeur épaules",
+            "Descends comme pour t'asseoir",
+            "Genoux suivent direction orteils",
+            "Remonte en poussant talons",
+            "Débutant : 15 reps",
+            "Avancé : 20-30 reps ou ajoute poids"
+          ],
+          "scientific_reference": "Squats améliorent mobilité fonctionnelle de 44% chez adultes"
+        },
+        {
+          "id": "movement_plank",
+          "title": "Gainage",
+          "icon": "figure.core.training",
+          "category": "movement",
+          "difficulty": "Tous niveaux",
+          "duration_minutes": 3,
+          "xp": 25,
+          "tags": ["core", "stabilité", "mental"],
+          "best_for": ["Force core", "Posture", "Mental"],
+          "when_to_use": "Quotidien - challenge personnel",
+          "description": "Planche pour renforcer la ceinture abdominale et le mental",
+          "why_it_works": "Gainage renforce 29 muscles du core, améliore posture de 41% et réduit douleurs dos de 56%. Bonus : mental (tenir = discipline).",
+          "instructions": [
+            "Position planche : avant-bras au sol, corps droit",
+            "Ne creuse pas le dos, serre abdos/fessiers",
+            "Débutant : 20-30 sec, repos, répète",
+            "Intermédiaire : 45-60 sec",
+            "Avancé : 90+ sec ou variations",
+            "Objectif : Tenir 2 min d'affilée"
+          ],
+          "scientific_reference": "Gainage quotidien réduit douleurs lombaires de 56% en 8 semaines"
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "name": "Éducation",
+      "icon": "graduationcap.fill",
+      "color": "#3498DB",
+      "description": "Apprentissage et développement des connaissances et compétences",
+      "tasks": [
+        {
+          "id": "education_podcast",
+          "title": "Écouter un podcast",
+          "icon": "podcast.fill",
+          "category": "education",
+          "difficulty": "Accessible",
+          "duration_minutes": 20,
+          "xp": 25,
+          "tags": ["audio", "apprentissage", "flexible"],
+          "best_for": ["Apprendre en faisant autre chose", "Inspiration"],
+          "when_to_use": "En marchant, transport, ménage",
+          "description": "Écoute active d'un épisode de podcast éducatif ou inspirant",
+          "why_it_works": "Apprentissage audio active zones cérébrales différentes de lecture. 20 min quotidiennes = 2 livres/mois en connaissances.",
+          "instructions": [
+            "Choisis podcast bien-être, psycho, science",
+            "Écoute activement (pas en background)",
+            "Note 1-2 insights clés",
+            "Applique au moins 1 chose apprise"
+          ]
+        },
+        {
+          "id": "education_video",
+          "title": "Regarder reportage/vidéo",
+          "icon": "play.rectangle.fill",
+          "category": "education",
+          "difficulty": "Accessible",
+          "duration_minutes": 20,
+          "xp": 25,
+          "tags": ["visuel", "documentaire", "TED"],
+          "best_for": ["Apprendre visuellement", "Inspiration"],
+          "when_to_use": "Pause éducative consciente",
+          "description": "Visionnage d'un documentaire, TED Talk ou vidéo éducative",
+          "why_it_works": "Apprentissage visuel + auditif = meilleure rétention (65% vs 10% lecture seule).",
+          "instructions": [
+            "TED Talk, documentaire, vidéo éducative",
+            "Prends des notes",
+            "Partage 1 chose apprise avec quelqu'un"
+          ]
+        },
+        {
+          "id": "education_reading",
+          "title": "Lire 10 pages",
+          "icon": "book.fill",
+          "category": "education",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 20,
+          "tags": ["lecture", "livres", "quotidien"],
+          "best_for": ["Développement personnel", "Apprentissage profond"],
+          "when_to_use": "Matin ou soir - rituel quotidien",
+          "description": "Lecture de 10 pages d'un livre de ton choix",
+          "why_it_works": "10 pages/jour = 18 livres/an. Lecture réduit stress de 68% en 6 min, améliore empathie et cognition.",
+          "instructions": [
+            "Choisis livre qui t'intéresse",
+            "Lis 10 pages minimum",
+            "Sans distraction (téléphone off)",
+            "Sur papier si possible (meilleure rétention)"
+          ]
+        },
+        {
+          "id": "education_skill",
+          "title": "Apprendre une compétence",
+          "icon": "brain.fill",
+          "category": "education",
+          "difficulty": "Accessible",
+          "duration_minutes": 20,
+          "xp": 30,
+          "tags": ["compétence", "pratique", "progression"],
+          "best_for": ["Développement compétences", "Confiance"],
+          "when_to_use": "Session dédiée d'apprentissage",
+          "description": "Pratiquer une compétence : langue, code, instrument, design...",
+          "why_it_works": "20 min quotidiennes = maîtrise en 6-12 mois. Neuroplasticité maximale avec pratique régulière courte.",
+          "instructions": [
+            "Choisis compétence à développer",
+            "Duolingo, Codecademy, tuto YouTube...",
+            "Pratique active (pas juste regarder)",
+            "Régularité > Intensité"
+          ]
+        },
+        {
+          "id": "education_study",
+          "title": "Réviser ses études",
+          "icon": "text.book.closed.fill",
+          "category": "education",
+          "difficulty": "Accessible",
+          "duration_minutes": 25,
+          "xp": 30,
+          "tags": ["études", "révision", "académique"],
+          "best_for": ["Étudiants", "Prépa examens"],
+          "when_to_use": "Sessions d'étude programmées",
+          "description": "Révision de cours, exercices ou préparation d'examen",
+          "why_it_works": "Sessions courtes (25 min) avec breaks = meilleure rétention que marathons. Technique Pomodoro validée.",
+          "instructions": [
+            "25 min focus total",
+            "Pas de distractions",
+            "Révise activement (résume, explique)",
+            "5 min break après",
+            "Répète"
+          ]
+        },
+        {
+          "id": "education_language",
+          "title": "Pratiquer une langue",
+          "icon": "character.bubble.fill",
+          "category": "education",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 25,
+          "tags": ["langue", "communication", "voyage"],
+          "best_for": ["Apprendre langue", "Voyageurs"],
+          "when_to_use": "Quotidien - consistance clé",
+          "description": "Pratique d'une langue étrangère (app, conversation, écoute)",
+          "why_it_works": "15 min quotidiennes = plus efficace que 2h/semaine. Apprentissage langues améliore cognition et prévient déclin cognitif.",
+          "instructions": [
+            "Duolingo, Babbel, ou conversation",
+            "Pratique les 4 compétences",
+            "Écoute podcast dans la langue",
+            "Parle à voix haute (même seul)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "screen_limit",
+      "name": "Limite Écran",
+      "icon": "iphone.slash",
+      "color": "#34495E",
+      "description": "Défis pour réduire temps d'écran et recréer espace mental",
+      "tasks": [
+        {
+          "id": "screen_before_bed",
+          "title": "Pas d'écran 1h avant coucher",
+          "icon": "moon.zzz",
+          "category": "screen_limit",
+          "difficulty": "Débutant",
+          "duration_minutes": 60,
+          "xp": 25,
+          "tags": ["sommeil", "routine soir", "essentiel"],
+          "best_for": ["Qualité sommeil", "Insomnie"],
+          "when_to_use": "Tous les soirs - non négociable",
+          "description": "Couper tous les écrans 1 heure avant l'heure de coucher",
+          "why_it_works": "Lumière bleue réduit mélatonine de 50%. 1h sans écran améliore qualité sommeil de 43% et réduit latence d'endormissement de 28%.",
+          "instructions": [
+            "Définis heure coucher (ex: 23h)",
+            "Arrête écrans 22h",
+            "Remplace par : lecture, étirements, méditation",
+            "Met téléphone en mode avion",
+            "Laisse-le idéalement hors chambre"
+          ],
+          "scientific_reference": "Harvard Sleep Lab - Écrans avant sommeil réduisent mélatonine de 50%"
+        },
+        {
+          "id": "screen_morning",
+          "title": "Matin sans téléphone (1h)",
+          "icon": "sunrise.fill",
+          "category": "screen_limit",
+          "difficulty": "Débutant",
+          "duration_minutes": 60,
+          "xp": 25,
+          "tags": ["morning routine", "intention", "clarté"],
+          "best_for": ["Commencer journée calmement", "Intention"],
+          "when_to_use": "Chaque matin au réveil",
+          "description": "Ne pas toucher son téléphone pendant la première heure après réveil",
+          "why_it_works": "Checker téléphone dans les 5 min = réactivité toute la journée. 1h sans = proactivité, clarté et réduction anxiété de 34%.",
+          "instructions": [
+            "Laisse téléphone en charge ailleurs",
+            "Réveil avec alarme classique",
+            "Première heure : routine pour TOI",
+            "Respiration, mouvement, journal, petit-déj",
+            "Téléphone = APRÈS routine"
+          ],
+          "scientific_reference": "Cal Newport - Morning routine sans écran améliore focus de 47% pour la journée"
+        },
+        {
+          "id": "screen_meals",
+          "title": "Pas de téléphone à table",
+          "icon": "fork.knife",
+          "category": "screen_limit",
+          "difficulty": "Débutant",
+          "duration_minutes": 20,
+          "xp": 20,
+          "tags": ["mindful eating", "présence", "social"],
+          "best_for": ["Manger consciemment", "Connexion sociale"],
+          "when_to_use": "Tous les repas",
+          "description": "Manger sans aucun écran - juste le repas et éventuellement la compagnie",
+          "why_it_works": "Manger sans écran améliore digestion de 23%, réduit suralimentation de 18% et augmente satisfaction du repas de 31%.",
+          "instructions": [
+            "Téléphone silencieux, face cachée",
+            "Ou dans autre pièce",
+            "Focus sur nourriture : goûts, textures",
+            "Si avec d'autres : conversation",
+            "Si seul : juste manger mindfully"
+          ],
+          "scientific_reference": "Mindful eating research - Réduction suralimentation de 18% sans écrans"
+        },
+        {
+          "id": "screen_bedroom",
+          "title": "Téléphone hors chambre la nuit",
+          "icon": "bed.double.circle.fill",
+          "category": "screen_limit",
+          "difficulty": "Intermédiaire",
+          "duration_minutes": 480,
+          "xp": 30,
+          "tags": ["sommeil", "discipline", "qualité"],
+          "best_for": ["Sommeil profond", "Tentation nocturne"],
+          "when_to_use": "Toutes les nuits",
+          "description": "Laisser son téléphone charger en dehors de la chambre",
+          "why_it_works": "Téléphone hors chambre = +52% de chances de bien dormir. Élimine tentation, radiations et lumière perturbatrice.",
+          "instructions": [
+            "Station de charge dans salon/cuisine",
+            "Achète réveil classique (10€)",
+            "Mode avion si absolument nécessaire dans chambre",
+            "Chambres = pour sommeil uniquement"
+          ],
+          "scientific_reference": "National Sleep Foundation - Téléphone hors chambre améliore sommeil de 52%"
+        },
+        {
+          "id": "screen_airplane",
+          "title": "Mode avion soirée (après 21h)",
+          "icon": "airplane",
+          "category": "screen_limit",
+          "difficulty": "Intermédiaire",
+          "duration_minutes": 180,
+          "xp": 30,
+          "tags": ["déconnexion", "soir", "notifications"],
+          "best_for": ["Couper stimulations", "Soirée calme"],
+          "when_to_use": "Chaque soir après 21h",
+          "description": "Activer mode avion pour éliminer toutes notifications",
+          "why_it_works": "Notifications augmentent cortisol de 8% par alerte. Mode avion le soir = réduction anxiété de 31% et amélioration sommeil de 24%.",
+          "instructions": [
+            "21h : mode avion ON",
+            "Téléphone devient : lampe, musique, réveil",
+            "Pas de messages, mails, réseaux sociaux",
+            "Si urgence : les gens peuvent appeler (ça sonne quand même)",
+            "Désactive mode avion le matin"
+          ],
+          "scientific_reference": "Mode avion soirée réduit anxiété nocturne de 31%"
+        },
+        {
+          "id": "screen_social_media",
+          "title": "Pas de réseaux sociaux en journée",
+          "icon": "person.2.slash.fill",
+          "category": "screen_limit",
+          "difficulty": "Avancé",
+          "duration_minutes": 600,
+          "xp": 35,
+          "tags": ["focus", "productivité", "mental"],
+          "best_for": ["Deep work", "Clarté mentale", "Productivité"],
+          "when_to_use": "Jours de travail important",
+          "description": "Supprimer apps réseaux sociaux ou ne les ouvrir que le soir (18h+)",
+          "why_it_works": "Réseaux sociaux = -2.5h/jour et anxiété +33%. Journée sans = focus +66%, accomplissement +48%, anxiété -27%.",
+          "instructions": [
+            "Supprime apps Instagram, TikTok, X... du téléphone",
+            "Ou : App Limits à 5 min/jour",
+            "Si besoin : accès navigateur soir uniquement",
+            "Remplace scrolling par activités réelles",
+            "Teste 7 jours = transformationnel"
+          ],
+          "scientific_reference": "Cal Newport - Réseaux sociaux réduisent focus de 40% même quand non utilisés"
+        },
+        {
+          "id": "screen_2h_limit",
+          "title": "Temps écran < 2h/jour",
+          "icon": "hourglass",
+          "category": "screen_limit",
+          "difficulty": "Avancé",
+          "duration_minutes": 120,
+          "xp": 40,
+          "tags": ["discipline", "équilibre", "vie réelle"],
+          "best_for": ["Reprendre contrôle", "Équilibre vie"],
+          "when_to_use": "Quotidien - objectif à atteindre",
+          "description": "Limiter temps écran total à 2h maximum par jour (hors travail)",
+          "why_it_works": "Moyenne = 7h/jour. 2h/jour = +5h pour activités réelles. Réduit anxiété 41%, dépression 34%, améliore sommeil 52%.",
+          "instructions": [
+            "Active Screen Time / Bien-être digital",
+            "Définis limite 2h",
+            "Exclue : travail, navigation GPS, musique",
+            "Inclue : réseaux sociaux, YouTube, Netflix...",
+            "Objectif ambitieux mais transformateur"
+          ],
+          "scientific_reference": "2h/jour = threshold. Au-delà = risque +41% anxiété, +34% dépression"
+        },
+        {
+          "id": "screen_detox_sunday",
+          "title": "Digital detox dimanche",
+          "icon": "power.dotted",
+          "category": "screen_limit",
+          "difficulty": "Expert",
+          "duration_minutes": 720,
+          "xp": 50,
+          "tags": ["detox", "reset", "weekend"],
+          "best_for": ["Reset complet", "Reconnexion réel"],
+          "when_to_use": "1 dimanche par mois minimum",
+          "description": "Journée complète sans écrans (sauf appels urgents)",
+          "why_it_works": "1 jour sans écran = reset complet dopamine, réduction anxiété 52%, créativité +73%. Redécouvrir vie réelle.",
+          "instructions": [
+            "Téléphone en mode avion (ou off)",
+            "Pas d'ordi, tablette, TV",
+            "Activités : nature, créativité, social IRL, sport",
+            "Appels urgents OK si nécessaire",
+            "Observe comment tu te sens",
+            "Difficile mais incroyablement libérateur"
+          ],
+          "scientific_reference": "Digital detox 24h réduit stress de 52% et améliore bien-être de 48%"
+        }
+      ]
+    },
+    {
+      "id": "creativity",
+      "name": "Créativité / Hobby",
+      "icon": "paintpalette.fill",
+      "color": "#F39C12",
+      "description": "Activités créatives pour expression émotionnelle et état de flow",
+      "tasks": [
+        {
+          "id": "creativity_draw",
+          "title": "Dessiner/colorier",
+          "icon": "pencil.tip.crop.circle",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 25,
+          "tags": ["art", "relaxation", "expression"],
+          "best_for": ["Détente", "Expression non-verbale"],
+          "when_to_use": "Moment de relaxation créative",
+          "description": "Dessiner, gribouiller ou colorier pour exprimer et se détendre",
+          "why_it_works": "Art réduit cortisol de 25% en 45 min. Coloriage adulte = méditation active. Expression non-verbale des émotions.",
+          "instructions": [
+            "Prends papier et crayons/feutres",
+            "Dessine sans jugement",
+            "Coloriage mandalas = très relaxant",
+            "Pas besoin talent, juste exprimer",
+            "15 min suffisent"
+          ]
+        },
+        {
+          "id": "creativity_write",
+          "title": "Écrire créatif",
+          "icon": "square.and.pencil",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 25,
+          "tags": ["écriture", "fiction", "imagination"],
+          "best_for": ["Expression créative", "Évasion"],
+          "when_to_use": "Moment d'inspiration",
+          "description": "Écrire fiction, poésie, histoire - laisser imagination libre",
+          "why_it_works": "Écriture créative active imagination, réduit ruminations et améliore régulation émotionnelle de 34%.",
+          "instructions": [
+            "Écris fiction, poésie, histoire",
+            "Ou décris lieu imaginaire",
+            "Sans jugement sur qualité",
+            "Laisse imagination guider",
+            "C'est thérapeutique"
+          ]
+        },
+        {
+          "id": "creativity_music_play",
+          "title": "Jouer d'un instrument",
+          "icon": "music.note",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 30,
+          "tags": ["musique", "pratique", "flow"],
+          "best_for": ["État de flow", "Expression"],
+          "when_to_use": "Session de pratique",
+          "description": "Pratiquer un instrument de musique pendant 15 minutes",
+          "why_it_works": "Musique active 7 zones cérébrales simultanément. Réduit anxiété 32%, améliore cognition et crée flow.",
+          "instructions": [
+            "Piano, guitare, chant...",
+            "Pratique régulière > perfection",
+            "Improvise ou joue morceaux connus",
+            "État de flow fréquent"
+          ]
+        },
+        {
+          "id": "creativity_music_listen",
+          "title": "Écouter musique activement",
+          "icon": "headphones",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 10,
+          "xp": 20,
+          "tags": ["musique", "écoute", "mindful"],
+          "best_for": ["Appréciation musicale", "Relaxation"],
+          "when_to_use": "Pause musicale consciente",
+          "description": "Écouter musique UNIQUEMENT - yeux fermés, pleine attention",
+          "why_it_works": "Écoute active (vs background) libère dopamine, réduit anxiété 29% et induit frissons (pic émotionnel positif).",
+          "instructions": [
+            "Choisis musique que tu aimes",
+            "Allonge-toi ou assieds-toi",
+            "Ferme les yeux",
+            "Écoute chaque instrument, nuance",
+            "Ressens émotions",
+            "Aucune distraction - juste musique"
+          ]
+        },
+        {
+          "id": "creativity_cooking",
+          "title": "Cuisiner une recette",
+          "icon": "fork.knife.circle.fill",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 20,
+          "xp": 30,
+          "tags": ["cuisine", "créativité", "mindful"],
+          "best_for": ["Créativité pratique", "Mindfulness"],
+          "when_to_use": "Préparation repas consciente",
+          "description": "Cuisiner consciemment une nouvelle recette ou plat favori",
+          "why_it_works": "Cuisine = créativité + mindfulness + gratification. Active 5 sens. Réduit stress et boost estime de soi.",
+          "instructions": [
+            "Choisis nouvelle recette ou expérimente",
+            "Coupe légumes mindfully",
+            "Apprécie processus, pas juste résultat",
+            "Cuisine = méditation active"
+          ]
+        },
+        {
+          "id": "creativity_diy",
+          "title": "Bricolage/DIY",
+          "icon": "hammer.fill",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 20,
+          "xp": 30,
+          "tags": ["créer", "mains", "accomplissement"],
+          "best_for": ["Créer de ses mains", "Accomplissement"],
+          "when_to_use": "Projet créatif",
+          "description": "Créer, réparer ou construire quelque chose de ses mains",
+          "why_it_works": "Créer physiquement active circuits de récompense. Accomplissement tangible boost dopamine et confiance.",
+          "instructions": [
+            "Répare objet cassé",
+            "Construis quelque chose",
+            "Bricolage, couture, tricot...",
+            "Plaisir de créer avec ses mains"
+          ]
+        },
+        {
+          "id": "creativity_photography",
+          "title": "Photographie",
+          "icon": "camera.fill",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 25,
+          "tags": ["photo", "observation", "beauté"],
+          "best_for": ["Observer beauté", "Pleine conscience"],
+          "when_to_use": "Balade photo",
+          "description": "Sortir avec objectif de photographier (téléphone OK)",
+          "why_it_works": "Photographie = pleine conscience visuelle. Force à observer détails. Cultive appréciation beauté quotidienne.",
+          "instructions": [
+            "Sors avec téléphone/appareil photo",
+            "Cherche beauté : lumière, détails, scènes",
+            "Prends ton temps",
+            "Partage ou garde pour toi",
+            "Processus > résultat"
+          ]
+        },
+        {
+          "id": "creativity_games",
+          "title": "Jeux créatifs",
+          "icon": "puzzlepiece.fill",
+          "category": "creativity",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 20,
+          "tags": ["puzzles", "jeux", "concentration"],
+          "best_for": ["Flow", "Concentration ludique"],
+          "when_to_use": "Pause relaxante engagée",
+          "description": "Puzzles, Lego, jeux de construction, sudoku...",
+          "why_it_works": "Jeux créatifs induisent flow, réduisent anxiété 37% et améliorent fonctions exécutives.",
+          "instructions": [
+            "Puzzles, Lego, sudoku, échecs...",
+            "15-30 min d'engagement total",
+            "État de flow fréquent",
+            "Détente + stimulation mentale"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nature",
+      "name": "Nature / Extérieur",
+      "icon": "leaf.fill",
+      "color": "#27AE60",
+      "description": "Activités en plein air pour reconnecter avec la nature et réduire le stress",
+      "tasks": [
+        {
+          "id": "nature_walk",
+          "title": "Marche en nature",
+          "icon": "figure.walk.circle",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 25,
+          "tags": ["nature", "marche", "essentiel"],
+          "best_for": ["Stress", "Clarté mentale", "Bien-être global"],
+          "when_to_use": "Quotidien si possible",
+          "description": "Marcher en forêt, parc ou tout espace vert",
+          "why_it_works": "15 min en nature réduisent cortisol de 16%, tension artérielle de 2.1%, et améliorent humeur de 71%. Phytoncides (molécules des arbres) boostent système immunitaire de 50%. Shinrin-yoku (bain de forêt japonais) validé scientifiquement.",
+          "instructions": [
+            "Trouve parc, forêt ou espace vert",
+            "Marche sans écran",
+            "Observe arbres, écoute oiseaux",
+            "Respire profondément",
+            "15 min minimum pour effets"
+          ],
+          "scientific_reference": "Étude japonaise - 15 min en nature réduisent cortisol de 16% et améliorent humeur de 71%"
+        },
+        {
+          "id": "nature_sit",
+          "title": "S'asseoir dehors sans écran",
+          "icon": "figure.seated.side",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 10,
+          "xp": 20,
+          "tags": ["observation", "mindfulness", "simple"],
+          "best_for": ["Pause mindfulness", "Connexion nature"],
+          "when_to_use": "Pause quotidienne",
+          "description": "Simplement s'asseoir dehors et observer sans distraction",
+          "why_it_works": "Être dehors sans activité = exposition ions négatifs (air frais) qui réduisent sérotonine et améliorent humeur. 10 min suffisent.",
+          "instructions": [
+            "Assieds-toi dehors (jardin, balcon, banc)",
+            "Aucun écran",
+            "Observe nuages, arbres qui bougent",
+            "Écoute sons naturels",
+            "Ressens air sur ta peau",
+            "Juste être présent"
+          ],
+          "scientific_reference": "10 min dehors réduisent stress de 13% et améliorent vitamine D"
+        },
+        {
+          "id": "nature_exercise",
+          "title": "Exercice en plein air",
+          "icon": "figure.outdoor.cycle",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 30,
+          "tags": ["sport", "extérieur", "énergie"],
+          "best_for": ["Combiner sport + nature"],
+          "when_to_use": "Session sport extérieure",
+          "description": "Faire exercice dehors : yoga, course, vélo, étirements...",
+          "why_it_works": "Exercice extérieur = double effet (sport + nature). Améliore humeur 50% plus qu'exercice intérieur. Boost vitamine D.",
+          "instructions": [
+            "Cours, vélo, yoga, étirements...",
+            "Dans parc ou espace vert",
+            "Bénéfices × 2 vs intérieur",
+            "Respire air frais",
+            "Bonus soleil = vitamine D"
+          ],
+          "scientific_reference": "Exercice extérieur améliore humeur 50% plus qu'en intérieur"
+        },
+        {
+          "id": "nature_observe",
+          "title": "Observer oiseaux/animaux",
+          "icon": "bird.fill",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 10,
+          "xp": 20,
+          "tags": ["observation", "contemplation", "mindfulness"],
+          "best_for": ["Pleine conscience naturelle", "Émerveillement"],
+          "when_to_use": "Moment contemplatif",
+          "description": "Observer activement oiseaux, écureuils ou autres animaux",
+          "why_it_works": "Observation nature = pleine conscience forcée. Cultive émerveillement (awe) qui réduit anxiété 36% et augmente sens de connexion.",
+          "instructions": [
+            "Trouve endroit avec animaux",
+            "Observe mouvements, comportements",
+            "Reste immobile et silencieux",
+            "Contemple simplement",
+            "Émerveillement thérapeutique"
+          ],
+          "scientific_reference": "Émerveillement (awe) réduit inflammation et anxiété de 36%"
+        },
+        {
+          "id": "nature_gardening",
+          "title": "Jardinage",
+          "icon": "leaf.arrow.triangle.circlepath",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 15,
+          "xp": 25,
+          "tags": ["jardin", "plantes", "soin"],
+          "best_for": ["Connexion terre", "Thérapie horticole"],
+          "when_to_use": "Soin des plantes",
+          "description": "S'occuper de plantes, jardin ou simplement arroser",
+          "why_it_works": "Jardinage réduit stress de 28%, améliore humeur de 47%. Contact terre = bactéries qui boostent sérotonine (antidépresseur naturel).",
+          "instructions": [
+            "Plante, arrose, désherbe",
+            "Ou juste entretiens plantes d'intérieur",
+            "Contact avec terre = thérapeutique",
+            "Bactéries du sol boostent sérotonine"
+          ],
+          "scientific_reference": "Jardinage réduit cortisol de 28% et contact terre boost sérotonine"
+        },
+        {
+          "id": "nature_picnic",
+          "title": "Pique-nique/repas dehors",
+          "icon": "tablefork.and.knife.fill",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 20,
+          "xp": 25,
+          "tags": ["repas", "social", "plaisir"],
+          "best_for": ["Moment convivial extérieur"],
+          "when_to_use": "Repas quand beau temps",
+          "description": "Manger un repas à l'extérieur en pleine conscience",
+          "why_it_works": "Combiner mindful eating + nature + éventuel social = triple bénéfice. Améliore satisfaction repas de 41%.",
+          "instructions": [
+            "Emmène repas dehors",
+            "Parc, jardin, balcon",
+            "Seul ou en compagnie",
+            "Mange mindfully",
+            "Profite moment"
+          ],
+          "scientific_reference": "Repas extérieurs améliorent satisfaction de 41% vs intérieur"
+        },
+        {
+          "id": "nature_sunrise_sunset",
+          "title": "Regarder lever/coucher soleil",
+          "icon": "sun.horizon.fill",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 10,
+          "xp": 25,
+          "tags": ["contemplation", "émerveillement", "rituel"],
+          "best_for": ["Moment transcendant", "Perspective"],
+          "when_to_use": "Matin ou soir selon préférence",
+          "description": "Contempler lever ou coucher de soleil en pleine conscience",
+          "why_it_works": "Moments transcendants induisent 'awe' qui réduit ego, anxiété et augmente connexion. Lumière matinale régule rythme circadien.",
+          "instructions": [
+            "Trouve endroit avec vue",
+            "Observe transformation ciel",
+            "Ressens émerveillement",
+            "Pas de photo (ou 1 rapide puis observe)",
+            "Moment de pure contemplation",
+            "Matin = bonus régulation sommeil"
+          ],
+          "scientific_reference": "Émerveillement (awe) face à nature réduit stress de 34% et augmente bien-être de 29%"
+        },
+        {
+          "id": "nature_breathing",
+          "title": "Respiration en extérieur",
+          "icon": "wind.circle.fill",
+          "category": "nature",
+          "difficulty": "Accessible",
+          "duration_minutes": 10,
+          "xp": 25,
+          "tags": ["respiration", "nature", "combiné"],
+          "best_for": ["Double effet nature + respiration"],
+          "when_to_use": "Combiner exercice respiration + extérieur",
+          "description": "Faire exercice de respiration dehors pour double bénéfice",
+          "why_it_works": "Nature + respiration = effets synergiques. Air frais améliore oxygénation. Phytoncides + respiration profonde = réduction cortisol 24%.",
+          "instructions": [
+            "Va dehors (jardin, parc, balcon)",
+            "Fais exercice respiration (cohérence, 4-7-8...)",
+            "Air frais améliore oxygénation",
+            "Double bénéfice nature + respiration",
+            "10 min = transformateur"
+          ],
+          "scientific_reference": "Respiration en nature combine effets : réduction stress 24% vs 13% séparément"
+        }
+      ]
+    }
+  ]
+}
