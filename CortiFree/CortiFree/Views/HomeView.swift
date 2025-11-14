@@ -153,6 +153,7 @@ struct HomeView: View {
 
                                 // TEST: Daily Program Button
                                 Button(action: {
+                                    HapticManager.light()
                                     showDailyProgram = true
                                 }) {
                                     Text("📅 TEST: Programme du Jour")
@@ -174,6 +175,7 @@ struct HomeView: View {
 
                                 // TEST: Tasks Library Button
                                 Button(action: {
+                                    HapticManager.light()
                                     showTasksLibrary = true
                                 }) {
                                     Text("📚 TEST: 59 Tâches")

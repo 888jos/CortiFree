@@ -95,16 +95,27 @@ struct ProfileView: View {
                     tabSelector
                         .padding(.horizontal, 24)
 
-                    // Content based on selected tab
-                    if selectedTab == .score {
-                        // CortiFree Score Section (Compact)
-                        cortiFreeScoreSection
-                            .padding(.horizontal, 24)
-                    } else {
-                        // Habits Section
-                        habitsSection
-                            .padding(.horizontal, 24)
+                    // Content based on selected tab with smooth transition
+                    ZStack {
+                        if selectedTab == .score {
+                            // CortiFree Score Section (Compact)
+                            cortiFreeScoreSection
+                                .padding(.horizontal, 24)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .leading).combined(with: .opacity),
+                                    removal: .move(edge: .trailing).combined(with: .opacity)
+                                ))
+                        } else {
+                            // Habits Section
+                            habitsSection
+                                .padding(.horizontal, 24)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                                    removal: .move(edge: .leading).combined(with: .opacity)
+                                ))
+                        }
                     }
+                    .animation(.spring(response: 0.4, dampingFraction: 0.8), value: selectedTab)
 
                     Spacer(minLength: 100)
                 }

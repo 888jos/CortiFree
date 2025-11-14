@@ -18,6 +18,7 @@ struct TasksV2View: View {
     @State private var taskStreaks: [String: Int] = [:] // Track individual task streaks
     @State private var globalStreak: Int = 0 // Global streak (consecutive days with at least 1 task validated)
     @State private var showConfetti: Bool = false // Confetti animation trigger
+    @State private var isRefreshing: Bool = false // Pull to refresh state
 
     // Mock initial global score from onboarding (day 1)
     private let initialGlobalScore: Int = 45 // This would come from CortiFreeRatingView
@@ -290,8 +291,16 @@ struct TasksV2View: View {
                     .padding(.bottom, 16)
                 }
 
-                // Tasks list
-                ScrollView(showsIndicators: false) {
+                // Tasks list with pull to refresh
+                RefreshableScrollView(
+                    isRefreshing: $isRefreshing,
+                    action: {
+                        // Simulate refresh
+                        await Task.sleep(1_500_000_000) // 1.5 seconds
+                        // Here you could reload tasks from Firebase
+                        HapticManager.success()
+                    }
+                ) {
                     VStack(spacing: 20) {
                         ForEach(Array(filteredTasks.enumerated()), id: \.offset) { index, task in
                             HabitTaskCard(
@@ -311,6 +320,8 @@ struct TasksV2View: View {
                                     skipTask(task)
                                 }
                             )
+                            .cascadeAppear(index: index, totalCount: filteredTasks.count)
+                            .bouncePress()
                         }
                     }
                     .padding(.horizontal, 24)
