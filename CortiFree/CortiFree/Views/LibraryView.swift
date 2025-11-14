@@ -340,75 +340,75 @@ struct LibraryView: View {
                     .foregroundColor(Color(hex: "B0B8D4"))
             }
 
-            // Breathing Options Grid (2x2 or more)
+            // Breathing Options Grid (2x2 or more) - Synchronized with BreathingListView
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "wind",
+                        title: "Respiration abdominale profonde",
+                        isPlaying: false
+                    ) {
+                        startBreathingExercise(.deepAbdominal)
+                    }
+
+                    SoundItem(
+                        icon: "moon.stars.fill",
                         title: "4-7-8",
                         isPlaying: false
                     ) {
                         startBreathingExercise(.fourSevenEight)
-                    }
-
-                    SoundItem(
-                        icon: "square.dashed",
-                        title: "Box Breathing",
-                        isPlaying: false
-                    ) {
-                        startBreathingExercise(.boxBreathing)
                     }
                 }
 
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "heart.fill",
-                        title: "Cohérence",
+                        title: "Cohérence cardiaque 5-5",
                         isPlaying: false
                     ) {
                         startBreathingExercise(.coherence)
                     }
 
                     SoundItem(
-                        icon: "figure.mind.and.body",
-                        title: "Deep Relax",
+                        icon: "bed.double.fill",
+                        title: "Respiration lente 6-6",
                         isPlaying: false
                     ) {
-                        startBreathingExercise(.deepAbdominal)
+                        startBreathingExercise(.slow66)
                     }
                 }
 
                 if showAllBreathing {
                     HStack(spacing: 12) {
                         SoundItem(
+                            icon: "triangle",
+                            title: "Triangle Breathing",
+                            isPlaying: false
+                        ) {
+                            startBreathingExercise(.triangle)
+                        }
+
+                        SoundItem(
+                            icon: "square",
+                            title: "Box Breathing",
+                            isPlaying: false
+                        ) {
+                            startBreathingExercise(.boxBreathing)
+                        }
+                    }
+
+                    HStack(spacing: 12) {
+                        SoundItem(
                             icon: "bolt.fill",
-                            title: "Energizing",
+                            title: "Kapalabhati",
                             isPlaying: false
                         ) {
                             startBreathingExercise(.kapalabhati)
                         }
 
                         SoundItem(
-                            icon: "moon.fill",
-                            title: "Sommeil",
-                            isPlaying: false
-                        ) {
-                            startBreathingExercise(.fourSevenEight)
-                        }
-                    }
-
-                    HStack(spacing: 12) {
-                        SoundItem(
-                            icon: "sparkles",
-                            title: "Clarté Mentale",
-                            isPlaying: false
-                        ) {
-                            startBreathingExercise(.boxBreathing)
-                        }
-
-                        SoundItem(
-                            icon: "sun.max.fill",
-                            title: "Éveil",
+                            icon: "flame.fill",
+                            title: "Bhastrika (Soufflet)",
                             isPlaying: false
                         ) {
                             startBreathingExercise(.bhastrika)
@@ -461,78 +461,78 @@ struct LibraryView: View {
                     .foregroundColor(Color(hex: "B0B8D4"))
             }
 
-            // Meditation Options Grid (2x2 or more)
+            // Meditation Options Grid (2x2 or more) - Synchronized with MeditationListView
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     SoundItem(
-                        icon: "leaf.fill",
-                        title: "Scan Corporel",
-                        isPlaying: soundPlayer.currentExercise?.id == "body-scan" && soundPlayer.isPlaying
+                        icon: "wind",
+                        title: "Respiration consciente",
+                        isPlaying: soundPlayer.currentExercise?.id == "conscious-breathing" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "body-scan", title: "Scan Corporel")
+                        playMeditation(id: "conscious-breathing", title: "Respiration consciente")
                     }
 
                     SoundItem(
-                        icon: "heart.text.square.fill",
-                        title: "Gratitude",
-                        isPlaying: soundPlayer.currentExercise?.id == "gratitude" && soundPlayer.isPlaying
+                        icon: "figure.stand",
+                        title: "Body Scan express",
+                        isPlaying: soundPlayer.currentExercise?.id == "body-scan" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "gratitude", title: "Gratitude")
+                        playMeditation(id: "body-scan", title: "Body Scan express")
                     }
                 }
 
                 HStack(spacing: 12) {
                     SoundItem(
-                        icon: "sunrise.fill",
-                        title: "Pleine Conscience",
+                        icon: "eye.fill",
+                        title: "Mindfulness de base",
                         isPlaying: soundPlayer.currentExercise?.id == "mindfulness" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "mindfulness", title: "Pleine Conscience")
+                        playMeditation(id: "mindfulness", title: "Mindfulness de base")
                     }
 
                     SoundItem(
-                        icon: "sparkles",
-                        title: "Visualisation",
-                        isPlaying: soundPlayer.currentExercise?.id == "visualization" && soundPlayer.isPlaying
+                        icon: "leaf.fill",
+                        title: "Ancrage corporel / Grounding",
+                        isPlaying: soundPlayer.currentExercise?.id == "grounding" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "visualization", title: "Visualisation")
+                        playMeditation(id: "grounding", title: "Ancrage corporel / Grounding")
                     }
                 }
 
                 if showAllMeditation {
                     HStack(spacing: 12) {
                         SoundItem(
-                            icon: "heart.fill",
-                            title: "Auto-Compassion",
-                            isPlaying: soundPlayer.currentExercise?.id == "compassion" && soundPlayer.isPlaying
+                            icon: "sparkles",
+                            title: "Visualisation lieu sûr",
+                            isPlaying: soundPlayer.currentExercise?.id == "visualization" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "compassion", title: "Auto-Compassion")
+                            playMeditation(id: "visualization", title: "Visualisation lieu sûr")
                         }
 
                         SoundItem(
-                            icon: "brain.head.profile",
-                            title: "Clarté",
-                            isPlaying: soundPlayer.currentExercise?.id == "clarity" && soundPlayer.isPlaying
+                            icon: "heart.fill",
+                            title: "Auto-compassion",
+                            isPlaying: soundPlayer.currentExercise?.id == "compassion" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "clarity", title: "Clarté")
+                            playMeditation(id: "compassion", title: "Auto-compassion")
                         }
                     }
 
                     HStack(spacing: 12) {
                         SoundItem(
-                            icon: "figure.walk",
-                            title: "Marche Méditative",
-                            isPlaying: soundPlayer.currentExercise?.id == "walking" && soundPlayer.isPlaying
+                            icon: "brain.head.profile",
+                            title: "Méditation focus/clarté",
+                            isPlaying: soundPlayer.currentExercise?.id == "focus-clarity" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "walking", title: "Marche Méditative")
+                            playMeditation(id: "focus-clarity", title: "Méditation focus/clarté")
                         }
 
                         SoundItem(
-                            icon: "star.fill",
-                            title: "Ancrage",
-                            isPlaying: soundPlayer.currentExercise?.id == "grounding" && soundPlayer.isPlaying
+                            icon: "moon.stars.fill",
+                            title: "Méditation sommeil / Yoga Nidra",
+                            isPlaying: soundPlayer.currentExercise?.id == "yoga-nidra" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "grounding", title: "Ancrage")
+                            playMeditation(id: "yoga-nidra", title: "Méditation sommeil / Yoga Nidra")
                         }
                     }
                 }
