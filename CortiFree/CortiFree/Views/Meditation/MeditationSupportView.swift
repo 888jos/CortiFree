@@ -35,30 +35,42 @@ struct MeditationSupportView: View {
                 // Header
                 header
 
-                Spacer()
+                // Content scrollable
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        // Title compact
+                        Text(support.title)
+                            .font(.custom("Poppins-Bold", size: 28))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                // Content centré
-                VStack(spacing: 40) {
-                    // Hero icon
-                    heroIcon
+                        // Benefit card
+                        benefitCard
 
-                    // Title
-                    Text(support.title)
-                        .font(.custom("Poppins-Bold", size: 28))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .shadow(color: Color.black.opacity(0.3), radius: 8, y: 4)
-                        .padding(.horizontal, 32)
+                        Spacer(minLength: 20)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 120) // Space for button
+                }
 
-                    // Benefit card
-                    benefitCard
-
-                    // Launch button
+                // Launch button fixé en bas
+                VStack {
                     launchButton
                 }
                 .padding(.horizontal, 24)
-
-                Spacer()
+                .padding(.vertical, 16)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "01000C"),
+                            Color(hex: "01000C").opacity(0.95)
+                        ],
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                    .ignoresSafeArea(edges: .bottom)
+                )
             }
         }
         .onAppear {
@@ -119,50 +131,6 @@ struct MeditationSupportView: View {
         .padding(.top, 20)
     }
 
-    // MARK: - Hero Icon
-    private var heroIcon: some View {
-        ZStack {
-            // Glow effect
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [Color(hex: "B388FF").opacity(0.3), Color.clear],
-                        center: .center,
-                        startRadius: 20,
-                        endRadius: 80
-                    )
-                )
-                .frame(width: 160, height: 160)
-                .scaleEffect(pulseAnimation ? 1.2 : 1.0)
-
-            // Main icon circle
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color(hex: "B388FF").opacity(0.3), Color(hex: "8C9EFF").opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 120, height: 120)
-                .overlay(
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                colors: [Color(hex: "B388FF"), Color(hex: "8C9EFF")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 2
-                        )
-                )
-                .shadow(color: Color(hex: "B388FF").opacity(0.3), radius: 20, y: 10)
-
-            Image(systemName: meditationIcon)
-                .font(.custom("Poppins-Medium", size: 50))
-                .foregroundColor(.white)
-        }
-    }
 
     // MARK: - Benefit Card
     private var benefitCard: some View {

@@ -31,8 +31,8 @@ struct BreathingExerciseDetailView: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
-                        // Hero section avec icône animée
-                        heroSection
+                        // Titre compact en haut
+                        compactTitleSection
 
                         // Comment ça marche - EXPANDABLE CARD
                         howItWorksExpandableCard
@@ -47,6 +47,7 @@ struct BreathingExerciseDetailView: View {
                         Spacer(minLength: 20)
                     }
                     .padding(.horizontal, 24)
+                    .padding(.top, 16)
                     .padding(.bottom, 180) // Space for fixed bottom section
                 }
 
@@ -133,77 +134,22 @@ struct BreathingExerciseDetailView: View {
         }
     }
 
-    // MARK: - Hero Section
+    // MARK: - Compact Title Section (replaces Hero)
 
-    private var heroSection: some View {
-        VStack(spacing: 20) {
-            // Animated icon avec glow effect
-            ZStack {
-                // Glow circles
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Color.appTheme.opacity(0.3),
-                                Color.clear
-                            ],
-                            center: .center,
-                            startRadius: 40,
-                            endRadius: 80
-                        )
-                    )
-                    .frame(width: 160, height: 160)
-                    .scaleEffect(pulseAnimation ? 1.2 : 1.0)
-
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "49288C"),
-                                Color(hex: "2A2B5A")
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 120, height: 120)
-                    .overlay(
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        Color.appTheme.opacity(0.6),
-                                        Color.appThemeSecondary.opacity(0.6)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
-                    )
-                    .shadow(color: Color.appTheme.opacity(0.3), radius: 20, y: 10)
-
-                Image(systemName: pattern.icon)
-                    .font(.system(size: 50))
-                    .foregroundColor(.white)
-            }
-            .padding(.top, 20)
-
-            // Title avec effet
+    private var compactTitleSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Title
             Text(pattern.displayName)
-                .font(.custom("Poppins-Bold", size: 36))
+                .font(.custom("Poppins-Bold", size: 28))
                 .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-                .shadow(color: Color.black.opacity(0.3), radius: 10, y: 5)
 
             // Description courte
             Text(pattern.description)
-                .font(.custom("Poppins-Regular", size: 16))
+                .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(.white.opacity(0.8))
-                .multilineTextAlignment(.center)
-                .lineSpacing(6)
-                .padding(.horizontal, 20)
+                .lineSpacing(4)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: - How It Works - EXPANDABLE CARD
