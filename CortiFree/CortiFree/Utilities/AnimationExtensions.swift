@@ -95,7 +95,7 @@ struct BouncePressModifier: ViewModifier {
         content
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
-            .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity) { _ in
+            .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity) {
                 // On press start
             } onPressingChanged: { pressing in
                 isPressed = pressing
@@ -134,7 +134,7 @@ struct ShakeModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .offset(x: offset)
-            .onChange(of: shake) { newValue in
+            .onChange(of: shake) { oldValue, newValue in
                 if newValue {
                     withAnimation(
                         .easeInOut(duration: 0.05)
@@ -220,9 +220,8 @@ struct SuccessAnimationView: View {
         ZStack {
             if showAnimation {
                 LottieView(
-                    animationName: "confetti",
-                    loopMode: .playOnce,
-                    contentMode: .scaleAspectFit
+                    filename: "confetti",
+                    loopMode: .playOnce
                 )
                 .frame(width: 300, height: 300)
                 .onAppear {

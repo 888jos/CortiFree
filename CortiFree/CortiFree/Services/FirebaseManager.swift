@@ -23,8 +23,7 @@ class FirebaseManager: ObservableObject {
 
     private func setupFirestore() {
         let settings = FirestoreSettings()
-        settings.isPersistenceEnabled = true
-        settings.cacheSizeBytes = FirestoreCacheSizeUnlimited
+        settings.cacheSettings = PersistentCacheSettings(sizeBytes: NSNumber(value: FirestoreCacheSizeUnlimited))
         db.settings = settings
     }
 
