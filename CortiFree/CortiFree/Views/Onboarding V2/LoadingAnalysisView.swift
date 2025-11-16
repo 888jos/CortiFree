@@ -115,7 +115,7 @@ struct LoadingAnalysisView: View {
     private func startProgressAnimation() {
         // 6 phases of 1.25s each = 7.5s total
         let phaseDuration: Double = 1.25
-        let updateInterval: Double = 0.04 // Update every 40ms (25 FPS)
+        _ = 0.04 // Update interval (40ms / 25 FPS) - not used directly
 
         // Phase 1: 0-17% avec "Compréhension des réponses"
         animatePhase(from: 0, to: 17, duration: phaseDuration, subtitle: subtitles[0]) {

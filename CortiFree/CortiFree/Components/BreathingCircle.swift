@@ -16,6 +16,15 @@ struct BreathingCircle: View {
         size > 200
     }
 
+    // Couleur principale violette de l'app
+    private var primaryColor: Color {
+        Color(hex: "B794F6")
+    }
+
+    private var secondaryColor: Color {
+        Color(hex: "D4B4FF")
+    }
+
     var body: some View {
         ZStack {
             // Halo externe large et flou
@@ -23,8 +32,8 @@ struct BreathingCircle: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            planet.haloColor.opacity(0.4),
-                            planet.haloColor.opacity(0.2),
+                            primaryColor.opacity(0.4),
+                            primaryColor.opacity(0.2),
                             Color.clear
                         ],
                         center: .center,
@@ -43,8 +52,8 @@ struct BreathingCircle: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            planet.haloColor.opacity(haloOpacity),
-                            planet.haloColor.opacity(0.15),
+                            primaryColor.opacity(haloOpacity),
+                            primaryColor.opacity(0.15),
                             Color.clear
                         ],
                         center: .center,
@@ -70,9 +79,9 @@ struct BreathingCircle: View {
                 .stroke(
                     LinearGradient(
                         colors: [
-                            planet.haloColor.opacity(0.6),
-                            planet.gradientSecondaryColor.opacity(0.6),
-                            planet.haloColor.opacity(0.6)
+                            primaryColor.opacity(0.6),
+                            secondaryColor.opacity(0.6),
+                            primaryColor.opacity(0.6)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -87,9 +96,9 @@ struct BreathingCircle: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            planet.gradientSecondaryColor.opacity(0.8),
-                            planet.haloColor.opacity(0.9),
-                            planet.haloColor.opacity(0.6)
+                            secondaryColor.opacity(0.8),
+                            primaryColor.opacity(0.9),
+                            primaryColor.opacity(0.6)
                         ],
                         center: .center,
                         startRadius: 0,
@@ -97,13 +106,13 @@ struct BreathingCircle: View {
                     )
                 )
                 .frame(width: size, height: size)
-                .shadow(color: planet.haloColor.opacity(0.8), radius: 40, x: 0, y: 0)
-                .shadow(color: planet.haloColor.opacity(0.6), radius: 20, x: 0, y: 0)
+                .shadow(color: primaryColor.opacity(0.8), radius: 40, x: 0, y: 0)
+                .shadow(color: primaryColor.opacity(0.6), radius: 20, x: 0, y: 0)
 
             // Anneau interne décoratif
             Circle()
                 .stroke(
-                    planet.gradientSecondaryColor.opacity(0.4),
+                    secondaryColor.opacity(0.4),
                     lineWidth: 2
                 )
                 .frame(width: size - 40, height: size - 40)

@@ -498,8 +498,11 @@ struct TaskCard: View {
                         .font(.custom("Poppins-Regular", size: 13))
                         .foregroundColor(.white.opacity(0.8))
 
-                    // Instructions button
-                    NavigationLink(destination: TaskInstructionsView(task: task)) {
+                    // Instructions button (TODO: Create TaskInstructionsView)
+                    // NavigationLink(destination: TaskInstructionsView(task: task)) {
+                    Button(action: {
+                        // TODO: Navigate to instructions
+                    }) {
                         HStack {
                             Text("Voir les instructions")
                                 .font(.custom("Poppins-SemiBold", size: 13))

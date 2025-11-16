@@ -27,7 +27,7 @@ struct ConfettiAnimation: View {
                     ConfettiParticleView(particle: particle)
                 }
             }
-            .onChange(of: trigger) { newValue in
+            .onChange(of: trigger) { oldValue, newValue in
                 if newValue {
                     createConfetti(in: geometry)
                 }

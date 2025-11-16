@@ -10,7 +10,8 @@ import SwiftUI
 
 struct HabitTaskCard: View {
     let title: String
-    let frequency: String
+    let duration: String  // Ex: "30 min" or "2.5L" for water
+    let frequencyText: String  // Ex: "3x/sem" or "Quotidien"
     let difficulty: Int // 1, 2, or 3
     let streak: Int
     let imageName: String
@@ -109,31 +110,41 @@ struct HabitTaskCard: View {
                             .fixedSize(horizontal: false, vertical: true)
 
                         HStack(spacing: 16) {
-                            // Frequency
-                            HStack(spacing: 6) {
+                            // Duration with clock icon
+                            if !duration.isEmpty {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "clock")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.white)
+
+                                    Text(duration)
+                                        .font(.custom("Poppins-Regular", size: 13))
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                            }
+
+                            // Frequency with repeat icon
+                            HStack(spacing: 4) {
                                 Image(systemName: "arrow.clockwise")
                                     .font(.system(size: 12))
                                     .foregroundColor(.white)
 
-                                Text(frequency)
+                                Text(frequencyText)
                                     .font(.custom("Poppins-Regular", size: 13))
                                     .foregroundColor(.white.opacity(0.7))
                             }
 
-                            // Difficulty bars (1-3 rectangles with progressive heights)
-                            HStack(spacing: 6) {
+                            // Difficulty bars
+                            HStack(spacing: 4) {
                                 HStack(alignment: .bottom, spacing: 2) {
-                                    // Bar 1: 3x6
                                     RoundedRectangle(cornerRadius: 20)
                                         .fill(difficulty >= 1 ? Color.white : Color(hex: "8B8B8B"))
                                         .frame(width: 3, height: 6)
 
-                                    // Bar 2: 3x9
                                     RoundedRectangle(cornerRadius: 20)
                                         .fill(difficulty >= 2 ? Color.white : Color(hex: "8B8B8B"))
                                         .frame(width: 3, height: 9)
 
-                                    // Bar 3: 3x12
                                     RoundedRectangle(cornerRadius: 20)
                                         .fill(difficulty >= 3 ? Color.white : Color(hex: "8B8B8B"))
                                         .frame(width: 3, height: 12)
@@ -169,11 +180,12 @@ struct HabitTaskCard: View {
 
         VStack(spacing: 24) {
             HabitTaskCard(
-                title: "Boire 2.5l d'eau",
-                frequency: "1x/sem",
+                title: "S'hydrater régulièrement",
+                duration: "2.5L",
+                frequencyText: "Quotidien",
                 difficulty: 1,
                 streak: 17,
-                imageName: "task_water",
+                imageName: "habit_water",
                 action: {
                     print("Tapped")
                 },
@@ -186,11 +198,12 @@ struct HabitTaskCard: View {
             )
 
             HabitTaskCard(
-                title: "Méditer 10 minutes",
-                frequency: "3x/sem",
+                title: "Méditer en pleine conscience",
+                duration: "10 min",
+                frequencyText: "3x/sem",
                 difficulty: 3,
                 streak: 24,
-                imageName: "task_meditate",
+                imageName: "habit_meditate",
                 action: {
                     print("Tapped")
                 },

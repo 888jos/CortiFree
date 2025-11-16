@@ -67,7 +67,7 @@ struct CustomTabBar: View {
         HStack(spacing: 0) {
             TabBarButton(
                 icon: "house.fill",
-                title: "Accueil",
+                title: NSLocalizedString("tab.home", comment: ""),
                 isSelected: selectedTab == .home,
                 themeColor: themeColor
             ) {
@@ -78,7 +78,7 @@ struct CustomTabBar: View {
 
             TabBarButton(
                 icon: "checkmark.circle.fill",
-                title: "Plan",
+                title: NSLocalizedString("tab.plan", comment: ""),
                 isSelected: selectedTab == .tasks,
                 themeColor: themeColor
             ) {
@@ -89,7 +89,7 @@ struct CustomTabBar: View {
 
             TabBarButton(
                 icon: "book.fill",
-                title: "Librairie",
+                title: NSLocalizedString("tab.library", comment: ""),
                 isSelected: selectedTab == .library,
                 themeColor: themeColor
             ) {
@@ -100,7 +100,7 @@ struct CustomTabBar: View {
 
             TabBarButton(
                 icon: "person.fill",
-                title: "Profil",
+                title: NSLocalizedString("tab.profile", comment: ""),
                 isSelected: selectedTab == .profile,
                 themeColor: themeColor
             ) {

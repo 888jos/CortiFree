@@ -106,11 +106,11 @@ enum Planet: String, CaseIterable, Identifiable {
 // Extension pour accéder facilement à la couleur du thème
 extension Color {
     static var appTheme: Color {
-        return PlanetSettings.shared.selectedPlanet.themeColor
+        return Color(hex: "B794F6") // Violet principal (same as footer selected tab)
     }
 
     static var appThemeSecondary: Color {
-        return PlanetSettings.shared.selectedPlanet.themeSecondaryColor
+        return Color(hex: "9B59B6") // Violet secondaire complémentaire
     }
 }
 
@@ -119,12 +119,12 @@ class PlanetSettings: ObservableObject {
 
     @Published var selectedPlanet: Planet {
         didSet {
-            UserDefaults.standard.set(selectedPlanet.rawValue, forKey: "selectedPlanet")
+            UserDefaults.standard.set(selectedPlanet.rawValue, forKey: AppConstants.UserDefaultsKeys.selectedPlanet)
         }
     }
 
     init() {
-        if let savedPlanet = UserDefaults.standard.string(forKey: "selectedPlanet"),
+        if let savedPlanet = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.selectedPlanet),
            let planet = Planet(rawValue: savedPlanet) {
             self.selectedPlanet = planet
         } else {

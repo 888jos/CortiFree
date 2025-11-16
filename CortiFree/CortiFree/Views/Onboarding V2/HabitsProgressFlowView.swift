@@ -80,9 +80,9 @@ struct HabitsProgressFlowView: View {
             title: "Passer du temps en nature",
             yAxisLabel: "",
             yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
-            currentValue: "1h30",
+            currentValue: "3h30",
             weekNumber: 10,
-            statMessage: "passeras 1h30 en nature par semaine.",
+            statMessage: "passeras 3h30 en nature par semaine.",
             maxValue: 4.0,
             currentProgress: 3.7,
             curveStyle: 5
@@ -149,6 +149,7 @@ struct HabitsProgressFlowView: View {
                 HStack(spacing: 6) {
                     ForEach(0..<habitProgresses.count, id: \.self) { index in
                         Button(action: {
+                            HapticManager.light()
                             currentHabitIndex = index
                             currentWeek = 0  // Reset to "Actuellement" when changing habit
                         }) {
@@ -263,13 +264,7 @@ struct HabitsProgressFlowView: View {
 
                 Button(action: {
                     HapticManager.medium()
-                    if currentHabitIndex < habitProgresses.count - 1 {
-                        withAnimation {
-                            currentHabitIndex += 1
-                        }
-                    } else {
-                        onComplete()
-                    }
+                    onComplete()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.right")

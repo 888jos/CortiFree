@@ -1,0 +1,113 @@
+/*
+  Localizable.strings - English
+  CortiFree
+*/
+
+// MARK: - Onboarding
+"onboarding.welcome.title" = "Welcome to CortiFree";
+"onboarding.welcome.subtitle" = "Your 66-day journey to mental wellness";
+"onboarding.continue" = "Continue";
+"onboarding.8habits.title" = "The 8 Key Habits";
+"onboarding.8habits.description1" = "Studies show that to reset your";
+"onboarding.8habits.description2" = "life, you need the";
+"onboarding.8habits.description3" = "8 fundamental";
+"onboarding.8habits.description4" = "habits below.";
+"onboarding.8habits.footer" = "See how your life will change in 66 days\nthanks to these 8 habits:";
+
+// MARK: - Tab Bar
+"tab.home" = "Home";
+"tab.plan" = "Plan";
+"tab.library" = "Library";
+"tab.profile" = "Profile";
+
+// MARK: - Home
+"home.greeting.morning" = "Good morning";
+"home.greeting.afternoon" = "Good afternoon";
+"home.greeting.evening" = "Good evening";
+"home.streak" = "Day streak";
+"home.cortifree_score" = "CortiFree Score";
+"home.goal.anxiety" = "You'll find your inner peace in:";
+"home.goal.sleep" = "You'll sleep peacefully in:";
+"home.goal.concentration" = "You'll be fully focused in:";
+"home.goal.fatigue" = "You'll regain your energy in:";
+"home.goal.tension" = "Your body will be at ease in:";
+"home.goal.control" = "You'll regain control in:";
+"home.goal.energy" = "You'll be full of energy in:";
+"home.goal.emotions" = "You'll master your emotions in:";
+"home.goal.default" = "You'll achieve your goal in:";
+
+// MARK: - Tasks
+"tasks.day" = "Day";
+"tasks.of" = "/";
+"tasks.encouragement" = "You're doing great. Keep it up!";
+"tasks.todo" = "To do";
+"tasks.done" = "Done";
+"tasks.skipped" = "Skipped";
+
+// MARK: - Habits
+"habit.breathe" = "Breathing exercises";
+"habit.meditate" = "Meditate 10 minutes";
+"habit.journal" = "Keep a journal";
+"habit.sport" = "Exercise";
+"habit.water" = "Drink 2.5l of water";
+"habit.nature" = "Time in nature";
+"habit.sleep" = "Wake up at 7am";
+"habit.social" = "Social interactions";
+
+// MARK: - Frequency
+"frequency.daily" = "Daily";
+"frequency.1x_day" = "1x/day";
+"frequency.2x_day" = "2x/day";
+"frequency.3x_week" = "3x/week";
+"frequency.2x_week" = "2x/week";
+"frequency.times_per_day" = "%d times/day";
+"frequency.times_per_week" = "%d times/week";
+
+// MARK: - Meditation
+"meditation.title" = "MEDITATION";
+"meditation.how_it_works" = "How it works";
+"meditation.scientific_data" = "Scientific data";
+"meditation.benefits" = "Benefits";
+"meditation.start_session" = "Start guided session";
+"meditation.source" = "Source: Scientific studies on meditation";
+
+// MARK: - Breathing
+"breathing.title" = "BREATHING";
+"breathing.start_exercise" = "Start exercise";
+
+// MARK: - Common
+"common.validate" = "Validate";
+"common.skip" = "Skip";
+"common.next" = "Next";
+"common.previous" = "Previous";
+"common.finish" = "Finish";
+"common.close" = "Close";
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+"common.delete" = "Delete";
+
+// MARK: - Planets
+"planet.mercury" = "Mercury";
+"planet.venus" = "Venus";
+"planet.earth" = "Earth";
+"planet.mars" = "Mars";
+"planet.jupiter" = "Jupiter";
+"planet.saturn" = "Saturn";
+"planet.uranus" = "Uranus";
+"planet.neptune" = "Neptune";
+"planet.select" = "Select a planet";
+"planet.swipe_to_explore" = "Swipe to explore";
+
+// MARK: - Profile
+"profile.settings" = "Settings";
+"profile.logout" = "Logout";
+
+// MARK: - Loading
+"loading.calculating" = "Calculating";
+"loading.understanding_answers" = "Understanding answers";
+"loading.analyzing_profile" = "Analyzing your profile";
+"loading.processing_data" = "Processing data";
+"loading.personalizing_journey" = "Personalizing journey";
+"loading.creating_plan" = "Creating plan";
+"loading.finalizing_recommendations" = "Finalizing recommendations";
+"loading.view_66day_plan" = "View my 66-day plan";

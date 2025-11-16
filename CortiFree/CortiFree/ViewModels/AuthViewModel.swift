@@ -33,12 +33,20 @@ class AuthViewModel: ObservableObject {
     }
 
     // Écouter les changements d'état d'authentification
+    private var authStateListenerHandle: AuthStateDidChangeListenerHandle?
+
     private func setupAuthStateListener() {
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             Task { @MainActor in
                 self?.currentUser = user
                 self?.isAuthenticated = user != nil
             }
+        }
+    }
+
+    deinit {
+        if let handle = authStateListenerHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
         }
     }
 

@@ -17,6 +17,7 @@ struct OverallQuizView: View {
     @State private var selectedAge: Int? = nil
     @State private var selectedReasons: Set<Int> = []
     @State private var selectedDuration: Int? = nil
+    @State private var isGoingBack: Bool = false
     @FocusState private var isTextFieldFocused: Bool
 
     private let totalQuestions = 5
@@ -55,36 +56,36 @@ struct OverallQuizView: View {
                         firstNameQuestion
                             .id(0)
                             .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
+                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 1 {
                         genderQuestion
                             .id(1)
                             .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
+                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 2 {
                         ageQuestion
                             .id(2)
                             .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
+                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 3 {
                         reasonQuestion
                             .id(3)
                             .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
+                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 4 {
                         durationQuestion
                             .id(4)
                             .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
+                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     }
                 }
@@ -103,8 +104,12 @@ struct OverallQuizView: View {
             Button(action: {
                 HapticManager.light()
                 if currentQuestionIndex > 0 {
+                    isGoingBack = true
                     withAnimation(.easeInOut(duration: 0.5)) {
                         currentQuestionIndex -= 1
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        isGoingBack = false
                     }
                 }
             }) {

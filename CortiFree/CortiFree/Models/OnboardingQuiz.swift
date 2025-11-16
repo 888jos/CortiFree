@@ -121,7 +121,7 @@ class QuizState: ObservableObject {
 
     func completeQuiz() {
         // Calculate score and save results
-        UserDefaults.standard.set(true, forKey: "onboardingQuizCompleted")
+        UserDefaults.standard.set(true, forKey: AppConstants.UserDefaultsKeys.onboardingQuizCompleted)
         isCompleted = true
     }
 }

@@ -67,7 +67,7 @@ struct OnboardingQuizView: View {
             }
         }
         .animation(.easeInOut(duration: 0.5), value: quizState.currentQuestionIndex)
-        .onChange(of: quizState.isCompleted) { completed in
+        .onChange(of: quizState.isCompleted) { oldValue, completed in
             if completed {
                 onComplete?()
             }
@@ -309,7 +309,7 @@ struct InfoScreenView: View {
             Spacer()
 
             // Optional Lottie animation space
-            if let lottieFile = infoScreen.lottieAnimation {
+            if let _ = infoScreen.lottieAnimation {
                 // TODO: Add Lottie animation here
                 Circle()
                     .fill(Color.white.opacity(0.1))

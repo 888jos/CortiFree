@@ -14,11 +14,11 @@ struct EightHabitsIntroView: View {
     private let habits: [(image: String, icon: String)] = [
         ("habit_breathe", "wind"),
         ("habit_meditate", "figure.mind.and.body"),
-        ("habit_journal", "book.pages"),
-        ("habit_sport", "figure.walk"),
+        ("habit_journal", "drop.fill"),
+        ("habit_sport", "figure.run"),
         ("habit_water", "drop.fill"),
-        ("habit_nature", "tree.fill"),
-        ("habit_sleep", "moon.zzz.fill"),
+        ("habit_nature", "moon.zzz.fill"),
+        ("habit_sleep", "figure.walk"),
         ("habit_social", "person.2.fill")
     ]
 

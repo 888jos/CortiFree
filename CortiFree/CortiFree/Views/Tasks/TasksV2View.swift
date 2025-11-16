@@ -43,89 +43,203 @@ struct TasksV2View: View {
         case skipped
     }
 
-    // Mock data for 8 habits
-    private let tasks: [HabitTask] = [
-        HabitTask(
-            title: "Se réveiller à 7h",
-            frequency: "Tous les jours",
-            difficulty: 2,
-            streak: 10,
-            imageName: "habit_sport",
-            totalCompletions: 24,
-            last7Days: [true, true, false, true, true, true, true],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_sleep")
-        ),
-        HabitTask(
-            title: "Exercices de respiration",
-            frequency: "2x/jour",
-            difficulty: 1,
-            streak: 15,
-            imageName: "habit_breathe",
-            totalCompletions: 30,
-            last7Days: [true, true, true, true, false, true, true],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_breathe")
-        ),
-        HabitTask(
-            title: "Méditer 10 minutes",
-            frequency: "1x/jour",
-            difficulty: 3,
-            streak: 24,
-            imageName: "habit_meditate",
-            totalCompletions: 24,
-            last7Days: [true, false, true, true, true, true, true],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_meditate")
-        ),
-        HabitTask(
-            title: "Tenir un journal",
-            frequency: "1x/jour",
-            difficulty: 2,
-            streak: 8,
-            imageName: "habit_water",
-            totalCompletions: 18,
-            last7Days: [false, true, true, true, false, true, true],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_journal")
-        ),
-        HabitTask(
-            title: "Faire du sport",
-            frequency: "3x/semaine",
-            difficulty: 3,
-            streak: 12,
-            imageName: "habit_nature",
-            totalCompletions: 14,
-            last7Days: [true, false, true, false, true, true, false],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_sport")
-        ),
-        HabitTask(
-            title: "Boire 2.5l d'eau",
-            frequency: "1x/jour",
+    // Computed property: Tasks for current day (ordre chronologique)
+    private var tasks: [HabitTask] {
+        var dailyTasks: [HabitTask] = []
+        let week = WeeklyHabitProgression.currentWeek(for: currentDay)
+        let dayOfWeek = (currentDay - 1) % 7 // 0 = lundi, 6 = dimanche
+
+        // 1. SE LEVER AVANT 7H (matin)
+        let sleepProgression = WeeklyHabitProgression.sleepProgression(week: week)
+        let sleepVariants = HabitVariantConfig.getSleepVariants()
+
+        // Ajouter "Se lever avant 7h"
+        if sleepVariants.count > 0 {
+            dailyTasks.append(HabitTask(
+                title: sleepVariants[0].title,
+                frequency: "", // For compatibility
+                duration: "", // Pas de durée pour le sommeil
+                frequencyText: "Quotidien",
+                difficulty: 2,
+                streak: 10,
+                imageName: sleepVariants[0].imageName,
+                totalCompletions: 24,
+                last7Days: [true, true, false, true, true, true, true],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_sleep")
+            ))
+        }
+
+        // 2. RESPIRATION (matin)
+        let breathingProgression = WeeklyHabitProgression.breathingProgression(week: week)
+        let breathingDuration = WeeklyHabitProgression.formatProgressionDisplay(breathingProgression)
+        // Afficher seulement certains jours selon fréquence
+        let showBreathing = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: breathingProgression.frequencyPerWeek)
+
+        if showBreathing {
+            dailyTasks.append(HabitTask(
+                title: "Respirer en conscience",
+                frequency: breathingDuration, // For compatibility
+                duration: breathingDuration,
+                frequencyText: breathingProgression.formattedFrequency,
+                difficulty: 1,
+                streak: 15,
+                imageName: "habit_breathe",
+                totalCompletions: 30,
+                last7Days: [true, true, true, true, false, true, true],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_breathe")
+            ))
+        }
+
+        // 3. MÉDITATION (matin)
+        let meditationProgression = WeeklyHabitProgression.meditationProgression(week: week)
+        let meditationDuration = WeeklyHabitProgression.formatProgressionDisplay(meditationProgression)
+        let showMeditation = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: meditationProgression.frequencyPerWeek)
+
+        if showMeditation {
+            dailyTasks.append(HabitTask(
+                title: "Méditer en pleine conscience",
+                frequency: meditationDuration,
+                duration: meditationDuration,
+                frequencyText: meditationProgression.formattedFrequency,
+                difficulty: 3,
+                streak: 24,
+                imageName: "habit_meditate",
+                totalCompletions: 24,
+                last7Days: [true, false, true, true, true, true, true],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_meditate")
+            ))
+        }
+
+        // 4. HYDRATATION (toute la journée)
+        let waterProgression = WeeklyHabitProgression.waterProgression(week: week)
+        let waterQuantity = waterProgression.formattedQuantity ?? "2L"
+
+        dailyTasks.append(HabitTask(
+            title: "Boire au minimum \(waterQuantity) d'eau",
+            frequency: "", // For compatibility
+            duration: "", // Pas de durée pour l'eau
+            frequencyText: "Quotidien",
             difficulty: 1,
             streak: 17,
-            imageName: "habit_journal",
+            imageName: "habit_water",
             totalCompletions: 24,
             last7Days: [true, true, false, true, true, true, true],
             impactAreas: HabitTask.getImpactAreas(for: "habit_water")
-        ),
-        HabitTask(
-            title: "Temps dans la nature",
-            frequency: "2x/semaine",
-            difficulty: 2,
-            streak: 6,
-            imageName: "habit_sleep",
-            totalCompletions: 8,
-            last7Days: [false, true, false, false, true, false, true],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_nature")
-        ),
-        HabitTask(
-            title: "Interactions sociales",
-            frequency: "3x/semaine",
-            difficulty: 2,
-            streak: 9,
-            imageName: "habit_social",
-            totalCompletions: 12,
-            last7Days: [true, false, true, true, false, true, false],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_social")
-        )
-    ]
+        ))
+
+        // 5. SPORT (journée) - Variante selon le jour
+        let sportProgression = WeeklyHabitProgression.sportProgression(week: week)
+        let sportDuration = WeeklyHabitProgression.formatProgressionDisplay(sportProgression)
+        let showSport = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: sportProgression.frequencyPerWeek)
+
+        if showSport, let sportVariant = HabitVariantConfig.variantForDay(currentDay, habitType: "sport") {
+            dailyTasks.append(HabitTask(
+                title: sportVariant.title,
+                frequency: sportDuration,
+                duration: sportDuration,
+                frequencyText: sportProgression.formattedFrequency,
+                difficulty: 3,
+                streak: 12,
+                imageName: sportVariant.imageName,
+                totalCompletions: 14,
+                last7Days: [true, false, true, false, true, true, false],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_sport")
+            ))
+        }
+
+        // 6. NATURE (après-midi)
+        let natureProgression = WeeklyHabitProgression.natureProgression(week: week)
+        let natureDuration = WeeklyHabitProgression.formatProgressionDisplay(natureProgression)
+        let showNature = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: natureProgression.frequencyPerWeek)
+
+        if showNature, let natureVariant = HabitVariantConfig.variantForDay(currentDay, habitType: "nature") {
+            dailyTasks.append(HabitTask(
+                title: natureVariant.title,
+                frequency: natureDuration,
+                duration: natureDuration,
+                frequencyText: natureProgression.formattedFrequency,
+                difficulty: 2,
+                streak: 6,
+                imageName: natureVariant.imageName,
+                totalCompletions: 8,
+                last7Days: [false, true, false, false, true, false, true],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_nature")
+            ))
+        }
+
+        // 7. SOCIAL (soirée)
+        let socialProgression = WeeklyHabitProgression.socialProgression(week: week)
+        let showSocial = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: socialProgression.frequencyPerWeek)
+
+        if showSocial, let socialVariant = HabitVariantConfig.variantForDay(currentDay, habitType: "social") {
+            dailyTasks.append(HabitTask(
+                title: socialVariant.title,
+                frequency: "", // For compatibility
+                duration: "", // Pas de durée pour le social
+                frequencyText: socialProgression.formattedFrequency,
+                difficulty: 2,
+                streak: 9,
+                imageName: socialVariant.imageName,
+                totalCompletions: 12,
+                last7Days: [true, false, true, true, false, true, false],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_social")
+            ))
+        }
+
+        // 8. JOURNAL (soir)
+        let journalProgression = WeeklyHabitProgression.journalProgression(week: week)
+        let journalDuration = WeeklyHabitProgression.formatProgressionDisplay(journalProgression)
+        let showJournal = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: journalProgression.frequencyPerWeek)
+
+        if showJournal {
+            dailyTasks.append(HabitTask(
+                title: "Écrire ses pensées",
+                frequency: journalDuration,
+                duration: journalDuration,
+                frequencyText: journalProgression.formattedFrequency,
+                difficulty: 2,
+                streak: 8,
+                imageName: "habit_journal",
+                totalCompletions: 18,
+                last7Days: [false, true, true, true, false, true, true],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_journal")
+            ))
+        }
+
+        // 9. SE COUCHER AVANT 23H (soir)
+        if sleepVariants.count > 1 {
+            dailyTasks.append(HabitTask(
+                title: sleepVariants[1].title,
+                frequency: "", // For compatibility
+                duration: "", // Pas de durée pour le sommeil
+                frequencyText: "Quotidien",
+                difficulty: 2,
+                streak: 10,
+                imageName: sleepVariants[1].imageName,
+                totalCompletions: 24,
+                last7Days: [true, true, false, true, true, true, true],
+                impactAreas: HabitTask.getImpactAreas(for: "habit_sleep")
+            ))
+        }
+
+        return dailyTasks
+    }
+
+    // Helper function to determine if a task should be shown on a given day
+    private func shouldShowTask(dayOfWeek: Int, frequencyPerWeek: Int) -> Bool {
+        if frequencyPerWeek >= 7 { return true } // Daily
+
+        // Distribuer les tâches de manière équilibrée dans la semaine
+        switch frequencyPerWeek {
+        case 1: return dayOfWeek == 3 // Mercredi seulement
+        case 2: return dayOfWeek == 1 || dayOfWeek == 4 // Mardi et vendredi
+        case 3: return dayOfWeek == 0 || dayOfWeek == 2 || dayOfWeek == 5 // Lundi, mercredi, samedi
+        case 4: return dayOfWeek != 2 && dayOfWeek != 5 // Tous sauf mercredi et samedi
+        case 5: return dayOfWeek != 6 && dayOfWeek != 3 // Tous sauf dimanche et jeudi
+        case 6: return dayOfWeek != 0 // Tous sauf lundi
+        default: return true
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -141,7 +255,7 @@ struct TasksV2View: View {
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
                                 .font(.system(size: 14))
-                                .foregroundColor(Color(hex: "FF8800"))
+                                .foregroundColor(AppConstants.Colors.streakOrange)
 
                             Text("\(globalStreak)")
                                 .font(.custom("HankenGrotesk-Bold", size: 16))
@@ -165,12 +279,12 @@ struct TasksV2View: View {
                                 .foregroundColor(.white.opacity(0.5))
                         }
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
                     .padding(.top, 16)
 
                     // Day counter
                     HStack {
-                        Text("Jour \(currentDay)/66")
+                        Text(currentDay <= 66 ? "Jour \(currentDay)/66" : "Jour \(currentDay)")
                             .font(.custom("HankenGrotesk-Bold", size: 48))
                             .foregroundColor(.white)
 
@@ -194,27 +308,24 @@ struct TasksV2View: View {
 
                             Button(action: {
                                 HapticManager.light()
-                                if currentDay < 66 {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        currentDay += 1
-                                    }
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    currentDay += 1
                                 }
                             }) {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 20, weight: .bold))
-                                    .foregroundColor(currentDay < 66 ? .white : .white.opacity(0.3))
+                                    .foregroundColor(.white)
                             }
-                            .disabled(currentDay >= 66)
                         }
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
 
                     // Encouragement text
                     Text("Tu fais du super boulot. Continue !")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, AppConstants.Layout.paddingLarge)
                         .padding(.bottom, 8)
 
                     // Tabs: À faire, Fait, Passé
@@ -225,7 +336,7 @@ struct TasksV2View: View {
                             selectedTab = .todos
                         }) {
                             HStack(spacing: 4) {
-                                Text("À faire")
+                                Text(NSLocalizedString("tasks.todo", comment: ""))
                                     .font(.custom(selectedTab == .todos ? "Poppins-SemiBold" : "Poppins-Regular", size: 14))
                                     .foregroundColor(selectedTab == .todos ? .black : .white.opacity(0.6))
 
@@ -233,10 +344,10 @@ struct TasksV2View: View {
                                     .font(.custom("HankenGrotesk-Bold", size: 12))
                                     .foregroundColor(selectedTab == .todos ? .black.opacity(0.6) : .white.opacity(0.4))
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, AppConstants.Layout.paddingMedium)
+                            .padding(.vertical, AppConstants.Layout.paddingSmall)
                             .background(
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: AppConstants.Layout.paddingSmall)
                                     .fill(selectedTab == .todos ? .white : Color.clear)
                             )
                         }
@@ -247,7 +358,7 @@ struct TasksV2View: View {
                             selectedTab = .done
                         }) {
                             HStack(spacing: 4) {
-                                Text("Fait")
+                                Text(NSLocalizedString("tasks.done", comment: ""))
                                     .font(.custom(selectedTab == .done ? "Poppins-SemiBold" : "Poppins-Regular", size: 14))
                                     .foregroundColor(selectedTab == .done ? .black : .white.opacity(0.6))
 
@@ -255,10 +366,10 @@ struct TasksV2View: View {
                                     .font(.custom("HankenGrotesk-Bold", size: 12))
                                     .foregroundColor(selectedTab == .done ? .black.opacity(0.6) : .white.opacity(0.4))
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, AppConstants.Layout.paddingMedium)
+                            .padding(.vertical, AppConstants.Layout.paddingSmall)
                             .background(
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: AppConstants.Layout.paddingSmall)
                                     .fill(selectedTab == .done ? .white : Color.clear)
                             )
                         }
@@ -269,7 +380,7 @@ struct TasksV2View: View {
                             selectedTab = .skipped
                         }) {
                             HStack(spacing: 4) {
-                                Text("Passé")
+                                Text(NSLocalizedString("tasks.skipped", comment: ""))
                                     .font(.custom(selectedTab == .skipped ? "Poppins-SemiBold" : "Poppins-Regular", size: 14))
                                     .foregroundColor(selectedTab == .skipped ? .black : .white.opacity(0.6))
 
@@ -277,17 +388,17 @@ struct TasksV2View: View {
                                     .font(.custom("HankenGrotesk-Bold", size: 12))
                                     .foregroundColor(selectedTab == .skipped ? .black.opacity(0.6) : .white.opacity(0.4))
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, AppConstants.Layout.paddingMedium)
+                            .padding(.vertical, AppConstants.Layout.paddingSmall)
                             .background(
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: AppConstants.Layout.paddingSmall)
                                     .fill(selectedTab == .skipped ? .white : Color.clear)
                             )
                         }
 
                         Spacer()
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
                     .padding(.bottom, 16)
                 }
 
@@ -296,7 +407,7 @@ struct TasksV2View: View {
                     isRefreshing: $isRefreshing,
                     action: {
                         // Simulate refresh
-                        await Task.sleep(1_500_000_000) // 1.5 seconds
+                        try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
                         // Here you could reload tasks from Firebase
                         HapticManager.success()
                     }
@@ -305,7 +416,8 @@ struct TasksV2View: View {
                         ForEach(Array(filteredTasks.enumerated()), id: \.offset) { index, task in
                             HabitTaskCard(
                                 title: task.title,
-                                frequency: task.frequency,
+                                duration: task.duration,
+                                frequencyText: task.frequencyText,
                                 difficulty: task.difficulty,
                                 streak: getTaskStreak(task),
                                 imageName: task.imageName,
@@ -324,7 +436,7 @@ struct TasksV2View: View {
                             .bouncePress()
                         }
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
                     .padding(.bottom, 100)
                 }
             }

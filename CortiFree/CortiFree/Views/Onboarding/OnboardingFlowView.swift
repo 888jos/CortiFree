@@ -9,24 +9,22 @@
 import SwiftUI
 
 struct OnboardingFlowView: View {
-    @StateObject private var quizState = QuizState()
-    @State private var currentScreen: OnboardingScreen = .welcome
-    @State private var cortisolDifference: Int = 38 // Will be calculated from quiz answers
+    @State private var currentScreen: OnboardingScreen = .overallQuiz
+    @State private var overallQuizData: OverallQuizData?
+    @State private var habitsQuizResult: HabitsQuizResult?
 
     enum OnboardingScreen {
-        case welcome
-        case quiz
-        case authentication
-        case loading
-        case diagnostic
-        case riseRating
-        case symptoms
-        case consequences
-        case recoveryBenefits
+        case overallQuiz
+        case reassurance
+        case habitsQuiz
         case sixtyDaysExplanation
         case scientificPlan
+        case authentication
+        case loading
+        case riseRating
+        case eightHabitsIntro
         case weekProgress
-        case eightHabits
+        case eightHabitsFlow
         case habitsProgress
         case socialProof
         case paywall
@@ -35,64 +33,23 @@ struct OnboardingFlowView: View {
     var body: some View {
         ZStack {
             switch currentScreen {
-            case .welcome:
-                WelcomeView(onContinue: {
-                    currentScreen = .quiz
+            case .overallQuiz:
+                OverallQuizView(onComplete: { quizData in
+                    overallQuizData = quizData
+                    currentScreen = .reassurance
                 })
 
-            case .quiz:
-                OnboardingQuizView(
-                    quizState: quizState,
-                    onComplete: {
-                        // After quiz completion, go to authentication
-                        currentScreen = .authentication
-                    }
-                )
-            case .authentication:
-                AuthenticationView(
-                    firstName: quizState.userFirstName.isEmpty ? "Utilisateur" : quizState.userFirstName,
-                    onComplete: {
-                        // Calculate cortisol difference from answers
-                        cortisolDifference = calculateCortisolDifference()
-                        currentScreen = .loading
+            case .reassurance:
+                ReassuranceView(
+                    userName: overallQuizData?.firstName ?? "Utilisateur",
+                    onStartQuiz: {
+                        currentScreen = .habitsQuiz
                     }
                 )
 
-            case .loading:
-                LoadingAnalysisView(onComplete: {
-                    currentScreen = .diagnostic
-                })
-
-            case .diagnostic:
-                DiagnosticResultView(
-                    cortisolDifference: cortisolDifference,
-                    onContinue: {
-                        currentScreen = .riseRating
-                    }
-                )
-
-            case .riseRating:
-                CortiFreeRatingView(
-                    habitsQuizResult: HabitsQuizResult(answers: Array(repeating: 0, count: 15)),
-                    onContinue: {
-                        currentScreen = .symptoms
-                    }
-                )
-
-            case .symptoms:
-                SymptomsSelectionView(onContinue: { selectedSymptoms in
-                    // Save symptoms and continue to consequences flow
-                    UserDefaults.standard.set(Array(selectedSymptoms), forKey: "selectedSymptoms")
-                    currentScreen = .consequences
-                })
-
-            case .consequences:
-                ConsequencesFlowView(onComplete: {
-                    currentScreen = .recoveryBenefits
-                })
-
-            case .recoveryBenefits:
-                RecoveryBenefitsFlowView(onComplete: {
+            case .habitsQuiz:
+                HabitsQuizView(onComplete: { result in
+                    habitsQuizResult = result
                     currentScreen = .sixtyDaysExplanation
                 })
 
@@ -103,15 +60,41 @@ struct OnboardingFlowView: View {
 
             case .scientificPlan:
                 ScientificPlanView(onContinue: {
+                    currentScreen = .authentication
+                })
+
+            case .authentication:
+                AuthenticationView(
+                    firstName: overallQuizData?.firstName ?? "Utilisateur",
+                    onComplete: {
+                        currentScreen = .loading
+                    }
+                )
+
+            case .loading:
+                LoadingAnalysisView(onComplete: {
+                    currentScreen = .riseRating
+                })
+
+            case .riseRating:
+                CortiFreeRatingView(
+                    habitsQuizResult: habitsQuizResult ?? HabitsQuizResult(answers: Array(repeating: 0, count: 15)),
+                    onContinue: {
+                        currentScreen = .eightHabitsIntro
+                    }
+                )
+
+            case .eightHabitsIntro:
+                EightHabitsIntroView(onContinue: {
                     currentScreen = .weekProgress
                 })
 
             case .weekProgress:
                 WeekProgressView(onContinue: {
-                    currentScreen = .eightHabits
+                    currentScreen = .eightHabitsFlow
                 })
 
-            case .eightHabits:
+            case .eightHabitsFlow:
                 EightHabitsFlowView(onComplete: {
                     currentScreen = .habitsProgress
                 })
@@ -129,7 +112,7 @@ struct OnboardingFlowView: View {
             case .paywall:
                 // TODO: Integrate Superwall paywall
                 Text("Paywall - À intégrer avec Superwall")
-                    .font(.custom("Poppins-Bold", size: 24))
+                    .font(.custom(AppConstants.Fonts.bold, size: AppConstants.FontSize.title2))
                     .foregroundColor(.white)
             }
         }
@@ -137,20 +120,7 @@ struct OnboardingFlowView: View {
             insertion: .move(edge: .trailing).combined(with: .opacity),
             removal: .move(edge: .leading).combined(with: .opacity)
         ))
-        .animation(.easeInOut(duration: 0.3), value: currentScreen)
-    }
-
-    // MARK: - Calculate Cortisol Difference
-
-    private func calculateCortisolDifference() -> Int {
-        // Simple calculation based on answers (higher score = higher cortisol)
-        // Each question scored 0-3 (4 answers)
-        let totalScore = quizState.answers.values.reduce(0, +)
-        let maxScore = quizState.questions.count * 3 // 20 questions × 3 max points
-
-        // Convert to percentage difference (0-60% range)
-        let percentage = Double(totalScore) / Double(maxScore)
-        return Int(percentage * 60) + 10 // Range: 10% to 70%
+        .animation(.easeInOut(duration: AppConstants.Animation.standardDuration), value: currentScreen)
     }
 }
 

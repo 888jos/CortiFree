@@ -7,8 +7,9 @@
 //
 
 import Foundation
-import FirebaseAuth
+@preconcurrency import FirebaseAuth
 
+@MainActor
 class AuthManager: ObservableObject {
     static let shared = AuthManager()
 
@@ -51,10 +52,8 @@ class AuthManager: ObservableObject {
         // Track signup
         MixpanelManager.shared.trackOnboardingStarted()
 
-        DispatchQueue.main.async {
-            self.currentUser = user
-            self.isAuthenticated = true
-        }
+        self.currentUser = user
+        self.isAuthenticated = true
 
         print("[Auth] Sign up successful: \(email)")
     }
@@ -69,10 +68,8 @@ class AuthManager: ObservableObject {
         // Track session
         MixpanelManager.shared.trackSessionStarted()
 
-        DispatchQueue.main.async {
-            self.currentUser = user
-            self.isAuthenticated = true
-        }
+        self.currentUser = user
+        self.isAuthenticated = true
 
         loadUserProfile(uid: user.uid)
 
@@ -82,11 +79,9 @@ class AuthManager: ObservableObject {
     func signOut() throws {
         try Auth.auth().signOut()
 
-        DispatchQueue.main.async {
-            self.currentUser = nil
-            self.isAuthenticated = false
-            FirebaseManager.shared.currentUser = nil
-        }
+        self.currentUser = nil
+        self.isAuthenticated = false
+        FirebaseManager.shared.currentUser = nil
 
         print("[Auth] User signed out")
     }

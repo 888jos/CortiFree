@@ -341,7 +341,7 @@ class RoutineProgramGenerator {
     private func selectTasks(from pool: [String], count: Int, day: Int) -> [String] {
         // Use day number as seed for deterministic but varied selection
         var selected: [String] = []
-        var available = pool
+        let available = pool
 
         // Rotate through tasks based on day
         let startIndex = (day - 1) % pool.count

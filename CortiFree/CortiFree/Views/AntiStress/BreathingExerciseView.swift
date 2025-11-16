@@ -22,6 +22,7 @@ struct BreathingExerciseView: View {
     @State private var cycleCount = 0
     @State private var showCompletion = false
     @State private var showConfetti = false
+    @State private var isExerciseActive = true // Pour arrêter les animations quand on quitte
 
     // Animation de la planète
     @State private var ballYPosition: CGFloat = 80 // Petite (exhale) = 80, Grande (inhale) = -80
@@ -142,16 +143,18 @@ struct BreathingExerciseView: View {
                 Spacer()
             }
 
-            // Close button - fixed position overlay
+            // Close button - fixed position overlay (always top-left, doesn't follow animation)
             VStack {
                 HStack {
                     Button(action: {
                         HapticManager.light()
+                        isExerciseActive = false // Arrêter l'exercice
                         dismiss()
                     }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundColor(.white.opacity(0.6))
+                        Image(systemName: "chevron.left")
+                            .font(.custom("Poppins-Bold", size: 22))
+                            .foregroundColor(.white)
+                            .frame(width: 44, height: 44)
                     }
                     Spacer()
                 }
@@ -207,9 +210,9 @@ struct BreathingExerciseView: View {
             }
         }
         .onReceive(timer) { _ in
-            if timeRemaining > 0 {
+            if isExerciseActive && timeRemaining > 0 {
                 timeRemaining -= 1
-            } else {
+            } else if isExerciseActive && timeRemaining == 0 {
                 completeExercise()
             }
         }
@@ -222,6 +225,8 @@ struct BreathingExerciseView: View {
     }
 
     private func animateBreathingCycle() {
+        guard isExerciseActive else { return }
+
         let pattern = breathingPattern
 
         // Inhale - la planète grandit
@@ -234,6 +239,7 @@ struct BreathingExerciseView: View {
         // Hold (if applicable) - la planète reste grande
         if pattern.hold > 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + pattern.inhale) {
+                guard self.isExerciseActive else { return }
                 currentPhase = .hold
                 // La planète reste grande pendant le hold
             }
@@ -241,6 +247,7 @@ struct BreathingExerciseView: View {
 
         // Exhale - la planète rétrécit
         DispatchQueue.main.asyncAfter(deadline: .now() + pattern.inhale + pattern.hold) {
+            guard self.isExerciseActive else { return }
             currentPhase = .exhale
             withAnimation(.easeInOut(duration: pattern.exhale)) {
                 ballYPosition = 80 // Petite
@@ -251,6 +258,7 @@ struct BreathingExerciseView: View {
         // Hold out (if applicable) - la planète reste petite
         if pattern.holdOut > 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + pattern.inhale + pattern.hold + pattern.exhale) {
+                guard self.isExerciseActive else { return }
                 currentPhase = .holdOut
                 // La planète reste petite pendant le hold
             }
@@ -259,10 +267,9 @@ struct BreathingExerciseView: View {
         // Next cycle
         let nextCycleDelay = pattern.inhale + pattern.hold + pattern.exhale + pattern.holdOut
         DispatchQueue.main.asyncAfter(deadline: .now() + nextCycleDelay) {
-            if timeRemaining > 0 {
-                cycleCount += 1
-                animateBreathingCycle()
-            }
+            guard self.isExerciseActive && self.timeRemaining > 0 else { return }
+            cycleCount += 1
+            animateBreathingCycle()
         }
     }
 

@@ -22,7 +22,6 @@ struct HomeView: View {
     @State private var showProgression = false
     @State private var haloOpacity: Double = 0.35
     @State private var planetScale: CGFloat = 1.0
-    @State private var showObjectiveInfo = false
     @State private var showOnboardingQuiz = false
     @State private var showSettings = false
     @State private var showRoutineDetails = false
@@ -30,7 +29,7 @@ struct HomeView: View {
 
     // TEST: New task system
     @State private var showDailyProgram = false
-    @State private var showTasksLibrary = false
+    @State private var showOnboardingV2 = false
 
     // Smart scroll detection
     @State private var lastScrollOffset: CGFloat = 0
@@ -38,22 +37,20 @@ struct HomeView: View {
 
     // Routine tracking
     private var routineStartDate: Date {
-        UserDefaults.standard.object(forKey: "routineStartDate") as? Date ?? Date()
+        UserDefaults.standard.object(forKey: AppConstants.UserDefaultsKeys.routineStartDate) as? Date ?? Date()
     }
 
     private var selectedRoutineTitle: String {
-        UserDefaults.standard.string(forKey: "selectedRoutineTitle") ?? "ton objectif"
+        UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.selectedRoutineTitle) ?? "ton objectif"
     }
 
     private var daysRemaining: Int {
-        let totalDays = 66 // 66 days program
         let daysPassed = Calendar.current.dateComponents([.day], from: routineStartDate, to: Date()).day ?? 0
-        return max(0, totalDays - daysPassed)
+        return max(0, AppConstants.Routine.totalDays - daysPassed)
     }
 
     private var timeRemaining: (days: Int, hours: Int, minutes: Int, seconds: Int) {
-        let totalDays = 66 // 66 days program
-        let endDate = Calendar.current.date(byAdding: .day, value: totalDays, to: routineStartDate) ?? currentTime
+        let endDate = Calendar.current.date(byAdding: .day, value: AppConstants.Routine.totalDays, to: routineStartDate) ?? currentTime
         let components = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: currentTime, to: endDate)
         return (
             max(0, components.day ?? 0),
@@ -66,24 +63,24 @@ struct HomeView: View {
     // Generate personalized phrase based on routine title
     private var personalizedPhrase: String {
         switch selectedRoutineTitle.lowercased() {
-        case let title where title.contains("anxiété"):
-            return "Tu retrouveras ton calme intérieur dans :"
-        case let title where title.contains("sommeil"):
-            return "Tu dormiras paisiblement dans :"
-        case let title where title.contains("concentration"):
-            return "Tu seras pleinement concentré dans :"
+        case let title where title.contains("anxiété") || title.contains("anxiety"):
+            return NSLocalizedString("home.goal.anxiety", comment: "")
+        case let title where title.contains("sommeil") || title.contains("sleep"):
+            return NSLocalizedString("home.goal.sleep", comment: "")
+        case let title where title.contains("concentration") || title.contains("focus"):
+            return NSLocalizedString("home.goal.concentration", comment: "")
         case let title where title.contains("fatigue"):
-            return "Tu retrouveras ton énergie dans :"
+            return NSLocalizedString("home.goal.fatigue", comment: "")
         case let title where title.contains("tension"):
-            return "Ton corps sera apaisé dans :"
-        case let title where title.contains("contrôle"):
-            return "Tu reprendras le contrôle dans :"
-        case let title where title.contains("énergie"):
-            return "Tu seras plein d'énergie dans :"
-        case let title where title.contains("émotions"):
-            return "Tu maîtriseras tes émotions dans :"
+            return NSLocalizedString("home.goal.tension", comment: "")
+        case let title where title.contains("contrôle") || title.contains("control"):
+            return NSLocalizedString("home.goal.control", comment: "")
+        case let title where title.contains("énergie") || title.contains("energy"):
+            return NSLocalizedString("home.goal.energy", comment: "")
+        case let title where title.contains("émotions") || title.contains("emotions"):
+            return NSLocalizedString("home.goal.emotions", comment: "")
         default:
-            return "Tu atteindras ton objectif dans :"
+            return NSLocalizedString("home.goal.default", comment: "")
         }
     }
 
@@ -101,7 +98,7 @@ struct HomeView: View {
                         // Header Navigation (60px)
                         headerNavigation
                             .frame(height: 60)
-                            .padding(.horizontal, 24)
+                            .padding(.horizontal, AppConstants.Layout.paddingLarge)
 
                         ScrollView(showsIndicators: false) {
                             VStack(spacing: 0) {
@@ -148,7 +145,7 @@ struct HomeView: View {
                                         )
                                         .clipShape(RoundedRectangle(cornerRadius: 27))
                                 }
-                                .padding(.horizontal, 34)
+                                .padding(.horizontal, AppConstants.Layout.paddingXLarge)
                                 .padding(.top, 20)
 
                                 // TEST: Daily Program Button
@@ -170,29 +167,7 @@ struct HomeView: View {
                                         )
                                         .clipShape(RoundedRectangle(cornerRadius: 27))
                                 }
-                                .padding(.horizontal, 34)
-                                .padding(.top, 16)
-
-                                // TEST: Tasks Library Button
-                                Button(action: {
-                                    HapticManager.light()
-                                    showTasksLibrary = true
-                                }) {
-                                    Text("📚 TEST: 59 Tâches")
-                                        .font(.custom("Poppins-SemiBold", size: 16))
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 54)
-                                        .background(
-                                            LinearGradient(
-                                                colors: [Color(hex: "E67E22"), Color(hex: "E74C3C")],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .clipShape(RoundedRectangle(cornerRadius: 27))
-                                }
-                                .padding(.horizontal, 34)
+                                .padding(.horizontal, AppConstants.Layout.paddingXLarge)
                                 .padding(.top, 16)
 
                                 Spacer(minLength: 40)
@@ -244,10 +219,25 @@ struct HomeView: View {
                 )
             }
         }
-        .sheet(isPresented: $showTasksLibrary) {
-            NavigationView {
-                TasksLibraryView()
+        .fullScreenCover(isPresented: $showOnboardingV2) {
+            OnboardingFlowView()
+        }
+        .overlay(alignment: .bottom) {
+            // TEST: Bouton Onboarding V2
+            Button(action: {
+                showOnboardingV2 = true
+            }) {
+                Text("Test Onboarding V2")
+                    .font(.custom(AppConstants.Fonts.semiBold, size: 12))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, AppConstants.Layout.paddingMedium)
+                    .padding(.vertical, AppConstants.Layout.paddingSmall)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
+                            .fill(AppConstants.Colors.violetDark.opacity(0.8))
+                    )
             }
+            .padding(.bottom, 100)
         }
     }
 
@@ -324,7 +314,7 @@ struct HomeView: View {
             viewModel.toggleDayCompletion(at: selectedDay.dayIndex)
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
     // MARK: - Central Orb
@@ -368,17 +358,6 @@ struct HomeView: View {
                 }
         }
         .frame(maxWidth: .infinity)
-        .onTapGesture {
-            HapticManager.medium()
-            showObjectiveInfo = true
-        }
-        .sheet(isPresented: $showObjectiveInfo) {
-            ObjectiveInfoView(
-                routineTitle: selectedRoutineTitle,
-                startDate: routineStartDate,
-                planet: planetSettings.selectedPlanet
-            )
-        }
     }
 
     // MARK: - Planet with Countdown Section
@@ -426,10 +405,6 @@ struct HomeView: View {
                             }
                     }
                     .offset(x: geometry.size.width * 0.45) // Décalage à droite pour que 60% soit visible
-                    .onTapGesture {
-                        HapticManager.medium()
-                        showObjectiveInfo = true
-                    }
 
                     // Countdown on the left side
                     VStack(alignment: .leading, spacing: 0) {
@@ -473,20 +448,12 @@ struct HomeView: View {
                 }
             }
             .frame(height: 352)
-            .sheet(isPresented: $showObjectiveInfo) {
-                ObjectiveInfoView(
-                    routineTitle: selectedRoutineTitle,
-                    startDate: routineStartDate,
-                    planet: planetSettings.selectedPlanet
-                )
-            }
         }
     }
 
     // Helper function to calculate time remaining
     private func calculateTimeRemaining(at date: Date) -> (days: Int, hours: Int, minutes: Int, seconds: Int) {
-        let totalDays = 56
-        let endDate = Calendar.current.date(byAdding: .day, value: totalDays, to: routineStartDate) ?? date
+        let endDate = Calendar.current.date(byAdding: .day, value: AppConstants.Routine.totalDays, to: routineStartDate) ?? date
         let components = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: date, to: endDate)
         return (
             max(0, components.day ?? 0),
@@ -533,7 +500,7 @@ struct HomeView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
     // MARK: - Routine Countdown
@@ -575,10 +542,10 @@ struct HomeView: View {
                         TimeUnitView(value: time.seconds, unit: time.seconds > 1 ? "secondes" : "seconde")
                     }
                 }
-                .padding(16)
+                .padding(AppConstants.Layout.paddingMedium)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(hex: "130C57")) // Même couleur que les boutons d'action
+                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
+                        .fill(AppConstants.Colors.darkBackground)
                 )
                 .shadow(color: Color.black.opacity(0.25), radius: 4, x: 1, y: 3)
             }
@@ -653,7 +620,7 @@ struct HomeView: View {
             .shadow(color: Color(red: 255/255, green: 68/255, blue: 68/255, opacity: 0.4), radius: 16, y: 4)
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 }
 
@@ -678,7 +645,7 @@ struct QuickActionButtonNew: View {
                     .frame(width: 60, height: 60)
                     .background(
                         Circle()
-                            .fill(Color(hex: "130C57"))
+                            .fill(AppConstants.Colors.darkBackground)
                     )
                     .shadow(color: Color.black.opacity(0.25), radius: 4, x: 1, y: 3)
 
@@ -715,7 +682,7 @@ struct AntiStressView: View {
 
                     Text(breatheIn ? "Inspirez..." : "Expirez...")
                         .font(.custom("Poppins-Regular", size: 18))
-                        .foregroundColor(Color(hex: "B0B8D4"))
+                        .foregroundColor(AppConstants.Colors.textSecondary)
                 }
                 .padding(.top, 60)
 
@@ -843,8 +810,8 @@ struct RoutineDetailsView: View {
                     .padding(.vertical, 20)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color(hex: "130C57").opacity(0.6))
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusLarge)
+                            .fill(AppConstants.Colors.darkBackground.opacity(0.6))
                     )
                     .padding(.horizontal, 24)
 
@@ -930,10 +897,10 @@ struct EvidenceCard: View {
                     .lineSpacing(4)
             }
         }
-        .padding(20)
+        .padding(AppConstants.Layout.spacingXLarge)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(hex: "130C57").opacity(0.4))
+            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
+                .fill(AppConstants.Colors.darkBackground.opacity(0.4))
         )
     }
 }

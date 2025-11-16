@@ -493,7 +493,9 @@ struct ImpactStatCard: View {
 struct HabitTask: Identifiable {
     var id: String { title } // Use title as unique identifier
     let title: String
-    let frequency: String
+    let frequency: String  // Kept for compatibility
+    let duration: String    // Ex: "30 min" or "2.5L"
+    let frequencyText: String  // Ex: "3x/sem" or "Quotidien"
     let difficulty: Int
     let streak: Int
     let imageName: String
@@ -503,7 +505,21 @@ struct HabitTask: Identifiable {
 
     // Static function to generate impact areas based on habit image name
     static func getImpactAreas(for imageName: String) -> [ImpactArea] {
-        switch imageName {
+        // Normalize image name to base habit type
+        let normalizedName: String
+        if imageName.starts(with: "habit_sport") {
+            normalizedName = "habit_sport"
+        } else if imageName.starts(with: "habit_nature") {
+            normalizedName = "habit_nature"
+        } else if imageName.starts(with: "habit_social") {
+            normalizedName = "habit_social"
+        } else if imageName.starts(with: "habit_sleep") {
+            normalizedName = "habit_sleep"
+        } else {
+            normalizedName = imageName
+        }
+
+        switch normalizedName {
         case "task_breathe", "habit_breathe":
             return [
                 ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 18, color: Color(hex: "9B59B6")),
@@ -588,17 +604,19 @@ struct ImpactArea {
 
 #Preview {
     let mockTask = HabitTask(
-        title: "Boire 2.5l d'eau",
-        frequency: "1x/jour",
+        title: "S'hydrater régulièrement",
+        frequency: "2.5L",
+        duration: "2.5L",
+        frequencyText: "Quotidien",
         difficulty: 1,
         streak: 17,
-        imageName: "task_water",
+        imageName: "habit_water",
         totalCompletions: 24,
         last7Days: [true, true, false, true, true, true, true],
-        impactAreas: HabitTask.getImpactAreas(for: "task_water")
+        impactAreas: HabitTask.getImpactAreas(for: "habit_water")
     )
 
-    return HabitTaskDetailView(
+    HabitTaskDetailView(
         task: mockTask,
         onValidate: { print("Validated") },
         onSkip: { print("Skipped") }

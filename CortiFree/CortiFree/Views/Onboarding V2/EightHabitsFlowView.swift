@@ -449,11 +449,7 @@ struct EightHabitsFlowView: View {
 
                 Button(action: {
                     HapticManager.medium()
-                    if currentHabitIndex < habits.count - 1 {
-                        currentHabitIndex += 1
-                    } else {
-                        onComplete()
-                    }
+                    onComplete()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.right")

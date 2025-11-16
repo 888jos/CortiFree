@@ -23,13 +23,13 @@ struct CortiFreeRatingView: View {
 
     private var currentScores: [Int] {
         let scores = [
-            habitsQuizResult.serenityScore,
-            habitsQuizResult.sleepScore,
-            habitsQuizResult.energyScore,
-            habitsQuizResult.focusScore,
-            habitsQuizResult.balanceScore
+            min(habitsQuizResult.serenityScore, 80),
+            min(habitsQuizResult.sleepScore, 80),
+            min(habitsQuizResult.energyScore, 80),
+            min(habitsQuizResult.focusScore, 80),
+            min(habitsQuizResult.balanceScore, 80)
         ]
-        let globalScore = scores.reduce(0, +) / scores.count
+        let globalScore = min(scores.reduce(0, +) / scores.count, 80)
         return [globalScore] + scores
     }
 

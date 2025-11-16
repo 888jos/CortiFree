@@ -75,6 +75,9 @@ struct HabitsQuizView: View {
                     withAnimation(.easeInOut(duration: 0.5)) {
                         currentQuestionIndex -= 1
                     }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        isGoingBack = false
+                    }
                 }
             }) {
                 Image(systemName: "chevron.left")

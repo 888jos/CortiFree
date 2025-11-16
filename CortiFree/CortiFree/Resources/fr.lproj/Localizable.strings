@@ -1,0 +1,113 @@
+/*
+  Localizable.strings - Français
+  CortiFree
+*/
+
+// MARK: - Onboarding
+"onboarding.welcome.title" = "Bienvenue sur CortiFree";
+"onboarding.welcome.subtitle" = "Ton parcours de 66 jours vers le bien-être mental";
+"onboarding.continue" = "Continuer";
+"onboarding.8habits.title" = "Les 8 habitudes clés";
+"onboarding.8habits.description1" = "Des études montrent que pour réinitialiser votre";
+"onboarding.8habits.description2" = "vie, vous avez besoin des";
+"onboarding.8habits.description3" = "8 habitudes";
+"onboarding.8habits.description4" = "fondamentales ci-dessous.";
+"onboarding.8habits.footer" = "Voir comment ta vie changera en 66 jours\ngrâce à ces 8 habitudes :";
+
+// MARK: - Tab Bar
+"tab.home" = "Accueil";
+"tab.plan" = "Plan";
+"tab.library" = "Librairie";
+"tab.profile" = "Profil";
+
+// MARK: - Home
+"home.greeting.morning" = "Bonjour";
+"home.greeting.afternoon" = "Bon après-midi";
+"home.greeting.evening" = "Bonsoir";
+"home.streak" = "Jours d'affilée";
+"home.cortifree_score" = "Score CortiFree";
+"home.goal.anxiety" = "Tu retrouveras ton calme intérieur dans :";
+"home.goal.sleep" = "Tu dormiras paisiblement dans :";
+"home.goal.concentration" = "Tu seras pleinement concentré dans :";
+"home.goal.fatigue" = "Tu retrouveras ton énergie dans :";
+"home.goal.tension" = "Ton corps sera apaisé dans :";
+"home.goal.control" = "Tu reprendras le contrôle dans :";
+"home.goal.energy" = "Tu seras plein d'énergie dans :";
+"home.goal.emotions" = "Tu maîtriseras tes émotions dans :";
+"home.goal.default" = "Tu atteindras ton objectif dans :";
+
+// MARK: - Tasks
+"tasks.day" = "Jour";
+"tasks.of" = "/";
+"tasks.encouragement" = "Tu fais du super boulot. Continue !";
+"tasks.todo" = "À faire";
+"tasks.done" = "Fait";
+"tasks.skipped" = "Passé";
+
+// MARK: - Habits
+"habit.breathe" = "Exercices de respiration";
+"habit.meditate" = "Méditer 10 minutes";
+"habit.journal" = "Tenir un journal";
+"habit.sport" = "Faire du sport";
+"habit.water" = "Boire 2.5l d'eau";
+"habit.nature" = "Temps dans la nature";
+"habit.sleep" = "Se réveiller à 7h";
+"habit.social" = "Interactions sociales";
+
+// MARK: - Frequency
+"frequency.daily" = "Tous les jours";
+"frequency.1x_day" = "1x/jour";
+"frequency.2x_day" = "2x/jour";
+"frequency.3x_week" = "3x/semaine";
+"frequency.2x_week" = "2x/semaine";
+"frequency.times_per_day" = "%d fois/jour";
+"frequency.times_per_week" = "%d fois/semaine";
+
+// MARK: - Meditation
+"meditation.title" = "MÉDITATION";
+"meditation.how_it_works" = "Comment ça marche";
+"meditation.scientific_data" = "Données scientifiques";
+"meditation.benefits" = "Bienfaits";
+"meditation.start_session" = "Démarrer la session guidée";
+"meditation.source" = "Source : Études scientifiques sur la méditation";
+
+// MARK: - Breathing
+"breathing.title" = "RESPIRATION";
+"breathing.start_exercise" = "Démarrer l'exercice";
+
+// MARK: - Common
+"common.validate" = "Valider";
+"common.skip" = "Passer";
+"common.next" = "Suivant";
+"common.previous" = "Précédent";
+"common.finish" = "Terminer";
+"common.close" = "Fermer";
+"common.cancel" = "Annuler";
+"common.save" = "Sauvegarder";
+"common.delete" = "Supprimer";
+
+// MARK: - Planets
+"planet.mercury" = "Mercure";
+"planet.venus" = "Vénus";
+"planet.earth" = "Terre";
+"planet.mars" = "Mars";
+"planet.jupiter" = "Jupiter";
+"planet.saturn" = "Saturne";
+"planet.uranus" = "Uranus";
+"planet.neptune" = "Neptune";
+"planet.select" = "Choisir une planète";
+"planet.swipe_to_explore" = "Glisse pour explorer";
+
+// MARK: - Profile
+"profile.settings" = "Paramètres";
+"profile.logout" = "Déconnexion";
+
+// MARK: - Loading
+"loading.calculating" = "Calcul en cours";
+"loading.understanding_answers" = "Compréhension des réponses";
+"loading.analyzing_profile" = "Analyse de ton profil";
+"loading.processing_data" = "Traitement des données";
+"loading.personalizing_journey" = "Personnalisation du parcours";
+"loading.creating_plan" = "Création du plan";
+"loading.finalizing_recommendations" = "Finalisation des recommandations";
+"loading.view_66day_plan" = "Voir mon plan de 66 jours";

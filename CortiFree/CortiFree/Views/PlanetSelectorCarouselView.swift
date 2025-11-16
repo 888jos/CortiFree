@@ -111,7 +111,7 @@ struct PlanetCarousel: View {
     var body: some View {
         GeometryReader { geometry in
             let screenWidth = geometry.size.width
-            let itemWidth: CGFloat = 290 // 280 planet + 10 spacing
+            let _ = 290 // itemWidth: 280 planet + 10 spacing (not used directly)
 
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
