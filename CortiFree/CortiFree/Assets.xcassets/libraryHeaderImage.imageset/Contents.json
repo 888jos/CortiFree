@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "background.header.library.png",
+      "filename" : "libraryHeaderImage.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "background.header.library.png",
+      "filename" : "ChatGPT Image 16 nov. 2025, 02_44_14.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "background.header.library.png",
+      "filename" : "ChatGPT Image 16 nov. 2025, 02_44_14 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
