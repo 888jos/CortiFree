@@ -2,631 +2,622 @@
 //  JournalHomeView.swift
 //  CortiFree
 //
-//  Created by Claude on 23/10/2025.
-//  Vue d'accueil du journal avec toutes les entrées
+//  Daily journal entry view - one entry per day
+//  Layout: Mood selector (top-left), Photo (top-right), Text (bottom)
 //
 
 import SwiftUI
+import PhotosUI
 
 struct JournalHomeView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = JournalViewModel()
-    @State private var selectedTab: JournalTab = .todo
-    @State private var showNewEntry = false
 
-    enum JournalTab: String, CaseIterable {
-        case todo = "To-Do"
-        case gratitude = "Gratitude"
-        case reflection = "Réflexion"
-        case goals = "Objectifs"
+    @State private var journalText = ""
+    @State private var selectedMood: Mood?
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var photoImage: UIImage?
+    @State private var showSuccessMessage = false
+    @State private var isLoadingToday = true
+    @State private var todayEntry: JournalEntry?
+    @State private var showHistory = false
+    @FocusState private var isTextFocused: Bool
 
-        var icon: String {
-            switch self {
-            case .todo: return "checklist"
-            case .gratitude: return "heart.text.square.fill"
-            case .reflection: return "sparkles"
-            case .goals: return "flag.checkered"
-            }
+    private var wordCount: Int {
+        journalText.split(separator: " ").count
+    }
+
+    private var characterCount: Int {
+        journalText.count
+    }
+
+    private var canSave: Bool {
+        characterCount >= 50 && hasChanges
+    }
+
+    private var hasChanges: Bool {
+        // Check if there are any changes compared to existing entry
+        if let existing = todayEntry {
+            return journalText != existing.content ||
+                   selectedMood != existing.mood ||
+                   photoImage != nil  // New photo selected
         }
+        return characterCount >= 50  // New entry
+    }
 
-        var color: Color {
-            switch self {
-            case .todo: return Color(hex: "00BCD4")
-            case .gratitude: return Color(hex: "FF6B9D")
-            case .reflection: return Color(hex: "FFB74D")
-            case .goals: return Color(hex: "4CAF50")
-            }
-        }
-
-        var description: String {
-            switch self {
-            case .todo: return "Tes routines quotidiennes"
-            case .gratitude: return "Ce pour quoi tu es reconnaissant"
-            case .reflection: return "Réfléchis sur ta journée"
-            case .goals: return "Tes objectifs et ambitions"
-            }
-        }
-
-        var meditationId: String? {
-            switch self {
-            case .gratitude: return "gratitude"
-            case .reflection: return "reflection"
-            case .goals: return "goals"
-            default: return nil
-            }
-        }
+    private var isToday: Bool {
+        guard let entry = todayEntry else { return false }
+        return Calendar.current.isDateInToday(entry.createdAt)
     }
 
     var body: some View {
         ZStack {
-            // Galaxy background
-            GalaxyBackgroundView(intensity: 1.0)
+            // Background
+            LinearGradient(
+                colors: [
+                    Color(hex: "0A0515"),
+                    Color(hex: "1a0a2e"),
+                    Color(hex: "16082e"),
+                    Color(hex: "0A0515")
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Header
-                headerSection
+                header
 
-                // Content with vertical tabs
-                HStack(spacing: 0) {
-                    // Vertical Tab Bar
-                    tabBarSection
-
-                    // Content
-                    if selectedTab == .todo {
-                        // Vue To-Do spéciale
-                        DailyTodosView()
-                    } else if viewModel.isLoading {
-                        Spacer()
-                        ProgressView()
-                            .tint(Color.appTheme)
-                        Spacer()
-                    } else if filteredEntries.isEmpty {
-                        emptyStateView
-                    } else {
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: 16) {
-                                // Stats for current tab
-                                statsSection
-
-                                // Entries list
-                                entriesList
-
-                                Spacer(minLength: 100)
-                            }
-                            .padding(.horizontal, 24)
-                            .padding(.top, 24)
-                        }
-                    }
-                }
-            }
-
-            // Floating Action Button (seulement pour les onglets non-todo)
-            if selectedTab != .todo && !filteredEntries.isEmpty {
-                VStack {
+                if isLoadingToday {
                     Spacer()
-                    HStack {
-                        Spacer()
-                        Button(action: { showNewEntry = true }) {
-                            Image(systemName: "plus")
-                                .font(.custom("Poppins-SemiBold", size: 24))
-                                .foregroundColor(.white)
-                                .frame(width: 60, height: 60)
-                                .background(
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [selectedTab.color, selectedTab.color.opacity(0.8)],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .shadow(color: selectedTab.color.opacity(0.4), radius: 12, x: 0, y: 4)
-                                )
+                    ProgressView()
+                        .tint(Color(hex: "B794F6"))
+                        .scaleEffect(1.5)
+                    Spacer()
+                } else {
+                    // Scrollable content
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 24) {
+                            // Top row: Mood (left) + Photo (right)
+                            HStack(alignment: .top, spacing: 16) {
+                                // Mood selector (left)
+                                moodSection
+                                    .frame(maxWidth: .infinity)
+
+                                // Photo (right)
+                                photoSection
+                            }
+
+                            // Text section (full width, below)
+                            textSection
+
+                            // Save button
+                            saveButton
+
+                            // View history button
+                            historyButton
                         }
-                        .padding(.trailing, 24)
-                        .padding(.bottom, 24)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 24)
+                        .padding(.bottom, 40)
                     }
                 }
             }
         }
+        .onChange(of: selectedPhoto) {
+            Task {
+                if let data = try? await selectedPhoto?.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    photoImage = image
+                }
+            }
+        }
+        .overlay(
+            Group {
+                if showSuccessMessage {
+                    successOverlay
+                }
+            }
+        )
         .task {
-            await viewModel.loadAllEntries()
-        }
-        .sheet(isPresented: $showNewEntry) {
-            newEntrySheet
+            await loadTodayEntry()
         }
     }
 
-    private var filteredEntries: [JournalEntry] {
-        switch selectedTab {
-        case .todo:
-            return [] // To-do tab doesn't use journal entries
-        case .gratitude:
-            return viewModel.entries.filter { $0.meditationType == "gratitude" }
-        case .reflection:
-            return viewModel.entries.filter { $0.meditationType == "reflection" }
-        case .goals:
-            return viewModel.entries.filter { $0.meditationType == "goals" }
-        }
-    }
+    // MARK: - Header
 
-    private var headerSection: some View {
+    private var header: some View {
         HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "chevron.left")
-                    .font(.custom("Poppins-SemiBold", size: 18))
-                    .foregroundColor(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(Color.white.opacity(0.1)))
+            Button(action: {
+                HapticManager.light()
+                dismiss()
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(.white.opacity(0.6))
             }
 
             Spacer()
 
             VStack(spacing: 4) {
                 Text("Mon Journal")
-                    .font(.custom("Poppins-SemiBold", size: 20))
+                    .font(.custom("HankenGrotesk-Bold", size: 20))
                     .foregroundColor(.white)
 
-                // Streak indicator
-                if streakDays > 0 {
-                    HStack(spacing: 4) {
-                        Text("🔥")
-                            .font(.system(size: 14))
-                        Text("\(streakDays) jour\(streakDays > 1 ? "s" : "")")
-                            .font(.custom("Poppins-Medium", size: 12))
-                            .foregroundColor(.orange)
-                    }
-                }
+                Text(formatDate(Date()))
+                    .font(.custom("Poppins-Regular", size: 12))
+                    .foregroundColor(.white.opacity(0.6))
             }
 
             Spacer()
 
-            // Invisible spacer for centering
+            // Placeholder for symmetry
             Color.clear
-                .frame(width: 36, height: 36)
+                .frame(width: 28, height: 28)
         }
         .padding(.horizontal, 24)
-        .padding(.top, 16)
-        .padding(.bottom, 12)
+        .padding(.top, 20)
+        .padding(.bottom, 16)
     }
 
-    private var streakDays: Int {
-        guard !viewModel.entries.isEmpty else { return 0 }
+    // MARK: - Mood Section (Top Left)
 
-        let calendar = Calendar.current
-        let sortedEntries = viewModel.entries.sorted { $0.createdAt > $1.createdAt }
-
-        var streak = 0
-        var checkDate = calendar.startOfDay(for: Date())
-
-        for entry in sortedEntries {
-            let entryDate = calendar.startOfDay(for: entry.createdAt)
-
-            if calendar.isDate(entryDate, inSameDayAs: checkDate) {
-                if streak == 0 || calendar.isDate(entryDate, inSameDayAs: calendar.date(byAdding: .day, value: -streak, to: Date())!) {
-                    streak += 1
-                    checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
-                }
-            } else {
-                break
-            }
-        }
-
-        return streak
-    }
-
-    private var tabBarSection: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 8) {
-                ForEach(JournalTab.allCases, id: \.self) { tab in
-                    TabButton(
-                        tab: tab,
-                        isSelected: selectedTab == tab
-                    ) {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedTab = tab
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 12)
-        }
-        .frame(width: 90)
-    }
-
-    private var statsSection: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                StatCard(
-                    title: selectedTab.rawValue,
-                    value: "\(filteredEntries.count)",
-                    icon: selectedTab.icon,
-                    color: selectedTab.color
-                )
-
-                StatCard(
-                    title: "Cette semaine",
-                    value: "\(entriesThisWeek)",
-                    icon: "calendar.badge.checkmark",
-                    color: selectedTab.color
-                )
-            }
-
-            // Mood distribution (if entries have mood data)
-            if !filteredEntries.isEmpty && filteredEntries.contains(where: { $0.mood != nil }) {
-                moodStatsCard
-            }
-        }
-    }
-
-    private var moodStatsCard: some View {
+    private var moodSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "face.smiling")
-                    .font(.system(size: 16))
-                    .foregroundColor(selectedTab.color)
+            HStack(spacing: 6) {
+                Image(systemName: "face.smiling.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(Color(hex: "B794F6"))
 
-                Text("Humeur moyenne")
+                Text("Mood")
                     .font(.custom("Poppins-SemiBold", size: 14))
                     .foregroundColor(.white)
-
-                Spacer()
             }
 
-            HStack(spacing: 8) {
-                ForEach(Mood.allCases, id: \.self) { mood in
-                    let count = filteredEntries.filter { $0.mood == mood }.count
-                    if count > 0 {
-                        VStack(spacing: 4) {
-                            Text(mood.emoji)
-                                .font(.system(size: 24))
-                            Text("\(count)")
-                                .font(.custom("Poppins-Bold", size: 12))
-                                .foregroundColor(.white)
+            // Mood selector - grid when nothing selected, horizontal when selected
+            ZStack {
+                if selectedMood == nil {
+                    // Grid layout - 2 rows x 3 columns
+                    VStack(spacing: 8) {
+                        // First row
+                        HStack(spacing: 8) {
+                            ForEach(Array(Mood.allCases.prefix(3)), id: \.self) { mood in
+                                moodButton(mood)
+                            }
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(hex: mood.color).opacity(0.2))
-                        )
+
+                        // Second row
+                        HStack(spacing: 8) {
+                            ForEach(Array(Mood.allCases.suffix(3)), id: \.self) { mood in
+                                moodButton(mood)
+                            }
+                        }
+                    }
+                    .transition(.opacity)
+                } else {
+                    // Horizontal carousel when mood selected
+                    ScrollViewReader { proxy in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                // Spacer to allow centering
+                                Spacer()
+                                    .frame(width: 40)
+
+                                ForEach(Mood.allCases, id: \.self) { mood in
+                                    moodButtonExpanded(mood)
+                                        .id(mood)
+                                }
+
+                                // Spacer to allow centering
+                                Spacer()
+                                    .frame(width: 40)
+                            }
+                        }
+                        .transition(.opacity)
+                        .onAppear {
+                            if let mood = selectedMood {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        proxy.scrollTo(mood, anchor: .center)
+                                    }
+                                }
+                            }
+                        }
+                        .onChange(of: selectedMood) {
+                            if let mood = selectedMood {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    proxy.scrollTo(mood, anchor: .center)
+                                }
+                            }
+                        }
                     }
                 }
             }
+            .frame(width: 140, height: 140)
         }
         .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(hex: "1A1B3A").opacity(0.6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(selectedTab.color.opacity(0.3), lineWidth: 1)
-                )
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.05))
         )
     }
 
-    private var entriesList: some View {
-        VStack(spacing: 12) {
-            ForEach(filteredEntries) { entry in
-                JournalEntryRow(entry: entry) {
-                    Task {
-                        await viewModel.deleteEntry(entry)
-                    }
-                }
-            }
-        }
-    }
+    // MARK: - Photo Section (Top Right)
 
-    private var emptyStateView: some View {
-        VStack(spacing: 24) {
-            Spacer()
+    private var photoSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "camera.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(Color(hex: "B794F6"))
 
-            Image(systemName: selectedTab.icon)
-                .font(.system(size: 60))
-                .foregroundColor(selectedTab.color.opacity(0.5))
-
-            VStack(spacing: 8) {
-                Text("Aucune entrée pour \(selectedTab.rawValue)")
-                    .font(.custom("Poppins-SemiBold", size: 20))
+                Text("Photo")
+                    .font(.custom("Poppins-SemiBold", size: 14))
                     .foregroundColor(.white)
-
-                Text(selectedTab.description)
-                    .font(.custom("Poppins-Regular", size: 14))
-                    .foregroundColor(Color.white.opacity(0.6))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
             }
 
-            // Bouton pour créer une entrée si c'est un onglet non-todo
-            if selectedTab != .todo {
-                Button(action: { showNewEntry = true }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 18))
-                        Text("Créer une entrée")
-                            .font(.custom("Poppins-SemiBold", size: 16))
+            PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                ZStack {
+                    if let photoImage = photoImage {
+                        // Display selected photo
+                        Image(uiImage: photoImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 140, height: 140)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [Color(hex: "B794F6"), Color(hex: "9F7AEA")],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 2
+                                    )
+                            )
+                    } else if let existing = todayEntry,
+                              let photoBase64 = existing.photoURL,
+                              !photoBase64.isEmpty,
+                              let imageData = Data(base64Encoded: photoBase64),
+                              let uiImage = UIImage(data: imageData) {
+                        // Display existing photo
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 140, height: 140)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(hex: "B794F6").opacity(0.5), lineWidth: 2)
+                            )
+                    } else {
+                        // Placeholder
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white.opacity(0.03))
+                            .frame(width: 140, height: 140)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
+                                    .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 3]))
+                            )
+                            .overlay(
+                                VStack(spacing: 6) {
+                                    Image(systemName: "camera.fill")
+                                        .font(.system(size: 24))
+                                        .foregroundColor(Color(hex: "B794F6").opacity(0.6))
+
+                                    Text("Ajoute")
+                                        .font(.custom("Poppins-Medium", size: 11))
+                                        .foregroundColor(.white.opacity(0.5))
+                                }
+                            )
                     }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 14)
-                    .background(
-                        LinearGradient(
-                            colors: [selectedTab.color, selectedTab.color.opacity(0.8)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(Capsule())
                 }
-                .padding(.top, 8)
             }
-
-            Spacer()
+            .frame(width: 140, height: 140)
         }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.05))
+        )
     }
 
-    private var newEntrySheet: some View {
-        ZStack {
-            GalaxyBackgroundView(intensity: 0.8)
+    // MARK: - Text Section
 
-            VStack(spacing: 0) {
-                // Header
-                HStack {
-                    Button(action: { showNewEntry = false }) {
-                        Image(systemName: "xmark")
-                            .font(.custom("Poppins-SemiBold", size: 18))
-                            .foregroundColor(.white)
-                            .frame(width: 36, height: 36)
-                            .background(Circle().fill(Color.white.opacity(0.1)))
-                    }
-
-                    Spacer()
-
-                    Text(entrySheetTitle)
-                        .font(.custom("Poppins-SemiBold", size: 18))
-                        .foregroundColor(.white)
-
-                    Spacer()
-
-                    Color.clear.frame(width: 36, height: 36)
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
-                .padding(.bottom, 12)
-
-                // Journal view adapté selon l'onglet
-                JournalView(
-                    meditationId: selectedTab.meditationId ?? "general",
-                    meditationType: selectedTab.meditationId ?? "general",
-                    prompt: entryPrompt,
-                    sharedViewModel: viewModel
-                )
-            }
-        }
-    }
-
-    private var entrySheetTitle: String {
-        switch selectedTab {
-        case .todo: return "Routine Quotidienne"
-        case .gratitude: return "Journal de Gratitude"
-        case .reflection: return "Réflexion du Jour"
-        case .goals: return "Mes Objectifs"
-        }
-    }
-
-    private var entryPrompt: String {
-        switch selectedTab {
-        case .todo: return "Décris ta routine..."
-        case .gratitude: return DailyPrompt.getDailyPrompt(for: "gratitude")
-        case .reflection: return DailyPrompt.getDailyPrompt(for: "reflection")
-        case .goals: return DailyPrompt.getDailyPrompt(for: "goals")
-        }
-    }
-
-    private var entriesThisWeek: Int {
-        let calendar = Calendar.current
-        let weekAgo = calendar.date(byAdding: .day, value: -7, to: Date()) ?? Date()
-        return filteredEntries.filter { $0.createdAt >= weekAgo }.count
-    }
-}
-
-// MARK: - Tab Button
-
-struct TabButton: View {
-    let tab: JournalHomeView.JournalTab
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: tab.icon)
-                    .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
-                    .foregroundColor(isSelected ? tab.color : Color.white.opacity(0.6))
-
-                Text(tab.rawValue)
-                    .font(.custom("Poppins-Medium", size: 9))
-                    .foregroundColor(isSelected ? .white : Color.white.opacity(0.6))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-            }
-            .frame(width: 70, height: 70)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? tab.color.opacity(0.2) : Color.clear)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? tab.color : Color.clear, lineWidth: 2)
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
-
-// MARK: - Stat Card
-
-struct StatCard: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private var textSection: some View {
+        VStack(spacing: 16) {
             HStack {
-                Image(systemName: icon)
+                Image(systemName: "pencil.line")
                     .font(.system(size: 16))
-                    .foregroundColor(color)
+                    .foregroundColor(Color(hex: "B794F6"))
+
+                Text("Ma journée")
+                    .font(.custom("Poppins-SemiBold", size: 16))
+                    .foregroundColor(.white)
 
                 Spacer()
             }
 
-            Text(value)
-                .font(.custom("Poppins-Bold", size: 28))
-                .foregroundColor(.white)
+            ZStack(alignment: .topLeading) {
+                // Background
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(isTextFocused ? Color(hex: "B794F6") : Color.white.opacity(0.1), lineWidth: 1.5)
+                    )
 
-            Text(title)
-                .font(.custom("Poppins-Regular", size: 12))
-                .foregroundColor(Color.white.opacity(0.6))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(hex: "1A1B3A").opacity(0.6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(color.opacity(0.3), lineWidth: 1)
-                )
-        )
-    }
-}
+                // TextEditor
+                TextEditor(text: $journalText)
+                    .font(.custom("Poppins-Regular", size: 15))
+                    .foregroundColor(.white)
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    .padding(16)
+                    .focused($isTextFocused)
+                    .frame(minHeight: 200)
 
-// MARK: - Filter Chip
+                // Placeholder
+                if journalText.isEmpty {
+                    Text("Raconte ta journée, tes émotions, ce que tu as vécu...")
+                        .font(.custom("Poppins-Regular", size: 15))
+                        .foregroundColor(.white.opacity(0.4))
+                        .padding(.horizontal, 20)
+                        .padding(.top, 24)
+                        .allowsHitTesting(false)
+                }
+            }
 
-struct FilterChip: View {
-    let title: String
-    var icon: String?
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                if let icon = icon {
-                    Image(systemName: icon)
-                        .font(.system(size: 12))
+            // Word and character count
+            HStack(spacing: 16) {
+                HStack(spacing: 4) {
+                    Text("\(characterCount)")
+                        .font(.custom("Poppins-SemiBold", size: 13))
+                        .foregroundColor(characterCount >= 50 ? Color(hex: "10B981") : Color(hex: "B794F6"))
+                    Text("caractères")
+                        .font(.custom("Poppins-Regular", size: 13))
+                        .foregroundColor(.white.opacity(0.6))
                 }
 
-                Text(title)
-                    .font(.custom("Poppins-Medium", size: 14))
+                Circle()
+                    .fill(Color.white.opacity(0.3))
+                    .frame(width: 3, height: 3)
+
+                HStack(spacing: 4) {
+                    Text("\(wordCount)")
+                        .font(.custom("Poppins-SemiBold", size: 13))
+                        .foregroundColor(Color(hex: "B794F6"))
+                    Text("mots")
+                        .font(.custom("Poppins-Regular", size: 13))
+                        .foregroundColor(.white.opacity(0.6))
+                }
+
+                Spacer()
+
+                if characterCount < 50 {
+                    Text("Minimum 50 caractères")
+                        .font(.custom("Poppins-Regular", size: 11))
+                        .foregroundColor(.white.opacity(0.4))
+                }
             }
-            .foregroundColor(isSelected ? .white : Color.white.opacity(0.7))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.05))
+        )
+    }
+
+    // MARK: - Save Button
+
+    private var saveButton: some View {
+        Button(action: {
+            Task {
+                await saveEntry()
+            }
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: isToday && todayEntry != nil ? "arrow.triangle.2.circlepath" : "checkmark.circle.fill")
+                    .font(.system(size: 20))
+
+                Text(isToday && todayEntry != nil ? "Mettre à jour" : "Sauvegarder")
+                    .font(.custom("Poppins-SemiBold", size: 16))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
             .background(
-                Capsule()
-                    .fill(isSelected ?
-                          LinearGradient(
-                            colors: [Color.appTheme, Color.appThemeSecondary],
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        canSave ?
+                        LinearGradient(
+                            colors: [Color(hex: "B794F6"), Color(hex: "9F7AEA")],
                             startPoint: .leading,
                             endPoint: .trailing
-                          ) :
-                          LinearGradient(
+                        ) :
+                        LinearGradient(
                             colors: [Color.white.opacity(0.1), Color.white.opacity(0.1)],
                             startPoint: .leading,
                             endPoint: .trailing
-                          )
+                        )
                     )
             )
         }
+        .disabled(!canSave)
+        .opacity(canSave ? 1.0 : 0.5)
     }
-}
 
-// MARK: - Journal Entry Row
+    // MARK: - History Button
 
-struct JournalEntryRow: View {
-    let entry: JournalEntry
-    let onDelete: () -> Void
+    private var historyButton: some View {
+        Button(action: {
+            HapticManager.light()
+            showHistory = true
+        }) {
+            HStack(spacing: 8) {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 14))
 
-    @State private var showDeleteConfirmation = false
+                Text("Voir mes entrées passées")
+                    .font(.custom("Poppins-Medium", size: 14))
+            }
+            .foregroundColor(Color(hex: "B794F6"))
+        }
+        .fullScreenCover(isPresented: $showHistory) {
+            JournalHistoryView()
+        }
+    }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header: date + type + mood + delete
-            HStack {
-                // Mood emoji if exists
-                if let mood = entry.mood {
+    // MARK: - Success Overlay
+
+    private var successOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(Color(hex: "10B981"))
+
+                Text(isToday && todayEntry != nil ? "Entrée mise à jour !" : "Entrée sauvegardée !")
+                    .font(.custom("Poppins-SemiBold", size: 18))
+                    .foregroundColor(.white)
+            }
+            .padding(40)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(hex: "1a0a2e"))
+            )
+        }
+    }
+
+    // MARK: - Helper Methods
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "fr_FR")
+        formatter.dateFormat = "EEEE d MMMM yyyy"
+        return formatter.string(from: date).capitalized
+    }
+
+    private func loadTodayEntry() async {
+        isLoadingToday = true
+        await viewModel.loadAllEntries()
+
+        // Find today's entry
+        todayEntry = viewModel.allEntries.first { entry in
+            Calendar.current.isDateInToday(entry.createdAt)
+        }
+
+        // Populate fields if entry exists
+        if let entry = todayEntry {
+            journalText = entry.content
+            selectedMood = entry.mood
+        }
+
+        isLoadingToday = false
+    }
+
+    private func saveEntry() async {
+        guard canSave else { return }
+
+        HapticManager.medium()
+
+        // Upload photo if new one selected
+        var photoURL: String? = todayEntry?.photoURL  // Keep existing if no new photo
+        if let photoImage = photoImage {
+            photoURL = await viewModel.uploadPhoto(photoImage)
+        }
+
+        // Save entry (will update if exists for today)
+        await viewModel.saveEntry(
+            content: journalText,
+            mood: selectedMood,
+            photoURL: photoURL,
+            wordCount: wordCount,
+            entryId: todayEntry?.id  // Pass existing entry ID for update
+        )
+
+        // Show success message
+        withAnimation {
+            showSuccessMessage = true
+        }
+
+        // Reload today's entry
+        await loadTodayEntry()
+
+        // Hide success message
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        withAnimation {
+            showSuccessMessage = false
+        }
+
+        // Clear new photo selection (keep existing)
+        photoImage = nil
+        selectedPhoto = nil
+    }
+
+    // MARK: - Mood Button (Grid mode)
+
+    @ViewBuilder
+    private func moodButton(_ mood: Mood) -> some View {
+        Button(action: {
+            HapticManager.light()
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                selectedMood = mood
+            }
+        }) {
+            VStack(spacing: 4) {
+                ZStack {
+                    // Circle background with mood color
+                    Circle()
+                        .fill(Color(hex: mood.color).opacity(0.25))
+                        .frame(width: 38, height: 38)
+
+                    // Emoji
                     Text(mood.emoji)
                         .font(.system(size: 20))
                 }
-
-                // Type icon
-                if let type = JournalType(rawValue: entry.meditationType) {
-                    Image(systemName: type.icon)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color.appTheme)
-                }
-
-                Text(entry.createdAt, style: .date)
-                    .font(.custom("Poppins-Regular", size: 12))
-                    .foregroundColor(Color.white.opacity(0.6))
-
-                Text(entry.createdAt, style: .time)
-                    .font(.custom("Poppins-Regular", size: 12))
-                    .foregroundColor(Color.white.opacity(0.6))
-
-                Spacer()
-
-                // Word count if exists
-                if let wordCount = entry.wordCount, wordCount > 0 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "text.word.spacing")
-                            .font(.system(size: 10))
-                        Text("\(wordCount)")
-                            .font(.custom("Poppins-Regular", size: 11))
-                    }
-                    .foregroundColor(Color.white.opacity(0.5))
-                }
-
-                Button(action: { showDeleteConfirmation = true }) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "FF6B9D"))
-                }
             }
-
-            // Prompt
-            if let prompt = entry.prompt, !prompt.isEmpty {
-                Text(prompt)
-                    .font(.custom("Poppins-Medium", size: 13))
-                    .foregroundColor(Color.appTheme)
-                    .italic()
-            }
-
-            // Content preview
-            Text(entry.content)
-                .font(.custom("Poppins-Regular", size: 14))
-                .foregroundColor(.white)
-                .lineLimit(3)
-                .lineSpacing(4)
+            .frame(width: 40, height: 60)
         }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(hex: "1A1B3A").opacity(0.6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
-        .confirmationDialog("Supprimer cette entrée ?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
-            Button("Supprimer", role: .destructive) {
-                onDelete()
+    }
+
+    // MARK: - Mood Button Expanded (Carousel mode)
+
+    @ViewBuilder
+    private func moodButtonExpanded(_ mood: Mood) -> some View {
+        Button(action: {
+            HapticManager.light()
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                selectedMood = mood
             }
-            Button("Annuler", role: .cancel) {}
+        }) {
+            VStack(spacing: 6) {
+                ZStack {
+                    // Circle background - same size for all
+                    Circle()
+                        .fill(Color(hex: mood.color).opacity(selectedMood == mood ? 0.4 : 0.25))
+                        .frame(width: 56, height: 56)
+
+                    // Emoji - same size for all
+                    Text(mood.emoji)
+                        .font(.system(size: 32))
+                }
+
+                // Label only for selected mood
+                if selectedMood == mood {
+                    Text(mood.displayName)
+                        .font(.custom("Poppins-SemiBold", size: 10))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .frame(width: 60)
+            .opacity(selectedMood == mood ? 1.0 : 0.5)
         }
     }
 }

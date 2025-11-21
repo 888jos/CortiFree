@@ -14,6 +14,7 @@ struct NotificationPermissionsView: View {
     @State private var enableStreak: Bool = true
     @State private var enableDailyRitual: Bool = true
     @State private var enableWeeklyReport: Bool = true
+    @State private var screenViewTime: Date?
 
     var body: some View {
         ZStack {
@@ -79,7 +80,16 @@ struct NotificationPermissionsView: View {
 
                 // Continue button
                 Button(action: {
+                    print("🔔 NotificationPermissionsView: Bouton Suivant cliqué - Navigation vers HabitsProgress")
                     HapticManager.medium()
+
+                    // Track permission request
+                    MixpanelManager.shared.trackOnboardingNotificationPermissionRequested(
+                        streakEnabled: enableStreak,
+                        dailyRitualEnabled: enableDailyRitual,
+                        weeklyReportEnabled: enableWeeklyReport
+                    )
+
                     requestNotificationPermissions()
                     onContinue()
                 }) {
@@ -108,6 +118,10 @@ struct NotificationPermissionsView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
+        }
+        .onAppear {
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingNotificationPermissionViewed()
         }
     }
 

@@ -23,6 +23,8 @@ enum AppConstants {
         static let accentEnd = Color.appThemeSecondary
         static let primaryGreen = Color.appTheme
         static let violetDark = Color(hex: "49288C")
+        static let violet = Color(hex: "B794F6")
+        static let violetLight = Color(hex: "9F7AEA")
 
         // Text colors
         static let textPrimary = Color.white
@@ -35,9 +37,30 @@ enum AppConstants {
         static let warningYellow = Color(hex: "FFD700")
         static let streakOrange = Color(hex: "FF8800")
 
+        // Anti-stress button colors
+        static let antiStressBackground = Color(hex: "4A0000").opacity(0.66)
+        static let antiStressBorder = Color(hex: "9B0003")
+
+        // Task colors
+        static let taskBackground1 = Color(hex: "0A0515")
+        static let taskBackground2 = Color(hex: "1a0a2e")
+
+        // Profile domain colors
+        static let domainSerenity = Color(hex: "B794F6")
+        static let domainSleep = Color(hex: "64B5F6")
+        static let domainEnergy = Color(hex: "FFB74D")
+        static let domainFocus = Color(hex: "81C784")
+        static let domainBalance = Color(hex: "E57373")
+
+        // Journal tab colors
+        static let journalGratitude = Color(hex: "FF6B9D")
+        static let journalReflection = Color(hex: "FFB74D")
+        static let journalGoals = Color(hex: "4CAF50")
+
         // Overlay colors
         static let overlayDark = Color.black.opacity(0.3)
         static let overlayLight = Color.white.opacity(0.1)
+        static let glassmorphicLight = Color.white.opacity(0.15)
     }
 
     // MARK: - Fonts
@@ -156,11 +179,32 @@ enum AppConstants {
         static let buttonHeight: CGFloat = 50
         static let buttonHeightSmall: CGFloat = 40
         static let buttonHeightLarge: CGFloat = 60
+        static let antiStressButtonHeight: CGFloat = 54
+        static let antiStressButtonWidth: CGFloat = 336
 
         // Specific widths
         static let progressBarHeight: CGFloat = 8
         static let dividerHeight: CGFloat = 1
         static let shadowRadius: CGFloat = 10
+
+        // Header dimensions
+        static let headerHeight: CGFloat = 60
+        static let bannerHeight: CGFloat = 220
+        static let avatarSize: CGFloat = 80
+
+        // Profile specific
+        static let profileBannerHeight: CGFloat = 220
+        static let profileAvatarSize: CGFloat = 80
+        static let radarChartSize: CGFloat = 256
+
+        // Task card dimensions
+        static let taskCardSpacing: CGFloat = 16
+        static let taskCardPadding: CGFloat = 20
+
+        // Journal dimensions
+        static let journalHeaderHeight: CGFloat = 140
+        static let journalSegmentHeight: CGFloat = 44
+        static let journalStatCardHeight: CGFloat = 100
     }
 }
 

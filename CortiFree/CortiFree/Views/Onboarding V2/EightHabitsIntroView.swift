@@ -104,6 +104,7 @@ struct EightHabitsIntroView: View {
                 // Continue button
                 Button(action: {
                     HapticManager.medium()
+                    MixpanelManager.shared.trackOnboardingEightHabitsIntroContinue()
                     onContinue()
                 }) {
                     HStack(spacing: 8) {
@@ -124,6 +125,9 @@ struct EightHabitsIntroView: View {
                 .padding(.horizontal, 32)
                 .padding(.bottom, 40)
             }
+        }
+        .onAppear {
+            MixpanelManager.shared.trackOnboardingEightHabitsIntroViewed()
         }
     }
 }

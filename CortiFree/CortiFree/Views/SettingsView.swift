@@ -1,14 +1,17 @@
 import SwiftUI
 import SafariServices
+import FirebaseAuth
 
 struct SettingsView: View {
-    @StateObject private var planetSettings = PlanetSettings.shared
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @AppStorage("appLanguage") private var appLanguage: String = Locale.current.language.languageCode?.identifier ?? "fr"
 
     // Profile & Objective
     @State private var currentObjective: String = "Réduire mon stress quotidien"
     @State private var notificationsEnabled: Bool = true
     @State private var showRoutineSheet: Bool = false
+    @State private var showLanguagePicker: Bool = false
 
     // Experience & Habits
     @State private var morningRoutineEnabled: Bool = true
@@ -62,6 +65,9 @@ struct SettingsView: View {
         .sheet(isPresented: $showRoutineSheet) {
             RoutineSelectionSheet(currentObjective: $currentObjective)
         }
+        .sheet(isPresented: $showLanguagePicker) {
+            LanguagePickerSheet(selectedLanguage: $appLanguage)
+        }
         .onChange(of: notificationsEnabled) { _ in
             saveSettings()
         }
@@ -82,9 +88,6 @@ struct SettingsView: View {
         }
         .onChange(of: syncEnabled) { _ in
             saveSettings()
-        }
-        .sheet(isPresented: $showProfileEdit) {
-            PlanetSettingsView()
         }
         .sheet(isPresented: $showSoundPicker) {
             SoundPickerSheet(selectedSound: $defaultSound)
@@ -169,13 +172,13 @@ struct SettingsView: View {
         settingsSection(title: "Profil & Objectif", icon: "person.circle.fill") {
             VStack(spacing: 0) {
                 settingsRow(
-                    icon: "person.fill",
-                    title: "Mon profil",
-                    subtitle: planetSettings.selectedPlanet.displayName,
+                    icon: "globe",
+                    title: NSLocalizedString("settings.language", comment: ""),
+                    subtitle: appLanguage == "en" ? "English" : "Français",
                     showChevron: true
                 ) {
                     HapticManager.light()
-                    showProfileEdit = true
+                    showLanguagePicker = true
                 }
 
                 Divider()
@@ -684,13 +687,42 @@ struct SettingsView: View {
     }
 
     private func signOut() {
-        // TODO: Sign out from Firebase
+        HapticManager.success()
+
+        // Sign out via AuthViewModel
+        authViewModel.signOut()
+
+        // Clear local data
+        UserDefaults.standard.removeObject(forKey: "onboardingV2Completed")
+        UserDefaults.standard.removeObject(forKey: "selectedRoutineId")
+        UserDefaults.standard.removeObject(forKey: "selectedRoutineTitle")
+        UserDefaults.standard.removeObject(forKey: "routineStartDate")
+
+        // Dismiss settings (will automatically navigate to auth screen via CortiFreeApp)
         dismiss()
     }
 
     private func deleteAccount() {
-        // TODO: Delete account from Firebase and local data
-        dismiss()
+        HapticManager.success()
+
+        Task {
+            do {
+                // Delete Firebase account
+                try await Auth.auth().currentUser?.delete()
+
+                // Clear all local data
+                let domain = Bundle.main.bundleIdentifier!
+                UserDefaults.standard.removePersistentDomain(forName: domain)
+                UserDefaults.standard.synchronize()
+
+                // Sign out
+                authViewModel.signOut()
+
+                dismiss()
+            } catch {
+                print("❌ Error deleting account: \(error)")
+            }
+        }
     }
 
     private func calculateLocalDataSize() {
@@ -713,7 +745,6 @@ struct SettingsView: View {
 // MARK: - Routine Selection Sheet
 struct RoutineSelectionSheet: View {
     @Binding var currentObjective: String
-    @StateObject private var planetSettings = PlanetSettings.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedRoutineId: String?
@@ -749,7 +780,7 @@ struct RoutineSelectionSheet: View {
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
 
-                    Text("La planète sera automatiquement mise à jour")
+                    Text("Sélectionne ta nouvelle routine")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -761,8 +792,7 @@ struct RoutineSelectionSheet: View {
                         ForEach(RoutinePlan.allPlans) { plan in
                             RoutineSelectionRow(
                                 plan: plan,
-                                isSelected: selectedRoutineId == plan.id,
-                                associatedPlanet: Planet.planet(for: plan.title)
+                                isSelected: selectedRoutineId == plan.id
                             ) {
                                 HapticManager.medium()
 
@@ -918,10 +948,6 @@ struct RoutineSelectionSheet: View {
         UserDefaults.standard.set(1, forKey: "currentWeek")
         UserDefaults.standard.set(1, forKey: "currentDay")
 
-        // Auto-update planet based on routine
-        let associatedPlanet = Planet.planet(for: plan.title)
-        planetSettings.selectedPlanet = associatedPlanet
-
         // Update UI
         currentObjective = plan.title
 
@@ -955,17 +981,20 @@ struct WarningItem: View {
 struct RoutineSelectionRow: View {
     let plan: RoutinePlan
     let isSelected: Bool
-    let associatedPlanet: Planet
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                // Planet image (small)
-                Image(associatedPlanet.imageName)
-                    .resizable()
-                    .scaledToFit()
+                // Icon instead of planet
+                Image(systemName: getIconForRoutine(plan.title))
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundColor(Color.appTheme)
                     .frame(width: 50, height: 50)
+                    .background(
+                        Circle()
+                            .fill(Color.appTheme.opacity(0.1))
+                    )
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(plan.title)
@@ -973,15 +1002,10 @@ struct RoutineSelectionRow: View {
                         .foregroundColor(.white)
                         .multilineTextAlignment(.leading)
 
-                    HStack(spacing: 4) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 10))
-                            .foregroundColor(associatedPlanet.haloColor.opacity(0.8))
-
-                        Text(associatedPlanet.displayName)
-                            .font(.custom("Poppins-Regular", size: 13))
-                            .foregroundColor(associatedPlanet.haloColor.opacity(0.8))
-                    }
+                    Text(getDescriptionForRoutine(plan.title))
+                        .font(.custom("Poppins-Regular", size: 13))
+                        .foregroundColor(.white.opacity(0.6))
+                        .lineLimit(2)
                 }
 
                 Spacer()
@@ -997,19 +1021,45 @@ struct RoutineSelectionRow: View {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(
                         isSelected ?
-                        associatedPlanet.haloColor.opacity(0.15) :
+                        Color.appTheme.opacity(0.15) :
                         Color(hex: "131146")
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(
-                                isSelected ? associatedPlanet.haloColor.opacity(0.5) : Color.clear,
+                                isSelected ? Color.appTheme.opacity(0.5) : Color.clear,
                                 lineWidth: 2
                             )
                     )
             )
         }
         .buttonStyle(PlainButtonStyle())
+    }
+
+    private func getIconForRoutine(_ title: String) -> String {
+        if title.contains("stress") || title.contains("anxiété") {
+            return "heart.fill"
+        } else if title.contains("sommeil") || title.contains("dormir") {
+            return "moon.fill"
+        } else if title.contains("énergie") || title.contains("fatigue") {
+            return "bolt.fill"
+        } else if title.contains("concentration") || title.contains("focus") {
+            return "brain"
+        } else {
+            return "star.fill"
+        }
+    }
+
+    private func getDescriptionForRoutine(_ title: String) -> String {
+        if title.contains("stress") {
+            return "Techniques de relaxation et méditation"
+        } else if title.contains("sommeil") {
+            return "Routine du soir et sommeil réparateur"
+        } else if title.contains("énergie") {
+            return "Boost d'énergie naturelle"
+        } else {
+            return "Programme personnalisé de bien-être"
+        }
     }
 }
 
@@ -1086,6 +1136,120 @@ struct SoundPickerSheet: View {
                     }
                 }
                 .padding(.horizontal, 20)
+
+                Spacer()
+            }
+        }
+    }
+}
+
+// MARK: - Language Picker Sheet
+struct LanguagePickerSheet: View {
+    @Binding var selectedLanguage: String
+    @Environment(\.dismiss) private var dismiss
+
+    let languages = [
+        ("fr", "Français", "🇫🇷"),
+        ("en", "English", "🇬🇧")
+    ]
+
+    var body: some View {
+        ZStack {
+            // Galaxy background
+            GalaxyBackgroundView(intensity: 0.8)
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                // Header
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        HapticManager.light()
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Color.white.opacity(0.1)))
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+
+                VStack(spacing: 8) {
+                    Text(NSLocalizedString("settings.choose_language", comment: ""))
+                        .font(.custom("Poppins-Bold", size: 28))
+                        .foregroundColor(.white)
+
+                    Text(NSLocalizedString("settings.language_subtitle", comment: ""))
+                        .font(.custom("Poppins-Regular", size: 14))
+                        .foregroundColor(.white.opacity(0.6))
+                }
+
+                // Languages list
+                VStack(spacing: 12) {
+                    ForEach(languages, id: \.0) { language in
+                        Button(action: {
+                            HapticManager.medium()
+                            selectedLanguage = language.0
+
+                            // Update app language
+                            UserDefaults.standard.set([language.0], forKey: "AppleLanguages")
+                            UserDefaults.standard.synchronize()
+
+                            // Show restart alert
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                dismiss()
+                                // The app needs to be restarted for language change
+                                exit(0)
+                            }
+                        }) {
+                            HStack(spacing: 16) {
+                                Text(language.2)
+                                    .font(.system(size: 32))
+
+                                Text(language.1)
+                                    .font(.custom("Poppins-SemiBold", size: 18))
+                                    .foregroundColor(.white)
+
+                                Spacer()
+
+                                if selectedLanguage == language.0 {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 24))
+                                        .foregroundColor(Color.appTheme)
+                                }
+                            }
+                            .padding(20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(
+                                        selectedLanguage == language.0 ?
+                                        Color.appTheme.opacity(0.15) :
+                                        Color(hex: "131146")
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(
+                                                selectedLanguage == language.0 ?
+                                                Color.appTheme.opacity(0.5) :
+                                                Color.clear,
+                                                lineWidth: 2
+                                            )
+                                    )
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding(.horizontal, 20)
+
+                Text(NSLocalizedString("settings.language_restart_note", comment: ""))
+                    .font(.custom("Poppins-Regular", size: 12))
+                    .foregroundColor(.white.opacity(0.5))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
 
                 Spacer()
             }

@@ -7,11 +7,10 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
-    @StateObject private var planetSettings = PlanetSettings.shared
-    @StateObject private var progressionManager = ProgressionManager.shared
     @Binding var isScrolling: Bool
     @Binding var scrollTimer: Timer?
 
@@ -19,21 +18,14 @@ struct HomeView: View {
     @State private var showMeditationList = false
     @State private var showSoundsList = false
     @State private var showJournal = false
-    @State private var showProgression = false
-    @State private var haloOpacity: Double = 0.35
-    @State private var planetScale: CGFloat = 1.0
-    @State private var showOnboardingQuiz = false
     @State private var showSettings = false
-    @State private var showRoutineDetails = false
-    @State private var currentTime = Date() // For countdown updates
-
-    // TEST: New task system
-    @State private var showDailyProgram = false
     @State private var showOnboardingV2 = false
+    @State private var currentTime = Date() // For countdown updates
 
     // Smart scroll detection
     @State private var lastScrollOffset: CGFloat = 0
     @State private var scrollVelocity: CGFloat = 0
+    @State private var scrollOffset: CGFloat = 0 // For parallax effect
 
     // Routine tracking
     private var routineStartDate: Date {
@@ -111,66 +103,26 @@ struct HomeView: View {
                                 .frame(height: 0)
 
 
-                                // Subheader - Weekly Status
-                                weeklyStatusView
-                                    .padding(.top, 16)
+                                // Countdown Section with parallax (slower)
+                                countdownSection
+                                    .padding(.top, 20)
+                                    .offset(y: scrollOffset * 0.3)
 
-                                // Planet + Countdown Combined
-                                planetWithCountdownSection
-                                    .padding(.top, 0)
+                                // Avatar Progress Card - 66 days grid
+                                AvatarProgressCard()
+                                    .padding(.top, 20)
+                                    .offset(y: scrollOffset * 0.4)
 
-                                // Quick Actions - descendre
+                                // Quick Actions - descendre with parallax (faster)
                                 quickActionsRow
-                                    .padding(.top, 10)
+                                    .padding(.top, 20)
+                                    .offset(y: scrollOffset * 0.6)
 
                                 // Anti-Stress Button - rapprocher
                                 antiStressButton
                                     .padding(.top, 16)
 
-                                // TEST: Onboarding Quiz Button (temporary)
-                                Button(action: {
-                                    showOnboardingQuiz = true
-                                }) {
-                                    Text("🧪 TEST: Onboarding Quiz")
-                                        .font(.custom("Poppins-SemiBold", size: 16))
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 54)
-                                        .background(
-                                            LinearGradient(
-                                                colors: [Color(hex: "73DE85"), Color(hex: "53D7D9")],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .clipShape(RoundedRectangle(cornerRadius: 27))
-                                }
-                                .padding(.horizontal, AppConstants.Layout.paddingXLarge)
-                                .padding(.top, 20)
-
-                                // TEST: Daily Program Button
-                                Button(action: {
-                                    HapticManager.light()
-                                    showDailyProgram = true
-                                }) {
-                                    Text("📅 TEST: Programme du Jour")
-                                        .font(.custom("Poppins-SemiBold", size: 16))
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 54)
-                                        .background(
-                                            LinearGradient(
-                                                colors: [Color(hex: "4A90E2"), Color(hex: "9B59B6")],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .clipShape(RoundedRectangle(cornerRadius: 27))
-                                }
-                                .padding(.horizontal, AppConstants.Layout.paddingXLarge)
-                                .padding(.top, 16)
-
-                                Spacer(minLength: 40)
+                                Spacer(minLength: 150)
                             }
                             .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
                                 handleScroll(offset: value)
@@ -196,48 +148,11 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showJournal) {
             JournalHomeView()
         }
-        .sheet(isPresented: $showProgression) {
-            ProgressionView()
-        }
-        .sheet(isPresented: $showRoutineDetails) {
-            RoutineDetailsView(
-                routineTitle: selectedRoutineTitle,
-                daysRemaining: daysRemaining
-            )
-        }
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
         }
-        .fullScreenCover(isPresented: $showOnboardingQuiz) {
-            OnboardingFlowView()
-        }
-        .sheet(isPresented: $showDailyProgram) {
-            NavigationView {
-                SimplifiedDailyProgramView(
-                    routine: RoutinePlan.allPlans[0], // Master Mind
-                    dayNumber: 1
-                )
-            }
-        }
         .fullScreenCover(isPresented: $showOnboardingV2) {
-            OnboardingFlowView()
-        }
-        .overlay(alignment: .bottom) {
-            // TEST: Bouton Onboarding V2
-            Button(action: {
-                showOnboardingV2 = true
-            }) {
-                Text("Test Onboarding V2")
-                    .font(.custom(AppConstants.Fonts.semiBold, size: 12))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, AppConstants.Layout.paddingMedium)
-                    .padding(.vertical, AppConstants.Layout.paddingSmall)
-                    .background(
-                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
-                            .fill(AppConstants.Colors.violetDark.opacity(0.8))
-                    )
-            }
-            .padding(.bottom, 100)
+            OnboardingV2FlowView()
         }
     }
 
@@ -247,6 +162,7 @@ struct HomeView: View {
         // Calculate scroll velocity (direction and speed)
         scrollVelocity = offset - lastScrollOffset
         lastScrollOffset = offset
+        scrollOffset = offset // Track for parallax
 
         // Threshold pour détecter un scroll significatif
         let scrollThreshold: CGFloat = 5
@@ -285,6 +201,18 @@ struct HomeView: View {
 
             Spacer()
 
+            // Onboarding V2 button
+            Button(action: {
+                HapticManager.light()
+                showOnboardingV2 = true
+            }) {
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 24))
+                    .foregroundColor(AppConstants.Colors.primaryGreen)
+            }
+            .padding(.trailing, 12)
+
+            // Settings button
             Button(action: {
                 HapticManager.light()
                 showSettings = true
@@ -317,150 +245,91 @@ struct HomeView: View {
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
-    // MARK: - Central Orb
+    // MARK: - Countdown Section
 
-    private var centralOrbSection: some View {
-        // Selected planet with colored halo
-        ZStack {
-            // Halo coloré personnalisé avec animation d'opacité
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            planetSettings.selectedPlanet.haloColor.opacity(haloOpacity),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 160,
-                        endRadius: 185
-                    )
-                )
-                .frame(width: 240, height: 240)
-                .onAppear {
-                    // Animation d'opacité du halo
-                    withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
-                        haloOpacity = 0.55
-                    }
-                }
-
-            // Planète avec animation de pulse subtile
-            Image(planetSettings.selectedPlanet.imageName)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 352, height: 352) // Taille originale restaurée
-                .shadow(color: planetSettings.selectedPlanet.haloColor.opacity(0.5), radius: 25)
-                .scaleEffect(planetScale)
-                .onAppear {
-                    // Animation de pulse de la planète (très subtile)
-                    withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
-                        planetScale = 1.03
-                    }
-                }
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    // MARK: - Planet with Countdown Section
-
-    private var planetWithCountdownSection: some View {
+    private var countdownSection: some View {
         TimelineView(.periodic(from: Date(), by: 1.0)) { timeline in
-            GeometryReader { geometry in
-                let time = calculateTimeRemaining(at: timeline.date)
+            let time = calculateTimeElapsed(at: timeline.date)
 
-                ZStack(alignment: .leading) {
-                    // Planet on the right side (60% visible, 40% cut off)
-                    ZStack {
-                        // Halo - synchronisé avec la planète
-                        Circle()
-                            .fill(
-                                RadialGradient(
-                                    colors: [
-                                        planetSettings.selectedPlanet.haloColor.opacity(haloOpacity),
-                                        Color.clear
-                                    ],
-                                    center: .center,
-                                    startRadius: 160,
-                                    endRadius: 185
-                                )
-                            )
-                            .frame(width: 240, height: 240)
-                            .scaleEffect(planetScale) // Suit l'échelle de la planète
-                            .onAppear {
-                                withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
-                                    haloOpacity = 0.55
-                                }
-                            }
+            VStack(spacing: 8) {
+                // Title
+                Text(String(format: NSLocalizedString(StringKeys.Home.congratulations, comment: ""), getUserFirstName()))
+                    .font(.custom("SF Pro Rounded-Bold", size: 24))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.white, Color(hex: "B794F6")],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .multilineTextAlignment(.center)
 
-                        // Planet - taille augmentée x1.1, pulse de 1.0 à 1.08
-                        Image(planetSettings.selectedPlanet.imageName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 387, height: 387) // 352 * 1.1 = 387
-                            .shadow(color: planetSettings.selectedPlanet.haloColor.opacity(0.5), radius: 25)
-                            .scaleEffect(planetScale)
-                            .onAppear {
-                                withAnimation(.easeInOut(duration: 5.0).repeatForever(autoreverses: true)) {
-                                    planetScale = 1.08
-                                }
-                            }
-                    }
-                    .offset(x: geometry.size.width * 0.45) // Décalage à droite pour que 60% soit visible
+                // Subtitle
+                Text(NSLocalizedString(StringKeys.Home.programStarted, comment: ""))
+                    .font(.custom("Poppins-Medium", size: 14))
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, 4)
 
-                    // Countdown on the left side
-                    VStack(alignment: .leading, spacing: 0) {
-                        // "Continue de briller" - au plus haut de la planète visible
-                        Text("Continue de briller")
-                            .font(.custom("SF Pro Rounded-Bold", size: 22))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [.white, Color(hex: "B794F6")],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .padding(.top, 50) // Baissé de 15px
-
-                        // Phrase personnalisée selon l'objectif
-                        Text(personalizedPhrase)
-                            .font(.custom("SF Pro Rounded-Bold", size: 16))
-                            .foregroundColor(.white.opacity(0.8))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.top, 8)
-
-                        Spacer()
-
-                        // Countdown vertical (sans fond) - au plus bas de la planète visible
-                        VStack(alignment: .leading, spacing: 8) {
-                            TimeUnitRowView(value: time.days, unit: time.days > 1 ? "jours" : "jour")
-                            TimeUnitRowView(value: time.hours, unit: time.hours > 1 ? "heures" : "heure")
-                            TimeUnitRowView(value: time.minutes, unit: time.minutes > 1 ? "minutes" : "minute")
-                            TimeUnitRowView(value: time.seconds, unit: time.seconds > 1 ? "secondes" : "seconde")
-                        }
-                        .padding(.bottom, 50) // Baissé de 15px vers le bas
-                    }
-                    .frame(maxWidth: geometry.size.width * 0.5, alignment: .leading) // Aligné à gauche
-                    .frame(height: 387) // Hauteur de l'image de la planète
-                    .padding(.leading, 24)
-                    .onTapGesture {
-                        HapticManager.light()
-                        showRoutineDetails = true
-                    }
+                // Time elapsed display with flip animation
+                HStack(spacing: 12) {
+                    FlipDigitView(
+                        digit: time.days,
+                        font: .custom("SF Pro Rounded-Bold", size: 32),
+                        foregroundColor: .white
+                    )
+                    Text(":")
+                        .font(.custom("SF Pro Rounded-Bold", size: 32))
+                        .foregroundColor(.white.opacity(0.5))
+                    FlipDigitView(
+                        digit: time.hours,
+                        font: .custom("SF Pro Rounded-Bold", size: 32),
+                        foregroundColor: .white
+                    )
+                    Text(":")
+                        .font(.custom("SF Pro Rounded-Bold", size: 32))
+                        .foregroundColor(.white.opacity(0.5))
+                    FlipDigitView(
+                        digit: time.minutes,
+                        font: .custom("SF Pro Rounded-Bold", size: 32),
+                        foregroundColor: .white
+                    )
+                    Text(":")
+                        .font(.custom("SF Pro Rounded-Bold", size: 32))
+                        .foregroundColor(.white.opacity(0.5))
+                    FlipDigitView(
+                        digit: time.seconds,
+                        font: .custom("SF Pro Rounded-Bold", size: 32),
+                        foregroundColor: .white
+                    )
                 }
+                .padding(.vertical, 12)
             }
-            .frame(height: 352)
+            .padding(.horizontal, 20)
         }
     }
 
-    // Helper function to calculate time remaining
-    private func calculateTimeRemaining(at date: Date) -> (days: Int, hours: Int, minutes: Int, seconds: Int) {
-        let endDate = Calendar.current.date(byAdding: .day, value: AppConstants.Routine.totalDays, to: routineStartDate) ?? date
-        let components = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: date, to: endDate)
+    // Helper function to calculate time elapsed since start
+    private func calculateTimeElapsed(at date: Date) -> (days: Int, hours: Int, minutes: Int, seconds: Int) {
+        let components = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: routineStartDate, to: date)
         return (
             max(0, components.day ?? 0),
             max(0, components.hour ?? 0),
             max(0, components.minute ?? 0),
             max(0, components.second ?? 0)
         )
+    }
+
+    // Helper function to get user's first name
+    private func getUserFirstName() -> String {
+        if let user = Auth.auth().currentUser {
+            if let displayName = user.displayName {
+                return displayName.components(separatedBy: " ").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+            } else if let email = user.email {
+                return email.components(separatedBy: "@").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+            }
+        }
+        return NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
     }
 
     // MARK: - Quick Actions
@@ -474,6 +343,7 @@ struct HomeView: View {
             ) {
                 showBreathingList = true
             }
+            .cascadeAppear(index: 0, baseDelay: 0.06)
 
             QuickActionButtonNew(
                 icon: "figure.mind.and.body",
@@ -482,6 +352,7 @@ struct HomeView: View {
             ) {
                 showMeditationList = true
             }
+            .cascadeAppear(index: 1, baseDelay: 0.06)
 
             QuickActionButtonNew(
                 icon: "waveform",
@@ -490,6 +361,7 @@ struct HomeView: View {
             ) {
                 showSoundsList = true
             }
+            .cascadeAppear(index: 2, baseDelay: 0.06)
 
             QuickActionButtonNew(
                 icon: "book.fill",
@@ -498,6 +370,7 @@ struct HomeView: View {
             ) {
                 showJournal = true
             }
+            .cascadeAppear(index: 3, baseDelay: 0.06)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -508,18 +381,15 @@ struct HomeView: View {
     private var routineCountdownView: some View {
         let time = timeRemaining
 
-        return Button(action: {
-            HapticManager.light()
-            showRoutineDetails = true
-        }) {
+        return VStack(spacing: 0) {
             VStack(spacing: 12) {
                 // First line: "Continue de briller"
-                Text("Continue de briller")
+                Text(NSLocalizedString(StringKeys.Home.keepShining, comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(.white)
 
                 // Second line: "Tu atteindras [objectif] dans :"
-                Text("Tu atteindras \(selectedRoutineTitle) dans :")
+                Text(String(format: NSLocalizedString(StringKeys.Home.routineCountdown, comment: ""), selectedRoutineTitle))
                     .font(.custom("Poppins-Regular", size: 14))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
@@ -528,18 +398,18 @@ struct HomeView: View {
                 VStack(spacing: 4) {
                     HStack(spacing: 8) {
                         // Days
-                        TimeUnitView(value: time.days, unit: time.days > 1 ? "jours" : "jour")
+                        TimeUnitView(value: time.days, unit: time.days > 1 ? NSLocalizedString(StringKeys.Common.days, comment: "") : NSLocalizedString(StringKeys.Common.day, comment: ""))
 
                         // Hours
-                        TimeUnitView(value: time.hours, unit: time.hours > 1 ? "heures" : "heure")
+                        TimeUnitView(value: time.hours, unit: time.hours > 1 ? NSLocalizedString(StringKeys.Common.hours, comment: "") : NSLocalizedString(StringKeys.Common.hour, comment: ""))
                     }
 
                     HStack(spacing: 8) {
                         // Minutes
-                        TimeUnitView(value: time.minutes, unit: time.minutes > 1 ? "minutes" : "minute")
+                        TimeUnitView(value: time.minutes, unit: time.minutes > 1 ? NSLocalizedString(StringKeys.Common.minutes, comment: "") : NSLocalizedString(StringKeys.Common.minute, comment: ""))
 
                         // Seconds
-                        TimeUnitView(value: time.seconds, unit: time.seconds > 1 ? "secondes" : "seconde")
+                        TimeUnitView(value: time.seconds, unit: time.seconds > 1 ? NSLocalizedString(StringKeys.Common.seconds, comment: "") : NSLocalizedString(StringKeys.Common.second, comment: ""))
                     }
                 }
                 .padding(AppConstants.Layout.paddingMedium)
@@ -550,46 +420,28 @@ struct HomeView: View {
                 .shadow(color: Color.black.opacity(0.25), radius: 4, x: 1, y: 3)
             }
         }
-        .buttonStyle(PlainButtonStyle())
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 30)
     }
 
     // MARK: - Progress Level Bar
-
-    private var progressLevelBar: some View {
-        let progressInfo = progressionManager.progressInfo()
-
-        return Button(action: {
-            HapticManager.light()
-            showProgression = true
-        }) {
-            LevelProgressBarView(
-                level: progressionManager.currentLevel.id,
-                levelName: progressionManager.currentLevel.name,
-                percentage: progressInfo.percentage
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 30)
-    }
+    // Removed - no longer using XP/Levels system
 
     // MARK: - Level Name Helper
 
     private func getLevelName(_ level: Int) -> String {
         switch level {
-        case 1: return "Débutant Serein"
-        case 2: return "Novice Apaisé"
-        case 3: return "Apprenti Zen"
-        case 4: return "Pratiquant Éveillé"
-        case 5: return "Méditant Confirmé"
-        case 6: return "Expert du Calme"
-        case 7: return "Maître du Calme"
-        case 8: return "Guru Paisible"
-        case 9: return "Sage Éclairé"
-        case 10: return "Légende Immortelle"
-        default: return level > 10 ? "Maître Suprême" : "Novice"
+        case 1: return NSLocalizedString(StringKeys.Levels.beginnerSerene, comment: "")
+        case 2: return NSLocalizedString(StringKeys.Levels.noviceCalm, comment: "")
+        case 3: return NSLocalizedString(StringKeys.Levels.apprenticeZen, comment: "")
+        case 4: return NSLocalizedString(StringKeys.Levels.practitionerAwakened, comment: "")
+        case 5: return NSLocalizedString(StringKeys.Levels.confirmedMeditator, comment: "")
+        case 6: return NSLocalizedString(StringKeys.Levels.expertCalm, comment: "")
+        case 7: return NSLocalizedString(StringKeys.Levels.masterCalm, comment: "")
+        case 8: return NSLocalizedString(StringKeys.Levels.peacefulGuru, comment: "")
+        case 9: return NSLocalizedString(StringKeys.Levels.enlightenedSage, comment: "")
+        case 10: return NSLocalizedString(StringKeys.Levels.immortalLegend, comment: "")
+        default: return level > 10 ? NSLocalizedString(StringKeys.Levels.supremeMaster, comment: "") : NSLocalizedString(StringKeys.Levels.novice, comment: "")
         }
     }
 
@@ -604,7 +456,7 @@ struct HomeView: View {
                     .font(.system(size: 24))
                     .foregroundColor(.white)
 
-                Text("Bouton Anti-Stress")
+                Text(NSLocalizedString(StringKeys.Home.antiStressButton, comment: ""))
                     .font(.custom("Poppins-Medium", size: 16))
                     .foregroundColor(.white)
             }
@@ -617,10 +469,29 @@ struct HomeView: View {
                             .stroke(Color(hex: "9B0003"), lineWidth: 2)
                     )
             )
-            .shadow(color: Color(red: 255/255, green: 68/255, blue: 68/255, opacity: 0.4), radius: 16, y: 4)
+            .modifier(AntiStressPulseModifier())
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
+    }
+}
+
+// MARK: - Anti-Stress Pulse Modifier
+
+struct AntiStressPulseModifier: ViewModifier {
+    @State private var isPulsing = false
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(
+                color: Color(red: 255/255, green: 68/255, blue: 68/255, opacity: isPulsing ? 0.7 : 0.4),
+                radius: isPulsing ? 20 : 16,
+                y: 4
+            )
+            .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isPulsing)
+            .onAppear {
+                isPulsing = true
+            }
     }
 }
 
@@ -631,6 +502,8 @@ struct QuickActionButtonNew: View {
     let title: String
     let hapticStyle: UIImpactFeedbackGenerator.FeedbackStyle
     let action: () -> Void
+
+    @State private var isPressed = false
 
     var body: some View {
         Button(action: {
@@ -658,6 +531,14 @@ struct QuickActionButtonNew: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(width: 70)
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity) {
+            // Press action
+        } onPressingChanged: { pressing in
+            isPressed = pressing
         }
     }
 }
@@ -676,11 +557,11 @@ struct AntiStressView: View {
 
             VStack(spacing: 60) {
                 VStack(spacing: 12) {
-                    Text("Respirez profondément")
+                    Text(NSLocalizedString(StringKeys.Home.breatheDeeply, comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 28))
                         .foregroundColor(.white)
 
-                    Text(breatheIn ? "Inspirez..." : "Expirez...")
+                    Text(breatheIn ? NSLocalizedString(StringKeys.Home.breatheIn, comment: "") : NSLocalizedString(StringKeys.Home.breatheOut, comment: ""))
                         .font(.custom("Poppins-Regular", size: 18))
                         .foregroundColor(AppConstants.Colors.textSecondary)
                 }
@@ -716,7 +597,7 @@ struct AntiStressView: View {
                 Button(action: {
                     dismiss()
                 }) {
-                    Text("Fermer")
+                    Text(NSLocalizedString(StringKeys.Common.close, comment: ""))
                         .font(.custom("Poppins-Medium", size: 16))
                         .foregroundColor(Color.appTheme)
                         .padding(.horizontal, 40)
@@ -744,8 +625,8 @@ struct RoutineDetailsView: View {
         // For now, generic evidence. Can be customized per routine later
         return [
             (
-                title: "Neuroplasticité cérébrale",
-                description: "Des études montrent que 66 jours de pratique régulière suffisent pour observer des changements structurels dans le cerveau, notamment dans l'hippocampe et le cortex préfrontal."
+                title: NSLocalizedString(StringKeys.Home.neuroplasticity, comment: ""),
+                description: NSLocalizedString(StringKeys.Home.neuroplasticityDesc, comment: "")
             ),
             (
                 title: "Réduction du cortisol",
@@ -771,12 +652,12 @@ struct RoutineDetailsView: View {
                 VStack(spacing: 24) {
                     // Header
                     VStack(spacing: 12) {
-                        Text("Pourquoi 66 jours ?")
+                        Text(NSLocalizedString(StringKeys.Home.why66Days, comment: ""))
                             .font(.custom("Poppins-Bold", size: 28))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
 
-                        Text("Les preuves scientifiques")
+                        Text(NSLocalizedString(StringKeys.Home.scientificEvidence, comment: ""))
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(.white.opacity(0.7))
                     }
@@ -801,7 +682,7 @@ struct RoutineDetailsView: View {
                                 .font(.custom("Poppins-Bold", size: 36))
                                 .foregroundColor(.white)
 
-                            Text(daysRemaining > 1 ? "jours" : "jour")
+                            Text(daysRemaining > 1 ? NSLocalizedString(StringKeys.Common.days, comment: "") : NSLocalizedString(StringKeys.Common.day, comment: ""))
                                 .font(.custom("Poppins-Medium", size: 18))
                                 .foregroundColor(.white.opacity(0.9))
                                 .offset(y: 6)
@@ -831,7 +712,7 @@ struct RoutineDetailsView: View {
                     Button(action: {
                         dismiss()
                     }) {
-                        Text("Fermer")
+                        Text(NSLocalizedString(StringKeys.Common.close, comment: ""))
                             .font(.custom("Poppins-Medium", size: 16))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -948,6 +829,25 @@ struct TimeUnitRowView: View {
                 .font(.custom("SF Pro Rounded-Bold", size: 14))
                 .foregroundColor(.white.opacity(0.8))
                 .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+// MARK: - Time Unit Compact View (for horizontal countdown)
+
+struct TimeUnitCompactView: View {
+    let value: Int
+    let unit: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text("\(String(format: "%02d", value))")
+                .font(.custom("SF Pro Rounded-Bold", size: 28))
+                .foregroundColor(.white)
+
+            Text(unit.uppercased())
+                .font(.custom("Poppins-Medium", size: 10))
+                .foregroundColor(.white.opacity(0.6))
         }
     }
 }

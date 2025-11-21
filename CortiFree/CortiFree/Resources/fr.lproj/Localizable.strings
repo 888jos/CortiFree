@@ -102,6 +102,12 @@
 "profile.settings" = "Paramètres";
 "profile.logout" = "Déconnexion";
 
+// MARK: - Settings
+"settings.language" = "Langue";
+"settings.choose_language" = "Choisir la langue";
+"settings.language_subtitle" = "Sélectionnez votre langue préférée";
+"settings.language_restart_note" = "L'app redémarrera pour appliquer les changements";
+
 // MARK: - Loading
 "loading.calculating" = "Calcul en cours";
 "loading.understanding_answers" = "Compréhension des réponses";
@@ -111,3 +117,212 @@
 "loading.creating_plan" = "Création du plan";
 "loading.finalizing_recommendations" = "Finalisation des recommandations";
 "loading.view_66day_plan" = "Voir mon plan de 66 jours";
+
+// MARK: - Common Extended
+"common.default_user_name" = "Champion";
+"common.default_user" = "Utilisateur";
+"common.start" = "Commencer";
+"common.stop" = "Arrêter";
+"common.pause" = "Pause";
+"common.resume" = "Reprendre";
+"common.day" = "jour";
+"common.days" = "jours";
+"common.hour" = "heure";
+"common.hours" = "heures";
+"common.minute" = "minute";
+"common.minutes" = "minutes";
+"common.second" = "seconde";
+"common.seconds" = "secondes";
+"common.see_more" = "Voir plus";
+"common.see_less" = "Voir moins";
+"common.score" = "score";
+"common.streak" = "série";
+"common.global" = "Global";
+"common.current" = "Actuel";
+"common.potential" = "Potentiel (J66)";
+
+// MARK: - Home Extended
+"home.congratulations" = "Félicitations %@,";
+"home.program_started" = "tu as commencé le programme il y a :";
+"home.keep_shining" = "Continue de briller";
+"home.routine_countdown" = "Tu atteindras %@ dans :";
+"home.antistress_button" = "Bouton Anti-Stress";
+"home.breathe_deeply" = "Respirez profondément";
+"home.breathe_in" = "Inspirez...";
+"home.breathe_out" = "Expirez...";
+"home.neuroplasticity" = "Neuroplasticité cérébrale";
+"home.neuroplasticity_desc" = "La neuroplasticité est la capacité du cerveau à créer, défaire ou réorganiser les réseaux neuronaux. Grâce à des pratiques régulières sur 66 jours, nous pouvons littéralement recâbler notre cerveau pour réduire naturellement le stress et l'anxiété.";
+"home.why_66_days" = "Pourquoi 66 jours ?";
+"home.why_66_days_desc" = "Basé sur l'étude du Dr. Phillippa Lally de l'University College London, il faut en moyenne 66 jours pour qu'un nouveau comportement devienne automatique. C'est le temps nécessaire pour que votre cerveau crée de nouvelles connexions durables.";
+"home.scientific_evidence" = "Les preuves scientifiques";
+"home.scientific_evidence_desc" = "Des études en neurosciences montrent que la méditation et les exercices de respiration modifient physiquement la structure du cerveau, réduisant l'amygdale (centre de la peur) et renforçant le cortex préfrontal (contrôle émotionnel).";
+
+// MARK: - Levels
+"level.beginner_serene" = "Débutant Serein";
+"level.novice_calm" = "Novice Apaisé";
+"level.apprentice_zen" = "Apprenti Zen";
+"level.practitioner_awakened" = "Pratiquant Éveillé";
+"level.confirmed_meditator" = "Méditant Confirmé";
+"level.expert_calm" = "Expert du Calme";
+"level.master_calm" = "Maître du Calme";
+"level.peaceful_guru" = "Guru Paisible";
+"level.enlightened_sage" = "Sage Éclairé";
+"level.immortal_legend" = "Légende Immortelle";
+"level.supreme_master" = "Maître Suprême";
+"level.novice" = "Novice";
+
+// MARK: - Library
+"library.title" = "Librairie";
+"library.category.learn" = "Apprendre";
+"library.category.blog" = "Blog";
+"library.category.tips" = "Conseils";
+"library.category.studies" = "Études";
+"library.relaxing_sounds" = "Sons Relaxants";
+"library.relaxing_sounds_desc" = "Aide ton coeur à se réguler lors d'une situation stressante";
+"library.breathing_exercises" = "Exercices de Respiration Guidés";
+"library.breathing_exercises_desc" = "Techniques de respiration pour gérer le stress";
+"library.meditation_exercises" = "Exercices de Méditation Guidés";
+"library.meditation_exercises_desc" = "Méditations guidées pour la relaxation profonde";
+
+// MARK: - Library Sounds
+"library.sound.rain" = "Pluie";
+"library.sound.ocean" = "Ocean";
+"library.sound.fire" = "Feu";
+"library.sound.white_noise" = "Bruit Blanc";
+"library.sound.morning" = "Matinée";
+"library.sound.forest" = "Forêt";
+"library.sound.stream" = "Ruisseau";
+"library.sound.summer_night" = "Nuit d'été";
+
+// MARK: - Library Sections
+"library.section.respiration" = "Respiration";
+"library.section.meditation" = "Méditation";
+"library.section.journal" = "Journal";
+"library.section.research" = "Études";
+
+// MARK: - Profile
+"profile.score_cortifree" = "Score CortiFree";
+"profile.habits" = "Habitudes";
+"profile.day_progress" = "Jour %d/66";
+"profile.habit.meditation" = "Méditation";
+"profile.habit.breathing" = "Respiration";
+"profile.habit.journal" = "Journal";
+"profile.habit.sport" = "Sport";
+"profile.habit.water" = "Eau";
+"profile.habit.nature" = "Nature";
+"profile.habit.sleep" = "Sommeil";
+"profile.habit.social" = "Social";
+"profile.domain.serenity" = "Sérénité";
+"profile.domain.sleep" = "Sommeil";
+"profile.domain.energy" = "Énergie";
+"profile.domain.focus" = "Focus";
+"profile.domain.balance" = "Équilibre";
+
+// Profile Edit
+"profile.edit.title" = "Mon Profil";
+"profile.edit.save" = "Sauvegarder";
+"profile.edit.personal_info" = "Informations personnelles";
+"profile.edit.first_name" = "Prénom";
+"profile.edit.sleep_section" = "Sommeil";
+"profile.edit.bed_time" = "Heure de coucher";
+"profile.edit.wake_time" = "Heure de réveil";
+"profile.edit.goals_section" = "Objectifs après 10 semaines";
+"profile.edit.current_section" = "Actuellement";
+"profile.edit.frequency_label" = "Fréquence";
+"profile.edit.duration_label" = "Durée";
+"profile.edit.quantity_label" = "Quantité";
+"profile.edit.apply_next_week" = "Les modifications seront appliquées à partir du %@";
+"profile.habit.frequency.daily" = "Quotidien";
+"profile.habit.frequency.week" = "sem";
+"profile.habit.times_per_week" = "%d fois/semaine";
+"profile.habit.minutes_per_session" = "%d min/session";
+"profile.habit.liters_per_day" = "%.1f L/jour";
+"profile.habit.hours_per_night" = "%.1f h/nuit";
+"profile.habit.routine_duration" = "Routine de %d min";
+"profile.habit.completion_rate" = "Taux de complétion: %@";
+"profile.habit.no_data_yet" = "Pas encore de données";
+
+// MARK: - Tasks Extended
+"tasks.day_progress" = "Jour %d/66";
+"tasks.breathe_consciously" = "Respirer en conscience";
+"tasks.meditate_mindfully" = "Méditer en pleine conscience";
+"tasks.drink_water" = "Boire au minimum %@ d'eau";
+"tasks.write_thoughts" = "Écrire ses pensées";
+"tasks.do_sport" = "Faire du sport";
+"tasks.go_outside" = "Sortir dehors";
+"tasks.good_sleep" = "Bien dormir";
+"tasks.social_time" = "Moment social";
+
+// MARK: - Settings Extended
+"settings.title" = "Paramètres";
+"settings.logout_confirm" = "Êtes-vous sûr de vouloir vous déconnecter ?";
+"settings.delete_account" = "Supprimer le compte";
+"settings.delete_account_warning" = "Cette action est irréversible. Toutes vos données seront définitivement supprimées.";
+"settings.change_routine" = "Changer de routine";
+"settings.select_new_routine" = "Sélectionne ta nouvelle routine";
+"settings.warning_title" = "⚠️ Attention";
+"settings.change_routine_warning" = "Changer de routine réinitialisera :";
+"settings.notifications" = "Notifications";
+"settings.sounds" = "Sons";
+"settings.privacy" = "Confidentialité";
+"settings.about" = "À propos";
+"settings.help" = "Aide";
+"settings.version" = "Version";
+"settings.terms" = "Conditions d'utilisation";
+"settings.privacy_policy" = "Politique de confidentialité";
+
+// MARK: - Exercise
+"exercise.start" = "Commencer";
+"exercise.stop" = "Arrêter";
+"exercise.pause" = "Pause";
+"exercise.resume" = "Reprendre";
+"exercise.completed" = "Terminé";
+"exercise.duration" = "Durée";
+"exercise.description" = "Description";
+"exercise.benefits" = "Bénéfices";
+"exercise.how_to" = "Comment faire";
+
+// MARK: - Journal
+"journal.title" = "Mon Journal";
+"journal.streak" = "%d jour(s)";
+"journal.create" = "Créer une entrée";
+"journal.save" = "Sauvegarder";
+"journal.saved" = "Sauvegardé !";
+"journal.delete" = "Supprimer";
+"journal.delete_confirm" = "Supprimer cette entrée ?";
+"journal.history" = "Historique";
+
+// Journal Tabs
+"journal.tab.gratitude" = "Gratitude";
+"journal.tab.reflection" = "Réflexion";
+"journal.tab.goals" = "Objectifs";
+
+// Tab Descriptions
+"journal.desc.gratitude" = "Ce pour quoi tu es reconnaissant";
+"journal.desc.reflection" = "Réfléchis sur ta journée";
+"journal.desc.goals" = "Tes objectifs et ambitions";
+
+// Sheet Titles
+"journal.title.gratitude" = "Journal de Gratitude";
+"journal.title.reflection" = "Réflexion du Jour";
+"journal.title.goals" = "Mes Objectifs";
+
+// Stats
+"journal.stats.this_week" = "Cette semaine";
+"journal.stats.average_mood" = "Humeur moyenne";
+"journal.stats.total_entries" = "Entrées";
+"journal.stats.word_count" = "mots";
+"journal.stats.words" = "mots";
+
+// Empty States
+"journal.empty.no_entries" = "Aucune entrée pour %@";
+"journal.empty.start_writing" = "Commence à écrire...";
+
+// Prompts
+"journal.prompt.placeholder" = "Votre réflexion";
+"journal.prompt.gratitude" = "Ajoute quelque chose...";
+
+// Mood
+"journal.mood.question" = "Comment te sens-tu ?";
+"journal.mood.hide" = "Masquer";
+"journal.mood.change" = "Changer";

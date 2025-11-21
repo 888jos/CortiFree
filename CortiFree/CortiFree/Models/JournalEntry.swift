@@ -11,67 +11,86 @@ import FirebaseFirestore
 
 struct JournalEntry: Identifiable, Codable {
     @DocumentID var id: String?
-    let meditationId: String
-    let meditationType: String  // "gratitude", "clarity", "journal", etc.
-    let prompt: String?         // La question/prompt associé
     let content: String         // Le contenu écrit par l'user
     let createdAt: Date
     let userId: String
     var mood: Mood?             // Humeur associée
-    var tags: [String]?         // Tags personnalisés
-    var isFavorite: Bool?       // Marquée comme favorie
+    var photoURL: String?       // URL de la photo dans Firebase Storage
     var wordCount: Int?         // Nombre de mots
+
+    // Legacy fields (kept for backward compatibility but not used in new simplified journal)
+    var meditationId: String?
+    var meditationType: String?
+    var prompt: String?
+    var tags: [String]?
+    var isFavorite: Bool?
 
     enum CodingKeys: String, CodingKey {
         case id
-        case meditationId
-        case meditationType
-        case prompt
         case content
         case createdAt
         case userId
         case mood
+        case photoURL
+        case wordCount
+        case meditationId
+        case meditationType
+        case prompt
         case tags
         case isFavorite
-        case wordCount
     }
 }
 
 // MARK: - Mood Enum
 enum Mood: String, Codable, CaseIterable {
-    case amazing = "amazing"
-    case good = "good"
-    case okay = "okay"
+    case awful = "awful"
+    case angry = "angry"
     case low = "low"
-    case difficult = "difficult"
+    case okay = "okay"
+    case good = "good"
+    case amazing = "amazing"
 
     var emoji: String {
         switch self {
-        case .amazing: return "😊"
-        case .good: return "🙂"
-        case .okay: return "😐"
+        case .awful: return "😭"
+        case .angry: return "😤"
         case .low: return "😔"
-        case .difficult: return "😢"
+        case .okay: return "😐"
+        case .good: return "🙂"
+        case .amazing: return "😊"
         }
     }
 
     var displayName: String {
         switch self {
-        case .amazing: return "Excellent"
-        case .good: return "Bien"
-        case .okay: return "Moyen"
+        case .awful: return "Terrible"
+        case .angry: return "Colère"
         case .low: return "Faible"
-        case .difficult: return "Difficile"
+        case .okay: return "Neutre"
+        case .good: return "Bien"
+        case .amazing: return "Génial"
+        }
+    }
+
+    var pastelColor: String {
+        switch self {
+        case .awful: return "FF9999"        // Pastel Red
+        case .angry: return "FFB366"        // Pastel Orange
+        case .low: return "FFD699"          // Pastel Yellow-Orange
+        case .okay: return "FFEB99"         // Pastel Yellow
+        case .good: return "B3E6B3"         // Pastel Green
+        case .amazing: return "99E699"      // Pastel Bright Green
         }
     }
 
     var color: String {
         switch self {
-        case .amazing: return "4CAF50"      // Green
-        case .good: return "8BC34A"         // Light Green
-        case .okay: return "FFC107"         // Amber
-        case .low: return "FF9800"          // Orange
-        case .difficult: return "F44336"    // Red
+        case .awful: return "E63946"        // Bright Red
+        case .angry: return "F77F00"        // Vivid Orange
+        case .low: return "FCBF49"          // Golden Yellow
+        case .okay: return "90E0EF"         // Sky Blue
+        case .good: return "06D6A0"         // Turquoise Green
+        case .amazing: return "7209B7"      // Vibrant Purple
         }
     }
 }

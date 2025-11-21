@@ -185,14 +185,36 @@ struct AuthenticationView: View {
         .fullScreenCover(isPresented: $showEmailAuth) {
             EmailAuthView(onComplete: {
                 showEmailAuth = false
+
+                // Track auth completion
+                if let userId = Auth.auth().currentUser?.uid {
+                    MixpanelManager.shared.trackOnboardingAuthenticationCompleted(
+                        authMethod: "email",
+                        userId: userId
+                    )
+                }
+
                 onComplete()
             })
         }
         .fullScreenCover(isPresented: $showGoogleAuth) {
             GoogleAuthView(onComplete: {
                 showGoogleAuth = false
+
+                // Track auth completion
+                if let userId = Auth.auth().currentUser?.uid {
+                    MixpanelManager.shared.trackOnboardingAuthenticationCompleted(
+                        authMethod: "google",
+                        userId: userId
+                    )
+                }
+
                 onComplete()
             })
+        }
+        .onAppear {
+            // Track authentication screen view
+            MixpanelManager.shared.trackOnboardingAuthenticationViewed(firstName: firstName)
         }
     }
 
@@ -332,11 +354,13 @@ struct EmailAuthView: View {
 
                             SecureField("", text: $password, prompt: Text("Mot de passe").foregroundColor(.white.opacity(0.6)))
                                 .textFieldStyle(CustomTextFieldStyle())
+                                .textContentType(.oneTimeCode)
                                 .colorScheme(.dark)
 
                             if isSignUp {
                                 SecureField("", text: $confirmPassword, prompt: Text("Confirmer le mot de passe").foregroundColor(.white.opacity(0.6)))
                                     .textFieldStyle(CustomTextFieldStyle())
+                                    .textContentType(.oneTimeCode)
                                     .colorScheme(.dark)
                             }
                         }

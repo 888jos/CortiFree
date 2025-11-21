@@ -18,6 +18,7 @@ struct ReassuranceView: View {
     @State private var player: AVPlayer?
     @State private var showBadges: Bool = false
     @State private var showButton: Bool = false
+    @State private var screenViewTime: Date?
 
     private let fullText: String
 
@@ -82,6 +83,13 @@ struct ReassuranceView: View {
                     VStack(spacing: 12) {
                         Button(action: {
                             HapticManager.medium()
+
+                            // Track button click with time spent
+                            if let startTime = screenViewTime {
+                                let timeSpent = Date().timeIntervalSince(startTime)
+                                MixpanelManager.shared.trackOnboardingReassuranceContinue(timeSpent: timeSpent)
+                            }
+
                             onStartQuiz()
                         }) {
                             HStack(spacing: 12) {
@@ -120,6 +128,10 @@ struct ReassuranceView: View {
             }
         }
         .onAppear {
+            // Track screen view
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingReassuranceViewed(userName: userName)
+
             setupVideo()
             startTextAnimation()
         }
@@ -175,8 +187,10 @@ struct ReassuranceView: View {
         displayedText.append(fullText[index])
         currentCharacterIndex += 1
 
-        // Light haptic feedback for each character
-        HapticManager.light()
+        // Haptic feedback only every 10 characters to avoid rate-limit (32hz)
+        if currentCharacterIndex % 10 == 0 {
+            HapticManager.light()
+        }
 
         // Continue animation with slight delay
         let delay: Double = fullText[index].isWhitespace ? 0.01 : 0.05

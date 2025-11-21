@@ -2,12 +2,70 @@
 //  ProgressionView.swift
 //  CortiFree
 //
-//  Vue de progression avec système de niveaux
+//  DEPRECATED: Vue de progression avec système de niveaux
+//  NOTE: This view is no longer used - XP/Levels system has been removed
+//  Replaced by Achievement system in ProfileView
 //
 
 import SwiftUI
 
+// DEPRECATED: This view has been replaced by the Achievements tab in ProfileView
 struct ProgressionView: View {
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        ZStack {
+            GalaxyBackgroundView(intensity: 1.0)
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Spacer()
+
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 80))
+                    .foregroundColor(Color(hex: "B794F6"))
+
+                Text("Système de Progression Mis à Jour")
+                    .font(.custom("HankenGrotesk-Bold", size: 24))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+
+                Text("Le système de niveaux a été remplacé par le système de badges d'achievements.")
+                    .font(.custom("Poppins-Regular", size: 16))
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+
+                Text("Rendez-vous dans l'onglet \"Badges\" de votre profil pour voir vos accomplissements!")
+                    .font(.custom("Poppins-Regular", size: 14))
+                    .foregroundColor(.white.opacity(0.5))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+
+                Button(action: {
+                    dismiss()
+                }) {
+                    Text("Fermer")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(hex: "B794F6"))
+                        )
+                }
+                .padding(.horizontal, 40)
+                .padding(.top, 24)
+
+                Spacer()
+            }
+        }
+    }
+}
+
+/* ORIGINAL CODE - DEPRECATED - DO NOT USE
+struct ProgressionView_DEPRECATED: View {
     @StateObject private var progressionManager = ProgressionManager.shared
     @StateObject private var planetSettings = PlanetSettings.shared
     @State private var selectedTab: ProgressionTab = .current
@@ -312,6 +370,7 @@ struct ProgressionView: View {
         )
     }
 }
+*/
 
 // MARK: - Preview
 #Preview {

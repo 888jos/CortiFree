@@ -18,6 +18,7 @@ struct OverallQuizView: View {
     @State private var selectedReasons: Set<Int> = []
     @State private var selectedDuration: Int? = nil
     @State private var isGoingBack: Bool = false
+    @State private var quizStartTime: Date?
     @FocusState private var isTextFieldFocused: Bool
 
     private let totalQuestions = 5
@@ -94,6 +95,10 @@ struct OverallQuizView: View {
             }
         }
         .animation(.easeInOut(duration: 0.5), value: currentQuestionIndex)
+        .onAppear {
+            quizStartTime = Date()
+            MixpanelManager.shared.trackOnboardingOverallQuizViewed()
+        }
     }
 
     // MARK: - Header Section
@@ -638,7 +643,32 @@ struct OverallQuizView: View {
             reasons: selectedReasonTexts,
             duration: durationOptions[selectedDuration ?? 0]
         )
+
+        // Track quiz completion
+        let totalTime = quizStartTime.map { Date().timeIntervalSince($0) } ?? 0
+        let ageString = ageOptions[selectedAge ?? 0]
+        let ageInt = extractAgeFromString(ageString)
+
+        MixpanelManager.shared.trackOnboardingOverallQuizCompleted(
+            firstName: firstName,
+            age: ageInt,
+            gender: genderOptions[selectedGender ?? 0],
+            stressReasons: selectedReasonTexts,
+            stressDuration: durationOptions[selectedDuration ?? 0],
+            timeToComplete: totalTime
+        )
+
         onComplete(data)
+    }
+
+    // Helper to extract age from string like "18-24 ans"
+    private func extractAgeFromString(_ ageString: String) -> Int {
+        // Extract first number from string like "18-24 ans" -> 18
+        let components = ageString.components(separatedBy: CharacterSet.decimalDigits.inverted)
+        if let firstNumber = components.first(where: { !$0.isEmpty }), let age = Int(firstNumber) {
+            return age
+        }
+        return 25 // Default fallback
     }
 }
 

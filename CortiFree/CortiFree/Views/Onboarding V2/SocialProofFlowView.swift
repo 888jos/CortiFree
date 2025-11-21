@@ -33,21 +33,8 @@ struct SocialProofFlowView: View {
                     ))
                 }
 
-                // Screen 2: Before/After Statistics
+                // Screen 2: Goals Selection (BeforeAfterStats removed)
                 if currentPage == 1 {
-                    BeforeAfterStatsView(onContinue: {
-                        withAnimation {
-                            currentPage = 2
-                        }
-                    })
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
-                }
-
-                // Screen 3: Goals Selection
-                if currentPage == 2 {
                     GoalsSelectionView(onContinue: {
                         onComplete()
                     })
@@ -66,6 +53,7 @@ struct SocialProofFlowView: View {
 
 struct TestimonialsView: View {
     var onContinue: () -> Void
+    @State private var screenViewTime: Date?
 
     private let testimonials = [
         Testimonial(
@@ -159,6 +147,10 @@ struct TestimonialsView: View {
             // Continue button
             Button(action: {
                 HapticManager.light()
+
+                // Track continue action
+                MixpanelManager.shared.trackOnboardingTestimonialsContinue()
+
                 onContinue()
             }) {
                 HStack(spacing: 8) {
@@ -177,6 +169,10 @@ struct TestimonialsView: View {
             }
             .padding(.horizontal, 34)
             .padding(.bottom, 80)
+        }
+        .onAppear {
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingTestimonialsViewed()
         }
     }
 }
@@ -415,6 +411,7 @@ struct StressEvolutionChart: View {
 
 struct GoalsSelectionView: View {
     @State private var selectedGoals: Set<Int> = []
+    @State private var screenViewTime: Date?
     var onContinue: () -> Void
 
     private let goals = [
@@ -482,14 +479,21 @@ struct GoalsSelectionView: View {
 
             Spacer()
 
-            // Continue button
+            // Continue button - Génère le plan personnalisé
             Button(action: {
                 HapticManager.light()
+
+                // Track goal selection
+                let selectedGoalNames = selectedGoals.map { goals[$0] }
+                MixpanelManager.shared.trackOnboardingGoalsSelectionCompleted(
+                    selectedGoals: selectedGoalNames
+                )
+
                 // Save selected goals to UserDefaults
                 UserDefaults.standard.set(Array(selectedGoals), forKey: "selectedGoals")
                 onContinue()
             }) {
-                Text("Voir mes options")
+                Text("Commencer mon programme")
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(Color(hex: "1A1A4E"))
                     .frame(maxWidth: .infinity)
@@ -501,6 +505,10 @@ struct GoalsSelectionView: View {
             .padding(.bottom, 80)
             .disabled(selectedGoals.isEmpty)
             .opacity(selectedGoals.isEmpty ? 0.5 : 1.0)
+        }
+        .onAppear {
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingGoalsSelectionViewed()
         }
     }
 }

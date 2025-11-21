@@ -42,15 +42,13 @@ class AuthManager: ObservableObject {
         )
 
         // Set Mixpanel profile
-        MixpanelManager.shared.setUserProfile(
-            userId: user.uid,
-            email: email,
-            routineId: nil,
-            level: 1
-        )
+        MixpanelManager.shared.identify(userId: user.uid)
+
+        // TODO: Set user profile after onboarding with full data
+        // MixpanelManager.shared.setUserProfile(...)
 
         // Track signup
-        MixpanelManager.shared.trackOnboardingStarted()
+        MixpanelManager.shared.trackOnboardingWelcomeViewed()
 
         self.currentUser = user
         self.isAuthenticated = true

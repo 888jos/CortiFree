@@ -366,14 +366,13 @@ struct SimplifiedDailyProgramView: View {
             totalXPEarned += task.xp
             HapticManager.success()
 
-            // Award XP via ProgressionManager
-            ProgressionManager.shared.addCustomXP(task.xp, description: task.title)
+            // XP system removed - using scoring system instead
 
             // Check if all tasks completed and checkpoint exists
             if allTasksCompleted, let program = dailyProgram, program.checkpointDay {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     totalXPEarned += program.bonusXP
-                    ProgressionManager.shared.addCustomXP(program.bonusXP, description: "Checkpoint Jour \(dayNumber)")
+                    // XP system removed - using scoring system instead
                     showCheckpointCelebration = true
                 }
             }

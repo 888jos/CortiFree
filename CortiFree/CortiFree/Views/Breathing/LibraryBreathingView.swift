@@ -227,10 +227,7 @@ struct LibraryBreathingView: View {
     private func completeExercise() {
         HapticManager.success()
 
-        // Award XP for completing breathing exercise
-        if totalDuration >= 60 { // At least 1 minute
-            ProgressionManager.shared.addXP(.breathingComplete)
-        }
+        // XP system removed - using scoring system instead
 
         withAnimation(.easeInOut(duration: 0.5)) {
             showCompletion = true

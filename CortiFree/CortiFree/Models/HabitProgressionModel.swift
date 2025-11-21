@@ -68,12 +68,12 @@ struct WeeklyHabitProgression {
         )
     }
 
-    // Méditation: 2x/sem 5min → 7x/sem 13min (1h30 total par semaine)
+    // Méditation: 3x/sem 5min → 7x/sem 13min (1h30 total par semaine)
     static func meditationProgression(week: Int) -> HabitProgression {
         let clampedWeek = min(max(week, 1), 10)
 
-        // Frequency: 2 → 7 times per week
-        let frequency = 2 + (5 * (clampedWeek - 1)) / 9
+        // Frequency: 3 → 7 times per week
+        let frequency = 3 + (4 * (clampedWeek - 1)) / 9
 
         // Duration: 5 → 13 minutes
         let duration = 5 + (8 * (clampedWeek - 1)) / 9
@@ -85,12 +85,12 @@ struct WeeklyHabitProgression {
         )
     }
 
-    // Journal: 2x/sem 5min → 7x/sem 10min
+    // Journal: 7x/sem (quotidien) 5min → 10min
     static func journalProgression(week: Int) -> HabitProgression {
         let clampedWeek = min(max(week, 1), 10)
 
-        // Frequency: 2 → 7 times per week
-        let frequency = 2 + (5 * (clampedWeek - 1)) / 9
+        // Frequency: Daily (7x/sem)
+        let frequency = 7
 
         // Duration: 5 → 10 minutes
         let duration = 5 + (5 * (clampedWeek - 1)) / 9
@@ -133,12 +133,12 @@ struct WeeklyHabitProgression {
         )
     }
 
-    // Nature: 1x/sem 30min → 3x/sem 70min (3h30 total par semaine)
+    // Nature: 2x/sem 30min → 4x/sem 70min (3h30 total par semaine)
     static func natureProgression(week: Int) -> HabitProgression {
         let clampedWeek = min(max(week, 1), 10)
 
-        // Frequency: 1 → 3 times per week
-        let frequency = 1 + (2 * (clampedWeek - 1)) / 9
+        // Frequency: 2 → 4 times per week
+        let frequency = 2 + (2 * (clampedWeek - 1)) / 9
 
         // Duration: 30 → 70 minutes
         let duration = 30 + (40 * (clampedWeek - 1)) / 9

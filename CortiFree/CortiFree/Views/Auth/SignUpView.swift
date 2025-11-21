@@ -162,6 +162,7 @@ struct SignUpView: View {
                                         .font(.custom("Poppins-Regular", size: 16))
                                         .foregroundColor(.white)
                                         .textInputAutocapitalization(.never)
+                                        .textContentType(.oneTimeCode)
                                         .focused($focusedField, equals: .password)
                                         .overlay(
                                             Text(password.isEmpty ? "Min. 6 caractères" : "")
@@ -217,6 +218,7 @@ struct SignUpView: View {
                                         .font(.custom("Poppins-Regular", size: 16))
                                         .foregroundColor(.white)
                                         .textInputAutocapitalization(.never)
+                                        .textContentType(.oneTimeCode)
                                         .focused($focusedField, equals: .confirmPassword)
                                         .overlay(
                                             Text(confirmPassword.isEmpty ? "Confirmez votre mot de passe" : "")

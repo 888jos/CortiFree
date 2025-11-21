@@ -3,7 +3,9 @@
 //  CortiFree
 //
 //  Created by Claude on 11/11/2025.
-//  Quiz de 15 questions optimisées pour scorer les 4 domaines + habitudes clés
+//  Enhanced Quiz: 25 questions including baseline assessment
+//  Q1-10: Baseline habits to prevent regression
+//  Q11-25: Domain assessment for personalized scoring
 //
 
 import SwiftUI
@@ -14,10 +16,15 @@ struct HabitsQuizView: View {
     @State private var currentQuestionIndex: Int = 0
     @State private var selectedAnswer: Int? = nil
     @State private var energySliderValue: Double = 5.0
-    @State private var answers: [Int] = Array(repeating: 0, count: 15)
+    @State private var waterSliderValue: Double = 1.5
+    @State private var wakeTimeHour: Int = 7
+    @State private var wakeTimeMinute: Int = 0
+    @State private var answers: [Int] = Array(repeating: 0, count: 12) // Optimized to 12 questions
     @State private var isGoingBack: Bool = false
+    @State private var questionStartTime: Date? // Track time spent on each question
+    @State private var quizStartTime: Date? // Track total quiz time
 
-    private let totalQuestions = 15
+    private let totalQuestions = 12 // Optimized from 25 to 12
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -61,6 +68,16 @@ struct HabitsQuizView: View {
             }
         }
         .animation(.easeInOut(duration: 0.5), value: currentQuestionIndex)
+        .onAppear {
+            // Track quiz started
+            quizStartTime = Date()
+            questionStartTime = Date()
+            // Quiz start is tracked by first question view
+        }
+        .onChange(of: currentQuestionIndex) { _ in
+            // Reset timer when question changes
+            questionStartTime = Date()
+        }
     }
 
     // MARK: - Header Section
@@ -71,6 +88,11 @@ struct HabitsQuizView: View {
             Button(action: {
                 HapticManager.light()
                 if currentQuestionIndex > 0 {
+                    // Track back button click
+                    MixpanelManager.shared.trackOnboardingQuizBackClicked(
+                        fromQuestionNumber: currentQuestionIndex + 1
+                    )
+
                     isGoingBack = true
                     withAnimation(.easeInOut(duration: 0.5)) {
                         currentQuestionIndex -= 1
@@ -160,6 +182,18 @@ struct HabitsQuizView: View {
                             selectedAnswer = index
                         }
 
+                        // Track the answer
+                        let question = getQuestion(at: currentQuestionIndex)
+                        let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
+
+                        MixpanelManager.shared.trackOnboardingQuizQuestionAnswered(
+                            questionNumber: currentQuestionIndex + 1,
+                            questionText: question.text,
+                            answerIndex: index,
+                            answerText: options[index],
+                            timeToAnswer: timeToAnswer
+                        )
+
                         // Save answer and advance
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             answers[currentQuestionIndex] = index
@@ -241,6 +275,30 @@ struct HabitsQuizView: View {
 
     private func calculateAndComplete() {
         let result = HabitsQuizResult(answers: answers)
+
+        // Calculate total time spent on quiz
+        let totalTime = quizStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
+
+        // Track quiz completion with all scores
+        MixpanelManager.shared.trackOnboardingHabitsQuizCompleted(
+            totalTime: totalTime,
+            serenityScore: result.serenityScore,
+            sleepScore: result.sleepScore,
+            energyScore: result.energyScore,
+            focusScore: result.focusScore,
+            habitsScore: result.habitsScore,
+            balanceScore: result.balanceScore,
+            globalScore: result.globalScore,
+            baselineWakeTime: result.baselineData.wakeTime,
+            baselineSleepDuration: result.baselineData.sleepDuration,
+            baselineWaterIntake: result.baselineData.waterIntake,
+            baselineExerciseFrequency: result.baselineData.exerciseFrequency,
+            baselineMeditationFrequency: result.baselineData.meditationFrequency,
+            baselineAvailableTime: String(result.baselineData.availableTime),
+            hasPhysicalLimitations: nil,
+            primaryGoal: result.primaryGoal
+        )
+
         onComplete(result)
     }
 
@@ -264,7 +322,10 @@ struct HabitsQuestion {
 
 func getAllHabitsQuestions() -> [HabitsQuestion] {
     return [
-        // Q1 - SÉRÉNITÉ
+        // ============ PHASE 1: SYMPTÔMES (Q1-Q4) ============
+        // Identifier l'état mental et physique actuel
+
+        // Q1 - SÉRÉNITÉ: Pensées en boucle
         HabitsQuestion(
             text: "As-tu des pensées qui tournent en boucle dans ta tête ?",
             options: [
@@ -276,56 +337,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [10, 40, 70, 100]
         ),
 
-        // Q2 - SÉRÉNITÉ
-        HabitsQuestion(
-            text: "Arrives-tu à \"éteindre\" ton cerveau en fin de journée ?",
-            options: [
-                "Impossible, mon cerveau ne s'arrête jamais",
-                "Non, je reste en mode \"actif\" même le soir",
-                "Ça prend un peu de temps mais j'y arrive",
-                "Oui, je décroche facilement"
-            ],
-            scoring: [10, 40, 70, 100]
-        ),
-
-        // Q6 - SOMMEIL
-        HabitsQuestion(
-            text: "Combien de temps te faut-il pour t'endormir le soir ?",
-            options: [
-                "Plus d'une heure",
-                "30-60 minutes",
-                "15-30 minutes",
-                "Moins de 15 minutes"
-            ],
-            scoring: [10, 40, 75, 100]
-        ),
-
-        // Q7 - SOMMEIL
-        HabitsQuestion(
-            text: "Combien de fois te réveilles-tu par nuit en moyenne ?",
-            options: [
-                "4 fois ou plus",
-                "2-3 fois",
-                "1 fois",
-                "Jamais, je dors d'une traite"
-            ],
-            scoring: [10, 40, 70, 100]
-        ),
-
-        // Q9 - SOMMEIL
-        HabitsQuestion(
-            text: "Combien d'heures dors-tu par nuit ?",
-            options: [
-                "Moins de 5 heures",
-                "5-6 heures",
-                "6-7 heures",
-                "7-8 heures",
-                "Plus de 8 heures"
-            ],
-            scoring: [10, 40, 70, 100, 60]
-        ),
-
-        // Q11 - ÉNERGIE
+        // Q2 - ÉNERGIE: Niveau d'énergie quotidien
         HabitsQuestion(
             text: "Quel est ton niveau d'énergie au quotidien ?",
             options: [
@@ -338,19 +350,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [10, 35, 60, 80, 100]
         ),
 
-        // Q14 - ÉNERGIE
-        HabitsQuestion(
-            text: "Comment est ta motivation au quotidien ?",
-            options: [
-                "Aucune motivation, tout est un effort",
-                "Il faut que je me force pour tout",
-                "Ça va, je fais ce que j'ai à faire",
-                "Motivé, j'ai envie de faire les choses"
-            ],
-            scoring: [10, 35, 65, 100]
-        ),
-
-        // Q16 - FOCUS
+        // Q3 - FOCUS: Capacité de concentration
         HabitsQuestion(
             text: "Combien de temps peux-tu rester concentré sur une tâche ?",
             options: [
@@ -362,95 +362,126 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [10, 40, 70, 100]
         ),
 
-        // Q21 - HABITUDES
+        // Q4 - SOMMEIL: Temps d'endormissement
         HabitsQuestion(
-            text: "Combien de fois par semaine fais-tu des exercices de respiration consciente ?",
+            text: "Combien de temps te faut-il pour t'endormir le soir ?",
             options: [
-                "Jamais",
+                "Plus d'une heure",
+                "30-60 minutes",
+                "15-30 minutes",
+                "Moins de 15 minutes"
+            ],
+            scoring: [10, 40, 75, 100]
+        ),
+
+        // ============ PHASE 2: CONTEXTE (Q5-Q6) ============
+        // Comprendre l'environnement et les contraintes
+
+        // Q5 - SOCIAL: Interactions sociales
+        HabitsQuestion(
+            text: "Combien de fois par semaine as-tu des interactions sociales significatives ?",
+            options: [
+                "Jamais ou presque",
                 "1-2 fois par semaine",
                 "3-4 fois par semaine",
                 "5-6 fois par semaine",
                 "Tous les jours"
-            ],
-            scoring: [0, 30, 55, 75, 100]
-        ),
-
-        // Q22 - HABITUDES
-        HabitsQuestion(
-            text: "Combien de fois par semaine médites-tu ou pratiques-tu la pleine conscience ?",
-            options: [
-                "Jamais",
-                "1-2 fois par semaine",
-                "3-4 fois par semaine",
-                "5-6 fois par semaine",
-                "Tous les jours"
-            ],
-            scoring: [0, 30, 55, 75, 100]
-        ),
-
-        // Q25 - HABITUDES
-        HabitsQuestion(
-            text: "Combien de fois par semaine écris-tu dans un journal (gratitude, pensées, etc.) ?",
-            options: [
-                "Jamais",
-                "1-2 fois par semaine",
-                "3-4 fois par semaine",
-                "5-6 fois par semaine",
-                "Tous les jours"
-            ],
-            scoring: [0, 30, 55, 75, 100]
-        ),
-
-        // Q24 - HABITUDES
-        HabitsQuestion(
-            text: "Combien de nuits par semaine te couches-tu et te lèves-tu à la même heure ?",
-            options: [
-                "Jamais les mêmes horaires",
-                "2-3 nuits par semaine",
-                "4-5 nuits par semaine",
-                "6 nuits par semaine",
-                "Tous les jours mêmes horaires"
             ],
             scoring: [10, 35, 60, 80, 100]
         ),
 
-        // Q26 - HABITUDES
+        // Q6 - CONTRAINTES: Limitations physiques
         HabitsQuestion(
-            text: "Combien de fois par semaine fais-tu une activité physique (marche, yoga, sport) ?",
+            text: "As-tu des limitations physiques qui pourraient affecter certaines habitudes ?",
             options: [
-                "Jamais",
-                "1-2 fois par semaine",
-                "3-4 fois par semaine",
-                "5-6 fois par semaine",
-                "Tous les jours"
+                "Oui, plusieurs limitations importantes",
+                "Quelques limitations mineures",
+                "Non, aucune limitation"
             ],
-            scoring: [0, 30, 55, 75, 100]
+            scoring: [30, 65, 100]
         ),
 
-        // Q27 - HABITUDES
+        // ============ PHASE 3: BASELINE HABITS (Q7-Q12) ============
+        // Mesurer les habitudes actuelles pour éviter la régression
+
+        // Q7 - BASELINE SOMMEIL: Heure de réveil
         HabitsQuestion(
-            text: "Combien de fois par semaine passes-tu au moins 15 minutes dans la nature ou dehors ?",
+            text: "À quelle heure te réveilles-tu habituellement ?",
             options: [
-                "Jamais",
-                "1-2 fois par semaine",
-                "3-4 fois par semaine",
-                "5-6 fois par semaine",
-                "Tous les jours"
+                "Avant 6h00",
+                "Entre 6h00 et 7h00",
+                "Entre 7h00 et 8h00",
+                "Entre 8h00 et 9h00",
+                "Après 9h00"
             ],
-            scoring: [0, 30, 55, 75, 100]
+            scoring: [100, 90, 70, 50, 30]
         ),
 
-        // Q23 - HABITUDES
+        // Q8 - BASELINE SOMMEIL: Durée de sommeil
         HabitsQuestion(
-            text: "Combien de litres d'eau bois-tu par jour en moyenne ?",
+            text: "Combien d'heures dors-tu actuellement par nuit ?",
             options: [
-                "Moins de 1 litre",
-                "1 à 1,5 litres",
-                "1,5 à 2 litres",
-                "2 à 2,5 litres",
-                "Plus de 2,5 litres"
+                "Moins de 5 heures",
+                "5-6 heures",
+                "6-7 heures",
+                "7-8 heures",
+                "Plus de 8 heures"
             ],
-            scoring: [10, 40, 70, 90, 100]
+            scoring: [20, 40, 60, 90, 100]
+        ),
+
+        // Q9 - BASELINE HYDRATATION: Consommation d'eau
+        HabitsQuestion(
+            text: "Quelle quantité d'eau bois-tu par jour actuellement ?",
+            options: [
+                "Moins de 0.5L",
+                "0.5L à 1L",
+                "1L à 1.5L",
+                "1.5L à 2L",
+                "2L à 2.5L",
+                "Plus de 2.5L"
+            ],
+            scoring: [10, 25, 45, 65, 85, 100]
+        ),
+
+        // Q10 - BASELINE SPORT: Fréquence d'exercice
+        HabitsQuestion(
+            text: "Combien de fois fais-tu du sport/exercice par semaine actuellement ?",
+            options: [
+                "Jamais",
+                "1 fois par semaine",
+                "2-3 fois par semaine",
+                "4-5 fois par semaine",
+                "6-7 fois par semaine"
+            ],
+            scoring: [0, 25, 50, 75, 100]
+        ),
+
+        // Q11 - BASELINE MINDFULNESS: Pratique méditation
+        HabitsQuestion(
+            text: "Pratiques-tu déjà la méditation ou la pleine conscience ?",
+            options: [
+                "Jamais essayé",
+                "J'ai essayé mais j'ai arrêté",
+                "Occasionnellement (1-2x/mois)",
+                "Régulièrement (1-2x/semaine)",
+                "Souvent (3-5x/semaine)",
+                "Tous les jours"
+            ],
+            scoring: [0, 15, 30, 50, 75, 100]
+        ),
+
+        // Q12 - FAISABILITÉ: Temps disponible (CRUCIAL - dernière question)
+        HabitsQuestion(
+            text: "Combien de temps peux-tu consacrer aux nouvelles habitudes par jour ?",
+            options: [
+                "Moins de 15 minutes",
+                "15-30 minutes",
+                "30-45 minutes",
+                "45-60 minutes",
+                "Plus d'1 heure"
+            ],
+            scoring: [30, 50, 70, 85, 100]
         )
     ]
 }
@@ -514,25 +545,43 @@ struct HabitsAnswerButton: View {
 struct HabitsQuizResult {
     let answers: [Int]
 
-    // Calculate scores (updated for 15-question quiz)
+    // MARK: - Baseline Data (Q7-Q12)
+    var baselineData: BaselineHabits {
+        BaselineHabits(
+            wakeTime: getWakeTimeFromAnswer(answers[6]),           // Q7
+            sleepDuration: getSleepDurationFromAnswer(answers[7]), // Q8
+            waterIntake: getWaterIntakeFromAnswer(answers[8]),     // Q9
+            exerciseFrequency: getExerciseFrequencyFromAnswer(answers[9]), // Q10
+            exerciseDuration: 30,  // DEFAULT: question removed, reasonable default
+            meditationFrequency: getMeditationFrequencyFromAnswer(answers[10]), // Q11
+            meditationDuration: 5, // DEFAULT: question removed, reasonable default
+            breathingFrequency: 0, // DEFAULT: question removed, assume not practiced
+            availableTime: getAvailableTimeFromAnswer(answers[11]), // Q12
+            preferredIntensity: "moderate" // DEFAULT: question removed, moderate pace
+        )
+    }
+
+    // MARK: - Domain Scores (Q1-Q12 optimized)
     var serenityScore: Int {
-        calculateDomainScore(questionIndices: [0, 1]) // Q1, Q2
+        calculateDomainScore(questionIndices: [0]) // Q1: Pensées en boucle
     }
 
     var sleepScore: Int {
-        calculateDomainScore(questionIndices: [2, 3, 4]) // Q6, Q7, Q9
+        // Q4 (temps endormissement) + Q7 (heure réveil) + Q8 (durée sommeil)
+        calculateDomainScore(questionIndices: [3, 6, 7])
     }
 
     var energyScore: Int {
-        calculateDomainScore(questionIndices: [5, 6]) // Q11 (slider), Q14
+        calculateDomainScore(questionIndices: [1]) // Q2: Niveau d'énergie
     }
 
     var focusScore: Int {
-        calculateDomainScore(questionIndices: [7]) // Q16
+        calculateDomainScore(questionIndices: [2]) // Q3: Concentration
     }
 
     var habitsScore: Int {
-        calculateDomainScore(questionIndices: [8, 9, 10, 11, 12, 13, 14]) // Q21, Q22, Q25, Q24, Q26, Q27, Q23
+        // Q5 (social) + Q9 (eau) + Q10 (sport) + Q11 (méditation)
+        calculateDomainScore(questionIndices: [4, 8, 9, 10])
     }
 
     var globalScore: Int {
@@ -543,6 +592,31 @@ struct HabitsQuizResult {
         (serenityScore + focusScore) / 2
     }
 
+    // MARK: - Additional Insights
+    var hasPhysicalLimitations: Bool {
+        answers[5] < 2 // Q6 - physical limitations (0 or 1 = has limitations)
+    }
+
+    var preferredTimeOfDay: String {
+        // Default to morning since question was removed
+        "morning"
+    }
+
+    var primaryGoal: String {
+        // Determine from symptoms: highest priority from low scores
+        if serenityScore < sleepScore && serenityScore < energyScore {
+            return "stress"
+        } else if sleepScore < energyScore {
+            return "sleep"
+        } else if energyScore < focusScore {
+            return "energy"
+        } else if focusScore < 50 {
+            return "focus"
+        }
+        return "balance"
+    }
+
+    // MARK: - Helper Methods
     private func calculateDomainScore(questionIndices: [Int]) -> Int {
         let questions = getAllHabitsQuestions()
         var total = 0
@@ -550,16 +624,62 @@ struct HabitsQuizResult {
         for index in questionIndices {
             let answerIndex = answers[index]
             let scoring = questions[index].scoring
-            total += scoring[answerIndex]
+            total += scoring[safe: answerIndex] ?? 0
         }
 
         return total / questionIndices.count
+    }
+
+    // Baseline extraction methods
+    private func getWakeTimeFromAnswer(_ answer: Int) -> String {
+        ["05:30", "06:30", "07:30", "08:30", "09:30"][answer]
+    }
+
+    private func getSleepDurationFromAnswer(_ answer: Int) -> Double {
+        [4.5, 5.5, 6.5, 7.5, 8.5][answer]
+    }
+
+    private func getWaterIntakeFromAnswer(_ answer: Int) -> Double {
+        [0.5, 0.75, 1.25, 1.75, 2.25, 2.75][answer]
+    }
+
+    private func getExerciseFrequencyFromAnswer(_ answer: Int) -> Int {
+        [0, 1, 3, 5, 7][answer]
+    }
+
+    private func getMeditationFrequencyFromAnswer(_ answer: Int) -> Int {
+        [0, 0, 1, 2, 4, 7][answer]
+    }
+
+    private func getAvailableTimeFromAnswer(_ answer: Int) -> Int {
+        [10, 22, 37, 52, 75][answer]
+    }
+}
+
+// MARK: - Baseline Habits Structure
+struct BaselineHabits {
+    let wakeTime: String
+    let sleepDuration: Double
+    let waterIntake: Double
+    let exerciseFrequency: Int // per week
+    let exerciseDuration: Int // minutes
+    let meditationFrequency: Int // per week
+    let meditationDuration: Int // minutes
+    let breathingFrequency: Int // per week
+    let availableTime: Int // minutes per day
+    let preferredIntensity: String
+}
+
+// Safe array access extension
+extension Array {
+    subscript(safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
     }
 }
 
 #Preview {
     HabitsQuizView { result in
-        print("Quiz completed:")
+        print("Quiz completed (12 questions):")
         print("- Sérénité: \(result.serenityScore)")
         print("- Sommeil: \(result.sleepScore)")
         print("- Énergie: \(result.energyScore)")
@@ -567,5 +687,6 @@ struct HabitsQuizResult {
         print("- Habitudes: \(result.habitsScore)")
         print("- Global: \(result.globalScore)")
         print("- Équilibre: \(result.balanceScore)")
+        print("- Baseline: \(result.baselineData)")
     }
 }

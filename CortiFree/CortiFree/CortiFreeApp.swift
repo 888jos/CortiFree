@@ -8,23 +8,43 @@
 import SwiftUI
 import UIKit
 import FirebaseCore
+import FirebaseFirestore
 import SuperwallKit
 #if canImport(GoogleSignIn)
 import GoogleSignIn
+#endif
+#if canImport(Mixpanel)
+import Mixpanel
 #endif
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+
+        // Configure Firebase ONLY - NO Firestore settings to avoid crash
         FirebaseApp.configure()
-        Superwall.configure(apiKey: "pk_JPmmC0H5be4yqTnw24VTm")
+
+        // DO NOT configure Firestore settings here - it crashes the app
+        // Firestore will use default settings
+
+        // Configurer Superwall seulement si activé
+        if UserDefaults.standard.bool(forKey: "superwallEnabled") != false {
+            Superwall.configure(apiKey: "pk_JPmmC0H5be4yqTnw24VTm")
+        }
 
         // Register custom fonts
         FontManager.registerFonts()
 
-        // Initialize TaskManager to load tasks database
+        // Initialize Mixpanel Analytics
+        MixpanelManager.shared.initialize()
+
+        // Initialize TaskManager with optimization
         print("🚀 Initializing TaskManager...")
         _ = TaskManager.shared
+
+        // Apply fixes
+        AppFixes.shared.optimizeTaskManager()
+        AppFixes.shared.suppressNetworkLogs()
 
         return true
     }
@@ -49,9 +69,17 @@ struct CortiFreeApp: App {
     var body: some Scene {
         WindowGroup {
             if authViewModel.isAuthenticated {
-                ContentView()
-                    .environmentObject(authViewModel)
+                // User is authenticated - check if onboarding is completed
+                if UserDefaults.standard.bool(forKey: "onboardingV2Completed") {
+                    // Onboarding completed - show main app
+                    ContentView()
+                        .environmentObject(authViewModel)
+                } else {
+                    // Onboarding not completed - show onboarding flow (includes welcome screen)
+                    OnboardingV2FlowView()
+                }
             } else {
+                // Not authenticated - show auth screens
                 AuthView()
                     .environmentObject(authViewModel)
             }

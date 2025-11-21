@@ -168,7 +168,8 @@ class TasksViewModel: ObservableObject {
                 isCustomTask: false,
                 sfSymbol: "wind",
                 recommendedTime: "07:00",
-                taskDescription: "La technique de respiration 4-7-8 active le système nerveux parasympathique, réduisant instantanément les niveaux de cortisol. En inspirant 4 secondes, retenant 7 secondes et expirant 8 secondes, vous signalez à votre corps qu'il est en sécurité. Cette pratique matinale programme votre journée en mode calme plutôt qu'en mode stress."
+                taskDescription: "La technique de respiration 4-7-8 active le système nerveux parasympathique, réduisant instantanément les niveaux de cortisol. En inspirant 4 secondes, retenant 7 secondes et expirant 8 secondes, vous signalez à votre corps qu'il est en sécurité. Cette pratique matinale programme votre journée en mode calme plutôt qu'en mode stress.",
+                habitId: "breathing"
             ),
             TaskItem(
                 title: "Méditer 5 minutes",
@@ -179,7 +180,8 @@ class TasksViewModel: ObservableObject {
                 isCustomTask: false,
                 sfSymbol: "figure.mind.and.body",
                 recommendedTime: "08:00",
-                taskDescription: "La méditation matinale réduit le cortisol jusqu'à 20% selon des études scientifiques. Elle renforce votre capacité à gérer le stress tout au long de la journée en créant un espace mental de recul. Même 5 minutes suffisent pour recalibrer votre système nerveux et améliorer votre régulation émotionnelle face aux défis quotidiens."
+                taskDescription: "La méditation matinale réduit le cortisol jusqu'à 20% selon des études scientifiques. Elle renforce votre capacité à gérer le stress tout au long de la journée en créant un espace mental de recul. Même 5 minutes suffisent pour recalibrer votre système nerveux et améliorer votre régulation émotionnelle face aux défis quotidiens.",
+                habitId: "meditation"
             ),
             TaskItem(
                 title: "Boire un verre d'eau",
@@ -190,7 +192,8 @@ class TasksViewModel: ObservableObject {
                 isCustomTask: false,
                 sfSymbol: "drop.fill",
                 recommendedTime: "12:00",
-                taskDescription: "La déshydratation, même légère, augmente la production de cortisol et amplifie la perception du stress. Votre cerveau est composé de 75% d'eau - le maintenir hydraté optimise vos fonctions cognitives et votre capacité à gérer l'anxiété. Un simple verre d'eau peut réduire les symptômes de stress en quelques minutes."
+                taskDescription: "La déshydratation, même légère, augmente la production de cortisol et amplifie la perception du stress. Votre cerveau est composé de 75% d'eau - le maintenir hydraté optimise vos fonctions cognitives et votre capacité à gérer l'anxiété. Un simple verre d'eau peut réduire les symptômes de stress en quelques minutes.",
+                habitId: "water"
             ),
             TaskItem(
                 title: "S'étirer doucement",
@@ -201,7 +204,8 @@ class TasksViewModel: ObservableObject {
                 isCustomTask: false,
                 sfSymbol: "figure.flexibility",
                 recommendedTime: "15:00",
-                taskDescription: "Les étirements doux libèrent les tensions musculaires accumulées par le stress et favorisent la circulation sanguine. Cette pratique envoie des signaux de détente au cerveau, réduisant la production de cortisol. En milieu d'après-midi, elle prévient l'accumulation de stress et maintient votre corps dans un état de relaxation active."
+                taskDescription: "Les étirements doux libèrent les tensions musculaires accumulées par le stress et favorisent la circulation sanguine. Cette pratique envoie des signaux de détente au cerveau, réduisant la production de cortisol. En milieu d'après-midi, elle prévient l'accumulation de stress et maintient votre corps dans un état de relaxation active.",
+                habitId: "sport"
             ),
             TaskItem(
                 title: "Éteindre les écrans",
@@ -212,7 +216,8 @@ class TasksViewModel: ObservableObject {
                 isCustomTask: false,
                 sfSymbol: "moonphase.waning.crescent",
                 recommendedTime: "21:00",
-                taskDescription: "La lumière bleue des écrans inhibe la mélatonine et stimule la production de cortisol, perturbant votre rythme circadien. Éteindre les écrans 1h avant le coucher permet à votre cerveau de se préparer naturellement au sommeil. Un sommeil de qualité est votre meilleure défense contre le stress chronique et l'anxiété."
+                taskDescription: "La lumière bleue des écrans inhibe la mélatonine et stimule la production de cortisol, perturbant votre rythme circadien. Éteindre les écrans 1h avant le coucher permet à votre cerveau de se préparer naturellement au sommeil. Un sommeil de qualité est votre meilleure défense contre le stress chronique et l'anxiété.",
+                habitId: "sleep"
             )
         ]
 
@@ -260,9 +265,17 @@ class TasksViewModel: ObservableObject {
                 let wasCompleted = tasks[index].completed
                 tasks[index].completed.toggle()
 
-                // Award XP when completing a task (not when uncompleting)
-                if !wasCompleted && tasks[index].completed {
-                    ProgressionManager.shared.addXP(.dailyMissionComplete)
+                // XP system removed - using scoring system instead
+
+                // Apply or remove habit impact on domain scores
+                if let habitId = task.habitId, !habitId.isEmpty {
+                    if !wasCompleted && tasks[index].completed {
+                        // Task completed: apply impact
+                        _ = try await ImpactScoringService.shared.applyTaskImpact(habitId: habitId)
+                    } else if wasCompleted && !tasks[index].completed {
+                        // Task uncompleted: remove impact
+                        _ = try await ImpactScoringService.shared.removeTaskImpact(habitId: habitId)
+                    }
                 }
 
                 // Check if all tasks completed

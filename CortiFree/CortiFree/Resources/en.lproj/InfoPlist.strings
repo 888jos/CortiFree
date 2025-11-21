@@ -1,0 +1,21 @@
+/*
+  InfoPlist.strings - English
+  CortiFree
+*/
+
+/* App Name */
+"CFBundleDisplayName" = "CortiFree";
+
+/* App Description */
+"NSHumanReadableCopyright" = "© 2025 CortiFree. All rights reserved.";
+
+/* Privacy Descriptions */
+"NSCameraUsageDescription" = "CortiFree needs camera access to let you scan documents and track your progress visually.";
+"NSPhotoLibraryUsageDescription" = "CortiFree needs access to your photo library to let you save and share your progress.";
+"NSPhotoLibraryAddUsageDescription" = "CortiFree needs permission to save images to your photo library.";
+"NSMicrophoneUsageDescription" = "CortiFree needs microphone access for guided meditation and breathing exercises.";
+"NSLocationWhenInUseUsageDescription" = "CortiFree uses your location to provide personalized nature activity suggestions based on your area.";
+"NSMotionUsageDescription" = "CortiFree uses motion tracking to monitor your physical activity and provide better exercise recommendations.";
+"NSHealthShareUsageDescription" = "CortiFree reads health data to provide personalized wellness insights and track your progress.";
+"NSHealthUpdateUsageDescription" = "CortiFree saves your meditation and exercise data to Apple Health to give you a complete view of your wellness.";
+"NSUserTrackingUsageDescription" = "CortiFree uses this information to provide you with a better, more personalized experience.";

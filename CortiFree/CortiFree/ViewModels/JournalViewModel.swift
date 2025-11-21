@@ -2,22 +2,72 @@
 //  JournalViewModel.swift
 //  CortiFree
 //
-//  Created by Claude on 23/10/2025.
 //  ViewModel pour gérer les entrées de journal
 //
 
 import Foundation
 import FirebaseAuth
+import UIKit
 
 @MainActor
 class JournalViewModel: ObservableObject {
     @Published var entries: [JournalEntry] = []
+    @Published var allEntries: [JournalEntry] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
     private let journalService = JournalService.shared
 
-    // Sauvegarder une nouvelle entrée
+    // MARK: - New Simplified Methods
+
+    /// Save simplified journal entry with optional photo
+    func saveEntry(content: String, mood: Mood?, photoURL: String?, wordCount: Int, entryId: String? = nil) async {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            errorMessage = "Utilisateur non connecté"
+            return
+        }
+
+        guard !content.isEmpty else {
+            errorMessage = "Le contenu ne peut pas être vide"
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+
+        let entry = JournalEntry(
+            id: entryId,  // Pass existing ID if updating
+            content: content,
+            createdAt: Date(),
+            userId: userId,
+            mood: mood,
+            photoURL: photoURL,
+            wordCount: wordCount,
+            meditationId: nil,
+            meditationType: nil,
+            prompt: nil,
+            tags: nil,
+            isFavorite: nil
+        )
+
+        do {
+            try await journalService.saveEntry(entry)
+            await loadAllEntries()
+        } catch {
+            errorMessage = "Erreur lors de la sauvegarde: \(error.localizedDescription)"
+        }
+
+        isLoading = false
+    }
+
+    /// Upload photo to Firebase Storage
+    func uploadPhoto(_ image: UIImage) async -> String? {
+        return await journalService.uploadPhoto(image)
+    }
+
+    // MARK: - Legacy Methods (for backward compatibility)
+
+    /// Save entry with legacy format
     func saveEntry(meditationId: String, meditationType: String, prompt: String?, content: String, mood: Mood? = nil, tags: [String]? = nil, reloadAll: Bool = false) async {
         guard let userId = Auth.auth().currentUser?.uid else {
             errorMessage = "Utilisateur non connecté"
@@ -37,16 +87,17 @@ class JournalViewModel: ObservableObject {
 
         let entry = JournalEntry(
             id: nil,
-            meditationId: meditationId,
-            meditationType: meditationType,
-            prompt: prompt,
             content: content,
             createdAt: Date(),
             userId: userId,
             mood: mood,
+            photoURL: nil,
+            wordCount: wordCount,
+            meditationId: meditationId,
+            meditationType: meditationType,
+            prompt: prompt,
             tags: tags,
-            isFavorite: false,
-            wordCount: wordCount
+            isFavorite: false
         )
 
         do {
@@ -84,7 +135,8 @@ class JournalViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            entries = try await journalService.loadAllEntries()
+            allEntries = try await journalService.loadAllEntries()
+            entries = allEntries // Keep both for compatibility
         } catch {
             errorMessage = "Erreur lors du chargement: \(error.localizedDescription)"
         }
@@ -111,6 +163,7 @@ class JournalViewModel: ObservableObject {
         do {
             try await journalService.deleteEntry(entry)
             entries.removeAll { $0.id == entry.id }
+            allEntries.removeAll { $0.id == entry.id }
         } catch {
             errorMessage = "Erreur lors de la suppression: \(error.localizedDescription)"
         }

@@ -13,7 +13,7 @@ import SwiftUI
 
 struct TaskDatabase: Codable {
     let metadata: TaskMetadata
-    let progressionSystem: ProgressionSystem
+    let progressionSystem: ProgressionSystem?  // Made optional to handle missing key
     let categories: [TaskCategoryInfo]
 
     enum CodingKeys: String, CodingKey {

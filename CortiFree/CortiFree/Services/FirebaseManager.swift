@@ -18,13 +18,7 @@ class FirebaseManager: ObservableObject {
     @Published var isLoading = false
 
     private init() {
-        setupFirestore()
-    }
-
-    private func setupFirestore() {
-        let settings = FirestoreSettings()
-        settings.cacheSettings = PersistentCacheSettings(sizeBytes: NSNumber(value: FirestoreCacheSizeUnlimited))
-        db.settings = settings
+        // DO NOT configure Firestore settings - causes crash
     }
 
     // MARK: - User Management
@@ -92,7 +86,8 @@ class FirebaseManager: ObservableObject {
         ])
 
         // Track with Mixpanel
-        MixpanelManager.shared.trackOnboardingCompleted(selectedRoutine: selectedRoutineId)
+        // TODO: Update with correct signature in Phase 2
+        // MixpanelManager.shared.trackOnboardingCompleted(...)
     }
 
     // MARK: - Routines
@@ -142,12 +137,10 @@ class FirebaseManager: ObservableObject {
         ])
 
         // Track with Mixpanel
-        if let routine = try? await fetchRoutine(routineId: routineId) {
-            MixpanelManager.shared.trackRoutineStarted(
-                routineId: routineId,
-                routineName: routine.title
-            )
-        }
+        // TODO: Implement trackRoutineStarted in MixpanelManager
+        // if let routine = try? await fetchRoutine(routineId: routineId) {
+        //     MixpanelManager.shared.trackRoutineStarted(...)
+        // }
     }
 
     // MARK: - Exercises
@@ -208,18 +201,14 @@ class FirebaseManager: ObservableObject {
 
             // Check for level up
             if newLevel > user.level {
-                MixpanelManager.shared.trackLevelUp(newLevel: newLevel, totalXP: newTotalXP)
+                // TODO: Implement trackLevelUp in MixpanelManager
+                // MixpanelManager.shared.trackLevelUp(newLevel: newLevel, totalXP: newTotalXP)
             }
         }
 
         // Track with Mixpanel
-        MixpanelManager.shared.trackExerciseCompleted(
-            exerciseId: task.exerciseId,
-            exerciseType: task.moment,
-            durationSeconds: task.durationActualSeconds,
-            feedbackMood: task.feedbackMood,
-            xpEarned: task.xpEarned
-        )
+        // TODO: Implement trackExerciseCompleted in MixpanelManager
+        // MixpanelManager.shared.trackExerciseCompleted(...)
     }
 
     private func updateDailyProgress(uid: String, date: String, xpEarned: Int) async throws {
@@ -266,11 +255,8 @@ class FirebaseManager: ObservableObject {
 
         // Track with Mixpanel
         if let mood = feedback.mood as String? {
-            MixpanelManager.shared.trackFeedbackSubmitted(
-                mood: mood,
-                exerciseId: feedback.exerciseId ?? "unknown",
-                hasNote: feedback.note != nil
-            )
+            // TODO: Implement trackFeedbackSubmitted in MixpanelManager
+            // MixpanelManager.shared.trackFeedbackSubmitted(...)
         }
     }
 
@@ -283,10 +269,8 @@ class FirebaseManager: ObservableObject {
             .document()
             .setData(from: task)
 
-        MixpanelManager.shared.trackCustomTaskAdded(
-            exerciseType: task.exerciseId,
-            moment: task.moment
-        )
+        // TODO: Implement trackCustomTaskAdded in MixpanelManager
+        // MixpanelManager.shared.trackCustomTaskAdded(...)
     }
 
     func fetchCustomTasks(uid: String) async throws -> [CustomTask] {
@@ -379,7 +363,8 @@ class FirebaseManager: ObservableObject {
 
             // Track milestone streaks
             if newStreak % 7 == 0 {
-                MixpanelManager.shared.trackStreakMilestone(streakDays: newStreak)
+                // TODO: Implement trackStreakMilestone in MixpanelManager
+                // MixpanelManager.shared.trackStreakMilestone(streakDays: newStreak)
             }
         }
     }
@@ -398,12 +383,139 @@ class FirebaseManager: ObservableObject {
         return snapshot.documents.compactMap { try? $0.data(as: CompletedTask.self) }
     }
 
+    // MARK: - User Settings & Habit Tracking
+
+    func saveUserSettings(uid: String, settings: UserSettings) async throws {
+        try await db.collection("users").document(uid)
+            .collection("settings").document("preferences")
+            .setData(settings.toFirestore())
+
+        // Also save to UserDefaults for offline access
+        settings.saveToUserDefaults()
+    }
+
+    func fetchUserSettings(uid: String) async throws -> UserSettings? {
+        let document = try await db.collection("users").document(uid)
+            .collection("settings").document("preferences")
+            .getDocument()
+
+        let settings = UserSettings.from(document: document)
+
+        // Cache in UserDefaults
+        settings?.saveToUserDefaults()
+
+        return settings
+    }
+
+    func initializeHabitTracking(uid: String) async throws {
+        let habits = [
+            ("breathing", "Respirer en conscience"),
+            ("meditation", "Méditer en pleine conscience"),
+            ("journal", "Tenir un journal"),
+            ("water", "S'hydrater régulièrement"),
+            ("sport", "Faire du sport"),
+            ("nature", "Sortir dans la nature"),
+            ("social", "Moments sociaux"),
+            ("sleep", "Routine de sommeil")
+        ]
+
+        for (habitId, title) in habits {
+            let tracking = HabitTracking(habitId: habitId, habitTitle: title)
+            try await db.collection("users").document(uid)
+                .collection("habit_tracking").document(habitId)
+                .setData(tracking.toFirestore())
+        }
+    }
+
+    func fetchHabitTracking(uid: String, habitId: String) async throws -> HabitTracking? {
+        let document = try await db.collection("users").document(uid)
+            .collection("habit_tracking").document(habitId)
+            .getDocument()
+
+        return HabitTracking.from(document: document)
+    }
+
+    func fetchAllHabitTracking(uid: String) async throws -> [String: HabitTracking] {
+        let snapshot = try await db.collection("users").document(uid)
+            .collection("habit_tracking")
+            .getDocuments()
+
+        var trackingDict: [String: HabitTracking] = [:]
+        for document in snapshot.documents {
+            if let tracking = HabitTracking.from(document: document) {
+                trackingDict[tracking.habitId] = tracking
+            }
+        }
+
+        return trackingDict
+    }
+
+    func markHabitCompleted(uid: String, habitId: String, date: Date = Date()) async throws {
+        let dateString = getCurrentDateString(from: date)
+
+        // Save daily completion
+        try await db.collection("users").document(uid)
+            .collection("habit_tracking").document(habitId)
+            .collection("daily_completion").document(dateString)
+            .setData([
+                "completed": true,
+                "completedAt": Timestamp(date: date),
+                "date": dateString
+            ])
+
+        // Update habit tracking stats
+        if var tracking = try await fetchHabitTracking(uid: uid, habitId: habitId) {
+            tracking.markCompleted(on: date)
+
+            try await db.collection("users").document(uid)
+                .collection("habit_tracking").document(habitId)
+                .setData(tracking.toFirestore())
+        }
+    }
+
+    func fetchHabitCompletionHistory(uid: String, habitId: String, days: Int = 7) async throws -> [Bool] {
+        let calendar = Calendar.current
+        let today = Date()
+        var completionHistory: [Bool] = []
+
+        for dayOffset in (0..<days).reversed() {
+            guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) else {
+                completionHistory.append(false)
+                continue
+            }
+
+            let dateString = getCurrentDateString(from: date)
+            let document = try await db.collection("users").document(uid)
+                .collection("habit_tracking").document(habitId)
+                .collection("daily_completion").document(dateString)
+                .getDocument()
+
+            let isCompleted = document.data()?["completed"] as? Bool ?? false
+            completionHistory.append(isCompleted)
+        }
+
+        return completionHistory
+    }
+
+    func saveOnboardingScore(uid: String, score: Int) async throws {
+        try await db.collection("users").document(uid).updateData([
+            "onboardingScore": score,
+            "onboardingScoreSavedAt": Timestamp()
+        ])
+    }
+
     // MARK: - Utility Functions
 
     private func getCurrentDate() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: Date())
+    }
+
+    private func getCurrentDateString(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
     }
 
     private func getStartOfDayTimestamp(date: String) -> Timestamp {

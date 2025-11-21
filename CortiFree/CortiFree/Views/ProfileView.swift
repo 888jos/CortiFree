@@ -7,50 +7,111 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct ProfileView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = ProfileViewModel()
-    @StateObject private var planetSettings = PlanetSettings.shared
-    @StateObject private var progressionManager = ProgressionManager.shared
-    @State private var showPlanetSettings = false
+    @StateObject private var achievementService = AchievementService.shared
+    @StateObject private var habitBadgeService = HabitBadgeService.shared
     @State private var showSettings = false
     @State private var showProgression = false
     @State private var showPotentialScores = false
+    @State private var showEditProfile = false
+    @State private var showAchievementsView = false
     @State private var selectedTab: ProfileTab = .score
 
     enum ProfileTab {
         case score
         case habits
+        case achievements
     }
 
-    // Mock scores data - 5 domain scores
-    private let domainScores: [Double] = [0.52, 0.38, 0.41, 0.35, 0.44] // Sérénité, Sommeil, Énergie, Focus, Équilibre
-    private let potentialDomainScores: [Double] = [0.92, 0.78, 0.81, 0.75, 0.84]
+    // Computed habits data from ViewModel
+    private var habits: [(name: String, icon: String, progress: Double, color: Color)] {
+        [
+            (
+                "Méditation",
+                "brain.head.profile",
+                calculateProgress(habitId: "meditation"),
+                Color(hex: "9B59B6")
+            ),
+            (
+                "Respiration",
+                "wind",
+                calculateProgress(habitId: "breathing"),
+                Color(hex: "1ABC9C")
+            ),
+            (
+                "Journal",
+                "book.fill",
+                calculateProgress(habitId: "journal"),
+                Color(hex: "E74C3C")
+            ),
+            (
+                "Sport",
+                "figure.run",
+                calculateProgress(habitId: "sport"),
+                Color(hex: "2ECC71")
+            ),
+            (
+                "Eau",
+                "drop.fill",
+                calculateProgress(habitId: "water"),
+                Color(hex: "3498DB")
+            ),
+            (
+                "Nature",
+                "leaf.fill",
+                calculateProgress(habitId: "nature"),
+                Color(hex: "27AE60")
+            ),
+            (
+                "Sommeil",
+                "moon.fill",
+                calculateProgress(habitId: "sleep"),
+                Color(hex: "E67E22")
+            ),
+            (
+                "Social",
+                "person.2.fill",
+                calculateProgress(habitId: "social"),
+                Color(hex: "F39C12")
+            )
+        ]
+    }
 
-    // Mock habits data - 8 habits
-    private let habits: [(name: String, icon: String, progress: Double, color: Color)] = [
-        ("Méditation", "brain.head.profile", 0.75, Color(hex: "9B59B6")),
-        ("Respiration", "wind", 0.82, Color(hex: "1ABC9C")),
-        ("Journal", "book.fill", 0.64, Color(hex: "E74C3C")),
-        ("Sport", "figure.run", 0.58, Color(hex: "2ECC71")),
-        ("Eau", "drop.fill", 0.88, Color(hex: "3498DB")),
-        ("Nature", "leaf.fill", 0.45, Color(hex: "27AE60")),
-        ("Sommeil", "moon.fill", 0.70, Color(hex: "E67E22")),
-        ("Social", "person.2.fill", 0.52, Color(hex: "F39C12"))
-    ]
+    // Calculate progress percentage for a habit (completed / total)
+    private func calculateProgress(habitId: String) -> Double {
+        guard let stats = viewModel.habitProgress[habitId] else { return 0.0 }
+        guard stats.total > 0 else { return 0.0 }
+        return Double(stats.completed) / Double(stats.total)
+    }
 
-    // Calculate global score (average of 5 domains)
+    // Calculate global score (average of 5 domains) - Using real data from ViewModel
     private var globalScore: Int {
-        let scores = showPotentialScores ? potentialDomainScores : domainScores
+        let scores = showPotentialScores ? viewModel.potentialScores : viewModel.domainScores
+        guard !scores.isEmpty, scores.count > 0 else { return 0 }
         let average = scores.reduce(0, +) / Double(scores.count)
-        return Int(round(average * 100))
+        // Validate against NaN
+        guard !average.isNaN && average.isFinite else { return 0 }
+        // Scores are already 0-100, no need to multiply by 100
+        return Int(round(average))
     }
 
-    // Full 6-domain array for radar chart (Global + 5 domains)
+    // Full 6-domain array for radar chart (Global + 5 domains) - Using real data from ViewModel
+    // Radar chart expects values 0-1, so divide by 100
     private var radarScores: [Double] {
-        let scores = showPotentialScores ? potentialDomainScores : domainScores
+        let scores = showPotentialScores ? viewModel.potentialScores : viewModel.domainScores
+        guard !scores.isEmpty, scores.count > 0 else { return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
         let global = scores.reduce(0, +) / Double(scores.count)
-        return [global] + scores
+        // Validate against NaN and normalize to 0-1 range
+        let validGlobal = (global.isNaN || !global.isFinite) ? 0.0 : global / 100.0
+        let validScores = scores.map { score in
+            let valid = (score.isNaN || !score.isFinite) ? 0.0 : score
+            return valid / 100.0  // Normalize to 0-1 range
+        }
+        return [validGlobal] + validScores
     }
 
     // Domain colors
@@ -85,30 +146,54 @@ struct ProfileView: View {
                 .ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 20) {
-                    // Header avec contenu du profil
-                    profileHeader
-                        .padding(.horizontal, 24)
-                        .padding(.top, 60)
+                VStack(spacing: 0) {
+                    // Profile Banner Image with header overlay - scrollable
+                    ZStack(alignment: .top) {
+                        profileBanner
+                            .ignoresSafeArea(edges: .top)
+                            .offset(y: -60)
 
-                    // Tab selector
+                        // Header avec contenu du profil (baissé de 56px au total: 40px + 16px)
+                        VStack {
+                            profileHeader
+                                .padding(.horizontal, 24)
+                                .padding(.top, 20)
+
+                            Spacer()
+                        }
+                        .offset(y: -4) // Changed from -20 to -4 (lowered by additional 16px)
+                    }
+
+                    // Tab selector - juste en dessous de l'image (moved higher)
                     tabSelector
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, 32)
+                        .padding(.top, -12) // Moved even higher (negative padding)
 
                     // Content based on selected tab with smooth transition
                     ZStack {
                         if selectedTab == .score {
                             // CortiFree Score Section (Compact)
                             cortiFreeScoreSection
-                                .padding(.horizontal, 24)
+                                .padding(.horizontal, 32)
+                                .padding(.top, 20)
                                 .transition(.asymmetric(
                                     insertion: .move(edge: .leading).combined(with: .opacity),
                                     removal: .move(edge: .trailing).combined(with: .opacity)
                                 ))
-                        } else {
+                        } else if selectedTab == .habits {
                             // Habits Section
                             habitsSection
-                                .padding(.horizontal, 24)
+                                .padding(.horizontal, 32)
+                                .padding(.top, 20)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                                    removal: .move(edge: .leading).combined(with: .opacity)
+                                ))
+                        } else {
+                            // Achievements Section
+                            achievementsSection
+                                .padding(.horizontal, 32)
+                                .padding(.top, 20)
                                 .transition(.asymmetric(
                                     insertion: .move(edge: .trailing).combined(with: .opacity),
                                     removal: .move(edge: .leading).combined(with: .opacity)
@@ -121,41 +206,92 @@ struct ProfileView: View {
                 }
             }
         }
-        .ignoresSafeArea(edges: .top)
         .ignoresSafeArea(.keyboard)
-        .sheet(isPresented: $showPlanetSettings) {
-            PlanetSettingsView()
-        }
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
+                .environmentObject(authViewModel)
         }
+        .fullScreenCover(isPresented: $showEditProfile) {
+            EditProfileView()
+        }
+        .onAppear {
+            // Refresh profile data when view appears
+            Task {
+                await viewModel.refreshProfile()
+                // Load habit badges immediately
+                await habitBadgeService.loadHabitBadges()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskValidated"))) { _ in
+            // Refresh habit progress when a task is validated
+            Task {
+                await viewModel.refreshProfile()
+            }
+        }
+    }
+
+    // MARK: - Profile Banner
+
+    private var profileBanner: some View {
+        ZStack(alignment: .top) {
+            // Background image - extends to top, ignoring safe area (reduced to 220px)
+            Image("profile_banner")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity)
+                .frame(height: 220)
+                .clipped()
+                .overlay(
+                    // Gradient fade from transparent to dark at bottom
+                    LinearGradient(
+                        colors: [
+                            Color.clear,
+                            Color.clear,
+                            Color(hex: "01000C").opacity(0.3),
+                            Color(hex: "01000C")
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        }
+        .frame(height: 220)
     }
 
     // MARK: - Profile Header
 
     private var profileHeader: some View {
         HStack(spacing: 16) {
-            // Avatar with selected planet image
-            Image(planetSettings.selectedPlanet.imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 80, height: 80)
-                .clipShape(Circle())
-                .overlay(
-                    Circle()
-                        .stroke(planetSettings.selectedPlanet.haloColor.opacity(0.3), lineWidth: 2)
-                )
+            // Avatar with user initials
+            ZStack {
+                Circle()
+                    .fill(LinearGradient(
+                        colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ))
+                    .frame(width: 80, height: 80)
+
+                Text(String(getUserFirstName().prefix(1)).uppercased())
+                    .font(.custom("HankenGrotesk-Bold", size: 32))
+                    .foregroundColor(.white)
+            }
+            .overlay(
+                Circle()
+                    .stroke(Color.white.opacity(0.2), lineWidth: 2)
+            )
 
             // User Info
             VStack(alignment: .leading, spacing: 6) {
                 // Name with edit icon
                 HStack(spacing: 8) {
-                    Text("Gabriel")
+                    Text(getUserFirstName())
                         .font(.custom("HankenGrotesk-Bold", size: 20))
                         .foregroundColor(.white)
 
                     Button(action: {
                         HapticManager.light()
+                        showEditProfile = true
                     }) {
                         Image(systemName: "pencil")
                             .font(.system(size: 12))
@@ -163,28 +299,20 @@ struct ProfileView: View {
                     }
                 }
 
-                // Level
-                Text("\(progressionManager.currentLevel.name)")
-                    .font(.custom("Poppins-Medium", size: 13))
-                    .foregroundColor(planetSettings.selectedPlanet.haloColor)
+                // Removed level display - no longer using XP/Levels system
             }
 
             Spacer()
 
-            // Settings button
+            // Settings button (sans rond)
             Button(action: {
                 HapticManager.light()
                 showSettings = true
             }) {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.1))
-                        .frame(width: 44, height: 44)
-
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                }
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
             }
         }
     }
@@ -200,7 +328,7 @@ struct ProfileView: View {
                     selectedTab = .score
                 }
             }) {
-                Text("Score CortiFree")
+                Text("Score")
                     .font(.custom(selectedTab == .score ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
                     .foregroundColor(selectedTab == .score ? .black : .white.opacity(0.7))
                     .frame(maxWidth: .infinity)
@@ -228,28 +356,46 @@ struct ProfileView: View {
                             .fill(selectedTab == .habits ? .white : Color.clear)
                     )
             }
+
+            // Achievements tab
+            Button(action: {
+                HapticManager.light()
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    selectedTab = .achievements
+                }
+            }) {
+                Text("Badges")
+                    .font(.custom(selectedTab == .achievements ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
+                    .foregroundColor(selectedTab == .achievements ? .black : .white.opacity(0.7))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(selectedTab == .achievements ? .white : Color.clear)
+                    )
+            }
         }
         .padding(2)
         .background(
             RoundedRectangle(cornerRadius: 7)
                 .fill(Color.white.opacity(0.2))
         )
-        .frame(maxWidth: 230)
+        .frame(maxWidth: 300)
     }
 
     // MARK: - CortiFree Score Section (Compact)
 
     private var cortiFreeScoreSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 12) { // Reduced from 20 to 12
             // Header with toggle
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) { // Reduced from 4 to 2
                     Text("Score CortiFree")
-                        .font(.custom("HankenGrotesk-Bold", size: 20))
+                        .font(.custom("HankenGrotesk-Bold", size: 18)) // Reduced from 20 to 18
                         .foregroundColor(.white)
 
                     Text(showPotentialScores ? "Potentiel (J66)" : "Actuel")
-                        .font(.custom("Poppins-Regular", size: 12))
+                        .font(.custom("Poppins-Regular", size: 11)) // Reduced from 12 to 11
                         .foregroundColor(.white.opacity(0.6))
                 }
 
@@ -275,16 +421,16 @@ struct ProfileView: View {
 
             // Hexagon with scores around it
             ZStack {
-                // Larger hexagon radar
+                // Larger hexagon radar - reduced size
                 HexagonRadarChart(
                     progress: radarScores,
-                    color: planetSettings.selectedPlanet.haloColor,
-                    size: 256, // 160 * 1.6
+                    color: Color(hex: "B794F6"),
+                    size: 220, // Reduced from 256 to 220
                     showLabels: false
                 )
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
 
-                // Position the 6 scores around the hexagon (Global + 5 domains)
+                // Position the 6 scores around the hexagon (Global + 5 domains) - adjusted offsets
 
                 // Global - Top (0°)
                 SimpleDomainScore(
@@ -293,86 +439,306 @@ struct ProfileView: View {
                     value: globalScore,
                     color: Color(hex: "B794F6")
                 )
-                .offset(x: 0, y: -155)
+                .offset(x: 0, y: -135) // Reduced from -155 to -135
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
 
                 // Sérénité - Top right (60°)
                 SimpleDomainScore(
                     icon: domainIcons[0],
                     title: domainNames[0],
-                    value: showPotentialScores ? Int(potentialDomainScores[0] * 100) : Int(domainScores[0] * 100),
+                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 0] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 0] ?? 0.0)),
                     color: domainColors[0]
                 )
-                .offset(x: 145, y: -75)
+                .offset(x: 125, y: -65) // Reduced from 145/-75 to 125/-65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
 
                 // Sommeil - Bottom right (120°)
                 SimpleDomainScore(
                     icon: domainIcons[1],
                     title: domainNames[1],
-                    value: showPotentialScores ? Int(potentialDomainScores[1] * 100) : Int(domainScores[1] * 100),
+                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 1] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 1] ?? 0.0)),
                     color: domainColors[1]
                 )
-                .offset(x: 145, y: 75)
+                .offset(x: 125, y: 65) // Reduced from 145/75 to 125/65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
 
                 // Énergie - Bottom (180°)
                 SimpleDomainScore(
                     icon: domainIcons[2],
                     title: domainNames[2],
-                    value: showPotentialScores ? Int(potentialDomainScores[2] * 100) : Int(domainScores[2] * 100),
+                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 2] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 2] ?? 0.0)),
                     color: domainColors[2]
                 )
-                .offset(x: 0, y: 155)
+                .offset(x: 0, y: 135) // Reduced from 155 to 135
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
 
                 // Focus - Bottom left (240°)
                 SimpleDomainScore(
                     icon: domainIcons[3],
                     title: domainNames[3],
-                    value: showPotentialScores ? Int(potentialDomainScores[3] * 100) : Int(domainScores[3] * 100),
+                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 3] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 3] ?? 0.0)),
                     color: domainColors[3]
                 )
-                .offset(x: -145, y: 75)
+                .offset(x: -125, y: 65) // Reduced from -145/75 to -125/65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
 
                 // Équilibre - Top left (300°)
                 SimpleDomainScore(
                     icon: domainIcons[4],
                     title: domainNames[4],
-                    value: showPotentialScores ? Int(potentialDomainScores[4] * 100) : Int(domainScores[4] * 100),
+                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 4] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 4] ?? 0.0)),
                     color: domainColors[4]
                 )
-                .offset(x: -145, y: -75)
+                .offset(x: -125, y: -65) // Reduced from -145/-75 to -125/-65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
             }
-            .frame(height: 380)
+            .frame(height: 330) // Reduced from 380 to 330
         }
     }
 
     // MARK: - Habits Section
 
     private var habitsSection: some View {
-        VStack(spacing: 20) {
-            // Grid of vertical habit bars
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 16) {
-                ForEach(Array(habits.enumerated()), id: \.offset) { index, habit in
-                    VerticalHabitBar(
-                        icon: habit.icon,
-                        title: habit.name,
-                        progress: habit.progress,
-                        color: habit.color
-                    )
-                }
+        VStack(spacing: 12) {
+            // List of horizontal habit bars
+            ForEach(Array(habits.enumerated()), id: \.offset) { index, habit in
+                let habitId = getHabitId(from: habit.name)
+                let stats = viewModel.habitProgress[habitId]
+                HorizontalHabitBar(
+                    icon: habit.icon,
+                    title: habit.name,
+                    progress: habit.progress,
+                    color: habit.color,
+                    completed: stats?.completed ?? 0,
+                    total: stats?.total ?? 0
+                )
             }
         }
     }
 
+    // MARK: - Helper Methods
+
+    private func getUserFirstName() -> String {
+        if let user = Auth.auth().currentUser {
+            if let displayName = user.displayName {
+                return displayName.components(separatedBy: " ").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+            } else if let email = user.email {
+                return email.components(separatedBy: "@").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+            }
+        }
+        return NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+    }
+
+    private func getHabitId(from habitName: String) -> String {
+        switch habitName {
+        case "Méditation": return "meditation"
+        case "Respiration": return "breathing"
+        case "Journal": return "journal"
+        case "Sport": return "sport"
+        case "Eau": return "water"
+        case "Nature": return "nature"
+        case "Sommeil": return "sleep"
+        case "Social": return "social"
+        default: return "unknown"
+        }
+    }
+
+    // MARK: - Achievements Section
+
+    private var achievementsSection: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                // Global Progress Header
+                globalBadgeProgress
+
+                // SECTION 1: Streak Achievements (3x3 grid)
+                VStack(spacing: 16) {
+                    // Section header
+                    HStack(spacing: 12) {
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(Color(hex: "FF8800"))
+
+                        Text("STREAKS")
+                            .font(.custom("Poppins-Bold", size: 16))
+                            .foregroundColor(.white)
+
+                        Spacer()
+
+                        Text("\(streakAchievements.filter { $0.isUnlocked }.count)/\(streakAchievements.count)")
+                            .font(.custom("Poppins-Regular", size: 14))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 12)
+
+                    // Grid 3 colonnes pour streaks
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 16),
+                        GridItem(.flexible(), spacing: 16),
+                        GridItem(.flexible(), spacing: 16)
+                    ], spacing: 20) {
+                        ForEach(Array(streakAchievements.enumerated()), id: \.element.id) { index, achievement in
+                            AchievementBadge(
+                                achievement: achievement,
+                                size: .medium
+                            )
+                            .cascadeAppear(index: index, totalCount: streakAchievements.count, baseDelay: 0.05)
+                        }
+                    }
+                }
+
+                // Divider horizontal
+                Rectangle()
+                    .fill(Color.white.opacity(0.15))
+                    .frame(height: 1)
+                    .padding(.vertical, 20)
+
+                // SECTION 2: Habit Badges (3 per row)
+                VStack(spacing: 16) {
+                    // Section header
+                    HStack(spacing: 12) {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 20))
+                            .foregroundColor(Color(hex: "B794F6"))
+
+                        Text("HABITUDES")
+                            .font(.custom("Poppins-Bold", size: 16))
+                            .foregroundColor(.white)
+
+                        Spacer()
+
+                        Text("\(habitBadgeService.unlockedBadgesCount)/\(habitBadgeService.totalBadgesCount)")
+                            .font(.custom("Poppins-Regular", size: 14))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 12)
+
+                    // Grid 3 colonnes pour habits avec animation staggered
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 16),
+                        GridItem(.flexible(), spacing: 16),
+                        GridItem(.flexible(), spacing: 16)
+                    ], spacing: 20) {
+                        ForEach(Array(HabitBadge.allHabitIds.enumerated()), id: \.element) { index, habitId in
+                            SingleEvolvingHabitBadge(
+                                habitId: habitId,
+                                badges: habitBadgeService.badges(for: habitId),
+                                currentProgress: getHabitProgress(habitId),
+                                totalTasks: getHabitTotal(habitId)
+                            )
+                            .cascadeAppear(index: index, totalCount: HabitBadge.allHabitIds.count, baseDelay: 0.05)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
+        }
+        .fullScreenCover(isPresented: $showAchievementsView) {
+            AchievementsView()
+        }
+        .overlay(
+            Group {
+                // Achievement unlock popup
+                if achievementService.showAchievementPopup, let achievement = achievementService.newlyUnlockedAchievement {
+                    AchievementUnlockView(achievement: achievement) {
+                        achievementService.showAchievementPopup = false
+                    }
+                    .transition(.opacity)
+                }
+
+                // Milestone celebration popup
+                if achievementService.showMilestonePopup, let milestone = achievementService.newlyCompletedMilestone {
+                    MilestoneCelebrationView(milestone: milestone) {
+                        achievementService.showMilestonePopup = false
+                    }
+                    .transition(.opacity)
+                }
+
+                // Habit badge unlock popup
+                if habitBadgeService.showBadgePopup, let badge = habitBadgeService.newlyUnlockedBadge {
+                    BadgeEvolutionView(badge: badge, isPresented: $habitBadgeService.showBadgePopup)
+                        .transition(.opacity)
+                }
+            }
+        )
+    }
+
+    // MARK: - Global Badge Progress
+
+    private var globalBadgeProgress: some View {
+        VStack(spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Badges")
+                        .font(.custom("HankenGrotesk-Bold", size: 24))
+                        .foregroundColor(.white)
+
+                    Text("\(totalUnlockedBadges)/\(totalBadges) débloqués")
+                        .font(.custom("Poppins-Regular", size: 14))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+
+                Spacer()
+            }
+
+            // Progress bar
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(height: 8)
+
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geo.size.width * globalBadgePercentage, height: 8)
+                }
+            }
+            .frame(height: 8)
+
+            Text("\(Int(globalBadgePercentage * 100))% Complete")
+                .font(.custom("Poppins-Regular", size: 12))
+                .foregroundColor(.white.opacity(0.6))
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    // MARK: - Helper Computed Properties
+
+    private var streakAchievements: [Achievement] {
+        achievementService.achievements.filter { $0.category == .streak }
+    }
+
+    private var totalUnlockedBadges: Int {
+        achievementService.unlockedCount + habitBadgeService.unlockedBadgesCount
+    }
+
+    private var totalBadges: Int {
+        achievementService.totalCount + habitBadgeService.totalBadgesCount
+    }
+
+    private var globalBadgePercentage: Double {
+        guard totalBadges > 0 else { return 0 }
+        return Double(totalUnlockedBadges) / Double(totalBadges)
+    }
+
+    private func getHabitProgress(_ habitId: String) -> Int {
+        let stats = viewModel.habitProgress[habitId]
+        return stats?.completed ?? 0
+    }
+
+    private func getHabitTotal(_ habitId: String) -> Int {
+        let stats = viewModel.habitProgress[habitId]
+        return stats?.total ?? 0
+    }
 }
 
 // MARK: - Simple Domain Score Component (positioned around hexagon)
@@ -402,61 +768,327 @@ struct SimpleDomainScore: View {
     }
 }
 
-// MARK: - Vertical Habit Bar Component
+// MARK: - Horizontal Habit Bar Component
 
-struct VerticalHabitBar: View {
+struct HorizontalHabitBar: View {
     let icon: String
     let title: String
     let progress: Double
     let color: Color
+    let completed: Int
+    let total: Int
 
-    private let barHeight: CGFloat = 180
+    @State private var animatedProgress: Double = 0
 
     var body: some View {
-        VStack(spacing: 8) {
-            // Progress percentage
-            Text("\(Int(progress * 100))")
-                .font(.custom("HankenGrotesk-Bold", size: 16))
-                .foregroundColor(.white)
+        VStack(alignment: .leading, spacing: 6) {
+            // Header: Icon + Title + Progress
+            HStack(spacing: 8) {
+                // Icon
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(color)
+                    .frame(width: 24)
 
-            // Vertical bar
-            ZStack(alignment: .bottom) {
-                // Background bar
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.white.opacity(0.1))
-                    .frame(width: 44, height: barHeight)
+                // Title
+                Text(title)
+                    .font(.custom("Poppins-Medium", size: 13))
+                    .foregroundColor(.white)
 
-                // Progress fill
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                color.opacity(0.8),
-                                color
-                            ],
-                            startPoint: .bottom,
-                            endPoint: .top
-                        )
-                    )
-                    .frame(width: 44, height: barHeight * progress)
+                Spacer()
 
-                // Icon at bottom of filled area
-                VStack {
-                    Spacer()
-                    Image(systemName: icon)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                        .padding(.bottom, 8)
-                }
-                .frame(height: barHeight * progress)
+                // Progress as completed/total
+                Text("\(completed)/\(total)")
+                    .font(.custom("HankenGrotesk-Bold", size: 13))
+                    .foregroundColor(.white.opacity(0.8))
             }
 
-            // Title
-            Text(title)
+            // Horizontal progress bar
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    // Background bar
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.white.opacity(0.1))
+                        .frame(height: 8)
+
+                    // Progress fill with animation
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    color.opacity(0.8),
+                                    color
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geo.size.width * animatedProgress, height: 8)
+                }
+            }
+            .frame(height: 8)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white.opacity(0.05))
+        )
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.65).delay(0.1)) {
+                animatedProgress = progress
+            }
+        }
+        .onChange(of: progress) { oldValue, newValue in
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.65)) {
+                animatedProgress = newValue
+            }
+        }
+    }
+}
+
+// MARK: - Single Evolving Habit Badge Component
+
+struct SingleEvolvingHabitBadge: View {
+    let habitId: String
+    let badges: [HabitBadge]
+    let currentProgress: Int
+    let totalTasks: Int
+
+    @State private var showDetail = false
+
+    // Find the highest unlocked badge or the next one to unlock
+    private var displayBadge: HabitBadge {
+        // First check if any badge is unlocked, return highest unlocked
+        let unlockedBadges = badges.filter { $0.isUnlocked }.sorted { $0.level.percentage > $1.level.percentage }
+        if let highestUnlocked = unlockedBadges.first {
+            return highestUnlocked
+        }
+        // Otherwise return the first locked badge (bronze)
+        return badges.sorted { $0.level.percentage < $1.level.percentage }.first ?? badges[0]
+    }
+
+    var body: some View {
+        VStack(spacing: 6) {
+            // Badge circle (NO GLOW)
+            ZStack {
+                // Badge
+                Circle()
+                    .fill(
+                        displayBadge.isUnlocked
+                        ? LinearGradient(
+                            colors: [
+                                Color(hex: displayBadge.level.color),
+                                Color(hex: displayBadge.level.color).opacity(0.7)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        : LinearGradient(
+                            colors: [Color.white.opacity(0.15), Color.white.opacity(0.05)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 60, height: 60)
+
+                // Icon or Lock
+                if displayBadge.isUnlocked {
+                    Text(displayBadge.level.emoji)
+                        .font(.system(size: 28))
+                } else {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.3))
+                }
+            }
+
+            // Habit name
+            Text(HabitBadge.habitDisplayName(habitId))
                 .font(.custom("Poppins-Medium", size: 11))
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+
+            // Progress
+            Text("\(currentProgress)/\(totalTasks)")
+                .font(.custom("Poppins-Regular", size: 10))
+                .foregroundColor(.white.opacity(0.6))
+        }
+        .onTapGesture {
+            showDetail = true
+        }
+        .sheet(isPresented: $showDetail) {
+            HabitBadgeDetailSheet(
+                habitId: habitId,
+                badges: badges,
+                currentProgress: currentProgress,
+                totalTasks: totalTasks
+            )
+        }
+    }
+}
+
+// MARK: - Habit Badge Detail Sheet
+
+struct HabitBadgeDetailSheet: View {
+    let habitId: String
+    let badges: [HabitBadge]
+    let currentProgress: Int
+    let totalTasks: Int
+
+    @Environment(\.dismiss) var dismiss
+
+    // Find current level
+    private var currentBadge: HabitBadge {
+        let unlockedBadges = badges.filter { $0.isUnlocked }.sorted { $0.level.percentage > $1.level.percentage }
+        if let highestUnlocked = unlockedBadges.first {
+            return highestUnlocked
+        }
+        return badges.sorted { $0.level.percentage < $1.level.percentage }.first ?? badges[0]
+    }
+
+    var body: some View {
+        ZStack {
+            // Background
+            LinearGradient(
+                colors: [
+                    Color(hex: "1A1B3A"),
+                    Color(hex: "0D0E1F")
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Large current badge
+                    ZStack {
+                        if currentBadge.isUnlocked {
+                            Circle()
+                                .fill(Color(hex: currentBadge.level.color).opacity(0.3))
+                                .frame(width: 160, height: 160)
+                                .blur(radius: 30)
+                        }
+
+                        Circle()
+                            .fill(
+                                currentBadge.isUnlocked
+                                ? LinearGradient(
+                                    colors: [
+                                        Color(hex: currentBadge.level.color),
+                                        Color(hex: currentBadge.level.color).opacity(0.7)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                                : LinearGradient(
+                                    colors: [Color.white.opacity(0.15), Color.white.opacity(0.05)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 140, height: 140)
+
+                        if currentBadge.isUnlocked {
+                            Text(currentBadge.level.emoji)
+                                .font(.system(size: 70))
+                        } else {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 50, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.3))
+                        }
+                    }
+                    .padding(.top, 40)
+
+                    // Title
+                    VStack(spacing: 8) {
+                        Text(HabitBadge.habitDisplayName(habitId))
+                            .font(.custom("Poppins-Bold", size: 28))
+                            .foregroundColor(.white)
+
+                        Text(currentBadge.level.displayName)
+                            .font(.custom("Poppins-SemiBold", size: 18))
+                            .foregroundColor(Color(hex: currentBadge.level.color))
+                    }
+
+                    // All 4 levels progress
+                    VStack(spacing: 16) {
+                        ForEach(badges.sorted(by: { $0.level.percentage < $1.level.percentage })) { badge in
+                            HStack(spacing: 12) {
+                                // Level emoji
+                                Text(badge.level.emoji)
+                                    .font(.system(size: 24))
+
+                                // Level name
+                                Text(badge.level.displayName)
+                                    .font(.custom("Poppins-Medium", size: 14))
+                                    .foregroundColor(.white)
+                                    .frame(width: 80, alignment: .leading)
+
+                                // Progress bar
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.white.opacity(0.1))
+                                            .frame(height: 8)
+
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [Color(hex: badge.level.color), Color(hex: badge.level.color).opacity(0.7)],
+                                                    startPoint: .leading,
+                                                    endPoint: .trailing
+                                                )
+                                            )
+                                            .frame(
+                                                width: geo.size.width * min(Double(currentProgress) / Double(badge.requirement), 1.0),
+                                                height: 8
+                                            )
+                                    }
+                                }
+                                .frame(height: 8)
+
+                                // Requirement
+                                Text("\(currentProgress)/\(badge.requirement)")
+                                    .font(.custom("HankenGrotesk-Bold", size: 12))
+                                    .foregroundColor(badge.isUnlocked ? .white : .white.opacity(0.5))
+                                    .frame(width: 50, alignment: .trailing)
+
+                                // Check or lock
+                                Image(systemName: badge.isUnlocked ? "checkmark.circle.fill" : "lock.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(badge.isUnlocked ? Color(hex: badge.level.color) : .white.opacity(0.3))
+                            }
+                            .padding(.horizontal, 20)
+                        }
+                    }
+                    .padding(.vertical, 20)
+
+                    // Close button
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Text("Fermer")
+                            .font(.custom("Poppins-SemiBold", size: 16))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                            )
+                    }
+                    .padding(.horizontal, 40)
+                    .padding(.bottom, 40)
+                }
+            }
         }
     }
 }

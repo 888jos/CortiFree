@@ -52,23 +52,18 @@ class AntiStressViewModel: ObservableObject {
         guard let situation = currentSituation,
               let exerciseType = currentExercise else { return }
 
-        // Award XP with new progression system
-        ProgressionManager.shared.addXP(.sosUsed)
-
-        // Award XP (old system compatibility)
-        let xp = exerciseType.xpReward
-        xpEarned = xp
+        // XP system removed - using scoring system instead
+        xpEarned = 0
 
         do {
-            // Update user XP
-            _ = try await firebaseService.updateUserXP(addXP: xp)
+            // Note: XP update removed - using domain scoring system instead
 
             // Save exercise completion
             try await saveExerciseCompletion(
                 exerciseType: exerciseType,
                 situation: situation,
                 duration: exerciseType.duration,
-                xp: xp
+                xp: 0  // XP system deprecated
             )
 
             isExerciseComplete = true

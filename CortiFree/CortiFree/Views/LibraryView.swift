@@ -21,6 +21,8 @@ struct LibraryView: View {
     @State private var selectedMeditationSupport: MeditationSupport?
 
     @State private var showJournal = false
+    @State private var showLearning = false
+    @State private var showTips = false
 
     var body: some View {
         ZStack {
@@ -88,8 +90,14 @@ struct LibraryView: View {
             MeditationSupportView(support: support)
                 .presentationBackground(.clear)
         }
-        .sheet(isPresented: $showJournal) {
+        .fullScreenCover(isPresented: $showJournal) {
             JournalHomeView()
+        }
+        .fullScreenCover(isPresented: $showLearning) {
+            LearningSectionView()
+        }
+        .fullScreenCover(isPresented: $showTips) {
+            TipsSectionView()
         }
     }
 
@@ -171,7 +179,7 @@ struct LibraryView: View {
                     backgroundImage: "button_apprendre",
                     strokeColor: Color(hex: "894208")
                 ) {
-                    // Navigate to Learning section
+                    showLearning = true
                 }
 
                 CategoryButton(
@@ -189,7 +197,7 @@ struct LibraryView: View {
                     backgroundImage: "button_conseil",
                     strokeColor: Color(hex: "842F6C")
                 ) {
-                    // Navigate to Tips
+                    showTips = true
                 }
 
                 CategoryButton(

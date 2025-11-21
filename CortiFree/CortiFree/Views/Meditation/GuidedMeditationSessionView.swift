@@ -261,10 +261,7 @@ struct GuidedMeditationSessionView: View {
     }
 
     private func completeSession() {
-        // Award XP for completing meditation (session with at least 5 steps = ~5+ minutes)
-        if allSteps.count >= 5 {
-            ProgressionManager.shared.addXP(.meditationComplete)
-        }
+        // XP system removed - using scoring system instead
 
         HapticManager.success()
 

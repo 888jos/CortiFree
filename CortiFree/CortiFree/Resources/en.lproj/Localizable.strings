@@ -7,12 +7,183 @@
 "onboarding.welcome.title" = "Welcome to CortiFree";
 "onboarding.welcome.subtitle" = "Your 66-day journey to mental wellness";
 "onboarding.continue" = "Continue";
+"onboarding.next" = "Next";
 "onboarding.8habits.title" = "The 8 Key Habits";
 "onboarding.8habits.description1" = "Studies show that to reset your";
 "onboarding.8habits.description2" = "life, you need the";
 "onboarding.8habits.description3" = "8 fundamental";
 "onboarding.8habits.description4" = "habits below.";
 "onboarding.8habits.footer" = "See how your life will change in 66 days\nthanks to these 8 habits:";
+
+// MARK: - Onboarding Overall Quiz
+"quiz.whats_your_name" = "What can I call you?";
+"quiz.your_first_name" = "Your first name";
+"quiz.whats_your_gender" = "What's your gender?";
+"quiz.man" = "Male";
+"quiz.woman" = "Female";
+"quiz.prefer_not_say" = "Prefer not to say";
+"quiz.how_old_are_you" = "How old are you?";
+"quiz.age_18_24" = "18-24 years";
+"quiz.age_25_34" = "25-34 years";
+"quiz.age_35_44" = "35-44 years";
+"quiz.age_45_54" = "45-54 years";
+"quiz.age_55_64" = "55-64 years";
+"quiz.age_65_plus" = "65 years and over";
+"quiz.why_download_today" = "What made you download CortiFree today?";
+"quiz.sleep_poorly" = "I sleep very poorly";
+"quiz.always_anxious" = "I feel anxious all the time";
+"quiz.constantly_exhausted" = "I'm constantly exhausted";
+"quiz.cant_concentrate" = "I can't concentrate anymore";
+"quiz.improve_wellbeing" = "I want to improve my wellbeing";
+"quiz.how_long_difficulties" = "How long have you been feeling this way?";
+"quiz.few_weeks" = "A few weeks";
+"quiz.2_6_months" = "2 to 6 months";
+"quiz.6_months_1_year" = "6 months to 1 year";
+"quiz.more_than_year" = "More than a year";
+"quiz.several_years" = "Several years";
+
+// MARK: - Onboarding Habits Quiz
+"quiz.thoughts_looping" = "Do you have thoughts looping in your head?";
+"quiz.all_the_time" = "All the time, non-stop";
+"quiz.almost_every_day" = "Almost every day";
+"quiz.few_times_week" = "A few times a week";
+"quiz.no_mind_calm" = "No, my mind is calm";
+"quiz.can_switch_off_brain" = "Can you 'switch off' your brain at night?";
+"quiz.impossible_never_stops" = "Impossible, my brain never stops";
+"quiz.no_stay_active" = "No, I stay in 'active' mode even at night";
+"quiz.takes_time_but_manage" = "Takes some time but I manage";
+"quiz.yes_disconnect_easily" = "Yes, I disconnect easily";
+"quiz.time_to_fall_asleep" = "How long does it take you to fall asleep?";
+"quiz.more_than_hour" = "More than an hour";
+"quiz.30_60_minutes" = "30-60 minutes";
+"quiz.15_30_minutes" = "15-30 minutes";
+"quiz.less_than_15" = "Less than 15 minutes";
+"quiz.wake_ups_per_night" = "How many times do you wake up at night?";
+"quiz.4_times_or_more" = "4 times or more";
+"quiz.2_3_times" = "2-3 times";
+"quiz.1_time" = "Once";
+"quiz.never_sleep_through" = "Never, I sleep through";
+"quiz.hours_sleep_night" = "How many hours do you sleep per night?";
+"quiz.less_than_5" = "Less than 5 hours";
+"quiz.5_6_hours" = "5-6 hours";
+"quiz.6_7_hours" = "6-7 hours";
+"quiz.7_8_hours" = "7-8 hours";
+"quiz.more_than_8" = "More than 8 hours";
+"quiz.daily_energy_level" = "What's your daily energy level?";
+"quiz.exhausted" = "😴 Exhausted";
+"quiz.full_of_energy" = "🤩 Full of energy";
+"quiz.daily_motivation" = "How's your daily motivation?";
+"quiz.no_motivation" = "No motivation, everything's an effort";
+"quiz.force_myself" = "I have to force myself for everything";
+"quiz.its_okay" = "It's okay, I do what I need to do";
+"quiz.motivated" = "Motivated, I want to do things";
+"quiz.concentration_duration" = "How long can you stay focused on a task?";
+"quiz.less_15_wandering" = "Less than 15 min, my mind wanders";
+"quiz.15_30_then_lose" = "15-30 min then I lose focus";
+"quiz.30_60_before_dropping" = "30-60 min before dropping off";
+"quiz.more_hour_no_problem" = "Over an hour without issue";
+
+// MARK: - Habit Frequency Questions
+"quiz.breathing_frequency" = "How often do you practice conscious breathing per week?";
+"quiz.meditation_frequency" = "How often do you meditate or practice mindfulness per week?";
+"quiz.journal_frequency" = "How often do you write in a journal (gratitude, thoughts, etc.) per week?";
+"quiz.sleep_schedule_consistency" = "How many nights per week do you go to bed and wake up at the same time?";
+"quiz.physical_activity_frequency" = "How often do you do physical activity (walking, yoga, sports) per week?";
+"quiz.nature_time_frequency" = "How often do you spend at least 15 minutes in nature or outside per week?";
+"quiz.water_intake_daily" = "How many liters of water do you drink per day on average?";
+
+// Frequency Options
+"quiz.never" = "Never";
+"quiz.1_2_times_week" = "1-2 times a week";
+"quiz.3_4_times_week" = "3-4 times a week";
+"quiz.5_6_times_week" = "5-6 times a week";
+"quiz.every_day" = "Every day";
+"quiz.never_same_schedule" = "Never the same schedule";
+"quiz.2_3_nights_week" = "2-3 nights a week";
+"quiz.4_5_nights_week" = "4-5 nights a week";
+"quiz.6_nights_week" = "6 nights a week";
+"quiz.every_day_same_schedule" = "Same schedule every day";
+"quiz.less_than_1_liter" = "Less than 1 liter";
+"quiz.1_to_1_5_liters" = "1 to 1.5 liters";
+"quiz.1_5_to_2_liters" = "1.5 to 2 liters";
+"quiz.2_to_2_5_liters" = "2 to 2.5 liters";
+"quiz.more_than_2_5_liters" = "More than 2.5 liters";
+
+// MARK: - Reassurance View
+"reassurance.not_alone" = "%@ it's okay. You're not alone.\n\nThousands of people like you have already found their serenity with CortiFree.\n\nNow, we'll do a quick quiz to better understand your situation and personalize your journey.";
+"reassurance.start_quiz" = "Start the quiz";
+"reassurance.takes_2_minutes" = "Takes 2 minutes";
+
+// MARK: - Eight Habits Intro
+"habits.key_habits" = "The 8 Key Habits";
+"habits.studies_show" = "Studies show that to reset your";
+"habits.life_need" = "life, you need the";
+"habits.8_fundamental" = "8 fundamental";
+"habits.habits_below" = "habits below.";
+"habits.see_how_change" = "See how your life will change in 66 days";
+"habits.thanks_to_habits" = "thanks to these 8 habits:";
+
+// MARK: - Social Proof
+"social.thousands_changed" = "Thousands of lives changed with CortiFree";
+"social.discover_how" = "Discover how people like you found their serenity";
+"social.measurable_results" = "Measurable results";
+"social.stress_reduction" = "On average, a 68% reduction in perceived stress in just 60 days";
+"social.without_cortifree" = "Without CortiFree";
+"social.with_cortifree" = "With CortiFree";
+"social.stress_level" = "Stress level";
+"social.duration" = "Duration";
+"social.your_goals" = "Your goals";
+"social.select_improve" = "Select what you want to improve";
+"social.view_options" = "View my options";
+"social.high_stress" = "High stress";
+"social.low_stress" = "Low stress";
+
+// MARK: - Testimonials
+"testimonial.sophie.title" = "My life changed";
+"testimonial.sophie.text" = "Before CortiFree, I slept poorly and felt exhausted all the time. After two weeks, I noticed I was waking up more rested and my work stress had decreased. The app taught me simple breathing exercises that make a real difference. I recommend it to anyone feeling overwhelmed by daily life.";
+"testimonial.julien.title" = "Finally calm";
+"testimonial.julien.text" = "I was skeptical, but CortiFree surprised me. My anxiety was constant due to work, and I couldn't focus anymore. Thanks to guided sessions and reminders, I gradually regained control. After a month, my colleagues even noticed I was more relaxed. Really useful!";
+"testimonial.claire.title" = "Energy boost";
+"testimonial.claire.text" = "Between kids and my job, I was at my limit and migraines kept coming back. CortiFree helped me identify my stress triggers and manage them. Today, I feel more serene and have energy to enjoy my family again.";
+"testimonial.marc.title" = "Better sleep";
+"testimonial.marc.text" = "I was waking up multiple times per night and dragging constant fatigue. CortiFree taught me relaxation techniques that transformed my nights. Now I sleep deeply and wake up refreshed. A radical change for my quality of life.";
+"testimonial.emma.title" = "More serene";
+"testimonial.emma.text" = "My daily stress made me irritable and tired. With CortiFree, I discovered how to better manage my emotions and take a step back. The exercises are simple but effective. I feel so much better in my skin now!";
+"testimonial.thomas.title" = "Regained focus";
+"testimonial.thomas.text" = "I couldn't concentrate for more than 10 minutes and it was affecting my work. CortiFree's mindfulness techniques really made a difference. Today I can focus on tasks for hours without losing track.";
+
+// MARK: - Scientific Plan
+"scientific.approach" = "CortiFree's Scientific Approach";
+"scientific.quote1" = "Habits are formed through repeated actions in stable contexts, and it takes weeks or even months for them to become automatic.";
+"scientific.quote2" = "96 participants adopted a daily behavior, and automaticity was modeled to reach a plateau at an average of 66 days, with a range of 18 to 254 days.";
+"scientific.quote3" = "On average, it takes more than two months before a new behavior becomes automatic — 66 days to be exact.";
+"scientific.google_citations" = "+1,500 citations\nGoogle Scholar";
+"scientific.copies_sold" = "+1,000,000\ncopies sold";
+
+// MARK: - Distractions & ROI
+"roi.hours_wasted" = "How many hours per\nweek do you waste on\ndistractions?";
+"roi.example_scrolling" = "Ex: mindless scrolling, procrastination";
+"roi.about_hours" = "About %d hours";
+"roi.potential_return" = "Potential return from\nLife Reset";
+"roi.if_sell_hour" = "If you sold an hour of your life,\nhow much would you charge?";
+"roi.if_hour_worth" = "If an hour of your time is worth";
+"roi.per_hour" = "€%d per hour";
+"roi.you_are_here" = "You are here";
+"roi.could_save" = "You could save";
+"roi.per_year" = "per year";
+
+// MARK: - Sixty Six Days
+"sixtysix.scientific_confirm" = "Scientific studies confirm:";
+"sixtysix.66_days" = "66 days";
+"sixtysix.time_needed" = "is the time needed to anchor a";
+"sixtysix.habit_transform" = "habit and truly transform your life.";
+"sixtysix.scientific_research" = "Scientific research";
+
+// MARK: - CortiFree Rating
+"rating.current_evaluation" = "Your current rating";
+"rating.potential_evaluation" = "Your potential rating";
+"rating.after_66_days" = "after 66 days";
+"rating.see_potential" = "See potential";
 
 // MARK: - Tab Bar
 "tab.home" = "Home";
@@ -38,6 +209,8 @@
 
 // MARK: - Tasks
 "tasks.day" = "Day";
+"tasks.day_format" = "Day %d/66";
+"tasks.day_format_ongoing" = "Day %d";
 "tasks.of" = "/";
 "tasks.encouragement" = "You're doing great. Keep it up!";
 "tasks.todo" = "To do";
@@ -45,6 +218,30 @@
 "tasks.skipped" = "Skipped";
 
 // MARK: - Habits
+"habit.wake_before_7" = "Wake up before 7am";
+"habit.sleep_before_11" = "Sleep before 11pm";
+"habit.breathe_consciously" = "Conscious breathing";
+"habit.meditate_mindfully" = "Mindful meditation";
+"habit.write_thoughts" = "Write your thoughts";
+"habit.drink_water" = "Drink at least %@ of water";
+"habit.explore_nature" = "Explore nature";
+"habit.conquer_summit" = "Conquer a summit";
+"habit.bike_escape" = "Escape by bike";
+"habit.release_boxing" = "Release energy boxing";
+"habit.jump_rope_challenge" = "Jump rope challenge";
+"habit.dance_express" = "Dance and express";
+"habit.deep_stretching" = "Deep stretching";
+"habit.swim_serenity" = "Swim to serenity";
+"habit.sculpt_body" = "Sculpt your body";
+"habit.run_goals" = "Run towards goals";
+"habit.create_together" = "Create together";
+"habit.reconnect_bonds" = "Reconnect bonds";
+"habit.share_meal" = "Share a meal";
+"habit.movie_night" = "Movie night";
+"habit.playful_challenges" = "Playful challenges";
+"habit.social_moment" = "Social moment";
+
+// Old habit names (for compatibility)
 "habit.breathe" = "Breathing exercises";
 "habit.meditate" = "Meditate 10 minutes";
 "habit.journal" = "Keep a journal";
@@ -54,14 +251,120 @@
 "habit.sleep" = "Wake up at 7am";
 "habit.social" = "Social interactions";
 
+// MARK: - Habit Details
+"habit.days" = "days";
+"habit.this_month" = "this month";
+"habit.last_7_days" = "last 7 days";
+"habit.vs_previous_week_plus" = "+%d vs previous week";
+"habit.vs_previous_week_minus" = "%d vs previous week";
+"habit.same_as_previous" = "Same as previous week";
+"habit.difficulty" = "Difficulty";
+
 // MARK: - Frequency
 "frequency.daily" = "Daily";
+"frequency.quotidien" = "Daily";
 "frequency.1x_day" = "1x/day";
 "frequency.2x_day" = "2x/day";
 "frequency.3x_week" = "3x/week";
 "frequency.2x_week" = "2x/week";
 "frequency.times_per_day" = "%d times/day";
 "frequency.times_per_week" = "%d times/week";
+
+// MARK: - Domains
+"domain.global" = "Overall";
+"domain.serenity" = "Serenity";
+"domain.sleep" = "Sleep";
+"domain.energy" = "Energy";
+"domain.focus" = "Focus";
+"domain.balance" = "Balance";
+
+// MARK: - Profile
+"profile.cortifree_score" = "CortiFree Score";
+"profile.habits" = "Habits";
+"profile.current" = "Current";
+"profile.potential_d66" = "Potential (D66)";
+"profile.settings" = "Settings";
+"profile.logout" = "Logout";
+
+// MARK: - Settings
+"settings.title" = "Settings";
+"settings.language" = "Language";
+"settings.choose_language" = "Choose Language";
+"settings.language_subtitle" = "Select your preferred language";
+"settings.language_restart_note" = "The app will restart to apply changes";
+"settings.profile_goal" = "PROFILE & GOAL";
+"settings.my_profile" = "My profile";
+"settings.my_current_goal" = "My current goal";
+"settings.change_routine" = "Change routine";
+"settings.experience_habits" = "EXPERIENCE & HABITS";
+"settings.reminders_notifications" = "Reminders & Notifications";
+"settings.receive_daily_reminders" = "Receive daily reminders";
+"settings.daily_routines" = "Daily routines";
+"settings.morning_routine" = "Morning routine";
+"settings.afternoon_routine" = "Afternoon routine";
+"settings.evening_routine" = "Evening routine";
+"settings.reminder_times" = "Reminder times";
+"settings.morning" = "Morning";
+"settings.afternoon" = "Afternoon";
+"settings.evening" = "Evening";
+"settings.default_relaxing_sounds" = "Default relaxing sounds";
+"settings.voice_guidance" = "Voice & Guidance";
+"settings.voice_support_exercises" = "Voice support during exercises";
+"settings.ambient_volume" = "Ambient volume";
+"settings.subscription_premium" = "SUBSCRIPTION & PREMIUM ACCESS";
+"settings.current_status" = "Current status";
+"settings.renewal" = "Renewal";
+"settings.manage_subscription" = "Manage my subscription";
+"settings.modify_cancel" = "Modify or cancel";
+"settings.restore_purchases" = "Restore my purchases";
+"settings.privacy_security" = "PRIVACY & SECURITY";
+"settings.logout" = "Log out";
+"settings.privacy_policy" = "Privacy Policy";
+"settings.terms_of_use" = "Terms of Use";
+"settings.delete_account" = "Delete my account";
+"settings.irreversible_action" = "Irreversible action";
+"settings.local_data" = "Local data";
+"settings.icloud_sync" = "iCloud sync";
+"settings.backup_cloud" = "Back up your data in the cloud";
+"settings.about_support" = "ABOUT & SUPPORT";
+"settings.contact_support" = "Contact support";
+"settings.faq" = "FAQ";
+"settings.rate_app" = "Rate the app";
+"settings.help_improve" = "Help us improve";
+"settings.follow_cortifree" = "Follow CortiFree";
+
+// Settings Alerts
+"settings.logout_confirm_title" = "Log out";
+"settings.logout_confirm_message" = "Are you sure you want to log out?";
+"settings.cancel" = "Cancel";
+"settings.delete_account_title" = "Delete account";
+"settings.delete_account_message" = "This action is irreversible. All your data will be permanently deleted.";
+"settings.delete" = "Delete";
+
+// Routine Change Sheet
+"settings.change_routine_title" = "Change routine";
+"settings.planet_auto_update" = "The planet will be automatically updated";
+"settings.warning" = "⚠️ Warning";
+"settings.change_routine_reset" = "Changing routine will reset:";
+"settings.current_progress" = "Your current progress (week/day)";
+"settings.task_history" = "Your completed tasks history";
+"settings.routine_stats" = "Your routine statistics";
+"settings.start_date_reset" = "Start date will be reset to today";
+"settings.xp_level_preserved" = "Your total XP, level and streak will be preserved.";
+"settings.confirm_change" = "Confirm change";
+
+// Sound Picker
+"settings.relaxing_sounds" = "Relaxing sounds";
+"settings.forest_rain" = "Forest rain";
+"settings.ocean" = "Ocean";
+"settings.fireplace" = "Fireplace";
+"settings.gentle_wind" = "Gentle wind";
+"settings.river" = "River";
+"settings.morning_birds" = "Morning birds";
+
+// Default Values
+"settings.default_goal" = "Reduce my daily stress";
+"settings.premium_active" = "Premium active";
 
 // MARK: - Meditation
 "meditation.title" = "MEDITATION";
@@ -85,6 +388,7 @@
 "common.cancel" = "Cancel";
 "common.save" = "Save";
 "common.delete" = "Delete";
+"common.continue" = "Continue";
 
 // MARK: - Planets
 "planet.mercury" = "Mercury";
@@ -98,10 +402,6 @@
 "planet.select" = "Select a planet";
 "planet.swipe_to_explore" = "Swipe to explore";
 
-// MARK: - Profile
-"profile.settings" = "Settings";
-"profile.logout" = "Logout";
-
 // MARK: - Loading
 "loading.calculating" = "Calculating";
 "loading.understanding_answers" = "Understanding answers";
@@ -111,3 +411,293 @@
 "loading.creating_plan" = "Creating plan";
 "loading.finalizing_recommendations" = "Finalizing recommendations";
 "loading.view_66day_plan" = "View my 66-day plan";
+
+// MARK: - Progress
+"progress.each_week_tasks" = "Each week, your tasks become";
+"progress.progressively_harder" = "progressively harder";
+"progress.refresh_dopamine" = "to refresh your dopaminergic system.";
+"progress.with_cortifree" = "With CortiFree";
+"progress.without_cortifree" = "Without CortiFree";
+"progress.by_week" = "By week %d, you'll";
+
+// MARK: - Legacy Onboarding
+"legacy.analysis_complete" = "Analysis complete";
+"legacy.news_to_announce" = "We have news for you...";
+"legacy.cortisol_too_high" = "Your answers clearly indicate cortisol levels that are too high*";
+"legacy.your_current_level" = "Your current level";
+"legacy.recommended_level" = "Recommended level";
+"legacy.normal" = "Normal";
+"legacy.check_symptoms" = "Check your symptoms";
+"legacy.indicative_only" = "* This result is for guidance only and does not constitute a medical diagnosis.";
+"legacy.your_score" = "Your score";
+"legacy.average" = "Average";
+
+// MARK: - Authentication
+"auth.create_account_diagnostic" = "create your account to access your personalized diagnostic";
+"auth.continue_with_email" = "Continue with Email";
+"auth.continue_with_apple" = "Continue with Apple";
+"auth.continue_with_google" = "Continue with Google";
+"auth.login_google_personalized" = "Sign in with your Google account to access your personalized space";
+"auth.sign_in_google" = "Sign in with Google";
+"auth.create_account" = "Create account";
+"auth.login" = "Login";
+"auth.first_name" = "First name";
+"auth.email" = "Email";
+"auth.password" = "Password";
+"auth.confirm_password" = "Confirm password";
+"auth.create_my_account" = "Create my account";
+"auth.sign_in" = "Sign in";
+"auth.enter_first_name" = "Please enter your first name";
+"auth.already_account" = "Already have an account? Sign in";
+"auth.no_account" = "No account? Sign up";
+
+// MARK: - Welcome
+"welcome.title" = "Welcome!";
+"welcome.subtitle" = "Let's start by checking if your cortisol level is higher than you think.";
+"welcome.start" = "Start";
+
+// MARK: - Symptoms
+"symptoms.title" = "Symptoms";
+"symptoms.select_below" = "Select the symptoms below that you've already experienced";
+"symptoms.mental" = "Mental Symptoms";
+"symptoms.physical" = "Physical Symptoms";
+"symptoms.social" = "Social Symptoms";
+"symptoms.difficulty_concentrating" = "Difficulty concentrating";
+"symptoms.general_anxiety" = "General or anticipatory anxiety";
+"symptoms.looping_thoughts" = "Looping thoughts hard to stop";
+"symptoms.muscle_tension" = "Muscle tension (neck, jaw, shoulders)";
+"symptoms.disrupted_sleep" = "Disrupted or non-restorative sleep";
+"symptoms.chronic_fatigue" = "Chronic fatigue upon waking";
+"symptoms.frequent_irritability" = "Frequent annoyance or irritability";
+"symptoms.difficulty_unexpected" = "Difficulty handling the unexpected";
+"symptoms.find_serenity" = "Find my serenity";
+
+// MARK: - Consequences Flow
+"consequences.cortisol_alert" = "Cortisol keeps your body on permanent alert...";
+"consequences.delays_sleep" = "It delays falling asleep and fragments your nights...";
+"consequences.exhausts_heart" = "Cortisol exhausts your heart";
+"consequences.disrupts_metabolism" = "Cortisol disrupts your metabolism";
+"consequences.feeds_anxiety" = "Cortisol feeds anxiety";
+"consequences.suppresses_immune" = "Progressively suppresses your immune system...";
+"consequences.next" = "Next →";
+"consequences.continue" = "Continue";
+
+// MARK: - Recovery Benefits
+"recovery.path_to_recovery" = "Path to recovery";
+"recovery.scientific_approach" = "The scientific approach";
+"recovery.body_relaxes" = "A body that relaxes";
+"recovery.stable_energy" = "More stable energy";
+"recovery.natural_balance" = "A balance that becomes natural";
+"recovery.discover_cortifree" = "Discover CortiFree";
+
+// MARK: - Errors
+"error.generic" = "An error occurred";
+"error.network" = "Network error";
+"error.authentication" = "Authentication error";
+
+// MARK: - Common Extended
+"common.default_user_name" = "Champion";
+"common.default_user" = "User";
+"common.start" = "Start";
+"common.stop" = "Stop";
+"common.pause" = "Pause";
+"common.resume" = "Resume";
+"common.day" = "day";
+"common.days" = "days";
+"common.hour" = "hour";
+"common.hours" = "hours";
+"common.minute" = "minute";
+"common.minutes" = "minutes";
+"common.second" = "second";
+"common.seconds" = "seconds";
+"common.see_more" = "See more";
+"common.see_less" = "See less";
+"common.score" = "score";
+"common.streak" = "streak";
+"common.global" = "Global";
+"common.current" = "Current";
+"common.potential" = "Potential (D66)";
+
+// MARK: - Home Extended
+"home.congratulations" = "Congratulations %@,";
+"home.program_started" = "you started the program:";
+"home.keep_shining" = "Keep shining";
+"home.routine_countdown" = "You'll reach %@ in:";
+"home.antistress_button" = "Anti-Stress Button";
+"home.breathe_deeply" = "Breathe deeply";
+"home.breathe_in" = "Breathe in...";
+"home.breathe_out" = "Breathe out...";
+"home.neuroplasticity" = "Brain neuroplasticity";
+"home.neuroplasticity_desc" = "Neuroplasticity is the brain's ability to create, undo, or reorganize neural networks. Through regular practice over 66 days, we can literally rewire our brain to naturally reduce stress and anxiety.";
+"home.why_66_days" = "Why 66 days?";
+"home.why_66_days_desc" = "Based on Dr. Phillippa Lally's study from University College London, it takes an average of 66 days for a new behavior to become automatic. This is the time needed for your brain to create lasting new connections.";
+"home.scientific_evidence" = "The scientific evidence";
+"home.scientific_evidence_desc" = "Neuroscience studies show that meditation and breathing exercises physically modify brain structure, reducing the amygdala (fear center) and strengthening the prefrontal cortex (emotional control).";
+
+// MARK: - Levels
+"level.beginner_serene" = "Serene Beginner";
+"level.novice_calm" = "Calm Novice";
+"level.apprentice_zen" = "Zen Apprentice";
+"level.practitioner_awakened" = "Awakened Practitioner";
+"level.confirmed_meditator" = "Confirmed Meditator";
+"level.expert_calm" = "Calm Expert";
+"level.master_calm" = "Calm Master";
+"level.peaceful_guru" = "Peaceful Guru";
+"level.enlightened_sage" = "Enlightened Sage";
+"level.immortal_legend" = "Immortal Legend";
+"level.supreme_master" = "Supreme Master";
+"level.novice" = "Novice";
+
+// MARK: - Library
+"library.title" = "Library";
+"library.category.learn" = "Learn";
+"library.category.blog" = "Blog";
+"library.category.tips" = "Tips";
+"library.category.studies" = "Studies";
+"library.relaxing_sounds" = "Relaxing Sounds";
+"library.relaxing_sounds_desc" = "Help your heart regulate during stressful situations";
+"library.breathing_exercises" = "Guided Breathing Exercises";
+"library.breathing_exercises_desc" = "Breathing techniques to manage stress";
+"library.meditation_exercises" = "Guided Meditation Exercises";
+"library.meditation_exercises_desc" = "Guided meditations for deep relaxation";
+
+// MARK: - Library Sounds
+"library.sound.rain" = "Rain";
+"library.sound.ocean" = "Ocean";
+"library.sound.fire" = "Fire";
+"library.sound.white_noise" = "White Noise";
+"library.sound.morning" = "Morning";
+"library.sound.forest" = "Forest";
+"library.sound.stream" = "Stream";
+"library.sound.summer_night" = "Summer Night";
+
+// MARK: - Library Sections
+"library.section.respiration" = "Breathing";
+"library.section.meditation" = "Meditation";
+"library.section.journal" = "Journal";
+"library.section.research" = "Research";
+
+// MARK: - Profile Extended
+"profile.score_cortifree" = "CortiFree Score";
+"profile.habits_title" = "Habits";
+"profile.day_progress" = "Day %d/66";
+"profile.habit.meditation" = "Meditation";
+"profile.habit.breathing" = "Breathing";
+"profile.habit.journal" = "Journal";
+"profile.habit.sport" = "Sport";
+"profile.habit.water" = "Water";
+"profile.habit.nature" = "Nature";
+"profile.habit.sleep" = "Sleep";
+"profile.habit.social" = "Social";
+"profile.domain.serenity" = "Serenity";
+"profile.domain.sleep" = "Sleep";
+"profile.domain.energy" = "Energy";
+"profile.domain.focus" = "Focus";
+"profile.domain.balance" = "Balance";
+
+// Profile Edit
+"profile.edit.title" = "My Profile";
+"profile.edit.save" = "Save";
+"profile.edit.personal_info" = "Personal Information";
+"profile.edit.first_name" = "First Name";
+"profile.edit.sleep_section" = "Sleep";
+"profile.edit.bed_time" = "Bedtime";
+"profile.edit.wake_time" = "Wake time";
+"profile.edit.goals_section" = "Goals after 10 weeks";
+"profile.edit.current_section" = "Currently";
+"profile.edit.frequency_label" = "Frequency";
+"profile.edit.duration_label" = "Duration";
+"profile.edit.quantity_label" = "Quantity";
+"profile.edit.apply_next_week" = "Changes will be applied from %@";
+"profile.habit.frequency.daily" = "Daily";
+"profile.habit.frequency.week" = "wk";
+"profile.habit.times_per_week" = "%d times/week";
+"profile.habit.minutes_per_session" = "%d min/session";
+"profile.habit.liters_per_day" = "%.1f L/day";
+"profile.habit.hours_per_night" = "%.1f h/night";
+"profile.habit.routine_duration" = "%d min routine";
+"profile.habit.completion_rate" = "Completion rate: %@";
+"profile.habit.no_data_yet" = "No data yet";
+
+// MARK: - Tasks Extended
+"tasks.day_progress" = "Day %d/66";
+"tasks.breathe_consciously" = "Conscious breathing";
+"tasks.meditate_mindfully" = "Mindful meditation";
+"tasks.drink_water" = "Drink at least %@ of water";
+"tasks.write_thoughts" = "Write your thoughts";
+"tasks.do_sport" = "Do sports";
+"tasks.go_outside" = "Go outside";
+"tasks.good_sleep" = "Sleep well";
+"tasks.social_time" = "Social time";
+
+// MARK: - Settings Extended
+"settings.logout_confirm" = "Are you sure you want to log out?";
+"settings.delete_account_confirm" = "Delete account";
+"settings.delete_account_warning" = "This action is irreversible. All your data will be permanently deleted.";
+"settings.change_routine_title" = "Change routine";
+"settings.select_new_routine" = "Select your new routine";
+"settings.warning_title" = "⚠️ Warning";
+"settings.change_routine_warning" = "Changing routine will reset:";
+"settings.notifications" = "Notifications";
+"settings.sounds" = "Sounds";
+"settings.privacy" = "Privacy";
+"settings.about" = "About";
+"settings.help" = "Help";
+"settings.version" = "Version";
+"settings.terms" = "Terms of Use";
+
+// MARK: - Exercise
+"exercise.start" = "Start";
+"exercise.stop" = "Stop";
+"exercise.pause" = "Pause";
+"exercise.resume" = "Resume";
+"exercise.completed" = "Completed";
+"exercise.duration" = "Duration";
+"exercise.description" = "Description";
+"exercise.benefits" = "Benefits";
+"exercise.how_to" = "How to";
+
+// MARK: - Journal
+"journal.title" = "My Journal";
+"journal.streak" = "%d day(s)";
+"journal.create" = "Create entry";
+"journal.save" = "Save";
+"journal.saved" = "Saved!";
+"journal.delete" = "Delete";
+"journal.delete_confirm" = "Delete this entry?";
+"journal.history" = "History";
+
+// Journal Tabs
+"journal.tab.gratitude" = "Gratitude";
+"journal.tab.reflection" = "Reflection";
+"journal.tab.goals" = "Goals";
+
+// Tab Descriptions
+"journal.desc.gratitude" = "What you're grateful for";
+"journal.desc.reflection" = "Reflect on your day";
+"journal.desc.goals" = "Your goals and ambitions";
+
+// Sheet Titles
+"journal.title.gratitude" = "Gratitude Journal";
+"journal.title.reflection" = "Daily Reflection";
+"journal.title.goals" = "My Goals";
+
+// Stats
+"journal.stats.this_week" = "This week";
+"journal.stats.average_mood" = "Average mood";
+"journal.stats.total_entries" = "Entries";
+"journal.stats.word_count" = "words";
+"journal.stats.words" = "words";
+
+// Empty States
+"journal.empty.no_entries" = "No entries for %@";
+"journal.empty.start_writing" = "Start writing...";
+
+// Prompts
+"journal.prompt.placeholder" = "Your reflection";
+"journal.prompt.gratitude" = "Add something...";
+
+// Mood
+"journal.mood.question" = "How are you feeling?";
+"journal.mood.hide" = "Hide";
+"journal.mood.change" = "Change";

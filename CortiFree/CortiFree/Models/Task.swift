@@ -105,6 +105,7 @@ struct TaskItem: Codable, Identifiable {
     var sfSymbol: String? // SF Symbol icon name (e.g., "wind", "figure.meditation")
     var recommendedTime: String? // Recommended time for task (e.g., "07:00", "14:30")
     var taskDescription: String? // Description of benefits/why to do this task
+    var habitId: String? // Habit ID for impact scoring (e.g., "meditation", "breathing", "sport")
 
     init(id: String? = nil,
          title: String,
@@ -121,7 +122,8 @@ struct TaskItem: Codable, Identifiable {
          icon: String? = nil,
          sfSymbol: String? = nil,
          recommendedTime: String? = nil,
-         taskDescription: String? = nil) {
+         taskDescription: String? = nil,
+         habitId: String? = nil) {
         self.id = id
         self.title = title
         self.category = category
@@ -137,6 +139,7 @@ struct TaskItem: Codable, Identifiable {
         self.icon = icon
         self.sfSymbol = sfSymbol
         self.recommendedTime = recommendedTime
+        self.habitId = habitId
         self.taskDescription = taskDescription
     }
 

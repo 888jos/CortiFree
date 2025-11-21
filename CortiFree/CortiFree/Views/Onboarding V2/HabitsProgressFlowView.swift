@@ -12,6 +12,9 @@ struct HabitsProgressFlowView: View {
     let onComplete: () -> Void
     @State private var currentHabitIndex: Int = 0
     @State private var currentWeek: Int = 0
+    @State private var shouldRenderChart = false
+    @State private var loadedHabits: Set<Int> = [] // Track which habits have been loaded
+    @State private var screenViewTime: Date?
 
     // Les habitudes avec leurs statistiques de progression
     private let habitProgresses: [HabitProgress] = [
@@ -122,6 +125,19 @@ struct HabitsProgressFlowView: View {
             // Dark background
             Color.black.ignoresSafeArea()
 
+            if !shouldRenderChart {
+                // Loading state - show simple UI without heavy computation
+                VStack(spacing: 20) {
+                    Text("Chargement de tes habitudes...")
+                        .font(.custom("Poppins-SemiBold", size: 18))
+                        .foregroundColor(.white)
+
+                    ProgressView()
+                        .tint(Color(hex: "B794F6"))
+                        .scaleEffect(1.5)
+                }
+            }
+
             VStack(spacing: 0) {
                 // Description text
                 VStack(spacing: 0) {
@@ -144,6 +160,7 @@ struct HabitsProgressFlowView: View {
                 .padding(.horizontal, 28)
                 .padding(.top, 70)
                 .padding(.bottom, 28)
+                .opacity(shouldRenderChart ? 1 : 0)
 
                 // Habit icons row
                 HStack(spacing: 6) {
@@ -152,6 +169,16 @@ struct HabitsProgressFlowView: View {
                             HapticManager.light()
                             currentHabitIndex = index
                             currentWeek = 0  // Reset to "Actuellement" when changing habit
+
+                            // Load this habit's chart if not already loaded
+                            if !loadedHabits.contains(index) {
+                                Task {
+                                    try? await Task.sleep(nanoseconds: 150_000_000) // 0.15s delay
+                                    withAnimation(.easeIn(duration: 0.2)) {
+                                        loadedHabits.insert(index)
+                                    }
+                                }
+                            }
                         }) {
                             Image(systemName: habitProgresses[index].icon)
                                 .font(.system(size: 17))
@@ -166,10 +193,12 @@ struct HabitsProgressFlowView: View {
                                         .stroke(currentHabitIndex == index ? Color(hex: "B794F6") : Color.white.opacity(0.2), lineWidth: 2)
                                 )
                         }
+                        .disabled(!shouldRenderChart)
                     }
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
+                .opacity(shouldRenderChart ? 1 : 0)
 
                 // Chart card
                 VStack(spacing: 16) {
@@ -185,18 +214,37 @@ struct HabitsProgressFlowView: View {
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    // Chart
-                    HabitProgressChart(
-                        yAxisValues: currentHabitProgress.yAxisValues,
-                        currentValue: currentHabitProgress.currentValue,
-                        weekNumber: currentHabitProgress.weekNumber,
-                        maxValue: currentHabitProgress.maxValue,
-                        currentProgress: currentHabitProgress.currentProgress,
-                        curveStyle: currentHabitProgress.curveStyle,
-                        currentWeek: $currentWeek
-                    )
-                    .frame(height: 175)
-                    .animation(nil, value: currentHabitIndex)
+                    // Chart with per-habit lazy loading
+                    if shouldRenderChart && loadedHabits.contains(currentHabitIndex) {
+                        HabitProgressChart(
+                            yAxisValues: currentHabitProgress.yAxisValues,
+                            currentValue: currentHabitProgress.currentValue,
+                            weekNumber: currentHabitProgress.weekNumber,
+                            maxValue: currentHabitProgress.maxValue,
+                            currentProgress: currentHabitProgress.currentProgress,
+                            curveStyle: currentHabitProgress.curveStyle,
+                            currentWeek: $currentWeek
+                        )
+                        .frame(height: 175)
+                        .drawingGroup()
+                        .animation(nil, value: currentHabitIndex)
+                        .transition(.opacity)
+                    } else {
+                        // Loading placeholder for this specific habit
+                        VStack(spacing: 12) {
+                            ProgressView()
+                                .tint(Color(hex: "B794F6"))
+                                .scaleEffect(1.2)
+
+                            if shouldRenderChart {
+                                Text("Chargement du graphique...")
+                                    .font(.custom("Poppins-Regular", size: 12))
+                                    .foregroundColor(.white.opacity(0.6))
+                            }
+                        }
+                        .frame(height: 175)
+                        .frame(maxWidth: .infinity)
+                    }
                 }
                 .padding(24)
                 .background(
@@ -206,9 +254,6 @@ struct HabitsProgressFlowView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
                 .animation(nil, value: currentHabitIndex)
-                .onChange(of: currentHabitIndex) {
-                    currentWeek = 1
-                }
 
                 // Legend
                 HStack(spacing: 16) {
@@ -233,6 +278,7 @@ struct HabitsProgressFlowView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
                 .animation(nil, value: currentHabitIndex)
+                .opacity(shouldRenderChart ? 1 : 0)
 
                 // Stat message
                 HStack(alignment: .top, spacing: 12) {
@@ -254,9 +300,11 @@ struct HabitsProgressFlowView: View {
                 }
                 .padding(.horizontal, 24)
                 .animation(nil, value: currentHabitIndex)
+                .opacity(shouldRenderChart ? 1 : 0)
 
                 Spacer()
             }
+            .opacity(shouldRenderChart ? 1 : 0)
 
             // Bottom button
             VStack {
@@ -264,6 +312,13 @@ struct HabitsProgressFlowView: View {
 
                 Button(action: {
                     HapticManager.medium()
+
+                    // Track continue action
+                    let timeSpent = screenViewTime.map { Date().timeIntervalSince($0) } ?? 0
+                    MixpanelManager.shared.trackOnboardingProgressContinue(
+                        timeSpent: timeSpent
+                    )
+
                     onComplete()
                 }) {
                     HStack(spacing: 8) {
@@ -283,6 +338,23 @@ struct HabitsProgressFlowView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
+            }
+        }
+        .task {
+            // Track screen view
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingHabitsProgressViewed()
+
+            // Initial load: show UI first
+            try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 second
+            withAnimation(.easeIn(duration: 0.2)) {
+                shouldRenderChart = true
+            }
+
+            // Then load only the first habit's chart
+            try? await Task.sleep(nanoseconds: 150_000_000) // Additional 0.15s
+            withAnimation(.easeIn(duration: 0.2)) {
+                loadedHabits.insert(0) // Load first habit (Respirer consciemment)
             }
         }
     }
@@ -418,28 +490,11 @@ struct HabitProgressChart: View {
 
                         // Circle indicator (draggable) - white with purple stroke and glow
                         ZStack {
-                            // Outer glow layer 3 (largest, most subtle)
-                            Circle()
-                                .fill(Color(hex: "B794F6").opacity(0.15))
-                                .frame(width: 32, height: 32)
-                                .blur(radius: 8)
-
-                            // Outer glow layer 2
-                            Circle()
-                                .fill(Color(hex: "B794F6").opacity(0.3))
-                                .frame(width: 26, height: 26)
-                                .blur(radius: 6)
-
-                            // Outer glow layer 1 (closest to circle)
-                            Circle()
-                                .fill(Color(hex: "B794F6").opacity(0.5))
-                                .frame(width: 22, height: 22)
-                                .blur(radius: 3)
-
                             // Main circle - white
                             Circle()
                                 .fill(Color.white)
                                 .frame(width: 18, height: 18)
+                                .shadow(color: Color(hex: "B794F6").opacity(0.6), radius: 8, x: 0, y: 0)
 
                             // Purple stroke
                             Circle()

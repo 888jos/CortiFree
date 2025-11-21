@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import FirebaseAuth
+import FirebaseFirestore
 
 @MainActor
 class ProfileViewModel: ObservableObject {
@@ -13,6 +15,9 @@ class ProfileViewModel: ObservableObject {
     @Published var stats: UserStats?
     @Published var isLoading: Bool = true
     @Published var selectedPeriod: StatsPeriod = .week
+    @Published var domainScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0] // Sérénité, Sommeil, Énergie, Focus, Équilibre
+    @Published var potentialScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0]
+    @Published var habitProgress: [String: (completed: Int, total: Int)] = [:] // Progress par habitude
 
     private let firebaseService = FirebaseService.shared
 
@@ -50,18 +55,71 @@ class ProfileViewModel: ObservableObject {
     func loadProfile() async {
         isLoading = true
 
+        // Try to fetch user, but don't fail if it doesn't exist
+        user = try? await firebaseService.fetchUser()
+        stats = try? await firebaseService.fetchStats()
+
         do {
-            user = try await firebaseService.fetchUser()
-            stats = try await firebaseService.fetchStats()
-            isLoading = false
+            // Load domain scores using ImpactScoringService
+            let currentScores = try await ImpactScoringService.shared.fetchCurrentScores()
+
+            domainScores = [
+                currentScores.serenity,
+                currentScores.sleep,
+                currentScores.energy,
+                currentScores.focus,
+                currentScores.balance
+            ]
+
+            print("📊 Profile scores loaded: Sérénité=\(currentScores.serenity), Sommeil=\(currentScores.sleep), Énergie=\(currentScores.energy), Focus=\(currentScores.focus), Équilibre=\(currentScores.balance)")
         } catch {
-            // Gestion silencieuse si pas de données (première utilisation)
-            print("👤 Profile: Initializing with default values")
-            isLoading = false
+            print("⚠️ Failed to load domain scores: \(error)")
         }
+
+        do {
+            // Load potential scores from Firebase
+            if let userId = Auth.auth().currentUser?.uid {
+                let userDoc = try await Firestore.firestore()
+                    .collection("users")
+                    .document(userId)
+                    .getDocument()
+
+                if let data = userDoc.data() {
+                    // Load potential scores
+                    if let scores = data["potentialScores"] as? [String: Int] {
+                        potentialScores = [
+                            Double(scores["serenity"] ?? 0),
+                            Double(scores["sleep"] ?? 0),
+                            Double(scores["energy"] ?? 0),
+                            Double(scores["focus"] ?? 0),
+                            Double(scores["balance"] ?? 0)
+                        ]
+                    }
+                }
+            }
+        } catch {
+            print("⚠️ Failed to load potential scores: \(error)")
+        }
+
+        do {
+            // Load habit progress statistics
+            let progress = try await TaskStatusService.shared.calculateHabitProgress()
+            habitProgress = progress
+
+            print("📊 Habit progress loaded: Méditation=\(progress["meditation"]?.completed ?? 0)/\(progress["meditation"]?.total ?? 0), Respiration=\(progress["breathing"]?.completed ?? 0)/\(progress["breathing"]?.total ?? 0)")
+        } catch {
+            print("❌ Failed to load habit progress: \(error)")
+        }
+
+        isLoading = false
     }
 
     func selectPeriod(_ period: StatsPeriod) {
         selectedPeriod = period
+    }
+
+    /// Refresh profile data (called when returning to profile view)
+    func refreshProfile() async {
+        await loadProfile()
     }
 }

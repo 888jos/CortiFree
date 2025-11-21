@@ -410,34 +410,48 @@ struct HabitTaskDetailView: View {
     // Helper function to convert impact areas to progress array for radar chart
     // Order: [Global, Sérénité, Sommeil, Énergie, Focus, Équilibre]
     private func getImpactProgress() -> [Double] {
-        var progress: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        // Get the real impact weights from HabitImpactWeights
+        let habitId = getHabitId(for: task.imageName)
+        let impact = HabitImpactWeights.impactForHabit(habitId)
 
-        // Map each impact to its position in the radar
-        for impact in task.impactAreas {
-            switch impact.title {
-            case "Sérénité":
-                progress[1] = Double(impact.increaseValue) / 30.0 // Normalize to 0-1 scale
-            case "Sommeil":
-                progress[2] = Double(impact.increaseValue) / 30.0
-            case "Énergie":
-                progress[3] = Double(impact.increaseValue) / 30.0
-            case "Focus":
-                progress[4] = Double(impact.increaseValue) / 30.0
-            case "Équilibre":
-                progress[5] = Double(impact.increaseValue) / 30.0
-            default:
-                break
-            }
+        // Normalize weights to 0-1 scale for radar chart display
+        // Max weight per task ≈ 0.3 (some habits have higher weights)
+        // We'll use 65 as max since that's the total progression over 66 days
+        // But for display, we normalize relative to the strongest impact
+        let maxWeight = max(impact.serenity, impact.sleep, impact.energy, impact.focus, impact.balance, 0.001)
+
+        let normalizedSerenity = impact.serenity / maxWeight
+        let normalizedSleep = impact.sleep / maxWeight
+        let normalizedEnergy = impact.energy / maxWeight
+        let normalizedFocus = impact.focus / maxWeight
+        let normalizedBalance = impact.balance / maxWeight
+
+        // Global is the average of all domains
+        let global = (normalizedSerenity + normalizedSleep + normalizedEnergy + normalizedFocus + normalizedBalance) / 5.0
+
+        return [global, normalizedSerenity, normalizedSleep, normalizedEnergy, normalizedFocus, normalizedBalance]
+    }
+
+    // Helper to map image name to habit ID
+    private func getHabitId(for imageName: String) -> String {
+        if imageName.contains("sleep") || imageName.contains("sommeil") {
+            return "sleep"
+        } else if imageName.contains("breathe") || imageName.contains("respir") {
+            return "breathing"
+        } else if imageName.contains("meditate") || imageName.contains("médita") {
+            return "meditation"
+        } else if imageName.contains("water") || imageName.contains("eau") {
+            return "water"
+        } else if imageName.contains("sport") || imageName.contains("exercice") {
+            return "sport"
+        } else if imageName.contains("nature") {
+            return "nature"
+        } else if imageName.contains("social") || imageName.contains("ami") {
+            return "social"
+        } else if imageName.contains("journal") {
+            return "journal"
         }
-
-        // Calculate Global as average of the 5 specific domains only
-        let domainValues = Array(progress[1...5])
-        let nonZeroDomains = domainValues.filter { $0 > 0 }
-        if !nonZeroDomains.isEmpty {
-            progress[0] = nonZeroDomains.reduce(0, +) / Double(nonZeroDomains.count)
-        }
-
-        return progress
+        return "unknown"
     }
 }
 
@@ -504,92 +518,47 @@ struct HabitTask: Identifiable {
     let impactAreas: [ImpactArea]
 
     // Static function to generate impact areas based on habit image name
+    // Uses real impact weights from HabitImpactWeights
     static func getImpactAreas(for imageName: String) -> [ImpactArea] {
-        // Normalize image name to base habit type
-        let normalizedName: String
-        if imageName.starts(with: "habit_sport") {
-            normalizedName = "habit_sport"
-        } else if imageName.starts(with: "habit_nature") {
-            normalizedName = "habit_nature"
-        } else if imageName.starts(with: "habit_social") {
-            normalizedName = "habit_social"
-        } else if imageName.starts(with: "habit_sleep") {
-            normalizedName = "habit_sleep"
+        // Map image name to habit ID
+        let habitId: String
+        if imageName.contains("sleep") || imageName.contains("sommeil") {
+            habitId = "sleep"
+        } else if imageName.contains("breathe") || imageName.contains("respir") {
+            habitId = "breathing"
+        } else if imageName.contains("meditate") || imageName.contains("médita") {
+            habitId = "meditation"
+        } else if imageName.contains("water") || imageName.contains("eau") {
+            habitId = "water"
+        } else if imageName.contains("sport") || imageName.contains("exercice") {
+            habitId = "sport"
+        } else if imageName.contains("nature") {
+            habitId = "nature"
+        } else if imageName.contains("social") || imageName.contains("ami") {
+            habitId = "social"
+        } else if imageName.contains("journal") {
+            habitId = "journal"
         } else {
-            normalizedName = imageName
+            habitId = "unknown"
         }
 
-        switch normalizedName {
-        case "task_breathe", "habit_breathe":
-            return [
-                ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 18, color: Color(hex: "9B59B6")),
-                ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: 12, color: Color(hex: "1ABC9C")),
-                ImpactArea(icon: "target", title: "Focus", increaseValue: 10, color: Color(hex: "2ECC71")),
-                ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: 8, color: Color(hex: "E74C3C"))
-            ]
+        // Get real impact weights
+        let impact = HabitImpactWeights.impactForHabit(habitId)
 
-        case "task_meditate", "habit_meditate":
-            return [
-                ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 20, color: Color(hex: "9B59B6")),
-                ImpactArea(icon: "target", title: "Focus", increaseValue: 18, color: Color(hex: "2ECC71")),
-                ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: 15, color: Color(hex: "3498DB")),
-                ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: 10, color: Color(hex: "E74C3C"))
-            ]
+        // Convert weights to ImpactArea array
+        // Scale weights to display values (multiply by ~100 for better visual)
+        // Sort by descending impact value to show most important first
+        var areas = [
+            ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: Int(impact.serenity * 100), color: Color(hex: "9B59B6")),
+            ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: Int(impact.sleep * 100), color: Color(hex: "E74C3C")),
+            ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: Int(impact.energy * 100), color: Color(hex: "1ABC9C")),
+            ImpactArea(icon: "target", title: "Focus", increaseValue: Int(impact.focus * 100), color: Color(hex: "2ECC71")),
+            ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: Int(impact.balance * 100), color: Color(hex: "3498DB"))
+        ]
 
-        case "task_journal", "habit_journal":
-            return [
-                ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: 20, color: Color(hex: "3498DB")),
-                ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 15, color: Color(hex: "9B59B6")),
-                ImpactArea(icon: "target", title: "Focus", increaseValue: 12, color: Color(hex: "2ECC71")),
-                ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: 8, color: Color(hex: "E74C3C"))
-            ]
-
-        case "task_sport", "habit_sport":
-            return [
-                ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: 22, color: Color(hex: "1ABC9C")),
-                ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: 15, color: Color(hex: "E74C3C")),
-                ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 12, color: Color(hex: "9B59B6")),
-                ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: 10, color: Color(hex: "3498DB"))
-            ]
-
-        case "task_water", "habit_water":
-            return [
-                ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: 15, color: Color(hex: "1ABC9C")),
-                ImpactArea(icon: "target", title: "Focus", increaseValue: 15, color: Color(hex: "2ECC71")),
-                ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 8, color: Color(hex: "9B59B6")),
-                ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: 6, color: Color(hex: "E74C3C"))
-            ]
-
-        case "task_nature", "habit_nature":
-            return [
-                ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 20, color: Color(hex: "9B59B6")),
-                ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: 15, color: Color(hex: "1ABC9C")),
-                ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: 12, color: Color(hex: "3498DB")),
-                ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: 10, color: Color(hex: "E74C3C"))
-            ]
-
-        case "task_sleep", "habit_sleep":
-            return [
-                ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: 25, color: Color(hex: "E74C3C")),
-                ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: 20, color: Color(hex: "1ABC9C")),
-                ImpactArea(icon: "target", title: "Focus", increaseValue: 18, color: Color(hex: "2ECC71")),
-                ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: 12, color: Color(hex: "3498DB"))
-            ]
-
-        case "task_social", "habit_social":
-            return [
-                ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: 22, color: Color(hex: "3498DB")),
-                ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: 18, color: Color(hex: "9B59B6")),
-                ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: 10, color: Color(hex: "1ABC9C")),
-                ImpactArea(icon: "target", title: "Focus", increaseValue: 8, color: Color(hex: "2ECC71"))
-            ]
-
-        default:
-            // Default fallback
-            return [
-                ImpactArea(icon: "star.fill", title: "Bien-être", increaseValue: 10, color: Color(hex: "B794F6"))
-            ]
-        }
+        // Sort by impact value (descending) and keep only top 4
+        areas.sort { $0.increaseValue > $1.increaseValue }
+        return Array(areas.prefix(4))
     }
 }
 

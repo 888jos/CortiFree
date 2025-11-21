@@ -162,8 +162,13 @@ private struct Star {
         let driftX = cos(driftAngle) * driftSpeed * time
         let driftY = sin(driftAngle) * driftSpeed * time
 
-        let finalX = (x + driftX).truncatingRemainder(dividingBy: 1.0)
-        let finalY = (y + driftY).truncatingRemainder(dividingBy: 1.0)
+        // Ensure values stay in 0-1 range (wrapping)
+        var finalX = (x + driftX).truncatingRemainder(dividingBy: 1.0)
+        var finalY = (y + driftY).truncatingRemainder(dividingBy: 1.0)
+
+        // Handle negative remainders
+        if finalX < 0 { finalX += 1.0 }
+        if finalY < 0 { finalY += 1.0 }
 
         return CGPoint(
             x: finalX * size.width,

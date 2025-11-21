@@ -11,6 +11,8 @@ import SwiftUI
 struct EightHabitsFlowView: View {
     let onComplete: () -> Void
     @State private var currentHabitIndex: Int = 0
+    @State private var screenViewTime: Date?
+    @State private var viewedHabits: Set<Int> = []
 
     // Les 8 habitudes avec leurs détails
     private let habits: [Habit] = [
@@ -138,6 +140,7 @@ struct EightHabitsFlowView: View {
             Color(hex: "1a0a2e")
                 .ignoresSafeArea()
 
+            // Main scrollable content
             VStack(spacing: 0) {
                 // Title
                 Text("Les 8 habitudes clés")
@@ -442,13 +445,23 @@ struct EightHabitsFlowView: View {
                 }
                 .id(currentHabitIndex)
             }
+            .ignoresSafeArea(.keyboard)
 
-            // Bottom button
+            // Bottom button - Always on top with explicit hit testing
             VStack {
                 Spacer()
 
                 Button(action: {
+                    print("🔘 EightHabitsFlowView: Bouton Continuer cliqué - Navigation vers NotificationPermissions")
                     HapticManager.medium()
+
+                    // Track continue action with analytics
+                    let timeSpent = screenViewTime.map { Date().timeIntervalSince($0) } ?? 0
+                    MixpanelManager.shared.trackOnboardingEightHabitsContinue(
+                        habitsViewedCount: viewedHabits.count,
+                        timeSpent: timeSpent
+                    )
+
                     onComplete()
                 }) {
                     HStack(spacing: 8) {
@@ -461,6 +474,7 @@ struct EightHabitsFlowView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
+                    .contentShape(Rectangle())
                     .background(
                         RoundedRectangle(cornerRadius: 28)
                             .fill(
@@ -472,9 +486,21 @@ struct EightHabitsFlowView: View {
                             )
                     )
                 }
+                .buttonStyle(.plain)
+                .allowsHitTesting(true)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
+            .zIndex(100)
+        }
+        .background(Color.black.opacity(0.001))
+        .onAppear {
+            screenViewTime = Date()
+            viewedHabits.insert(currentHabitIndex)
+            MixpanelManager.shared.trackOnboardingEightHabitsFlowViewed()
+        }
+        .onChange(of: currentHabitIndex) { newIndex in
+            viewedHabits.insert(newIndex)
         }
     }
 

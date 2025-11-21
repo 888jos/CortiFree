@@ -121,6 +121,7 @@ struct LoginView: View {
                                         .font(.custom("Poppins-Regular", size: 16))
                                         .foregroundColor(.white)
                                         .textInputAutocapitalization(.never)
+                                        .textContentType(.oneTimeCode)
                                         .focused($focusedField, equals: .password)
                                         .overlay(
                                             Text(password.isEmpty ? "••••••••" : "")

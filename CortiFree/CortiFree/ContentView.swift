@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     @State private var selectedTab: Tab = .home
     @ObservedObject private var soundPlayer = SoundPlayer.shared
     @StateObject private var planetSettings = PlanetSettings.shared
@@ -23,17 +24,21 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Content
+            // Content - Optimized with lazy loading
             Group {
                 switch selectedTab {
                 case .home:
                     HomeView(isScrolling: $isScrolling, scrollTimer: $scrollTimer)
+                        .id(Tab.home) // Force view refresh on tab change
                 case .tasks:
                     TasksV2View()
+                        .id(Tab.tasks)
                 case .library:
                     LibraryView()
+                        .id(Tab.library)
                 case .profile:
                     ProfileView()
+                        .id(Tab.profile)
                 }
             }
 
@@ -71,7 +76,7 @@ struct CustomTabBar: View {
                 isSelected: selectedTab == .home,
                 themeColor: themeColor
             ) {
-                withAnimation(.spring(response: 0.3)) {
+                if selectedTab != .home {
                     selectedTab = .home
                 }
             }
@@ -82,7 +87,7 @@ struct CustomTabBar: View {
                 isSelected: selectedTab == .tasks,
                 themeColor: themeColor
             ) {
-                withAnimation(.spring(response: 0.3)) {
+                if selectedTab != .tasks {
                     selectedTab = .tasks
                 }
             }
@@ -93,7 +98,7 @@ struct CustomTabBar: View {
                 isSelected: selectedTab == .library,
                 themeColor: themeColor
             ) {
-                withAnimation(.spring(response: 0.3)) {
+                if selectedTab != .library {
                     selectedTab = .library
                 }
             }
@@ -104,7 +109,7 @@ struct CustomTabBar: View {
                 isSelected: selectedTab == .profile,
                 themeColor: themeColor
             ) {
-                withAnimation(.spring(response: 0.3)) {
+                if selectedTab != .profile {
                     selectedTab = .profile
                 }
             }

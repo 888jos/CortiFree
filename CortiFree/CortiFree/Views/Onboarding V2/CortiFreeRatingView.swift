@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct CortiFreeRatingView: View {
     let habitsQuizResult: HabitsQuizResult
@@ -13,6 +15,8 @@ struct CortiFreeRatingView: View {
     @State private var selectedTab: RatingTab = .current
     @State private var animateProgress: Bool = false
     @State private var currentStartProgress: [Double] = []
+    @State private var isSavingScore: Bool = false
+    @State private var screenViewTime: Date?
 
     enum RatingTab {
         case current
@@ -196,7 +200,14 @@ struct CortiFreeRatingView: View {
                         // Continue button (smaller)
                         Button(action: {
                             HapticManager.medium()
-                            onContinue()
+
+                            // Track continue action with time spent
+                            let timeSpent = screenViewTime.map { Date().timeIntervalSince($0) } ?? 0
+                            MixpanelManager.shared.trackOnboardingRatingContinue(
+                                timeSpent: timeSpent
+                            )
+
+                            saveScoreAndContinue()
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "arrow.right")
@@ -220,10 +231,76 @@ struct CortiFreeRatingView: View {
             }
         }
         .onAppear {
+            screenViewTime = Date()
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.easeOut(duration: 0.8)) {
                     animateProgress = true
                 }
+            }
+        }
+    }
+
+    // MARK: - Helper Methods
+
+    private func saveScoreAndContinue() {
+        guard !isSavingScore else { return }
+
+        Task {
+            isSavingScore = true
+            defer { isSavingScore = false }
+
+            // Save score to Firebase
+            if let userId = Auth.auth().currentUser?.uid {
+                do {
+                    let globalScore = currentScores[0] // Global score from quiz
+
+                    // Save detailed scores to Firebase
+                    let scoresData: [String: Any] = [
+                        "onboardingScore": globalScore,
+                        "onboardingScoreSavedAt": Timestamp(),
+                        "domainScores": [
+                            "global": currentScores[0],
+                            "serenity": currentScores[1],
+                            "sleep": currentScores[2],
+                            "energy": currentScores[3],
+                            "focus": currentScores[4],
+                            "balance": currentScores[5]
+                        ],
+                        "potentialScores": [
+                            "global": potentialScores[0],
+                            "serenity": potentialScores[1],
+                            "sleep": potentialScores[2],
+                            "energy": potentialScores[3],
+                            "focus": potentialScores[4],
+                            "balance": potentialScores[5]
+                        ]
+                    ]
+
+                    try await Firestore.firestore()
+                        .collection("users")
+                        .document(userId)
+                        .setData(scoresData, merge: true)
+
+                    // Create and save user settings with program start date
+                    let settings = UserSettings(
+                        programStartDate: Date(), // Day 1 starts today
+                        onboardingScore: globalScore
+                    )
+                    try await FirebaseManager.shared.saveUserSettings(uid: userId, settings: settings)
+
+                    // Initialize habit tracking
+                    try await FirebaseManager.shared.initializeHabitTracking(uid: userId)
+
+                    print("✅ Successfully saved detailed onboarding scores")
+                } catch {
+                    print("❌ Error saving onboarding scores: \(error)")
+                }
+            }
+
+            // Continue regardless of save success
+            await MainActor.run {
+                onContinue()
             }
         }
     }
@@ -318,8 +395,8 @@ struct CortiFreeStatCard: View {
 }
 
 #Preview {
-    // Mock quiz result for preview
-    let mockAnswers = [0, 1, 2, 1, 2, 3, 1, 2, 0, 1, 2, 3, 1, 2, 1] // 15 answers
+    // Mock quiz result for preview (12 questions optimized)
+    let mockAnswers = [0, 1, 2, 1, 2, 1, 1, 2, 3, 2, 3, 2] // 12 answers
     let mockResult = HabitsQuizResult(answers: mockAnswers)
 
     return CortiFreeRatingView(habitsQuizResult: mockResult, onContinue: {})

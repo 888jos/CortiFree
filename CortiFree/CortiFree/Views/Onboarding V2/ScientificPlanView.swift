@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ScientificPlanView: View {
     let onContinue: () -> Void
+    @State private var screenViewTime: Date?
 
     var body: some View {
         ZStack {
@@ -78,6 +79,12 @@ struct ScientificPlanView: View {
 
                 Button(action: {
                     HapticManager.medium()
+
+                    if let startTime = screenViewTime {
+                        let timeSpent = Date().timeIntervalSince(startTime)
+                        MixpanelManager.shared.trackOnboardingScientificPlanContinue(timeSpent: timeSpent)
+                    }
+
                     onContinue()
                 }) {
                     HStack(spacing: 8) {
@@ -107,6 +114,10 @@ struct ScientificPlanView: View {
             }
         }
         .ignoresSafeArea()
+        .onAppear {
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingScientificPlanViewed()
+        }
     }
 }
 

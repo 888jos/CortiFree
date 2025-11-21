@@ -13,6 +13,7 @@ import Darwin
 struct WeekProgressView: View {
     let onContinue: () -> Void
     @State private var currentWeek: Int = 1
+    @State private var screenViewTime: Date?
 
     // Configuration des semaines avec progrès individuels pour chaque catégorie
     // Ordre: [Global, Sérénité, Sommeil, Énergie, Focus, Équilibre]
@@ -205,6 +206,9 @@ struct WeekProgressView: View {
                                 }
                             }
                         } else {
+                            // Track continue action
+                            MixpanelManager.shared.trackOnboardingWeekProgressContinue()
+
                             onContinue()
                         }
                     }) {
@@ -232,6 +236,10 @@ struct WeekProgressView: View {
                 .clipShape(RoundedCorner(radius: 40, corners: [.topLeft, .topRight]))
                 .ignoresSafeArea(edges: .bottom)
             }
+        }
+        .onAppear {
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingWeekProgressViewed()
         }
     }
 }

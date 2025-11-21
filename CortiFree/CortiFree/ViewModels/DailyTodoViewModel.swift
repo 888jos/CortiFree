@@ -80,10 +80,7 @@ class DailyTodoViewModel: ObservableObject {
             try await service.toggleTodoCompletion(todo)
             await loadTodos()
 
-            // Award XP if completing (not uncompleting)
-            if !todo.isCompleted {
-                ProgressionManager.shared.addXP(.dailyMissionComplete)
-            }
+            // XP system removed - using scoring system instead
         } catch {
             errorMessage = "Erreur lors de la mise à jour: \(error.localizedDescription)"
         }

@@ -12,6 +12,7 @@ struct LoadingAnalysisView: View {
     @State private var displayedProgress: Int = 0
     @State private var currentSubtitle: String = "Compréhension des réponses"
     @State private var showResultsButton: Bool = false
+    @State private var screenViewTime: Date?
     let onComplete: () -> Void
 
     private let subtitles = [
@@ -84,6 +85,12 @@ struct LoadingAnalysisView: View {
                 if showResultsButton {
                     Button(action: {
                         HapticManager.light()
+
+                        if let startTime = screenViewTime {
+                            let timeSpent = Date().timeIntervalSince(startTime)
+                            MixpanelManager.shared.trackOnboardingLoadingAnalysisComplete(timeSpent: timeSpent)
+                        }
+
                         onComplete()
                     }) {
                         HStack(spacing: 8) {
@@ -108,6 +115,8 @@ struct LoadingAnalysisView: View {
             .padding(.horizontal, 36)
         }
         .onAppear {
+            screenViewTime = Date()
+            MixpanelManager.shared.trackOnboardingLoadingAnalysisViewed()
             startProgressAnimation()
         }
     }

@@ -20,6 +20,7 @@ struct HabitTaskCard: View {
     let onSkip: () -> Void
 
     @State private var isPressed = false
+    @State private var showExerciseView = false
 
     var body: some View {
         Button(action: {
@@ -73,11 +74,12 @@ struct HabitTaskCard: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Top section: Streak (left) + Info icon (right)
                     HStack {
-                        // Streak badge (flamme)
+                        // Streak badge (flamme) with pulse animation
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
                                 .font(.system(size: 12))
                                 .foregroundColor(Color(hex: "FF8800"))
+                                .pulse(duration: 2.0)
 
                             Text("\(streak)")
                                 .font(.custom("Poppins-SemiBold", size: 13))
@@ -160,6 +162,39 @@ struct HabitTaskCard: View {
 
                     Spacer()
                 }
+
+                // Shortcut button (bottom right) - Only for meditation, breathing, journal
+                if shouldShowShortcut() {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+
+                            Button(action: {
+                                HapticManager.light()
+                                showExerciseView = true
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: getShortcutIcon())
+                                        .font(.system(size: 16, weight: .semibold))
+
+                                    Text(getShortcutText())
+                                        .font(.custom("Poppins-SemiBold", size: 13))
+                                }
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(Color.white)
+                                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 4)
+                                )
+                            }
+                            .padding(.trailing, 12)
+                            .padding(.bottom, 12)
+                        }
+                    }
+                }
             }
             .frame(width: 345, height: 180)
             .clipShape(RoundedRectangle(cornerRadius: 14))
@@ -171,6 +206,77 @@ struct HabitTaskCard: View {
             .scaleEffect(isPressed ? 0.97 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())
+        .fullScreenCover(isPresented: $showExerciseView) {
+            let habitId = getHabitId(for: imageName)
+            switch habitId {
+            case "meditation":
+                MeditationListView()
+            case "breathing":
+                BreathingListView()
+            case "journal":
+                JournalHomeView()
+            default:
+                EmptyView()
+            }
+        }
+    }
+
+    // Helper to map image name to habit ID
+    private func getHabitId(for imageName: String) -> String {
+        if imageName.contains("sleep") || imageName.contains("sommeil") {
+            return "sleep"
+        } else if imageName.contains("breathe") || imageName.contains("respir") {
+            return "breathing"
+        } else if imageName.contains("meditate") || imageName.contains("médita") {
+            return "meditation"
+        } else if imageName.contains("water") || imageName.contains("eau") {
+            return "water"
+        } else if imageName.contains("sport") || imageName.contains("exercice") {
+            return "sport"
+        } else if imageName.contains("nature") {
+            return "nature"
+        } else if imageName.contains("social") || imageName.contains("ami") {
+            return "social"
+        } else if imageName.contains("journal") {
+            return "journal"
+        }
+        return "unknown"
+    }
+
+    // Helper to determine if shortcut button should show
+    private func shouldShowShortcut() -> Bool {
+        let habitId = getHabitId(for: imageName)
+        return habitId == "meditation" || habitId == "breathing" || habitId == "journal"
+    }
+
+    // Helper to get icon for shortcut button
+    private func getShortcutIcon() -> String {
+        let habitId = getHabitId(for: imageName)
+        switch habitId {
+        case "meditation":
+            return "brain.head.profile"
+        case "breathing":
+            return "wind"
+        case "journal":
+            return "book.fill"
+        default:
+            return "star.fill"
+        }
+    }
+
+    // Helper to get text for shortcut button
+    private func getShortcutText() -> String {
+        let habitId = getHabitId(for: imageName)
+        switch habitId {
+        case "meditation":
+            return "Méditer"
+        case "breathing":
+            return "Respirer"
+        case "journal":
+            return "Écrire"
+        default:
+            return "Ouvrir"
+        }
     }
 }
 
