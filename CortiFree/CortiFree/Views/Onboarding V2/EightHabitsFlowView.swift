@@ -468,7 +468,7 @@ struct EightHabitsFlowView: View {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 18, weight: .semibold))
 
-                        Text("Continuer")
+                        Text(StringKeys.Common.continueButton)
                             .font(.custom("Poppins-SemiBold", size: 18))
                     }
                     .foregroundColor(.white)
@@ -586,11 +586,11 @@ struct HabitCard: View {
         switch habitIndex {
         case 0: return "habit_breathe"      // Respirer consciemment
         case 1: return "habit_meditate"     // Méditer
-        case 2: return "habit_water"        // Tenir un journal (inversé avec eau)
-        case 3: return "habit_nature"       // Faire du sport (inversé avec nature)
-        case 4: return "habit_journal"      // Boire de l'eau (inversé avec journal)
-        case 5: return "habit_sleep"        // Passer du temps en nature (inversé avec sleep après sport)
-        case 6: return "habit_sport"        // Suivre une routine sommeil (inversé avec nature après sport)
+        case 2: return "habit_journal"      // Tenir un journal
+        case 3: return "habit_sport"        // Faire du sport
+        case 4: return "habit_water"        // Boire de l'eau
+        case 5: return "habit_nature"       // Passer du temps en nature
+        case 6: return "habit_sleep"        // Suivre une routine sommeil
         case 7: return "habit_social"       // Se connecter socialement
         default: return "habit_breathe"
         }

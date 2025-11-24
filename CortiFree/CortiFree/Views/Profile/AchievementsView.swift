@@ -42,7 +42,7 @@ struct AchievementsView: View {
 
                     VStack(spacing: 4) {
                         Text("Achievements")
-                            .font(.custom("HankenGrotesk-Bold", size: 24))
+                            .font(Font.Poppins.custom(.bold, size: 24))
                             .foregroundColor(.white)
 
                         Text("\(achievementService.unlockedCount)/\(achievementService.totalCount) Unlocked")
@@ -122,13 +122,6 @@ struct AchievementsView: View {
                             selectedCategory = .habit
                         }
 
-                        CategoryFilterButton(
-                            title: "Milestone",
-                            isSelected: selectedCategory == .milestone,
-                            color: Color(hex: "F39C12")
-                        ) {
-                            selectedCategory = .milestone
-                        }
 
                         CategoryFilterButton(
                             title: "Special",
@@ -316,8 +309,6 @@ struct AchievementDetailView: View {
             return Color(hex: "2ECC71")
         case .habit:
             return Color(hex: "B794F6")
-        case .milestone:
-            return Color(hex: "F39C12")
         case .special:
             return Color(hex: "E74C3C")
         }

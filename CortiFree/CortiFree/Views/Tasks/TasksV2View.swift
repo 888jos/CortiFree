@@ -17,19 +17,26 @@ struct TasksV2View: View {
     @State private var taskStatuses: [String: [String: TaskStatus]] = [:] // [day: [taskTitle: status]]
     @State private var currentDay: Int = 1 // Day 1 to 66
     @State private var showAddTask = false
-    @State private var globalScore: Int = 45 // Current global score (average of 5 domains, rounded)
-    @State private var initialGlobalScore: Int = 45 // Initial score from onboarding
+    @State private var globalScore: Int = AppConstants.Program.defaultInitialScore // Current global score (average of 5 domains, rounded)
+    @State private var initialGlobalScore: Int = AppConstants.Program.defaultInitialScore // Initial score from onboarding
     @State private var taskStreaks: [String: Int] = [:] // Track individual task streaks
     @State private var globalStreak: Int = 0 // Global streak (consecutive days with at least 1 task validated)
     @State private var showConfetti: Bool = false // Confetti animation trigger
     @State private var showSuccessCheckmark: Bool = false // Success checkmark animation trigger
     @State private var isRefreshing: Bool = false // Pull to refresh state
     @State private var showFutureWeekAlert: Bool = false // Show blocking screen for future weeks
+    @State private var showScoreDetail: Bool = false // Show score detail sheet
+
+    // Undo functionality for skip action
+    @State private var showUndoToast: Bool = false
+    @State private var skippedTask: HabitTask?
+    @State private var undoWorkItem: DispatchWorkItem?
 
     // Firebase data
     @State private var userSettings: UserSettings?
     @State private var habitTracking: [String: HabitTracking] = [:]
     @State private var isLoadingData: Bool = true
+    @State private var loadingError: String? = nil
 
     // Actual day the user is on (calculated from start date)
     private var actualDay: Int {
@@ -65,17 +72,18 @@ struct TasksV2View: View {
 
         // Ajouter "Se lever avant 7h"
         if sleepVariants.count > 0 {
-            let sleepData = habitTracking["sleep"]
+            let sleepData = habitTracking[AppConstants.Habits.ID.sleep]
             dailyTasks.append(HabitTask(
                 title: sleepVariants[0].title,
                 frequency: "", // For compatibility
                 duration: "", // Pas de durée pour le sommeil
-                frequencyText: "Quotidien",
-                difficulty: 2,
+                frequencyText: StringKeys.Frequency.daily,
+                difficulty: AppConstants.Habits.Difficulty.medium,
                 streak: sleepData?.currentStreak ?? 0,
                 imageName: sleepVariants[0].imageName,
                 totalCompletions: sleepData?.totalCompletions ?? 0,
                 last7Days: sleepData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: sleepData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_sleep")
             ))
         }
@@ -87,17 +95,18 @@ struct TasksV2View: View {
         let showBreathing = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: breathingProgression.frequencyPerWeek)
 
         if showBreathing {
-            let breathingData = habitTracking["breathing"]
+            let breathingData = habitTracking[AppConstants.Habits.ID.breathing]
             dailyTasks.append(HabitTask(
-                title: "Respirer en conscience",
+                title: StringKeys.HabitTitles.breathing,
                 frequency: breathingDuration, // For compatibility
                 duration: breathingDuration,
                 frequencyText: breathingProgression.formattedFrequency,
-                difficulty: 1,
+                difficulty: AppConstants.Habits.Difficulty.easy,
                 streak: breathingData?.currentStreak ?? 0,
                 imageName: "habit_breathe",
                 totalCompletions: breathingData?.totalCompletions ?? 0,
                 last7Days: breathingData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: breathingData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_breathe")
             ))
         }
@@ -108,36 +117,38 @@ struct TasksV2View: View {
         let showMeditation = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: meditationProgression.frequencyPerWeek)
 
         if showMeditation {
-            let meditationData = habitTracking["meditation"]
+            let meditationData = habitTracking[AppConstants.Habits.ID.meditation]
             dailyTasks.append(HabitTask(
-                title: "Méditer en pleine conscience",
+                title: StringKeys.HabitTitles.meditation,
                 frequency: meditationDuration,
                 duration: meditationDuration,
                 frequencyText: meditationProgression.formattedFrequency,
-                difficulty: 3,
+                difficulty: AppConstants.Habits.Difficulty.hard,
                 streak: meditationData?.currentStreak ?? 0,
                 imageName: "habit_meditate",
                 totalCompletions: meditationData?.totalCompletions ?? 0,
                 last7Days: meditationData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: meditationData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_meditate")
             ))
         }
 
         // 4. HYDRATATION (toute la journée)
         let waterProgression = WeeklyHabitProgression.waterProgression(week: week)
-        let waterQuantity = waterProgression.formattedQuantity ?? "2L"
-        let waterData = habitTracking["water"]
+        let waterQuantity = waterProgression.formattedQuantity ?? AppConstants.Habits.defaultWaterQuantity
+        let waterData = habitTracking[AppConstants.Habits.ID.water]
 
         dailyTasks.append(HabitTask(
             title: "Boire au minimum \(waterQuantity) d'eau",
             frequency: "", // For compatibility
             duration: "", // Pas de durée pour l'eau
-            frequencyText: "Quotidien",
-            difficulty: 1,
+            frequencyText: StringKeys.Frequency.daily,
+            difficulty: AppConstants.Habits.Difficulty.easy,
             streak: waterData?.currentStreak ?? 0,
             imageName: "habit_water",
             totalCompletions: waterData?.totalCompletions ?? 0,
             last7Days: waterData?.last7Days ?? [false, false, false, false, false, false, false],
+            completedDays: waterData?.completedDays ?? [],
             impactAreas: HabitTask.getImpactAreas(for: "habit_water")
         ))
 
@@ -146,18 +157,19 @@ struct TasksV2View: View {
         let sportDuration = WeeklyHabitProgression.formatProgressionDisplay(sportProgression)
         let showSport = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: sportProgression.frequencyPerWeek)
 
-        if showSport, let sportVariant = HabitVariantConfig.variantForDay(currentDay, habitType: "sport") {
-            let sportData = habitTracking["sport"]
+        if showSport, let sportVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.sport) {
+            let sportData = habitTracking[AppConstants.Habits.ID.sport]
             dailyTasks.append(HabitTask(
                 title: sportVariant.title,
                 frequency: sportDuration,
                 duration: sportDuration,
                 frequencyText: sportProgression.formattedFrequency,
-                difficulty: 3,
+                difficulty: AppConstants.Habits.Difficulty.hard,
                 streak: sportData?.currentStreak ?? 0,
                 imageName: sportVariant.imageName,
                 totalCompletions: sportData?.totalCompletions ?? 0,
                 last7Days: sportData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: sportData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_sport")
             ))
         }
@@ -167,18 +179,19 @@ struct TasksV2View: View {
         let natureDuration = WeeklyHabitProgression.formatProgressionDisplay(natureProgression)
         let showNature = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: natureProgression.frequencyPerWeek)
 
-        if showNature, let natureVariant = HabitVariantConfig.variantForDay(currentDay, habitType: "nature") {
-            let natureData = habitTracking["nature"]
+        if showNature, let natureVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.nature) {
+            let natureData = habitTracking[AppConstants.Habits.ID.nature]
             dailyTasks.append(HabitTask(
                 title: natureVariant.title,
                 frequency: natureDuration,
                 duration: natureDuration,
                 frequencyText: natureProgression.formattedFrequency,
-                difficulty: 2,
+                difficulty: AppConstants.Habits.Difficulty.medium,
                 streak: natureData?.currentStreak ?? 0,
                 imageName: natureVariant.imageName,
                 totalCompletions: natureData?.totalCompletions ?? 0,
                 last7Days: natureData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: natureData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_nature")
             ))
         }
@@ -187,18 +200,19 @@ struct TasksV2View: View {
         let socialProgression = WeeklyHabitProgression.socialProgression(week: week)
         let showSocial = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: socialProgression.frequencyPerWeek)
 
-        if showSocial, let socialVariant = HabitVariantConfig.variantForDay(currentDay, habitType: "social") {
-            let socialData = habitTracking["social"]
+        if showSocial, let socialVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.social) {
+            let socialData = habitTracking[AppConstants.Habits.ID.social]
             dailyTasks.append(HabitTask(
                 title: socialVariant.title,
                 frequency: "", // For compatibility
                 duration: "", // Pas de durée pour le social
                 frequencyText: socialProgression.formattedFrequency,
-                difficulty: 2,
+                difficulty: AppConstants.Habits.Difficulty.medium,
                 streak: socialData?.currentStreak ?? 0,
                 imageName: socialVariant.imageName,
                 totalCompletions: socialData?.totalCompletions ?? 0,
                 last7Days: socialData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: socialData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_social")
             ))
         }
@@ -209,34 +223,36 @@ struct TasksV2View: View {
         let showJournal = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: journalProgression.frequencyPerWeek)
 
         if showJournal {
-            let journalData = habitTracking["journal"]
+            let journalData = habitTracking[AppConstants.Habits.ID.journal]
             dailyTasks.append(HabitTask(
-                title: "Écrire ses pensées",
+                title: StringKeys.HabitTitles.journal,
                 frequency: journalDuration,
                 duration: journalDuration,
                 frequencyText: journalProgression.formattedFrequency,
-                difficulty: 2,
+                difficulty: AppConstants.Habits.Difficulty.medium,
                 streak: journalData?.currentStreak ?? 0,
                 imageName: "habit_journal",
                 totalCompletions: journalData?.totalCompletions ?? 0,
                 last7Days: journalData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: journalData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_journal")
             ))
         }
 
         // 9. SE COUCHER AVANT 23H (soir)
         if sleepVariants.count > 1 {
-            let sleepData = habitTracking["sleep"]
+            let sleepData = habitTracking[AppConstants.Habits.ID.sleep]
             dailyTasks.append(HabitTask(
                 title: sleepVariants[1].title,
                 frequency: "", // For compatibility
                 duration: "", // Pas de durée pour le sommeil
-                frequencyText: "Quotidien",
-                difficulty: 2,
+                frequencyText: StringKeys.Frequency.daily,
+                difficulty: AppConstants.Habits.Difficulty.medium,
                 streak: sleepData?.currentStreak ?? 0,
                 imageName: sleepVariants[1].imageName,
                 totalCompletions: sleepData?.totalCompletions ?? 0,
                 last7Days: sleepData?.last7Days ?? [false, false, false, false, false, false, false],
+                completedDays: sleepData?.completedDays ?? [],
                 impactAreas: HabitTask.getImpactAreas(for: "habit_sleep")
             ))
         }
@@ -286,25 +302,30 @@ struct TasksV2View: View {
                                 .foregroundColor(AppConstants.Colors.streakOrange)
 
                             Text("\(globalStreak)")
-                                .font(.custom("HankenGrotesk-Bold", size: 16))
+                                .font(Font.Poppins.custom(.bold, size: 16))
                                 .foregroundColor(.white)
                         }
 
                         Spacer()
 
-                        // Global Score (from CortiFreeRatingView for day 1)
-                        HStack(spacing: 4) {
-                            Image(systemName: "star.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white)
+                        // Global Score (from CortiFreeRatingView for day 1) - Clickable
+                        Button(action: {
+                            HapticManager.light()
+                            showScoreDetail = true
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
 
-                            Text("\(globalScore)")
-                                .font(.custom("HankenGrotesk-Bold", size: 16))
-                                .foregroundColor(.white)
+                                Text("\(globalScore)")
+                                    .font(Font.Poppins.custom(.bold, size: 16))
+                                    .foregroundColor(.white)
 
-                            Text("(+\(globalScoreIncrease))")
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.5))
+                                Text("(+\(globalScoreIncrease))")
+                                    .font(.custom("Poppins-Regular", size: 12))
+                                    .foregroundColor(.white.opacity(0.5))
+                            }
                         }
                     }
                     .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -313,7 +334,7 @@ struct TasksV2View: View {
                     // Day counter
                     HStack {
                         Text(currentDay <= 66 ? "Jour \(currentDay)/66" : "Jour \(currentDay)")
-                            .font(.custom("HankenGrotesk-Bold", size: 48))
+                            .font(Font.Poppins.custom(.bold, size: 48))
                             .foregroundColor(.white)
 
                         Spacer()
@@ -323,7 +344,7 @@ struct TasksV2View: View {
                             Button(action: {
                                 HapticManager.light()
                                 if currentDay > 1 {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                    withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                                         currentDay -= 1
                                     }
                                 }
@@ -343,13 +364,13 @@ struct TasksV2View: View {
                                 // let targetWeek = WeeklyHabitProgression.currentWeek(for: targetDay)
 
                                 // Allow navigation to any day (testing mode)
-                                withAnimation(.easeInOut(duration: 0.2)) {
+                                withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                                     currentDay = targetDay
                                 }
 
                                 // ORIGINAL CODE (commented for testing):
                                 // if targetWeek <= currentWeek {
-                                //     withAnimation(.easeInOut(duration: 0.2)) {
+                                //     withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                                 //         currentDay = targetDay
                                 //     }
                                 // } else {
@@ -385,7 +406,7 @@ struct TasksV2View: View {
                                     .foregroundColor(selectedTab == .todos ? .black : .white.opacity(0.6))
 
                                 Text("\(todoCount)")
-                                    .font(.custom("HankenGrotesk-Bold", size: 12))
+                                    .font(Font.Poppins.custom(.bold, size: 12))
                                     .foregroundColor(selectedTab == .todos ? .black.opacity(0.6) : .white.opacity(0.4))
                             }
                             .padding(.horizontal, AppConstants.Layout.paddingMedium)
@@ -407,7 +428,7 @@ struct TasksV2View: View {
                                     .foregroundColor(selectedTab == .done ? .black : .white.opacity(0.6))
 
                                 Text("\(doneCount)")
-                                    .font(.custom("HankenGrotesk-Bold", size: 12))
+                                    .font(Font.Poppins.custom(.bold, size: 12))
                                     .foregroundColor(selectedTab == .done ? .black.opacity(0.6) : .white.opacity(0.4))
                             }
                             .padding(.horizontal, AppConstants.Layout.paddingMedium)
@@ -429,7 +450,7 @@ struct TasksV2View: View {
                                     .foregroundColor(selectedTab == .skipped ? .black : .white.opacity(0.6))
 
                                 Text("\(skippedCount)")
-                                    .font(.custom("HankenGrotesk-Bold", size: 12))
+                                    .font(Font.Poppins.custom(.bold, size: 12))
                                     .foregroundColor(selectedTab == .skipped ? .black.opacity(0.6) : .white.opacity(0.4))
                             }
                             .padding(.horizontal, AppConstants.Layout.paddingMedium)
@@ -457,12 +478,84 @@ struct TasksV2View: View {
                     }
                 ) {
                     VStack(spacing: 20) {
-                        if isLoadingData {
+                        if let error = loadingError {
+                            // Show error state with retry button
+                            VStack(spacing: 24) {
+                                Spacer()
+
+                                // Error icon
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(.orange)
+
+                                // Error message
+                                VStack(spacing: 8) {
+                                    Text("Erreur de chargement")
+                                        .font(Font.Poppins.custom(.semiBold, size: 20))
+                                        .foregroundColor(.white)
+
+                                    Text(error)
+                                        .font(Font.Poppins.custom(.regular, size: 14))
+                                        .foregroundColor(.white.opacity(0.7))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 32)
+                                }
+
+                                // Retry button
+                                Button(action: {
+                                    HapticManager.medium()
+                                    loadingError = nil
+                                    loadFirebaseData()
+                                }) {
+                                    Text("Réessayer")
+                                        .font(Font.Poppins.custom(.semiBold, size: 16))
+                                        .foregroundColor(.black)
+                                        .padding(.horizontal, 32)
+                                        .padding(.vertical, 12)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
+                                                .fill(.white)
+                                        )
+                                }
+                                .minimumTouchTarget()
+
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 100)
+                        } else if isLoadingData {
                             // Show skeleton loaders while loading
                             ForEach(0..<5, id: \.self) { index in
                                 SkeletonTaskCard()
                                     .cascadeAppear(index: index, totalCount: 5, baseDelay: 0.05)
                             }
+                        } else if filteredTasks.isEmpty {
+                            // Show empty state when no tasks
+                            VStack(spacing: 24) {
+                                Spacer()
+
+                                // Empty state icon
+                                Image(systemName: selectedTab == .done ? "checkmark.circle" : selectedTab == .skipped ? "xmark.circle" : "tray")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(.white.opacity(0.3))
+
+                                // Empty state message
+                                VStack(spacing: 8) {
+                                    Text(emptyStateTitle)
+                                        .font(Font.Poppins.custom(.semiBold, size: 18))
+                                        .foregroundColor(.white)
+
+                                    Text(emptyStateMessage)
+                                        .font(Font.Poppins.custom(.regular, size: 14))
+                                        .foregroundColor(.white.opacity(0.6))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 32)
+                                }
+
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 100)
                         } else {
                             // Show actual tasks when loaded
                             ForEach(Array(filteredTasks.enumerated()), id: \.offset) { index, task in
@@ -481,16 +574,44 @@ struct TasksV2View: View {
                                         validateTask(task)
                                     },
                                     onSkip: {
-                                        skipTask(task)
+                                        skipTaskWithUndo(task)
                                     }
                                 )
                                 .bouncePress()
                                 .cascadeAppear(index: index, totalCount: filteredTasks.count, baseDelay: 0.05)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
+                                        HapticManager.medium()
+                                        skipTaskWithUndo(task)
+                                    } label: {
+                                        Label("Passer", systemImage: "xmark.circle")
+                                    }
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    Button {
+                                        HapticManager.success()
+                                        validateTask(task)
+                                    } label: {
+                                        Label("Valider", systemImage: "checkmark.circle")
+                                    }
+                                    .tint(.green)
+                                }
                             }
                         }
                     }
                     .padding(.horizontal, AppConstants.Layout.paddingLarge)
                     .padding(.bottom, 100)
+                }
+
+                // Undo Toast
+                if showUndoToast {
+                    UndoToast(
+                        message: "Tâche passée",
+                        duration: 5.0,
+                        undoAction: restoreSkippedTask
+                    )
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(1000)
                 }
             }
         }
@@ -540,13 +661,6 @@ struct TasksV2View: View {
                     .transition(.opacity)
                 }
 
-                // Milestone celebration popup
-                if achievementService.showMilestonePopup, let milestone = achievementService.newlyCompletedMilestone {
-                    MilestoneCelebrationView(milestone: milestone) {
-                        achievementService.showMilestonePopup = false
-                    }
-                    .transition(.opacity)
-                }
 
                 // Success checkmark animation
                 if showSuccessCheckmark {
@@ -563,12 +677,19 @@ struct TasksV2View: View {
                 }
             }
         )
+        .sheet(isPresented: $showScoreDetail) {
+            ScoreDetailView(
+                globalScore: globalScore,
+                initialGlobalScore: initialGlobalScore
+            )
+        }
     }
 
     // Load data from Firebase
     private func loadFirebaseData() {
         Task {
             isLoadingData = true
+            loadingError = nil // Clear any previous error
             defer { isLoadingData = false }
 
             guard let userId = Auth.auth().currentUser?.uid else { return }
@@ -642,8 +763,10 @@ struct TasksV2View: View {
                 }
             } catch {
                 print("Error loading Firebase data: \(error)")
-                // Use default values if Firebase fails
+                // Set error state for UI display
                 await MainActor.run {
+                    self.loadingError = error.localizedDescription
+                    // Use default values if Firebase fails
                     self.userSettings = UserSettings.loadFromUserDefaults() ?? UserSettings()
                 }
             }
@@ -702,6 +825,29 @@ struct TasksV2View: View {
         }
     }
 
+    // Empty state properties
+    private var emptyStateTitle: String {
+        switch selectedTab {
+        case .todos:
+            return "Aucune tâche à faire"
+        case .done:
+            return "Aucune tâche complétée"
+        case .skipped:
+            return "Aucune tâche ignorée"
+        }
+    }
+
+    private var emptyStateMessage: String {
+        switch selectedTab {
+        case .todos:
+            return "Toutes vos tâches sont complétées ou ignorées pour aujourd'hui"
+        case .done:
+            return "Complétez des tâches pour les voir ici"
+        case .skipped:
+            return "Les tâches ignorées apparaîtront ici"
+        }
+    }
+
     // Helper functions
     private func dayKey(_ day: Int) -> String {
         return "day_\(day)"
@@ -752,6 +898,18 @@ struct TasksV2View: View {
         }
 
         globalStreak = streak
+
+        // Save to UserDefaults to sync with other views (AvatarProgressCard, SettingsView)
+        UserDefaults.standard.set(streak, forKey: "streakDays")
+
+        // Also update best streak if current streak is higher
+        let currentBestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
+        if streak > currentBestStreak {
+            UserDefaults.standard.set(streak, forKey: "bestStreak")
+        }
+
+        // Notify other views to refresh streak display
+        NotificationCenter.default.post(name: NSNotification.Name("StreakUpdated"), object: nil)
     }
 
     private func validateTask(_ task: HabitTask) {
@@ -798,7 +956,7 @@ struct TasksV2View: View {
                 )
 
                 // Mark habit completed (for streaks and tracking)
-                try await FirebaseManager.shared.markHabitCompleted(uid: userId, habitId: habitId)
+                try await FirebaseManager.shared.markHabitCompleted(uid: userId, habitId: habitId, programDay: currentDay)
 
                 // Apply impact to domain scores
                 let updatedScores = try await ImpactScoringService.shared.applyTaskImpact(habitId: habitId)
@@ -823,8 +981,6 @@ struct TasksV2View: View {
                     tasksCompletedToday: tasksCompletedToday
                 )
 
-                // Check milestones
-                _ = await achievementService.checkMilestones(currentDay: currentDay)
 
                 // Check habit badges
                 let habitProgress = try? await TaskStatusService.shared.calculateHabitProgress()
@@ -879,6 +1035,10 @@ struct TasksV2View: View {
 
         HapticManager.medium()
 
+        // Check if task was previously validated
+        let previousStatus = taskStatuses[dayKey(currentDay)]?[taskKey(task)]
+        let wasValidated = previousStatus == .done
+
         // Initialize day dictionary if needed
         if taskStatuses[dayKey(currentDay)] == nil {
             taskStatuses[dayKey(currentDay)] = [:]
@@ -892,18 +1052,112 @@ struct TasksV2View: View {
         // Update global streak (in case this was the only task keeping the streak alive)
         updateGlobalStreak()
 
-        // Save skip status to Firebase
+        // Save skip status to Firebase and reverse points if task was previously validated
         Task {
+            guard let userId = Auth.auth().currentUser?.uid else { return }
+            let habitId = getHabitId(for: task)
+
             do {
                 try await TaskStatusService.shared.saveTaskStatus(
                     day: currentDay,
                     taskTitle: taskKey(task),
                     status: "skipped"
                 )
+
+                // If task was previously validated, reverse the impact on scores
+                if wasValidated {
+                    // Remove habit completion from tracking
+                    try await FirebaseManager.shared.removeHabitCompletion(uid: userId, habitId: habitId, programDay: currentDay)
+
+                    // Reverse the impact on domain scores (negative impact)
+                    let updatedScores = try await ImpactScoringService.shared.reverseTaskImpact(habitId: habitId)
+
+                    // Reload habit tracking data
+                    let updatedTracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: userId)
+                    await MainActor.run {
+                        self.habitTracking = updatedTracking
+                        // Update global score with reversed scores
+                        self.globalScore = updatedScores.roundedScores.global
+
+                        // Notify ProfileView to refresh habit progress
+                        NotificationCenter.default.post(name: NSNotification.Name("TaskSkippedAfterValidation"), object: nil)
+                    }
+                }
             } catch {
                 print("Error saving skip status: \(error)")
             }
         }
+    }
+
+    private func skipTaskWithUndo(_ task: HabitTask) {
+        HapticManager.medium()
+
+        // Cancel any pending permanent skip
+        undoWorkItem?.cancel()
+
+        // Store the task for potential restoration
+        skippedTask = task
+
+        // Soft skip (mark as skipped but keep reference)
+        skipTask(task)
+
+        // Show undo toast
+        withAnimation(.appSpring) {
+            showUndoToast = true
+        }
+
+        // Schedule permanent skip after 5 seconds
+        let workItem = DispatchWorkItem {
+            withAnimation(.appSpring) {
+                showUndoToast = false
+            }
+            skippedTask = nil
+        }
+
+        undoWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: workItem)
+    }
+
+    private func restoreSkippedTask() {
+        HapticManager.light()
+
+        // Cancel permanent skip
+        undoWorkItem?.cancel()
+
+        // Restore task if it exists
+        if let task = skippedTask {
+            // Initialize day dictionary if needed
+            if taskStatuses[dayKey(currentDay)] == nil {
+                taskStatuses[dayKey(currentDay)] = [:]
+            }
+
+            // Set task back to todo status
+            taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .todo
+
+            // Recalculate streaks
+            updateTaskStreak(task)
+            updateGlobalStreak()
+
+            // Save todo status to Firebase
+            Task {
+                do {
+                    try await TaskStatusService.shared.saveTaskStatus(
+                        day: currentDay,
+                        taskTitle: taskKey(task),
+                        status: "todo"
+                    )
+                } catch {
+                    print("Error restoring task status: \(error)")
+                }
+            }
+        }
+
+        // Hide toast
+        withAnimation(.appSpring) {
+            showUndoToast = false
+        }
+
+        skippedTask = nil
     }
 }
 
@@ -931,7 +1185,7 @@ struct FutureWeekBlockingView: View {
 
                 // Title
                 Text("Semaine \(currentWeek + 1) verrouillée")
-                    .font(.custom("HankenGrotesk-Bold", size: 24))
+                    .font(Font.Poppins.custom(.bold, size: 24))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
 
@@ -976,6 +1230,254 @@ struct FutureWeekBlockingView: View {
                     .fill(Color(hex: "1a0a2e"))
             )
             .padding(.horizontal, 32)
+        }
+    }
+}
+
+// MARK: - Score Detail View
+
+struct ScoreDetailView: View {
+    let globalScore: Int
+    let initialGlobalScore: Int
+
+    @Environment(\.dismiss) var dismiss
+    @State private var domainScores: UserDomainScores = UserDomainScores()
+    @State private var isLoading: Bool = true
+
+    private var scoreIncrease: Int {
+        return globalScore - initialGlobalScore
+    }
+
+    // Full 6-domain array for radar chart (Global + 5 domains)
+    // Radar chart expects values 0-1, so divide by 100
+    private var radarScores: [Double] {
+        let scores = [
+            domainScores.serenity,
+            domainScores.sleep,
+            domainScores.energy,
+            domainScores.focus,
+            domainScores.balance
+        ]
+        let global = scores.reduce(0, +) / Double(scores.count)
+        // Validate against NaN and normalize to 0-1 range
+        let validGlobal = (global.isNaN || !global.isFinite) ? 0.0 : global / 100.0
+        let validScores = scores.map { score in
+            let valid = (score.isNaN || !score.isFinite) ? 0.0 : score
+            return valid / 100.0  // Normalize to 0-1 range
+        }
+        return [validGlobal] + validScores
+    }
+
+    // Domain colors
+    private let domainColors: [Color] = [
+        Color(hex: "9B59B6"), // Sérénité
+        Color(hex: "E74C3C"), // Sommeil
+        Color(hex: "1ABC9C"), // Énergie
+        Color(hex: "2ECC71"), // Focus
+        Color(hex: "3498DB")  // Équilibre
+    ]
+
+    private let domainIcons: [String] = [
+        "leaf.fill",    // Sérénité
+        "moon.fill",    // Sommeil
+        "bolt.fill",    // Énergie
+        "target",       // Focus
+        "heart.fill"    // Équilibre
+    ]
+
+    private var domainNames: [String] {
+        [
+            NSLocalizedString("profile.domain.serenity", comment: ""),
+            NSLocalizedString("profile.domain.sleep", comment: ""),
+            NSLocalizedString("profile.domain.energy", comment: ""),
+            NSLocalizedString("profile.domain.focus", comment: ""),
+            NSLocalizedString("profile.domain.balance", comment: "")
+        ]
+    }
+
+    var body: some View {
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                colors: [
+                    Color(hex: "1A1B3A"),
+                    Color(hex: "0D0E1F")
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    Spacer()
+
+                    Text("Détails du score")
+                        .font(.custom("Poppins-Bold", size: 20))
+                        .foregroundColor(.white)
+
+                    Spacer()
+
+                    Button(action: {
+                        HapticManager.light()
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 44, height: 44)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+
+                if isLoading {
+                    Spacer()
+                    ProgressView()
+                        .tint(.white)
+                    Spacer()
+                } else {
+                    VStack(spacing: 28) {
+                        // Global Score Card
+                        VStack(spacing: 12) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(Color(hex: "B794F6"))
+
+                            Text("\(globalScore)")
+                                .font(Font.Poppins.custom(.bold, size: 56))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.white, Color(hex: "B794F6")],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+
+                            Text("Score global")
+                                .font(.custom("Poppins-Medium", size: 16))
+                                .foregroundColor(.white.opacity(0.7))
+
+                            if scoreIncrease > 0 {
+                                Text("+\(scoreIncrease) depuis le début")
+                                    .font(.custom("Poppins-Regular", size: 14))
+                                    .foregroundColor(.green)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 32)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.white.opacity(0.05))
+                        )
+                        .padding(.top, 20)
+
+                        // Hexagon radar with domain scores
+                        ZStack {
+                            // Hexagon radar
+                            HexagonRadarChart(
+                                progress: radarScores,
+                                color: Color(hex: "B794F6"),
+                                size: 280,
+                                showLabels: false
+                            )
+
+                            // Position the 6 scores around the hexagon (Global + 5 domains)
+
+                            // Global - Top (0°)
+                            SimpleDomainScore(
+                                icon: "star.fill",
+                                title: "Global",
+                                value: globalScore,
+                                color: Color(hex: "B794F6")
+                            )
+                            .offset(x: 0, y: -175)
+
+                            // Sérénité - Top right (60°)
+                            SimpleDomainScore(
+                                icon: domainIcons[0],
+                                title: domainNames[0],
+                                value: getDomainScore(index: 0),
+                                color: domainColors[0]
+                            )
+                            .offset(x: 155, y: -85)
+
+                            // Sommeil - Bottom right (120°)
+                            SimpleDomainScore(
+                                icon: domainIcons[1],
+                                title: domainNames[1],
+                                value: getDomainScore(index: 1),
+                                color: domainColors[1]
+                            )
+                            .offset(x: 155, y: 85)
+
+                            // Énergie - Bottom (180°)
+                            SimpleDomainScore(
+                                icon: domainIcons[2],
+                                title: domainNames[2],
+                                value: getDomainScore(index: 2),
+                                color: domainColors[2]
+                            )
+                            .offset(x: 0, y: 175)
+
+                            // Focus - Bottom left (240°)
+                            SimpleDomainScore(
+                                icon: domainIcons[3],
+                                title: domainNames[3],
+                                value: getDomainScore(index: 3),
+                                color: domainColors[3]
+                            )
+                            .offset(x: -155, y: 85)
+
+                            // Équilibre - Top left (300°)
+                            SimpleDomainScore(
+                                icon: domainIcons[4],
+                                title: domainNames[4],
+                                value: getDomainScore(index: 4),
+                                color: domainColors[4]
+                            )
+                            .offset(x: -155, y: -85)
+                        }
+                        .frame(height: 420)
+                        .padding(.horizontal, 24)
+
+                        Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                }
+            }
+        }
+        .onAppear {
+            loadDomainScores()
+        }
+    }
+
+    private func getDomainScore(index: Int) -> Int {
+        let scores = [
+            domainScores.serenity,
+            domainScores.sleep,
+            domainScores.energy,
+            domainScores.focus,
+            domainScores.balance
+        ]
+        return Int(round(scores[index]))
+    }
+
+    private func loadDomainScores() {
+        Task {
+            do {
+                let scores = try await ImpactScoringService.shared.fetchCurrentScores()
+                await MainActor.run {
+                    self.domainScores = scores
+                    self.isLoading = false
+                }
+            } catch {
+                print("Error loading domain scores: \(error)")
+                await MainActor.run {
+                    self.isLoading = false
+                }
+            }
         }
     }
 }

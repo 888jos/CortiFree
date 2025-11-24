@@ -13,16 +13,18 @@ struct SoundsListView: View {
     @StateObject private var viewModel = LibraryViewModel()
     @ObservedObject private var soundPlayer = SoundPlayer.shared
 
-    let sounds: [(id: String, icon: String, title: String, imageName: String)] = [
-        ("rain", "cloud.rain.fill", "Pluie", "sound_rain"),
-        ("ocean", "water.waves", "Ocean", "sound_ocean"),
-        ("fire", "flame.fill", "Feu", "sound_fire"),
-        ("whitenoise", "waveform", "Bruit Blanc", "sound_whitenoise"),
-        ("wind", "sunrise.fill", "Matinée", "sound_morning"),
-        ("forest", "leaf.fill", "Forêt", "sound_forest"),
-        ("stream", "drop.fill", "Ruisseau", "sound_stream"),
-        ("night", "moon.stars.fill", "Nuit d'été", "sound_night")
-    ]
+    var sounds: [(id: String, icon: String, title: String, imageName: String)] {
+        [
+            ("rain", "cloud.rain.fill", NSLocalizedString("sounds.rain", comment: ""), "sound_rain"),
+            ("ocean", "water.waves", NSLocalizedString("sounds.ocean", comment: ""), "sound_ocean"),
+            ("fire", "flame.fill", NSLocalizedString("sounds.fire", comment: ""), "sound_fire"),
+            ("whitenoise", "waveform", NSLocalizedString("sounds.whitenoise", comment: ""), "sound_whitenoise"),
+            ("wind", "sunrise.fill", NSLocalizedString("sounds.morning", comment: ""), "sound_morning"),
+            ("forest", "leaf.fill", NSLocalizedString("sounds.forest", comment: ""), "sound_forest"),
+            ("stream", "drop.fill", NSLocalizedString("sounds.stream", comment: ""), "sound_stream"),
+            ("night", "moon.stars.fill", NSLocalizedString("sounds.night", comment: ""), "sound_night")
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -72,7 +74,7 @@ struct SoundsListView: View {
 
             Spacer()
 
-            Text("Sons Relaxants")
+            Text(NSLocalizedString("sounds.title", comment: ""))
                 .font(.custom("Poppins-SemiBold", size: 20))
                 .foregroundColor(.white)
 

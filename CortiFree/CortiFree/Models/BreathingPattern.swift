@@ -27,74 +27,74 @@ struct BreathingPattern: Identifiable {
 
     static let deepAbdominal = BreathingPattern(
         name: "DeepAbdominal",
-        displayName: "Respiration abdominale profonde",
+        displayName: NSLocalizedString("library.breathing.deep_abdominal", comment: ""),
         inhaleDuration: 4,
         holdDuration: 2,
         exhaleDuration: 6,
-        description: "Base pour tous les exercices"
+        description: NSLocalizedString("breathing_pattern.deep_abdominal.description", comment: "")
     )
 
     static let fourSevenEight = BreathingPattern(
         name: "4-7-8",
-        displayName: "4-7-8",
+        displayName: NSLocalizedString("library.breathing.4_7_8", comment: ""),
         inhaleDuration: 4,
         holdDuration: 7,
         exhaleDuration: 8,
-        description: "Anxiété, sommeil"
+        description: NSLocalizedString("breathing_pattern.four_seven_eight.description", comment: "")
     )
 
     static let coherence = BreathingPattern(
         name: "Coherence",
-        displayName: "Cohérence cardiaque 5-5",
+        displayName: NSLocalizedString("library.breathing.cardiac_coherence", comment: ""),
         inhaleDuration: 5,
         holdDuration: 0,
         exhaleDuration: 5,
-        description: "Stress quotidien ⭐"
+        description: NSLocalizedString("breathing_pattern.coherence.description", comment: "")
     )
 
     static let slow66 = BreathingPattern(
         name: "Slow66",
-        displayName: "Respiration lente 6-6",
+        displayName: NSLocalizedString("library.breathing.slow", comment: ""),
         inhaleDuration: 6,
         holdDuration: 0,
         exhaleDuration: 6,
-        description: "Sommeil profond"
+        description: NSLocalizedString("breathing_pattern.slow66.description", comment: "")
     )
 
     static let triangle = BreathingPattern(
         name: "Triangle",
-        displayName: "Triangle Breathing 4-4-4",
+        displayName: NSLocalizedString("library.breathing.triangle", comment: ""),
         inhaleDuration: 4,
         holdDuration: 4,
         exhaleDuration: 4,
-        description: "Relaxation"
+        description: NSLocalizedString("breathing_pattern.triangle.description", comment: "")
     )
 
     static let boxBreathing = BreathingPattern(
         name: "Box",
-        displayName: "Box Breathing 4-4-4-4",
+        displayName: NSLocalizedString("library.breathing.box", comment: ""),
         inhaleDuration: 4,
         holdDuration: 4,
         exhaleDuration: 4,
-        description: "Stress aigu"
+        description: NSLocalizedString("breathing_pattern.box.description", comment: "")
     )
 
     static let kapalabhati = BreathingPattern(
         name: "Kapalabhati",
-        displayName: "Kapalabhati",
+        displayName: NSLocalizedString("library.breathing.kapalabhati", comment: ""),
         inhaleDuration: 1,
         holdDuration: 0,
         exhaleDuration: 1,
-        description: "Énergie explosive"
+        description: NSLocalizedString("breathing_pattern.kapalabhati.description", comment: "")
     )
 
     static let bhastrika = BreathingPattern(
         name: "Bhastrika",
-        displayName: "Bhastrika (Soufflet)",
+        displayName: NSLocalizedString("library.breathing.bhastrika", comment: ""),
         inhaleDuration: 1,
         holdDuration: 0,
         exhaleDuration: 1,
-        description: "Énergie intense"
+        description: NSLocalizedString("breathing_pattern.bhastrika.description", comment: "")
     )
 
     static let allPatterns: [BreathingPattern] = [

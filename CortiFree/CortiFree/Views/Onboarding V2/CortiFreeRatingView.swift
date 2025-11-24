@@ -68,7 +68,7 @@ struct CortiFreeRatingView: View {
                     VStack(spacing: 4) {
                         if selectedTab == .current {
                             Text("Ton évalutation actuelle")
-                                .font(.custom("HankenGrotesk-Bold", size: 28))
+                                .font(Font.Poppins.custom(.bold, size: 28))
                                 .foregroundStyle(
                                     LinearGradient(
                                         colors: [.white, Color(hex: "B794F6")],
@@ -80,7 +80,7 @@ struct CortiFreeRatingView: View {
                         } else {
                             VStack(spacing: 0) {
                                 Text("Ton évaluation potentielle")
-                                    .font(.custom("HankenGrotesk-Bold", size: 28))
+                                    .font(Font.Poppins.custom(.bold, size: 28))
                                     .foregroundStyle(
                                         LinearGradient(
                                             colors: [.white, Color(hex: "B794F6")],
@@ -89,7 +89,7 @@ struct CortiFreeRatingView: View {
                                         )
                                     )
                                 Text("après 66 jours")
-                                    .font(.custom("HankenGrotesk-Bold", size: 28))
+                                    .font(Font.Poppins.custom(.bold, size: 28))
                                     .foregroundStyle(
                                         LinearGradient(
                                             colors: [.white, Color(hex: "B794F6")],
@@ -213,7 +213,7 @@ struct CortiFreeRatingView: View {
                                 Image(systemName: "arrow.right")
                                     .font(.system(size: 18, weight: .semibold))
 
-                                Text("Continuer")
+                                Text(StringKeys.Common.continueButton)
                                     .font(.custom("Poppins-SemiBold", size: 18))
                             }
                             .foregroundColor(.white)
@@ -282,15 +282,8 @@ struct CortiFreeRatingView: View {
                         .document(userId)
                         .setData(scoresData, merge: true)
 
-                    // Create and save user settings with program start date
-                    let settings = UserSettings(
-                        programStartDate: Date(), // Day 1 starts today
-                        onboardingScore: globalScore
-                    )
-                    try await FirebaseManager.shared.saveUserSettings(uid: userId, settings: settings)
-
-                    // Initialize habit tracking
-                    try await FirebaseManager.shared.initializeHabitTracking(uid: userId)
+                    // Note: UserSettings and program start date will be initialized
+                    // in HomeView.onAppear after user passes paywall
 
                     print("✅ Successfully saved detailed onboarding scores")
                 } catch {
@@ -338,12 +331,12 @@ struct CortiFreeStatCard: View {
             // Value with increase - Centered vertically
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("\(value)")
-                    .font(.custom("HankenGrotesk-Bold", size: 52))
+                    .font(Font.Poppins.custom(.bold, size: 52))
                     .foregroundColor(.white)
 
                 if let increase = increase {
                     Text("(+\(increase))")
-                        .font(.custom("HankenGrotesk-Bold", size: 20))
+                        .font(Font.Poppins.custom(.bold, size: 20))
                         .foregroundColor(.green)
                 }
             }

@@ -120,6 +120,11 @@ class ImpactScoringService {
         return currentScores
     }
 
+    /// Alias pour reverseTaskImpact (utilisé lors d'un skip après validation)
+    func reverseTaskImpact(habitId: String) async throws -> UserDomainScores {
+        return try await removeTaskImpact(habitId: habitId)
+    }
+
     // MARK: - Score Display Helpers
 
     /// Retourne les scores arrondis pour l'affichage

@@ -10,12 +10,12 @@ import FirebaseAuth
 
 struct ProfileCardView: View {
     // Removed ProgressionManager - using scoring system instead
-    @State private var completedDays: Int = 23 // Nombre de jours complétés
-    @State private var currentDay: Int = 24 // Jour actuel du programme
+    @State private var daysElapsed: Int = 0 // Nombre de jours écoulés depuis le début
     @State private var userName: String = ""
     @State private var userLevel: String = "" // Deprecated - no longer using levels
     @State private var globalScore: Int = 0
     @State private var globalStreak: Int = 0
+    @State private var programStartDate: Date? = nil
 
     private let totalDays = 66
     private let columns = 9  // 9 colonnes pour mieux remplir l'espace
@@ -61,9 +61,9 @@ struct ProfileCardView: View {
 
                 // Stats row
                 HStack(spacing: 32) {
-                    // Days completed
+                    // Days elapsed
                     VStack(spacing: 2) {
-                        Text("\(completedDays)")
+                        Text("\(daysElapsed)")
                             .font(.custom("Poppins-Bold", size: 20))
                             .foregroundColor(.white)
                         Text("jours")
@@ -107,13 +107,13 @@ struct ProfileCardView: View {
             VStack(spacing: 12) {
                 // Title
                 HStack {
-                    Text("Programme 66 jours")
+                    Text(NSLocalizedString("profile.program_subtitle", comment: ""))
                         .font(.custom("Poppins-Medium", size: 14))
                         .foregroundColor(.white.opacity(0.8))
 
                     Spacer()
 
-                    Text("Jour \(currentDay)/66")
+                    Text("Jour \(min(daysElapsed + 1, 66))/66")
                         .font(.custom("Poppins-SemiBold", size: 12))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -124,9 +124,7 @@ struct ProfileCardView: View {
                     ForEach(0..<totalDays, id: \.self) { day in
                         DaySquare(
                             dayNumber: day + 1,
-                            isCompleted: day < completedDays,
-                            isCurrent: day == currentDay - 1,
-                            isLocked: day >= currentDay
+                            isCompleted: day < daysElapsed
                         )
                     }
                 }
@@ -196,10 +194,21 @@ struct ProfileCardView: View {
     }
 
     private func loadUserData() {
-        // Load real data from UserDefaults or Firebase
-        if let savedDay = UserDefaults.standard.value(forKey: "currentProgramDay") as? Int {
-            currentDay = savedDay
-            completedDays = savedDay - 1
+        // Load program start date from UserDefaults
+        if let savedStartDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
+            programStartDate = savedStartDate
+
+            // Calculate days elapsed since start
+            let calendar = Calendar.current
+            let startOfToday = calendar.startOfDay(for: Date())
+            let startOfProgramDay = calendar.startOfDay(for: savedStartDate)
+
+            if let daysDifference = calendar.dateComponents([.day], from: startOfProgramDay, to: startOfToday).day {
+                daysElapsed = min(daysDifference, 66) // Cap at 66 days
+            }
+        } else {
+            // If no start date, use default
+            daysElapsed = 0
         }
 
         if let savedScore = UserDefaults.standard.value(forKey: "globalScore") as? Int {
@@ -218,38 +227,11 @@ struct ProfileCardView: View {
 struct DaySquare: View {
     let dayNumber: Int
     let isCompleted: Bool
-    let isCurrent: Bool
-    let isLocked: Bool
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(backgroundColor)
-                .frame(width: 28, height: 28)
-
-            if isCompleted {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(.white)
-            } else if isCurrent {
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 8, height: 8)
-            }
-        }
-        .opacity(isLocked && !isCurrent ? 0.3 : 1.0)
-    }
-
-    private var backgroundColor: Color {
-        if isCompleted {
-            return Color(hex: "B794F6")
-        } else if isCurrent {
-            return Color(hex: "B794F6").opacity(0.5)
-        } else if isLocked {
-            return Color.white.opacity(0.1)
-        } else {
-            return Color.white.opacity(0.2)
-        }
+        RoundedRectangle(cornerRadius: 4)
+            .fill(isCompleted ? Color(hex: "B794F6") : Color.white.opacity(0.15))
+            .frame(width: 28, height: 28)
     }
 }
 

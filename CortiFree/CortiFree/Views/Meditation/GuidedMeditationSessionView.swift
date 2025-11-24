@@ -68,7 +68,6 @@ struct GuidedMeditationSessionView: View {
             // Completion overlay
             if showCompletion {
                 CompletionOverlay(
-                    xpEarned: 15,
                     onDismiss: {
                         dismiss()
                     }

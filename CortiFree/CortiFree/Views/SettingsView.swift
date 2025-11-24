@@ -1,50 +1,38 @@
 import SwiftUI
 import SafariServices
 import FirebaseAuth
+import StoreKit
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authViewModel: AuthViewModel
-    @AppStorage("appLanguage") private var appLanguage: String = Locale.current.language.languageCode?.identifier ?? "fr"
+    @AppStorage("appLanguage") private var appLanguage: String = {
+        // Détection de la région pour la langue par défaut
+        let regionCode = Locale.current.region?.identifier ?? ""
+        let frenchSpeakingRegions = ["FR", "BE", "CH", "CA", "LU", "MC", "CD", "CI", "SN", "ML", "NE", "BF", "BJ", "TG", "CM", "GA", "CG", "MG", "RE", "GP", "MQ", "GF", "NC", "PF"]
 
-    // Profile & Objective
-    @State private var currentObjective: String = "Réduire mon stress quotidien"
-    @State private var notificationsEnabled: Bool = true
-    @State private var showRoutineSheet: Bool = false
+        // Si région francophone -> français, sinon anglais
+        return frenchSpeakingRegions.contains(regionCode) ? "fr" : "en"
+    }()
+
+    // ViewModel for settings management
+    @StateObject private var viewModel = SettingsViewModel()
+    @StateObject private var tasksViewModel = TasksViewModel()
+
+    // UI State only
     @State private var showLanguagePicker: Bool = false
-
-    // Experience & Habits
-    @State private var morningRoutineEnabled: Bool = true
-    @State private var afternoonRoutineEnabled: Bool = true
-    @State private var eveningRoutineEnabled: Bool = true
-    @State private var morningTime: Date = Calendar.current.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
-    @State private var afternoonTime: Date = Calendar.current.date(from: DateComponents(hour: 14, minute: 0)) ?? Date()
-    @State private var eveningTime: Date = Calendar.current.date(from: DateComponents(hour: 20, minute: 0)) ?? Date()
-    @State private var defaultSound: String = "Pluie forestière"
-    @State private var voiceGuidance: Bool = true
-    @State private var ambientVolume: Double = 0.7
-
-    // Subscription
-    @State private var subscriptionStatus: String = "Premium actif"
-    @State private var renewalDate: String = "15 novembre 2025"
-
-    // Privacy
-    @State private var localDataSize: String = "2.3 MB"
-    @State private var syncEnabled: Bool = true
-
-    // Debug
     @State private var showDebugSection: Bool = false
     @State private var versionTapCount: Int = 0
-
-    // Safari
     @State private var showSafari: Bool = false
     @State private var safariURL: URL?
-
-    // Alerts & Sheets
     @State private var showProfileEdit: Bool = false
-    @State private var showSoundPicker: Bool = false
     @State private var showDeleteAccountAlert: Bool = false
     @State private var showSignOutAlert: Bool = false
+    @State private var showLanguageChangeAlert: Bool = false
+    @State private var pendingLanguage: String?
+    @State private var showResetUserDefaultsAlert: Bool = false
+    @State private var showClearAllDataAlert: Bool = false
+    @State private var currentStreak: Int = 0
 
     var body: some View {
         ZStack {
@@ -62,35 +50,14 @@ struct SettingsView: View {
             }
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $showRoutineSheet) {
-            RoutineSelectionSheet(currentObjective: $currentObjective)
-        }
         .sheet(isPresented: $showLanguagePicker) {
-            LanguagePickerSheet(selectedLanguage: $appLanguage)
-        }
-        .onChange(of: notificationsEnabled) { _ in
-            saveSettings()
-        }
-        .onChange(of: morningRoutineEnabled) { _ in
-            saveSettings()
-        }
-        .onChange(of: afternoonRoutineEnabled) { _ in
-            saveSettings()
-        }
-        .onChange(of: eveningRoutineEnabled) { _ in
-            saveSettings()
-        }
-        .onChange(of: voiceGuidance) { _ in
-            saveSettings()
-        }
-        .onChange(of: ambientVolume) { _ in
-            saveSettings()
-        }
-        .onChange(of: syncEnabled) { _ in
-            saveSettings()
-        }
-        .sheet(isPresented: $showSoundPicker) {
-            SoundPickerSheet(selectedSound: $defaultSound)
+            LanguagePickerSheet(
+                selectedLanguage: $appLanguage,
+                onLanguageChange: { newLanguage in
+                    pendingLanguage = newLanguage
+                    showLanguageChangeAlert = true
+                }
+            )
         }
         .alert("Se déconnecter", isPresented: $showSignOutAlert) {
             Button("Annuler", role: .cancel) { }
@@ -108,12 +75,42 @@ struct SettingsView: View {
         } message: {
             Text("Cette action est irréversible. Toutes vos données seront définitivement supprimées.")
         }
-        .onAppear {
-            calculateLocalDataSize()
-            // Load current routine from UserDefaults
-            if let routineTitle = UserDefaults.standard.string(forKey: "selectedRoutineTitle") {
-                currentObjective = routineTitle
+        .alert(StringKeys.Settings.languageRestartNote, isPresented: $showLanguageChangeAlert) {
+            Button(StringKeys.Common.cancel, role: .cancel) {
+                pendingLanguage = nil
             }
+            Button(StringKeys.Common.continueButton, role: .destructive) {
+                if let newLanguage = pendingLanguage {
+                    applyLanguageChange(newLanguage)
+                }
+            }
+        } message: {
+            Text("L'application va se fermer pour appliquer le changement de langue. Veuillez la relancer.")
+        }
+        .alert("Réinitialiser UserDefaults", isPresented: $showResetUserDefaultsAlert) {
+            Button("Annuler", role: .cancel) { }
+            Button("Réinitialiser", role: .destructive) {
+                resetUserDefaults()
+            }
+        } message: {
+            Text("Cette action va réinitialiser toutes les préférences utilisateur (notifications, sons, horaires, etc.). Vos données de progression seront conservées.")
+        }
+        .alert("Supprimer toutes les données", isPresented: $showClearAllDataAlert) {
+            Button("Annuler", role: .cancel) { }
+            Button("Tout supprimer", role: .destructive) {
+                clearAllData()
+            }
+        } message: {
+            Text("⚠️ ATTENTION : Cette action va supprimer toutes vos données locales (progression, statistiques, préférences). Cette action est irréversible.")
+        }
+        .onAppear {
+            viewModel.calculateLocalDataSize()
+            // Load initial streak value
+            currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
+            // Reload streak when updated from TasksV2View
+            currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
         }
     }
 
@@ -151,7 +148,7 @@ struct SettingsView: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 profileObjectiveSection
-                experienceHabitsSection
+                statisticsSection
                 subscriptionSection
                 privacySecuritySection
                 aboutSupportSection
@@ -185,151 +182,155 @@ struct SettingsView: View {
                     .background(Color.white.opacity(0.1))
                     .padding(.leading, 48)
 
-                settingsRow(
-                    icon: "target",
-                    title: "Mon objectif actuel",
-                    subtitle: currentObjective,
-                    showChevron: false
-                ) {}
-
-                Divider()
-                    .background(Color.white.opacity(0.1))
-                    .padding(.leading, 48)
-
-                settingsRow(
-                    icon: "arrow.triangle.2.circlepath",
-                    title: "Changer de routine",
-                    subtitle: nil,
-                    showChevron: true
-                ) {
-                    HapticManager.light()
-                    showRoutineSheet = true
-                }
-
-                Divider()
-                    .background(Color.white.opacity(0.1))
-                    .padding(.leading, 48)
-
                 settingsToggleRow(
                     icon: "bell.fill",
-                    title: "Rappels & Notifications",
+                    title: StringKeys.Settings.notificationsToggle,
                     subtitle: "Recevoir des rappels quotidiens",
-                    isOn: $notificationsEnabled
+                    isOn: $viewModel.notificationsEnabled
                 )
             }
         }
     }
 
-    // MARK: - Experience & Habits Section
-    private var experienceHabitsSection: some View {
-        settingsSection(title: "Expérience & Habitudes", icon: "sparkles") {
+    // MARK: - Statistics Section
+    private var statisticsSection: some View {
+        settingsSection(title: "Statistiques & Progression", icon: "chart.bar.fill") {
             VStack(spacing: 0) {
-                routinesSubsection
-                timesSubsection
-                soundsSubsection
-            }
-        }
-    }
+                // Streak days
+                HStack(spacing: 12) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.orange)
+                        .frame(width: 20, height: 20)
 
-    private var routinesSubsection: some View {
-        Group {
-            Text("Routines quotidiennes")
-                .font(.custom("Poppins-Medium", size: 14))
-                .foregroundColor(.white.opacity(0.7))
-                .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Série de jours")
+                            .font(.custom("Poppins-Regular", size: 16))
+                            .foregroundColor(.white)
+
+                        Text("Jours consécutifs d'activité")
+                            .font(.custom("Poppins-Regular", size: 13))
+                            .foregroundColor(.white.opacity(0.5))
+                    }
+
+                    Spacer()
+
+                    Text("\(currentStreak) jours")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(Color.appTheme)
+                }
                 .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 12)
+                .padding(.vertical, 12)
 
-            settingsToggleRow(
-                icon: "sunrise.fill",
-                title: "Routine matinale",
-                subtitle: nil,
-                isOn: $morningRoutineEnabled
-            )
+                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+                // Completion rate
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(Color.appTheme)
+                        .frame(width: 20, height: 20)
 
-            settingsToggleRow(
-                icon: "sun.max.fill",
-                title: "Routine après-midi",
-                subtitle: nil,
-                isOn: $afternoonRoutineEnabled
-            )
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Taux de complétion")
+                            .font(.custom("Poppins-Regular", size: 16))
+                            .foregroundColor(.white)
 
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+                        Text("Tâches accomplies cette semaine")
+                            .font(.custom("Poppins-Regular", size: 13))
+                            .foregroundColor(.white.opacity(0.5))
+                    }
 
-            settingsToggleRow(
-                icon: "moon.stars.fill",
-                title: "Routine soirée",
-                subtitle: nil,
-                isOn: $eveningRoutineEnabled
-            )
+                    Spacer()
 
-            Divider().background(Color.white.opacity(0.1)).padding(.top, 12)
-        }
-    }
-
-    private var timesSubsection: some View {
-        Group {
-            Text("Heures de rappel")
-                .font(.custom("Poppins-Medium", size: 14))
-                .foregroundColor(.white.opacity(0.7))
-                .frame(maxWidth: .infinity, alignment: .leading)
+                    Text("\(calculateCompletionRate())%")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(Color.appTheme)
+                }
                 .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 12)
+                .padding(.vertical, 12)
 
-            settingsTimeRow(icon: "sunrise.fill", title: "Matinée", time: $morningTime)
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-            settingsTimeRow(icon: "sun.max.fill", title: "Après-midi", time: $afternoonTime)
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+                // Current week/day
+                HStack(spacing: 12) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(width: 20, height: 20)
 
-            settingsTimeRow(icon: "moon.stars.fill", title: "Soirée", time: $eveningTime)
-            Divider().background(Color.white.opacity(0.1)).padding(.top, 12)
-        }
-    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Programme actuel")
+                            .font(.custom("Poppins-Regular", size: 16))
+                            .foregroundColor(.white)
 
-    private var soundsSubsection: some View {
-        Group {
-            settingsRow(
-                icon: "speaker.wave.2.fill",
-                title: "Sons relaxants par défaut",
-                subtitle: defaultSound,
-                showChevron: true
-            ) {
-                HapticManager.light()
-                showSoundPicker = true
+                        Text("Progression dans le plan 66 jours")
+                            .font(.custom("Poppins-Regular", size: 13))
+                            .foregroundColor(.white.opacity(0.5))
+                    }
+
+                    Spacer()
+
+                    Text("S\(UserDefaults.standard.integer(forKey: "currentWeek")) · J\(UserDefaults.standard.integer(forKey: "currentDay"))")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+
+                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+
+                // Firebase sync status (if enabled)
+                if viewModel.syncEnabled {
+                    HStack(spacing: 12) {
+                        if viewModel.isSyncing {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                                .frame(width: 20, height: 20)
+                        } else {
+                            Image(systemName: viewModel.syncError == nil ? "checkmark.icloud.fill" : "exclamationmark.icloud.fill")
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundColor(viewModel.syncError == nil ? .green : .orange)
+                                .frame(width: 20, height: 20)
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(viewModel.isSyncing ? StringKeys.Settings.syncing : StringKeys.Settings.syncStatus)
+                                .font(.custom("Poppins-Regular", size: 16))
+                                .foregroundColor(.white)
+
+                            if let lastSync = viewModel.lastSyncDate {
+                                Text("Dernière sync: \(formatSyncDate(lastSync))")
+                                    .font(.custom("Poppins-Regular", size: 13))
+                                    .foregroundColor(.white.opacity(0.5))
+                            } else if let error = viewModel.syncError {
+                                Text("Erreur: \(error)")
+                                    .font(.custom("Poppins-Regular", size: 13))
+                                    .foregroundColor(.orange.opacity(0.8))
+                            } else {
+                                Text("Synchronisation automatique")
+                                    .font(.custom("Poppins-Regular", size: 13))
+                                    .foregroundColor(.white.opacity(0.5))
+                            }
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                }
             }
-
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-            settingsToggleRow(
-                icon: "waveform",
-                title: "Voix & Guidance",
-                subtitle: "Accompagnement vocal durant les exercices",
-                isOn: $voiceGuidance
-            )
-
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-            settingsSliderRow(
-                icon: "speaker.wave.3.fill",
-                title: "Volume d'ambiance",
-                value: $ambientVolume
-            )
         }
     }
 
     // MARK: - Subscription Section
     private var subscriptionSection: some View {
-        settingsSection(title: "Abonnement & Accès Premium", icon: "crown.fill") {
+        settingsSection(title: StringKeys.Settings.subscription, icon: "crown.fill") {
             VStack(spacing: 0) {
-                settingsRow(icon: "checkmark.circle.fill", title: "Statut actuel", subtitle: subscriptionStatus, showChevron: false) {}
+                settingsRow(icon: "checkmark.circle.fill", title: "Statut actuel", subtitle: viewModel.subscriptionStatus, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "arrow.clockwise", title: "Renouvellement", subtitle: renewalDate, showChevron: false) {}
+                settingsRow(icon: "arrow.clockwise", title: StringKeys.Settings.renewalDate, subtitle: viewModel.renewalDate.isEmpty ? "N/A" : viewModel.renewalDate, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsRow(icon: "gearshape.fill", title: "Gérer mon abonnement", subtitle: "Modifier ou annuler", showChevron: true) {
@@ -374,10 +375,10 @@ struct SettingsView: View {
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "internaldrive.fill", title: "Données locales", subtitle: localDataSize, showChevron: false) {}
+                settingsRow(icon: "internaldrive.fill", title: StringKeys.Settings.localDataSize, subtitle: viewModel.localDataSize, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: "Synchronisation iCloud", subtitle: "Sauvegarder vos données dans le cloud", isOn: $syncEnabled)
+                settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: StringKeys.Settings.icloudSync, subtitle: "Sauvegarder vos données dans le cloud", isOn: $viewModel.syncEnabled)
             }
         }
     }
@@ -405,9 +406,9 @@ struct SettingsView: View {
 
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "envelope.fill", title: "Contact support", subtitle: "support@cortifree.com", showChevron: true) {
+                settingsRow(icon: "envelope.fill", title: "Contact support", subtitle: "contact.cortifree@gmail.com", showChevron: true) {
                     HapticManager.light()
-                    openURL("mailto:support@cortifree.com")
+                    openURL("mailto:contact.cortifree@gmail.com")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
@@ -419,6 +420,7 @@ struct SettingsView: View {
 
                 settingsRow(icon: "star.fill", title: "Noter l'application", subtitle: "Aidez-nous à nous améliorer", showChevron: true) {
                     HapticManager.light()
+                    requestAppReview()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
@@ -436,16 +438,19 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 settingsRow(icon: "hammer.fill", title: "Reset UserDefaults", subtitle: nil, showChevron: false) {
                     HapticManager.medium()
+                    showResetUserDefaultsAlert = true
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsRow(icon: "trash.circle.fill", title: "Clear all data", subtitle: nil, showChevron: false, isDestructive: true) {
                     HapticManager.heavy()
+                    showClearAllDataAlert = true
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsRow(icon: "arrow.clockwise.circle.fill", title: "Force sync", subtitle: nil, showChevron: false) {
                     HapticManager.light()
+                    // TODO: Implement force sync if needed
                 }
             }
         }
@@ -604,7 +609,6 @@ struct SettingsView: View {
                 .colorScheme(.dark)
                 .onChange(of: time.wrappedValue) { _ in
                     HapticManager.light()
-                    saveSettings()
                 }
         }
         .padding(.horizontal, 16)
@@ -657,17 +661,37 @@ struct SettingsView: View {
         }
     }
 
-    private func saveSettings() {
-        // Save to UserDefaults
-        UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled")
-        UserDefaults.standard.set(morningRoutineEnabled, forKey: "morningRoutineEnabled")
-        UserDefaults.standard.set(afternoonRoutineEnabled, forKey: "afternoonRoutineEnabled")
-        UserDefaults.standard.set(eveningRoutineEnabled, forKey: "eveningRoutineEnabled")
-        UserDefaults.standard.set(voiceGuidance, forKey: "voiceGuidance")
-        UserDefaults.standard.set(ambientVolume, forKey: "ambientVolume")
-        UserDefaults.standard.set(syncEnabled, forKey: "syncEnabled")
+    // MARK: - Statistics Helper Functions
 
-        // TODO: Sync to Firestore when implemented
+    private func calculateCompletionRate() -> Int {
+        // Utilise le taux de complétion du TasksViewModel
+        return Int(tasksViewModel.completionPercentage * 100)
+    }
+
+    private func formatSyncDate(_ date: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        formatter.locale = Locale(identifier: appLanguage)
+        return formatter.localizedString(for: date, relativeTo: Date())
+    }
+
+    // MARK: - Language Change
+
+    private func applyLanguageChange(_ newLanguage: String) {
+        HapticManager.success()
+
+        // Update @AppStorage variable immediately
+        appLanguage = newLanguage
+
+        // Save language preference to AppleLanguages for system-wide consistency
+        UserDefaults.standard.set([newLanguage], forKey: "AppleLanguages")
+        UserDefaults.standard.synchronize()
+
+        // Force app termination to apply language change
+        // The app needs to restart for the language bundle to reload
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            exit(0)
+        }
     }
 
     // MARK: - Helper Functions
@@ -684,6 +708,12 @@ struct SettingsView: View {
         #if canImport(SuperwallKit)
         // Superwall.shared.restorePurchases(...)
         #endif
+    }
+
+    private func requestAppReview() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: windowScene)
+        }
     }
 
     private func signOut() {
@@ -725,21 +755,42 @@ struct SettingsView: View {
         }
     }
 
-    private func calculateLocalDataSize() {
-        // Calculate size of local data
-        let fileManager = FileManager.default
-        if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            do {
-                let size = try fileManager.allocatedSizeOfDirectory(at: documentsPath)
-                let formatter = ByteCountFormatter()
-                formatter.allowedUnits = [.useMB, .useKB]
-                formatter.countStyle = .file
-                localDataSize = formatter.string(fromByteCount: Int64(size))
-            } catch {
-                localDataSize = "N/A"
-            }
-        }
+    // MARK: - Debug Actions
+
+    private func resetUserDefaults() {
+        HapticManager.success()
+
+        // Reset only UI preferences, keep progression data
+        UserDefaults.standard.removeObject(forKey: "notificationsEnabled")
+        UserDefaults.standard.removeObject(forKey: "morningRoutineEnabled")
+        UserDefaults.standard.removeObject(forKey: "afternoonRoutineEnabled")
+        UserDefaults.standard.removeObject(forKey: "eveningRoutineEnabled")
+        UserDefaults.standard.removeObject(forKey: "morningTime")
+        UserDefaults.standard.removeObject(forKey: "afternoonTime")
+        UserDefaults.standard.removeObject(forKey: "eveningTime")
+        UserDefaults.standard.removeObject(forKey: "defaultSound")
+        UserDefaults.standard.removeObject(forKey: "voiceGuidance")
+        UserDefaults.standard.removeObject(forKey: "ambientVolume")
+        UserDefaults.standard.removeObject(forKey: "syncEnabled")
+        UserDefaults.standard.synchronize()
+
+        // Reload view model to show reset values
+        viewModel.loadSettings()
     }
+
+    private func clearAllData() {
+        HapticManager.success()
+
+        // Clear all UserDefaults including progression
+        let domain = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        UserDefaults.standard.synchronize()
+
+        // Reload view model
+        viewModel.loadSettings()
+        viewModel.calculateLocalDataSize()
+    }
+
 }
 
 // MARK: - Routine Selection Sheet
@@ -1146,6 +1197,7 @@ struct SoundPickerSheet: View {
 // MARK: - Language Picker Sheet
 struct LanguagePickerSheet: View {
     @Binding var selectedLanguage: String
+    var onLanguageChange: ((String) -> Void)?
     @Environment(\.dismiss) private var dismiss
 
     let languages = [
@@ -1192,18 +1244,16 @@ struct LanguagePickerSheet: View {
                     ForEach(languages, id: \.0) { language in
                         Button(action: {
                             HapticManager.medium()
-                            selectedLanguage = language.0
 
-                            // Update app language
-                            UserDefaults.standard.set([language.0], forKey: "AppleLanguages")
-                            UserDefaults.standard.synchronize()
-
-                            // Show restart alert
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            // Don't change if it's already selected
+                            if selectedLanguage == language.0 {
                                 dismiss()
-                                // The app needs to be restarted for language change
-                                exit(0)
+                                return
                             }
+
+                            // Call the callback to handle language change
+                            onLanguageChange?(language.0)
+                            dismiss()
                         }) {
                             HStack(spacing: 16) {
                                 Text(language.2)

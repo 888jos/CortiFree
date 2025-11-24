@@ -70,6 +70,8 @@ struct GenericExerciseView: View {
                             .font(.custom("Poppins-SemiBold", size: 28))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
 
                         Text(exerciseType.description)
                             .font(.custom("Poppins-Regular", size: 18))
@@ -110,7 +112,6 @@ struct GenericExerciseView: View {
             // Completion overlay
             if showCompletion {
                 CompletionOverlay(
-                    xpEarned: exerciseType.xpReward,
                     onDismiss: {
                         dismiss()
                     }

@@ -261,7 +261,7 @@ private struct ShootingStar: Identifiable {
 
         VStack {
             Text("CortiFree")
-                .font(.custom("SF Pro Rounded-Bold", size: 48))
+                .font(Font.Poppins.custom(.bold, size: 48))
                 .foregroundColor(.white)
 
             Text("Galaxy Background")

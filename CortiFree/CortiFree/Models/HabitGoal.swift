@@ -141,7 +141,9 @@ struct HabitPerformance: Codable {
 
     var formattedAverageDuration: String? {
         guard let duration = averageDurationMinutes else { return nil }
-        return "\(Int(round(duration))) min"
+        // Arrondir au multiple de 5 le plus proche
+        let roundedDuration = Int(round(duration / 5.0) * 5.0)
+        return "\(roundedDuration) min"
     }
 
     var formattedAverageQuantity: String? {
@@ -163,8 +165,8 @@ struct HabitPerformance: Codable {
 extension HabitGoal {
     static func defaultGoals() -> [HabitGoal] {
         return [
-            // Méditation: Semaine 10 = 7x/sem, 13 min
-            HabitGoal(habitId: "meditation", frequencyPerWeek: 7, durationMinutes: 13),
+            // Méditation: Semaine 10 = 7x/sem, 15 min (arrondi de 13)
+            HabitGoal(habitId: "meditation", frequencyPerWeek: 7, durationMinutes: 15),
 
             // Respiration: Semaine 10 = 7x/sem, 10 min
             HabitGoal(habitId: "breathing", frequencyPerWeek: 7, durationMinutes: 10),
@@ -172,8 +174,8 @@ extension HabitGoal {
             // Journal: Semaine 10 = 7x/sem, 10 min
             HabitGoal(habitId: "journal", frequencyPerWeek: 7, durationMinutes: 10),
 
-            // Sport: Semaine 10 = 4x/sem, 53 min
-            HabitGoal(habitId: "sport", frequencyPerWeek: 4, durationMinutes: 53),
+            // Sport: Semaine 10 = 4x/sem, 55 min (arrondi de 53)
+            HabitGoal(habitId: "sport", frequencyPerWeek: 4, durationMinutes: 55),
 
             // Eau: Semaine 10 = 2.5L/jour
             HabitGoal(habitId: "water", frequencyPerWeek: 7, dailyQuantity: 2.5),

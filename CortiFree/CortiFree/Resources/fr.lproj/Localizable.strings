@@ -212,11 +212,31 @@
 "profile.habit.nature" = "Nature";
 "profile.habit.sleep" = "Sommeil";
 "profile.habit.social" = "Social";
+"profile.program_subtitle" = "Tu as commencé ton programme depuis :";
 "profile.domain.serenity" = "Sérénité";
 "profile.domain.sleep" = "Sommeil";
 "profile.domain.energy" = "Énergie";
 "profile.domain.focus" = "Focus";
 "profile.domain.balance" = "Équilibre";
+
+// Profile Tabs
+"profile.tab.score" = "Score";
+"profile.tab.habits" = "Habitudes";
+"profile.tab.badges" = "Badges";
+
+// Score Section
+"profile.score.title" = "Score CortiFree";
+"profile.score.current" = "Actuel";
+"profile.score.potential" = "Potentiel (J66)";
+"profile.score.global" = "Global";
+
+// Achievements Section
+"profile.achievements.streaks" = "STREAKS";
+"profile.achievements.habits" = "HABITUDES";
+"profile.achievements.badges_title" = "Badges";
+"profile.achievements.unlocked" = "débloqués";
+"profile.achievements.complete" = "Complete";
+"profile.achievements.close" = "Fermer";
 
 // Profile Edit
 "profile.edit.title" = "Mon Profil";
@@ -242,6 +262,69 @@
 "profile.habit.completion_rate" = "Taux de complétion: %@";
 "profile.habit.no_data_yet" = "Pas encore de données";
 
+// MARK: - Library
+"library.title" = "Librairie";
+"library.icon.breathing" = "Respiration";
+"library.icon.meditation" = "Méditation";
+"library.icon.journal" = "Journal";
+"library.icon.studies" = "Études";
+
+// MARK: - Quick Actions (HomeView icons)
+"quickaction.breathing" = "Respiration";
+"quickaction.meditation" = "Méditation";
+"quickaction.sounds" = "Sons";
+"quickaction.journal" = "Journal";
+
+// MARK: - Sounds
+"sounds.title" = "Sons Relaxants";
+"sounds.rain" = "Pluie";
+"sounds.ocean" = "Ocean";
+"sounds.fire" = "Feu";
+"sounds.whitenoise" = "Bruit Blanc";
+"sounds.morning" = "Matinée";
+"sounds.forest" = "Forêt";
+"sounds.stream" = "Ruisseau";
+"sounds.night" = "Nuit d'été";
+
+// MARK: - Duration Selector
+"duration.infinite" = "Infini";
+"duration.5min" = "5 min";
+"duration.10min" = "10 min";
+"duration.15min" = "15 min";
+"duration.30min" = "30 min";
+"duration.1hour" = "1 heure";
+"duration.title" = "Durée de lecture";
+"duration.subtitle" = "Choisir combien de temps le son doit jouer";
+
+// MARK: - Avatar Progress Card
+"avatar.my_progress" = "Ma Progression";
+"avatar.days" = "jours";
+"avatar.motivation.0_10" = "Chaque grand voyage commence par un premier pas !";
+"avatar.motivation.10_25" = "Tu es sur la bonne voie, continue comme ça !";
+"avatar.motivation.25_50" = "Tu as déjà accompli %d%% du chemin !";
+"avatar.motivation.50_75" = "Plus de la moitié ! Tu es incroyable !";
+"avatar.motivation.75_100" = "La ligne d'arrivée est proche, ne lâche rien !";
+"avatar.motivation.100" = "Programme complété ! Tu es une légende !";
+"avatar.next_badge" = "Plus que %d jour%@ !";
+"avatar.next_badge.singular" = "";
+"avatar.next_badge.plural" = "s";
+"avatar.badges_title" = "Badges";
+"avatar.badges_unlocked" = "%d/%d débloqués";
+"avatar.badges_complete" = "%d%% Complete";
+"avatar.streaks_section" = "STREAKS";
+"avatar.habits_section" = "HABITUDES";
+
+// Badge names
+"avatar.badge.beginner" = "Débutant";
+"avatar.badge.motivated" = "Motivé";
+"avatar.badge.determined" = "Déterminé";
+"avatar.badge.engaged" = "Engagé";
+"avatar.badge.assiduous" = "Assidu";
+"avatar.badge.champion" = "Champion";
+"avatar.badge.invincible" = "Invincible";
+"avatar.badge.legend" = "Légende";
+"avatar.badge.master" = "Maître";
+
 // MARK: - Tasks Extended
 "tasks.day_progress" = "Jour %d/66";
 "tasks.breathe_consciously" = "Respirer en conscience";
@@ -263,6 +346,7 @@
 "settings.warning_title" = "⚠️ Attention";
 "settings.change_routine_warning" = "Changer de routine réinitialisera :";
 "settings.notifications" = "Notifications";
+"settings.notifications_toggle" = "Autoriser les notifications";
 "settings.sounds" = "Sons";
 "settings.privacy" = "Confidentialité";
 "settings.about" = "À propos";
@@ -326,3 +410,1826 @@
 "journal.mood.question" = "Comment te sens-tu ?";
 "journal.mood.hide" = "Masquer";
 "journal.mood.change" = "Changer";
+
+// MARK: - Additional Common Keys
+"common.continue" = "Continuer";
+"common.next" = "Suivant";
+"common.previous" = "Précédent";
+"common.week" = "semaine";
+"common.weeks" = "semaines";
+"common.serenity" = "Sérénité";
+"common.sleep" = "Sommeil";
+"common.energy" = "Énergie";
+"common.focus" = "Focus";
+"common.balance" = "Équilibre";
+
+// MARK: - Onboarding V2 - Overall Quiz
+"onboarding.overall_quiz.title" = "Quelques questions pour commencer";
+"onboarding.overall_quiz.first_name_label" = "Ton prénom ?";
+"onboarding.overall_quiz.first_name_placeholder" = "Entre ton prénom";
+"onboarding.overall_quiz.age_label" = "Ton âge ?";
+"onboarding.overall_quiz.gender_label" = "Ton genre ?";
+"onboarding.overall_quiz.stress_reason_label" = "Qu'est-ce qui te stresse ?";
+"onboarding.overall_quiz.stress_duration_label" = "Depuis combien de temps ?";
+
+// Age options
+"onboarding.overall_quiz.age_18_24" = "18-24 ans";
+"onboarding.overall_quiz.age_25_34" = "25-34 ans";
+"onboarding.overall_quiz.age_35_44" = "35-44 ans";
+"onboarding.overall_quiz.age_45_54" = "45-54 ans";
+"onboarding.overall_quiz.age_55_plus" = "55+ ans";
+
+// Gender options
+"onboarding.overall_quiz.gender_male" = "Homme";
+"onboarding.overall_quiz.gender_female" = "Femme";
+"onboarding.overall_quiz.gender_other" = "Autre";
+"onboarding.overall_quiz.gender_prefer_not" = "Préfère ne pas dire";
+
+// Stress reasons
+"onboarding.overall_quiz.reason_work" = "Travail";
+"onboarding.overall_quiz.reason_finances" = "Finances";
+"onboarding.overall_quiz.reason_relationships" = "Relations";
+"onboarding.overall_quiz.reason_health" = "Santé";
+"onboarding.overall_quiz.reason_family" = "Famille";
+"onboarding.overall_quiz.reason_studies" = "Études";
+"onboarding.overall_quiz.reason_future" = "Avenir";
+"onboarding.overall_quiz.reason_other" = "Autre";
+
+// Duration options
+"onboarding.overall_quiz.duration_less_1_month" = "Moins d'1 mois";
+"onboarding.overall_quiz.duration_1_3_months" = "1-3 mois";
+"onboarding.overall_quiz.duration_3_6_months" = "3-6 mois";
+"onboarding.overall_quiz.duration_6_12_months" = "6-12 mois";
+"onboarding.overall_quiz.duration_more_1_year" = "Plus d'1 an";
+
+// MARK: - Onboarding V2 - Habits Quiz
+"onboarding.habits_quiz.title" = "Évalue tes habitudes actuelles";
+"onboarding.habits_quiz.subtitle" = "Réponds honnêtement pour un plan personnalisé";
+"onboarding.habits_quiz.question_of" = "Question %d sur %d";
+
+// Questions
+"onboarding.habits_quiz.q1" = "À quelle fréquence médites-tu ?";
+"onboarding.habits_quiz.q2" = "Pratiques-tu des exercices de respiration ?";
+"onboarding.habits_quiz.q3" = "Écris-tu régulièrement dans un journal ?";
+"onboarding.habits_quiz.q4" = "À quelle fréquence fais-tu du sport ?";
+"onboarding.habits_quiz.q5" = "Bois-tu suffisamment d'eau chaque jour ?";
+"onboarding.habits_quiz.q6" = "Passes-tu du temps dans la nature ?";
+"onboarding.habits_quiz.q7" = "Comment évalues-tu la qualité de ton sommeil ?";
+"onboarding.habits_quiz.q8" = "Entretiens-tu des relations sociales régulières ?";
+"onboarding.habits_quiz.q9" = "Te sens-tu souvent stressé ou anxieux ?";
+"onboarding.habits_quiz.q10" = "As-tu des moments de détente dans ta journée ?";
+"onboarding.habits_quiz.q11" = "Gères-tu bien tes émotions ?";
+"onboarding.habits_quiz.q12" = "Te sens-tu énergique au quotidien ?";
+
+// Answer options
+"onboarding.habits_quiz.answer_never" = "Jamais";
+"onboarding.habits_quiz.answer_rarely" = "Rarement";
+"onboarding.habits_quiz.answer_sometimes" = "Parfois";
+"onboarding.habits_quiz.answer_often" = "Souvent";
+"onboarding.habits_quiz.answer_always" = "Toujours";
+
+// MARK: - Onboarding V2 - Rating View
+"onboarding.rating.current_title" = "Ton évaluation actuelle";
+"onboarding.rating.potential_title" = "Ton évaluation potentielle";
+"onboarding.rating.potential_subtitle" = "après 66 jours";
+"onboarding.rating.see_potential" = "Voir le potentiel";
+
+// MARK: - Onboarding V2 - Eight Habits Intro
+"onboarding.eight_habits_intro.title" = "Les 8 habitudes clés pour diminuer ton stress";
+"onboarding.eight_habits_intro.subtitle" = "Chaque habitude a été sélectionnée pour son impact scientifiquement prouvé sur la réduction du cortisol";
+"onboarding.eight_habits_intro.habit_meditation" = "Méditation";
+"onboarding.eight_habits_intro.habit_breathing" = "Respiration";
+"onboarding.eight_habits_intro.habit_journal" = "Journal";
+"onboarding.eight_habits_intro.habit_sport" = "Sport";
+"onboarding.eight_habits_intro.habit_water" = "Eau";
+"onboarding.eight_habits_intro.habit_nature" = "Nature";
+"onboarding.eight_habits_intro.habit_sleep" = "Sommeil";
+"onboarding.eight_habits_intro.habit_social" = "Social";
+
+// MARK: - Onboarding V2 - Eight Habits Flow
+"onboarding.eight_habits_flow.see_details" = "Voir en détail les 8 habitudes";
+"onboarding.eight_habits_flow.how_habits_help" = "Comment les 8 habitudes vous aident";
+
+// Meditation
+"onboarding.eight_habits_flow.meditation_title" = "Méditation en pleine conscience";
+"onboarding.eight_habits_flow.meditation_subtitle" = "Calme l'esprit, réduit le stress";
+"onboarding.eight_habits_flow.meditation_benefit_1" = "Réduit l'anxiété de 30%";
+"onboarding.eight_habits_flow.meditation_benefit_2" = "Améliore la concentration";
+"onboarding.eight_habits_flow.meditation_benefit_3" = "Diminue le cortisol";
+"onboarding.eight_habits_flow.meditation_impact_serenity" = "Sérénité";
+"onboarding.eight_habits_flow.meditation_impact_focus" = "Focus";
+"onboarding.eight_habits_flow.meditation_impact_balance" = "Équilibre";
+
+// Breathing
+"onboarding.eight_habits_flow.breathing_title" = "Exercices de respiration";
+"onboarding.eight_habits_flow.breathing_subtitle" = "Apaise instantanément le système nerveux";
+"onboarding.eight_habits_flow.breathing_benefit_1" = "Calme immédiat";
+"onboarding.eight_habits_flow.breathing_benefit_2" = "Régule le rythme cardiaque";
+"onboarding.eight_habits_flow.breathing_benefit_3" = "Réduit la tension";
+"onboarding.eight_habits_flow.breathing_impact_serenity" = "Sérénité";
+"onboarding.eight_habits_flow.breathing_impact_energy" = "Énergie";
+
+// Journal
+"onboarding.eight_habits_flow.journal_title" = "Tenue d'un journal";
+"onboarding.eight_habits_flow.journal_subtitle" = "Libère les pensées, clarifie l'esprit";
+"onboarding.eight_habits_flow.journal_benefit_1" = "Réduit les ruminations";
+"onboarding.eight_habits_flow.journal_benefit_2" = "Améliore l'humeur";
+"onboarding.eight_habits_flow.journal_benefit_3" = "Clarifie les émotions";
+"onboarding.eight_habits_flow.journal_impact_serenity" = "Sérénité";
+"onboarding.eight_habits_flow.journal_impact_balance" = "Équilibre";
+
+// Sport
+"onboarding.eight_habits_flow.sport_title" = "Activité physique régulière";
+"onboarding.eight_habits_flow.sport_subtitle" = "Libère les endorphines, brûle le stress";
+"onboarding.eight_habits_flow.sport_benefit_1" = "Augmente les endorphines";
+"onboarding.eight_habits_flow.sport_benefit_2" = "Réduit le cortisol";
+"onboarding.eight_habits_flow.sport_benefit_3" = "Améliore l'humeur";
+"onboarding.eight_habits_flow.sport_impact_energy" = "Énergie";
+"onboarding.eight_habits_flow.sport_impact_sleep" = "Sommeil";
+"onboarding.eight_habits_flow.sport_impact_balance" = "Équilibre";
+
+// Water
+"onboarding.eight_habits_flow.water_title" = "Hydratation optimale";
+"onboarding.eight_habits_flow.water_subtitle" = "Essentielle pour le cerveau et le corps";
+"onboarding.eight_habits_flow.water_benefit_1" = "Améliore la concentration";
+"onboarding.eight_habits_flow.water_benefit_2" = "Réduit la fatigue";
+"onboarding.eight_habits_flow.water_benefit_3" = "Optimise les fonctions cérébrales";
+"onboarding.eight_habits_flow.water_impact_energy" = "Énergie";
+"onboarding.eight_habits_flow.water_impact_focus" = "Focus";
+
+// Nature
+"onboarding.eight_habits_flow.nature_title" = "Contact avec la nature";
+"onboarding.eight_habits_flow.nature_subtitle" = "Reconnecte, ressource, revitalise";
+"onboarding.eight_habits_flow.nature_benefit_1" = "Baisse la pression artérielle";
+"onboarding.eight_habits_flow.nature_benefit_2" = "Réduit le stress mental";
+"onboarding.eight_habits_flow.nature_benefit_3" = "Améliore l'humeur";
+"onboarding.eight_habits_flow.nature_impact_serenity" = "Sérénité";
+"onboarding.eight_habits_flow.nature_impact_balance" = "Équilibre";
+
+// Sleep
+"onboarding.eight_habits_flow.sleep_title" = "Sommeil de qualité";
+"onboarding.eight_habits_flow.sleep_subtitle" = "Pilier de la récupération et de la santé";
+"onboarding.eight_habits_flow.sleep_benefit_1" = "Régénère le corps et l'esprit";
+"onboarding.eight_habits_flow.sleep_benefit_2" = "Réduit le cortisol";
+"onboarding.eight_habits_flow.sleep_benefit_3" = "Améliore la mémoire";
+"onboarding.eight_habits_flow.sleep_impact_sleep" = "Sommeil";
+"onboarding.eight_habits_flow.sleep_impact_energy" = "Énergie";
+"onboarding.eight_habits_flow.sleep_impact_focus" = "Focus";
+
+// Social
+"onboarding.eight_habits_flow.social_title" = "Connexions sociales";
+"onboarding.eight_habits_flow.social_subtitle" = "Le soutien social, antidote au stress";
+"onboarding.eight_habits_flow.social_benefit_1" = "Réduit l'anxiété";
+"onboarding.eight_habits_flow.social_benefit_2" = "Augmente l'ocytocine";
+"onboarding.eight_habits_flow.social_benefit_3" = "Renforce le bien-être";
+"onboarding.eight_habits_flow.social_impact_serenity" = "Sérénité";
+"onboarding.eight_habits_flow.social_impact_balance" = "Équilibre";
+
+// Common
+"onboarding.eight_habits_flow.benefits_title" = "Bénéfices scientifiques";
+"onboarding.eight_habits_flow.impact_on_title" = "Impact sur";
+
+// MARK: - Onboarding V2 - Week Progress
+"onboarding.week_progress.week_number" = "Semaine %d";
+"onboarding.week_progress.week_1_message" = "Tu débutes — ton départ est un peu faible.";
+"onboarding.week_progress.week_5_message" = "Tu progresses — continue comme ça !";
+"onboarding.week_progress.week_10_message" = "Tu maîtrises tous les domaines — ton progrès est évident !";
+
+// MARK: - Onboarding V2 - Habits Progress Flow
+"onboarding.habits_progress_flow.title" = "Évolution de tes habitudes";
+"onboarding.habits_progress_flow.subtitle" = "Vois comment tes efforts se transforment en résultats concrets";
+"onboarding.habits_progress_flow.week_label" = "Semaine";
+"onboarding.habits_progress_flow.progress_label" = "Progrès";
+
+// MARK: - Onboarding V2 - Testimonials
+"onboarding.testimonials.title" = "Ils ont transformé leur vie";
+"onboarding.testimonials.subtitle" = "Rejoins des milliers d'utilisateurs qui ont réduit leur stress";
+
+"onboarding.testimonials.testimonial_1_name" = "Marie L.";
+"onboarding.testimonials.testimonial_1_age" = "32 ans";
+"onboarding.testimonials.testimonial_1_text" = "En 10 semaines, j'ai appris à gérer mon stress au travail. Les exercices de respiration sont devenus mon réflexe dans les moments difficiles.";
+
+"onboarding.testimonials.testimonial_2_name" = "Thomas D.";
+"onboarding.testimonials.testimonial_2_age" = "28 ans";
+"onboarding.testimonials.testimonial_2_text" = "J'étais sceptique au début, mais la méditation guidée et le suivi des habitudes ont vraiment changé ma qualité de vie. Je dors mieux et je me sens plus calme.";
+
+"onboarding.testimonials.testimonial_3_name" = "Sophie M.";
+"onboarding.testimonials.testimonial_3_age" = "45 ans";
+"onboarding.testimonials.testimonial_3_text" = "Le journal de gratitude m'a aidée à voir les choses positivement. Après 66 jours, c'est devenu une habitude naturelle.";
+
+"onboarding.testimonials.testimonial_4_name" = "Lucas B.";
+"onboarding.testimonials.testimonial_4_age" = "35 ans";
+"onboarding.testimonials.testimonial_4_text" = "L'approche scientifique m'a convaincu. Chaque exercice est basé sur des études, et les résultats sont au rendez-vous.";
+
+// MARK: - Onboarding V2 - Goals Selection
+"onboarding.goals_selection.title" = "Quel est ton objectif principal ?";
+"onboarding.goals_selection.subtitle" = "Sélectionne jusqu'à 3 objectifs";
+
+"onboarding.goals_selection.goal_1" = "Réduire mon stress au quotidien";
+"onboarding.goals_selection.goal_2" = "Mieux dormir";
+"onboarding.goals_selection.goal_3" = "Augmenter mon énergie";
+"onboarding.goals_selection.goal_4" = "Améliorer ma concentration";
+"onboarding.goals_selection.goal_5" = "Trouver l'équilibre vie pro/perso";
+"onboarding.goals_selection.goal_6" = "Gérer mes émotions";
+"onboarding.goals_selection.goal_7" = "Développer la pleine conscience";
+"onboarding.goals_selection.goal_8" = "Créer des habitudes saines";
+
+"onboarding.goals_selection.selection_count" = "%d/3 sélectionnés";
+
+// MARK: - Onboarding V2 - Authentication
+"onboarding.auth.title" = "Crée ton compte pour commencer";
+"onboarding.auth.subtitle" = "Sauvegarde ta progression et accède à ton programme personnalisé";
+"onboarding.auth.email_placeholder" = "Adresse email";
+"onboarding.auth.password_placeholder" = "Mot de passe";
+"onboarding.auth.sign_in_button" = "Se connecter";
+"onboarding.auth.sign_up_button" = "S'inscrire";
+"onboarding.auth.or_continue_with" = "Ou continue avec";
+"onboarding.auth.google_button" = "Continuer avec Google";
+"onboarding.auth.apple_button" = "Continuer avec Apple";
+"onboarding.auth.already_have_account" = "Déjà un compte ?";
+"onboarding.auth.no_account_yet" = "Pas encore de compte ?";
+"onboarding.auth.forgot_password" = "Mot de passe oublié ?";
+"onboarding.auth.reset_password" = "Réinitialiser";
+"onboarding.auth.back_to_login" = "Retour à la connexion";
+
+// MARK: - Auto-Generated Translations (Review and Update)
+// TODO: Review these translations for accuracy
+
+"onboarding.next" = "Suivant";
+"quiz.whats_your_name" = "What can I call you?";
+"quiz.your_first_name" = "Your first name";
+"quiz.whats_your_gender" = "What's your gender?";
+"quiz.man" = "Male";
+"quiz.woman" = "Female";
+"quiz.prefer_not_say" = "Prefer not to say";
+"quiz.how_old_are_you" = "How old are you?";
+"quiz.age_18_24" = "18-24 years";
+"quiz.age_25_34" = "25-34 years";
+"quiz.age_35_44" = "35-44 years";
+"quiz.age_45_54" = "45-54 years";
+"quiz.age_55_64" = "55-64 years";
+"quiz.age_65_plus" = "65 years and over";
+"quiz.why_download_today" = "What made you download CortiFree today?";
+"quiz.sleep_poorly" = "I sleep very poorly";
+"quiz.always_anxious" = "I feel anxious all the time";
+"quiz.constantly_exhausted" = "I'm constantly exhausted";
+"quiz.cant_concentrate" = "I can't concentrate anymore";
+"quiz.improve_wellbeing" = "I want to improve my wellbeing";
+"quiz.how_long_difficulties" = "How long have you been feeling this way?";
+"quiz.few_weeks" = "A few weeks";
+"quiz.2_6_months" = "2 to 6 months";
+"quiz.6_months_1_year" = "6 months to 1 year";
+"quiz.more_than_year" = "More than a year";
+"quiz.several_years" = "Several years";
+"quiz.thoughts_looping" = "Do you have thoughts looping in your head?";
+"quiz.all_the_time" = "All the time, non-stop";
+"quiz.almost_every_day" = "Almost every day";
+"quiz.few_times_week" = "A few times a week";
+"quiz.no_mind_calm" = "No, my mind is calm";
+"quiz.can_switch_off_brain" = "Can you 'switch off' your brain at night?";
+"quiz.impossible_never_stops" = "Impossible, my brain never stops";
+"quiz.no_stay_active" = "No, I stay in 'active' mode even at night";
+"quiz.takes_time_but_manage" = "Takes some time but I manage";
+"quiz.yes_disconnect_easily" = "Yes, I disconnect easily";
+"quiz.time_to_fall_asleep" = "How long does it take you to fall asleep?";
+"quiz.more_than_hour" = "More than an hour";
+"quiz.30_60_minutes" = "30-60 minutes";
+"quiz.15_30_minutes" = "15-30 minutes";
+"quiz.less_than_15" = "Less than 15 minutes";
+"quiz.wake_ups_per_night" = "How many times do you wake up at night?";
+"quiz.4_times_or_more" = "4 times or more";
+"quiz.2_3_times" = "2-3 times";
+"quiz.1_time" = "Once";
+"quiz.never_sleep_through" = "Never, I sleep through";
+"quiz.hours_sleep_night" = "How many hours do you sleep per night?";
+"quiz.less_than_5" = "Less than 5 hours";
+"quiz.5_6_hours" = "5-6 hours";
+"quiz.6_7_hours" = "6-7 hours";
+"quiz.7_8_hours" = "7-8 hours";
+"quiz.more_than_8" = "More than 8 hours";
+"quiz.daily_energy_level" = "What's your daily energy level?";
+"quiz.exhausted" = "😴 Exhausted";
+"quiz.full_of_energy" = "🤩 Full of energy";
+"quiz.daily_motivation" = "How's your daily motivation?";
+"quiz.no_motivation" = "No motivation, everything's an effort";
+"quiz.force_myself" = "I have to force myself for everything";
+"quiz.its_okay" = "It's okay, I do what I need to do";
+"quiz.motivated" = "Motivated, I want to do things";
+"quiz.concentration_duration" = "How long can you stay focused on a task?";
+"quiz.less_15_wandering" = "Less than 15 min, my mind wanders";
+"quiz.15_30_then_lose" = "15-30 min then I lose focus";
+"quiz.30_60_before_dropping" = "30-60 min before dropping off";
+"quiz.more_hour_no_problem" = "Over an hour without issue";
+"quiz.breathing_frequency" = "How often do you practice conscious breathing per week?";
+"quiz.meditation_frequency" = "How often do you meditate or practice mindfulness per week?";
+"quiz.journal_frequency" = "How often do you write in a journal (gratitude, thoughts, etc.) per week?";
+"quiz.sleep_schedule_consistency" = "How many nights per week do you go to bed and wake up at the same time?";
+"quiz.physical_activity_frequency" = "How often do you do physical activity (walking, yoga, sports) per week?";
+"quiz.nature_time_frequency" = "How often do you spend at least 15 minutes in nature or outside per week?";
+"quiz.water_intake_daily" = "How many liters of water do you drink per day on average?";
+"quiz.never" = "Never";
+"quiz.1_2_times_week" = "1-2 times a week";
+"quiz.3_4_times_week" = "3-4 times a week";
+"quiz.5_6_times_week" = "5-6 times a week";
+"quiz.every_day" = "Every day";
+"quiz.never_same_schedule" = "Never the same schedule";
+"quiz.2_3_nights_week" = "2-3 nights a week";
+"quiz.4_5_nights_week" = "4-5 nights a week";
+"quiz.6_nights_week" = "6 nights a week";
+"quiz.every_day_same_schedule" = "Same schedule every day";
+"quiz.less_than_1_liter" = "Less than 1 liter";
+"quiz.1_to_1_5_liters" = "1 to 1.5 liters";
+"quiz.1_5_to_2_liters" = "1.5 to 2 liters";
+"quiz.2_to_2_5_liters" = "2 to 2.5 liters";
+"quiz.more_than_2_5_liters" = "More than 2.5 liters";
+"reassurance.not_alone" = "%@ it's okay. You're not alone.\n\nThousands of people like you have already found their serenity with CortiFree.\n\nNow, we'll do a quick quiz to better understand your situation and personalize your journey.";
+"reassurance.start_quiz" = "Start the quiz";
+"reassurance.takes_2_minutes" = "Takes 2 minutes";
+"habits.key_habits" = "The 8 Key Habits";
+"habits.studies_show" = "Studies show that to reset your";
+"habits.life_need" = "life, you need the";
+"habits.8_fundamental" = "8 fundamental";
+"habits.habits_below" = "habits below.";
+"habits.see_how_change" = "See how your life will change in 66 days";
+"habits.thanks_to_habits" = "thanks to these 8 habits:";
+"social.thousands_changed" = "Thousands of lives changed with CortiFree";
+"social.discover_how" = "Discover how people like you found their serenity";
+"social.measurable_results" = "Measurable results";
+"social.stress_reduction" = "On average, a 68% reduction in perceived stress in just 60 days";
+"social.without_cortifree" = "Without CortiFree";
+"social.with_cortifree" = "With CortiFree";
+"social.stress_level" = "Stress level";
+"social.duration" = "Duration";
+"social.your_goals" = "Your goals";
+"social.select_improve" = "Select what you want to improve";
+"social.view_options" = "View my options";
+"social.high_stress" = "High stress";
+"social.low_stress" = "Low stress";
+"testimonial.sophie.title" = "My life changed";
+"testimonial.sophie.text" = "Before CortiFree, I slept poorly and felt exhausted all the time. After two weeks, I noticed I was waking up more rested and my work stress had decreased. The app taught me simple breathing exercises that make a real difference. I recommend it to anyone feeling overwhelmed by daily life.";
+"testimonial.julien.title" = "Finally calm";
+"testimonial.julien.text" = "I was skeptical, but CortiFree surprised me. My anxiety was constant due to work, and I couldn't focus anymore. Thanks to guided sessions and reminders, I gradually regained control. After a month, my colleagues even noticed I was more relaxed. Really useful!";
+"testimonial.claire.title" = "Energy boost";
+"testimonial.claire.text" = "Between kids and my job, I was at my limit and migraines kept coming back. CortiFree helped me identify my stress triggers and manage them. Today, I feel more serene and have energy to enjoy my family again.";
+"testimonial.marc.title" = "Better sleep";
+"testimonial.marc.text" = "I was waking up multiple times per night and dragging constant fatigue. CortiFree taught me relaxation techniques that transformed my nights. Now I sleep deeply and wake up refreshed. A radical change for my quality of life.";
+"testimonial.emma.title" = "More serene";
+"testimonial.emma.text" = "My daily stress made me irritable and tired. With CortiFree, I discovered how to better manage my emotions and take a step back. The exercises are simple but effective. I feel so much better in my skin now!";
+"testimonial.thomas.title" = "Regained focus";
+"testimonial.thomas.text" = "I couldn't concentrate for more than 10 minutes and it was affecting my work. CortiFree's mindfulness techniques really made a difference. Today I can focus on tasks for hours without losing track.";
+"scientific.approach" = "CortiFree's Scientific Approach";
+"scientific.quote1" = "Habits are formed through repeated actions in stable contexts, and it takes weeks or even months for them to become automatic.";
+"scientific.quote2" = "96 participants adopted a daily behavior, and automaticity was modeled to reach a plateau at an average of 66 days, with a range of 18 to 254 days.";
+"scientific.quote3" = "On average, it takes more than two months before a new behavior becomes automatic — 66 days to be exact.";
+"scientific.google_citations" = "+1,500 citations\nGoogle Scholar";
+"scientific.copies_sold" = "+1,000,000\ncopies sold";
+"roi.hours_wasted" = "How many hours per\nweek do you waste on\ndistractions?";
+"roi.example_scrolling" = "Ex: mindless scrolling, procrastination";
+"roi.about_hours" = "About %d hours";
+"roi.potential_return" = "Potential return from\nLife Reset";
+"roi.if_sell_hour" = "If you sold an hour of your life,\nhow much would you charge?";
+"roi.if_hour_worth" = "If an hour of your time is worth";
+"roi.per_hour" = "€%d per hour";
+"roi.you_are_here" = "You are here";
+"roi.could_save" = "You could save";
+"roi.per_year" = "per year";
+"sixtysix.scientific_confirm" = "Scientific studies confirm:";
+"sixtysix.66_days" = "66 days";
+"sixtysix.time_needed" = "is the time needed to anchor a";
+"sixtysix.habit_transform" = "habit and truly transform your life.";
+"sixtysix.scientific_research" = "Scientific research";
+"rating.current_evaluation" = "Your current rating";
+"rating.potential_evaluation" = "Your potential rating";
+"rating.after_66_days" = "after 66 days";
+"rating.see_potential" = "See potential";
+"tasks.day_format" = "Day %d/66";
+"tasks.day_format_ongoing" = "Day %d";
+"habit.wake_before_7" = "Wake up before 7am";
+"habit.sleep_before_11" = "Sleep before 11pm";
+"habit.breathe_consciously" = "Conscious breathing";
+"habit.meditate_mindfully" = "Mindful meditation";
+"habit.write_thoughts" = "Write your thoughts";
+"habit.drink_water" = "Drink at least %@ of water";
+"habit.explore_nature" = "Explore nature";
+"habit.conquer_summit" = "Conquer a summit";
+"habit.bike_escape" = "Escape by bike";
+"habit.release_boxing" = "Release energy boxing";
+"habit.jump_rope_challenge" = "Jump rope challenge";
+"habit.dance_express" = "Dance and express";
+"habit.deep_stretching" = "Deep stretching";
+"habit.swim_serenity" = "Swim to serenity";
+"habit.sculpt_body" = "Sculpt your body";
+"habit.run_goals" = "Run towards goals";
+"habit.create_together" = "Create together";
+"habit.reconnect_bonds" = "Reconnect bonds";
+"habit.share_meal" = "Share a meal";
+"habit.movie_night" = "Movie night";
+"habit.playful_challenges" = "Playful challenges";
+"habit.social_moment" = "Social moment";
+"habit.days" = "days";
+"habit.this_month" = "this month";
+"habit.last_7_days" = "last 7 days";
+"habit.vs_previous_week_plus" = "+%d vs previous week";
+"habit.vs_previous_week_minus" = "%d vs previous week";
+"habit.same_as_previous" = "Same as previous week";
+"habit.difficulty" = "Difficulty";
+"frequency.quotidien" = "Daily";
+"domain.global" = "Overall";
+"domain.serenity" = "Serenity";
+"domain.sleep" = "Sleep";
+"domain.energy" = "Energy";
+"domain.focus" = "Focus";
+"domain.balance" = "Balance";
+"profile.cortifree_score" = "CortiFree Score";
+"profile.current" = "Current";
+"profile.potential_d66" = "Potential (D66)";
+"settings.profile_goal" = "PROFILE & GOAL";
+"settings.my_profile" = "My profile";
+"settings.my_current_goal" = "My current goal";
+"settings.experience_habits" = "EXPERIENCE & HABITS";
+"settings.reminders_notifications" = "Reminders & Notifications";
+"settings.receive_daily_reminders" = "Receive daily reminders";
+"settings.daily_routines" = "Daily routines";
+"settings.morning_routine" = "Morning routine";
+"settings.afternoon_routine" = "Afternoon routine";
+"settings.evening_routine" = "Evening routine";
+"settings.reminder_times" = "Reminder times";
+"settings.morning" = "Morning";
+"settings.afternoon" = "Afternoon";
+"settings.evening" = "Evening";
+"settings.default_relaxing_sounds" = "Default relaxing sounds";
+"settings.voice_guidance" = "Voice & Guidance";
+"settings.voice_support_exercises" = "Voice support during exercises";
+"settings.ambient_volume" = "Ambient volume";
+"settings.subscription_premium" = "SUBSCRIPTION & PREMIUM ACCESS";
+"settings.current_status" = "Current status";
+"settings.renewal" = "Renewal";
+"settings.manage_subscription" = "Manage my subscription";
+"settings.modify_cancel" = "Modify or cancel";
+"settings.restore_purchases" = "Restore my purchases";
+"settings.privacy_security" = "PRIVACY & SECURITY";
+"settings.logout" = "Log out";
+"settings.terms_of_use" = "Terms of Use";
+"settings.irreversible_action" = "Irreversible action";
+"settings.local_data" = "Local data";
+"settings.icloud_sync" = "iCloud sync";
+"settings.backup_cloud" = "Back up your data in the cloud";
+"settings.about_support" = "ABOUT & SUPPORT";
+"settings.contact_support" = "Contact support";
+"settings.faq" = "FAQ";
+"settings.rate_app" = "Rate the app";
+"settings.help_improve" = "Help us improve";
+"settings.follow_cortifree" = "Follow CortiFree";
+"settings.logout_confirm_title" = "Log out";
+"settings.logout_confirm_message" = "Are you sure you want to log out?";
+"settings.cancel" = "Annuler";
+"settings.delete_account_title" = "Delete account";
+"settings.delete_account_message" = "This action is irreversible. All your data will be permanently deleted.";
+"settings.delete" = "Supprimer";
+"settings.change_routine_title" = "Change routine";
+"settings.planet_auto_update" = "The planet will be automatically updated";
+"settings.warning" = "⚠️ Warning";
+"settings.change_routine_reset" = "Changing routine will reset:";
+"settings.current_progress" = "Your current progress (week/day)";
+"settings.task_history" = "Your completed tasks history";
+"settings.routine_stats" = "Your routine statistics";
+"settings.start_date_reset" = "Start date will be reset to today";
+"settings.xp_level_preserved" = "Your total XP, level and streak will be preserved.";
+"settings.confirm_change" = "Confirm change";
+"settings.relaxing_sounds" = "Relaxing sounds";
+"settings.forest_rain" = "Forest rain";
+"settings.ocean" = "Ocean";
+"settings.fireplace" = "Fireplace";
+"settings.gentle_wind" = "Gentle wind";
+"settings.river" = "River";
+"settings.morning_birds" = "Morning birds";
+"settings.default_goal" = "Reduce my daily stress";
+"settings.premium_active" = "Premium active";
+"progress.each_week_tasks" = "Each week, your tasks become";
+"progress.progressively_harder" = "progressively harder";
+"progress.refresh_dopamine" = "to refresh your dopaminergic system.";
+"progress.with_cortifree" = "With CortiFree";
+"progress.without_cortifree" = "Without CortiFree";
+"progress.by_week" = "By week %d, you'll";
+"legacy.analysis_complete" = "Analysis complete";
+"legacy.news_to_announce" = "We have news for you...";
+"legacy.cortisol_too_high" = "Your answers clearly indicate cortisol levels that are too high*";
+"legacy.your_current_level" = "Your current level";
+"legacy.recommended_level" = "Recommended level";
+"legacy.normal" = "Normal";
+"legacy.check_symptoms" = "Check your symptoms";
+"legacy.indicative_only" = "* This result is for guidance only and does not constitute a medical diagnosis.";
+"legacy.your_score" = "Your score";
+"legacy.average" = "Average";
+"auth.create_account_diagnostic" = "Crée ton compte pour accéder à ton diagnostic personnalisé";
+"auth.continue_with_email" = "Continuer avec Email";
+"auth.continue_with_apple" = "Continuer avec Apple";
+"auth.continue_with_google" = "Continuer avec Google";
+"auth.login_google_personalized" = "Sign in with your Google account to access your personalized space";
+"auth.sign_in_google" = "Sign in with Google";
+"auth.create_account" = "Créer un compte";
+"auth.login" = "Login";
+"auth.first_name" = "First name";
+"auth.email" = "Email";
+"auth.password" = "Mot de passe";
+"auth.confirm_password" = "Confirmer le mot de passe";
+"auth.create_my_account" = "Créer mon compte";
+"auth.sign_in" = "Se connecter";
+"auth.enter_first_name" = "Entre ton prénom";
+"auth.already_account" = "Déjà un compte ? Se connecter";
+"auth.no_account" = "No account? Sign up";
+"welcome.title" = "Welcome!";
+"welcome.subtitle" = "Let's start by checking if your cortisol level is higher than you think.";
+"welcome.start" = "Start";
+"symptoms.title" = "Symptômes";
+"symptoms.select_below" = "Select the symptoms below that you've already experienced";
+"symptoms.mental" = "Mental Symptoms";
+"symptoms.physical" = "Physical Symptoms";
+"symptoms.social" = "Social Symptoms";
+"symptoms.difficulty_concentrating" = "Difficulty concentrating";
+"symptoms.general_anxiety" = "General or anticipatory anxiety";
+"symptoms.looping_thoughts" = "Looping thoughts hard to stop";
+"symptoms.muscle_tension" = "Muscle tension (neck, jaw, shoulders)";
+"symptoms.disrupted_sleep" = "Disrupted or non-restorative sleep";
+"symptoms.chronic_fatigue" = "Chronic fatigue upon waking";
+"symptoms.frequent_irritability" = "Frequent annoyance or irritability";
+"symptoms.difficulty_unexpected" = "Difficulty handling the unexpected";
+"symptoms.find_serenity" = "Find my serenity";
+"consequences.cortisol_alert" = "Cortisol keeps your body on permanent alert...";
+"consequences.delays_sleep" = "It delays falling asleep and fragments your nights...";
+"consequences.exhausts_heart" = "Cortisol exhausts your heart";
+"consequences.disrupts_metabolism" = "Cortisol disrupts your metabolism";
+"consequences.feeds_anxiety" = "Cortisol feeds anxiety";
+"consequences.suppresses_immune" = "Progressively suppresses your immune system...";
+"consequences.next" = "Next →";
+"consequences.continue" = "Continuer";
+"recovery.path_to_recovery" = "Path to recovery";
+"recovery.scientific_approach" = "The scientific approach";
+"recovery.body_relaxes" = "A body that relaxes";
+"recovery.stable_energy" = "More stable energy";
+"recovery.natural_balance" = "A balance that becomes natural";
+"recovery.discover_cortifree" = "Discover CortiFree";
+// MARK: - Error Messages
+
+// Generic
+"error.title.generic" = "Erreur";
+
+// Authentication Errors
+"error.auth.failed" = "Échec de l'authentification : %@";
+"error.auth.user_not_found" = "Utilisateur introuvable";
+"error.auth.invalid_credentials" = "Identifiants invalides";
+"error.auth.session_expired" = "Session expirée";
+"error.auth.email_in_use" = "Cette adresse email est déjà utilisée";
+"error.auth.weak_password" = "Le mot de passe est trop faible";
+
+// Network Errors
+"error.network.unavailable" = "Connexion internet indisponible";
+"error.network.server_error" = "Erreur serveur (code %d)";
+"error.network.timeout" = "Délai de connexion dépassé";
+"error.network.invalid_response" = "Réponse du serveur invalide";
+
+// Data Errors
+"error.data.corrupted" = "Données corrompues";
+"error.data.document_not_found" = "Document introuvable dans %@ (ID: %@)";
+"error.data.save_failed" = "Échec de la sauvegarde : %@";
+"error.data.fetch_failed" = "Échec de la récupération : %@";
+"error.data.decoding_failed" = "Échec du décodage des données";
+"error.data.encoding_failed" = "Échec de l'encodage des données";
+
+// Validation Errors
+"error.validation.invalid_input" = "Saisie invalide pour %@ : %@";
+"error.validation.missing_field" = "Champ requis manquant : %@";
+"error.validation.invalid_format" = "Format invalide pour %@";
+
+// Business Logic Errors
+"error.business.not_allowed" = "Opération non autorisée : %@";
+"error.business.insufficient_permissions" = "Permissions insuffisantes";
+"error.business.resource_unavailable" = "Ressource non disponible";
+"error.business.daily_limit" = "Limite quotidienne atteinte";
+
+// Recovery Suggestions
+"error.recovery.check_connection" = "Vérifiez votre connexion internet et réessayez";
+"error.recovery.check_credentials" = "Vérifiez vos identifiants et réessayez";
+"error.recovery.sign_in_again" = "Veuillez vous reconnecter";
+"error.recovery.stronger_password" = "Utilisez un mot de passe plus fort (8+ caractères, majuscules, chiffres)";
+"error.recovery.try_again" = "Veuillez réessayer";
+"error.recovery.try_tomorrow" = "Revenez demain pour continuer";
+
+// Error Actions
+"error.action.retry" = "Réessayer";
+"error.action.sign_in" = "Se connecter";
+"profile.habits_title" = "Habits";
+"settings.delete_account_confirm" = "Delete account";
+"settings.change_routine_title" = "Change routine";
+
+// MARK: - Habit Titles (TasksV2View)
+"habit.title.sleep" = "Se réveiller avant 7h";
+"habit.title.breathing" = "Respiration consciente";
+"habit.title.meditation" = "Méditation pleine conscience";
+"habit.title.water" = "Boire de l'eau";
+"habit.title.sport" = "Sport";
+"habit.title.nature" = "Temps dans la nature";
+"habit.title.social" = "Interaction sociale";
+"habit.title.journal" = "Journal";
+
+// MARK: - Frequency Labels
+"frequency.label.daily" = "Quotidien";
+"frequency.label.1x_week" = "1x/semaine";
+"frequency.label.2x_week" = "2x/semaine";
+"frequency.label.3x_week" = "3x/semaine";
+"frequency.label.4x_week" = "4x/semaine";
+"frequency.label.5x_week" = "5x/semaine";
+
+// MARK: - Tasks View
+"tasks.view.encouragement_default" = "Tu es sur la bonne voie. Continue comme ça !";
+"tasks.view.loading" = "Chargement de vos tâches...";
+"tasks.view.no_tasks_today" = "Pas de tâches aujourd'hui";
+"tasks.view.all_done" = "Toutes les tâches complétées !";
+
+// MARK: - Alerts
+"alert.task_completion.title" = "Tâche complétée";
+"alert.task_completion.message" = "Excellent travail ! Continue comme ça !";
+"alert.error.title" = "Erreur";
+"alert.error.generic_message" = "Une erreur s'est produite. Veuillez réessayer.";
+
+// MARK: - Exercise UI Labels
+"exercise.slide.step_label" = "Étape";
+"exercise.slide.next" = "Suivant";
+"exercise.slide.previous" = "Précédent";
+"exercise.slide.finish" = "Terminer";
+"exercise.completion.title" = "Exercice terminé";
+"exercise.completion.subtitle" = "Tu as repris le contrôle";
+"exercise.completion.continue" = "Continuer";
+
+// MARK: - Exercise Instructions - Body Scan
+"exercise.body_scan.step_1.title" = "Installe-toi comme un chat";
+"exercise.body_scan.step_1.subtitle" = "Trouve LA position parfaite (oui, bouge encore un peu)";
+"exercise.body_scan.step_1.duration" = "30 sec";
+
+"exercise.body_scan.step_2.title" = "Ferme les yeux, c'est parti !";
+"exercise.body_scan.step_2.subtitle" = "Ta respiration va devenir ton ancre";
+"exercise.body_scan.step_2.duration" = "30 sec";
+
+"exercise.body_scan.step_3.title" = "Direction ton visage";
+"exercise.body_scan.step_3.subtitle" = "Détends ta mâchoire, lisse ton front - tu fais la grimace sans le savoir ?";
+"exercise.body_scan.step_3.duration" = "1 min";
+
+"exercise.body_scan.step_4.title" = "Tes épaules descendent...";
+"exercise.body_scan.step_4.subtitle" = "Laisse-les tomber comme si tu abandonnais un sac lourd";
+"exercise.body_scan.step_4.duration" = "1 min";
+
+"exercise.body_scan.step_5.title" = "Respire dans ton ventre";
+"exercise.body_scan.step_5.subtitle" = "Imagine un ballon qui se gonfle et se dégonfle doucement";
+"exercise.body_scan.step_5.duration" = "1 min";
+
+"exercise.body_scan.step_6.title" = "Tes jambes te portent au sol";
+"exercise.body_scan.step_6.subtitle" = "Sens tes pieds bien ancrés - solide comme un arbre";
+"exercise.body_scan.step_6.duration" = "1 min";
+
+"exercise.body_scan.step_7.title" = "Bravo, tu as parcouru tout ton corps !";
+"exercise.body_scan.step_7.subtitle" = "Ouvre les yeux quand tu veux, sans te presser";
+"exercise.body_scan.step_7.duration" = "30 sec";
+
+// MARK: - Exercise Instructions - 5-4-3-2-1 Anchoring
+"exercise.anchoring.step_1.title" = "Cherche 5 choses à voir";
+"exercise.anchoring.step_1.subtitle" = "Un détail que tu n'avais jamais remarqué compte double !";
+"exercise.anchoring.step_1.duration" = "1 min";
+
+"exercise.anchoring.step_2.title" = "Touche 4 textures différentes";
+"exercise.anchoring.step_2.subtitle" = "Lisse, rugueux, froid, chaud... Explore !";
+"exercise.anchoring.step_2.duration" = "1 min";
+
+"exercise.anchoring.step_3.title" = "Attrape 3 sons";
+"exercise.anchoring.step_3.subtitle" = "Le plus lointain, le plus proche, le plus discret...";
+"exercise.anchoring.step_3.duration" = "50 sec";
+
+"exercise.anchoring.step_4.title" = "Capture 2 odeurs";
+"exercise.anchoring.step_4.subtitle" = "Inspire profondément - neutre compte aussi !";
+"exercise.anchoring.step_4.duration" = "40 sec";
+
+"exercise.anchoring.step_5.title" = "Trouve 1 goût";
+"exercise.anchoring.step_5.subtitle" = "Dans ta bouche ou sur tes lèvres - il y a toujours quelque chose";
+"exercise.anchoring.step_5.duration" = "30 sec";
+
+"exercise.anchoring.step_6.title" = "Mission accomplie ✓";
+"exercise.anchoring.step_6.subtitle" = "Tu es bien ici, bien maintenant, bien ancré·e";
+"exercise.anchoring.step_6.duration" = "20 sec";
+
+// MARK: - Exercise Instructions - 2-Minute Meditation
+"exercise.meditation_2min.step_1.title" = "Assieds-toi (vraiment) confortablement";
+"exercise.meditation_2min.step_1.subtitle" = "Pas besoin de position du lotus, juste d'être bien";
+"exercise.meditation_2min.step_1.duration" = "20 sec";
+
+"exercise.meditation_2min.step_2.title" = "Ferme les yeux ou baisse le regard";
+"exercise.meditation_2min.step_2.subtitle" = "Choisis ce qui te met le plus à l'aise";
+"exercise.meditation_2min.step_2.duration" = "15 sec";
+
+"exercise.meditation_2min.step_3.title" = "3 grandes respirations pour commencer";
+"exercise.meditation_2min.step_3.subtitle" = "Inspire par le nez, souffle fort par la bouche (comme pour éteindre une bougie)";
+"exercise.meditation_2min.step_3.duration" = "30 sec";
+
+"exercise.meditation_2min.step_4.title" = "Tes pensées vont défiler";
+"exercise.meditation_2min.step_4.subtitle" = "C'est normal ! Regarde-les passer comme un film au ralenti";
+"exercise.meditation_2min.step_4.duration" = "30 sec";
+
+"exercise.meditation_2min.step_5.title" = "Reviens à ta respiration";
+"exercise.meditation_2min.step_5.subtitle" = "Perdu·e dans tes pensées ? Pas grave, reviens juste respirer";
+"exercise.meditation_2min.step_5.duration" = "30 sec";
+
+"exercise.meditation_2min.step_6.title" = "Dernière grande inspiration";
+"exercise.meditation_2min.step_6.subtitle" = "Étire-toi, bâille, ouvre les yeux - tu as médité !";
+"exercise.meditation_2min.step_6.duration" = "15 sec";
+
+// MARK: - Exercise Instructions - 5 Senses Grounding
+"exercise.grounding.step_1.title" = "Grande inspiration de départ";
+"exercise.grounding.step_1.subtitle" = "Ancre-toi dans l'ici et maintenant";
+"exercise.grounding.step_1.duration" = "20 sec";
+
+"exercise.grounding.step_2.title" = "Vue : 5 détails à repérer";
+"exercise.grounding.step_2.subtitle" = "Couleurs, formes, lumières - deviens détective de l'instant";
+"exercise.grounding.step_2.duration" = "50 sec";
+
+"exercise.grounding.step_3.title" = "Toucher : 4 sensations tactiles";
+"exercise.grounding.step_3.subtitle" = "Température, texture, poids... Que sent ta peau ?";
+"exercise.grounding.step_3.duration" = "40 sec";
+
+"exercise.grounding.step_4.title" = "Ouïe : 3 sons à attraper";
+"exercise.grounding.step_4.subtitle" = "Le plus fort, le plus doux, le plus surprenant";
+"exercise.grounding.step_4.duration" = "30 sec";
+
+"exercise.grounding.step_5.title" = "Odorat : 2 parfums en l'air";
+"exercise.grounding.step_5.subtitle" = "Inspire à fond - l'absence d'odeur, c'est aussi une odeur !";
+"exercise.grounding.step_5.duration" = "20 sec";
+
+"exercise.grounding.step_6.title" = "Goût : qu'est-ce qui traîne en bouche ?";
+"exercise.grounding.step_6.subtitle" = "Même subtil, il y a toujours quelque chose";
+"exercise.grounding.step_6.duration" = "20 sec";
+
+// MARK: - Exercise Instructions - Conscious Stretching
+"exercise.stretching.step_1.title" = "Debout, pieds largeur des épaules";
+"exercise.stretching.step_1.subtitle" = "Bien stable, comme si tu t'enracinais";
+"exercise.stretching.step_1.duration" = "20 sec";
+
+"exercise.stretching.step_2.title" = "Bras au ciel, touche les nuages";
+"exercise.stretching.step_2.subtitle" = "Monte en inspirant, descends en soufflant - 3 fois";
+"exercise.stretching.step_2.duration" = "30 sec";
+
+"exercise.stretching.step_3.title" = "Roule tes épaules (tu les portes depuis trop longtemps)";
+"exercise.stretching.step_3.subtitle" = "5 cercles vers l'arrière, 5 vers l'avant - dénoue tout ça";
+"exercise.stretching.step_3.duration" = "30 sec";
+
+"exercise.stretching.step_4.title" = "Penche-toi sur les côtés";
+"exercise.stretching.step_4.subtitle" = "Bras au ciel, étire un côté puis l'autre - tiens 3 respirations";
+"exercise.stretching.step_4.duration" = "40 sec";
+
+"exercise.stretching.step_5.title" = "Tourne-toi comme une girouette";
+"exercise.stretching.step_5.subtitle" = "Tourne doucement le buste, regarde derrière toi - ça craque ? C'est bon signe !";
+"exercise.stretching.step_5.duration" = "30 sec";
+
+"exercise.stretching.step_6.title" = "3 dernières respirations amples";
+"exercise.stretching.step_6.subtitle" = "Sens comme ton corps respire mieux maintenant";
+"exercise.stretching.step_6.duration" = "30 sec";
+
+// MARK: - Exercise Instructions - Audio Relaxation
+"exercise.audio.step_1.title" = "Mets tes écouteurs (confort max !)";
+"exercise.audio.step_1.subtitle" = "Trouve un coin tranquille où personne ne viendra te déranger";
+"exercise.audio.step_1.duration" = "30 sec";
+
+"exercise.audio.step_2.title" = "Allonge-toi comme une étoile de mer";
+"exercise.audio.step_2.subtitle" = "Ou assieds-toi en mode cocon - l'important c'est d'être relax";
+"exercise.audio.step_2.duration" = "30 sec";
+
+"exercise.audio.step_3.title" = "Lance l'audio et ferme les yeux";
+"exercise.audio.step_3.subtitle" = "Laisse la voix devenir ton GPS vers la détente";
+"exercise.audio.step_3.duration" = "1 min";
+
+"exercise.audio.step_4.title" = "Ne force rien, suis juste la voix";
+"exercise.audio.step_4.subtitle" = "Elle sait où elle va (promis)";
+"exercise.audio.step_4.duration" = "2 min";
+
+"exercise.audio.step_5.title" = "Ton corps devient de plus en plus lourd";
+"exercise.audio.step_5.subtitle" = "Comme si tu coulais doucement dans ton matelas/fauteuil";
+"exercise.audio.step_5.duration" = "2 min";
+
+"exercise.audio.step_6.title" = "Étire-toi comme au réveil";
+"exercise.audio.step_6.subtitle" = "Prends ton temps, ouvre les yeux - comment tu te sens ?";
+"exercise.audio.step_6.duration" = "30 sec";
+
+// MARK: - Exercise Instructions - Positive Mantra
+"exercise.mantra.step_1.title" = "Choisis TA phrase magique";
+"exercise.mantra.step_1.subtitle" = "\"Je suis calme\", \"Tout va bien\", \"Je gère\" - celle qui te parle vraiment";
+"exercise.mantra.step_1.duration" = "20 sec";
+
+"exercise.mantra.step_2.title" = "Assieds-toi confortablement";
+"exercise.mantra.step_2.subtitle" = "Main sur le cœur si ça te dit (ça amplifie l'effet)";
+"exercise.mantra.step_2.duration" = "15 sec";
+
+"exercise.mantra.step_3.title" = "Ferme les yeux et souris légèrement";
+"exercise.mantra.step_3.subtitle" = "Oui, sourire active déjà le mode positif dans ton cerveau";
+"exercise.mantra.step_3.duration" = "15 sec";
+
+"exercise.mantra.step_4.title" = "Répète ton mantra à chaque expiration";
+"exercise.mantra.step_4.subtitle" = "Dans ta tête ou à voix basse - fais-le 10 fois minimum";
+"exercise.mantra.step_4.duration" = "1 min";
+
+"exercise.mantra.step_5.title" = "Ressens vraiment les mots";
+"exercise.mantra.step_5.subtitle" = "Pas juste les dire, les croire - même un peu";
+"exercise.mantra.step_5.duration" = "30 sec";
+
+"exercise.mantra.step_6.title" = "Respire profondément 3 fois";
+"exercise.mantra.step_6.subtitle" = "Ouvre les yeux - ta phrase reste avec toi toute la journée";
+"exercise.mantra.step_6.duration" = "20 sec";
+
+// MARK: - Exercise Instructions - Visual Micro-Break
+"exercise.visual_break.step_1.title" = "Lâche ton écran des yeux !";
+"exercise.visual_break.step_1.subtitle" = "Trouve la chose la plus loin que tu puisses voir (fenêtre idéale)";
+"exercise.visual_break.step_1.duration" = "15 sec";
+
+"exercise.visual_break.step_2.title" = "Règle 20-20-20 : fixe un point lointain 20 secondes";
+"exercise.visual_break.step_2.subtitle" = "Au moins 6 mètres - un arbre, un immeuble, le bout de la rue";
+"exercise.visual_break.step_2.duration" = "20 sec";
+
+"exercise.visual_break.step_3.title" = "Cligne des yeux 10 fois (pour de vrai)";
+"exercise.visual_break.step_3.subtitle" = "Tes yeux sont secs à force de fixer - réhydrate-les";
+"exercise.visual_break.step_3.duration" = "15 sec";
+
+"exercise.visual_break.step_4.title" = "Massage express : tempes en cercles";
+"exercise.visual_break.step_4.subtitle" = "3 cercles doux de chaque côté - oui, ça détend vraiment";
+"exercise.visual_break.step_4.duration" = "20 sec";
+
+"exercise.visual_break.step_5.title" = "Ferme les yeux 10 secondes (mini spa)";
+"exercise.visual_break.step_5.subtitle" = "Le noir complet, c'est exactement ce que tes yeux réclamaient";
+"exercise.visual_break.step_5.duration" = "15 sec";
+
+"exercise.visual_break.step_6.title" = "Rouvre - c'est déjà mieux non ?";
+"exercise.visual_break.step_6.subtitle" = "À refaire toutes les heures d'écran (challenge accepté ?)";
+"exercise.visual_break.step_6.duration" = "15 sec";
+
+// MARK: - Exercise Instructions - Slow Walk
+"exercise.slow_walk.step_1.title" = "Trouve 5-10 mètres d'espace libre";
+"exercise.slow_walk.step_1.subtitle" = "Intérieur, extérieur, couloir - peu importe, juste un mini parcours";
+"exercise.slow_walk.step_1.duration" = "30 sec";
+
+"exercise.slow_walk.step_2.title" = "Debout, pieds ancrés au sol";
+"exercise.slow_walk.step_2.subtitle" = "Sens tout ton poids - tu es connecté·e à la terre comme un arbre";
+"exercise.slow_walk.step_2.duration" = "20 sec";
+
+"exercise.slow_walk.step_3.title" = "Marche AU RALENTI (genre tortue mode)";
+"exercise.slow_walk.step_3.subtitle" = "Décompose : talon qui se lève, pied qui roule, orteil qui décolle... fascinant non ?";
+"exercise.slow_walk.step_3.duration" = "1 min";
+
+"exercise.slow_walk.step_4.title" = "Synchronise chaque pas avec ta respiration";
+"exercise.slow_walk.step_4.subtitle" = "1 pas = 1 inspiration, 1 pas = 1 expiration (trouve ton rythme)";
+"exercise.slow_walk.step_4.duration" = "1 min";
+
+"exercise.slow_walk.step_5.title" = "Continue 5 minutes - c'est méditatif";
+"exercise.slow_walk.step_5.subtitle" = "Ton mental va râler \"c'est trop lent\" - c'est exactement le but";
+"exercise.slow_walk.step_5.duration" = "5 min";
+
+"exercise.slow_walk.step_6.title" = "Arrête-toi, respire 3 fois";
+"exercise.slow_walk.step_6.subtitle" = "Sens ce calme bizarre qui s'est installé ? Garde-le.";
+"exercise.slow_walk.step_6.duration" = "30 sec";
+
+// MARK: - Exercise Instructions - White Noise
+"exercise.white_noise.step_1.title" = "Choisis ton ambiance sonore";
+"exercise.white_noise.step_1.subtitle" = "Pluie qui tombe, vagues de l'océan, ou bruit blanc pur - teste et trouve ton favori";
+"exercise.white_noise.step_1.duration" = "30 sec";
+
+"exercise.white_noise.step_2.title" = "Écouteurs ou enceintes + volume doux";
+"exercise.white_noise.step_2.subtitle" = "Assez bas pour envelopper sans envahir (genre murmure de fond)";
+"exercise.white_noise.step_2.duration" = "20 sec";
+
+"exercise.white_noise.step_3.title" = "Installe-toi en mode cocooning";
+"exercise.white_noise.step_3.subtitle" = "Allongé·e ou assis·e - position détente maximale activée";
+"exercise.white_noise.step_3.duration" = "30 sec";
+
+"exercise.white_noise.step_4.title" = "Ferme les yeux, fonds-toi dans le son";
+"exercise.white_noise.step_4.subtitle" = "Laisse chaque vague/goutte/vibration bercer ton cerveau";
+"exercise.white_noise.step_4.duration" = "1 min";
+
+"exercise.white_noise.step_5.title" = "10 minutes minimum (ou plus, c'est toi qui gères)";
+"exercise.white_noise.step_5.subtitle" = "Certains s'endorment, d'autres méditent - tout est parfait";
+"exercise.white_noise.step_5.duration" = "10 min";
+
+"exercise.white_noise.step_6.title" = "Reviens en douceur, étire-toi";
+"exercise.white_noise.step_6.subtitle" = "Sens cette détente ? Tu peux garder le son en fond si tu veux";
+"exercise.white_noise.step_6.duration" = "30 sec";
+
+// MARK: - Meditation - Conscious Breathing
+"meditation.conscious_breathing.step_1.title" = "Installe-toi confortablement";
+"meditation.conscious_breathing.step_1.subtitle" = "Assis, allongé, peu importe - l'essentiel c'est que tu sois bien";
+"meditation.conscious_breathing.step_1.duration" = "20 sec";
+
+"meditation.conscious_breathing.step_2.title" = "Observe ta respiration naturelle";
+"meditation.conscious_breathing.step_2.subtitle" = "Sans la forcer, juste la sentir entrer et sortir";
+"meditation.conscious_breathing.step_2.duration" = "30 sec";
+
+"meditation.conscious_breathing.step_3.title" = "L'air qui entre par ton nez";
+"meditation.conscious_breathing.step_3.subtitle" = "Frais à l'inspiration, doux et chaud";
+"meditation.conscious_breathing.step_3.duration" = "30 sec";
+
+"meditation.conscious_breathing.step_4.title" = "Ton esprit s'égare ? C'est normal";
+"meditation.conscious_breathing.step_4.subtitle" = "Ramène-le gentiment vers ta respiration, encore et encore";
+"meditation.conscious_breathing.step_4.duration" = "40 sec";
+
+"meditation.conscious_breathing.step_5.title" = "Continue pendant 3 minutes";
+"meditation.conscious_breathing.step_5.subtitle" = "Respire, observe, reviens quand ça part";
+"meditation.conscious_breathing.step_5.duration" = "3 min";
+
+// MARK: - Meditation - Body Scan
+"meditation.body_scan.step_1.title" = "Commence par tes pieds";
+"meditation.body_scan.step_1.subtitle" = "Sens-tu des picotements ? Du chaud ? Du froid ?";
+"meditation.body_scan.step_1.duration" = "20 sec";
+
+"meditation.body_scan.step_2.title" = "Monte vers tes jambes";
+"meditation.body_scan.step_2.subtitle" = "Mollets, genoux, cuisses - détends tout ce que tu croises";
+"meditation.body_scan.step_2.duration" = "30 sec";
+
+"meditation.body_scan.step_3.title" = "Ton bassin et ton ventre";
+"meditation.body_scan.step_3.subtitle" = "Respire dans cette zone, laisse-la se relâcher";
+"meditation.body_scan.step_3.duration" = "30 sec";
+
+"meditation.body_scan.step_4.title" = "Poitrine et épaules";
+"meditation.body_scan.step_4.subtitle" = "Imagine la tension qui s'évapore à chaque expiration";
+"meditation.body_scan.step_4.duration" = "40 sec";
+
+"meditation.body_scan.step_5.title" = "Nuque, visage, crâne";
+"meditation.body_scan.step_5.subtitle" = "Relâche ta mâchoire, tes sourcils, tout ton visage";
+"meditation.body_scan.step_5.duration" = "30 sec";
+
+// MARK: - Meditation - Mindfulness
+"meditation.mindfulness.step_1.title" = "Assieds-toi et ferme les yeux";
+"meditation.mindfulness.step_1.subtitle" = "Pas besoin d'être en lotus - juste confortable";
+"meditation.mindfulness.step_1.duration" = "20 sec";
+
+"meditation.mindfulness.step_2.title" = "Reviens à ta respiration";
+"meditation.mindfulness.step_2.subtitle" = "C'est ta maison, ton ancre dans le présent";
+"meditation.mindfulness.step_2.duration" = "30 sec";
+
+"meditation.mindfulness.step_3.title" = "Une pensée arrive";
+"meditation.mindfulness.step_3.subtitle" = "\"Tiens, une pensée\" - note-la mentalement sans jugement";
+"meditation.mindfulness.step_3.duration" = "40 sec";
+
+"meditation.mindfulness.step_4.title" = "Laisse-la passer";
+"meditation.mindfulness.step_4.subtitle" = "Comme un nuage dans le ciel, elle va partir toute seule";
+"meditation.mindfulness.step_4.duration" = "40 sec";
+
+"meditation.mindfulness.step_5.title" = "Retour à la respiration";
+"meditation.mindfulness.step_5.subtitle" = "Encore et encore - c'est ça la méditation";
+"meditation.mindfulness.step_5.duration" = "2 min";
+
+// MARK: - Meditation - Grounding
+"meditation.grounding.step_1.title" = "5 choses que tu VOIS";
+"meditation.grounding.step_1.subtitle" = "Nomme-les à voix haute ou dans ta tête";
+"meditation.grounding.step_1.duration" = "30 sec";
+
+"meditation.grounding.step_2.title" = "4 choses que tu TOUCHES";
+"meditation.grounding.step_2.subtitle" = "Le sol sous tes pieds, tes vêtements, l'air sur ta peau...";
+"meditation.grounding.step_2.duration" = "30 sec";
+
+"meditation.grounding.step_3.title" = "3 choses que tu ENTENDS";
+"meditation.grounding.step_3.subtitle" = "Même les sons les plus discrets comptent";
+"meditation.grounding.step_3.duration" = "30 sec";
+
+"meditation.grounding.step_4.title" = "2 choses que tu SENS";
+"meditation.grounding.step_4.subtitle" = "Des odeurs, même légères";
+"meditation.grounding.step_4.duration" = "30 sec";
+
+"meditation.grounding.step_5.title" = "1 chose que tu GOÛTES";
+"meditation.grounding.step_5.subtitle" = "Le goût dans ta bouche, même subtil";
+"meditation.grounding.step_5.duration" = "20 sec";
+
+// MARK: - Meditation - Visualization
+"meditation.visualization.step_1.title" = "Ferme les yeux";
+"meditation.visualization.step_1.subtitle" = "Prends une grande inspiration";
+"meditation.visualization.step_1.duration" = "15 sec";
+
+"meditation.visualization.step_2.title" = "Imagine ton lieu sûr";
+"meditation.visualization.step_2.subtitle" = "Plage, forêt, lit douillet - c'est TON refuge";
+"meditation.visualization.step_2.duration" = "30 sec";
+
+"meditation.visualization.step_3.title" = "Les couleurs, les formes";
+"meditation.visualization.step_3.subtitle" = "Rends tout vivant dans ton esprit";
+"meditation.visualization.step_3.duration" = "40 sec";
+
+"meditation.visualization.step_4.title" = "Les sons de ce lieu";
+"meditation.visualization.step_4.subtitle" = "Vagues, oiseaux, silence... qu'est-ce que tu entends ?";
+"meditation.visualization.step_4.duration" = "40 sec";
+
+"meditation.visualization.step_5.title" = "Les sensations";
+"meditation.visualization.step_5.subtitle" = "Chaleur du soleil, fraîcheur de l'air, douceur sous tes pieds";
+"meditation.visualization.step_5.duration" = "40 sec";
+
+"meditation.visualization.step_6.title" = "Reste aussi longtemps que tu veux";
+"meditation.visualization.step_6.subtitle" = "Ce lieu est à toi, tu peux y revenir quand tu veux";
+"meditation.visualization.step_6.duration" = "2 min";
+
+// MARK: - Meditation - Focus & Clarity
+"meditation.focus_clarity.step_1.title" = "Choisis ton point focal";
+"meditation.focus_clarity.step_1.subtitle" = "Ta respiration, un objet, une flamme de bougie";
+"meditation.focus_clarity.step_1.duration" = "20 sec";
+
+"meditation.focus_clarity.step_2.title" = "Fixe toute ton attention dessus";
+"meditation.focus_clarity.step_2.subtitle" = "Juste ça, rien d'autre n'existe pour l'instant";
+"meditation.focus_clarity.step_2.duration" = "40 sec";
+
+"meditation.focus_clarity.step_3.title" = "Distraction ? Retour au focus";
+"meditation.focus_clarity.step_3.subtitle" = "C'est un entraînement - chaque retour renforce ta concentration";
+"meditation.focus_clarity.step_3.duration" = "40 sec";
+
+"meditation.focus_clarity.step_4.title" = "Ton esprit se clarifie";
+"meditation.focus_clarity.step_4.subtitle" = "Comme de l'eau trouble qui devient limpide";
+"meditation.focus_clarity.step_4.duration" = "2 min";
+
+// MARK: - Meditation - Yoga Nidra
+"meditation.yoga_nidra.step_1.title" = "Allonge-toi dans ton lit";
+"meditation.yoga_nidra.step_1.subtitle" = "Sur le dos, bras le long du corps, paumes vers le haut";
+"meditation.yoga_nidra.step_1.duration" = "30 sec";
+
+"meditation.yoga_nidra.step_2.title" = "Scan de tout ton corps";
+"meditation.yoga_nidra.step_2.subtitle" = "De la tête aux pieds, comme une vague de détente";
+"meditation.yoga_nidra.step_2.duration" = "1 min";
+
+"meditation.yoga_nidra.step_3.title" = "Relâche chaque partie";
+"meditation.yoga_nidra.step_3.subtitle" = "Front, yeux, mâchoire, épaules, bras... tout";
+"meditation.yoga_nidra.step_3.duration" = "1 min";
+
+"meditation.yoga_nidra.step_4.title" = "Respire lentement";
+"meditation.yoga_nidra.step_4.subtitle" = "Profondément, comme si tu coulais dans le matelas";
+"meditation.yoga_nidra.step_4.duration" = "1 min";
+
+"meditation.yoga_nidra.step_5.title" = "Laisse-toi aller";
+"meditation.yoga_nidra.step_5.subtitle" = "Si tu t'endors, c'est parfait - c'est le but";
+"meditation.yoga_nidra.step_5.duration" = "3 min";
+
+// MARK: - Library View
+"library.title" = "Librairie";
+"library.category.learn" = "Apprendre";
+"library.category.blog" = "Blog";
+"library.category.tips" = "Conseils";
+"library.category.studies" = "Études";
+
+// Library - Relaxing Sounds Section
+"library.sounds.title" = "Sons Relaxants";
+"library.sounds.subtitle" = "Aide ton coeur à se réguler lors d'une situation stressante";
+"library.sounds.rain" = "Pluie";
+"library.sounds.ocean" = "Ocean";
+"library.sounds.fire" = "Feu";
+"library.sounds.whitenoise" = "Bruit Blanc";
+"library.sounds.morning" = "Matinée";
+"library.sounds.forest" = "Forêt";
+"library.sounds.stream" = "Ruisseau";
+"library.sounds.summer_night" = "Nuit d'été";
+"library.sounds.see_more" = "Voir plus";
+"library.sounds.see_less" = "Voir moins";
+
+// Library - Breathing Exercises Section
+"library.breathing.title" = "Exercices de Respiration Guidés";
+"library.breathing.subtitle" = "Techniques de respiration pour gérer le stress";
+"library.breathing.deep_abdominal" = "Respiration abdominale";
+"library.breathing.4_7_8" = "4-7-8";
+"library.breathing.cardiac_coherence" = "Cohérence cardiaque";
+"library.breathing.slow" = "Respiration lente";
+"library.breathing.triangle" = "Triangle Breathing";
+"library.breathing.box" = "Box Breathing";
+"library.breathing.kapalabhati" = "Kapalabhati";
+"library.breathing.bhastrika" = "Bhastrika";
+
+// Library - Meditation Exercises Section
+"library.meditation.title" = "Exercices de Méditation Guidés";
+"library.meditation.subtitle" = "Méditations guidées pour la relaxation profonde";
+"library.meditation.conscious_breathing" = "Respiration consciente";
+"library.meditation.body_scan" = "Body Scan";
+"library.meditation.mindfulness" = "Mindfulness";
+"library.meditation.grounding" = "Ancrage corporel";
+"library.meditation.visualization" = "Visualisation lieu sûr";
+"library.meditation.compassion" = "Auto-compassion";
+"library.meditation.focus" = "Méditation focus";
+"library.meditation.sleep" = "Méditation sommeil";
+
+// MARK: - Breathing Detail View
+"breathing_detail.category_badge" = "RESPIRATION";
+"breathing_detail.how_it_works" = "Comment ça marche ?";
+"breathing_detail.scientific_evidence" = "Preuves scientifiques";
+"breathing_detail.benefits" = "Bienfaits";
+"breathing_detail.exercise_duration" = "Durée de l'exercice";
+"breathing_detail.start_exercise" = "Commencer l'exercice";
+
+// How it works texts
+"breathing_detail.how_it_works.deep_abdominal" = "Respire profondément avec ton ventre pour activer naturellement le système nerveux parasympathique et créer un état de calme immédiat dans tout ton corps";
+"breathing_detail.how_it_works.cardiac_coherence" = "Respire à un rythme de six cycles par minute pour créer un équilibre optimal entre ton cœur et ton cerveau réduisant ainsi le cortisol mesurable";
+"breathing_detail.how_it_works.box_breathing" = "La technique utilisée par les forces spéciales pour maintenir le calme dans le stress intense en respirant sur quatre temps égaux synchronisant ton rythme cardiaque";
+"breathing_detail.how_it_works.alternate_breathing" = "Une respiration alternée qui calme instantanément ton système nerveux en équilibrant les deux hémisphères de ton cerveau pour favoriser sommeil profond et réparateur";
+"breathing_detail.how_it_works.default" = "Suis attentivement le rythme respiratoire guidé pour activer ta réponse de relaxation naturelle et retrouver rapidement un état de calme profond et durable";
+
+// Scientific evidence texts
+"breathing_detail.evidence.cardiac_coherence_1" = "Baisse du cortisol de vingt-trois pourcent après seulement trois semaines de pratique régulière quotidienne";
+"breathing_detail.evidence.cardiac_coherence_2" = "Améliore significativement la variabilité cardiaque mesurable dès la toute première séance de pratique guidée";
+"breathing_detail.evidence.cardiac_coherence_3" = "Augmente drastiquement la clarté mentale et la capacité de concentration en équilibrant le système nerveux autonome";
+
+"breathing_detail.evidence.box_breathing_1" = "Calme instantanément le système nerveux en synchronisant parfaitement le rythme cardiaque avec la respiration contrôlée";
+"breathing_detail.evidence.box_breathing_2" = "Ralentit efficacement le rythme cardiaque pour induire un état de calme profond et durable mesurable";
+"breathing_detail.evidence.box_breathing_3" = "Améliore considérablement la concentration mentale de vingt-cinq pourcent après seulement cinq minutes de pratique";
+
+"breathing_detail.evidence.alternate_breathing_1" = "Réduit significativement l'anxiété en équilibrant les deux hémisphères cérébraux grâce à la respiration nasale alternée";
+"breathing_detail.evidence.alternate_breathing_2" = "Apaise profondément le rythme cardiaque en activant la réponse parasympathique de relaxation du système nerveux";
+"breathing_detail.evidence.alternate_breathing_3" = "Favorise grandement l'endormissement rapide et améliore la qualité du sommeil profond selon études scientifiques récentes";
+
+"breathing_detail.evidence.default_1" = "Procure une relaxation rapide et profonde en activant immédiatement la réponse de détente du système nerveux";
+"breathing_detail.evidence.default_2" = "Calme efficacement tout le système nerveux en réduisant le stress et l'anxiété de manière mesurable scientifiquement";
+"breathing_detail.evidence.default_3" = "Améliore considérablement l'oxygénation du cerveau en augmentant le flux sanguin cérébral de manière significative et durable";
+
+"breathing_detail.source" = "Sources: HeartMath Institute";
+
+// Benefits
+"breathing_detail.benefit.reduce_stress" = "Réduit le stress";
+"breathing_detail.benefit.calm_heart" = "Calme le cœur";
+"breathing_detail.benefit.improve_sleep" = "Améliore le sommeil";
+"breathing_detail.benefit.soothe_mind" = "Apaise l'esprit";
+
+// MARK: - Meditation Detail View
+"meditation.category_badge" = "MÉDITATION";
+"meditation.how_it_works" = "Comment ça marche ?";
+"meditation.benefits" = "Bienfaits";
+"meditation.scientific_evidence" = "Données scientifiques";
+"meditation.start_button" = "Commencer la méditation";
+
+// Legacy keys (keep for compatibility)
+"meditation_detail.category_badge" = "MÉDITATION";
+"meditation_detail.title" = "Méditation guidée";
+"meditation_detail.subtitle" = "Recentre ton esprit et retrouve le calme";
+"meditation_detail.how_it_works" = "Comment ça marche ?";
+"meditation_detail.how_it_works_text" = "Concentre toute ton attention sur ta respiration naturelle pour apaiser ton esprit et créer un espace de calme intérieur profond en observant sans jugement tes pensées";
+"meditation_detail.scientific_data" = "Données scientifiques";
+"meditation_detail.benefits" = "Bienfaits";
+"meditation_detail.start_meditation" = "Commencer la méditation";
+
+// Scientific evidence
+"meditation_detail.evidence_1" = "Réduit significativement le stress chronique et l'anxiété selon nombreuses études scientifiques en psychologie comportementale moderne";
+"meditation_detail.evidence_2" = "Améliore considérablement la capacité de concentration et de focus mental en renforçant les circuits neuronaux attentionnels";
+"meditation_detail.evidence_3" = "Apaise profondément le rythme cardiaque et réduit la pression artérielle de manière mesurable scientifiquement et durable";
+"meditation_detail.source" = "Sources: Mindfulness Research";
+
+// Benefits
+"meditation_detail.benefit.reduce_stress" = "Réduit le stress";
+"meditation_detail.benefit.improve_focus" = "Améliore la concentration";
+"meditation_detail.benefit.soothe_mind" = "Apaise l'esprit";
+"meditation_detail.benefit.mental_clarity" = "Clarté mentale";
+
+// MARK: - Journal Home View
+"journal_home.title" = "Mon Journal";
+"journal_home.mood" = "Mood";
+"journal_home.photo" = "Photo";
+"journal_home.photo_add" = "Ajoute";
+"journal_home.my_day" = "Ma journée";
+"journal_home.placeholder" = "Raconte ta journée, tes émotions, ce que tu as vécu...";
+"journal_home.characters" = "caractères";
+"journal_home.words" = "mots";
+"journal_home.minimum_characters" = "Minimum 50 caractères";
+"journal_home.update" = "Mettre à jour";
+"journal_home.save" = "Sauvegarder";
+"journal_home.view_past_entries" = "Voir mes entrées passées";
+"journal_home.entry_updated" = "Entrée mise à jour !";
+"journal_home.entry_saved" = "Entrée sauvegardée !";
+
+// MARK: - Journal History View
+"journal_history.title" = "Mes Entrées";
+"journal_history.entries_count" = "%d entrée";
+"journal_history.entries_count_plural" = "%d entrées";
+"journal_history.entry_deleted" = "Entrée supprimée";
+"journal_history.empty_title" = "Aucune entrée pour le moment";
+"journal_history.empty_subtitle" = "Commence à écrire ton journal quotidien";
+"journal_history.see_more" = "Voir plus";
+"journal_history.see_less" = "Voir moins";
+"journal_history.delete" = "Supprimer";
+"journal_history.share" = "Partager";
+"journal_history.words_count" = "%d mots";
+"journal_history.share_text_prefix" = "Journal - ";
+"journal_history.share_text_suffix" = "\n\nÉcrit avec CortiFree";
+// MARK: - Learning Section
+"learning.title" = "Apprendre";
+"learning.subtitle" = "Comprendre la science du stress";
+"learning.articles" = "articles";
+
+// Learning Categories
+"learning.category.science" = "Science";
+"learning.category.santé" = "Santé";
+"learning.category.techniques" = "Techniques";
+"learning.category.habitudes" = "Habitudes";
+"learning.category.psychologie" = "Psychologie";
+
+// MARK: - Learning Card 1: Le cortisol
+"learning.card.cortisol.title" = "Le cortisol, c'est quoi ?";
+"learning.card.cortisol.description" = "Comprendre l'hormone du stress";
+"learning.card.cortisol.section1.title" = "Introduction";
+"learning.card.cortisol.section1.content" = "Le cortisol est souvent appelé \"l'hormone du stress\". Il est produit par les glandes surrénales et joue un rôle essentiel dans la réponse de ton corps au stress.";
+"learning.card.cortisol.section2.title" = "Rôles positifs du cortisol";
+"learning.card.cortisol.section2.content" = "• Régule ton niveau d'énergie tout au long de la journée\n• Aide à gérer les situations difficiles et stressantes\n• Contrôle la pression artérielle et la glycémie\n• Réduit l'inflammation dans le corps\n• Participe au métabolisme des graisses, protéines et glucides\n• Régule le cycle veille-sommeil (rythme circadien)";
+"learning.card.cortisol.section3.title" = "Problèmes d'un excès chronique";
+"learning.card.cortisol.section3.content" = "• Anxiété chronique et troubles du sommeil\n• Prise de poids (surtout au niveau abdominal)\n• Système immunitaire affaibli\n• Hypertension artérielle\n• Difficulté de concentration et problèmes de mémoire\n• Vieillissement prématuré de la peau\n• Fatigue persistante malgré le repos\n• Troubles digestifs";
+"learning.card.cortisol.section4.title" = "Les niveaux normaux";
+"learning.card.cortisol.section4.content" = "Le cortisol suit un rythme naturel : élevé le matin (pic vers 8h) pour te réveiller, puis diminue progressivement dans la journée pour être au plus bas le soir (vers 23h) et te permettre de dormir.";
+"learning.card.cortisol.section5.title" = "L'objectif de CortiFree";
+"learning.card.cortisol.section5.content" = "T'aider à maintenir un niveau de cortisol sain et équilibré grâce à des habitudes scientifiquement prouvées qui régulent naturellement cette hormone.";
+
+// MARK: - Learning Card 2: Méditation
+"learning.card.meditation_science.title" = "La science de la méditation";
+"learning.card.meditation_science.description" = "Ce que disent les neurosciences";
+"learning.card.meditation_science.section1.title" = "Preuves scientifiques";
+"learning.card.meditation_science.section1.content" = "Des milliers d'études scientifiques ont démontré les bienfaits de la méditation :\n\n• Épaississement du cortex préfrontal\n• Réduction de l'amygdale (centre de la peur)\n• Augmentation de la matière grise";
+"learning.card.meditation_science.section2.title" = "Résultats mesurables";
+"learning.card.meditation_science.section2.content" = "• -30% de cortisol après 8 semaines\n• Amélioration de 40% de la concentration\n• Réduction de 50% des symptômes anxieux";
+"learning.card.meditation_science.section3.title" = "Durée nécessaire";
+"learning.card.meditation_science.section3.content" = "Des changements cérébraux visibles apparaissent après seulement 8 semaines de pratique quotidienne de 10-15 minutes.\n\nTu es déjà sur la bonne voie avec CortiFree !";
+
+// MARK: - Learning Card 3: 66 jours
+"learning.card.66days.title" = "Les 66 jours pour former une habitude";
+"learning.card.66days.description" = "Pourquoi le programme dure 66 jours";
+"learning.card.66days.section1.title" = "L'étude de référence";
+"learning.card.66days.section1.content" = "• University College London (2009)\n• 66 jours = temps moyen pour automatiser une habitude\n• Varie de 18 à 254 jours selon la complexité";
+"learning.card.66days.section2.title" = "Les 3 phases";
+"learning.card.66days.section2.content" = "1. Semaines 1-3 : Période d'effort conscient\n2. Semaines 4-7 : Début d'automatisation\n3. Semaines 8-10 : Habitude ancrée";
+"learning.card.66days.section3.title" = "Pourquoi ça marche";
+"learning.card.66days.section3.content" = "• Création de nouvelles connexions neuronales\n• Renforcement progressif\n• Transformation en réflexe automatique";
+"learning.card.66days.section4.title" = "Ton objectif";
+"learning.card.66days.section4.content" = "À la fin des 66 jours, tes nouvelles habitudes anti-stress feront partie intégrante de ta vie !";
+
+// MARK: - Learning Card 4: Neuroplasticité
+"learning.card.neuroplasticity.title" = "La neuroplasticité : ton cerveau peut changer";
+"learning.card.neuroplasticity.description" = "Comment ton cerveau s'adapte et évolue";
+"learning.card.neuroplasticity.section1.title" = "Ce que cela signifie";
+"learning.card.neuroplasticity.section1.content" = "La neuroplasticité est la capacité de ton cerveau à se recâbler et à créer de nouvelles connexions neuronales tout au long de ta vie.\n\n• Ton cerveau n'est pas figé, il évolue constamment\n• Chaque nouvelle habitude crée de nouveaux circuits neuronaux\n• Les vieilles habitudes peuvent être \"désapprises\"\n• Plus tu pratiques, plus les connexions se renforcent";
+"learning.card.neuroplasticity.section2.title" = "Preuves scientifiques";
+"learning.card.neuroplasticity.section2.content" = "• Des scans IRM montrent des changements structurels après 8 semaines de méditation\n• Les zones du cerveau liées au stress (amygdale) peuvent diminuer de volume\n• Les zones liées à la concentration (cortex préfrontal) peuvent s'épaissir\n• La matière grise augmente dans les zones utilisées régulièrement";
+"learning.card.neuroplasticity.section3.title" = "Combien de temps ça prend";
+"learning.card.neuroplasticity.section3.content" = "• Premiers changements : 2-4 semaines\n• Changements mesurables : 6-8 semaines\n• Changements durables : 2-3 mois";
+"learning.card.neuroplasticity.section4.title" = "Le message important";
+"learning.card.neuroplasticity.section4.content" = "Tu n'es pas condamné à rester stressé. Avec CortiFree, tu reprogrammes littéralement ton cerveau pour mieux gérer le stress !";
+
+// MARK: - Learning Card 5: Cycles de sommeil
+"learning.card.sleep_cycles.title" = "Les cycles de sommeil";
+"learning.card.sleep_cycles.description" = "Comprendre et optimiser ton repos";
+"learning.card.sleep_cycles.section1.title" = "Les 4 phases du sommeil";
+"learning.card.sleep_cycles.section1.content" = "Le sommeil est composé de cycles de 90 minutes qui se répètent 4-6 fois par nuit :\n\n1️⃣ Sommeil léger (5-10 min) : Transition veille-sommeil, muscles se détendent, facile de se réveiller\n\n2️⃣ Sommeil léger profond (20 min) : Rythme cardiaque ralentit, température corporelle baisse, 50% du temps total\n\n3️⃣ Sommeil profond (20-40 min) : Phase la plus réparatrice, régénération physique, RÉDUCTION MAXIMALE DU CORTISOL\n\n4️⃣ Sommeil paradoxal / REM (10-60 min) : Rêves intenses, consolidation émotionnelle, traitement du stress";
+"learning.card.sleep_cycles.section2.title" = "Optimiser tes cycles";
+"learning.card.sleep_cycles.section2.content" = "• Vise 7h30 ou 9h de sommeil (5 ou 6 cycles complets)\n• Évite 6h ou 8h (réveil en milieu de cycle = fatigue)\n• Se coucher et se lever à heures fixes (même le week-end)";
+"learning.card.sleep_cycles.section3.title" = "Impact sur le cortisol";
+"learning.card.sleep_cycles.section3.content" = "• Sommeil profond = baisse de 70% du cortisol\n• Manque de sommeil = +37% de cortisol le lendemain\n• 3 nuits mauvaises = résistance à l'insuline (pré-diabète)";
+"learning.card.sleep_cycles.section4.title" = "Qualité > Quantité";
+"learning.card.sleep_cycles.section4.content" = "Mieux vaut 6h avec beaucoup de sommeil profond que 8h de sommeil léger et fragmenté !";
+
+// MARK: - Learning Card 6: Stress et corps
+"learning.card.stress_body.title" = "Comment le stress affecte ton corps";
+"learning.card.stress_body.description" = "Les impacts physiques du stress chronique";
+"learning.card.stress_body.section1.title" = "Cerveau";
+"learning.card.stress_body.section1.content" = "• Difficulté de concentration\n• Problèmes de mémoire\n• Anxiété et dépression";
+"learning.card.stress_body.section2.title" = "Cœur";
+"learning.card.stress_body.section2.content" = "• Augmentation de la pression artérielle\n• Risque cardiovasculaire accru\n• Palpitations";
+"learning.card.stress_body.section3.title" = "Muscles";
+"learning.card.stress_body.section3.content" = "• Tensions et douleurs\n• Maux de tête\n• Fatigue chronique";
+"learning.card.stress_body.section4.title" = "Énergie";
+"learning.card.stress_body.section4.content" = "• Épuisement\n• Troubles du sommeil\n• Baisse de motivation\n\nC'est pour ça qu'il est crucial de gérer son stress au quotidien.";
+
+// MARK: - Learning Card 7: Alimentation anti-stress
+"learning.card.food.title" = "L'alimentation anti-stress";
+"learning.card.food.description" = "Les aliments qui régulent le cortisol";
+"learning.card.food.section1.title" = "Aliments qui RÉDUISENT le cortisol";
+"learning.card.food.section1.content" = "Graisses saines :\n• Avocats, noix, amandes\n• Huile d'olive, poissons gras (saumon, maquereau)\n• Riches en oméga-3 anti-inflammatoires\n\nAliments riches en magnésium :\n• Chocolat noir (>70% cacao)\n• Épinards, bananes\n• Graines de courge, amandes\n• Le magnésium réduit l'anxiété et le cortisol\n\nVitamine C :\n• Agrumes, kiwis, poivrons\n• Réduit le cortisol de 15-20%\n• Renforce le système immunitaire\n\nThé vert et noir :\n• L-théanine qui calme l'esprit\n• Réduction de 20% du cortisol après 6 semaines";
+"learning.card.food.section2.title" = "Aliments qui AUGMENTENT le cortisol";
+"learning.card.food.section2.content" = "Excès de caféine :\n• Plus de 400mg/jour (4 cafés)\n• Augmente le cortisol de 30%\n• Perturbe le sommeil\n\nSucres raffinés :\n• Pics de glycémie = pics de cortisol\n• Inflammation systémique\n• Addiction et fringales\n\nAlcool :\n• Perturbe le sommeil profond\n• Augmente le cortisol nocturne\n• Déshydratation";
+"learning.card.food.section3.title" = "Le timing compte";
+"learning.card.food.section3.content" = "• Petit-déjeuner riche en protéines (stabilise cortisol)\n• Éviter sucres et caféine le soir\n• Dîner léger 2-3h avant coucher";
+
+// MARK: - Learning Card 8: Respiration consciente
+"learning.card.breathing.title" = "Les bienfaits de la respiration consciente";
+"learning.card.breathing.description" = "Pourquoi respirer consciemment fonctionne";
+"learning.card.breathing.section1.title" = "Effets immédiats";
+"learning.card.breathing.section1.content" = "La respiration consciente est l'un des outils les plus puissants pour réguler ton stress :\n\n• Active le système nerveux parasympathique (relaxation)\n• Réduit le rythme cardiaque\n• Diminue la tension artérielle";
+"learning.card.breathing.section2.title" = "Bénéfices à long terme";
+"learning.card.breathing.section2.content" = "• Améliore la gestion du stress\n• Augmente la capacité pulmonaire\n• Favorise la clarté mentale";
+"learning.card.breathing.section3.title" = "Le saviez-vous ?";
+"learning.card.breathing.section3.content" = "Une respiration profonde peut réduire ton niveau de cortisol en seulement 2-3 minutes !\n\nC'est pourquoi les exercices de respiration sont au cœur du programme CortiFree.";
+
+// MARK: - Learning Card 9: Pouvoir de la nature
+"learning.card.nature.title" = "Le pouvoir de la nature";
+"learning.card.nature.description" = "Pourquoi la nature apaise";
+"learning.card.nature.section1.title" = "Études scientifiques";
+"learning.card.nature.section1.content" = "Le contact avec la nature a un effet prouvé sur le stress :\n\n• -15% de cortisol après 20 min en nature\n• Baisse de la pression artérielle\n• Amélioration de l'humeur";
+"learning.card.nature.section2.title" = "Le \"bain de forêt\" (Shinrin-yoku)";
+"learning.card.nature.section2.content" = "• Pratique japonaise millénaire\n• Marche lente en forêt\n• Connexion avec les 5 sens";
+"learning.card.nature.section3.title" = "Bénéfices";
+"learning.card.nature.section3.content" = "• Renforcement du système immunitaire\n• Réduction de l'anxiété\n• Meilleure créativité";
+"learning.card.nature.section4.title" = "Même en ville";
+"learning.card.nature.section4.content" = "Un parc, un jardin ou des plantes d'intérieur ont déjà des effets positifs !";
+
+// MARK: - Learning Card 10: Cohérence cardiaque
+"learning.card.cardiac_coherence.title" = "La cohérence cardiaque";
+"learning.card.cardiac_coherence.description" = "Synchroniser cœur et cerveau";
+"learning.card.cardiac_coherence.section1.title" = "Comment ça marche";
+"learning.card.cardiac_coherence.section1.content" = "La cohérence cardiaque est une technique de respiration qui synchronise ton rythme cardiaque avec ton cerveau pour un effet anti-stress puissant.\n\n• Respiration : 6 cycles par minute (5 sec inspiration, 5 sec expiration)\n• Durée : 5 minutes\n• Fréquence : 3 fois par jour (matin, midi, soir)\n• C'est la méthode 365 : 3 fois/jour, 6 respirations/min, 5 minutes";
+"learning.card.cardiac_coherence.section2.title" = "Bienfaits immédiats";
+"learning.card.cardiac_coherence.section2.content" = "• Réduction du cortisol en 3-5 minutes\n• Baisse de la fréquence cardiaque\n• Diminution de la pression artérielle\n• Sentiment de calme et clarté mentale";
+"learning.card.cardiac_coherence.section3.title" = "Effets à long terme (après 2 semaines)";
+"learning.card.cardiac_coherence.section3.content" = "• -24% de cortisol en moyenne\n• Meilleure régulation émotionnelle\n• Amélioration de la qualité du sommeil\n• Renforcement du système immunitaire\n• +17% de DHEA (hormone anti-vieillissement)";
+"learning.card.cardiac_coherence.section4.title" = "Utilisé par";
+"learning.card.cardiac_coherence.section4.content" = "• Pilotes de chasse\n• Sportifs de haut niveau\n• Médecins et personnels soignants\n• Dirigeants d'entreprise";
+"learning.card.cardiac_coherence.section5.title" = "Dans CortiFree";
+"learning.card.cardiac_coherence.section5.content" = "L'exercice \"Cohérence cardiaque 5-5\" dans la section Respiration suit exactement cette méthode scientifique.";
+
+// MARK: - Learning Card 11: Yoga
+"learning.card.yoga.title" = "Le yoga et la flexibilité mentale";
+"learning.card.yoga.description" = "Au-delà de la simple souplesse";
+"learning.card.yoga.section1.title" = "Les types de yoga anti-stress";
+"learning.card.yoga.section1.content" = "Le yoga est bien plus qu'une pratique physique. C'est un outil puissant de régulation du stress qui agit sur ton corps ET ton esprit.\n\n• Hatha Yoga : doux, parfait pour débuter\n• Yin Yoga : postures longues, très relaxant\n• Yoga Nidra : méditation guidée allongée\n• Vinyasa : dynamique mais méditatif";
+"learning.card.yoga.section2.title" = "Effets sur le cortisol";
+"learning.card.yoga.section2.content" = "• -27% après une session de 60 min\n• Effets cumulatifs avec pratique régulière\n• -41% de cortisol après 12 semaines (3x/semaine)";
+"learning.card.yoga.section3.title" = "Bénéfices prouvés scientifiquement";
+"learning.card.yoga.section3.content" = "Physiques :\n• Flexibilité et force musculaire\n• Meilleure posture\n• Réduction des douleurs chroniques\n• Amélioration de l'équilibre\n\nMentaux :\n• -65% des symptômes anxieux\n• Meilleure régulation émotionnelle\n• Augmentation de la matière grise\n• Amélioration de la concentration\n\nPhysiologiques :\n• Activation du système parasympathique (relaxation)\n• Meilleure variabilité de la fréquence cardiaque\n• Réduction de l'inflammation\n• Amélioration de la digestion";
+"learning.card.yoga.section4.title" = "Ce qui se passe dans ton cerveau";
+"learning.card.yoga.section4.content" = "• Augmentation GABA (neurotransmetteur calmant)\n• Réduction activité de l'amygdale (peur/stress)\n• Activation cortex préfrontal (contrôle émotionnel)";
+"learning.card.yoga.section5.title" = "Pas besoin d'être souple";
+"learning.card.yoga.section5.content" = "Le yoga n'est pas une compétition. Chaque corps est différent, et les bénéfices anti-stress arrivent dès les premières séances, même avec des adaptations !";
+
+// MARK: - Learning Card 12: Sommeil et cortisol
+"learning.card.sleep_cortisol.title" = "Le sommeil et le cortisol";
+"learning.card.sleep_cortisol.description" = "L'importance d'un bon rythme circadien";
+"learning.card.sleep_cortisol.section1.title" = "Le rythme naturel";
+"learning.card.sleep_cortisol.section1.content" = "Ton sommeil et ton niveau de cortisol sont intimement liés :\n\n• Cortisol élevé le matin (pour te réveiller)\n• Cortisol bas le soir (pour dormir)";
+"learning.card.sleep_cortisol.section2.title" = "Quand ça déraille";
+"learning.card.sleep_cortisol.section2.content" = "• Sommeil perturbé → Cortisol élevé 24h/24\n• Cercle vicieux : stress → mauvais sommeil → plus de stress";
+"learning.card.sleep_cortisol.section3.title" = "Solutions CortiFree";
+"learning.card.sleep_cortisol.section3.content" = "• Se lever avant 7h (routine matinale)\n• Se coucher avant 23h (récupération)\n• Méditation du soir (préparation au sommeil)";
+"learning.card.sleep_cortisol.section4.title" = "Le saviez-vous ?";
+"learning.card.sleep_cortisol.section4.content" = "Une seule nuit de mauvais sommeil peut augmenter ton cortisol de 37% le lendemain !";
+
+// MARK: - Learning Card 13: Hydratation
+"learning.card.hydration.title" = "L'hydratation et le stress";
+"learning.card.hydration.description" = "Pourquoi boire de l'eau réduit le stress";
+"learning.card.hydration.section1.title" = "Effets de la déshydratation";
+"learning.card.hydration.section1.content" = "L'eau joue un rôle crucial dans la régulation du stress :\n\n• Augmentation du cortisol (+25%)\n• Fatigue et irritabilité\n• Difficulté de concentration";
+"learning.card.hydration.section2.title" = "Bienfaits d'une bonne hydratation";
+"learning.card.hydration.section2.content" = "• Régulation de la température corporelle\n• Élimination des toxines\n• Meilleur fonctionnement cérébral";
+"learning.card.hydration.section3.title" = "Recommandation";
+"learning.card.hydration.section3.content" = "• Minimum 2L d'eau par jour\n• Plus si activité physique\n• Répartir tout au long de la journée";
+"learning.card.hydration.section4.title" = "Astuce";
+"learning.card.hydration.section4.content" = "Commence ta journée avec un grand verre d'eau pour réveiller ton métabolisme !";
+
+// MARK: - Learning Card 14: Exercice physique
+"learning.card.exercise.title" = "L'exercice physique anti-stress";
+"learning.card.exercise.description" = "Comment le sport régule le cortisol";
+"learning.card.exercise.section1.title" = "Effets sur le cortisol";
+"learning.card.exercise.section1.content" = "L'activité physique est un régulateur naturel du stress :\n\n• Court terme : légère augmentation (normale)\n• Long terme : baisse significative du cortisol de base";
+"learning.card.exercise.section2.title" = "Bénéfices supplémentaires";
+"learning.card.exercise.section2.content" = "• Libération d'endorphines (hormones du bonheur)\n• Amélioration du sommeil\n• Meilleure estime de soi";
+"learning.card.exercise.section3.title" = "Durée idéale";
+"learning.card.exercise.section3.content" = "• 20-30 min par session\n• 3-5 fois par semaine\n• Intensité modérée";
+"learning.card.exercise.section4.title" = "Attention";
+"learning.card.exercise.section4.content" = "Trop d'exercice intense peut augmenter le cortisol. L'équilibre est la clé !";
+
+// MARK: - Learning Card 15: Relations sociales
+"learning.card.social.title" = "Les relations sociales positives";
+"learning.card.social.description" = "L'importance du soutien social";
+"learning.card.social.section1.title" = "Impact sur le cortisol";
+"learning.card.social.section1.content" = "Les connexions sociales de qualité sont essentielles pour gérer le stress :\n\n• Interactions positives → -20% de cortisol\n• Libération d'ocytocine (\"hormone de l'amour\")\n• Sentiment de sécurité et d'appartenance";
+"learning.card.social.section2.title" = "Types de connexions bénéfiques";
+"learning.card.social.section2.content" = "• Conversations profondes avec amis\n• Moments de qualité en famille\n• Activités de groupe (sport, loisirs)";
+"learning.card.social.section3.title" = "À éviter";
+"learning.card.social.section3.content" = "• Isolement prolongé\n• Relations toxiques ou conflictuelles";
+"learning.card.social.section4.title" = "Le saviez-vous ?";
+"learning.card.social.section4.content" = "Un simple câlin de 20 secondes peut réduire significativement ton niveau de stress !";
+
+// MARK: - Learning Card 16: Lumière naturelle
+"learning.card.light.title" = "L'exposition à la lumière naturelle";
+"learning.card.light.description" = "Régule ton horloge biologique";
+"learning.card.light.section1.title" = "L'importance du matin";
+"learning.card.light.section1.content" = "La lumière naturelle joue un rôle crucial dans la régulation de ton cortisol et de ton rythme circadien :\n\n• S'exposer à la lumière dans les 30-60 min après le réveil\n• 10-30 minutes minimum dehors (même par temps nuageux)\n• Active la production de cortisol matinal (normal et bénéfique)\n• Stoppe la production de mélatonine (hormone du sommeil)";
+"learning.card.light.section2.title" = "Impact sur ton horloge biologique";
+"learning.card.light.section2.content" = "• Régule le cycle cortisol/mélatonine\n• Améliore la qualité du sommeil nocturne\n• Augmente l'énergie et la vigilance diurne\n• Synchronise tous tes rythmes biologiques";
+"learning.card.light.section3.title" = "Études scientifiques";
+"learning.card.light.section3.content" = "• +25% d'énergie diurne avec exposition matinale\n• Endormissement 1h plus rapide le soir\n• -35% de symptômes dépressifs\n• Meilleure régulation de l'appétit";
+"learning.card.light.section4.title" = "Le soir, éviter";
+"learning.card.light.section4.content" = "• Les écrans 1-2h avant le coucher\n• Les lumières vives (préférer lumières chaudes/tamisées)\n• La lumière bleue qui bloque la mélatonine";
+"learning.card.light.section5.title" = "Astuce CortiFree";
+"learning.card.light.section5.content" = "Combine ta marche matinale avec l'exposition à la lumière naturelle pour un effet démultiplié sur ton énergie et ton stress !";
+
+// MARK: - Learning Card 17: Pensées négatives
+"learning.card.negative_thoughts.title" = "Les pensées automatiques négatives";
+"learning.card.negative_thoughts.description" = "Identifier et remplacer les schémas toxiques";
+"learning.card.negative_thoughts.section1.title" = "Les 7 types de pensées toxiques";
+"learning.card.negative_thoughts.section1.content" = "Tes pensées influencent directement ton niveau de stress et de cortisol. Apprendre à identifier et modifier les pensées automatiques négatives est crucial.\n\n1️⃣ Catastrophisme : \"Si je rate cet examen, ma vie est finie\"\n→ Réalité : Un échec n'est pas une fin\n\n2️⃣ Pensée tout ou rien : \"Si ce n'est pas parfait, c'est un échec\"\n→ Réalité : La vie est faite de nuances\n\n3️⃣ Surgénéralisation : \"J'ai échoué une fois, j'échoue toujours\"\n→ Réalité : Une situation ≠ toutes les situations\n\n4️⃣ Filtre mental : Ignorer le positif, se focaliser sur le négatif\n→ Réalité : Chercher aussi ce qui va bien\n\n5️⃣ Lecture de pensées : \"Ils pensent que je suis incompétent\"\n→ Réalité : Tu ne peux pas lire dans les pensées\n\n6️⃣ Personnalisation : \"C'est forcément de ma faute\"\n→ Réalité : Tout ne dépend pas de toi\n\n7️⃣ Obligations tyranniques : \"Je DOIS être parfait\"\n→ Réalité : Personne n'est parfait";
+"learning.card.negative_thoughts.section2.title" = "La technique des 3 colonnes";
+"learning.card.negative_thoughts.section2.content" = "Colonne 1 : Situation\nColonne 2 : Pensée automatique\nColonne 3 : Pensée alternative réaliste";
+"learning.card.negative_thoughts.section3.title" = "Impact mesurable";
+"learning.card.negative_thoughts.section3.content" = "• -40% d'anxiété avec thérapie cognitive\n• -28% de cortisol en identifiant et modifiant ces pensées\n• Amélioration durable après 8-12 semaines";
+"learning.card.negative_thoughts.section4.title" = "Astuce du journaling";
+"learning.card.negative_thoughts.section4.content" = "Écrire tes pensées dans le journal CortiFree t'aide à les identifier, les questionner et les transformer !";
+
+// MARK: - Learning Card 18: Gratitude
+"learning.card.gratitude.title" = "La gratitude et le cerveau";
+"learning.card.gratitude.description" = "L'effet scientifique de la reconnaissance";
+"learning.card.gratitude.section1.title" = "Ce qui se passe dans ton cerveau";
+"learning.card.gratitude.section1.content" = "Pratiquer la gratitude n'est pas juste du \"positive thinking\" : c'est une technique scientifiquement validée qui modifie ton cerveau et ton niveau de stress.\n\n• Activation du cortex préfrontal médian (bien-être)\n• Libération de dopamine et sérotonine (bonheur)\n• Réduction activité de l'amygdale (stress/peur)\n• -23% de cortisol en moyenne";
+"learning.card.gratitude.section2.title" = "Études scientifiques majeures";
+"learning.card.gratitude.section2.content" = "UC Berkeley (2015) :\n• Journaling de gratitude 3x/semaine\n• -27% de dépression après 12 semaines\n• Amélioration sommeil et relations sociales\n\nHarvard Medical School (2021) :\n• 5 minutes de gratitude par jour\n• +25% de bonheur ressenti\n• -18% d'anxiété";
+"learning.card.gratitude.section3.title" = "Comment pratiquer efficacement";
+"learning.card.gratitude.section3.content" = "Méthode des 3 gratitudes (5 min/jour) :\n1. Note 3 choses pour lesquelles tu es reconnaissant\n2. Sois spécifique (pas juste \"ma famille\")\n3. Ressens l'émotion en écrivant\n4. Varie les gratitudes chaque jour\n\nExemples :\nTrop vague : \"Je suis reconnaissant pour ma santé\"\nSpécifique : \"Je suis reconnaissant d'avoir pu faire ma marche matinale sans douleur et de sentir l'air frais sur mon visage\"";
+"learning.card.gratitude.section4.title" = "Effets à long terme";
+"learning.card.gratitude.section4.content" = "Après 4 semaines :\n• Changements mesurables dans le cerveau\n• Meilleure qualité de sommeil\n• Plus d'émotions positives\n\nAprès 12 semaines :\n• Nouvelle \"baseline\" de bonheur plus élevée\n• Résilience accrue face au stress\n• Meilleures relations interpersonnelles";
+"learning.card.gratitude.section5.title" = "Intégré dans CortiFree";
+"learning.card.gratitude.section5.content" = "Le journal te permet de noter tes gratitudes quotidiennes. Cette simple pratique de 2-3 minutes peut transformer ton rapport au stress !";
+"learning.card.gratitude.section6.title" = "Important";
+"learning.card.gratitude.section6.content" = "La gratitude ne nie pas les problèmes, elle entraîne ton cerveau à aussi voir le positif au lieu de se focaliser uniquement sur le négatif.";
+
+// MARK: - Tips Section
+"tips.title" = "Conseils";
+"tips.subtitle" = "Des conseils pratiques pour ton quotidien";
+"tips.count.singular" = "conseil";
+"tips.count.plural" = "conseils";
+
+// MARK: - Tips Categories
+"tips.category.routine" = "Routine";
+"tips.category.sommeil" = "Sommeil";
+"tips.category.travail" = "Travail";
+"tips.category.nutrition" = "Nutrition";
+"tips.category.emotions" = "Émotions";
+"tips.category.mindfulness" = "Mindfulness";
+"tips.category.relations" = "Relations";
+"tips.category.productivite" = "Productivité";
+"tips.category.environnement" = "Environnement";
+"tips.category.urgence" = "Urgence";
+
+// MARK: - Tips Card: Routine Matinale
+"tips.card.morning_routine.title" = "Routine matinale anti-stress";
+"tips.card.morning_routine.short_description" = "Commence ta journée du bon pied";
+"tips.card.morning_routine.section1.title" = "Pourquoi c'est important";
+"tips.card.morning_routine.section1.content" = "Les premières 60 minutes de ta journée déterminent ton niveau de cortisol pour toute la journée.";
+"tips.card.morning_routine.section2.title" = "La routine idéale (60 min)";
+"tips.card.morning_routine.section2.content" = "6h00-6h15 : Réveil et hydratation\n• Boire 500ml d'eau dès le réveil\n• Réhydrate ton corps après 8h de sommeil\n• Active ton métabolisme\n\n6h15-6h30 : Exposition à la lumière\n• Sortir dehors ou près d'une fenêtre\n• 15-30 min de lumière naturelle\n• Stoppe la mélatonine, active le cortisol matinal sain\n\n6h30-6h45 : Mouvement doux\n• Étirements, yoga doux, ou marche\n• Réveille le corps en douceur\n• Libère les endorphines\n\n6h45-7h00 : Pratique de pleine conscience\n• 5-10 min de méditation ou respiration\n• Cohérence cardiaque\n• Définit l'intention de la journée";
+"tips.card.morning_routine.section3.title" = "À ÉVITER les 60 premières minutes";
+"tips.card.morning_routine.section3.content" = "• Téléphone/emails/réseaux sociaux\n• Actualités (souvent négatives)\n• Situations stressantes\n• Caféine avant hydratation";
+"tips.card.morning_routine.section4.title" = "Pourquoi ça marche";
+"tips.card.morning_routine.section4.content" = "Cette routine synchronise ton rythme circadien, optimise ton pic de cortisol matinal (bénéfique) et te met dans un état mental positif pour la journée.";
+
+// MARK: - Tips Card: Rituel du Coucher
+"tips.card.sleep_ritual.title" = "Rituel du coucher optimal";
+"tips.card.sleep_ritual.short_description" = "Prépare ton corps et esprit au repos";
+"tips.card.sleep_ritual.section1.title" = "Le rituel parfait";
+"tips.card.sleep_ritual.section1.content" = "Un bon sommeil commence 90 minutes avant de se coucher.\n\n21h30 : Baisse de lumière\n• Tamiser les lumières dans la maison\n• Activer mode nuit sur téléphone/ordinateur\n• Lumières chaudes uniquement\n\n21h45 : Arrêt des écrans\n• Plus de téléphone, TV, ordinateur\n• Lire un livre papier à la place\n• La lumière bleue bloque la mélatonine\n\n22h00 : Hygiène et routine\n• Douche tiède (pas chaude)\n• Routine soins visage/dents\n• Préparation vêtements du lendemain\n\n22h15 : Activité relaxante\n• Lecture légère (pas thriller!)\n• Journaling/gratitudes\n• Méditation ou respiration douce\n• Étirements légers\n\n22h30 : Préparation de la chambre\n• Température fraîche (18-19°C)\n• Obscurité totale (rideaux occultants)\n• Silence (bouchons d'oreille si besoin)\n\n22h45-23h00 : Coucher\n• Toujours à la même heure\n• Même le week-end\n• Cohérence = meilleur sommeil";
+"tips.card.sleep_ritual.section2.title" = "Tips supplémentaires";
+"tips.card.sleep_ritual.section2.content" = "• Pas de sport intense après 20h\n• Dernier repas 2-3h avant coucher\n• Éviter alcool et caféine après 16h\n• Chambre réservée au sommeil (pas de travail)";
+
+// MARK: - Tips Card: Stress au Travail
+"tips.card.work_stress.title" = "Gérer le stress au travail";
+"tips.card.work_stress.short_description" = "Stratégies pour rester zen au bureau";
+"tips.card.work_stress.section1.title" = "Micro-pauses toutes les heures";
+"tips.card.work_stress.section1.content" = "• 2 min de respiration profonde\n• Étirements au bureau\n• Regarder au loin (détend les yeux)\n• Marcher quelques pas";
+"tips.card.work_stress.section2.title" = "Priorisation intelligente";
+"tips.card.work_stress.section2.content" = "Matrice d'Eisenhower :\n• Urgent + Important = Faire maintenant\n• Important + Non urgent = Planifier\n• Urgent + Non important = Déléguer\n• Non urgent + Non important = Éliminer\n\nMéthode 1-3-5 :\n• 1 tâche principale par jour\n• 3 tâches moyennes\n• 5 petites tâches";
+"tips.card.work_stress.section3.title" = "Gestion des interruptions";
+"tips.card.work_stress.section3.content" = "• Mode concentration : 90 min sans interruption\n• Désactiver notifications non urgentes\n• Créneaux \"portes ouvertes\" pour collègues\n• Email : vérifier 3 fois/jour maximum";
+"tips.card.work_stress.section4.title" = "Dire non avec diplomatie";
+"tips.card.work_stress.section4.content" = "\"J'aimerais t'aider, mais j'ai déjà pris des engagements pour [X]. Je peux te proposer [alternative] ou être disponible à partir de [date].\"\n\nTon temps est précieux. Protège-le.";
+
+// MARK: - Tips Card: Alimentation Anti-Stress
+"tips.card.nutrition.title" = "Alimentation quotidienne anti-stress";
+"tips.card.nutrition.short_description" = "Repas et snacks qui calment";
+"tips.card.nutrition.section1.title" = "Petit-déjeuner idéal";
+"tips.card.nutrition.section1.content" = "Protéines + Graisses saines + Fibres :\n\nOption 1 : Œufs + Avocat + Pain complet\nOption 2 : Yaourt grec + Noix + Fruits rouges\nOption 3 : Smoothie (banane, épinards, beurre amandes, lait végétal)\n\nPourquoi : Stabilise la glycémie et le cortisol pour toute la matinée.";
+"tips.card.nutrition.section2.title" = "Snacks anti-stress";
+"tips.card.nutrition.section2.content" = "Quand une fringale arrive (10h ou 16h) :\n\n• Amandes (15-20) + 1 carré chocolat noir\n• Pomme + Beurre d'amande\n• Yaourt nature + Myrtilles\n• Houmous + Bâtonnets de légumes\n• Banane + Quelques noix\n\nÉviter : Barres industrielles, viennoiseries, sodas";
+"tips.card.nutrition.section3.title" = "Hydratation intelligente";
+"tips.card.nutrition.section3.content" = "• 2L d'eau/jour minimum\n• Infusions calmantes (camomille, verveine, tilleul)\n• Thé vert (L-théanine anti-stress)\n• Eau citronnée le matin\n\nLimiter :\n• Café : max 2-3 par jour, pas après 14h\n• Alcool : max 1 verre/jour\n• Sodas : occasionnellement uniquement";
+"tips.card.nutrition.section4.title" = "Dîner léger";
+"tips.card.nutrition.section4.content" = "2-3h avant coucher :\n\n• Légumes + Protéines maigres (poisson, poulet, tofu)\n• Glucides complexes en petite quantité (riz, quinoa)\n• Éviter fritures, plats lourds, épices fortes\n• Tisane digestive après le repas";
+
+// MARK: - Tips Card: Gérer les Émotions
+"tips.card.emotions.title" = "Gérer les émotions difficiles";
+"tips.card.emotions.short_description" = "Techniques d'urgence émotionnelle";
+"tips.card.emotions.section1.title" = "Technique 4-7-8 (urgence anxiété)";
+"tips.card.emotions.section1.content" = "1. Expire complètement par la bouche (whoosh)\n2. Inspire par le nez en comptant jusqu'à 4\n3. Retiens ta respiration en comptant jusqu'à 7\n4. Expire par la bouche en comptant jusqu'à 8\n\nRépéter 4 cycles.\nEffet : Active le système parasympathique, calme en 90 secondes.";
+"tips.card.emotions.section2.title" = "Technique 5-4-3-2-1 (ancrage présent)";
+"tips.card.emotions.section2.content" = "Quand tu te sens submergé, nomme à voix haute :\n\n• 5 choses que tu VOIS autour de toi\n• 4 choses que tu TOUCHES\n• 3 choses que tu ENTENDS\n• 2 choses que tu SENS (odorat)\n• 1 chose que tu GOÛTES\n\nRamène ton esprit dans le moment présent et stoppe la spirale anxieuse.";
+"tips.card.emotions.section3.title" = "Journaling émotionnel";
+"tips.card.emotions.section3.content" = "Quand une émotion forte arrive, écris :\n\n1. Quelle est cette émotion ? (nom exact)\n2. Où la sens-tu dans ton corps ?\n3. Quelle pensée l'a déclenchée ?\n4. Cette pensée est-elle un fait ou une interprétation ?\n5. Quelle serait une pensée alternative plus réaliste ?\n\nÉcrire = Traiter l'émotion au lieu de la ruminer.";
+"tips.card.emotions.section4.title" = "Mouvement libérateur";
+"tips.card.emotions.section4.content" = "L'émotion = énergie coincée dans le corps.\n\n• Marche rapide 10-15 min\n• Secoue tes bras/jambes vigoureusement\n• Dance sur une musique énergique\n• Étirements profonds\n• Cri dans un oreiller (si besoin)\n\nLe corps DOIT évacuer le stress physiquement.";
+
+// MARK: - Tips Card: Mindfulness Quotidien
+"tips.card.mindfulness.title" = "Pleine conscience au quotidien";
+"tips.card.mindfulness.short_description" = "Intégrer la mindfulness partout";
+"tips.card.mindfulness.section1.title" = "Mindfulness du café/thé";
+"tips.card.mindfulness.section1.content" = "Au lieu de boire distraitement :\n\n1. Observe la couleur du liquide\n2. Sens l'arôme profondément\n3. Ressens la chaleur de la tasse dans tes mains\n4. Prends une petite gorgée, laisse-la en bouche\n5. Remarque le goût, la texture, la température\n6. Ressens la chaleur qui descend\n\n5 minutes de présence pure.";
+"tips.card.mindfulness.section2.title" = "Marche consciente";
+"tips.card.mindfulness.section2.content" = "Transforme n'importe quelle marche en méditation :\n\n• Sens le contact du pied avec le sol à chaque pas\n• Remarque le mouvement de tes bras\n• Observe ce que tu vois sans jugement\n• Écoute les sons autour de toi\n• Sens l'air sur ta peau, le vent dans tes cheveux\n\n5-10 min suffisent pour reset ton esprit.";
+"tips.card.mindfulness.section3.title" = "Douche mindful";
+"tips.card.mindfulness.section3.content" = "• Sens la température de l'eau\n• Remarque les gouttes qui coulent sur ta peau\n• Concentre-toi sur les sensations corporelles\n• Observe le bruit de l'eau\n• Sens l'odeur du savon/shampoing\n\nChaque activité quotidienne = opportunité de méditation.";
+"tips.card.mindfulness.section4.title" = "Alimentation consciente";
+"tips.card.mindfulness.section4.content" = "1 repas/jour minimum sans distraction :\n\n• Pas de téléphone, TV, ordinateur\n• Observe ton assiette (couleurs, textures)\n• Sens les odeurs\n• Mâche lentement (20-30 fois par bouchée)\n• Remarque les saveurs, textures\n• Pose ta fourchette entre chaque bouchée\n\nMeilleure digestion + Satiété naturelle + Moment de calme";
+
+// MARK: - Tips Card: Communication Non-Violente
+"tips.card.nvc.title" = "Communication non-violente";
+"tips.card.nvc.short_description" = "Exprimer ses besoins sans conflit";
+"tips.card.nvc.section1.title" = "Les 4 étapes de la CNV";
+"tips.card.nvc.section1.content" = "1. OBSERVATION (fait objectif)\n\"Quand tu arrives en retard aux rendez-vous...\"\n(PAS \"Tu es toujours en retard\" = jugement)\n\n2. SENTIMENT (ton émotion)\n\"...je me sens stressé et frustré...\"\n(PAS \"Tu me stresses\" = accusation)\n\n3. BESOIN (ce dont tu as besoin)\n\"...parce que j'ai besoin de pouvoir compter sur nos engagements...\"\n\n4. DEMANDE (action concrète)\n\"...pourrais-tu m'envoyer un message si tu as du retard ?\"\n(PAS \"Il faut que tu sois à l'heure\" = ordre)";
+"tips.card.nvc.section2.title" = "Écoute active";
+"tips.card.nvc.section2.content" = "Quand quelqu'un te parle :\n\n• Arrête ce que tu fais\n• Regarde la personne dans les yeux\n• Ne prépare pas ta réponse pendant qu'elle parle\n• Reformule pour vérifier ta compréhension\n• Valide l'émotion avant de donner un conseil\n\n\"Si je comprends bien, tu te sens [émotion] parce que [situation] ?\"";
+"tips.card.nvc.section3.title" = "Gérer les critiques";
+"tips.card.nvc.section3.content" = "• Respire profondément avant de répondre\n• Cherche la part de vérité (même petite)\n• Remercie pour le feedback\n• Demande des précisions si besoin\n• Prends du recul avant de décider d'une action\n\n\"Merci de me le dire. Peux-tu me donner un exemple concret ?\"\n\nNe pas prendre personnellement ≠ Se laisser maltraiter";
+
+// MARK: - Tips Card: Relations Positives
+"tips.card.positive_relations.title" = "Cultiver des relations positives";
+"tips.card.positive_relations.short_description" = "Renforcer tes liens sociaux";
+"tips.card.positive_relations.section1.title" = "Rituels de connexion";
+"tips.card.positive_relations.section1.content" = "• 1 appel vidéo/semaine avec un proche\n• 1 café/repas en face à face par semaine\n• Message de check-in à 2-3 amis/semaine\n• Activité de groupe mensuelle (sport, loisir)\n\nLa qualité > quantité, mais la régularité compte.";
+"tips.card.positive_relations.section2.title" = "Exprimer de la gratitude";
+"tips.card.positive_relations.section2.content" = "1 fois/jour minimum, dis à quelqu'un :\n\n\"J'apprécie vraiment que tu [action concrète]. Ça m'a fait [émotion positive].\"\n\nExemples :\n• \"Merci d'avoir écouté mes préoccupations hier. Je me suis senti compris.\"\n• \"J'apprécie que tu aies pensé à moi. Ça m'a fait sourire.\"\n\nRenforce les liens + Libère ocytocine (hormone du bonheur)";
+"tips.card.positive_relations.section3.title" = "Identifier les relations toxiques";
+"tips.card.positive_relations.section3.content" = "Signaux d'alarme :\n\n• Tu te sens drainé après les interactions\n• Critique constante, jamais de soutien\n• Vampirisation émotionnelle (toujours eux, jamais toi)\n• Manipulation ou culpabilisation\n• Pas de respect de tes limites\n\nAction : Distanciation progressive ou conversation franche.\nTu as le droit de protéger ton énergie.";
+"tips.card.positive_relations.section4.title" = "Demander du soutien";
+"tips.card.positive_relations.section4.content" = "Demander de l'aide ≠ faiblesse :\n\n\"J'ai besoin d'aide avec [situation]. Est-ce que tu aurais [temps/compétence] pour m'aider ?\"\n\nOu simplement :\n\"Je passe une période difficile. Est-ce qu'on peut prendre un café pour en parler ?\"\n\nLes gens veulent aider, mais ne savent pas toujours comment. Sois spécifique.";
+
+// MARK: - Tips Card: Productivité
+"tips.card.productivity.title" = "Productivité sans stress";
+"tips.card.productivity.short_description" = "Efficace ET zen";
+"tips.card.productivity.section1.title" = "Technique Pomodoro adaptée";
+"tips.card.productivity.section1.content" = "Travail par sessions :\n\n• 25 min focus total sur UNE tâche\n• 5 min pause (marche, étirements, respiration)\n• Répéter 4 fois\n• Grande pause de 20-30 min\n\nRègles :\n• Timer visible\n• Téléphone en mode avion\n• Notifications désactivées\n• Si interruption = reset le Pomodoro\n\nRésultat : 4h de vrai travail valent mieux que 8h de distraction.";
+"tips.card.productivity.section2.title" = "Travailler avec ton cerveau";
+"tips.card.productivity.section2.content" = "Chaque cerveau a ses pics d'énergie :\n\nMatinaux (lève-tôt) :\n• 8h-12h : Tâches complexes/créatives\n• 14h-16h : Tâches routinières\n• Après 16h : Organisation/emails\n\nSoireux (couche-tard) :\n• Matin : Routine/emails\n• 14h-18h : Tâches complexes\n• Soirée : Créativité/projets\n\nIdentifie TON rythme et adapte ton planning.";
+"tips.card.productivity.section3.title" = "Liste 'Done' en plus de 'To-Do'";
+"tips.card.productivity.section3.content" = "En fin de journée, écris ce que tu AS fait :\n\n• Valide tes accomplissements\n• Combat le syndrome de l'imposteur\n• Montre le chemin parcouru\n• Boost confiance en soi\n\nTon cerveau se souvient du négatif (biais de négativité).\nForce-le à voir le positif.";
+"tips.card.productivity.section4.title" = "L'art du 'presque parfait'";
+"tips.card.productivity.section4.content" = "Perfectionnisme = Source majeure de stress.\n\nRègle 80/20 (Pareto) :\n• 80% du résultat vient de 20% de l'effort\n• Les 20% restants du résultat demandent 80% d'effort supplémentaire\n\nQuestion : \"Ce dernier 20% vaut-il vraiment mon temps et mon stress ?\"\n\nSouvent, \"assez bon\" EST parfait.";
+
+// MARK: - Tips Card: Environnement
+"tips.card.environment.title" = "Optimiser ton environnement";
+"tips.card.environment.short_description" = "Espace de vie anti-stress";
+"tips.card.environment.section1.title" = "Désencombrement (règle KonMari adaptée)";
+"tips.card.environment.section1.content" = "1 zone/semaine :\n\nPrends chaque objet et demande-toi :\n• Est-ce que je l'ai utilisé dans les 6 derniers mois ?\n• Est-ce que ça m'apporte de la joie ?\n• Est-ce vraiment utile ?\n\nSi 3x non → Don, recyclage, ou poubelle.\n\nDésordre visuel = Surcharge mentale.\nEspace dégagé = Esprit dégagé.";
+"tips.card.environment.section2.title" = "Plantes d'intérieur";
+"tips.card.environment.section2.content" = "Top 5 anti-stress faciles d'entretien :\n\n1. Pothos (air + stress)\n2. Sansevieria (oxygène la nuit)\n3. Aloe Vera (purifie l'air)\n4. Plante araignée (facile, efficace)\n5. Lavande (parfum calmant)\n\nBénéfices prouvés :\n• -15% de cortisol\n• Meilleure qualité de l'air\n• Effet visuel apaisant";
+"tips.card.environment.section3.title" = "Lumière naturelle maximale";
+"tips.card.environment.section3.content" = "• Ouvre rideaux dès le réveil\n• Bureau près fenêtre si possible\n• Ampoules lumière du jour (5000-6500K) le matin\n• Ampoules chaudes (2700-3000K) le soir\n• Variateurs de lumière dans chambres\n\nLumière = régulateur #1 du rythme circadien.";
+"tips.card.environment.section4.title" = "Sons et musique";
+"tips.card.environment.section4.content" = "Travail/Concentration :\n• Bruits blancs/bruns\n• Musique classique baroque (60 bpm)\n• Sons de la nature (pluie, forêt)\n• Pas de paroles\n\nRelaxation :\n• Fréquences 432Hz\n• Bols tibétains\n• Musique méditative\n• Sons binauraux (theta/delta)\n\nCréer une playlist par activité.";
+"tips.card.environment.section5.title" = "Température et air";
+"tips.card.environment.section5.content" = "Température optimale :\n• Journée active : 20-22°C\n• Sommeil : 18-19°C\n• Trop chaud = fatigue, irritabilité\n\nAir :\n• Aérer 10-15 min matin et soir\n• Humidificateur en hiver (40-60% humidité)\n• Éviter encens/bougies parfumées toxiques\n\nTon corps régule mieux le stress dans un environnement optimal.";
+
+// MARK: - Tips Card: Kit d'Urgence
+"tips.card.emergency_kit.title" = "Kit d'urgence anti-stress";
+"tips.card.emergency_kit.short_description" = "Quand tu sens que tu vas craquer";
+"tips.card.emergency_kit.section1.title" = "Crise de panique imminente";
+"tips.card.emergency_kit.section1.content" = "MAINTENANT (dans l'ordre) :\n\n1. Respiration 4-7-8 (décrit plus haut)\n2. Eau glacée sur visage ou douche froide\n3. Technique 5-4-3-2-1 (ancrage sensoriel)\n4. Sortir dehors si possible\n5. Appeler quelqu'un de confiance\n\nRappel : Crise de panique = désagréable mais PAS dangereuse.\nÇa passe en 10-20 min maximum.";
+"tips.card.emergency_kit.section2.title" = "Libération physique urgente";
+"tips.card.emergency_kit.section2.content" = "Quand le stress est DANS ton corps :\n\n• Sprint 30 secondes à fond (si lieu sûr)\n• 20 jumping jacks\n• Serrer fort un oreiller/coussin puis relâcher (5x)\n• Pousser contre un mur de toutes tes forces (10 sec)\n\nL'énergie du stress DOIT sortir du corps.";
+"tips.card.emergency_kit.section3.title" = "Qui appeler";
+"tips.card.emergency_kit.section3.content" = "Prépare cette liste MAINTENANT (dans ton téléphone) :\n\n• 3 amis/famille de confiance\n• Ligne d'écoute (SOS Amitié : 09 72 39 40 50)\n• Ton thérapeute si tu en as un\n• Urgences si danger immédiat : 112\n\nEn crise, tu ne penses pas clairement.\nListe préparée = bouée de sauvetage.";
+"tips.card.emergency_kit.section4.title" = "Permission de faire une pause";
+"tips.card.emergency_kit.section4.content" = "Tu as le DROIT de :\n\n• Annuler des plans\n• Dire \"Je ne peux pas aujourd'hui\"\n• Prendre une journée de repos mental\n• Déléguer ce qui peut l'être\n• Mettre ton téléphone en mode avion\n\nPrendre soin de toi ≠ Égoïsme.\nC'est de la SURVIE.\n\nSi tu ne vas pas bien, tu ne peux aider personne.";
+"tips.card.emergency_kit.section5.title" = "Après la crise";
+"tips.card.emergency_kit.section5.content" = "Une fois calmé :\n\n1. Bois de l'eau\n2. Mange quelque chose de léger\n3. Note ce qui a déclenché (pour identifier les patterns)\n4. Pratique de l'auto-compassion (pas de jugement)\n5. Prévois aide professionnelle si récurrent\n\nAvoir besoin d'aide ≠ Faiblesse.\nC'est du courage.";
+
+
+// MARK: - Task Detail View
+"task.detail.days" = "jours";
+"task.detail.progression_66_days" = "Progression sur 66 jours";
+"task.detail.occurrences" = "occurrences";
+"task.detail.this_month" = "ce mois";
+"task.detail.habit_improves" = "Cette habitude améliore";
+"task.detail.cortifree_score_domains" = "Ton score CortiFree dans ces domaines";
+"task.detail.domain.global" = "Global";
+"task.detail.domain.serenity" = "Sérénité";
+"task.detail.domain.sleep" = "Sommeil";
+"task.detail.domain.energy" = "Énergie";
+"task.detail.domain.focus" = "Focus";
+"task.detail.domain.balance" = "Équilibre";
+"task.detail.button.skip" = "Passer";
+"task.detail.button.validate" = "Valider";
+
+// MARK: - VoiceOver
+"voiceover.enable" = "Activer la voix";
+"voiceover.disable" = "Désactiver la voix";
+"voiceover.step_of" = "Étape %d sur %d";
+"voiceover.completed" = "Exercice terminé";
+"voiceover.breathing.inhale" = "Inspire";
+"voiceover.breathing.hold" = "Retiens";
+"voiceover.breathing.exhale" = "Expire";
+"voiceover.breathing.hold_out" = "Retiens";
+
+// MARK: - Motivational Messages
+"motivational.title.morning" = "Réveille toi bien\n%@";
+"motivational.title.afternoon" = "Passe une bonne journée\n%@";
+"motivational.title.evening" = "Profite de cette soirée\n%@";
+"motivational.title.night" = "Endors toi bien\n%@";
+
+"motivational.greeting.morning" = "Bonjour\n%@";
+"motivational.greeting.afternoon" = "Bon après-midi\n%@";
+"motivational.greeting.evening" = "Bonsoir\n%@";
+
+// 20 motivational message variants
+"motivational.message.0" = "Chaque petit pas compte vraiment.";
+"motivational.message.1" = "Tu transformes cette journée !";
+"motivational.message.2" = "Respire. Tu le mérites.";
+"motivational.message.3" = "Ta force dépasse tous tes défis.";
+"motivational.message.4" = "Prends soin de toi aujourd'hui.";
+"motivational.message.5" = "Le progrès avant la perfection.";
+"motivational.message.6" = "Tu évolues chaque jour !";
+"motivational.message.7" = "Ton calme est ta force.";
+"motivational.message.8" = "Respirer, c'est s'aimer.";
+"motivational.message.9" = "Sois fier de ton chemin.";
+"motivational.message.10" = "Tu mérites cette paix intérieure.";
+"motivational.message.11" = "Sois doux envers toi-même.";
+"motivational.message.12" = "Ta présence est un super-pouvoir.";
+"motivational.message.13" = "Chaque instant est une chance.";
+"motivational.message.14" = "Tu es exactement où tu dois être.";
+"motivational.message.15" = "Célèbre tes petites victoires.";
+"motivational.message.16" = "Ton bien-être est prioritaire.";
+"motivational.message.17" = "Tu as survécu à tes jours durs.";
+"motivational.message.18" = "Offre-toi de la patience.";
+"motivational.message.19" = "Ta pratique crée du changement.";
+"motivational.message.20" = "Chaque jour est un nouveau départ.";
+"motivational.message.21" = "Tu as tout ce qu'il te faut.";
+"motivational.message.22" = "Ton courage t'inspire.";
+"motivational.message.23" = "La paix commence par toi.";
+"motivational.message.24" = "Tu mérites de te sentir bien.";
+"motivational.message.25" = "Avance à ton propre rythme.";
+"motivational.message.26" = "Ta santé mentale compte.";
+"motivational.message.27" = "Tu fais de ton mieux.";
+"motivational.message.28" = "Chaque effort compte vraiment.";
+"motivational.message.29" = "Tu es plus fort que tu penses.";
+
+// MARK: - AntiStress
+
+// Stress Situations
+"antistress.situation.overwhelmed" = "Je me sens submergé";
+"antistress.situation.insomnia" = "Je n'arrive pas à dormir";
+"antistress.situation.physical_tension" = "Je suis tendu physiquement";
+"antistress.situation.before_event" = "Je stresse avant un événement";
+"antistress.situation.anxiety" = "J'ai de l'anxiété";
+"antistress.situation.need_energy" = "J'ai besoin d'énergie";
+
+// MARK: - Exercise Recommendation Page
+"antistress.recommendation.title" = "Exercices recommandés";
+"antistress.recommendation.subtitle" = "Basé sur ta situation actuelle";
+
+// MARK: - Anti-Stress Exercise Detail View
+"antistress.how_it_works" = "Comment ça marche ?";
+"antistress.benefits" = "Bienfaits";
+"antistress.scientific_evidence" = "Preuves scientifiques";
+"antistress.start_button" = "Commencer l'exercice";
+
+// Category badges
+"antistress.category.movement" = "MOUVEMENT";
+"antistress.category.audio" = "AUDIO";
+"antistress.category.mental" = "MENTAL";
+"antistress.category.visual" = "VISUEL";
+"antistress.category.exercise" = "EXERCICE";
+
+// MARK: - Body Scan Detail View
+"antistress.body_scan.category_badge" = "ANCRAGE";
+"antistress.body_scan.title" = "Scan corporel";
+"antistress.body_scan.subtitle" = "Détends chaque partie de ton corps";
+"antistress.body_scan.how_it_works_text" = "Scanne mentalement chaque partie de ton corps de la tête aux pieds pour relâcher progressivement toutes les tensions musculaires accumulées et retrouver un état de détente profonde complète";
+"antistress.body_scan.benefit_1" = "Relaxation profonde";
+"antistress.body_scan.benefit_2" = "Libère tensions";
+"antistress.body_scan.benefit_3" = "Meilleur sommeil";
+"antistress.body_scan.benefit_4" = "Conscience corporelle";
+"antistress.body_scan.evidence_1" = "Réduit significativement le stress chronique et l'anxiété selon études de psychologie comportementale";
+"antistress.body_scan.evidence_2" = "Relaxe en profondeur tous les muscles du corps en libérant les tensions physiques accumulées";
+"antistress.body_scan.evidence_3" = "Améliore considérablement la qualité du sommeil en préparant le corps au repos nocturne";
+"antistress.body_scan.source" = "Sources: Psychosomatic Research";
+
+// Exercise Names
+"antistress.exercise.guided_breathing" = "Respiration guidée";
+"antistress.exercise.grounding_5_senses" = "Grounding 5 sens";
+"antistress.exercise.conscious_stretching" = "Étirements";
+"antistress.exercise.cardiac_coherence" = "Cohérence cardiaque";
+"antistress.exercise.audio_relaxation" = "Relaxation audio";
+"antistress.exercise.body_scan" = "Scan corporel";
+"antistress.exercise.box_breathing" = "Respiration carrée";
+"antistress.exercise.anchoring_54321" = "Ancrage 54321";
+"antistress.exercise.positive_mantra" = "Mantra positif";
+"antistress.exercise.visual_micro_break" = "Pause visuelle";
+"antistress.exercise.alternate_breathing" = "Respiration alternée";
+"antistress.exercise.slow_walk" = "Marche lente";
+"antistress.exercise.conscious_breathing" = "Respiration consciente";
+"antistress.exercise.meditation_2_min" = "Méditation";
+"antistress.exercise.white_noise" = "Bruit blanc";
+
+// Exercise Descriptions
+"antistress.description.guided_breathing" = "Ralentis ton rythme cardiaque";
+"antistress.description.grounding_5_senses" = "Reconnecte avec le moment présent";
+"antistress.description.conscious_stretching" = "Relâche les tensions physiques";
+"antistress.description.cardiac_coherence" = "Équilibre ton système nerveux";
+"antistress.description.audio_relaxation" = "Laisse-toi guider par le son";
+"antistress.description.body_scan" = "Détends chaque partie de ton corps";
+"antistress.description.box_breathing" = "Technique de respiration militaire";
+"antistress.description.anchoring_54321" = "Ramène-toi dans l'instant présent";
+"antistress.description.positive_mantra" = "Renforce ta confiance intérieure";
+"antistress.description.visual_micro_break" = "Repose tes yeux et ton esprit";
+"antistress.description.alternate_breathing" = "Équilibre tes deux hémisphères";
+"antistress.description.slow_walk" = "Marche en pleine conscience";
+"antistress.description.conscious_breathing" = "Retrouve ton calme naturel";
+"antistress.description.meditation_2_min" = "Courte méditation guidée";
+"antistress.description.white_noise" = "Sons apaisants pour te détendre";
+
+// MARK: - AntiStress Detail Views - Complete Translations
+
+// Grounding 5 Senses
+"antistress.grounding_5_senses.category_badge" = "ANCRAGE";
+"antistress.grounding_5_senses.title" = "Grounding 5 sens";
+"antistress.grounding_5_senses.subtitle" = "Reconnecte avec le moment présent";
+"antistress.grounding_5_senses.how_it_works_text" = "Active consciemment tes cinq sens pour identifier ce que tu perçois autour de toi. Cette technique ancestrale te reconnecte instantanément au moment présent.";
+"antistress.grounding_5_senses.benefit_1" = "Ancrage immédiat";
+"antistress.grounding_5_senses.benefit_2" = "Calme l'anxiété";
+"antistress.grounding_5_senses.benefit_3" = "Clarté mentale";
+"antistress.grounding_5_senses.benefit_4" = "Présence accrue";
+"antistress.grounding_5_senses.evidence_1" = "Stoppe efficacement les crises d'anxiété aiguës selon études comportementales";
+"antistress.grounding_5_senses.evidence_2" = "Ancre ton attention dans l'instant présent grâce à l'activation sensorielle";
+"antistress.grounding_5_senses.evidence_3" = "Réduit les ruminations mentales de quarante pourcent d'après recherches cliniques";
+"antistress.grounding_5_senses.source" = "Sources: Journal of Anxiety Disorders, Mindfulness Research";
+
+// Anchoring 5-4-3-2-1
+"antistress.anchoring_54321.category_badge" = "ANCRAGE";
+"antistress.anchoring_54321.title" = "Ancrage 5-4-3-2-1";
+"antistress.anchoring_54321.subtitle" = "Ramène-toi dans l'instant présent";
+"antistress.anchoring_54321.how_it_works_text" = "Nomme successivement cinq choses que tu vois, quatre que tu touches, trois que tu entends, deux que tu sens, une que tu goûtes. Cette séquence ramène ton attention au présent.";
+"antistress.anchoring_54321.benefit_1" = "Stop l'anxiété";
+"antistress.anchoring_54321.benefit_2" = "Ancrage rapide";
+"antistress.anchoring_54321.benefit_3" = "Recentrage";
+"antistress.anchoring_54321.benefit_4" = "Calme instantané";
+"antistress.anchoring_54321.evidence_1" = "Technique validée scientifiquement pour gérer les crises d'anxiété aiguës rapidement";
+"antistress.anchoring_54321.evidence_2" = "Ramène ton attention dans l'instant présent en deux minutes de pratique";
+"antistress.anchoring_54321.evidence_3" = "Réduit les ruminations mentales de quarante pourcent par activation sensorielle";
+"antistress.anchoring_54321.source" = "Sources: Behavioral Therapy";
+
+// Slow Walk
+"antistress.slow_walk.subtitle" = "Marche en pleine conscience pour te recentrer";
+"antistress.slow_walk.detailed_description" = "Marche lentement en portant toute ton attention sur chaque mouvement de ton corps. Sens tes pieds toucher le sol, observe ton environnement, respire profondément.";
+"antistress.slow_walk.benefit_1" = "Apaise l'esprit";
+"antistress.slow_walk.benefit_2" = "Réduit le stress";
+"antistress.slow_walk.benefit_3" = "Recentrage corporel";
+"antistress.slow_walk.benefit_4" = "Clarté mentale";
+"antistress.slow_walk.evidence_1" = "Réduit significativement le niveau de cortisol dans le sang";
+"antistress.slow_walk.evidence_2" = "Améliore la conscience corporelle et réduit les tensions musculaires";
+"antistress.slow_walk.evidence_3" = "Favorise la production d'endorphines naturelles pour un bien-être durable";
+"antistress.slow_walk.source" = "Sources: Movement Therapy Research";
+
+// Conscious Stretching
+"antistress.conscious_stretching.subtitle" = "Étirements doux pour relâcher les tensions";
+"antistress.conscious_stretching.detailed_description" = "Étire doucement ton corps en conscience. Respire profondément dans chaque mouvement et sens les tensions se relâcher progressivement. Écoute les signaux de ton corps.";
+"antistress.conscious_stretching.benefit_1" = "Libère tensions";
+"antistress.conscious_stretching.benefit_2" = "Détend muscles";
+"antistress.conscious_stretching.benefit_3" = "Améliore posture";
+"antistress.conscious_stretching.benefit_4" = "Bien-être corporel";
+"antistress.conscious_stretching.evidence_1" = "Réduit efficacement les tensions musculaires accumulées dans le corps";
+"antistress.conscious_stretching.evidence_2" = "Améliore la circulation sanguine et favorise l'oxygénation des tissus";
+"antistress.conscious_stretching.evidence_3" = "Diminue les douleurs chroniques liées au stress et à la posture";
+"antistress.conscious_stretching.source" = "Sources: Physiotherapy Journal";
+
+// Audio Relaxation
+"antistress.audio_relaxation.subtitle" = "Détente profonde par l'écoute guidée";
+"antistress.audio_relaxation.detailed_description" = "Laisse-toi guider par des instructions audio apaisantes. Ferme les yeux, détends-toi profondément et laisse ton corps se relâcher complètement au son de la voix.";
+"antistress.audio_relaxation.benefit_1" = "Relaxation profonde";
+"antistress.audio_relaxation.benefit_2" = "Calme l'esprit";
+"antistress.audio_relaxation.benefit_3" = "Réduit l'anxiété";
+"antistress.audio_relaxation.benefit_4" = "Améliore le sommeil";
+"antistress.audio_relaxation.evidence_1" = "Induit rapidement un état de relaxation profonde du système nerveux";
+"antistress.audio_relaxation.evidence_2" = "Réduit significativement l'activité du cortex préfrontal lié au stress";
+"antistress.audio_relaxation.evidence_3" = "Améliore la qualité du sommeil et réduit l'insomnie chronique";
+"antistress.audio_relaxation.source" = "Sources: Sleep Research Journal";
+
+// White Noise
+"antistress.white_noise.subtitle" = "Sons apaisants pour calmer l'esprit";
+"antistress.white_noise.detailed_description" = "Écoute des sons neutres et apaisants qui masquent les bruits environnants. Ces fréquences douces calment ton système nerveux et favorisent un état de relaxation profonde.";
+"antistress.white_noise.benefit_1" = "Masque distractions";
+"antistress.white_noise.benefit_2" = "Favorise concentration";
+"antistress.white_noise.benefit_3" = "Apaise le système nerveux";
+"antistress.white_noise.benefit_4" = "Améliore le sommeil";
+"antistress.white_noise.evidence_1" = "Masque efficacement les sons perturbateurs de l'environnement";
+"antistress.white_noise.evidence_2" = "Favorise l'endormissement et améliore la continuité du sommeil";
+"antistress.white_noise.evidence_3" = "Réduit l'activité mentale excessive et les pensées intrusives";
+"antistress.white_noise.source" = "Sources: Acoustic Research";
+
+// Positive Mantra
+"antistress.positive_mantra.subtitle" = "Affirmations positives pour renforcer le mental";
+"antistress.positive_mantra.detailed_description" = "Répète mentalement ou à voix haute des affirmations positives puissantes. Ces phrases reprogramment ton esprit et renforcent ta confiance en toi et ton calme intérieur.";
+"antistress.positive_mantra.benefit_1" = "Renforce confiance";
+"antistress.positive_mantra.benefit_2" = "Pensées positives";
+"antistress.positive_mantra.benefit_3" = "Réduit le stress";
+"antistress.positive_mantra.benefit_4" = "Clarté mentale";
+"antistress.positive_mantra.evidence_1" = "Reprogramme les schémas de pensée négatifs par répétition consciente";
+"antistress.positive_mantra.evidence_2" = "Renforce la confiance en soi et l'estime personnelle durablement";
+"antistress.positive_mantra.evidence_3" = "Réduit l'anxiété anticipatoire avant événements stressants importants";
+"antistress.positive_mantra.source" = "Sources: Cognitive Psychology";
+
+// Visual Micro Break
+"antistress.visual_micro_break.subtitle" = "Pause visuelle pour reposer tes yeux";
+"antistress.visual_micro_break.detailed_description" = "Détourne ton regard des écrans. Observe au loin, cligne des yeux, fais rouler tes épaules. Cette micro-pause visuelle réduit la fatigue oculaire et mentale.";
+"antistress.visual_micro_break.benefit_1" = "Repose les yeux";
+"antistress.visual_micro_break.benefit_2" = "Réduit fatigue";
+"antistress.visual_micro_break.benefit_3" = "Améliore focus";
+"antistress.visual_micro_break.benefit_4" = "Relaxe le mental";
+"antistress.visual_micro_break.evidence_1" = "Réduit significativement la fatigue oculaire liée aux écrans";
+"antistress.visual_micro_break.evidence_2" = "Améliore la concentration et la productivité après la pause";
+"antistress.visual_micro_break.evidence_3" = "Prévient les maux de tête et tensions liés au travail sur écran";
+"antistress.visual_micro_break.source" = "Sources: Occupational Health";

@@ -32,14 +32,28 @@ struct LearningSectionView: View {
                 // Show cards in selected category
                 CategoryCardsView(
                     category: category,
-                    onBack: { selectedCategory = nil },
+                    onBack: {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                            selectedCategory = nil
+                        }
+                    },
                     onCardSelected: { card in selectedCard = card }
                 )
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing),
+                    removal: .move(edge: .leading)
+                ))
             } else {
                 // Show category grid
                 CategoriesGridView(onCategorySelected: { category in
-                    selectedCategory = category
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        selectedCategory = category
+                    }
                 })
+                .transition(.asymmetric(
+                    insertion: .move(edge: .leading),
+                    removal: .move(edge: .trailing)
+                ))
             }
         }
         .fullScreenCover(item: $selectedCard) { card in
@@ -90,12 +104,12 @@ struct CategoriesGridView: View {
                         .frame(width: 4, height: 32)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Apprendre")
-                            .font(.custom("HankenGrotesk-Bold", size: 32))
+                        Text(NSLocalizedString("learning.title", comment: ""))
+                            .font(Font.Poppins.custom(.bold, size: 32))
                             .tracking(0.5)
                             .foregroundColor(.white)
 
-                        Text("Découvre les secrets de la gestion du stress")
+                        Text(NSLocalizedString("learning.subtitle", comment: ""))
                             .font(.custom("Poppins-Regular", size: 14))
                             .tracking(0.3)
                             .foregroundColor(.white.opacity(0.65))
@@ -109,7 +123,7 @@ struct CategoriesGridView: View {
             .background(
                 LinearGradient(
                     colors: [
-                        Color(hex: "B794F6").opacity(0.08),
+                        Color(hex: "F97316").opacity(0.08),
                         Color.clear
                     ],
                     startPoint: .top,
@@ -182,12 +196,12 @@ struct CategoryCardView: View {
 
                 // Content
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(category.name)
-                        .font(.custom("HankenGrotesk-Bold", size: 20))
+                    Text(category.localizedName)
+                        .font(Font.Poppins.custom(.bold, size: 20))
                         .tracking(0.4)
                         .foregroundColor(.white)
 
-                    Text("\(category.cardCount) articles")
+                    Text("\(category.cardCount) \(NSLocalizedString("learning.articles", comment: ""))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -285,12 +299,12 @@ struct CategoryCardsView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(category.name)
-                        .font(.custom("HankenGrotesk-Bold", size: 28))
+                    Text(category.localizedName)
+                        .font(Font.Poppins.custom(.bold, size: 28))
                         .tracking(0.5)
                         .foregroundColor(.white)
 
-                    Text("\(filteredCards.count) articles")
+                    Text("\(filteredCards.count) \(NSLocalizedString("learning.articles", comment: ""))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.65))
                 }
@@ -369,7 +383,7 @@ struct LearningCardView: View {
                 // Content
                 VStack(alignment: .leading, spacing: 7) {
                     Text(card.title)
-                        .font(.custom("HankenGrotesk-Bold", size: 17))
+                        .font(Font.Poppins.custom(.bold, size: 17))
                         .tracking(0.3)
                         .foregroundColor(.white)
                         .multilineTextAlignment(.leading)
@@ -557,7 +571,7 @@ struct LearningCardDetailView: View {
                         }
 
                         Text(card.category.uppercased())
-                            .font(.custom("HankenGrotesk-SemiBold", size: 12))
+                            .font(Font.Poppins.custom(.semiBold, size: 12))
                             .tracking(1.2)
                             .foregroundColor(card.categoryColor)
                             .padding(.horizontal, 14)
@@ -584,7 +598,7 @@ struct LearningCardDetailView: View {
 
                     // Title
                     Text(card.title)
-                        .font(.custom("HankenGrotesk-Bold", size: 28))
+                        .font(Font.Poppins.custom(.bold, size: 28))
                         .tracking(0.4)
                         .lineSpacing(1.3)
                         .foregroundColor(.white)
@@ -635,7 +649,7 @@ struct ContentSectionView: View {
                     )
 
                 Text(section.title)
-                    .font(.custom("HankenGrotesk-Bold", size: 18))
+                    .font(Font.Poppins.custom(.bold, size: 18))
                     .tracking(0.3)
                     .foregroundColor(.white)
             }
@@ -689,6 +703,10 @@ struct LearningCategory: Identifiable {
     let icon: String
     let color: Color
     let cardCount: Int
+
+    var localizedName: String {
+        return NSLocalizedString("learning.category.\(name.lowercased())", comment: "")
+    }
 
     static let allCategories: [LearningCategory] = [
         LearningCategory(
@@ -760,213 +778,141 @@ struct LearningCard: Identifiable {
         // SCIENCE CATEGORY
         LearningCard(
             icon: "brain.head.profile",
-            title: "Le cortisol, c'est quoi ?",
+            title: NSLocalizedString("learning.card.cortisol.title", comment: ""),
             category: "Science",
-            shortDescription: "Comprendre l'hormone du stress",
+            shortDescription: NSLocalizedString("learning.card.cortisol.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "info.circle.fill",
-                    title: "Introduction",
-                    content: "Le cortisol est souvent appelé \"l'hormone du stress\". Il est produit par les glandes surrénales et joue un rôle essentiel dans la réponse de ton corps au stress."
+                    title: NSLocalizedString("learning.card.cortisol.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cortisol.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "sparkles",
-                    title: "Rôles positifs du cortisol",
-                    content: """
-                    • Régule ton niveau d'énergie tout au long de la journée
-                    • Aide à gérer les situations difficiles et stressantes
-                    • Contrôle la pression artérielle et la glycémie
-                    • Réduit l'inflammation dans le corps
-                    • Participe au métabolisme des graisses, protéines et glucides
-                    • Régule le cycle veille-sommeil (rythme circadien)
-                    """
+                    title: NSLocalizedString("learning.card.cortisol.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cortisol.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: "Problèmes d'un excès chronique",
-                    content: """
-                    • Anxiété chronique et troubles du sommeil
-                    • Prise de poids (surtout au niveau abdominal)
-                    • Système immunitaire affaibli
-                    • Hypertension artérielle
-                    • Difficulté de concentration et problèmes de mémoire
-                    • Vieillissement prématuré de la peau
-                    • Fatigue persistante malgré le repos
-                    • Troubles digestifs
-                    """
+                    title: NSLocalizedString("learning.card.cortisol.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cortisol.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Les niveaux normaux",
-                    content: "Le cortisol suit un rythme naturel : élevé le matin (pic vers 8h) pour te réveiller, puis diminue progressivement dans la journée pour être au plus bas le soir (vers 23h) et te permettre de dormir."
+                    title: NSLocalizedString("learning.card.cortisol.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cortisol.section4.content", comment: "")
                 ),
                 ContentSection(
                     icon: "target",
-                    title: "L'objectif de CortiFree",
-                    content: "T'aider à maintenir un niveau de cortisol sain et équilibré grâce à des habitudes scientifiquement prouvées qui régulent naturellement cette hormone."
+                    title: NSLocalizedString("learning.card.cortisol.section5.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cortisol.section5.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "figure.mind.and.body",
-            title: "La science de la méditation",
+            title: NSLocalizedString("learning.card.meditation_science.title", comment: ""),
             category: "Science",
-            shortDescription: "Ce que disent les neurosciences",
+            shortDescription: NSLocalizedString("learning.card.meditation_science.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "flask.fill",
-                    title: "Preuves scientifiques",
-                    content: """
-                    Des milliers d'études scientifiques ont démontré les bienfaits de la méditation :
-
-                    • Épaississement du cortex préfrontal
-                    • Réduction de l'amygdale (centre de la peur)
-                    • Augmentation de la matière grise
-                    """
+                    title: NSLocalizedString("learning.card.meditation_science.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.meditation_science.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Résultats mesurables",
-                    content: """
-                    • -30% de cortisol après 8 semaines
-                    • Amélioration de 40% de la concentration
-                    • Réduction de 50% des symptômes anxieux
-                    """
+                    title: NSLocalizedString("learning.card.meditation_science.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.meditation_science.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: "Durée nécessaire",
-                    content: "Des changements cérébraux visibles apparaissent après seulement 8 semaines de pratique quotidienne de 10-15 minutes.\n\nTu es déjà sur la bonne voie avec CortiFree !"
+                    title: NSLocalizedString("learning.card.meditation_science.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.meditation_science.section3.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "book.fill",
-            title: "Les 66 jours pour former une habitude",
+            title: NSLocalizedString("learning.card.66days.title", comment: ""),
             category: "Science",
-            shortDescription: "Pourquoi le programme dure 66 jours",
+            shortDescription: NSLocalizedString("learning.card.66days.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "flask.fill",
-                    title: "L'étude de référence",
-                    content: """
-                    • University College London (2009)
-                    • 66 jours = temps moyen pour automatiser une habitude
-                    • Varie de 18 à 254 jours selon la complexité
-                    """
+                    title: NSLocalizedString("learning.card.66days.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.66days.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.line.uptrend.xyaxis",
-                    title: "Les 3 phases",
-                    content: """
-                    1. Semaines 1-3 : Période d'effort conscient
-                    2. Semaines 4-7 : Début d'automatisation
-                    3. Semaines 8-10 : Habitude ancrée
-                    """
+                    title: NSLocalizedString("learning.card.66days.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.66days.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "figure.strengthtraining.traditional",
-                    title: "Pourquoi ça marche",
-                    content: """
-                    • Création de nouvelles connexions neuronales
-                    • Renforcement progressif
-                    • Transformation en réflexe automatique
-                    """
+                    title: NSLocalizedString("learning.card.66days.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.66days.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "target",
-                    title: "Ton objectif",
-                    content: "À la fin des 66 jours, tes nouvelles habitudes anti-stress feront partie intégrante de ta vie !"
+                    title: NSLocalizedString("learning.card.66days.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.66days.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "brain",
-            title: "La neuroplasticité : ton cerveau peut changer",
+            title: NSLocalizedString("learning.card.neuroplasticity.title", comment: ""),
             category: "Science",
-            shortDescription: "Comment ton cerveau s'adapte et évolue",
+            shortDescription: NSLocalizedString("learning.card.neuroplasticity.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: "Ce que cela signifie",
-                    content: """
-                    La neuroplasticité est la capacité de ton cerveau à se recâbler et à créer de nouvelles connexions neuronales tout au long de ta vie.
-
-                    • Ton cerveau n'est pas figé, il évolue constamment
-                    • Chaque nouvelle habitude crée de nouveaux circuits neuronaux
-                    • Les vieilles habitudes peuvent être "désapprises"
-                    • Plus tu pratiques, plus les connexions se renforcent
-                    """
+                    title: NSLocalizedString("learning.card.neuroplasticity.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.neuroplasticity.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: "Preuves scientifiques",
-                    content: """
-                    • Des scans IRM montrent des changements structurels après 8 semaines de méditation
-                    • Les zones du cerveau liées au stress (amygdale) peuvent diminuer de volume
-                    • Les zones liées à la concentration (cortex préfrontal) peuvent s'épaissir
-                    • La matière grise augmente dans les zones utilisées régulièrement
-                    """
+                    title: NSLocalizedString("learning.card.neuroplasticity.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.neuroplasticity.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: "Combien de temps ça prend",
-                    content: """
-                    • Premiers changements : 2-4 semaines
-                    • Changements mesurables : 6-8 semaines
-                    • Changements durables : 2-3 mois
-                    """
+                    title: NSLocalizedString("learning.card.neuroplasticity.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.neuroplasticity.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Le message important",
-                    content: "Tu n'es pas condamné à rester stressé. Avec CortiFree, tu reprogrammes littéralement ton cerveau pour mieux gérer le stress !"
+                    title: NSLocalizedString("learning.card.neuroplasticity.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.neuroplasticity.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "moon.zzz.fill",
-            title: "Les cycles de sommeil",
+            title: NSLocalizedString("learning.card.sleep_cycles.title", comment: ""),
             category: "Science",
-            shortDescription: "Comprendre et optimiser ton repos",
+            shortDescription: NSLocalizedString("learning.card.sleep_cycles.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "moon.fill",
-                    title: "Les 4 phases du sommeil",
-                    content: """
-                    Le sommeil est composé de cycles de 90 minutes qui se répètent 4-6 fois par nuit :
-
-                    1️⃣ Sommeil léger (5-10 min) : Transition veille-sommeil, muscles se détendent, facile de se réveiller
-
-                    2️⃣ Sommeil léger profond (20 min) : Rythme cardiaque ralentit, température corporelle baisse, 50% du temps total
-
-                    3️⃣ Sommeil profond (20-40 min) : Phase la plus réparatrice, régénération physique, RÉDUCTION MAXIMALE DU CORTISOL
-
-                    4️⃣ Sommeil paradoxal / REM (10-60 min) : Rêves intenses, consolidation émotionnelle, traitement du stress
-                    """
+                    title: NSLocalizedString("learning.card.sleep_cycles.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cycles.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: "Optimiser tes cycles",
-                    content: """
-                    • Vise 7h30 ou 9h de sommeil (5 ou 6 cycles complets)
-                    • Évite 6h ou 8h (réveil en milieu de cycle = fatigue)
-                    • Se coucher et se lever à heures fixes (même le week-end)
-                    """
+                    title: NSLocalizedString("learning.card.sleep_cycles.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cycles.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Impact sur le cortisol",
-                    content: """
-                    • Sommeil profond = baisse de 70% du cortisol
-                    • Manque de sommeil = +37% de cortisol le lendemain
-                    • 3 nuits mauvaises = résistance à l'insuline (pré-diabète)
-                    """
+                    title: NSLocalizedString("learning.card.sleep_cycles.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cycles.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: "Qualité > Quantité",
-                    content: "Mieux vaut 6h avec beaucoup de sommeil profond que 8h de sommeil léger et fragmenté !"
+                    title: NSLocalizedString("learning.card.sleep_cycles.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cycles.section4.content", comment: "")
                 )
             ]
         ),
@@ -974,109 +920,52 @@ struct LearningCard: Identifiable {
         // SANTÉ CATEGORY
         LearningCard(
             icon: "heart.text.square.fill",
-            title: "Comment le stress affecte ton corps",
+            title: NSLocalizedString("learning.card.stress_body.title", comment: ""),
             category: "Santé",
-            shortDescription: "Les impacts physiques du stress chronique",
+            shortDescription: NSLocalizedString("learning.card.stress_body.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: "Cerveau",
-                    content: """
-                    • Difficulté de concentration
-                    • Problèmes de mémoire
-                    • Anxiété et dépression
-                    """
+                    title: NSLocalizedString("learning.card.stress_body.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.stress_body.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "heart.fill",
-                    title: "Cœur",
-                    content: """
-                    • Augmentation de la pression artérielle
-                    • Risque cardiovasculaire accru
-                    • Palpitations
-                    """
+                    title: NSLocalizedString("learning.card.stress_body.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.stress_body.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "figure.strengthtraining.traditional",
-                    title: "Muscles",
-                    content: """
-                    • Tensions et douleurs
-                    • Maux de tête
-                    • Fatigue chronique
-                    """
+                    title: NSLocalizedString("learning.card.stress_body.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.stress_body.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "bolt.fill",
-                    title: "Énergie",
-                    content: """
-                    • Épuisement
-                    • Troubles du sommeil
-                    • Baisse de motivation
-
-                    C'est pour ça qu'il est crucial de gérer son stress au quotidien.
-                    """
+                    title: NSLocalizedString("learning.card.stress_body.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.stress_body.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "fork.knife",
-            title: "L'alimentation anti-stress",
+            title: NSLocalizedString("learning.card.food.title", comment: ""),
             category: "Santé",
-            shortDescription: "Les aliments qui régulent le cortisol",
+            shortDescription: NSLocalizedString("learning.card.food.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "checkmark.circle.fill",
-                    title: "Aliments qui RÉDUISENT le cortisol",
-                    content: """
-                    Graisses saines :
-                    • Avocats, noix, amandes
-                    • Huile d'olive, poissons gras (saumon, maquereau)
-                    • Riches en oméga-3 anti-inflammatoires
-
-                    Aliments riches en magnésium :
-                    • Chocolat noir (>70% cacao)
-                    • Épinards, bananes
-                    • Graines de courge, amandes
-                    • Le magnésium réduit l'anxiété et le cortisol
-
-                    Vitamine C :
-                    • Agrumes, kiwis, poivrons
-                    • Réduit le cortisol de 15-20%
-                    • Renforce le système immunitaire
-
-                    Thé vert et noir :
-                    • L-théanine qui calme l'esprit
-                    • Réduction de 20% du cortisol après 6 semaines
-                    """
+                    title: NSLocalizedString("learning.card.food.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.food.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "xmark.circle.fill",
-                    title: "Aliments qui AUGMENTENT le cortisol",
-                    content: """
-                    Excès de caféine :
-                    • Plus de 400mg/jour (4 cafés)
-                    • Augmente le cortisol de 30%
-                    • Perturbe le sommeil
-
-                    Sucres raffinés :
-                    • Pics de glycémie = pics de cortisol
-                    • Inflammation systémique
-                    • Addiction et fringales
-
-                    Alcool :
-                    • Perturbe le sommeil profond
-                    • Augmente le cortisol nocturne
-                    • Déshydratation
-                    """
+                    title: NSLocalizedString("learning.card.food.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.food.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: "Le timing compte",
-                    content: """
-                    • Petit-déjeuner riche en protéines (stabilise cortisol)
-                    • Éviter sucres et caféine le soir
-                    • Dîner léger 2-3h avant coucher
-                    """
+                    title: NSLocalizedString("learning.card.food.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.food.section3.content", comment: "")
                 )
             ]
         ),
@@ -1084,53 +973,37 @@ struct LearningCard: Identifiable {
         // TECHNIQUES CATEGORY
         LearningCard(
             icon: "wind",
-            title: "Les bienfaits de la respiration consciente",
+            title: NSLocalizedString("learning.card.breathing.title", comment: ""),
             category: "Techniques",
-            shortDescription: "Pourquoi respirer consciemment fonctionne",
+            shortDescription: NSLocalizedString("learning.card.breathing.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "star.fill",
-                    title: "Effets immédiats",
-                    content: """
-                    La respiration consciente est l'un des outils les plus puissants pour réguler ton stress :
-
-                    • Active le système nerveux parasympathique (relaxation)
-                    • Réduit le rythme cardiaque
-                    • Diminue la tension artérielle
-                    """
+                    title: NSLocalizedString("learning.card.breathing.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.breathing.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "figure.mind.and.body",
-                    title: "Bénéfices à long terme",
-                    content: """
-                    • Améliore la gestion du stress
-                    • Augmente la capacité pulmonaire
-                    • Favorise la clarté mentale
-                    """
+                    title: NSLocalizedString("learning.card.breathing.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.breathing.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Le saviez-vous ?",
-                    content: "Une respiration profonde peut réduire ton niveau de cortisol en seulement 2-3 minutes !\n\nC'est pourquoi les exercices de respiration sont au cœur du programme CortiFree."
+                    title: NSLocalizedString("learning.card.breathing.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.breathing.section3.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "leaf.fill",
-            title: "Le pouvoir de la nature",
+            title: NSLocalizedString("learning.card.nature.title", comment: ""),
             category: "Techniques",
-            shortDescription: "Pourquoi la nature apaise",
+            shortDescription: NSLocalizedString("learning.card.nature.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Études scientifiques",
-                    content: """
-                    Le contact avec la nature a un effet prouvé sur le stress :
-
-                    • -15% de cortisol après 20 min en nature
-                    • Baisse de la pression artérielle
-                    • Amélioration de l'humeur
-                    """
+                    title: NSLocalizedString("learning.card.nature.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.nature.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "tree.fill",
@@ -1143,139 +1016,79 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "sparkles",
-                    title: "Bénéfices",
-                    content: """
-                    • Renforcement du système immunitaire
-                    • Réduction de l'anxiété
-                    • Meilleure créativité
-                    """
+                    title: NSLocalizedString("learning.card.nature.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.nature.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Même en ville",
-                    content: "Un parc, un jardin ou des plantes d'intérieur ont déjà des effets positifs !"
+                    title: NSLocalizedString("learning.card.nature.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.nature.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "waveform.path.ecg",
-            title: "La cohérence cardiaque",
+            title: NSLocalizedString("learning.card.cardiac_coherence.title", comment: ""),
             category: "Techniques",
-            shortDescription: "Synchroniser cœur et cerveau",
+            shortDescription: NSLocalizedString("learning.card.cardiac_coherence.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "heart.fill",
-                    title: "Comment ça marche",
-                    content: """
-                    La cohérence cardiaque est une technique de respiration qui synchronise ton rythme cardiaque avec ton cerveau pour un effet anti-stress puissant.
-
-                    • Respiration : 6 cycles par minute (5 sec inspiration, 5 sec expiration)
-                    • Durée : 5 minutes
-                    • Fréquence : 3 fois par jour (matin, midi, soir)
-                    • C'est la méthode 365 : 3 fois/jour, 6 respirations/min, 5 minutes
-                    """
+                    title: NSLocalizedString("learning.card.cardiac_coherence.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cardiac_coherence.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: "Bienfaits immédiats",
-                    content: """
-                    • Réduction du cortisol en 3-5 minutes
-                    • Baisse de la fréquence cardiaque
-                    • Diminution de la pression artérielle
-                    • Sentiment de calme et clarté mentale
-                    """
+                    title: NSLocalizedString("learning.card.cardiac_coherence.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cardiac_coherence.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Effets à long terme (après 2 semaines)",
-                    content: """
-                    • -24% de cortisol en moyenne
-                    • Meilleure régulation émotionnelle
-                    • Amélioration de la qualité du sommeil
-                    • Renforcement du système immunitaire
-                    • +17% de DHEA (hormone anti-vieillissement)
-                    """
+                    title: NSLocalizedString("learning.card.cardiac_coherence.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cardiac_coherence.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "person.fill",
-                    title: "Utilisé par",
-                    content: """
-                    • Pilotes de chasse
-                    • Sportifs de haut niveau
-                    • Médecins et personnels soignants
-                    • Dirigeants d'entreprise
-                    """
+                    title: NSLocalizedString("learning.card.cardiac_coherence.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cardiac_coherence.section4.content", comment: "")
                 ),
                 ContentSection(
                     icon: "checkmark.circle.fill",
-                    title: "Dans CortiFree",
-                    content: "L'exercice \"Cohérence cardiaque 5-5\" dans la section Respiration suit exactement cette méthode scientifique."
+                    title: NSLocalizedString("learning.card.cardiac_coherence.section5.title", comment: ""),
+                    content: NSLocalizedString("learning.card.cardiac_coherence.section5.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "figure.yoga",
-            title: "Le yoga et la flexibilité mentale",
+            title: NSLocalizedString("learning.card.yoga.title", comment: ""),
             category: "Techniques",
-            shortDescription: "Au-delà de la simple souplesse",
+            shortDescription: NSLocalizedString("learning.card.yoga.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "figure.mind.and.body",
-                    title: "Les types de yoga anti-stress",
-                    content: """
-                    Le yoga est bien plus qu'une pratique physique. C'est un outil puissant de régulation du stress qui agit sur ton corps ET ton esprit.
-
-                    • Hatha Yoga : doux, parfait pour débuter
-                    • Yin Yoga : postures longues, très relaxant
-                    • Yoga Nidra : méditation guidée allongée
-                    • Vinyasa : dynamique mais méditatif
-                    """
+                    title: NSLocalizedString("learning.card.yoga.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.yoga.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Effets sur le cortisol",
-                    content: """
-                    • -27% après une session de 60 min
-                    • Effets cumulatifs avec pratique régulière
-                    • -41% de cortisol après 12 semaines (3x/semaine)
-                    """
+                    title: NSLocalizedString("learning.card.yoga.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.yoga.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: "Bénéfices prouvés scientifiquement",
-                    content: """
-                    Physiques :
-                    • Flexibilité et force musculaire
-                    • Meilleure posture
-                    • Réduction des douleurs chroniques
-                    • Amélioration de l'équilibre
-
-                    Mentaux :
-                    • -65% des symptômes anxieux
-                    • Meilleure régulation émotionnelle
-                    • Augmentation de la matière grise
-                    • Amélioration de la concentration
-
-                    Physiologiques :
-                    • Activation du système parasympathique (relaxation)
-                    • Meilleure variabilité de la fréquence cardiaque
-                    • Réduction de l'inflammation
-                    • Amélioration de la digestion
-                    """
+                    title: NSLocalizedString("learning.card.yoga.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.yoga.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: "Ce qui se passe dans ton cerveau",
-                    content: """
-                    • Augmentation GABA (neurotransmetteur calmant)
-                    • Réduction activité de l'amygdale (peur/stress)
-                    • Activation cortex préfrontal (contrôle émotionnel)
-                    """
+                    title: NSLocalizedString("learning.card.yoga.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.yoga.section4.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Pas besoin d'être souple",
-                    content: "Le yoga n'est pas une compétition. Chaque corps est différent, et les bénéfices anti-stress arrivent dès les premières séances, même avec des adaptations !"
+                    title: NSLocalizedString("learning.card.yoga.section5.title", comment: ""),
+                    content: NSLocalizedString("learning.card.yoga.section5.content", comment: "")
                 )
             ]
         ),
@@ -1283,136 +1096,97 @@ struct LearningCard: Identifiable {
         // HABITUDES CATEGORY
         LearningCard(
             icon: "bed.double.fill",
-            title: "Le sommeil et le cortisol",
+            title: NSLocalizedString("learning.card.sleep_cortisol.title", comment: ""),
             category: "Habitudes",
-            shortDescription: "L'importance d'un bon rythme circadien",
+            shortDescription: NSLocalizedString("learning.card.sleep_cortisol.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "sun.max.fill",
-                    title: "Le rythme naturel",
-                    content: """
-                    Ton sommeil et ton niveau de cortisol sont intimement liés :
-
-                    • Cortisol élevé le matin (pour te réveiller)
-                    • Cortisol bas le soir (pour dormir)
-                    """
+                    title: NSLocalizedString("learning.card.sleep_cortisol.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cortisol.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: "Quand ça déraille",
-                    content: """
-                    • Sommeil perturbé → Cortisol élevé 24h/24
-                    • Cercle vicieux : stress → mauvais sommeil → plus de stress
-                    """
+                    title: NSLocalizedString("learning.card.sleep_cortisol.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cortisol.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "checkmark.circle.fill",
-                    title: "Solutions CortiFree",
-                    content: """
-                    • Se lever avant 7h (routine matinale)
-                    • Se coucher avant 23h (récupération)
-                    • Méditation du soir (préparation au sommeil)
-                    """
+                    title: NSLocalizedString("learning.card.sleep_cortisol.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cortisol.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "moon.zzz.fill",
-                    title: "Le saviez-vous ?",
-                    content: "Une seule nuit de mauvais sommeil peut augmenter ton cortisol de 37% le lendemain !"
+                    title: NSLocalizedString("learning.card.breathing.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.sleep_cortisol.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "drop.fill",
-            title: "L'hydratation et le stress",
+            title: NSLocalizedString("learning.card.hydration.title", comment: ""),
             category: "Habitudes",
-            shortDescription: "Pourquoi boire de l'eau réduit le stress",
+            shortDescription: NSLocalizedString("learning.card.hydration.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: "Effets de la déshydratation",
-                    content: """
-                    L'eau joue un rôle crucial dans la régulation du stress :
-
-                    • Augmentation du cortisol (+25%)
-                    • Fatigue et irritabilité
-                    • Difficulté de concentration
-                    """
+                    title: NSLocalizedString("learning.card.hydration.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.hydration.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "sparkles",
-                    title: "Bienfaits d'une bonne hydratation",
-                    content: """
-                    • Régulation de la température corporelle
-                    • Élimination des toxines
-                    • Meilleur fonctionnement cérébral
-                    """
+                    title: NSLocalizedString("learning.card.hydration.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.hydration.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Recommandation",
-                    content: """
-                    • Minimum 2L d'eau par jour
-                    • Plus si activité physique
-                    • Répartir tout au long de la journée
-                    """
+                    title: NSLocalizedString("learning.card.hydration.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.hydration.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Astuce",
-                    content: "Commence ta journée avec un grand verre d'eau pour réveiller ton métabolisme !"
+                    title: NSLocalizedString("learning.card.hydration.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.hydration.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "figure.run",
-            title: "L'exercice physique anti-stress",
+            title: NSLocalizedString("learning.card.exercise.title", comment: ""),
             category: "Habitudes",
-            shortDescription: "Comment le sport régule le cortisol",
+            shortDescription: NSLocalizedString("learning.card.exercise.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Effets sur le cortisol",
-                    content: """
-                    L'activité physique est un régulateur naturel du stress :
-
-                    • Court terme : légère augmentation (normale)
-                    • Long terme : baisse significative du cortisol de base
-                    """
+                    title: NSLocalizedString("learning.card.yoga.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.yoga.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: "Bénéfices supplémentaires",
-                    content: """
-                    • Libération d'endorphines (hormones du bonheur)
-                    • Amélioration du sommeil
-                    • Meilleure estime de soi
-                    """
+                    title: NSLocalizedString("learning.card.exercise.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.exercise.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: "Durée idéale",
-                    content: """
-                    • 20-30 min par session
-                    • 3-5 fois par semaine
-                    • Intensité modérée
-                    """
+                    title: NSLocalizedString("learning.card.exercise.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.exercise.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: "Attention",
-                    content: "Trop d'exercice intense peut augmenter le cortisol. L'équilibre est la clé !"
+                    title: NSLocalizedString("learning.card.exercise.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.exercise.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "person.2.fill",
-            title: "Les relations sociales positives",
+            title: NSLocalizedString("learning.card.social.title", comment: ""),
             category: "Habitudes",
-            shortDescription: "L'importance du soutien social",
+            shortDescription: NSLocalizedString("learning.card.social.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "heart.circle.fill",
-                    title: "Impact sur le cortisol",
+                    title: NSLocalizedString("learning.card.social.section1.title", comment: ""),
                     content: """
                     Les connexions sociales de qualité sont essentielles pour gérer le stress :
 
@@ -1423,79 +1197,51 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "person.2.fill",
-                    title: "Types de connexions bénéfiques",
-                    content: """
-                    • Conversations profondes avec amis
-                    • Moments de qualité en famille
-                    • Activités de groupe (sport, loisirs)
-                    """
+                    title: NSLocalizedString("learning.card.social.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.social.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: "À éviter",
-                    content: """
-                    • Isolement prolongé
-                    • Relations toxiques ou conflictuelles
-                    """
+                    title: NSLocalizedString("learning.card.social.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.social.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Le saviez-vous ?",
-                    content: "Un simple câlin de 20 secondes peut réduire significativement ton niveau de stress !"
+                    title: NSLocalizedString("learning.card.breathing.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.social.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "sun.max.fill",
-            title: "L'exposition à la lumière naturelle",
+            title: NSLocalizedString("learning.card.light.title", comment: ""),
             category: "Habitudes",
-            shortDescription: "Régule ton horloge biologique",
+            shortDescription: NSLocalizedString("learning.card.light.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "sun.max.fill",
-                    title: "L'importance du matin",
-                    content: """
-                    La lumière naturelle joue un rôle crucial dans la régulation de ton cortisol et de ton rythme circadien :
-
-                    • S'exposer à la lumière dans les 30-60 min après le réveil
-                    • 10-30 minutes minimum dehors (même par temps nuageux)
-                    • Active la production de cortisol matinal (normal et bénéfique)
-                    • Stoppe la production de mélatonine (hormone du sommeil)
-                    """
+                    title: NSLocalizedString("learning.card.light.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.light.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Impact sur ton horloge biologique",
-                    content: """
-                    • Régule le cycle cortisol/mélatonine
-                    • Améliore la qualité du sommeil nocturne
-                    • Augmente l'énergie et la vigilance diurne
-                    • Synchronise tous tes rythmes biologiques
-                    """
+                    title: NSLocalizedString("learning.card.light.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.light.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: "Études scientifiques",
-                    content: """
-                    • +25% d'énergie diurne avec exposition matinale
-                    • Endormissement 1h plus rapide le soir
-                    • -35% de symptômes dépressifs
-                    • Meilleure régulation de l'appétit
-                    """
+                    title: NSLocalizedString("learning.card.nature.section1.title", comment: ""),
+                    content: NSLocalizedString("learning.card.nature.section1.content", comment: "")
                 ),
                 ContentSection(
                     icon: "moon.fill",
-                    title: "Le soir, éviter",
-                    content: """
-                    • Les écrans 1-2h avant le coucher
-                    • Les lumières vives (préférer lumières chaudes/tamisées)
-                    • La lumière bleue qui bloque la mélatonine
-                    """
+                    title: NSLocalizedString("learning.card.light.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.light.section4.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Astuce CortiFree",
-                    content: "Combine ta marche matinale avec l'exposition à la lumière naturelle pour un effet démultiplié sur ton énergie et ton stress !"
+                    title: NSLocalizedString("learning.card.light.section5.title", comment: ""),
+                    content: NSLocalizedString("learning.card.light.section5.content", comment: "")
                 )
             ]
         ),
@@ -1503,13 +1249,13 @@ struct LearningCard: Identifiable {
         // PSYCHOLOGIE CATEGORY
         LearningCard(
             icon: "quote.bubble.fill",
-            title: "Les pensées automatiques négatives",
+            title: NSLocalizedString("learning.card.negative_thoughts.title", comment: ""),
             category: "Psychologie",
-            shortDescription: "Identifier et remplacer les schémas toxiques",
+            shortDescription: NSLocalizedString("learning.card.negative_thoughts.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: "Les 7 types de pensées toxiques",
+                    title: NSLocalizedString("learning.card.negative_thoughts.section1.title", comment: ""),
                     content: """
                     Tes pensées influencent directement ton niveau de stress et de cortisol. Apprendre à identifier et modifier les pensées automatiques négatives est crucial.
 
@@ -1537,38 +1283,30 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "pencil.and.list.clipboard",
-                    title: "La technique des 3 colonnes",
-                    content: """
-                    Colonne 1 : Situation
-                    Colonne 2 : Pensée automatique
-                    Colonne 3 : Pensée alternative réaliste
-                    """
+                    title: NSLocalizedString("learning.card.negative_thoughts.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.negative_thoughts.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: "Impact mesurable",
-                    content: """
-                    • -40% d'anxiété avec thérapie cognitive
-                    • -28% de cortisol en identifiant et modifiant ces pensées
-                    • Amélioration durable après 8-12 semaines
-                    """
+                    title: NSLocalizedString("learning.card.negative_thoughts.section3.title", comment: ""),
+                    content: NSLocalizedString("learning.card.negative_thoughts.section3.content", comment: "")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: "Astuce du journaling",
-                    content: "Écrire tes pensées dans le journal CortiFree t'aide à les identifier, les questionner et les transformer !"
+                    title: NSLocalizedString("learning.card.negative_thoughts.section4.title", comment: ""),
+                    content: NSLocalizedString("learning.card.negative_thoughts.section4.content", comment: "")
                 )
             ]
         ),
         LearningCard(
             icon: "sparkles",
-            title: "La gratitude et le cerveau",
+            title: NSLocalizedString("learning.card.gratitude.title", comment: ""),
             category: "Psychologie",
-            shortDescription: "L'effet scientifique de la reconnaissance",
+            shortDescription: NSLocalizedString("learning.card.gratitude.description", comment: ""),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: "Ce qui se passe dans ton cerveau",
+                    title: NSLocalizedString("learning.card.yoga.section4.title", comment: ""),
                     content: """
                     Pratiquer la gratitude n'est pas juste du "positive thinking" : c'est une technique scientifiquement validée qui modifie ton cerveau et ton niveau de stress.
 
@@ -1580,22 +1318,12 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: "Études scientifiques majeures",
-                    content: """
-                    UC Berkeley (2015) :
-                    • Journaling de gratitude 3x/semaine
-                    • -27% de dépression après 12 semaines
-                    • Amélioration sommeil et relations sociales
-
-                    Harvard Medical School (2021) :
-                    • 5 minutes de gratitude par jour
-                    • +25% de bonheur ressenti
-                    • -18% d'anxiété
-                    """
+                    title: NSLocalizedString("learning.card.gratitude.section2.title", comment: ""),
+                    content: NSLocalizedString("learning.card.gratitude.section2.content", comment: "")
                 ),
                 ContentSection(
                     icon: "pencil.and.list.clipboard",
-                    title: "Comment pratiquer efficacement",
+                    title: NSLocalizedString("learning.card.gratitude.section3.title", comment: ""),
                     content: """
                     Méthode des 3 gratitudes (5 min/jour) :
                     1. Note 3 choses pour lesquelles tu es reconnaissant
@@ -1610,7 +1338,7 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: "Effets à long terme",
+                    title: NSLocalizedString("learning.card.gratitude.section4.title", comment: ""),
                     content: """
                     Après 4 semaines :
                     • Changements mesurables dans le cerveau
@@ -1625,13 +1353,13 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "target",
-                    title: "Intégré dans CortiFree",
-                    content: "Le journal te permet de noter tes gratitudes quotidiennes. Cette simple pratique de 2-3 minutes peut transformer ton rapport au stress !"
+                    title: NSLocalizedString("learning.card.gratitude.section5.title", comment: ""),
+                    content: NSLocalizedString("learning.card.gratitude.section5.content", comment: "")
                 ),
                 ContentSection(
                     icon: "info.circle.fill",
-                    title: "Important",
-                    content: "La gratitude ne nie pas les problèmes, elle entraîne ton cerveau à aussi voir le positif au lieu de se focaliser uniquement sur le négatif."
+                    title: NSLocalizedString("learning.card.gratitude.section6.title", comment: ""),
+                    content: NSLocalizedString("learning.card.gratitude.section6.content", comment: "")
                 )
             ]
         )

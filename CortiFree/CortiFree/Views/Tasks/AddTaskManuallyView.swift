@@ -37,7 +37,7 @@ struct AddTaskManuallyView: View {
                     Spacer()
 
                     Text("Nouvelle tâche")
-                        .font(.custom("HankenGrotesk-Bold", size: 20))
+                        .font(Font.Poppins.custom(.bold, size: 20))
                         .foregroundColor(.white)
 
                     Spacer()

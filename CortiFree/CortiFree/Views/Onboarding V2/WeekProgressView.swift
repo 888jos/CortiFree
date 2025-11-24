@@ -38,9 +38,9 @@ struct WeekProgressView: View {
         formatter.dateFormat = "d MMM"
 
         return [
-            (1, "\(formatter.string(from: week1Start)) au \(formatter.string(from: week1End))", "Tu débutes — ton départ est un peu faible.", Color(hex: "D32F2F"), [0.18, 0.25, 0.22, 0.15, 0.20, 0.24]),
-            (5, "\(formatter.string(from: week5Start)) au \(formatter.string(from: week5End))", "Tu progresses — continue comme ça !", Color(hex: "E67E22"), [0.52, 0.48, 0.55, 0.45, 0.50, 0.53]),
-            (10, "\(formatter.string(from: week10Start)) au \(formatter.string(from: week10End))", "Tu maîtrises tous les domaines — ton progrès est évident !", Color(hex: "27AE60"), [0.95, 0.92, 0.98, 0.90, 0.94, 0.96])
+            (1, "\(formatter.string(from: week1Start)) au \(formatter.string(from: week1End))", StringKeys.Onboarding.WeekProgress.week1Message, Color(hex: "D32F2F"), [0.18, 0.25, 0.22, 0.15, 0.20, 0.24]),
+            (5, "\(formatter.string(from: week5Start)) au \(formatter.string(from: week5End))", StringKeys.Onboarding.WeekProgress.week5Message, Color(hex: "E67E22"), [0.52, 0.48, 0.55, 0.45, 0.50, 0.53]),
+            (10, "\(formatter.string(from: week10Start)) au \(formatter.string(from: week10End))", StringKeys.Onboarding.WeekProgress.week10Message, Color(hex: "27AE60"), [0.95, 0.92, 0.98, 0.90, 0.94, 0.96])
         ]
     }
 
@@ -63,8 +63,8 @@ struct WeekProgressView: View {
 
             VStack(spacing: 0) {
                 // Week title
-                Text("Semaine \(currentWeekData.week)")
-                    .font(.custom("HankenGrotesk-Bold", size: 40))
+                Text(String(format: StringKeys.Onboarding.WeekProgress.weekNumber, currentWeekData.week))
+                    .font(Font.Poppins.custom(.bold, size: 40))
                     .foregroundColor(.white)
                     .padding(.top, 100)
                     .padding(.bottom, 16)
@@ -136,7 +136,7 @@ struct WeekProgressView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "star.fill")
                                     .font(.system(size: 14))
-                                Text("Global")
+                                Text(StringKeys.Common.global)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
@@ -146,7 +146,7 @@ struct WeekProgressView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "leaf.fill")
                                     .font(.system(size: 14))
-                                Text("Sérénité")
+                                Text(StringKeys.Common.serenity)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
@@ -156,7 +156,7 @@ struct WeekProgressView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "moon.fill")
                                     .font(.system(size: 14))
-                                Text("Sommeil")
+                                Text(StringKeys.Common.sleep)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
@@ -166,7 +166,7 @@ struct WeekProgressView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "bolt.fill")
                                     .font(.system(size: 14))
-                                Text("Énergie")
+                                Text(StringKeys.Common.energy)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
@@ -176,7 +176,7 @@ struct WeekProgressView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "target")
                                     .font(.system(size: 14))
-                                Text("Focus")
+                                Text(StringKeys.Common.focus)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
@@ -186,7 +186,7 @@ struct WeekProgressView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "heart.fill")
                                     .font(.system(size: 14))
-                                Text("Équilibre")
+                                Text(StringKeys.Common.balance)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
@@ -216,7 +216,7 @@ struct WeekProgressView: View {
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 16, weight: .semibold))
 
-                            Text(currentWeek == 10 ? "Comment les 8 habitudes vous aident" : "Continuer")
+                            Text(currentWeek == 10 ? StringKeys.Onboarding.EightHabitsFlow.howHabitsHelp : StringKeys.Common.continueButton)
                                 .font(.custom("Poppins-SemiBold", size: currentWeek == 10 ? 15 : 16))
                                 .lineLimit(1)
                         }

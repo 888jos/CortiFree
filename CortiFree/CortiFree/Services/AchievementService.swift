@@ -2,7 +2,7 @@
 //  AchievementService.swift
 //  CortiFree
 //
-//  Service for managing achievements and milestones
+//  Service for managing achievements
 //
 
 import Foundation
@@ -15,18 +15,14 @@ class AchievementService: ObservableObject {
     static let shared = AchievementService()
 
     @Published var achievements: [Achievement] = Achievement.allAchievements
-    @Published var milestones: [Milestone] = Milestone.allMilestones
     @Published var newlyUnlockedAchievement: Achievement?
     @Published var showAchievementPopup: Bool = false
-    @Published var newlyCompletedMilestone: Milestone?
-    @Published var showMilestonePopup: Bool = false
 
     private let db = Firestore.firestore()
 
     private init() {
         Task {
             await loadAchievements()
-            await loadMilestones()
         }
     }
 
@@ -59,33 +55,6 @@ class AchievementService: ObservableObject {
         }
     }
 
-    func loadMilestones() async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-
-        do {
-            let snapshot = try await db.collection("users")
-                .document(userId)
-                .collection("milestones")
-                .getDocuments()
-
-            var userMilestones = Milestone.allMilestones
-
-            for document in snapshot.documents {
-                let data = document.data()
-                if let milestone = Milestone.fromFirestore(data) {
-                    if let index = userMilestones.firstIndex(where: { $0.id == milestone.id }) {
-                        userMilestones[index] = milestone
-                    }
-                }
-            }
-
-            milestones = userMilestones
-            print("✅ Loaded \(milestones.filter(\.isCompleted).count)/\(milestones.count) milestones")
-        } catch {
-            print("❌ Error loading milestones: \(error)")
-        }
-    }
-
     // MARK: - Save to Firebase
 
     private func saveAchievement(_ achievement: Achievement) async {
@@ -99,20 +68,6 @@ class AchievementService: ObservableObject {
                 .setData(achievement.toFirestore, merge: true)
         } catch {
             print("❌ Error saving achievement: \(error)")
-        }
-    }
-
-    private func saveMilestone(_ milestone: Milestone) async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-
-        do {
-            try await db.collection("users")
-                .document(userId)
-                .collection("milestones")
-                .document(milestone.id)
-                .setData(milestone.toFirestore, merge: true)
-        } catch {
-            print("❌ Error saving milestone: \(error)")
         }
     }
 
@@ -170,38 +125,6 @@ class AchievementService: ObservableObject {
             showAchievementPopup = true
             HapticManager.success()
         }
-    }
-
-    // MARK: - Check and Complete Milestones
-
-    func checkMilestones(currentDay: Int) async -> Milestone? {
-        for (index, var milestone) in milestones.enumerated() {
-            guard !milestone.isCompleted else { continue }
-
-            if currentDay >= milestone.day {
-                milestone.completedAt = Date()
-                milestones[index] = milestone
-                await saveMilestone(milestone)
-
-                // Unlock associated badge if exists
-                if let badgeId = milestone.badgeId {
-                    if let badgeIndex = achievements.firstIndex(where: { $0.id == badgeId }) {
-                        achievements[badgeIndex].unlockedAt = Date()
-                        achievements[badgeIndex].progress = achievements[badgeIndex].requirement
-                        await saveAchievement(achievements[badgeIndex])
-                    }
-                }
-
-                newlyCompletedMilestone = milestone
-                showMilestonePopup = true
-                HapticManager.success()
-
-                print("🎉 Milestone completed: \(milestone.title)")
-                return milestone
-            }
-        }
-
-        return nil
     }
 
     // MARK: - Special Achievements

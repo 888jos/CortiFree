@@ -36,7 +36,7 @@ struct ProgressCircleView: View {
             // Content
             VStack(spacing: 4) {
                 Text("Niveau \(level.id)")
-                    .font(.custom("SF Pro Rounded-Bold", size: 24))
+                    .font(Font.Poppins.custom(.bold, size: 24))
                     .foregroundColor(.white)
 
                 Text(level.name)
@@ -49,12 +49,12 @@ struct ProgressCircleView: View {
                 if Level.nextLevel(for: level) != nil {
                     let progressInfo = Level.progressToNextLevel(currentXP: currentXP, currentLevel: level)
                     Text("\(progressInfo.current) / \(progressInfo.required) XP")
-                        .font(.custom("SF Pro Rounded-Regular", size: 12))
+                        .font(Font.Poppins.custom(.regular, size: 12))
                         .foregroundColor(.white.opacity(0.6))
                         .padding(.top, 2)
                 } else {
                     Text("Niveau max")
-                        .font(.custom("SF Pro Rounded-Regular", size: 12))
+                        .font(Font.Poppins.custom(.regular, size: 12))
                         .foregroundColor(planetSettings.selectedPlanet.haloColor)
                         .padding(.top, 2)
                 }

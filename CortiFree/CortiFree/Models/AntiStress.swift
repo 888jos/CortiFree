@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 import FirebaseFirestore
 
 // MARK: - Stress Situation
@@ -21,12 +22,12 @@ enum StressSituation: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .overwhelmed: return "Je me sens submergé"
-        case .insomnia: return "Je n'arrive pas à dormir"
-        case .physicalTension: return "Je suis tendu physiquement"
-        case .beforeEvent: return "Je stresse avant un événement"
-        case .anxiety: return "J'ai de l'anxiété"
-        case .needEnergy: return "J'ai besoin d'énergie"
+        case .overwhelmed: return NSLocalizedString("antistress.situation.overwhelmed", comment: "")
+        case .insomnia: return NSLocalizedString("antistress.situation.insomnia", comment: "")
+        case .physicalTension: return NSLocalizedString("antistress.situation.physical_tension", comment: "")
+        case .beforeEvent: return NSLocalizedString("antistress.situation.before_event", comment: "")
+        case .anxiety: return NSLocalizedString("antistress.situation.anxiety", comment: "")
+        case .needEnergy: return NSLocalizedString("antistress.situation.need_energy", comment: "")
         }
     }
 
@@ -80,21 +81,21 @@ enum AntiStressExerciseType: String, Codable {
 
     var displayName: String {
         switch self {
-        case .guidedBreathing: return "Respiration guidée"
-        case .grounding5Senses: return "Grounding 5 sens"
-        case .consciousStretching: return "Étirement conscient"
-        case .cardiacCoherence: return "Cohérence cardiaque"
-        case .audioRelaxation: return "Relaxation auditive"
-        case .bodyScan: return "Scan corporel"
-        case .boxBreathing: return "Respiration carrée"
-        case .anchoring54321: return "Ancrage 5-4-3-2-1"
-        case .positiveMantra: return "Mantra positif"
-        case .visualMicroBreak: return "Micro-pause visuelle"
-        case .alternateBreathing: return "Respiration alternée"
-        case .slowWalk: return "Marche lente"
-        case .consciousBreathing: return "Respiration consciente"
-        case .meditation2Min: return "Méditation 2 min"
-        case .whiteNoise: return "Bruit blanc apaisant"
+        case .guidedBreathing: return NSLocalizedString("antistress.exercise.guided_breathing", comment: "")
+        case .grounding5Senses: return NSLocalizedString("antistress.exercise.grounding_5_senses", comment: "")
+        case .consciousStretching: return NSLocalizedString("antistress.exercise.conscious_stretching", comment: "")
+        case .cardiacCoherence: return NSLocalizedString("antistress.exercise.cardiac_coherence", comment: "")
+        case .audioRelaxation: return NSLocalizedString("antistress.exercise.audio_relaxation", comment: "")
+        case .bodyScan: return NSLocalizedString("antistress.exercise.body_scan", comment: "")
+        case .boxBreathing: return NSLocalizedString("antistress.exercise.box_breathing", comment: "")
+        case .anchoring54321: return NSLocalizedString("antistress.exercise.anchoring_54321", comment: "")
+        case .positiveMantra: return NSLocalizedString("antistress.exercise.positive_mantra", comment: "")
+        case .visualMicroBreak: return NSLocalizedString("antistress.exercise.visual_micro_break", comment: "")
+        case .alternateBreathing: return NSLocalizedString("antistress.exercise.alternate_breathing", comment: "")
+        case .slowWalk: return NSLocalizedString("antistress.exercise.slow_walk", comment: "")
+        case .consciousBreathing: return NSLocalizedString("antistress.exercise.conscious_breathing", comment: "")
+        case .meditation2Min: return NSLocalizedString("antistress.exercise.meditation_2_min", comment: "")
+        case .whiteNoise: return NSLocalizedString("antistress.exercise.white_noise", comment: "")
         }
     }
 
@@ -133,6 +134,46 @@ enum AntiStressExerciseType: String, Codable {
 
     var xpReward: Int {
         return 5
+    }
+
+    var icon: String {
+        switch self {
+        case .guidedBreathing: return "wind"
+        case .grounding5Senses: return "hand.raised.fill"
+        case .consciousStretching: return "figure.flexibility"
+        case .cardiacCoherence: return "heart.circle.fill"
+        case .audioRelaxation: return "speaker.wave.3.fill"
+        case .bodyScan: return "figure.stand"
+        case .boxBreathing: return "square.on.square"
+        case .anchoring54321: return "123.rectangle.fill"
+        case .positiveMantra: return "text.quote"
+        case .visualMicroBreak: return "eye.fill"
+        case .alternateBreathing: return "arrow.left.arrow.right"
+        case .slowWalk: return "figure.walk"
+        case .consciousBreathing: return "lungs.fill"
+        case .meditation2Min: return "sparkles"
+        case .whiteNoise: return "waveform"
+        }
+    }
+
+    var completionEmoji: String {
+        switch self {
+        case .guidedBreathing: return "🌬️"
+        case .grounding5Senses: return "🖐️"
+        case .consciousStretching: return "🤸"
+        case .cardiacCoherence: return "💓"
+        case .audioRelaxation: return "🎧"
+        case .bodyScan: return "🧘"
+        case .boxBreathing: return "📦"
+        case .anchoring54321: return "🔢"
+        case .positiveMantra: return "✨"
+        case .visualMicroBreak: return "👁️"
+        case .alternateBreathing: return "🔄"
+        case .slowWalk: return "🚶"
+        case .consciousBreathing: return "🫁"
+        case .meditation2Min: return "🧘‍♂️"
+        case .whiteNoise: return "🎵"
+        }
     }
 }
 
@@ -212,6 +253,145 @@ class AntiStressRecommendationEngine {
                 ExerciseRecommendation(exerciseType: .visualMicroBreak, matchPercentage: 66),
                 ExerciseRecommendation(exerciseType: .consciousBreathing, matchPercentage: 60)
             ]
+        }
+    }
+}
+
+// MARK: - AntiStressExerciseType Extension for Localized Content
+
+extension AntiStressExerciseType {
+    var detailedDescription: String {
+        switch self {
+        case .slowWalk:
+            return NSLocalizedString("antistress.slow_walk.detailed_description", comment: "")
+        case .consciousStretching:
+            return NSLocalizedString("antistress.conscious_stretching.detailed_description", comment: "")
+        case .audioRelaxation:
+            return NSLocalizedString("antistress.audio_relaxation.detailed_description", comment: "")
+        case .whiteNoise:
+            return NSLocalizedString("antistress.white_noise.detailed_description", comment: "")
+        case .positiveMantra:
+            return NSLocalizedString("antistress.positive_mantra.detailed_description", comment: "")
+        case .visualMicroBreak:
+            return NSLocalizedString("antistress.visual_micro_break.detailed_description", comment: "")
+        default:
+            return NSLocalizedString("antistress.default.detailed_description", comment: "")
+        }
+    }
+
+    var benefits: [String] {
+        switch self {
+        case .slowWalk:
+            return [
+                NSLocalizedString("antistress.slow_walk.benefit_1", comment: ""),
+                NSLocalizedString("antistress.slow_walk.benefit_2", comment: ""),
+                NSLocalizedString("antistress.slow_walk.benefit_3", comment: ""),
+                NSLocalizedString("antistress.slow_walk.benefit_4", comment: "")
+            ]
+        case .consciousStretching:
+            return [
+                NSLocalizedString("antistress.conscious_stretching.benefit_1", comment: ""),
+                NSLocalizedString("antistress.conscious_stretching.benefit_2", comment: ""),
+                NSLocalizedString("antistress.conscious_stretching.benefit_3", comment: ""),
+                NSLocalizedString("antistress.conscious_stretching.benefit_4", comment: "")
+            ]
+        case .audioRelaxation:
+            return [
+                NSLocalizedString("antistress.audio_relaxation.benefit_1", comment: ""),
+                NSLocalizedString("antistress.audio_relaxation.benefit_2", comment: ""),
+                NSLocalizedString("antistress.audio_relaxation.benefit_3", comment: ""),
+                NSLocalizedString("antistress.audio_relaxation.benefit_4", comment: "")
+            ]
+        case .whiteNoise:
+            return [
+                NSLocalizedString("antistress.white_noise.benefit_1", comment: ""),
+                NSLocalizedString("antistress.white_noise.benefit_2", comment: ""),
+                NSLocalizedString("antistress.white_noise.benefit_3", comment: ""),
+                NSLocalizedString("antistress.white_noise.benefit_4", comment: "")
+            ]
+        case .positiveMantra:
+            return [
+                NSLocalizedString("antistress.positive_mantra.benefit_1", comment: ""),
+                NSLocalizedString("antistress.positive_mantra.benefit_2", comment: ""),
+                NSLocalizedString("antistress.positive_mantra.benefit_3", comment: ""),
+                NSLocalizedString("antistress.positive_mantra.benefit_4", comment: "")
+            ]
+        case .visualMicroBreak:
+            return [
+                NSLocalizedString("antistress.visual_micro_break.benefit_1", comment: ""),
+                NSLocalizedString("antistress.visual_micro_break.benefit_2", comment: ""),
+                NSLocalizedString("antistress.visual_micro_break.benefit_3", comment: ""),
+                NSLocalizedString("antistress.visual_micro_break.benefit_4", comment: "")
+            ]
+        default:
+            return []
+        }
+    }
+
+    var scientificEvidence: [String] {
+        switch self {
+        case .slowWalk:
+            return [
+                NSLocalizedString("antistress.slow_walk.evidence_1", comment: ""),
+                NSLocalizedString("antistress.slow_walk.evidence_2", comment: ""),
+                NSLocalizedString("antistress.slow_walk.evidence_3", comment: "")
+            ]
+        case .consciousStretching:
+            return [
+                NSLocalizedString("antistress.conscious_stretching.evidence_1", comment: ""),
+                NSLocalizedString("antistress.conscious_stretching.evidence_2", comment: ""),
+                NSLocalizedString("antistress.conscious_stretching.evidence_3", comment: "")
+            ]
+        case .audioRelaxation:
+            return [
+                NSLocalizedString("antistress.audio_relaxation.evidence_1", comment: ""),
+                NSLocalizedString("antistress.audio_relaxation.evidence_2", comment: ""),
+                NSLocalizedString("antistress.audio_relaxation.evidence_3", comment: "")
+            ]
+        case .whiteNoise:
+            return [
+                NSLocalizedString("antistress.white_noise.evidence_1", comment: ""),
+                NSLocalizedString("antistress.white_noise.evidence_2", comment: ""),
+                NSLocalizedString("antistress.white_noise.evidence_3", comment: "")
+            ]
+        case .positiveMantra:
+            return [
+                NSLocalizedString("antistress.positive_mantra.evidence_1", comment: ""),
+                NSLocalizedString("antistress.positive_mantra.evidence_2", comment: ""),
+                NSLocalizedString("antistress.positive_mantra.evidence_3", comment: "")
+            ]
+        case .visualMicroBreak:
+            return [
+                NSLocalizedString("antistress.visual_micro_break.evidence_1", comment: ""),
+                NSLocalizedString("antistress.visual_micro_break.evidence_2", comment: ""),
+                NSLocalizedString("antistress.visual_micro_break.evidence_3", comment: "")
+            ]
+        default:
+            return [NSLocalizedString("antistress.default.evidence", comment: "")]
+        }
+    }
+
+    var scientificSource: String {
+        switch self {
+        case .slowWalk: return NSLocalizedString("antistress.slow_walk.source", comment: "")
+        case .consciousStretching: return NSLocalizedString("antistress.conscious_stretching.source", comment: "")
+        case .audioRelaxation: return NSLocalizedString("antistress.audio_relaxation.source", comment: "")
+        case .whiteNoise: return NSLocalizedString("antistress.white_noise.source", comment: "")
+        case .positiveMantra: return NSLocalizedString("antistress.positive_mantra.source", comment: "")
+        case .visualMicroBreak: return NSLocalizedString("antistress.visual_micro_break.source", comment: "")
+        default: return NSLocalizedString("antistress.default.source", comment: "")
+        }
+    }
+
+    // Header gradient color based on exercise type
+    var headerGradientColor: Color {
+        switch self {
+        case .guidedBreathing, .boxBreathing, .consciousBreathing, .alternateBreathing, .cardiacCoherence:
+            return Color(hex: "3B5998") // Blue for breathing exercises
+        case .meditation2Min:
+            return Color(hex: "49288C") // Violet for meditation
+        default:
+            return Color(hex: "49288C") // Violet for all other exercises (grounding, etc.)
         }
     }
 }

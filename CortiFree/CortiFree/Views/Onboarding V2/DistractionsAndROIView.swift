@@ -153,7 +153,7 @@ struct DistractionsAndROIView: View {
         VStack(spacing: 0) {
             // Title
             Text("Combien d'heures par\nsemaine gaspillez-vous en\ndistractions ?")
-                .font(.custom("HankenGrotesk-Bold", size: 28))
+                .font(Font.Poppins.custom(.bold, size: 28))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -177,7 +177,7 @@ struct DistractionsAndROIView: View {
                 }
 
                 Text("\(selectedHours)h")
-                    .font(.custom("HankenGrotesk-Bold", size: 48))
+                    .font(Font.Poppins.custom(.bold, size: 48))
                     .foregroundColor(Color(hex: "FF2222"))
             }
             .frame(width: 168, height: 168)
@@ -207,7 +207,7 @@ struct DistractionsAndROIView: View {
         VStack(spacing: 0) {
             // Title
             Text("Retour potentiel de\nLife Reset")
-                .font(.custom("HankenGrotesk-Bold", size: 32))
+                .font(Font.Poppins.custom(.bold, size: 32))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -232,7 +232,7 @@ struct DistractionsAndROIView: View {
                             .foregroundColor(.white.opacity(0.8))
 
                         Text("€\(Int(hourlyValue)) par heure")
-                            .font(.custom("HankenGrotesk-Bold", size: 32))
+                            .font(Font.Poppins.custom(.bold, size: 32))
                             .foregroundColor(.white)
 
                         Slider(value: $hourlyValue, in: 5...100, step: 5)

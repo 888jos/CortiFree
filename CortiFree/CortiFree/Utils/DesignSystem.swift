@@ -40,20 +40,6 @@ extension Font {
         }
     }
 
-    // MARK: - HankenGrotesk
-    struct HankenGrotesk {
-        static func custom(_ weight: HankenWeight, size: CGFloat) -> Font {
-            return Font.custom(weight.rawValue, size: size)
-        }
-
-        enum HankenWeight: String {
-            case bold = "HankenGrotesk-Bold"
-            case semiBold = "HankenGrotesk-SemiBold"
-            case medium = "HankenGrotesk-Medium"
-            case regular = "HankenGrotesk-Regular"
-        }
-    }
-
     // MARK: - App Typography Scale
 
     // Titles
@@ -172,6 +158,24 @@ extension View {
     func secondaryButton() -> some View {
         modifier(SecondaryButtonStyle())
     }
+
+    // Standard corner radius
+    func standardCornerRadius() -> some View {
+        self.clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius))
+    }
+
+    func smallCornerRadius() -> some View {
+        self.clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall))
+    }
+
+    func largeCornerRadius() -> some View {
+        self.clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusLarge))
+    }
+
+    // Minimum touch target size (44x44pt Apple HIG)
+    func minimumTouchTarget() -> some View {
+        self.frame(minWidth: 44, minHeight: 44)
+    }
 }
 
 // MARK: - Shadow Styles
@@ -227,6 +231,40 @@ extension LinearGradient {
             ],
             startPoint: .top,
             endPoint: .bottom
+        )
+    }
+
+    static var galaxyGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(hex: "1E1E2E"),
+                Color(hex: "2D1B4E"),
+                Color(hex: "1E1E2E")
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var purpleCardGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(hex: "B794F6"),
+                Color.black
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var purpleLightCardGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(hex: "B794F6").opacity(0.2),
+                Color(hex: "B794F6").opacity(0.4)
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
         )
     }
 }

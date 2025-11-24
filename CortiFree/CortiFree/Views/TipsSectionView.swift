@@ -32,14 +32,28 @@ struct TipsSectionView: View {
                 // Show cards in selected category
                 TipsCategoryCardsView(
                     category: category,
-                    onBack: { selectedCategory = nil },
+                    onBack: {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                            selectedCategory = nil
+                        }
+                    },
                     onCardSelected: { card in selectedCard = card }
                 )
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing),
+                    removal: .move(edge: .leading)
+                ))
             } else {
                 // Show category grid
                 TipsCategoriesGridView(onCategorySelected: { category in
-                    selectedCategory = category
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        selectedCategory = category
+                    }
                 })
+                .transition(.asymmetric(
+                    insertion: .move(edge: .leading),
+                    removal: .move(edge: .trailing)
+                ))
             }
         }
         .fullScreenCover(item: $selectedCard) { card in
@@ -90,12 +104,12 @@ struct TipsCategoriesGridView: View {
                         .frame(width: 4, height: 32)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Conseils")
-                            .font(.custom("HankenGrotesk-Bold", size: 32))
+                        Text(NSLocalizedString("tips.title", comment: ""))
+                            .font(Font.Poppins.custom(.bold, size: 32))
                             .tracking(0.5)
                             .foregroundColor(.white)
 
-                        Text("Des conseils pratiques pour ton quotidien")
+                        Text(NSLocalizedString("tips.subtitle", comment: ""))
                             .font(.custom("Poppins-Regular", size: 14))
                             .tracking(0.3)
                             .foregroundColor(.white.opacity(0.65))
@@ -109,7 +123,7 @@ struct TipsCategoriesGridView: View {
             .background(
                 LinearGradient(
                     colors: [
-                        Color(hex: "F59E0B").opacity(0.08),
+                        Color(hex: "EC4899").opacity(0.08),
                         Color.clear
                     ],
                     startPoint: .top,
@@ -183,11 +197,11 @@ struct TipsCategoryCardView: View {
                 // Content
                 VStack(alignment: .leading, spacing: 8) {
                     Text(category.name)
-                        .font(.custom("HankenGrotesk-Bold", size: 20))
+                        .font(Font.Poppins.custom(.bold, size: 20))
                         .tracking(0.4)
                         .foregroundColor(.white)
 
-                    Text("\(category.cardCount) conseil\(category.cardCount > 1 ? "s" : "")")
+                    Text("\(category.cardCount) \(category.cardCount > 1 ? NSLocalizedString("tips.count.plural", comment: "") : NSLocalizedString("tips.count.singular", comment: ""))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -286,11 +300,11 @@ struct TipsCategoryCardsView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(category.name)
-                        .font(.custom("HankenGrotesk-Bold", size: 28))
+                        .font(Font.Poppins.custom(.bold, size: 28))
                         .tracking(0.5)
                         .foregroundColor(.white)
 
-                    Text("\(filteredCards.count) conseil\(filteredCards.count > 1 ? "s" : "")")
+                    Text("\(filteredCards.count) \(filteredCards.count > 1 ? NSLocalizedString("tips.count.plural", comment: "") : NSLocalizedString("tips.count.singular", comment: ""))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.65))
                 }
@@ -369,7 +383,7 @@ struct TipCardView: View {
                 // Content
                 VStack(alignment: .leading, spacing: 7) {
                     Text(card.title)
-                        .font(.custom("HankenGrotesk-Bold", size: 17))
+                        .font(Font.Poppins.custom(.bold, size: 17))
                         .tracking(0.3)
                         .foregroundColor(.white)
                         .multilineTextAlignment(.leading)
@@ -557,7 +571,7 @@ struct TipCardDetailView: View {
                         }
 
                         Text(card.category.uppercased())
-                            .font(.custom("HankenGrotesk-SemiBold", size: 12))
+                            .font(Font.Poppins.custom(.semiBold, size: 12))
                             .tracking(1.2)
                             .foregroundColor(card.categoryColor)
                             .padding(.horizontal, 14)
@@ -584,7 +598,7 @@ struct TipCardDetailView: View {
 
                     // Title
                     Text(card.title)
-                        .font(.custom("HankenGrotesk-Bold", size: 28))
+                        .font(Font.Poppins.custom(.bold, size: 28))
                         .tracking(0.4)
                         .lineSpacing(1.3)
                         .foregroundColor(.white)
@@ -635,7 +649,7 @@ struct TipContentSectionView: View {
                     )
 
                 Text(section.title)
-                    .font(.custom("HankenGrotesk-Bold", size: 18))
+                    .font(Font.Poppins.custom(.bold, size: 18))
                     .tracking(0.3)
                     .foregroundColor(.white)
             }
@@ -692,61 +706,61 @@ struct TipsCategory: Identifiable {
 
     static let allCategories: [TipsCategory] = [
         TipsCategory(
-            name: "Routine",
+            name: NSLocalizedString("tips.category.routine", comment: ""),
             icon: "alarm.fill",
             color: Color(hex: "F59E0B"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Sommeil",
+            name: NSLocalizedString("tips.category.sommeil", comment: ""),
             icon: "moon.stars.fill",
             color: Color(hex: "8B5CF6"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Travail",
+            name: NSLocalizedString("tips.category.travail", comment: ""),
             icon: "laptopcomputer",
             color: Color(hex: "3B82F6"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Nutrition",
+            name: NSLocalizedString("tips.category.nutrition", comment: ""),
             icon: "fork.knife",
             color: Color(hex: "10B981"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Émotions",
+            name: NSLocalizedString("tips.category.emotions", comment: ""),
             icon: "heart.fill",
             color: Color(hex: "EC4899"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Mindfulness",
+            name: NSLocalizedString("tips.category.mindfulness", comment: ""),
             icon: "figure.mind.and.body",
             color: Color(hex: "06B6D4"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Relations",
+            name: NSLocalizedString("tips.category.relations", comment: ""),
             icon: "person.2.fill",
             color: Color(hex: "F43F5E"),
             cardCount: 2
         ),
         TipsCategory(
-            name: "Productivité",
+            name: NSLocalizedString("tips.category.productivite", comment: ""),
             icon: "chart.line.uptrend.xyaxis",
             color: Color(hex: "6366F1"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Environnement",
+            name: NSLocalizedString("tips.category.environnement", comment: ""),
             icon: "house.fill",
             color: Color(hex: "22C55E"),
             cardCount: 1
         ),
         TipsCategory(
-            name: "Urgence",
+            name: NSLocalizedString("tips.category.urgence", comment: ""),
             icon: "exclamationmark.triangle.fill",
             color: Color(hex: "EF4444"),
             cardCount: 1
@@ -800,54 +814,29 @@ struct TipCard: Identifiable {
         // ROUTINE CATEGORY
         TipCard(
             icon: "alarm.fill",
-            title: "Routine matinale anti-stress",
-            category: "Routine",
-            shortDescription: "Commence ta journée du bon pied",
+            title: NSLocalizedString("tips.card.morning_routine.title", comment: ""),
+            category: NSLocalizedString("tips.category.routine", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.morning_routine.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "info.circle.fill",
-                    title: "Pourquoi c'est important",
-                    content: "Les premières 60 minutes de ta journée déterminent ton niveau de cortisol pour toute la journée."
+                    title: NSLocalizedString("tips.card.morning_routine.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.morning_routine.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "sun.max.fill",
-                    title: "La routine idéale (60 min)",
-                    content: """
-                    6h00-6h15 : Réveil et hydratation
-                    • Boire 500ml d'eau dès le réveil
-                    • Réhydrate ton corps après 8h de sommeil
-                    • Active ton métabolisme
-
-                    6h15-6h30 : Exposition à la lumière
-                    • Sortir dehors ou près d'une fenêtre
-                    • 15-30 min de lumière naturelle
-                    • Stoppe la mélatonine, active le cortisol matinal sain
-
-                    6h30-6h45 : Mouvement doux
-                    • Étirements, yoga doux, ou marche
-                    • Réveille le corps en douceur
-                    • Libère les endorphines
-
-                    6h45-7h00 : Pratique de pleine conscience
-                    • 5-10 min de méditation ou respiration
-                    • Cohérence cardiaque
-                    • Définit l'intention de la journée
-                    """
+                    title: NSLocalizedString("tips.card.morning_routine.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.morning_routine.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: "À ÉVITER les 60 premières minutes",
-                    content: """
-                    • Téléphone/emails/réseaux sociaux
-                    • Actualités (souvent négatives)
-                    • Situations stressantes
-                    • Caféine avant hydratation
-                    """
+                    title: NSLocalizedString("tips.card.morning_routine.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.morning_routine.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "lightbulb.fill",
-                    title: "Pourquoi ça marche",
-                    content: "Cette routine synchronise ton rythme circadien, optimise ton pic de cortisol matinal (bénéfique) et te met dans un état mental positif pour la journée."
+                    title: NSLocalizedString("tips.card.morning_routine.section4.title", comment: ""),
+                    content: NSLocalizedString("tips.card.morning_routine.section4.content", comment: "")
                 )
             ]
         ),
@@ -855,57 +844,19 @@ struct TipCard: Identifiable {
         // SOMMEIL CATEGORY
         TipCard(
             icon: "moon.stars.fill",
-            title: "Rituel du coucher optimal",
-            category: "Sommeil",
-            shortDescription: "Prépare ton corps et esprit au repos",
+            title: NSLocalizedString("tips.card.sleep_ritual.title", comment: ""),
+            category: NSLocalizedString("tips.category.sommeil", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.sleep_ritual.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "moon.fill",
-                    title: "Le rituel parfait",
-                    content: """
-                    Un bon sommeil commence 90 minutes avant de se coucher.
-
-                    21h30 : Baisse de lumière
-                    • Tamiser les lumières dans la maison
-                    • Activer mode nuit sur téléphone/ordinateur
-                    • Lumières chaudes uniquement
-
-                    21h45 : Arrêt des écrans
-                    • Plus de téléphone, TV, ordinateur
-                    • Lire un livre papier à la place
-                    • La lumière bleue bloque la mélatonine
-
-                    22h00 : Hygiène et routine
-                    • Douche tiède (pas chaude)
-                    • Routine soins visage/dents
-                    • Préparation vêtements du lendemain
-
-                    22h15 : Activité relaxante
-                    • Lecture légère (pas thriller!)
-                    • Journaling/gratitudes
-                    • Méditation ou respiration douce
-                    • Étirements légers
-
-                    22h30 : Préparation de la chambre
-                    • Température fraîche (18-19°C)
-                    • Obscurité totale (rideaux occultants)
-                    • Silence (bouchons d'oreille si besoin)
-
-                    22h45-23h00 : Coucher
-                    • Toujours à la même heure
-                    • Même le week-end
-                    • Cohérence = meilleur sommeil
-                    """
+                    title: NSLocalizedString("tips.card.sleep_ritual.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.sleep_ritual.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "star.fill",
-                    title: "Tips supplémentaires",
-                    content: """
-                    • Pas de sport intense après 20h
-                    • Dernier repas 2-3h avant coucher
-                    • Éviter alcool et caféine après 16h
-                    • Chambre réservée au sommeil (pas de travail)
-                    """
+                    title: NSLocalizedString("tips.card.sleep_ritual.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.sleep_ritual.section2.content", comment: "")
                 )
             ]
         ),
@@ -913,54 +864,29 @@ struct TipCard: Identifiable {
         // TRAVAIL CATEGORY
         TipCard(
             icon: "laptopcomputer",
-            title: "Gérer le stress au travail",
-            category: "Travail",
-            shortDescription: "Stratégies pour rester zen au bureau",
+            title: NSLocalizedString("tips.card.work_stress.title", comment: ""),
+            category: NSLocalizedString("tips.category.travail", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.work_stress.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "clock.fill",
-                    title: "Micro-pauses toutes les heures",
-                    content: """
-                    • 2 min de respiration profonde
-                    • Étirements au bureau
-                    • Regarder au loin (détend les yeux)
-                    • Marcher quelques pas
-                    """
+                    title: NSLocalizedString("tips.card.work_stress.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.work_stress.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "list.bullet.clipboard.fill",
-                    title: "Priorisation intelligente",
-                    content: """
-                    Matrice d'Eisenhower :
-                    • Urgent + Important = Faire maintenant
-                    • Important + Non urgent = Planifier
-                    • Urgent + Non important = Déléguer
-                    • Non urgent + Non important = Éliminer
-
-                    Méthode 1-3-5 :
-                    • 1 tâche principale par jour
-                    • 3 tâches moyennes
-                    • 5 petites tâches
-                    """
+                    title: NSLocalizedString("tips.card.work_stress.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.work_stress.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "bell.slash.fill",
-                    title: "Gestion des interruptions",
-                    content: """
-                    • Mode concentration : 90 min sans interruption
-                    • Désactiver notifications non urgentes
-                    • Créneaux "portes ouvertes" pour collègues
-                    • Email : vérifier 3 fois/jour maximum
-                    """
+                    title: NSLocalizedString("tips.card.work_stress.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.work_stress.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: "Dire non avec diplomatie",
-                    content: """
-                    \"J'aimerais t'aider, mais j'ai déjà pris des engagements pour [X]. Je peux te proposer [alternative] ou être disponible à partir de [date].\"
-
-                    Ton temps est précieux. Protège-le.
-                    """
+                    title: NSLocalizedString("tips.card.work_stress.section4.title", comment: ""),
+                    content: NSLocalizedString("tips.card.work_stress.section4.content", comment: "")
                 )
             ]
         ),
@@ -968,64 +894,29 @@ struct TipCard: Identifiable {
         // NUTRITION CATEGORY
         TipCard(
             icon: "fork.knife",
-            title: "Alimentation quotidienne anti-stress",
-            category: "Nutrition",
-            shortDescription: "Repas et snacks qui calment",
+            title: NSLocalizedString("tips.card.nutrition.title", comment: ""),
+            category: NSLocalizedString("tips.category.nutrition", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.nutrition.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "sun.max.fill",
-                    title: "Petit-déjeuner idéal",
-                    content: """
-                    Protéines + Graisses saines + Fibres :
-
-                    Option 1 : Œufs + Avocat + Pain complet
-                    Option 2 : Yaourt grec + Noix + Fruits rouges
-                    Option 3 : Smoothie (banane, épinards, beurre amandes, lait végétal)
-
-                    Pourquoi : Stabilise la glycémie et le cortisol pour toute la matinée.
-                    """
+                    title: NSLocalizedString("tips.card.nutrition.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.nutrition.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "leaf.circle.fill",
-                    title: "Snacks anti-stress",
-                    content: """
-                    Quand une fringale arrive (10h ou 16h) :
-
-                    • Amandes (15-20) + 1 carré chocolat noir
-                    • Pomme + Beurre d'amande
-                    • Yaourt nature + Myrtilles
-                    • Houmous + Bâtonnets de légumes
-                    • Banane + Quelques noix
-
-                    Éviter : Barres industrielles, viennoiseries, sodas
-                    """
+                    title: NSLocalizedString("tips.card.nutrition.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.nutrition.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "drop.fill",
-                    title: "Hydratation intelligente",
-                    content: """
-                    • 2L d'eau/jour minimum
-                    • Infusions calmantes (camomille, verveine, tilleul)
-                    • Thé vert (L-théanine anti-stress)
-                    • Eau citronnée le matin
-
-                    Limiter :
-                    • Café : max 2-3 par jour, pas après 14h
-                    • Alcool : max 1 verre/jour
-                    • Sodas : occasionnellement uniquement
-                    """
+                    title: NSLocalizedString("tips.card.nutrition.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.nutrition.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "moon.fill",
-                    title: "Dîner léger",
-                    content: """
-                    2-3h avant coucher :
-
-                    • Légumes + Protéines maigres (poisson, poulet, tofu)
-                    • Glucides complexes en petite quantité (riz, quinoa)
-                    • Éviter fritures, plats lourds, épices fortes
-                    • Tisane digestive après le repas
-                    """
+                    title: NSLocalizedString("tips.card.nutrition.section4.title", comment: ""),
+                    content: NSLocalizedString("tips.card.nutrition.section4.content", comment: "")
                 )
             ]
         ),
@@ -1033,67 +924,29 @@ struct TipCard: Identifiable {
         // ÉMOTIONS CATEGORY
         TipCard(
             icon: "heart.fill",
-            title: "Gérer les émotions difficiles",
-            category: "Émotions",
-            shortDescription: "Techniques d'urgence émotionnelle",
+            title: NSLocalizedString("tips.card.emotions.title", comment: ""),
+            category: NSLocalizedString("tips.category.emotions", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.emotions.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "wind",
-                    title: "Technique 4-7-8 (urgence anxiété)",
-                    content: """
-                    1. Expire complètement par la bouche (whoosh)
-                    2. Inspire par le nez en comptant jusqu'à 4
-                    3. Retiens ta respiration en comptant jusqu'à 7
-                    4. Expire par la bouche en comptant jusqu'à 8
-
-                    Répéter 4 cycles.
-                    Effet : Active le système parasympathique, calme en 90 secondes.
-                    """
+                    title: NSLocalizedString("tips.card.emotions.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emotions.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "hand.raised.fill",
-                    title: "Technique 5-4-3-2-1 (ancrage présent)",
-                    content: """
-                    Quand tu te sens submergé, nomme à voix haute :
-
-                    • 5 choses que tu VOIS autour de toi
-                    • 4 choses que tu TOUCHES
-                    • 3 choses que tu ENTENDS
-                    • 2 choses que tu SENS (odorat)
-                    • 1 chose que tu GOÛTES
-
-                    Ramène ton esprit dans le moment présent et stoppe la spirale anxieuse.
-                    """
+                    title: NSLocalizedString("tips.card.emotions.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emotions.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "pencil.and.list.clipboard",
-                    title: "Journaling émotionnel",
-                    content: """
-                    Quand une émotion forte arrive, écris :
-
-                    1. Quelle est cette émotion ? (nom exact)
-                    2. Où la sens-tu dans ton corps ?
-                    3. Quelle pensée l'a déclenchée ?
-                    4. Cette pensée est-elle un fait ou une interprétation ?
-                    5. Quelle serait une pensée alternative plus réaliste ?
-
-                    Écrire = Traiter l'émotion au lieu de la ruminer.
-                    """
+                    title: NSLocalizedString("tips.card.emotions.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emotions.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "figure.walk",
-                    title: "Mouvement libérateur",
-                    content: """
-                    L'émotion = énergie coincée dans le corps.
-
-                    • Marche rapide 10-15 min
-                    • Secoue tes bras/jambes vigoureusement
-                    • Dance sur une musique énergique
-                    • Étirements profonds
-                    • Cri dans un oreiller (si besoin)
-
-                    Le corps DOIT évacuer le stress physiquement.
-                    """
+                    title: NSLocalizedString("tips.card.emotions.section4.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emotions.section4.content", comment: "")
                 )
             ]
         ),
@@ -1101,69 +954,29 @@ struct TipCard: Identifiable {
         // MINDFULNESS CATEGORY
         TipCard(
             icon: "figure.mind.and.body",
-            title: "Pleine conscience au quotidien",
-            category: "Mindfulness",
-            shortDescription: "Intégrer la mindfulness partout",
+            title: NSLocalizedString("tips.card.mindfulness.title", comment: ""),
+            category: NSLocalizedString("tips.category.mindfulness", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.mindfulness.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "cup.and.saucer.fill",
-                    title: "Mindfulness du café/thé",
-                    content: """
-                    Au lieu de boire distraitement :
-
-                    1. Observe la couleur du liquide
-                    2. Sens l'arôme profondément
-                    3. Ressens la chaleur de la tasse dans tes mains
-                    4. Prends une petite gorgée, laisse-la en bouche
-                    5. Remarque le goût, la texture, la température
-                    6. Ressens la chaleur qui descend
-
-                    5 minutes de présence pure.
-                    """
+                    title: NSLocalizedString("tips.card.mindfulness.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.mindfulness.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "figure.walk",
-                    title: "Marche consciente",
-                    content: """
-                    Transforme n'importe quelle marche en méditation :
-
-                    • Sens le contact du pied avec le sol à chaque pas
-                    • Remarque le mouvement de tes bras
-                    • Observe ce que tu vois sans jugement
-                    • Écoute les sons autour de toi
-                    • Sens l'air sur ta peau, le vent dans tes cheveux
-
-                    5-10 min suffisent pour reset ton esprit.
-                    """
+                    title: NSLocalizedString("tips.card.mindfulness.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.mindfulness.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "shower.fill",
-                    title: "Douche mindful",
-                    content: """
-                    • Sens la température de l'eau
-                    • Remarque les gouttes qui coulent sur ta peau
-                    • Concentre-toi sur les sensations corporelles
-                    • Observe le bruit de l'eau
-                    • Sens l'odeur du savon/shampoing
-
-                    Chaque activité quotidienne = opportunité de méditation.
-                    """
+                    title: NSLocalizedString("tips.card.mindfulness.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.mindfulness.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "fork.knife",
-                    title: "Alimentation consciente",
-                    content: """
-                    1 repas/jour minimum sans distraction :
-
-                    • Pas de téléphone, TV, ordinateur
-                    • Observe ton assiette (couleurs, textures)
-                    • Sens les odeurs
-                    • Mâche lentement (20-30 fois par bouchée)
-                    • Remarque les saveurs, textures
-                    • Pose ta fourchette entre chaque bouchée
-
-                    Meilleure digestion + Satiété naturelle + Moment de calme
-                    """
+                    title: NSLocalizedString("tips.card.mindfulness.section4.title", comment: ""),
+                    content: NSLocalizedString("tips.card.mindfulness.section4.content", comment: "")
                 )
             ]
         ),
@@ -1171,13 +984,13 @@ struct TipCard: Identifiable {
         // RELATIONS CATEGORY (2 cards)
         TipCard(
             icon: "person.2.fill",
-            title: "Communication non-violente",
-            category: "Relations",
-            shortDescription: "Exprimer ses besoins sans conflit",
+            title: NSLocalizedString("tips.card.nvc.title", comment: ""),
+            category: NSLocalizedString("tips.category.relations", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.nvc.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "list.bullet.clipboard.fill",
-                    title: "Les 4 étapes de la CNV",
+                    title: NSLocalizedString("tips.card.nvc.section1.title", comment: ""),
                     content: """
                     1. OBSERVATION (fait objectif)
                     \"Quand tu arrives en retard aux rendez-vous...\"
@@ -1197,7 +1010,7 @@ struct TipCard: Identifiable {
                 ),
                 TipContentSection(
                     icon: "ear.fill",
-                    title: "Écoute active",
+                    title: NSLocalizedString("tips.card.nvc.section2.title", comment: ""),
                     content: """
                     Quand quelqu'un te parle :
 
@@ -1212,7 +1025,7 @@ struct TipCard: Identifiable {
                 ),
                 TipContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: "Gérer les critiques",
+                    title: NSLocalizedString("tips.card.nvc.section3.title", comment: ""),
                     content: """
                     • Respire profondément avant de répondre
                     • Cherche la part de vérité (même petite)
@@ -1229,25 +1042,18 @@ struct TipCard: Identifiable {
         ),
         TipCard(
             icon: "heart.circle.fill",
-            title: "Cultiver des relations positives",
-            category: "Relations",
-            shortDescription: "Renforcer tes liens sociaux",
+            title: NSLocalizedString("tips.card.positive_relations.title", comment: ""),
+            category: NSLocalizedString("tips.category.relations", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.positive_relations.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "calendar",
-                    title: "Rituels de connexion",
-                    content: """
-                    • 1 appel vidéo/semaine avec un proche
-                    • 1 café/repas en face à face par semaine
-                    • Message de check-in à 2-3 amis/semaine
-                    • Activité de groupe mensuelle (sport, loisir)
-
-                    La qualité > quantité, mais la régularité compte.
-                    """
+                    title: NSLocalizedString("tips.card.positive_relations.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.positive_relations.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "heart.fill",
-                    title: "Exprimer de la gratitude",
+                    title: NSLocalizedString("tips.card.positive_relations.section2.title", comment: ""),
                     content: """
                     1 fois/jour minimum, dis à quelqu'un :
 
@@ -1262,23 +1068,12 @@ struct TipCard: Identifiable {
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: "Identifier les relations toxiques",
-                    content: """
-                    Signaux d'alarme :
-
-                    • Tu te sens drainé après les interactions
-                    • Critique constante, jamais de soutien
-                    • Vampirisation émotionnelle (toujours eux, jamais toi)
-                    • Manipulation ou culpabilisation
-                    • Pas de respect de tes limites
-
-                    Action : Distanciation progressive ou conversation franche.
-                    Tu as le droit de protéger ton énergie.
-                    """
+                    title: NSLocalizedString("tips.card.positive_relations.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.positive_relations.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "figure.2.and.child.holdinghands",
-                    title: "Demander du soutien",
+                    title: NSLocalizedString("tips.card.positive_relations.section4.title", comment: ""),
                     content: """
                     Demander de l'aide ≠ faiblesse :
 
@@ -1296,67 +1091,28 @@ struct TipCard: Identifiable {
         // PRODUCTIVITÉ CATEGORY
         TipCard(
             icon: "chart.line.uptrend.xyaxis",
-            title: "Productivité sans stress",
-            category: "Productivité",
-            shortDescription: "Efficace ET zen",
+            title: NSLocalizedString("tips.card.productivity.title", comment: ""),
+            category: NSLocalizedString("tips.category.productivite", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.productivity.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "clock.fill",
-                    title: "Technique Pomodoro adaptée",
-                    content: """
-                    Travail par sessions :
-
-                    • 25 min focus total sur UNE tâche
-                    • 5 min pause (marche, étirements, respiration)
-                    • Répéter 4 fois
-                    • Grande pause de 20-30 min
-
-                    Règles :
-                    • Timer visible
-                    • Téléphone en mode avion
-                    • Notifications désactivées
-                    • Si interruption = reset le Pomodoro
-
-                    Résultat : 4h de vrai travail valent mieux que 8h de distraction.
-                    """
+                    title: NSLocalizedString("tips.card.productivity.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.productivity.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "brain.head.profile",
-                    title: "Travailler avec ton cerveau",
-                    content: """
-                    Chaque cerveau a ses pics d'énergie :
-
-                    Matinaux (lève-tôt) :
-                    • 8h-12h : Tâches complexes/créatives
-                    • 14h-16h : Tâches routinières
-                    • Après 16h : Organisation/emails
-
-                    Soireux (couche-tard) :
-                    • Matin : Routine/emails
-                    • 14h-18h : Tâches complexes
-                    • Soirée : Créativité/projets
-
-                    Identifie TON rythme et adapte ton planning.
-                    """
+                    title: NSLocalizedString("tips.card.productivity.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.productivity.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "checkmark.circle.fill",
-                    title: "Liste 'Done' en plus de 'To-Do'",
-                    content: """
-                    En fin de journée, écris ce que tu AS fait :
-
-                    • Valide tes accomplissements
-                    • Combat le syndrome de l'imposteur
-                    • Montre le chemin parcouru
-                    • Boost confiance en soi
-
-                    Ton cerveau se souvient du négatif (biais de négativité).
-                    Force-le à voir le positif.
-                    """
+                    title: NSLocalizedString("tips.card.productivity.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.productivity.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: "L'art du 'presque parfait'",
+                    title: NSLocalizedString("tips.card.productivity.section4.title", comment: ""),
                     content: """
                     Perfectionnisme = Source majeure de stress.
 
@@ -1375,93 +1131,34 @@ struct TipCard: Identifiable {
         // ENVIRONNEMENT CATEGORY
         TipCard(
             icon: "house.fill",
-            title: "Optimiser ton environnement",
-            category: "Environnement",
-            shortDescription: "Espace de vie anti-stress",
+            title: NSLocalizedString("tips.card.environment.title", comment: ""),
+            category: NSLocalizedString("tips.category.environnement", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.environment.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "sparkles",
-                    title: "Désencombrement (règle KonMari adaptée)",
-                    content: """
-                    1 zone/semaine :
-
-                    Prends chaque objet et demande-toi :
-                    • Est-ce que je l'ai utilisé dans les 6 derniers mois ?
-                    • Est-ce que ça m'apporte de la joie ?
-                    • Est-ce vraiment utile ?
-
-                    Si 3x non → Don, recyclage, ou poubelle.
-
-                    Désordre visuel = Surcharge mentale.
-                    Espace dégagé = Esprit dégagé.
-                    """
+                    title: NSLocalizedString("tips.card.environment.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.environment.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "leaf.fill",
-                    title: "Plantes d'intérieur",
-                    content: """
-                    Top 5 anti-stress faciles d'entretien :
-
-                    1. Pothos (air + stress)
-                    2. Sansevieria (oxygène la nuit)
-                    3. Aloe Vera (purifie l'air)
-                    4. Plante araignée (facile, efficace)
-                    5. Lavande (parfum calmant)
-
-                    Bénéfices prouvés :
-                    • -15% de cortisol
-                    • Meilleure qualité de l'air
-                    • Effet visuel apaisant
-                    """
+                    title: NSLocalizedString("tips.card.environment.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.environment.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "sun.max.fill",
-                    title: "Lumière naturelle maximale",
-                    content: """
-                    • Ouvre rideaux dès le réveil
-                    • Bureau près fenêtre si possible
-                    • Ampoules lumière du jour (5000-6500K) le matin
-                    • Ampoules chaudes (2700-3000K) le soir
-                    • Variateurs de lumière dans chambres
-
-                    Lumière = régulateur #1 du rythme circadien.
-                    """
+                    title: NSLocalizedString("tips.card.environment.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.environment.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "speaker.wave.3.fill",
-                    title: "Sons et musique",
-                    content: """
-                    Travail/Concentration :
-                    • Bruits blancs/bruns
-                    • Musique classique baroque (60 bpm)
-                    • Sons de la nature (pluie, forêt)
-                    • Pas de paroles
-
-                    Relaxation :
-                    • Fréquences 432Hz
-                    • Bols tibétains
-                    • Musique méditative
-                    • Sons binauraux (theta/delta)
-
-                    Créer une playlist par activité.
-                    """
+                    title: NSLocalizedString("tips.card.environment.section4.title", comment: ""),
+                    content: NSLocalizedString("tips.card.environment.section4.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "thermometer.medium",
-                    title: "Température et air",
-                    content: """
-                    Température optimale :
-                    • Journée active : 20-22°C
-                    • Sommeil : 18-19°C
-                    • Trop chaud = fatigue, irritabilité
-
-                    Air :
-                    • Aérer 10-15 min matin et soir
-                    • Humidificateur en hiver (40-60% humidité)
-                    • Éviter encens/bougies parfumées toxiques
-
-                    Ton corps régule mieux le stress dans un environnement optimal.
-                    """
+                    title: NSLocalizedString("tips.card.environment.section5.title", comment: ""),
+                    content: NSLocalizedString("tips.card.environment.section5.content", comment: "")
                 )
             ]
         ),
@@ -1469,58 +1166,28 @@ struct TipCard: Identifiable {
         // URGENCE CATEGORY
         TipCard(
             icon: "exclamationmark.triangle.fill",
-            title: "Kit d'urgence anti-stress",
-            category: "Urgence",
-            shortDescription: "Quand tu sens que tu vas craquer",
+            title: NSLocalizedString("tips.card.emergency_kit.title", comment: ""),
+            category: NSLocalizedString("tips.category.urgence", comment: ""),
+            shortDescription: NSLocalizedString("tips.card.emergency_kit.short_description", comment: ""),
             sections: [
                 TipContentSection(
                     icon: "exclamationmark.circle.fill",
-                    title: "Crise de panique imminente",
-                    content: """
-                    MAINTENANT (dans l'ordre) :
-
-                    1. Respiration 4-7-8 (décrit plus haut)
-                    2. Eau glacée sur visage ou douche froide
-                    3. Technique 5-4-3-2-1 (ancrage sensoriel)
-                    4. Sortir dehors si possible
-                    5. Appeler quelqu'un de confiance
-
-                    Rappel : Crise de panique = désagréable mais PAS dangereuse.
-                    Ça passe en 10-20 min maximum.
-                    """
+                    title: NSLocalizedString("tips.card.emergency_kit.section1.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emergency_kit.section1.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "figure.run",
-                    title: "Libération physique urgente",
-                    content: """
-                    Quand le stress est DANS ton corps :
-
-                    • Sprint 30 secondes à fond (si lieu sûr)
-                    • 20 jumping jacks
-                    • Serrer fort un oreiller/coussin puis relâcher (5x)
-                    • Pousser contre un mur de toutes tes forces (10 sec)
-
-                    L'énergie du stress DOIT sortir du corps.
-                    """
+                    title: NSLocalizedString("tips.card.emergency_kit.section2.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emergency_kit.section2.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "phone.fill",
-                    title: "Qui appeler",
-                    content: """
-                    Prépare cette liste MAINTENANT (dans ton téléphone) :
-
-                    • 3 amis/famille de confiance
-                    • Ligne d'écoute (SOS Amitié : 09 72 39 40 50)
-                    • Ton thérapeute si tu en as un
-                    • Urgences si danger immédiat : 112
-
-                    En crise, tu ne penses pas clairement.
-                    Liste préparée = bouée de sauvetage.
-                    """
+                    title: NSLocalizedString("tips.card.emergency_kit.section3.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emergency_kit.section3.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "heart.fill",
-                    title: "Permission de faire une pause",
+                    title: NSLocalizedString("tips.card.emergency_kit.section4.title", comment: ""),
                     content: """
                     Tu as le DROIT de :
 
@@ -1538,19 +1205,8 @@ struct TipCard: Identifiable {
                 ),
                 TipContentSection(
                     icon: "checkmark.circle.fill",
-                    title: "Après la crise",
-                    content: """
-                    Une fois calmé :
-
-                    1. Bois de l'eau
-                    2. Mange quelque chose de léger
-                    3. Note ce qui a déclenché (pour identifier les patterns)
-                    4. Pratique de l'auto-compassion (pas de jugement)
-                    5. Prévois aide professionnelle si récurrent
-
-                    Avoir besoin d'aide ≠ Faiblesse.
-                    C'est du courage.
-                    """
+                    title: NSLocalizedString("tips.card.emergency_kit.section5.title", comment: ""),
+                    content: NSLocalizedString("tips.card.emergency_kit.section5.content", comment: "")
                 )
             ]
         )

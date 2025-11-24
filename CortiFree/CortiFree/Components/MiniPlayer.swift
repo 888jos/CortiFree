@@ -140,14 +140,16 @@ struct DurationPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var soundPlayer = SoundPlayer.shared
 
-    let durations: [(title: String, minutes: TimeInterval?)] = [
-        ("Infini", nil),
-        ("5 min", 5 * 60),
-        ("10 min", 10 * 60),
-        ("15 min", 15 * 60),
-        ("30 min", 30 * 60),
-        ("1 heure", 60 * 60)
-    ]
+    var durations: [(title: String, minutes: TimeInterval?)] {
+        [
+            (NSLocalizedString("duration.infinite", comment: ""), nil),
+            (NSLocalizedString("duration.5min", comment: ""), 5 * 60),
+            (NSLocalizedString("duration.10min", comment: ""), 10 * 60),
+            (NSLocalizedString("duration.15min", comment: ""), 15 * 60),
+            (NSLocalizedString("duration.30min", comment: ""), 30 * 60),
+            (NSLocalizedString("duration.1hour", comment: ""), 60 * 60)
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -167,7 +169,7 @@ struct DurationPickerSheet: View {
                 // Header
                 HStack {
                     Spacer()
-                    Text("Durée de lecture")
+                    Text(NSLocalizedString("duration.title", comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 22))
                         .foregroundColor(.white)
                     Spacer()
@@ -175,7 +177,7 @@ struct DurationPickerSheet: View {
                 .padding(.top, 32)
                 .padding(.bottom, 8)
 
-                Text("Choisir combien de temps le son doit jouer")
+                Text(NSLocalizedString("duration.subtitle", comment: ""))
                     .font(.custom("Poppins-Regular", size: 14))
                     .foregroundColor(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
@@ -229,7 +231,7 @@ struct DurationButton: View {
             .frame(maxWidth: .infinity)
             .frame(height: 90)
             .background(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
                     .fill(
                         isSelected ?
                             LinearGradient(
@@ -247,7 +249,7 @@ struct DurationButton: View {
                             )
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14)
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
                             .stroke(
                                 isSelected ? Color.appTheme : Color.white.opacity(0.2),
                                 lineWidth: isSelected ? 2 : 1

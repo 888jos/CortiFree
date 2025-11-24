@@ -11,15 +11,16 @@ import SwiftUI
 struct EightHabitsIntroView: View {
     let onContinue: () -> Void
 
+    // Ordre: Respiration, Méditation, Journal, Sport, Eau, Nature, Sommeil, Social
     private let habits: [(image: String, icon: String)] = [
-        ("habit_breathe", "wind"),
-        ("habit_meditate", "figure.mind.and.body"),
-        ("habit_journal", "drop.fill"),
-        ("habit_sport", "figure.run"),
-        ("habit_water", "drop.fill"),
-        ("habit_nature", "moon.zzz.fill"),
-        ("habit_sleep", "figure.walk"),
-        ("habit_social", "person.2.fill")
+        ("habit_breathe", "wind"),               // Respiration
+        ("habit_meditate", "figure.mind.and.body"), // Méditation
+        ("habit_journal", "book.fill"),          // Journal
+        ("habit_sport", "figure.run"),           // Sport
+        ("habit_water", "drop.fill"),            // Eau
+        ("habit_nature", "leaf.fill"),           // Nature
+        ("habit_sleep", "moon.zzz.fill"),        // Sommeil
+        ("habit_social", "person.2.fill")        // Social
     ]
 
     var body: some View {
@@ -111,7 +112,7 @@ struct EightHabitsIntroView: View {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 18, weight: .semibold))
 
-                        Text("Continuer")
+                        Text(StringKeys.Common.continueButton)
                             .font(.custom("Poppins-SemiBold", size: 18))
                     }
                     .foregroundColor(.white)
@@ -163,7 +164,6 @@ struct HabitImageCard: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: 90)
-        .scaleEffect(x: 0.9, y: 1.0)
     }
 }
 

@@ -159,23 +159,23 @@ struct ReassuranceView: View {
     // MARK: - Text Animation
 
     private func startTextAnimation() {
-        // Start animation after short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        // Start animation after short delay (reduced by 50%)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             animateNextCharacter()
         }
     }
 
     private func animateNextCharacter() {
         guard currentCharacterIndex < fullText.count else {
-            // Text animation complete, show badges after delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation(.easeInOut(duration: 0.6)) {
+            // Text animation complete, show badges after delay (reduced by 50%)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                withAnimation(.easeInOut(duration: 0.3)) {
                     showBadges = true
                 }
 
-                // Show button after badges appear
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    withAnimation(.easeInOut(duration: 0.6)) {
+                // Show button after badges appear (reduced by 50%)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
                         showButton = true
                     }
                 }
@@ -192,8 +192,8 @@ struct ReassuranceView: View {
             HapticManager.light()
         }
 
-        // Continue animation with slight delay
-        let delay: Double = fullText[index].isWhitespace ? 0.01 : 0.05
+        // Continue animation with slight delay (reduced by 80% from original)
+        let delay: Double = fullText[index].isWhitespace ? 0.002 : 0.01
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             animateNextCharacter()
         }

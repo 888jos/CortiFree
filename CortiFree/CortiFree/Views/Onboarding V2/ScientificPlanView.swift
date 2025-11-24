@@ -21,7 +21,7 @@ struct ScientificPlanView: View {
                 VStack(spacing: 0) {
                     // Title
                     Text("L'approche scientifique de CortiFree")
-                        .font(.custom("HankenGrotesk-Bold", size: 28))
+                        .font(Font.Poppins.custom(.bold, size: 28))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [.white, Color(hex: "B794F6")],

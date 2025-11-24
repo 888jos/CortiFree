@@ -8,9 +8,11 @@
 
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @StateObject private var motivationalVM = MotivationalMessageViewModel()
     @Binding var isScrolling: Bool
     @Binding var scrollTimer: Timer?
 
@@ -103,8 +105,8 @@ struct HomeView: View {
                                 .frame(height: 0)
 
 
-                                // Countdown Section with parallax (slower)
-                                countdownSection
+                                // Motivational Message Card with parallax (slower)
+                                MotivationalMessageCard(viewModel: motivationalVM)
                                     .padding(.top, 20)
                                     .offset(y: scrollOffset * 0.3)
 
@@ -133,16 +135,16 @@ struct HomeView: View {
                 }
             }
         }
-        .sheet(isPresented: $viewModel.showAntiStressView) {
+        .fullScreenCover(isPresented: $viewModel.showAntiStressView) {
             AntiStressSituationView()
         }
-        .sheet(isPresented: $showBreathingList) {
+        .fullScreenCover(isPresented: $showBreathingList) {
             BreathingListView()
         }
-        .sheet(isPresented: $showMeditationList) {
+        .fullScreenCover(isPresented: $showMeditationList) {
             MeditationListView()
         }
-        .sheet(isPresented: $showSoundsList) {
+        .fullScreenCover(isPresented: $showSoundsList) {
             SoundsListView()
         }
         .fullScreenCover(isPresented: $showJournal) {
@@ -153,6 +155,13 @@ struct HomeView: View {
         }
         .fullScreenCover(isPresented: $showOnboardingV2) {
             OnboardingV2FlowView()
+        }
+        .onAppear {
+            // Refresh motivational message to pick up any name changes from profile edit
+            motivationalVM.refreshMessage()
+
+            // Initialize program start date if this is the first time HomeView is opened (after paywall)
+            initializeProgramStartDateIfNeeded()
         }
     }
 
@@ -169,7 +178,7 @@ struct HomeView: View {
 
         // En haut de la page (offset proche de 0) → footer toujours visible
         if offset > -50 {
-            withAnimation(.easeOut(duration: 0.3)) {
+            withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                 isScrolling = false
             }
             return
@@ -185,7 +194,7 @@ struct HomeView: View {
         // Scroll vers le haut (velocity positive) → afficher le footer
         else if scrollVelocity > scrollThreshold {
             scrollTimer?.invalidate()
-            withAnimation(.easeIn(duration: 0.3)) {
+            withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                 isScrolling = false
             }
         }
@@ -196,10 +205,21 @@ struct HomeView: View {
     private var headerNavigation: some View {
         HStack {
             Text("CortiFree")
-                .font(.custom("SF Pro Rounded-Semibold", size: 32))
+                .font(Font.Poppins.custom(.semiBold, size: AppConstants.FontSize.largeTitle))
                 .foregroundColor(.white)
 
             Spacer()
+
+            // Refresh quote button
+            Button(action: {
+                HapticManager.light()
+                motivationalVM.generateMessage()
+            }) {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 22))
+                    .foregroundColor(.white.opacity(0.8))
+            }
+            .padding(.trailing, 12)
 
             // Onboarding V2 button
             Button(action: {
@@ -245,92 +265,6 @@ struct HomeView: View {
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
-    // MARK: - Countdown Section
-
-    private var countdownSection: some View {
-        TimelineView(.periodic(from: Date(), by: 1.0)) { timeline in
-            let time = calculateTimeElapsed(at: timeline.date)
-
-            VStack(spacing: 8) {
-                // Title
-                Text(String(format: NSLocalizedString(StringKeys.Home.congratulations, comment: ""), getUserFirstName()))
-                    .font(.custom("SF Pro Rounded-Bold", size: 24))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.white, Color(hex: "B794F6")],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .multilineTextAlignment(.center)
-
-                // Subtitle
-                Text(NSLocalizedString(StringKeys.Home.programStarted, comment: ""))
-                    .font(.custom("Poppins-Medium", size: 14))
-                    .foregroundColor(.white.opacity(0.7))
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 4)
-
-                // Time elapsed display with flip animation
-                HStack(spacing: 12) {
-                    FlipDigitView(
-                        digit: time.days,
-                        font: .custom("SF Pro Rounded-Bold", size: 32),
-                        foregroundColor: .white
-                    )
-                    Text(":")
-                        .font(.custom("SF Pro Rounded-Bold", size: 32))
-                        .foregroundColor(.white.opacity(0.5))
-                    FlipDigitView(
-                        digit: time.hours,
-                        font: .custom("SF Pro Rounded-Bold", size: 32),
-                        foregroundColor: .white
-                    )
-                    Text(":")
-                        .font(.custom("SF Pro Rounded-Bold", size: 32))
-                        .foregroundColor(.white.opacity(0.5))
-                    FlipDigitView(
-                        digit: time.minutes,
-                        font: .custom("SF Pro Rounded-Bold", size: 32),
-                        foregroundColor: .white
-                    )
-                    Text(":")
-                        .font(.custom("SF Pro Rounded-Bold", size: 32))
-                        .foregroundColor(.white.opacity(0.5))
-                    FlipDigitView(
-                        digit: time.seconds,
-                        font: .custom("SF Pro Rounded-Bold", size: 32),
-                        foregroundColor: .white
-                    )
-                }
-                .padding(.vertical, 12)
-            }
-            .padding(.horizontal, 20)
-        }
-    }
-
-    // Helper function to calculate time elapsed since start
-    private func calculateTimeElapsed(at date: Date) -> (days: Int, hours: Int, minutes: Int, seconds: Int) {
-        let components = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: routineStartDate, to: date)
-        return (
-            max(0, components.day ?? 0),
-            max(0, components.hour ?? 0),
-            max(0, components.minute ?? 0),
-            max(0, components.second ?? 0)
-        )
-    }
-
-    // Helper function to get user's first name
-    private func getUserFirstName() -> String {
-        if let user = Auth.auth().currentUser {
-            if let displayName = user.displayName {
-                return displayName.components(separatedBy: " ").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
-            } else if let email = user.email {
-                return email.components(separatedBy: "@").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
-            }
-        }
-        return NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
-    }
 
     // MARK: - Quick Actions
 
@@ -338,7 +272,7 @@ struct HomeView: View {
         HStack(spacing: 24) {
             QuickActionButtonNew(
                 icon: "wind",
-                title: "Respiration",
+                title: NSLocalizedString("quickaction.breathing", comment: ""),
                 hapticStyle: .light
             ) {
                 showBreathingList = true
@@ -347,7 +281,7 @@ struct HomeView: View {
 
             QuickActionButtonNew(
                 icon: "figure.mind.and.body",
-                title: "Méditation",
+                title: NSLocalizedString("quickaction.meditation", comment: ""),
                 hapticStyle: .light
             ) {
                 showMeditationList = true
@@ -356,7 +290,7 @@ struct HomeView: View {
 
             QuickActionButtonNew(
                 icon: "waveform",
-                title: "Sons",
+                title: NSLocalizedString("quickaction.sounds", comment: ""),
                 hapticStyle: .light
             ) {
                 showSoundsList = true
@@ -365,7 +299,7 @@ struct HomeView: View {
 
             QuickActionButtonNew(
                 icon: "book.fill",
-                title: "Journal",
+                title: NSLocalizedString("quickaction.journal", comment: ""),
                 hapticStyle: .light
             ) {
                 showJournal = true
@@ -460,7 +394,7 @@ struct HomeView: View {
                     .font(.custom("Poppins-Medium", size: 16))
                     .foregroundColor(.white)
             }
-            .frame(maxWidth: 336, minHeight: 54)
+            .frame(maxWidth: 320, minHeight: 54)
             .background(
                 RoundedRectangle(cornerRadius: 60)
                     .fill(Color(hex: "4A0000").opacity(0.66))
@@ -473,6 +407,46 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
+    }
+
+    // MARK: - Program Start Date Initialization
+
+    private func initializeProgramStartDateIfNeeded() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        Task {
+            do {
+                // Try to fetch existing settings
+                if let existingSettings = try await FirebaseManager.shared.fetchUserSettings(uid: userId) {
+                    print("✅ User settings already exist, start date: \(existingSettings.programStartDate)")
+                    return
+                }
+
+                // No settings found - this is first time after paywall
+                // Fetch onboarding score from user document
+                let userDoc = try await Firestore.firestore()
+                    .collection("users")
+                    .document(userId)
+                    .getDocument()
+
+                let onboardingScore = userDoc.data()?["onboardingScore"] as? Int ?? 50
+
+                // Create settings with smart start date calculation
+                let settings = UserSettings(
+                    onboardingScore: onboardingScore
+                )
+
+                // Save settings
+                try await FirebaseManager.shared.saveUserSettings(uid: userId, settings: settings)
+
+                // Initialize habit tracking
+                try await FirebaseManager.shared.initializeHabitTracking(uid: userId)
+
+                print("✅ User settings initialized with start date: \(settings.programStartDate)")
+            } catch {
+                print("❌ Error initializing user settings: \(error)")
+            }
+        }
     }
 }
 
@@ -815,7 +789,7 @@ struct TimeUnitRowView: View {
     var body: some View {
         HStack(spacing: 8) {
             Text("\(value)")
-                .font(.custom("SF Pro Rounded-Bold", size: 36))
+                .font(Font.Poppins.custom(.bold, size: 36))
                 .foregroundStyle(
                     LinearGradient(
                         colors: [.white, Color(hex: "B794F6")],
@@ -826,7 +800,7 @@ struct TimeUnitRowView: View {
                 .frame(width: 70, alignment: .trailing)
 
             Text(unit)
-                .font(.custom("SF Pro Rounded-Bold", size: 14))
+                .font(Font.Poppins.custom(.bold, size: 14))
                 .foregroundColor(.white.opacity(0.8))
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -842,7 +816,7 @@ struct TimeUnitCompactView: View {
     var body: some View {
         VStack(spacing: 4) {
             Text("\(String(format: "%02d", value))")
-                .font(.custom("SF Pro Rounded-Bold", size: 28))
+                .font(Font.Poppins.custom(.bold, size: 28))
                 .foregroundColor(.white)
 
             Text(unit.uppercased())

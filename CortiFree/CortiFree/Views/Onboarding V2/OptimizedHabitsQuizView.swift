@@ -42,7 +42,7 @@ struct OptimizedHabitsQuizView: View {
             }
         }
         // Reduced animation duration for snappier feel
-        .animation(.easeInOut(duration: 0.2), value: currentQuestionIndex)
+        .animation(.easeInOut(duration: AppConstants.Animation.standardDuration), value: currentQuestionIndex)
     }
 
     // MARK: - Simplified Header

@@ -55,13 +55,13 @@ struct LevelUpPopupView: View {
 
                 // Congratulations text
                 Text("Bravo !")
-                    .font(.custom("SF Pro Rounded-Bold", size: 32))
+                    .font(Font.Poppins.custom(.bold, size: 32))
                     .foregroundColor(.white)
 
                 // Level info
                 VStack(spacing: 8) {
                     Text("Tu passes au niveau \(level.id)")
-                        .font(.custom("SF Pro Rounded-Semibold", size: 20))
+                        .font(Font.Poppins.custom(.semiBold, size: 20))
                         .foregroundColor(.white)
 
                     Text(level.name)
@@ -119,7 +119,7 @@ struct LevelUpPopupView: View {
 
     private func dismissPopup() {
         HapticManager.light()
-        withAnimation(.easeOut(duration: 0.3)) {
+        withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
             scale = 0.8
             opacity = 0
         }

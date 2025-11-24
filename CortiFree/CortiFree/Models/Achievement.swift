@@ -31,7 +31,6 @@ struct Achievement: Identifiable, Codable, Equatable {
         case streak
         case completion
         case habit
-        case milestone
         case special
     }
 
@@ -142,85 +141,5 @@ struct Achievement: Identifiable, Codable, Equatable {
         }
 
         return achievement
-    }
-}
-
-// MARK: - Milestone Model
-
-struct Milestone: Identifiable, Codable {
-    let id: String
-    let day: Int
-    let title: String
-    let description: String
-    let scoreBonus: Double // Bonus points for each domain
-    let badgeId: String? // Associated achievement badge
-    var completedAt: Date?
-
-    var isCompleted: Bool {
-        completedAt != nil
-    }
-
-    static let allMilestones: [Milestone] = [
-        Milestone(
-            id: "day_7",
-            day: 7,
-            title: "Champion d'une Semaine!",
-            description: "Tu as tenu une semaine complète, bravo!",
-            scoreBonus: 50,
-            badgeId: "week_warrior"
-        ),
-        Milestone(
-            id: "day_21",
-            day: 21,
-            title: "Formateur d'Habitudes!",
-            description: "21 jours - les neurosciences disent que c'est le début d'une vraie habitude!",
-            scoreBonus: 100,
-            badgeId: nil
-        ),
-        Milestone(
-            id: "day_33",
-            day: 33,
-            title: "Mi-parcours Héros!",
-            description: "Tu es à mi-chemin! Continue comme ça!",
-            scoreBonus: 150,
-            badgeId: "halfway_hero"
-        ),
-        Milestone(
-            id: "day_66",
-            day: 66,
-            title: "Programme Complété!",
-            description: "Incroyable! Tu as complété les 66 jours! Tu es officiellement diplômé!",
-            scoreBonus: 500,
-            badgeId: "graduate"
-        )
-    ]
-
-    // MARK: - Firebase Conversion
-
-    var toFirestore: [String: Any] {
-        var data: [String: Any] = [
-            "id": id,
-            "day": day
-        ]
-
-        if let completed = completedAt {
-            data["completedAt"] = Timestamp(date: completed)
-        }
-
-        return data
-    }
-
-    static func fromFirestore(_ data: [String: Any]) -> Milestone? {
-        guard let id = data["id"] as? String,
-              let day = data["day"] as? Int,
-              var milestone = allMilestones.first(where: { $0.id == id && $0.day == day }) else {
-            return nil
-        }
-
-        if let timestamp = data["completedAt"] as? Timestamp {
-            milestone.completedAt = timestamp.dateValue()
-        }
-
-        return milestone
     }
 }

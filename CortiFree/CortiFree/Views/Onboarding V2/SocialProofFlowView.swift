@@ -158,7 +158,7 @@ struct TestimonialsView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Color(hex: "1A1A4E"))
 
-                    Text("Continuer")
+                    Text(StringKeys.Common.continueButton)
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(Color(hex: "1A1A4E"))
                 }
@@ -295,7 +295,7 @@ struct BeforeAfterStatsView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Color(hex: "1A1A4E"))
 
-                    Text("Continuer")
+                    Text(StringKeys.Common.continueButton)
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(Color(hex: "1A1A4E"))
                 }

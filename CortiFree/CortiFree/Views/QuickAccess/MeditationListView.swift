@@ -14,14 +14,14 @@ struct MeditationListView: View {
     @State private var selectedMeditationSupport: MeditationSupport?
 
     let meditations: [(id: String, icon: String, title: String)] = [
-        ("conscious-breathing", "wind", "Respiration consciente"),
-        ("body-scan", "figure.stand", "Body Scan express"),
-        ("mindfulness", "eye.fill", "Mindfulness de base"),
-        ("grounding", "leaf.fill", "Ancrage corporel / Grounding"),
-        ("visualization", "sparkles", "Visualisation lieu sûr"),
-        ("compassion", "heart.fill", "Auto-compassion"),
-        ("focus-clarity", "brain.head.profile", "Méditation focus/clarté"),
-        ("yoga-nidra", "moon.stars.fill", "Méditation sommeil / Yoga Nidra")
+        ("conscious-breathing", "wind", NSLocalizedString("library.meditation.conscious_breathing", comment: "")),
+        ("body-scan", "figure.stand", NSLocalizedString("library.meditation.body_scan", comment: "")),
+        ("mindfulness", "eye.fill", NSLocalizedString("library.meditation.mindfulness", comment: "")),
+        ("grounding", "leaf.fill", NSLocalizedString("library.meditation.grounding", comment: "")),
+        ("visualization", "sparkles", NSLocalizedString("library.meditation.visualization", comment: "")),
+        ("compassion", "heart.fill", NSLocalizedString("library.meditation.compassion", comment: "")),
+        ("focus-clarity", "brain.head.profile", NSLocalizedString("library.meditation.focus", comment: "")),
+        ("yoga-nidra", "moon.stars.fill", NSLocalizedString("library.meditation.sleep", comment: ""))
     ]
 
     var body: some View {
@@ -78,7 +78,7 @@ struct MeditationListView: View {
 
             Spacer()
 
-            Text("Exercices de Méditation")
+            Text(NSLocalizedString("library.meditation.title", comment: ""))
                 .font(.custom("Poppins-SemiBold", size: 20))
                 .foregroundColor(.white)
 
@@ -112,51 +112,42 @@ struct MeditationCard: View {
             }
             action()
         }) {
-            VStack {
-                // Title avec étoile en haut
-                HStack(spacing: 6) {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(.white)
+            ZStack {
+                // Centered icon
+                Image(systemName: icon)
+                    .font(.system(size: 32, weight: .semibold))
+                    .foregroundColor(Color(hex: "F4EFFF"))
 
-                    Text(title)
-                        .font(.custom("Poppins-SemiBold", size: 13))
-                        .foregroundColor(.white)
+                // Title avec étoile en haut à gauche
+                VStack {
+                    HStack(spacing: 6) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+
+                        Text(title)
+                            .font(.custom("Poppins-SemiBold", size: 12))
+                            .foregroundColor(.white)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+
+                        Spacer()
+                    }
+                    .padding(.top, 12)
+                    .padding(.leading, 12)
+                    .padding(.trailing, 12)
 
                     Spacer()
                 }
-                .padding(.top, 12)
-                .padding(.leading, 12)
-
-                Spacer()
             }
             .frame(maxWidth: .infinity, minHeight: 160)
             .aspectRatio(1, contentMode: .fit)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "49288C").opacity(0.4),
-                                Color(hex: "2A2B5A").opacity(0.6)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(Color(hex: "2A1E47"))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        Color.appTheme.opacity(0.3),
-                                        Color.appThemeSecondary.opacity(0.3)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1
-                            )
+                            .stroke(Color(hex: "F4EFFF").opacity(0.3), lineWidth: 1)
                     )
             )
             .scaleEffect(isPressed ? 0.95 : 1.0)

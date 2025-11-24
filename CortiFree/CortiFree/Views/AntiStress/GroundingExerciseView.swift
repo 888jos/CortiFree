@@ -16,6 +16,7 @@ struct GroundingExerciseView: View {
     @State private var currentStep = 0
     @State private var showCompletion = false
     @State private var showConfetti = false
+    @StateObject private var voiceOverManager = VoiceOverManager.shared
 
     let steps = [
         GroundingStep(
@@ -32,7 +33,7 @@ struct GroundingExerciseView: View {
             instruction: "Nomme 4 choses que tu touches",
             subtitle: "Ressens les textures",
             count: 4,
-            color: "appThemeSecondary"
+            color: "66BB6A"
         ),
         GroundingStep(
             sense: "Ouïe",
@@ -83,6 +84,7 @@ struct GroundingExerciseView: View {
                 HStack {
                     Button(action: {
                         HapticManager.light()
+                        voiceOverManager.stop()
                         dismiss()
                     }) {
                         Image(systemName: "xmark.circle.fill")
@@ -98,6 +100,34 @@ struct GroundingExerciseView: View {
                             Circle()
                                 .fill(index <= currentStep ? Color.appTheme : Color.white.opacity(0.3))
                                 .frame(width: 8, height: 8)
+                        }
+                    }
+
+                    Spacer()
+
+                    // VoiceOver toggle button
+                    Button(action: {
+                        HapticManager.light()
+                        voiceOverManager.toggle()
+                        if voiceOverManager.isEnabled {
+                            speakCurrentStep()
+                        }
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.2) : Color.white.opacity(0.1))
+                                .frame(width: 44, height: 44)
+                                .blur(radius: 8)
+
+                            Circle()
+                                .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.3) : Color(hex: "1A1B3A").opacity(0.9))
+                                .frame(width: 44, height: 44)
+
+                            Image(systemName: voiceOverManager.isEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
+                                .font(.custom("Poppins-SemiBold", size: 16))
+                                .foregroundColor(voiceOverManager.isEnabled ? Color(hex: "B388FF") : .white.opacity(0.7))
+                                .scaleEffect(voiceOverManager.isSpeaking ? 1.1 : 1.0)
+                                .animation(.easeInOut(duration: 0.3).repeatForever(autoreverses: true), value: voiceOverManager.isSpeaking)
                         }
                     }
                 }
@@ -194,7 +224,6 @@ struct GroundingExerciseView: View {
             // Completion overlay
             if showCompletion {
                 CompletionOverlay(
-                    xpEarned: 5,
                     onDismiss: {
                         dismiss()
                     }
@@ -211,6 +240,24 @@ struct GroundingExerciseView: View {
         }
         .onAppear {
             viewModel.startExercise(.grounding5Senses)
+            speakCurrentStep()
+        }
+        .onChange(of: currentStep) { _ in
+            speakCurrentStep()
+        }
+    }
+
+    // MARK: - VoiceOver
+
+    private func speakCurrentStep() {
+        guard voiceOverManager.isEnabled else { return }
+
+        let step = steps[currentStep]
+        voiceOverManager.announceStep(current: currentStep + 1, total: steps.count)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            let text = "\(step.sense). \(step.instruction). \(step.subtitle)"
+            self.voiceOverManager.speak(text)
         }
     }
 
@@ -227,6 +274,8 @@ struct GroundingExerciseView: View {
     }
 
     private func completeExercise() {
+        voiceOverManager.announceCompletion()
+
         Task {
             await viewModel.completeExercise()
             HapticManager.success()

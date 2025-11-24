@@ -16,6 +16,7 @@ struct BreathingExerciseView: View {
     @ObservedObject var viewModel: AntiStressViewModel
     @Environment(\.dismiss) var dismiss
     @StateObject private var planetSettings = PlanetSettings.shared
+    @StateObject private var voiceOverManager = VoiceOverManager.shared
 
     @State private var isBreathingIn = true
     @State private var timeRemaining: Int
@@ -72,13 +73,13 @@ struct BreathingExerciseView: View {
     var currentPhaseText: String {
         switch currentPhase {
         case .inhale:
-            return "Inspire"
+            return NSLocalizedString("voiceover.breathing.inhale", comment: "")
         case .hold:
-            return "Retiens"
+            return NSLocalizedString("voiceover.breathing.hold", comment: "")
         case .exhale:
-            return "Expire"
+            return NSLocalizedString("voiceover.breathing.exhale", comment: "")
         case .holdOut:
-            return "Retiens"
+            return NSLocalizedString("voiceover.breathing.hold_out", comment: "")
         }
     }
 
@@ -90,7 +91,7 @@ struct BreathingExerciseView: View {
 
             VStack(spacing: 40) {
                 Spacer()
-                    .frame(height: 72) // Space for close button
+                    .frame(height: 100) // Space for back button
 
                 // Exercise Title
                 VStack(spacing: 8) {
@@ -143,26 +144,57 @@ struct BreathingExerciseView: View {
                 Spacer()
             }
 
-            // Close button - fixed position overlay (always top-left, doesn't follow animation)
-            VStack {
+            // Back button + VoiceOver toggle - FIXE et indépendant, au niveau du titre
+            VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Button(action: {
                         HapticManager.light()
-                        isExerciseActive = false // Arrêter l'exercice
+                        isExerciseActive = false
+                        voiceOverManager.stop()
                         dismiss()
                     }) {
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-Bold", size: 22))
-                            .foregroundColor(.white)
-                            .frame(width: 44, height: 44)
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 18, weight: .semibold))
+                            Text("Retour")
+                                .font(.custom("Poppins-SemiBold", size: 16))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
                     }
+
                     Spacer()
+
+                    // VoiceOver toggle button
+                    Button(action: {
+                        HapticManager.light()
+                        voiceOverManager.toggle()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.2) : Color.white.opacity(0.1))
+                                .frame(width: 44, height: 44)
+                                .blur(radius: 8)
+
+                            Circle()
+                                .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.3) : Color(hex: "1A1B3A").opacity(0.9))
+                                .frame(width: 44, height: 44)
+
+                            Image(systemName: voiceOverManager.isEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
+                                .font(.custom("Poppins-SemiBold", size: 16))
+                                .foregroundColor(voiceOverManager.isEnabled ? Color(hex: "B388FF") : .white.opacity(0.7))
+                                .scaleEffect(voiceOverManager.isSpeaking ? 1.1 : 1.0)
+                                .animation(.easeInOut(duration: 0.3).repeatForever(autoreverses: true), value: voiceOverManager.isSpeaking)
+                        }
+                    }
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 20)
+                .padding(.horizontal, 20)
+                .padding(.top, 110) // Au niveau du titre, pas en haut
 
                 Spacer()
             }
+            .zIndex(100) // Au-dessus de tout
 
             // Easter egg overlay
             if showEasterEgg {
@@ -182,8 +214,7 @@ struct BreathingExerciseView: View {
 
             // Completion overlay
             if showCompletion {
-                CompletionOverlay(
-                    xpEarned: exerciseType.xpReward,
+                BreathingCompletionOverlay(
                     onDismiss: {
                         dismiss()
                     }
@@ -231,6 +262,7 @@ struct BreathingExerciseView: View {
 
         // Inhale - la planète grandit
         currentPhase = .inhale
+        voiceOverManager.announceBreathingPhase(currentPhaseText)
         withAnimation(.easeInOut(duration: pattern.inhale)) {
             ballYPosition = -80 // Grande
             isBreathingIn = true
@@ -241,6 +273,7 @@ struct BreathingExerciseView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + pattern.inhale) {
                 guard self.isExerciseActive else { return }
                 currentPhase = .hold
+                self.voiceOverManager.announceBreathingPhase(self.currentPhaseText)
                 // La planète reste grande pendant le hold
             }
         }
@@ -249,6 +282,7 @@ struct BreathingExerciseView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + pattern.inhale + pattern.hold) {
             guard self.isExerciseActive else { return }
             currentPhase = .exhale
+            self.voiceOverManager.announceBreathingPhase(self.currentPhaseText)
             withAnimation(.easeInOut(duration: pattern.exhale)) {
                 ballYPosition = 80 // Petite
                 isBreathingIn = false
@@ -260,6 +294,7 @@ struct BreathingExerciseView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + pattern.inhale + pattern.hold + pattern.exhale) {
                 guard self.isExerciseActive else { return }
                 currentPhase = .holdOut
+                self.voiceOverManager.announceBreathingPhase(self.currentPhaseText)
                 // La planète reste petite pendant le hold
             }
         }
@@ -358,33 +393,12 @@ struct BreathingExerciseView: View {
     }
 }
 
-// MARK: - Completion Overlay
+// MARK: - Breathing Completion Overlay
 
-struct CompletionOverlay: View {
-    let xpEarned: Int
+struct BreathingCompletionOverlay: View {
     let onDismiss: () -> Void
 
-    @State private var showFeedback = false
-    @State private var showCelebration = true
-
     var body: some View {
-        ZStack {
-            if showCelebration {
-                celebrationView
-                    .transition(.opacity)
-            }
-
-            if showFeedback {
-                ExerciseFeedbackView(xpEarned: xpEarned) { feedback in
-                    // Feedback handling will be done by parent view
-                    onDismiss()
-                }
-                .transition(.opacity)
-            }
-        }
-    }
-
-    private var celebrationView: some View {
         ZStack {
             Color.black.opacity(0.8)
                 .ignoresSafeArea()
@@ -401,35 +415,16 @@ struct CompletionOverlay: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
 
-                Text("🧘‍♂️")
+                Image(systemName: "figure.mind.and.body")
                     .font(.system(size: 60))
+                    .foregroundColor(Color.appTheme)
 
-                // XP earned
-                HStack(spacing: 8) {
-                    Text("+\(xpEarned)")
-                        .font(.custom("Poppins-Bold", size: 24))
-                        .foregroundColor(Color.appTheme)
-
-                    Text("XP")
-                        .font(.custom("Poppins-Medium", size: 20))
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white.opacity(0.1))
-                )
-
-                // Feedback button
+                // Continue button
                 Button(action: {
                     HapticManager.light()
-                    withAnimation(.easeInOut(duration: 0.4)) {
-                        showCelebration = false
-                        showFeedback = true
-                    }
+                    onDismiss()
                 }) {
-                    Text("Donner mon avis")
+                    Text("Continuer")
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -448,16 +443,6 @@ struct CompletionOverlay: View {
                 }
                 .padding(.horizontal, 40)
                 .padding(.top, 8)
-
-                // Skip button
-                Button(action: {
-                    HapticManager.light()
-                    onDismiss()
-                }) {
-                    Text("Passer")
-                        .font(.custom("Poppins-Medium", size: 16))
-                        .foregroundColor(.white.opacity(0.6))
-                }
             }
             .padding(40)
         }
@@ -584,19 +569,6 @@ struct ExerciseFeedbackView: View {
     private var feedbackView: some View {
         VStack(spacing: 24) {
             VStack(spacing: 12) {
-                HStack(spacing: 8) {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(.yellow)
-
-                    Text("+\(xpEarned) XP")
-                        .font(.custom("Poppins-SemiBold", size: 18))
-                        .foregroundColor(.white)
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(Capsule().fill(Color.white.opacity(0.1)))
-
                 Text("Comment te sens-tu ?")
                     .font(.custom("Poppins-SemiBold", size: 24))
                     .foregroundColor(.white)
@@ -894,7 +866,7 @@ struct EasterEggOverlay: View {
         }
         .onAppear {
             HapticManager.success()
-            withAnimation(.easeOut(duration: 0.3)) {
+            withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                 animateStars = true
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

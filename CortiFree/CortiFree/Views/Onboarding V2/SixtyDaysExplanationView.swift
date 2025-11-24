@@ -220,7 +220,7 @@ struct BenefitStatCard: View {
 
             HStack(spacing: 4) {
                 Text(percentage)
-                    .font(.custom("HankenGrotesk-Bold", size: 28))
+                    .font(Font.Poppins.custom(.bold, size: 28))
                     .foregroundColor(.white)
 
                 Image(systemName: "arrow.up")

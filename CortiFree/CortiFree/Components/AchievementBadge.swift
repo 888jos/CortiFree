@@ -131,8 +131,6 @@ struct AchievementBadge: View {
             return Color(hex: "2ECC71") // Green
         case .habit:
             return Color(hex: "B794F6") // Purple
-        case .milestone:
-            return Color(hex: "F39C12") // Gold
         case .special:
             return Color(hex: "E74C3C") // Red
         }
@@ -152,7 +150,7 @@ struct AchievementBadge: View {
                         title: "Test Badge",
                         description: "Test",
                         icon: "star.fill",
-                        category: .milestone,
+                        category: .streak,
                         requirement: 1,
                         progress: 1,
                         unlockedAt: Date()

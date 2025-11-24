@@ -8,56 +8,38 @@
 import SwiftUI
 
 extension Font {
-    // Custom font with automatic fallback to HankenGrotesk
+    // Custom font with automatic fallback to system fonts
     static func customFont(_ name: String, size: CGFloat) -> Font {
-        // Check if Poppins was requested and map to HankenGrotesk
-        let mappedName: String
+        // Map Poppins to system fonts with matching weights
         switch name {
-        case "Poppins-Regular":
-            mappedName = "HankenGrotesk-Regular"
-        case "Poppins-Medium":
-            mappedName = "HankenGrotesk-Medium"
-        case "Poppins-SemiBold":
-            mappedName = "HankenGrotesk-SemiBold"
         case "Poppins-Bold":
-            mappedName = "HankenGrotesk-Bold"
+            return Font.system(size: size, weight: .bold)
+        case "Poppins-SemiBold":
+            return Font.system(size: size, weight: .semibold)
+        case "Poppins-Medium":
+            return Font.system(size: size, weight: .medium)
+        case "Poppins-Regular":
+            return Font.system(size: size, weight: .regular)
         default:
-            mappedName = name
-        }
-
-        // Try to create the custom font, fallback to system if fails
-        if UIFont(name: mappedName, size: size) != nil {
-            return Font.custom(mappedName, size: size)
-        } else {
-            // Fallback to system font with similar weight
-            switch name {
-            case "Poppins-Bold", "HankenGrotesk-Bold":
-                return Font.system(size: size, weight: .bold)
-            case "Poppins-SemiBold", "HankenGrotesk-SemiBold":
-                return Font.system(size: size, weight: .semibold)
-            case "Poppins-Medium", "HankenGrotesk-Medium":
-                return Font.system(size: size, weight: .medium)
-            default:
-                return Font.system(size: size, weight: .regular)
-            }
+            return Font.system(size: size, weight: .regular)
         }
     }
 
     // Convenience methods for common fonts
     static func poppinsRegular(_ size: CGFloat) -> Font {
-        return customFont("Poppins-Regular", size: size)
+        return Font.system(size: size, weight: .regular)
     }
 
     static func poppinsMedium(_ size: CGFloat) -> Font {
-        return customFont("Poppins-Medium", size: size)
+        return Font.system(size: size, weight: .medium)
     }
 
     static func poppinsSemiBold(_ size: CGFloat) -> Font {
-        return customFont("Poppins-SemiBold", size: size)
+        return Font.system(size: size, weight: .semibold)
     }
 
     static func poppinsBold(_ size: CGFloat) -> Font {
-        return customFont("Poppins-Bold", size: size)
+        return Font.system(size: size, weight: .bold)
     }
 }
 

@@ -243,7 +243,7 @@ struct HabitsQuizView: View {
                 answers[currentQuestionIndex] = Int(energySliderValue)
                 advanceToNextQuestion()
             }) {
-                Text("Continuer")
+                Text(StringKeys.Common.continueButton)
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)

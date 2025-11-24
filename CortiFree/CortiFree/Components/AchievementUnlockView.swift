@@ -78,7 +78,7 @@ struct AchievementUnlockView: View {
                 VStack(spacing: 16) {
                     // Title
                     Text("Achievement Unlocked!")
-                        .font(.custom("HankenGrotesk-Bold", size: 22))
+                        .font(Font.Poppins.custom(.bold, size: 22))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
@@ -127,7 +127,7 @@ struct AchievementUnlockView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(
-                            RoundedRectangle(cornerRadius: 14)
+                            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
                                 .fill(
                                     LinearGradient(
                                         colors: [
@@ -236,8 +236,6 @@ struct AchievementUnlockView: View {
             return Color(hex: "2ECC71") // Green
         case .habit:
             return Color(hex: "B794F6") // Purple
-        case .milestone:
-            return Color(hex: "F39C12") // Gold
         case .special:
             return Color(hex: "E74C3C") // Red
         }
@@ -251,8 +249,6 @@ struct AchievementUnlockView: View {
             return "Completion"
         case .habit:
             return "Habit"
-        case .milestone:
-            return "Milestone"
         case .special:
             return "Special"
         }

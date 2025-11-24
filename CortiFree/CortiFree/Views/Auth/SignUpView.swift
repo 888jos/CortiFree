@@ -323,6 +323,10 @@ struct SignUpView: View {
                 }
             }
         }
+        .onTapGesture {
+            // Dismiss keyboard when tapping outside text fields
+            focusedField = nil
+        }
         .onAppear {
             authViewModel.clearMessages()
         }

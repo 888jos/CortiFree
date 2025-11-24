@@ -102,7 +102,7 @@ extension View {
 
     /// Reduce animation complexity
     func lightAnimation() -> some View {
-        self.animation(.easeInOut(duration: 0.2))
+        self.animation(.easeInOut(duration: AppConstants.Animation.standardDuration))
     }
 }
 

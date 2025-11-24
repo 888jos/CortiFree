@@ -33,6 +33,14 @@ class ProfileManager: ObservableObject {
 
         if let firstName = firstName {
             updates["displayName"] = firstName
+
+            // IMPORTANT: Also update Firebase Auth displayName so it's visible everywhere
+            if let user = Auth.auth().currentUser {
+                let changeRequest = user.createProfileChangeRequest()
+                changeRequest.displayName = firstName
+                try await changeRequest.commitChanges()
+                print("✅ Firebase Auth displayName updated to: \(firstName)")
+            }
         }
 
         // Update UserSettings in Firestore
@@ -58,7 +66,7 @@ class ProfileManager: ObservableObject {
                 .setData(settingsUpdates, merge: true)
         }
 
-        print("✅ Personal info updated successfully")
+        print("✅ Personal info updated successfully in Firestore")
     }
 
     // MARK: - Goals Management

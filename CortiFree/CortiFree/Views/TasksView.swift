@@ -643,7 +643,7 @@ struct TaskRowDetailed: View {
                     .font(.custom("Poppins-Medium", size: 16))
                     .foregroundColor(isCompleted ? Color(hex: "B0B8D4") : .white)
                     .strikethrough(isCompleted, color: Color(hex: "B0B8D4"))
-                    .animation(.easeInOut(duration: 0.2), value: isCompleted)
+                    .animation(.easeInOut(duration: AppConstants.Animation.standardDuration), value: isCompleted)
 
                 Spacer()
 
@@ -727,7 +727,7 @@ struct TaskRowDetailed: View {
             showCheckmark = task.completed
         }
         .onChange(of: task.completed) { _, newValue in
-            withAnimation(.easeInOut(duration: 0.2)) {
+            withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                 isCompleted = newValue
                 showCheckmark = newValue
             }

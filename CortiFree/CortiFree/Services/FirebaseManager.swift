@@ -450,7 +450,7 @@ class FirebaseManager: ObservableObject {
         return trackingDict
     }
 
-    func markHabitCompleted(uid: String, habitId: String, date: Date = Date()) async throws {
+    func markHabitCompleted(uid: String, habitId: String, programDay: Int, date: Date = Date()) async throws {
         let dateString = getCurrentDateString(from: date)
 
         // Save daily completion
@@ -466,6 +466,38 @@ class FirebaseManager: ObservableObject {
         // Update habit tracking stats
         if var tracking = try await fetchHabitTracking(uid: uid, habitId: habitId) {
             tracking.markCompleted(on: date)
+
+            // Add program day to completedDays array if not already present
+            if !tracking.completedDays.contains(programDay) {
+                tracking.completedDays.append(programDay)
+                tracking.completedDays.sort() // Keep array sorted
+            }
+
+            try await db.collection("users").document(uid)
+                .collection("habit_tracking").document(habitId)
+                .setData(tracking.toFirestore())
+        }
+    }
+
+    func removeHabitCompletion(uid: String, habitId: String, programDay: Int, date: Date = Date()) async throws {
+        let dateString = getCurrentDateString(from: date)
+
+        // Remove daily completion
+        try await db.collection("users").document(uid)
+            .collection("habit_tracking").document(habitId)
+            .collection("daily_completion").document(dateString)
+            .delete()
+
+        // Update habit tracking stats
+        if var tracking = try await fetchHabitTracking(uid: uid, habitId: habitId) {
+            // Remove program day from completedDays array
+            tracking.completedDays.removeAll { $0 == programDay }
+
+            // Decrement total completions
+            tracking.totalCompletions = max(0, tracking.totalCompletions - 1)
+
+            // Reset last completed date to nil (will be recalculated on next fetch)
+            tracking.lastCompletedDate = nil
 
             try await db.collection("users").document(uid)
                 .collection("habit_tracking").document(habitId)
@@ -544,5 +576,72 @@ class FirebaseManager: ObservableObject {
         // Level 3: 400-899 XP
         // etc.
         return Int(floor(sqrt(Double(xp) / 100.0))) + 1
+    }
+
+    // MARK: - Daily Mood
+
+    func saveDailyMood(userId: String, mood: DailyMood) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateKey = dateFormatter.string(from: mood.date)
+
+        do {
+            try db.collection("users")
+                .document(userId)
+                .collection("daily_moods")
+                .document(dateKey)
+                .setData(from: mood)
+        } catch {
+            print("Error saving daily mood: \(error)")
+        }
+    }
+
+    func fetchTodaysMood(userId: String, completion: @escaping (Mood?) -> Void) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let todayKey = dateFormatter.string(from: Date())
+
+        db.collection("users")
+            .document(userId)
+            .collection("daily_moods")
+            .document(todayKey)
+            .getDocument { snapshot, error in
+                if let error = error {
+                    print("Error fetching today's mood: \(error)")
+                    completion(nil)
+                    return
+                }
+
+                guard let data = snapshot?.data(),
+                      let dailyMood = DailyMood(from: data) else {
+                    completion(nil)
+                    return
+                }
+
+                completion(dailyMood.mood)
+            }
+    }
+
+    func fetchRecentMoods(userId: String, days: Int, completion: @escaping ([DailyMood]) -> Void) {
+        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+
+        db.collection("users")
+            .document(userId)
+            .collection("daily_moods")
+            .whereField("date", isGreaterThanOrEqualTo: startDate)
+            .order(by: "date", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching recent moods: \(error)")
+                    completion([])
+                    return
+                }
+
+                let moods = snapshot?.documents.compactMap { doc -> DailyMood? in
+                    return DailyMood(from: doc.data())
+                } ?? []
+
+                completion(moods)
+            }
     }
 }

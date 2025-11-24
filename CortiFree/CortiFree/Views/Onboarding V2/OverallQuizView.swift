@@ -177,21 +177,25 @@ struct OverallQuizView: View {
 
             // Text input for first name
             VStack(spacing: 20) {
-                TextField("", text: $firstName)
-                    .placeholder(when: firstName.isEmpty) {
+                ZStack(alignment: .leading) {
+                    if firstName.isEmpty {
                         Text("Ton prénom")
                             .foregroundColor(Color.white.opacity(0.5))
                             .font(.custom("Poppins-Medium", size: 16))
+                            .padding(.horizontal, 20)
                     }
-                    .font(.custom("Poppins-Medium", size: 16))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 20)
-                    .frame(height: 54)
-                    .background(
-                        RoundedRectangle(cornerRadius: 40)
-                            .fill(Color(hex: "131146").opacity(0.8))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 40)
+
+                    TextField("", text: $firstName)
+                        .font(.custom("Poppins-Medium", size: 16))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                }
+                .frame(height: 54)
+                .background(
+                    RoundedRectangle(cornerRadius: 40)
+                        .fill(Color(hex: "131146").opacity(0.8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 40)
                                     .stroke(Color(hex: "1B1864"), lineWidth: 2)
                             )
                     )
@@ -208,7 +212,7 @@ struct OverallQuizView: View {
                             currentQuestionIndex += 1
                         }
                     }) {
-                        Text("Continuer")
+                        Text(StringKeys.Common.continueButton)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
@@ -508,7 +512,7 @@ struct OverallQuizView: View {
                             currentQuestionIndex += 1
                         }
                     }) {
-                        Text("Continuer")
+                        Text(StringKeys.Common.continueButton)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)

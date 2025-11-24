@@ -18,7 +18,7 @@ class AuthViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var successMessage: String?
 
-    private let authService = AuthService.shared
+    private let firebase = UnifiedFirebaseService.shared
     private var cancellables = Set<AnyCancellable>()
 
     init() {
@@ -28,8 +28,8 @@ class AuthViewModel: ObservableObject {
 
     // Vérifier l'état d'authentification au démarrage
     private func checkAuthState() {
-        isAuthenticated = authService.isAuthenticated
-        currentUser = authService.currentUser
+        isAuthenticated = firebase.auth.isAuthenticated
+        currentUser = firebase.auth.currentUser
     }
 
     // Écouter les changements d'état d'authentification
@@ -53,12 +53,12 @@ class AuthViewModel: ObservableObject {
     // Inscription
     func signUp(email: String, password: String, username: String) async {
         guard !email.isEmpty, !password.isEmpty, !username.isEmpty else {
-            errorMessage = "Tous les champs sont requis"
+            errorMessage = NSLocalizedString("error.validation.missing_field", comment: "")
             return
         }
 
         guard password.count >= 6 else {
-            errorMessage = "Le mot de passe doit contenir au moins 6 caractères"
+            errorMessage = NSLocalizedString("error.auth.weak_password", comment: "")
             return
         }
 
@@ -66,12 +66,16 @@ class AuthViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let user = try await authService.signUp(email: email, password: password, username: username)
+            let user = try await firebase.auth.signUp(email: email, password: password, displayName: username)
             currentUser = user
             isAuthenticated = true
             successMessage = "Compte créé avec succès !"
+        } catch let error as CoreError {
+            errorMessage = error.errorDescription
+            ErrorHandler.shared.handle(error, context: "AuthViewModel.signUp", showToUser: false)
         } catch {
-            errorMessage = handleAuthError(error)
+            errorMessage = error.localizedDescription
+            ErrorHandler.shared.handle(error, context: "AuthViewModel.signUp", showToUser: false)
         }
 
         isLoading = false
@@ -80,7 +84,7 @@ class AuthViewModel: ObservableObject {
     // Connexion
     func signIn(email: String, password: String) async {
         guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Email et mot de passe requis"
+            errorMessage = NSLocalizedString("error.validation.missing_field", comment: "")
             return
         }
 
@@ -88,12 +92,16 @@ class AuthViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let user = try await authService.signIn(email: email, password: password)
+            let user = try await firebase.auth.signIn(email: email, password: password)
             currentUser = user
             isAuthenticated = true
             successMessage = "Connexion réussie !"
+        } catch let error as CoreError {
+            errorMessage = error.errorDescription
+            ErrorHandler.shared.handle(error, context: "AuthViewModel.signIn", showToUser: false)
         } catch {
-            errorMessage = handleAuthError(error)
+            errorMessage = error.localizedDescription
+            ErrorHandler.shared.handle(error, context: "AuthViewModel.signIn", showToUser: false)
         }
 
         isLoading = false
@@ -101,20 +109,26 @@ class AuthViewModel: ObservableObject {
 
     // Déconnexion
     func signOut() {
-        do {
-            try authService.signOut()
-            currentUser = nil
-            isAuthenticated = false
-            successMessage = "Déconnexion réussie"
-        } catch {
-            errorMessage = "Erreur lors de la déconnexion"
+        Task {
+            do {
+                try await firebase.auth.signOut()
+                currentUser = nil
+                isAuthenticated = false
+                successMessage = "Déconnexion réussie"
+            } catch let error as CoreError {
+                errorMessage = error.errorDescription
+                ErrorHandler.shared.handle(error, context: "AuthViewModel.signOut", showToUser: false)
+            } catch {
+                errorMessage = error.localizedDescription
+                ErrorHandler.shared.handle(error, context: "AuthViewModel.signOut", showToUser: false)
+            }
         }
     }
 
     // Réinitialiser le mot de passe
     func resetPassword(email: String) async {
         guard !email.isEmpty else {
-            errorMessage = "Email requis"
+            errorMessage = NSLocalizedString("error.validation.missing_field", comment: "")
             return
         }
 
@@ -122,37 +136,17 @@ class AuthViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            try await authService.resetPassword(email: email)
+            try await firebase.auth.resetPassword(email: email)
             successMessage = "Email de réinitialisation envoyé !"
+        } catch let error as CoreError {
+            errorMessage = error.errorDescription
+            ErrorHandler.shared.handle(error, context: "AuthViewModel.resetPassword", showToUser: false)
         } catch {
-            errorMessage = handleAuthError(error)
+            errorMessage = error.localizedDescription
+            ErrorHandler.shared.handle(error, context: "AuthViewModel.resetPassword", showToUser: false)
         }
 
         isLoading = false
-    }
-
-    // Gérer les erreurs d'authentification
-    private func handleAuthError(_ error: Error) -> String {
-        let nsError = error as NSError
-
-        switch nsError.code {
-        case AuthErrorCode.emailAlreadyInUse.rawValue:
-            return "Cette adresse email est déjà utilisée"
-        case AuthErrorCode.invalidEmail.rawValue:
-            return "Adresse email invalide"
-        case AuthErrorCode.weakPassword.rawValue:
-            return "Le mot de passe est trop faible"
-        case AuthErrorCode.wrongPassword.rawValue:
-            return "Mot de passe incorrect"
-        case AuthErrorCode.userNotFound.rawValue:
-            return "Aucun compte trouvé avec cet email"
-        case AuthErrorCode.networkError.rawValue:
-            return "Erreur de connexion. Vérifiez votre connexion internet"
-        case AuthErrorCode.tooManyRequests.rawValue:
-            return "Trop de tentatives. Réessayez plus tard"
-        default:
-            return "Erreur: \(error.localizedDescription)"
-        }
     }
 
     // Effacer les messages

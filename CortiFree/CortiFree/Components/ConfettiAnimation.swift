@@ -140,7 +140,7 @@ struct SuccessValidationView: View {
                 // Text content
                 VStack(spacing: 12) {
                     Text("Bien joué !")
-                        .font(.custom("HankenGrotesk-Bold", size: 28))
+                        .font(Font.Poppins.custom(.bold, size: 28))
                         .foregroundColor(.white)
 
                     Text(taskTitle)
@@ -151,7 +151,7 @@ struct SuccessValidationView: View {
                     HStack(spacing: 32) {
                         VStack(spacing: 4) {
                             Text("+\(scoreIncrease)")
-                                .font(.custom("HankenGrotesk-Bold", size: 24))
+                                .font(Font.Poppins.custom(.bold, size: 24))
                                 .foregroundColor(.green)
                             Text("Score")
                                 .font(.custom("Poppins-Regular", size: 12))
@@ -164,7 +164,7 @@ struct SuccessValidationView: View {
                                     .font(.system(size: 20))
                                     .foregroundColor(.orange)
                                 Text("\(streak)")
-                                    .font(.custom("HankenGrotesk-Bold", size: 24))
+                                    .font(Font.Poppins.custom(.bold, size: 24))
                                     .foregroundColor(.white)
                             }
                             Text("Série")

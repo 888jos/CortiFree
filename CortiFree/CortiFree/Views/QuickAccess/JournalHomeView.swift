@@ -21,6 +21,9 @@ struct JournalHomeView: View {
     @State private var isLoadingToday = true
     @State private var todayEntry: JournalEntry?
     @State private var showHistory = false
+    @State private var showPhotoSourcePicker = false
+    @State private var showImagePicker = false
+    @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
     @FocusState private var isTextFocused: Bool
 
     private var wordCount: Int {
@@ -32,7 +35,7 @@ struct JournalHomeView: View {
     }
 
     private var canSave: Bool {
-        characterCount >= 50 && hasChanges
+        characterCount >= 1 && hasChanges
     }
 
     private var hasChanges: Bool {
@@ -42,7 +45,7 @@ struct JournalHomeView: View {
                    selectedMood != existing.mood ||
                    photoImage != nil  // New photo selected
         }
-        return characterCount >= 50  // New entry
+        return characterCount >= 1  // New entry
     }
 
     private var isToday: Bool {
@@ -120,6 +123,20 @@ struct JournalHomeView: View {
                 }
             }
         )
+        .confirmationDialog("Choisir la source", isPresented: $showPhotoSourcePicker) {
+            Button("Appareil photo") {
+                imagePickerSourceType = .camera
+                showImagePicker = true
+            }
+            Button("Photothèque") {
+                imagePickerSourceType = .photoLibrary
+                showImagePicker = true
+            }
+            Button("Annuler", role: .cancel) {}
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(image: $photoImage, sourceType: imagePickerSourceType)
+        }
         .task {
             await loadTodayEntry()
         }
@@ -141,8 +158,8 @@ struct JournalHomeView: View {
             Spacer()
 
             VStack(spacing: 4) {
-                Text("Mon Journal")
-                    .font(.custom("HankenGrotesk-Bold", size: 20))
+                Text(NSLocalizedString("journal_home.title", comment: ""))
+                    .font(Font.Poppins.custom(.bold, size: 20))
                     .foregroundColor(.white)
 
                 Text(formatDate(Date()))
@@ -170,7 +187,7 @@ struct JournalHomeView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text("Mood")
+                Text(NSLocalizedString("journal_home.mood", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 14))
                     .foregroundColor(.white)
             }
@@ -252,12 +269,15 @@ struct JournalHomeView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text("Photo")
+                Text(NSLocalizedString("journal_home.photo", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 14))
                     .foregroundColor(.white)
             }
 
-            PhotosPicker(selection: $selectedPhoto, matching: .images) {
+            Button(action: {
+                HapticManager.light()
+                showPhotoSourcePicker = true
+            }) {
                 ZStack {
                     if let photoImage = photoImage {
                         // Display selected photo
@@ -294,25 +314,26 @@ struct JournalHomeView: View {
                             )
                     } else {
                         // Placeholder
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.03))
-                            .frame(width: 140, height: 140)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
-                                    .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 3]))
-                            )
-                            .overlay(
-                                VStack(spacing: 6) {
-                                    Image(systemName: "camera.fill")
-                                        .font(.system(size: 24))
-                                        .foregroundColor(Color(hex: "B794F6").opacity(0.6))
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.03))
+                                .frame(width: 140, height: 140)
 
-                                    Text("Ajoute")
-                                        .font(.custom("Poppins-Medium", size: 11))
-                                        .foregroundColor(.white.opacity(0.5))
-                                }
-                            )
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 3]))
+                                .foregroundColor(Color(hex: "B794F6").opacity(0.4))
+                                .frame(width: 140, height: 140)
+
+                            VStack(spacing: 6) {
+                                Image(systemName: "camera.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(Color(hex: "B794F6").opacity(0.6))
+
+                                Text(NSLocalizedString("journal_home.photo_add", comment: ""))
+                                    .font(.custom("Poppins-Medium", size: 11))
+                                    .foregroundColor(.white.opacity(0.5))
+                            }
+                        }
                     }
                 }
             }
@@ -334,7 +355,7 @@ struct JournalHomeView: View {
                     .font(.system(size: 16))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text("Ma journée")
+                Text(NSLocalizedString("journal_home.my_day", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(.white)
 
@@ -362,7 +383,7 @@ struct JournalHomeView: View {
 
                 // Placeholder
                 if journalText.isEmpty {
-                    Text("Raconte ta journée, tes émotions, ce que tu as vécu...")
+                    Text(NSLocalizedString("journal_home.placeholder", comment: ""))
                         .font(.custom("Poppins-Regular", size: 15))
                         .foregroundColor(.white.opacity(0.4))
                         .padding(.horizontal, 20)
@@ -376,8 +397,8 @@ struct JournalHomeView: View {
                 HStack(spacing: 4) {
                     Text("\(characterCount)")
                         .font(.custom("Poppins-SemiBold", size: 13))
-                        .foregroundColor(characterCount >= 50 ? Color(hex: "10B981") : Color(hex: "B794F6"))
-                    Text("caractères")
+                        .foregroundColor(Color(hex: "B794F6"))
+                    Text(NSLocalizedString("journal_home.characters", comment: ""))
                         .font(.custom("Poppins-Regular", size: 13))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -390,18 +411,12 @@ struct JournalHomeView: View {
                     Text("\(wordCount)")
                         .font(.custom("Poppins-SemiBold", size: 13))
                         .foregroundColor(Color(hex: "B794F6"))
-                    Text("mots")
+                    Text(NSLocalizedString("journal_home.words", comment: ""))
                         .font(.custom("Poppins-Regular", size: 13))
                         .foregroundColor(.white.opacity(0.6))
                 }
 
                 Spacer()
-
-                if characterCount < 50 {
-                    Text("Minimum 50 caractères")
-                        .font(.custom("Poppins-Regular", size: 11))
-                        .foregroundColor(.white.opacity(0.4))
-                }
             }
         }
         .padding(20)
@@ -423,7 +438,7 @@ struct JournalHomeView: View {
                 Image(systemName: isToday && todayEntry != nil ? "arrow.triangle.2.circlepath" : "checkmark.circle.fill")
                     .font(.system(size: 20))
 
-                Text(isToday && todayEntry != nil ? "Mettre à jour" : "Sauvegarder")
+                Text(isToday && todayEntry != nil ? NSLocalizedString("journal_home.update", comment: "") : NSLocalizedString("journal_home.save", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 16))
             }
             .foregroundColor(.white)
@@ -461,7 +476,7 @@ struct JournalHomeView: View {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 14))
 
-                Text("Voir mes entrées passées")
+                Text(NSLocalizedString("journal_home.view_past_entries", comment: ""))
                     .font(.custom("Poppins-Medium", size: 14))
             }
             .foregroundColor(Color(hex: "B794F6"))
@@ -483,7 +498,7 @@ struct JournalHomeView: View {
                     .font(.system(size: 60))
                     .foregroundColor(Color(hex: "10B981"))
 
-                Text(isToday && todayEntry != nil ? "Entrée mise à jour !" : "Entrée sauvegardée !")
+                Text(isToday && todayEntry != nil ? NSLocalizedString("journal_home.entry_updated", comment: "") : NSLocalizedString("journal_home.entry_saved", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }

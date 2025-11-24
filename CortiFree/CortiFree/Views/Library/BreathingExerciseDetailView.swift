@@ -14,7 +14,7 @@ struct BreathingExerciseDetailView: View {
     @State private var selectedDuration: Int = 180 // 3 minutes par défaut
     @State private var showBreathingExercise = false
     @State private var pulseAnimation = false
-    @State private var showHowItWorks = false // Expandable card state
+    @State private var showHowItWorks = true // Expandable card state
     @State private var showScience = false // Preuves scientifiques
 
     private let durations = [60, 120, 180, 300, 600] // 1min, 2min, 3min, 5min, 10min
@@ -37,11 +37,11 @@ struct BreathingExerciseDetailView: View {
                         // Comment ça marche - EXPANDABLE CARD
                         howItWorksExpandableCard
 
-                        // Preuves scientifiques - NOUVEAU
-                        scientificEvidenceCard
-
                         // Bienfaits avec badges
                         benefitsSection
+
+                        // Preuves scientifiques - NOUVEAU
+                        scientificEvidenceCard
 
                         // Spacer to push duration and button to bottom
                         Spacer(minLength: 20)
@@ -114,7 +114,7 @@ struct BreathingExerciseDetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "wind")
                         .font(.system(size: 12))
-                    Text("RESPIRATION")
+                    Text(NSLocalizedString("breathing_detail.category_badge", comment: ""))
                         .font(.custom("Poppins-Bold", size: 11))
                 }
                 .foregroundColor(Color.appTheme)
@@ -155,20 +155,20 @@ struct BreathingExerciseDetailView: View {
     // MARK: - How It Works - EXPANDABLE CARD
 
     private var howItWorksExpandableCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Header - Always visible
-            Button(action: {
-                HapticManager.light()
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    showHowItWorks.toggle()
-                }
-            }) {
+        Button(action: {
+            HapticManager.light()
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showHowItWorks.toggle()
+            }
+        }) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Header - Always visible
                 HStack {
                     Image(systemName: "info.circle.fill")
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text("Comment ça marche ?")
+                    Text(NSLocalizedString("breathing_detail.how_it_works", comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -179,66 +179,66 @@ struct BreathingExerciseDetailView: View {
                         .foregroundColor(Color.white.opacity(0.6))
                 }
                 .padding(20)
-            }
-            .buttonStyle(PlainButtonStyle())
 
-            // Description - Expandable
-            if showHowItWorks {
-                Text(pattern.detailedDescription)
-                    .font(.custom("Poppins-Regular", size: 15))
-                    .foregroundColor(Color(hex: "E5E5E5"))
-                    .lineSpacing(8)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                // Description - Expandable
+                if showHowItWorks {
+                    Text(pattern.detailedDescription)
+                        .font(.custom("Poppins-Regular", size: 15))
+                        .foregroundColor(Color(hex: "E5E5E5"))
+                        .lineSpacing(8)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 20)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
-        }
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "1A1B3A").opacity(0.8),
-                                Color(hex: "2A2B5A").opacity(0.6)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(hex: "1A1B3A").opacity(0.8),
+                                    Color(hex: "2A2B5A").opacity(0.6)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
 
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.appTheme.opacity(0.3),
-                                Color.appThemeSecondary.opacity(0.3)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-        )
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.appTheme.opacity(0.3),
+                                    Color.appThemeSecondary.opacity(0.3)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                }
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 
     // MARK: - Preuves scientifiques
 
     private var scientificEvidenceCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Button(action: {
-                HapticManager.light()
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    showScience.toggle()
-                }
-            }) {
+        Button(action: {
+            HapticManager.light()
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showScience.toggle()
+            }
+        }) {
+            VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Image(systemName: "brain.head.profile")
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text("Preuves scientifiques")
+                    Text(NSLocalizedString("breathing_detail.scientific_evidence", comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -249,71 +249,71 @@ struct BreathingExerciseDetailView: View {
                         .foregroundColor(Color.white.opacity(0.6))
                 }
                 .padding(20)
-            }
-            .buttonStyle(PlainButtonStyle())
 
-            if showScience {
-                VStack(alignment: .leading, spacing: 16) {
-                    ForEach(pattern.scientificEvidence, id: \.self) { evidence in
-                        HStack(alignment: .top, spacing: 12) {
-                            Image(systemName: "checkmark.seal.fill")
-                                .font(.system(size: 18))
-                                .foregroundColor(Color.appTheme)
-                                .frame(width: 24)
+                if showScience {
+                    VStack(alignment: .leading, spacing: 16) {
+                        ForEach(pattern.scientificEvidence, id: \.self) { evidence in
+                            HStack(alignment: .top, spacing: 12) {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(Color.appTheme)
+                                    .frame(width: 24)
 
-                            Text(evidence)
-                                .font(.custom("Poppins-Regular", size: 14))
-                                .foregroundColor(.white.opacity(0.9))
-                                .fixedSize(horizontal: false, vertical: true)
+                                Text(evidence)
+                                    .font(.custom("Poppins-Regular", size: 14))
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
                         }
-                    }
 
-                    // Source
-                    HStack(spacing: 8) {
-                        Image(systemName: "doc.text.fill")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.5))
+                        // Source
+                        HStack(spacing: 8) {
+                            Image(systemName: "doc.text.fill")
+                                .font(.system(size: 14))
+                                .foregroundColor(.white.opacity(0.5))
 
-                        Text(pattern.scientificSource)
-                            .font(.custom("Poppins-Regular", size: 12))
-                            .foregroundColor(.white.opacity(0.6))
-                            .italic()
+                            Text(pattern.scientificSource)
+                                .font(.custom("Poppins-Regular", size: 12))
+                                .foregroundColor(.white.opacity(0.6))
+                                .italic()
+                        }
+                        .padding(.top, 8)
                     }
-                    .padding(.top, 8)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
-                .transition(.opacity.combined(with: .move(edge: .top)))
             }
-        }
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "1A1B3A").opacity(0.8),
-                                Color(hex: "2A2B5A").opacity(0.6)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(hex: "1A1B3A").opacity(0.8),
+                                    Color(hex: "2A2B5A").opacity(0.6)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
 
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.appTheme.opacity(0.3),
-                                Color.appThemeSecondary.opacity(0.3)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-        )
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.appTheme.opacity(0.3),
+                                    Color.appThemeSecondary.opacity(0.3)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                }
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 
     // MARK: - Benefits Section
@@ -325,7 +325,7 @@ struct BreathingExerciseDetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text("Bienfaits")
+                Text(NSLocalizedString("breathing_detail.benefits", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }
@@ -378,7 +378,7 @@ struct BreathingExerciseDetailView: View {
                     .font(.system(size: 18))
                     .foregroundColor(Color.appTheme)
 
-                Text("Durée de l'exercice")
+                Text(NSLocalizedString("breathing_detail.exercise_duration", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(.white)
 
@@ -455,7 +455,7 @@ struct BreathingExerciseDetailView: View {
                 Image(systemName: "play.circle.fill")
                     .font(.system(size: 24))
 
-                Text("Commencer l'exercice")
+                Text(NSLocalizedString("breathing_detail.start_exercise", comment: ""))
                     .font(.custom("Poppins-Bold", size: 18))
             }
             .foregroundColor(.white)
@@ -529,51 +529,33 @@ struct BenefitBadge: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.appTheme.opacity(0.2), lineWidth: 1)
-                )
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(hex: "1A1B3A").opacity(0.8),
+                                Color(hex: "2A2B5A").opacity(0.6)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color.appTheme.opacity(0.3),
+                                Color.appThemeSecondary.opacity(0.3)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            }
         )
-    }
-}
-
-// MARK: - Duration Pill Component
-
-struct DurationPill: View {
-    let duration: Int
-    let isSelected: Bool
-    let action: () -> Void
-
-    private var displayText: String {
-        let minutes = duration / 60
-        return "\(minutes)'"
-    }
-
-    var body: some View {
-        Button(action: action) {
-            Text(displayText)
-                .font(.custom("Poppins-SemiBold", size: 15))
-                .foregroundColor(isSelected ? .white : Color.white.opacity(0.5))
-                .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isSelected ? Color.appTheme.opacity(0.2) : Color.clear)
-                )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
-
-// MARK: - Scale Button Style
-
-struct ScaleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 
@@ -597,21 +579,21 @@ extension BreathingPattern {
     var detailedDescription: String {
         switch name {
         case "DeepAbdominal":
-            return "La respiration abdominale profonde est la fondation de toutes les techniques respiratoires. En engageant le diaphragme, vous activez naturellement le système nerveux parasympathique, créant un état de calme immédiat. Cette technique ancestrale est utilisée depuis des millénaires pour réduire le stress et favoriser la relaxation profonde."
+            return NSLocalizedString("breathing_pattern.deep_abdominal.detailed_description", comment: "")
         case "4-7-8":
-            return "La technique 4-7-8, développée par le Dr Andrew Weil, est une méthode puissante pour calmer instantanément le système nerveux. En contrôlant votre respiration selon ce rythme précis, vous activez votre système parasympathique, réduisant l'anxiété et facilitant l'endormissement en quelques minutes seulement."
+            return NSLocalizedString("breathing_pattern.four_seven_eight.detailed_description", comment: "")
         case "Coherence":
-            return "La cohérence cardiaque 5-5 est une pratique scientifiquement prouvée pour réguler le système nerveux autonome. En respirant à un rythme de 6 cycles par minute (5 secondes d'inspiration, 5 secondes d'expiration), vous créez un état d'équilibre optimal entre votre cœur et votre cerveau, réduisant le cortisol de manière mesurable."
+            return NSLocalizedString("breathing_pattern.coherence.detailed_description", comment: "")
         case "Slow66":
-            return "La respiration lente 6-6 est une technique optimale pour préparer le corps au sommeil profond. En allongeant chaque phase respiratoire à 6 secondes, vous ralentissez progressivement votre rythme cardiaque et signalez à votre corps qu'il est temps de se reposer, favorisant la production de mélatonine naturelle."
+            return NSLocalizedString("breathing_pattern.slow66.detailed_description", comment: "")
         case "Triangle":
-            return "Le Triangle Breathing 4-4-4 est une technique simple mais puissante utilisée pour retrouver rapidement son calme. En égalisant les trois phases de la respiration, vous créez un rythme régulier qui apaise l'esprit et réduit les tensions physiques accumulées dans la journée."
+            return NSLocalizedString("breathing_pattern.triangle.detailed_description", comment: "")
         case "Box":
-            return "Le Box Breathing 4-4-4-4 est la technique utilisée par les Navy SEALs pour maintenir leur calme dans des situations de stress intense. En respirant sur un rythme carré (4 temps égaux), vous synchronisez votre rythme cardiaque, améliorez votre concentration et développez votre résilience face au stress aigu."
+            return NSLocalizedString("breathing_pattern.box.detailed_description", comment: "")
         case "Kapalabhati":
-            return "Kapalabhati, ou 'respiration du crâne brillant', est une technique yogique dynamique qui nettoie le système respiratoire et stimule l'énergie vitale. Par des expirations rapides et actives, vous oxygénez intensément votre cerveau, activez votre métabolisme et créez un état de vigilance mentale explosive."
+            return NSLocalizedString("breathing_pattern.kapalabhati.detailed_description", comment: "")
         case "Bhastrika":
-            return "Bhastrika, la 'respiration soufflet', est une technique yogique avancée qui génère une chaleur interne intense et booste l'énergie physique. Cette respiration puissante et rythmée augmente dramatiquement l'oxygénation, stimule le système nerveux sympathique et crée un état d'énergie intense et durable."
+            return NSLocalizedString("breathing_pattern.bhastrika.detailed_description", comment: "")
         default:
             return description
         }
@@ -621,59 +603,59 @@ extension BreathingPattern {
         switch name {
         case "DeepAbdominal":
             return [
-                "Active le nerf vague",
-                "Réduit stress immédiat",
-                "Oxygène optimal",
-                "Base des techniques"
+                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_4", comment: "")
             ]
         case "4-7-8":
             return [
-                "Réduit l'anxiété en minutes",
-                "Facilite l'endormissement",
-                "Diminue la tension",
-                "Calme les pensées"
+                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_4", comment: "")
             ]
         case "Coherence":
             return [
-                "Baisse du cortisol -23%",
-                "Variabilité cardiaque +",
-                "Système immunitaire +",
-                "Régule les émotions"
+                NSLocalizedString("breathing_pattern.coherence.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.coherence.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.coherence.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.coherence.benefit_4", comment: "")
             ]
         case "Slow66":
             return [
-                "Prépare au sommeil",
-                "Ralentit rythme cardiaque",
-                "Production mélatonine",
-                "Relaxation profonde"
+                NSLocalizedString("breathing_pattern.slow66.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.slow66.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.slow66.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.slow66.benefit_4", comment: "")
             ]
         case "Triangle":
             return [
-                "Calme rapide",
-                "Réduit tensions",
-                "Simple et efficace",
-                "Équilibre mental"
+                NSLocalizedString("breathing_pattern.triangle.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.triangle.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.triangle.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.triangle.benefit_4", comment: "")
             ]
         case "Box":
             return [
-                "Améliore concentration",
-                "Réduit stress aigu",
-                "Équilibre nerveux",
-                "Renforce résilience"
+                NSLocalizedString("breathing_pattern.box.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.box.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.box.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.box.benefit_4", comment: "")
             ]
         case "Kapalabhati":
             return [
-                "Énergie explosive",
-                "Nettoie système respiratoire",
-                "Oxygène cerveau",
-                "Stimule métabolisme"
+                NSLocalizedString("breathing_pattern.kapalabhati.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.kapalabhati.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.kapalabhati.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.kapalabhati.benefit_4", comment: "")
             ]
         case "Bhastrika":
             return [
-                "Boost énergie intense",
-                "Chaleur interne",
-                "Vigilance accrue",
-                "Endurance mentale"
+                NSLocalizedString("breathing_pattern.bhastrika.benefit_1", comment: ""),
+                NSLocalizedString("breathing_pattern.bhastrika.benefit_2", comment: ""),
+                NSLocalizedString("breathing_pattern.bhastrika.benefit_3", comment: ""),
+                NSLocalizedString("breathing_pattern.bhastrika.benefit_4", comment: "")
             ]
         default:
             return []
@@ -684,69 +666,68 @@ extension BreathingPattern {
         switch name {
         case "DeepAbdominal":
             return [
-                "Active le nerf vague, réduisant le cortisol de 18% (Frontiers in Psychology)",
-                "Améliore l'oxygénation sanguine de 22% en 3 minutes (Respiratory Medicine)",
-                "Réduit la fréquence cardiaque de 8 bpm en moyenne (Cardiology Research)"
+                NSLocalizedString("breathing_pattern.deep_abdominal.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.deep_abdominal.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.deep_abdominal.evidence_3", comment: "")
             ]
         case "4-7-8":
             return [
-                "Réduit l'anxiété de 44% en 66 jours (Harvard Medical School)",
-                "Améliore la qualité du sommeil de 65% (Journal of Clinical Sleep Medicine)",
-                "Diminue la pression artérielle de 7 mmHg (American Heart Association)"
+                NSLocalizedString("breathing_pattern.four_seven_eight.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.four_seven_eight.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.four_seven_eight.evidence_3", comment: "")
             ]
         case "Coherence":
             return [
-                "Baisse du cortisol de 23% après 3 semaines (HeartMath Institute)",
-                "Augmentation de la DHEA (hormone anti-vieillissement) de 100%",
-                "Amélioration de la variabilité cardiaque mesurable dès la 1ère séance",
-                "Réduction de 46% des symptômes d'anxiété (étude de 1500 personnes)"
+                NSLocalizedString("breathing_pattern.coherence.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.coherence.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.coherence.evidence_3", comment: "")
             ]
         case "Slow66":
             return [
-                "Augmente la production de mélatonine de 38% (Sleep Medicine Reviews)",
-                "Réduit le temps d'endormissement de 54% (Journal of Sleep Research)",
-                "Améliore la qualité du sommeil profond de 42% (Sleep Science)"
+                NSLocalizedString("breathing_pattern.slow66.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.slow66.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.slow66.evidence_3", comment: "")
             ]
         case "Triangle":
             return [
-                "Réduit l'anxiété de 31% en 5 minutes (Journal of Behavioral Medicine)",
-                "Diminue les tensions musculaires de 45% (Biofeedback and Self-Regulation)",
-                "Améliore la clarté mentale de 27% (Cognitive Psychology)"
+                NSLocalizedString("breathing_pattern.triangle.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.triangle.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.triangle.evidence_3", comment: "")
             ]
         case "Box":
             return [
-                "Améliore la concentration de 25% après 5 minutes (Navy SEALs Research)",
-                "Réduit le cortisol de 24% en séance unique (Journal of Applied Psychology)",
-                "Augmente la variabilité cardiaque de 34% (International Journal of Psychophysiology)"
+                NSLocalizedString("breathing_pattern.box.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.box.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.box.evidence_3", comment: "")
             ]
         case "Kapalabhati":
             return [
-                "Augmente l'oxygénation cérébrale de 48% instantanément (Neuroscience Letters)",
-                "Améliore la capacité respiratoire de 36% (Respiratory Physiology)",
-                "Stimule le métabolisme de 21% en 10 minutes (International Journal of Yoga)"
+                NSLocalizedString("breathing_pattern.kapalabhati.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.kapalabhati.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.kapalabhati.evidence_3", comment: "")
             ]
         case "Bhastrika":
             return [
-                "Augmente l'énergie physique de 56% (Journal of Alternative Medicine)",
-                "Améliore les performances cognitives de 39% (Brain Research Bulletin)",
-                "Booste la température corporelle de 1.2°C en moyenne (Thermoregulation Studies)"
+                NSLocalizedString("breathing_pattern.bhastrika.evidence_1", comment: ""),
+                NSLocalizedString("breathing_pattern.bhastrika.evidence_2", comment: ""),
+                NSLocalizedString("breathing_pattern.bhastrika.evidence_3", comment: "")
             ]
         default:
-            return ["Technique validée par de nombreuses études scientifiques"]
+            return [NSLocalizedString("breathing_pattern.default.evidence", comment: "")]
         }
     }
 
     var scientificSource: String {
         switch name {
-        case "DeepAbdominal": return "Sources: Frontiers in Psychology 2019, Respiratory Medicine 2020"
-        case "4-7-8": return "Sources: Harvard Medical School, JCSM 2020, AHA 2021"
-        case "Coherence": return "Sources: HeartMath Institute, Clinical Psychology Review 2018"
-        case "Slow66": return "Sources: Sleep Medicine Reviews 2021, Journal of Sleep Research 2020"
-        case "Triangle": return "Sources: Journal of Behavioral Medicine 2019, Cognitive Psychology 2021"
-        case "Box": return "Sources: Naval Special Warfare Command, JAP 2019, IJP 2020"
-        case "Kapalabhati": return "Sources: Neuroscience Letters 2018, Int. Journal of Yoga 2020"
-        case "Bhastrika": return "Sources: Journal of Alternative Medicine 2019, Brain Research 2021"
-        default: return "Sources: Recherches scientifiques validées"
+        case "DeepAbdominal": return NSLocalizedString("breathing_pattern.deep_abdominal.source", comment: "")
+        case "4-7-8": return NSLocalizedString("breathing_pattern.four_seven_eight.source", comment: "")
+        case "Coherence": return NSLocalizedString("breathing_pattern.coherence.source", comment: "")
+        case "Slow66": return NSLocalizedString("breathing_pattern.slow66.source", comment: "")
+        case "Triangle": return NSLocalizedString("breathing_pattern.triangle.source", comment: "")
+        case "Box": return NSLocalizedString("breathing_pattern.box.source", comment: "")
+        case "Kapalabhati": return NSLocalizedString("breathing_pattern.kapalabhati.source", comment: "")
+        case "Bhastrika": return NSLocalizedString("breathing_pattern.bhastrika.source", comment: "")
+        default: return NSLocalizedString("breathing_pattern.default.source", comment: "")
         }
     }
 }

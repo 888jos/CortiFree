@@ -11,7 +11,7 @@ import SwiftUI
 struct HabitsProgressFlowView: View {
     let onComplete: () -> Void
     @State private var currentHabitIndex: Int = 0
-    @State private var currentWeek: Int = 0
+    @State private var currentWeek: Int = 1
     @State private var shouldRenderChart = false
     @State private var loadedHabits: Set<Int> = [] // Track which habits have been loaded
     @State private var screenViewTime: Date?
@@ -168,7 +168,7 @@ struct HabitsProgressFlowView: View {
                         Button(action: {
                             HapticManager.light()
                             currentHabitIndex = index
-                            currentWeek = 0  // Reset to "Actuellement" when changing habit
+                            currentWeek = 1  // Reset to week 1 when changing habit
 
                             // Load this habit's chart if not already loaded
                             if !loadedHabits.contains(index) {
@@ -204,7 +204,7 @@ struct HabitsProgressFlowView: View {
                 VStack(spacing: 16) {
                     // Title with gradient
                     Text(currentHabitProgress.title)
-                        .font(.custom("HankenGrotesk-Bold", size: 20))
+                        .font(Font.Poppins.custom(.bold, size: 20))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [.white, Color(hex: "B794F6")],
@@ -325,7 +325,7 @@ struct HabitsProgressFlowView: View {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 18, weight: .semibold))
 
-                        Text("Continuer")
+                        Text(StringKeys.Common.continueButton)
                             .font(.custom("Poppins-SemiBold", size: 18))
                     }
                     .foregroundColor(.white)
@@ -391,10 +391,11 @@ struct HabitProgressChart: View {
 
         GeometryReader { geometry in
             HStack(alignment: .top, spacing: 0) {
-                // Y-axis labels - positioned exactly at grid line levels with top padding
+                // Y-axis labels - positioned exactly at grid line levels with top and bottom padding
                 GeometryReader { labelGeometry in
                     let topPadding: CGFloat = 20
-                    let availableHeight = labelGeometry.size.height - topPadding
+                    let bottomPadding: CGFloat = 10
+                    let availableHeight = labelGeometry.size.height - topPadding - bottomPadding
 
                     ForEach(Array(yAxisValues.reversed().enumerated()), id: \.offset) { index, value in
                         let yPosition = topPadding + (availableHeight * CGFloat(index) / CGFloat(yAxisValues.count - 1))
@@ -413,10 +414,11 @@ struct HabitProgressChart: View {
 
                 // Chart area
                 ZStack(alignment: .bottomLeading) {
-                    // Grid lines - one per value, aligned with labels with top padding
+                    // Grid lines - one per value, aligned with labels with top and bottom padding
                     GeometryReader { chartGeometry in
                         let topPadding: CGFloat = 20
-                        let availableHeight = chartGeometry.size.height - topPadding
+                        let bottomPadding: CGFloat = 10
+                        let availableHeight = chartGeometry.size.height - topPadding - bottomPadding
 
                         ForEach(Array(yAxisValues.enumerated()), id: \.offset) { index, _ in
                             let yPosition = availableHeight * CGFloat(index) / CGFloat(yAxisValues.count - 1)
@@ -424,7 +426,7 @@ struct HabitProgressChart: View {
                             Rectangle()
                                 .fill(Color.white.opacity(0.1))
                                 .frame(height: 1)
-                                .position(x: chartGeometry.size.width / 2, y: chartGeometry.size.height - yPosition)
+                                .position(x: chartGeometry.size.width / 2, y: chartGeometry.size.height - bottomPadding - yPosition)
                         }
                     }
 
@@ -434,6 +436,7 @@ struct HabitProgressChart: View {
                         color: Color.gray.opacity(0.3),
                         fillGradient: false,
                         topPadding: 20,
+                        bottomPadding: 10,
                         curveStyle: 0
                     )
 
@@ -443,25 +446,27 @@ struct HabitProgressChart: View {
                         color: Color(hex: "B794F6"),
                         fillGradient: false,
                         topPadding: 20,
+                        bottomPadding: 10,
                         curveStyle: curveStyle
                     )
 
                     // CortiFree gradient fill - only up to currentWeek
                     GeometryReader { chartGeometry in
-                        let normalizedX = Double(currentWeek) / 10.0
+                        let normalizedX = Double(currentWeek - 1) / 9.0  // Maps weeks 1-10 to 0.0-1.0
 
                         PartialGradientFill(
                             progress: normalizedProgress,
                             cutoffX: normalizedX,
                             color: Color(hex: "B794F6"),
                             topPadding: 20,
+                            bottomPadding: 10,
                             curveStyle: curveStyle
                         )
                     }
 
                     // Current value indicator and week line
                     GeometryReader { chartGeometry in
-                        let normalizedX = Double(currentWeek) / 10.0
+                        let normalizedX = Double(currentWeek - 1) / 9.0  // Maps weeks 1-10 to 0.0-1.0
                         let topPadding: CGFloat = 20
                         let availableHeight = chartGeometry.size.height - topPadding
                         let curveX = chartGeometry.size.width * CGFloat(normalizedX)
@@ -483,7 +488,7 @@ struct HabitProgressChart: View {
                         )
 
                         // Week indicator below the line
-                        Text(currentWeek == 0 ? "Actuellement" : "Semaine \(currentWeek)")
+                        Text("Semaine \(currentWeek)")
                             .font(.custom("Poppins-SemiBold", size: 12))
                             .foregroundColor(Color(hex: "B794F6"))
                             .position(x: curveX, y: chartGeometry.size.height + 20)
@@ -507,8 +512,8 @@ struct HabitProgressChart: View {
                                 .onChanged { value in
                                     let newX = value.location.x
                                     let normalizedX = max(0.0, min(1.0, newX / chartGeometry.size.width))
-                                    let newWeek = Int(round(normalizedX * 10))
-                                    currentWeek = max(0, min(10, newWeek))
+                                    let newWeek = Int(round(normalizedX * 9)) + 1  // Maps 0.0-1.0 to weeks 1-10
+                                    currentWeek = max(1, min(10, newWeek))
                                 }
                         )
 
@@ -591,11 +596,12 @@ struct InteractiveHabitCurve: View {
     let color: Color
     let fillGradient: Bool
     let topPadding: CGFloat
+    let bottomPadding: CGFloat
     let curveStyle: Int
 
     var body: some View {
         GeometryReader { geometry in
-            let availableHeight = geometry.size.height - topPadding
+            let availableHeight = geometry.size.height - topPadding - bottomPadding
 
             ZStack {
                 // Fill gradient (if enabled)
@@ -716,11 +722,12 @@ struct PartialGradientFill: View {
     let cutoffX: Double
     let color: Color
     let topPadding: CGFloat
+    let bottomPadding: CGFloat
     let curveStyle: Int
 
     var body: some View {
         GeometryReader { geometry in
-            let availableHeight = geometry.size.height - topPadding
+            let availableHeight = geometry.size.height - topPadding - bottomPadding
 
             Path { path in
                 let width = geometry.size.width

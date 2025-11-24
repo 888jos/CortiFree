@@ -26,6 +26,10 @@ struct EditProfileView: View {
     @State private var isLoading = false
     @State private var isSaving = false
 
+    // Photo picker
+    @State private var showImagePicker = false
+    @State private var selectedImage: UIImage?
+
     var body: some View {
         ZStack {
             // Galaxy background
@@ -39,6 +43,9 @@ struct EditProfileView: View {
                 // Content
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: AppConstants.Layout.spacingXLarge) {
+                        // Profile Photo Section
+                        profilePhotoSection
+
                         // Profile Section
                         profileSection
 
@@ -61,6 +68,76 @@ struct EditProfileView: View {
         .onAppear {
             loadData()
         }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(image: $selectedImage)
+        }
+        .onChange(of: selectedImage) { _, newImage in
+            if let image = newImage {
+                saveProfilePhoto(image)
+            }
+        }
+    }
+
+    // MARK: - Profile Photo Section
+
+    private var profilePhotoSection: some View {
+        VStack(spacing: 16) {
+            Button(action: {
+                HapticManager.light()
+                showImagePicker = true
+            }) {
+                ZStack(alignment: .bottomTrailing) {
+                    // Main avatar circle
+                    Circle()
+                        .fill(LinearGradient(
+                            colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .frame(width: 100, height: 100)
+                        .overlay(
+                            Group {
+                                if let image = selectedImage {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipShape(Circle())
+                                } else {
+                                    Text(String(firstName.prefix(1)).uppercased())
+                                        .font(Font.Poppins.custom(.bold, size: 40))
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        )
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white.opacity(0.2), lineWidth: 2)
+                        )
+
+                    // Edit icon overlay
+                    ZStack {
+                        Circle()
+                            .fill(Color(hex: "B794F6"))
+                            .frame(width: 32, height: 32)
+
+                        Circle()
+                            .stroke(Color(hex: "01000C"), lineWidth: 2)
+                            .frame(width: 32, height: 32)
+
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(.white)
+                    }
+                    .offset(x: -4, y: -4)
+                }
+            }
+
+            Text("Touchez pour changer la photo")
+                .font(.custom(AppConstants.Fonts.regular, size: 13))
+                .foregroundColor(.white.opacity(0.6))
+        }
+        .padding(.vertical, 20)
     }
 
     // MARK: - Header
@@ -131,14 +208,6 @@ struct EditProfileView: View {
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                .fill(AppConstants.Colors.cardBackground.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
     }
 
     // MARK: - Sleep Section
@@ -191,14 +260,6 @@ struct EditProfileView: View {
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                .fill(AppConstants.Colors.cardBackground.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
     }
 
     // MARK: - Goals Section (8 Habits)
@@ -228,14 +289,6 @@ struct EditProfileView: View {
             habitRow(habitId: "sleep", icon: "moon.stars.fill", color: AppConstants.Colors.domainSleep)
         }
         .padding(AppConstants.Layout.paddingLarge)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                .fill(AppConstants.Colors.cardBackground.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
     }
 
     // MARK: - Habit Row
@@ -544,6 +597,33 @@ struct EditProfileView: View {
                     self.isSaving = false
                     HapticManager.error()
                 }
+            }
+        }
+    }
+
+    // MARK: - Save Profile Photo
+
+    private func saveProfilePhoto(_ image: UIImage) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        // Compress and convert to base64
+        guard let imageData = image.jpegData(compressionQuality: 0.7),
+              let base64String = imageData.base64EncodedString() as String? else {
+            print("Error: Could not convert image to base64")
+            return
+        }
+
+        Task {
+            do {
+                try await FirebaseManager.shared.updateUserProfile(
+                    uid: uid,
+                    updates: ["profilePhotoBase64": base64String]
+                )
+                print("✅ Profile photo saved successfully")
+                HapticManager.success()
+            } catch {
+                print("Error saving profile photo: \(error)")
+                HapticManager.error()
             }
         }
     }

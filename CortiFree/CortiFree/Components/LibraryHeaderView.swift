@@ -56,7 +56,7 @@ struct LibraryHeaderView: View {
             VStack(spacing: 0) {
                 // Title "Librairie" - positioned in upper portion of image
                 HStack {
-                    Text("Librairie")
+                    Text(NSLocalizedString("library.title", comment: ""))
                         .font(.custom("Poppins-Bold", size: 24))
                         .foregroundColor(Color(hex: "FFFFFF"))
                         .shadow(
@@ -76,7 +76,7 @@ struct LibraryHeaderView: View {
                 HStack(spacing: 30) {
                     LibraryIconButton(
                         section: .respiration,
-                        title: "Respiration",
+                        title: NSLocalizedString("library.icon.breathing", comment: ""),
                         iconName: "wind"
                     ) {
                         onIconTap(.respiration)
@@ -84,7 +84,7 @@ struct LibraryHeaderView: View {
 
                     LibraryIconButton(
                         section: .meditation,
-                        title: "Méditation",
+                        title: NSLocalizedString("library.icon.meditation", comment: ""),
                         iconName: "figure.mind.and.body"
                     ) {
                         onIconTap(.meditation)
@@ -92,7 +92,7 @@ struct LibraryHeaderView: View {
 
                     LibraryIconButton(
                         section: .journal,
-                        title: "Journal",
+                        title: NSLocalizedString("library.icon.journal", comment: ""),
                         iconName: "book.closed.fill"
                     ) {
                         onIconTap(.journal)
@@ -100,7 +100,7 @@ struct LibraryHeaderView: View {
 
                     LibraryIconButton(
                         section: .recherches,
-                        title: "Études",
+                        title: NSLocalizedString("library.icon.studies", comment: ""),
                         iconName: "book.fill"
                     ) {
                         onIconTap(.recherches)

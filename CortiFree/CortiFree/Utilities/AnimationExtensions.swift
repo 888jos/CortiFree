@@ -207,7 +207,7 @@ struct AnimationPresets {
 
     static let easeSmooth = Animation.easeInOut(duration: 0.3)
     static let easeSlow = Animation.easeInOut(duration: 0.5)
-    static let easeFast = Animation.easeInOut(duration: 0.2)
+    static let easeFast = Animation.easeInOut(duration: AppConstants.Animation.standardDuration)
 }
 
 // MARK: - Lottie Success Animation Helper
@@ -239,8 +239,34 @@ struct SuccessAnimationView: View {
 }
 
 // MARK: - Flip Digit View (for countdown)
+// Anime chaque chiffre individuellement
 
 struct FlipDigitView: View {
+    let digit: Int
+    let font: Font
+    let foregroundColor: Color
+
+    var body: some View {
+        HStack(spacing: 0) {
+            // Dizaine
+            SingleDigitFlipView(
+                digit: digit / 10,
+                font: font,
+                foregroundColor: foregroundColor
+            )
+
+            // Unité
+            SingleDigitFlipView(
+                digit: digit % 10,
+                font: font,
+                foregroundColor: foregroundColor
+            )
+        }
+    }
+}
+
+// Vue pour animer un seul chiffre (0-9)
+struct SingleDigitFlipView: View {
     let digit: Int
     let font: Font
     let foregroundColor: Color
@@ -251,7 +277,7 @@ struct FlipDigitView: View {
     var body: some View {
         ZStack {
             // Current digit
-            Text("\(String(format: "%02d", digit))")
+            Text("\(digit)")
                 .font(font)
                 .foregroundColor(foregroundColor)
                 .rotation3DEffect(
@@ -262,7 +288,7 @@ struct FlipDigitView: View {
                 .opacity(isFlipping ? 0 : 1)
 
             // Previous digit (flipping out)
-            Text("\(String(format: "%02d", previousDigit))")
+            Text("\(previousDigit)")
                 .font(font)
                 .foregroundColor(foregroundColor)
                 .rotation3DEffect(
@@ -272,6 +298,7 @@ struct FlipDigitView: View {
                 )
                 .opacity(isFlipping ? 1 : 0)
         }
+        .frame(minWidth: 20) // Assure une largeur minimale pour éviter les sauts
         .onChange(of: digit) { oldValue, newValue in
             guard oldValue != newValue else { return }
             previousDigit = oldValue
@@ -397,7 +424,7 @@ struct SuccessCheckmarkView: View {
 
             // Fade out
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                withAnimation(.easeOut(duration: 0.3)) {
+                withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
                     opacity = 0
                 }
             }

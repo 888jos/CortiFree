@@ -100,6 +100,11 @@ enum AppConstants {
         static let standardDuration: Double = 0.3
         static let progressDuration: Double = 0.6
         static let orbRotationDuration: Double = 20.0
+        static let dayNavigationDuration: Double = 0.2
+        static let confettiDuration: Double = 2.0
+        static let cascadeDelay: TimeInterval = 0.05
+        static let refreshDelay: UInt64 = 1_500_000_000 // 1.5 seconds in nanoseconds
+        static let firebaseLoadDelay: UInt64 = 100_000_000 // 0.1 second in nanoseconds
     }
 
     // MARK: - XP System
@@ -205,6 +210,48 @@ enum AppConstants {
         static let journalHeaderHeight: CGFloat = 140
         static let journalSegmentHeight: CGFloat = 44
         static let journalStatCardHeight: CGFloat = 100
+
+        // Task view specific
+        static let taskBottomPadding: CGFloat = 100
+        static let taskSkeletonCount: Int = 5
+    }
+
+    // MARK: - Program Configuration
+    enum Program {
+        static let totalDays: Int = 66
+        static let totalWeeks: Int = 10
+        static let defaultInitialScore: Int = 45
+        static let daysPerWeek: Int = 7
+    }
+
+    // MARK: - Habit Configuration
+    enum Habits {
+        // Habit IDs
+        enum ID {
+            static let sleep = "sleep"
+            static let breathing = "breathing"
+            static let meditation = "meditation"
+            static let water = "water"
+            static let sport = "sport"
+            static let nature = "nature"
+            static let social = "social"
+            static let journal = "journal"
+        }
+
+        // Difficulty levels
+        enum Difficulty {
+            static let easy: Int = 1
+            static let medium: Int = 2
+            static let hard: Int = 3
+        }
+
+        // Default values
+        static let defaultWaterQuantity = "2L"
+    }
+
+    // MARK: - Notification Names
+    enum Notifications {
+        static let taskValidated = NSNotification.Name("TaskValidated")
     }
 }
 
@@ -233,6 +280,18 @@ extension LinearGradient {
                 AppConstants.Colors.accentStart,
                 AppConstants.Colors.accentEnd,
                 AppConstants.Colors.primaryGreen
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var taskBackground: LinearGradient {
+        LinearGradient(
+            colors: [
+                AppConstants.Colors.taskBackground1,
+                AppConstants.Colors.taskBackground2,
+                AppConstants.Colors.taskBackground1
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing

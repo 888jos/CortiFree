@@ -137,8 +137,7 @@ struct TabBarButton: View {
 
     var body: some View {
         Button(action: {
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
+            HapticManager.light()
             action()
         }) {
             VStack(spacing: 4) {

@@ -31,49 +31,49 @@ struct ProfileView: View {
     private var habits: [(name: String, icon: String, progress: Double, color: Color)] {
         [
             (
-                "Méditation",
+                NSLocalizedString("profile.habit.meditation", comment: ""),
                 "brain.head.profile",
                 calculateProgress(habitId: "meditation"),
                 Color(hex: "9B59B6")
             ),
             (
-                "Respiration",
+                NSLocalizedString("profile.habit.breathing", comment: ""),
                 "wind",
                 calculateProgress(habitId: "breathing"),
                 Color(hex: "1ABC9C")
             ),
             (
-                "Journal",
+                NSLocalizedString("profile.habit.journal", comment: ""),
                 "book.fill",
                 calculateProgress(habitId: "journal"),
                 Color(hex: "E74C3C")
             ),
             (
-                "Sport",
+                NSLocalizedString("profile.habit.sport", comment: ""),
                 "figure.run",
                 calculateProgress(habitId: "sport"),
                 Color(hex: "2ECC71")
             ),
             (
-                "Eau",
+                NSLocalizedString("profile.habit.water", comment: ""),
                 "drop.fill",
                 calculateProgress(habitId: "water"),
                 Color(hex: "3498DB")
             ),
             (
-                "Nature",
+                NSLocalizedString("profile.habit.nature", comment: ""),
                 "leaf.fill",
                 calculateProgress(habitId: "nature"),
                 Color(hex: "27AE60")
             ),
             (
-                "Sommeil",
+                NSLocalizedString("profile.habit.sleep", comment: ""),
                 "moon.fill",
                 calculateProgress(habitId: "sleep"),
                 Color(hex: "E67E22")
             ),
             (
-                "Social",
+                NSLocalizedString("profile.habit.social", comment: ""),
                 "person.2.fill",
                 calculateProgress(habitId: "social"),
                 Color(hex: "F39C12")
@@ -131,13 +131,15 @@ struct ProfileView: View {
         "heart.fill"    // Équilibre
     ]
 
-    private let domainNames: [String] = [
-        "Sérénité",
-        "Sommeil",
-        "Énergie",
-        "Focus",
-        "Équilibre"
-    ]
+    private var domainNames: [String] {
+        [
+            NSLocalizedString("profile.domain.serenity", comment: ""),
+            NSLocalizedString("profile.domain.sleep", comment: ""),
+            NSLocalizedString("profile.domain.energy", comment: ""),
+            NSLocalizedString("profile.domain.focus", comment: ""),
+            NSLocalizedString("profile.domain.balance", comment: "")
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -145,64 +147,62 @@ struct ProfileView: View {
             GalaxyBackgroundView(intensity: 1.0)
                 .ignoresSafeArea()
 
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    // Profile Banner Image with header overlay - scrollable
-                    ZStack(alignment: .top) {
-                        profileBanner
-                            .ignoresSafeArea(edges: .top)
-                            .offset(y: -60)
+            VStack(spacing: 0) {
+                // Fixed header (banner + profile elements) - stays on top
+                ZStack(alignment: .center) {
+                    // Banner image
+                    profileBanner
+                        .offset(y: -65)
 
-                        // Header avec contenu du profil (baissé de 56px au total: 40px + 16px)
-                        VStack {
-                            profileHeader
-                                .padding(.horizontal, 24)
-                                .padding(.top, 20)
-
-                            Spacer()
-                        }
-                        .offset(y: -4) // Changed from -20 to -4 (lowered by additional 16px)
+                    // Profile header elements
+                    VStack {
+                        Spacer()
+                        profileHeader
+                            .padding(.horizontal, 24)
+                            .offset(y: -45)
+                        Spacer()
                     }
+                }
+                .frame(height: 220)
+                .zIndex(1) // Ensure header stays on top
 
-                    // Tab selector - juste en dessous de l'image (moved higher)
+                // Scrollable content: tabs and sections (scroll UNDER the header)
+                VStack(spacing: 0) {
+                    // Tab selector
                     tabSelector
                         .padding(.horizontal, 32)
-                        .padding(.top, -12) // Moved even higher (negative padding)
+                        .padding(.top, 16)
 
                     // Content based on selected tab with smooth transition
-                    ZStack {
-                        if selectedTab == .score {
-                            // CortiFree Score Section (Compact)
+                    TabView(selection: $selectedTab) {
+                        // CortiFree Score Section (scrollable)
+                        ScrollView(showsIndicators: false) {
                             cortiFreeScoreSection
                                 .padding(.horizontal, 32)
-                                .padding(.top, 20)
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .leading).combined(with: .opacity),
-                                    removal: .move(edge: .trailing).combined(with: .opacity)
-                                ))
-                        } else if selectedTab == .habits {
-                            // Habits Section
+                                .padding(.top, 12)
+
+                            Spacer(minLength: 100)
+                        }
+                        .tag(ProfileTab.score)
+
+                        // Habits Section (scrollable)
+                        ScrollView(showsIndicators: false) {
                             habitsSection
                                 .padding(.horizontal, 32)
-                                .padding(.top, 20)
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                                    removal: .move(edge: .leading).combined(with: .opacity)
-                                ))
-                        } else {
-                            // Achievements Section
-                            achievementsSection
-                                .padding(.horizontal, 32)
-                                .padding(.top, 20)
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                                    removal: .move(edge: .leading).combined(with: .opacity)
-                                ))
-                        }
-                    }
-                    .animation(.spring(response: 0.4, dampingFraction: 0.8), value: selectedTab)
+                                .padding(.top, 24)
 
-                    Spacer(minLength: 100)
+                            Spacer(minLength: 100)
+                        }
+                        .tag(ProfileTab.habits)
+
+                        // Achievements Section (scrollable)
+                        achievementsSection
+                            .padding(.horizontal, 32)
+                            .padding(.top, 24)
+                            .tag(ProfileTab.achievements)
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .animation(.appSpring, value: selectedTab)
                 }
             }
         }
@@ -234,7 +234,7 @@ struct ProfileView: View {
 
     private var profileBanner: some View {
         ZStack(alignment: .top) {
-            // Background image - extends to top, ignoring safe area (reduced to 220px)
+            // Background image
             Image("profile_banner")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
@@ -262,42 +262,55 @@ struct ProfileView: View {
 
     private var profileHeader: some View {
         HStack(spacing: 16) {
-            // Avatar with user initials
-            ZStack {
-                Circle()
-                    .fill(LinearGradient(
-                        colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ))
-                    .frame(width: 80, height: 80)
+            // Avatar with user initials and edit button
+            ZStack(alignment: .bottomLeading) {
+                // Main avatar
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(
+                            colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .frame(width: 80, height: 80)
 
-                Text(String(getUserFirstName().prefix(1)).uppercased())
-                    .font(.custom("HankenGrotesk-Bold", size: 32))
-                    .foregroundColor(.white)
+                    Text(String(getUserFirstName().prefix(1)).uppercased())
+                        .font(Font.Poppins.custom(.bold, size: 32))
+                        .foregroundColor(.white)
+                }
+                .overlay(
+                    Circle()
+                        .stroke(Color(hex: "01000C"), lineWidth: 2)
+                )
+
+                // Edit button overlay (bottom left)
+                Button(action: {
+                    HapticManager.light()
+                    showEditProfile = true
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(hex: "B794F6"))
+                            .frame(width: 28, height: 28)
+
+                        Circle()
+                            .stroke(Color(hex: "01000C"), lineWidth: 2)
+                            .frame(width: 28, height: 28)
+
+                        Image(systemName: "pencil")
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                    }
+                }
+                .offset(x: -2, y: 2)
             }
-            .overlay(
-                Circle()
-                    .stroke(Color.white.opacity(0.2), lineWidth: 2)
-            )
 
             // User Info
             VStack(alignment: .leading, spacing: 6) {
-                // Name with edit icon
-                HStack(spacing: 8) {
-                    Text(getUserFirstName())
-                        .font(.custom("HankenGrotesk-Bold", size: 20))
-                        .foregroundColor(.white)
-
-                    Button(action: {
-                        HapticManager.light()
-                        showEditProfile = true
-                    }) {
-                        Image(systemName: "pencil")
-                            .font(.system(size: 12))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                }
+                // Name
+                Text(getUserFirstName())
+                    .font(Font.Poppins.custom(.bold, size: 20))
+                    .foregroundColor(.white)
 
                 // Removed level display - no longer using XP/Levels system
             }
@@ -324,11 +337,11 @@ struct ProfileView: View {
             // Score CortiFree tab
             Button(action: {
                 HapticManager.light()
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withAnimation(.appSpring) {
                     selectedTab = .score
                 }
             }) {
-                Text("Score")
+                Text(NSLocalizedString("profile.tab.score", comment: ""))
                     .font(.custom(selectedTab == .score ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
                     .foregroundColor(selectedTab == .score ? .black : .white.opacity(0.7))
                     .frame(maxWidth: .infinity)
@@ -342,11 +355,11 @@ struct ProfileView: View {
             // Habitudes tab
             Button(action: {
                 HapticManager.light()
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withAnimation(.appSpring) {
                     selectedTab = .habits
                 }
             }) {
-                Text("Habitudes")
+                Text(NSLocalizedString("profile.tab.habits", comment: ""))
                     .font(.custom(selectedTab == .habits ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
                     .foregroundColor(selectedTab == .habits ? .black : .white.opacity(0.7))
                     .frame(maxWidth: .infinity)
@@ -360,11 +373,11 @@ struct ProfileView: View {
             // Achievements tab
             Button(action: {
                 HapticManager.light()
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                withAnimation(.appSpring) {
                     selectedTab = .achievements
                 }
             }) {
-                Text("Badges")
+                Text(NSLocalizedString("profile.tab.badges", comment: ""))
                     .font(.custom(selectedTab == .achievements ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
                     .foregroundColor(selectedTab == .achievements ? .black : .white.opacity(0.7))
                     .frame(maxWidth: .infinity)
@@ -386,15 +399,15 @@ struct ProfileView: View {
     // MARK: - CortiFree Score Section (Compact)
 
     private var cortiFreeScoreSection: some View {
-        VStack(spacing: 12) { // Reduced from 20 to 12
+        VStack(spacing: 24) { // Increased spacing between elements
             // Header with toggle
             HStack {
                 VStack(alignment: .leading, spacing: 2) { // Reduced from 4 to 2
-                    Text("Score CortiFree")
-                        .font(.custom("HankenGrotesk-Bold", size: 18)) // Reduced from 20 to 18
+                    Text(NSLocalizedString("profile.score.title", comment: ""))
+                        .font(Font.Poppins.custom(.bold, size: 18)) // Reduced from 20 to 18
                         .foregroundColor(.white)
 
-                    Text(showPotentialScores ? "Potentiel (J66)" : "Actuel")
+                    Text(showPotentialScores ? NSLocalizedString("profile.score.potential", comment: "") : NSLocalizedString("profile.score.current", comment: ""))
                         .font(.custom("Poppins-Regular", size: 11)) // Reduced from 12 to 11
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -435,7 +448,7 @@ struct ProfileView: View {
                 // Global - Top (0°)
                 SimpleDomainScore(
                     icon: "star.fill",
-                    title: "Global",
+                    title: NSLocalizedString("profile.score.global", comment: ""),
                     value: globalScore,
                     color: Color(hex: "B794F6")
                 )
@@ -499,7 +512,7 @@ struct ProfileView: View {
     // MARK: - Habits Section
 
     private var habitsSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 20) {
             // List of horizontal habit bars
             ForEach(Array(habits.enumerated()), id: \.offset) { index, habit in
                 let habitId = getHabitId(from: habit.name)
@@ -510,8 +523,10 @@ struct ProfileView: View {
                     progress: habit.progress,
                     color: habit.color,
                     completed: stats?.completed ?? 0,
-                    total: stats?.total ?? 0
+                    total: stats?.total ?? 0,
+                    animationTrigger: selectedTab == .habits
                 )
+                .cascadeAppear(index: index, totalCount: habits.count, baseDelay: 0.05)
             }
         }
     }
@@ -531,14 +546,14 @@ struct ProfileView: View {
 
     private func getHabitId(from habitName: String) -> String {
         switch habitName {
-        case "Méditation": return "meditation"
-        case "Respiration": return "breathing"
-        case "Journal": return "journal"
-        case "Sport": return "sport"
-        case "Eau": return "water"
-        case "Nature": return "nature"
-        case "Sommeil": return "sleep"
-        case "Social": return "social"
+        case NSLocalizedString("profile.habit.meditation", comment: ""): return "meditation"
+        case NSLocalizedString("profile.habit.breathing", comment: ""): return "breathing"
+        case NSLocalizedString("profile.habit.journal", comment: ""): return "journal"
+        case NSLocalizedString("profile.habit.sport", comment: ""): return "sport"
+        case NSLocalizedString("profile.habit.water", comment: ""): return "water"
+        case NSLocalizedString("profile.habit.nature", comment: ""): return "nature"
+        case NSLocalizedString("profile.habit.sleep", comment: ""): return "sleep"
+        case NSLocalizedString("profile.habit.social", comment: ""): return "social"
         default: return "unknown"
         }
     }
@@ -547,7 +562,7 @@ struct ProfileView: View {
 
     private var achievementsSection: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 32) {
                 // Global Progress Header
                 globalBadgeProgress
 
@@ -555,11 +570,7 @@ struct ProfileView: View {
                 VStack(spacing: 16) {
                     // Section header
                     HStack(spacing: 12) {
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 20))
-                            .foregroundColor(Color(hex: "FF8800"))
-
-                        Text("STREAKS")
+                        Text(NSLocalizedString("profile.achievements.streaks", comment: ""))
                             .font(.custom("Poppins-Bold", size: 16))
                             .foregroundColor(.white)
 
@@ -598,11 +609,7 @@ struct ProfileView: View {
                 VStack(spacing: 16) {
                     // Section header
                     HStack(spacing: 12) {
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                            .font(.system(size: 20))
-                            .foregroundColor(Color(hex: "B794F6"))
-
-                        Text("HABITUDES")
+                        Text(NSLocalizedString("profile.achievements.habits", comment: ""))
                             .font(.custom("Poppins-Bold", size: 16))
                             .foregroundColor(.white)
 
@@ -649,13 +656,6 @@ struct ProfileView: View {
                     .transition(.opacity)
                 }
 
-                // Milestone celebration popup
-                if achievementService.showMilestonePopup, let milestone = achievementService.newlyCompletedMilestone {
-                    MilestoneCelebrationView(milestone: milestone) {
-                        achievementService.showMilestonePopup = false
-                    }
-                    .transition(.opacity)
-                }
 
                 // Habit badge unlock popup
                 if habitBadgeService.showBadgePopup, let badge = habitBadgeService.newlyUnlockedBadge {
@@ -672,11 +672,11 @@ struct ProfileView: View {
         VStack(spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Badges")
-                        .font(.custom("HankenGrotesk-Bold", size: 24))
+                    Text(NSLocalizedString("profile.achievements.badges_title", comment: ""))
+                        .font(Font.Poppins.custom(.bold, size: 24))
                         .foregroundColor(.white)
 
-                    Text("\(totalUnlockedBadges)/\(totalBadges) débloqués")
+                    Text("\(totalUnlockedBadges)/\(totalBadges) \(NSLocalizedString("profile.achievements.unlocked", comment: ""))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -704,7 +704,7 @@ struct ProfileView: View {
             }
             .frame(height: 8)
 
-            Text("\(Int(globalBadgePercentage * 100))% Complete")
+            Text("\(Int(globalBadgePercentage * 100))% \(NSLocalizedString("profile.achievements.complete", comment: ""))")
                 .font(.custom("Poppins-Regular", size: 12))
                 .foregroundColor(.white.opacity(0.6))
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -761,7 +761,7 @@ struct SimpleDomainScore: View {
                     .foregroundColor(.white.opacity(0.8))
 
                 Text("\(value)")
-                    .font(.custom("HankenGrotesk-Bold", size: 20))
+                    .font(Font.Poppins.custom(.bold, size: 20))
                     .foregroundColor(.white)
             }
         }
@@ -777,6 +777,7 @@ struct HorizontalHabitBar: View {
     let color: Color
     let completed: Int
     let total: Int
+    let animationTrigger: Bool
 
     @State private var animatedProgress: Double = 0
 
@@ -799,7 +800,7 @@ struct HorizontalHabitBar: View {
 
                 // Progress as completed/total
                 Text("\(completed)/\(total)")
-                    .font(.custom("HankenGrotesk-Bold", size: 13))
+                    .font(Font.Poppins.custom(.bold, size: 13))
                     .foregroundColor(.white.opacity(0.8))
             }
 
@@ -833,14 +834,20 @@ struct HorizontalHabitBar: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.white.opacity(0.05))
         )
-        .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.65).delay(0.1)) {
-                animatedProgress = progress
+        .onChange(of: animationTrigger) { oldValue, newValue in
+            // Reset and animate when tab becomes visible
+            if newValue {
+                animatedProgress = 0
+                withAnimation(.spring(response: 0.8, dampingFraction: 0.75).delay(0.15)) {
+                    animatedProgress = progress
+                }
             }
         }
-        .onChange(of: progress) { oldValue, newValue in
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.65)) {
-                animatedProgress = newValue
+        .onAppear {
+            if animationTrigger {
+                withAnimation(.spring(response: 0.8, dampingFraction: 0.75).delay(0.15)) {
+                    animatedProgress = progress
+                }
             }
         }
     }
@@ -864,7 +871,11 @@ struct SingleEvolvingHabitBadge: View {
             return highestUnlocked
         }
         // Otherwise return the first locked badge (bronze)
-        return badges.sorted { $0.level.percentage < $1.level.percentage }.first ?? badges[0]
+        if let firstBadge = badges.sorted { $0.level.percentage < $1.level.percentage }.first {
+            return firstBadge
+        }
+        // Fallback: create default bronze badge if badges array is empty
+        return HabitBadge(id: "\(habitId)_bronze", habitId: habitId, level: .bronze, requirement: 1, progress: 0, unlockedAt: nil)
     }
 
     var body: some View {
@@ -915,6 +926,7 @@ struct SingleEvolvingHabitBadge: View {
                 .foregroundColor(.white.opacity(0.6))
         }
         .onTapGesture {
+            HapticManager.light()
             showDetail = true
         }
         .sheet(isPresented: $showDetail) {
@@ -944,7 +956,11 @@ struct HabitBadgeDetailSheet: View {
         if let highestUnlocked = unlockedBadges.first {
             return highestUnlocked
         }
-        return badges.sorted { $0.level.percentage < $1.level.percentage }.first ?? badges[0]
+        if let firstBadge = badges.sorted { $0.level.percentage < $1.level.percentage }.first {
+            return firstBadge
+        }
+        // Fallback: create default bronze badge if badges array is empty
+        return HabitBadge(id: "\(habitId)_bronze", habitId: habitId, level: .bronze, requirement: 1, progress: 0, unlockedAt: nil)
     }
 
     var body: some View {
@@ -1051,7 +1067,7 @@ struct HabitBadgeDetailSheet: View {
 
                                 // Requirement
                                 Text("\(currentProgress)/\(badge.requirement)")
-                                    .font(.custom("HankenGrotesk-Bold", size: 12))
+                                    .font(Font.Poppins.custom(.bold, size: 12))
                                     .foregroundColor(badge.isUnlocked ? .white : .white.opacity(0.5))
                                     .frame(width: 50, alignment: .trailing)
 
@@ -1067,9 +1083,10 @@ struct HabitBadgeDetailSheet: View {
 
                     // Close button
                     Button(action: {
+                        HapticManager.light()
                         dismiss()
                     }) {
-                        Text("Fermer")
+                        Text(NSLocalizedString("profile.achievements.close", comment: ""))
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)

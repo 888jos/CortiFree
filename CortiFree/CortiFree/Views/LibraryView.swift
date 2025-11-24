@@ -69,11 +69,11 @@ struct LibraryView: View {
                     }
                     .onChange(of: viewModel.scrollToSection) { _, section in
                         if let section = section {
-                            withAnimation(.easeInOut(duration: 0.5)) {
+                            withAnimation(.appSpring) {
                                 proxy.scrollTo(section, anchor: .top)
                             }
                             // Reset after scrolling
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 viewModel.scrollToSection = nil
                             }
                         }
@@ -105,7 +105,7 @@ struct LibraryView: View {
 
     private var headerNavigation: some View {
         HStack {
-            Text("Librairie")
+            Text(NSLocalizedString("library.title", comment: ""))
                 .font(.custom("Poppins-Bold", size: 24))
                 .foregroundColor(.white)
 
@@ -175,7 +175,7 @@ struct LibraryView: View {
         VStack(spacing: 16) {
             HStack(spacing: 16) {
                 CategoryButton(
-                    title: "Apprendre",
+                    title: NSLocalizedString("library.category.learn", comment: ""),
                     backgroundImage: "button_apprendre",
                     strokeColor: Color(hex: "894208")
                 ) {
@@ -183,7 +183,7 @@ struct LibraryView: View {
                 }
 
                 CategoryButton(
-                    title: "Blog",
+                    title: NSLocalizedString("library.category.blog", comment: ""),
                     backgroundImage: "button_blog",
                     strokeColor: Color(hex: "27154D")
                 ) {
@@ -193,7 +193,7 @@ struct LibraryView: View {
 
             HStack(spacing: 16) {
                 CategoryButton(
-                    title: "Conseils",
+                    title: NSLocalizedString("library.category.tips", comment: ""),
                     backgroundImage: "button_conseil",
                     strokeColor: Color(hex: "842F6C")
                 ) {
@@ -201,7 +201,7 @@ struct LibraryView: View {
                 }
 
                 CategoryButton(
-                    title: "Études",
+                    title: NSLocalizedString("library.category.studies", comment: ""),
                     backgroundImage: "button_etudes",
                     strokeColor: Color(hex: "155AAF")
                 ) {
@@ -218,11 +218,11 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Section Header
             VStack(alignment: .leading, spacing: 8) {
-                Text("Sons Relaxants")
+                Text(NSLocalizedString("library.sounds.title", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
 
-                Text("Aide ton coeur à se réguler lors d'une situation stressante")
+                Text(NSLocalizedString("library.sounds.subtitle", comment: ""))
                     .font(.custom("Poppins-Regular", size: 12))
                     .foregroundColor(Color(hex: "B0B8D4"))
             }
@@ -232,36 +232,36 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "cloud.rain.fill",
-                        title: "Pluie",
+                        title: NSLocalizedString("library.sounds.rain", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "rain" && soundPlayer.isPlaying
                     ) {
-                        playSound(id: "rain", title: "Pluie")
+                        playSound(id: "rain", title: NSLocalizedString("library.sounds.rain", comment: ""))
                     }
 
                     SoundItem(
                         icon: "water.waves",
-                        title: "Ocean",
+                        title: NSLocalizedString("library.sounds.ocean", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "ocean" && soundPlayer.isPlaying
                     ) {
-                        playSound(id: "ocean", title: "Ocean")
+                        playSound(id: "ocean", title: NSLocalizedString("library.sounds.ocean", comment: ""))
                     }
                 }
 
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "flame.fill",
-                        title: "Feu",
+                        title: NSLocalizedString("library.sounds.fire", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "fire" && soundPlayer.isPlaying
                     ) {
-                        playSound(id: "fire", title: "Feu")
+                        playSound(id: "fire", title: NSLocalizedString("library.sounds.fire", comment: ""))
                     }
 
                     SoundItem(
                         icon: "waveform",
-                        title: "Bruit Blanc",
+                        title: NSLocalizedString("library.sounds.whitenoise", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "whitenoise" && soundPlayer.isPlaying
                     ) {
-                        playSound(id: "whitenoise", title: "Bruit Blanc")
+                        playSound(id: "whitenoise", title: NSLocalizedString("library.sounds.whitenoise", comment: ""))
                     }
                 }
 
@@ -269,36 +269,36 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "sunrise.fill",
-                            title: "Matinée",
+                            title: NSLocalizedString("library.sounds.morning", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "wind" && soundPlayer.isPlaying
                         ) {
-                            playSound(id: "wind", title: "Matinée")
+                            playSound(id: "wind", title: NSLocalizedString("library.sounds.morning", comment: ""))
                         }
 
                         SoundItem(
                             icon: "leaf.fill",
-                            title: "Forêt",
+                            title: NSLocalizedString("library.sounds.forest", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "forest" && soundPlayer.isPlaying
                         ) {
-                            playSound(id: "forest", title: "Forêt")
+                            playSound(id: "forest", title: NSLocalizedString("library.sounds.forest", comment: ""))
                         }
                     }
 
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "drop.fill",
-                            title: "Ruisseau",
+                            title: NSLocalizedString("library.sounds.stream", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "stream" && soundPlayer.isPlaying
                         ) {
-                            playSound(id: "stream", title: "Ruisseau")
+                            playSound(id: "stream", title: NSLocalizedString("library.sounds.stream", comment: ""))
                         }
 
                         SoundItem(
                             icon: "moon.stars.fill",
-                            title: "Nuit d'été",
+                            title: NSLocalizedString("library.sounds.summer_night", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "night" && soundPlayer.isPlaying
                         ) {
-                            playSound(id: "night", title: "Nuit d'été")
+                            playSound(id: "night", title: NSLocalizedString("library.sounds.summer_night", comment: ""))
                         }
                     }
                 }
@@ -308,12 +308,12 @@ struct LibraryView: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                    withAnimation(.appSpring) {
                         showAllSounds.toggle()
                     }
                 }) {
                     HStack(spacing: 6) {
-                        Text(showAllSounds ? "Voir moins" : "Voir plus")
+                        Text(showAllSounds ? NSLocalizedString("library.sounds.see_less", comment: "") : NSLocalizedString("library.sounds.see_more", comment: ""))
                             .font(.custom("Poppins-Medium", size: 13))
                             .foregroundColor(Color.appTheme)
 
@@ -339,11 +339,11 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Section Header
             VStack(alignment: .leading, spacing: 8) {
-                Text("Exercices de Respiration Guidés")
+                Text(NSLocalizedString("library.breathing.title", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
 
-                Text("Techniques de respiration pour gérer le stress")
+                Text(NSLocalizedString("library.breathing.subtitle", comment: ""))
                     .font(.custom("Poppins-Regular", size: 12))
                     .foregroundColor(Color(hex: "B0B8D4"))
             }
@@ -353,7 +353,7 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "wind",
-                        title: "Respiration abdominale profonde",
+                        title: NSLocalizedString("library.breathing.deep_abdominal", comment: ""),
                         isPlaying: false
                     ) {
                         startBreathingExercise(.deepAbdominal)
@@ -361,7 +361,7 @@ struct LibraryView: View {
 
                     SoundItem(
                         icon: "moon.stars.fill",
-                        title: "4-7-8",
+                        title: NSLocalizedString("library.breathing.4_7_8", comment: ""),
                         isPlaying: false
                     ) {
                         startBreathingExercise(.fourSevenEight)
@@ -371,7 +371,7 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "heart.fill",
-                        title: "Cohérence cardiaque 5-5",
+                        title: NSLocalizedString("library.breathing.cardiac_coherence", comment: ""),
                         isPlaying: false
                     ) {
                         startBreathingExercise(.coherence)
@@ -379,7 +379,7 @@ struct LibraryView: View {
 
                     SoundItem(
                         icon: "bed.double.fill",
-                        title: "Respiration lente 6-6",
+                        title: NSLocalizedString("library.breathing.slow", comment: ""),
                         isPlaying: false
                     ) {
                         startBreathingExercise(.slow66)
@@ -390,7 +390,7 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "triangle",
-                            title: "Triangle Breathing",
+                            title: NSLocalizedString("library.breathing.triangle", comment: ""),
                             isPlaying: false
                         ) {
                             startBreathingExercise(.triangle)
@@ -398,7 +398,7 @@ struct LibraryView: View {
 
                         SoundItem(
                             icon: "square",
-                            title: "Box Breathing",
+                            title: NSLocalizedString("library.breathing.box", comment: ""),
                             isPlaying: false
                         ) {
                             startBreathingExercise(.boxBreathing)
@@ -408,7 +408,7 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "bolt.fill",
-                            title: "Kapalabhati",
+                            title: NSLocalizedString("library.breathing.kapalabhati", comment: ""),
                             isPlaying: false
                         ) {
                             startBreathingExercise(.kapalabhati)
@@ -416,7 +416,7 @@ struct LibraryView: View {
 
                         SoundItem(
                             icon: "flame.fill",
-                            title: "Bhastrika (Soufflet)",
+                            title: NSLocalizedString("library.breathing.bhastrika", comment: ""),
                             isPlaying: false
                         ) {
                             startBreathingExercise(.bhastrika)
@@ -429,12 +429,12 @@ struct LibraryView: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                    withAnimation(.appSpring) {
                         showAllBreathing.toggle()
                     }
                 }) {
                     HStack(spacing: 6) {
-                        Text(showAllBreathing ? "Voir moins" : "Voir plus")
+                        Text(showAllBreathing ? NSLocalizedString("library.sounds.see_less", comment: "") : NSLocalizedString("library.sounds.see_more", comment: ""))
                             .font(.custom("Poppins-Medium", size: 13))
                             .foregroundColor(Color.appTheme)
 
@@ -460,11 +460,11 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Section Header
             VStack(alignment: .leading, spacing: 8) {
-                Text("Exercices de Méditation Guidés")
+                Text(NSLocalizedString("library.meditation.title", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
 
-                Text("Méditations guidées pour la relaxation profonde")
+                Text(NSLocalizedString("library.meditation.subtitle", comment: ""))
                     .font(.custom("Poppins-Regular", size: 12))
                     .foregroundColor(Color(hex: "B0B8D4"))
             }
@@ -474,36 +474,36 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "wind",
-                        title: "Respiration consciente",
+                        title: NSLocalizedString("library.meditation.conscious_breathing", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "conscious-breathing" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "conscious-breathing", title: "Respiration consciente")
+                        playMeditation(id: "conscious-breathing", title: NSLocalizedString("library.meditation.conscious_breathing", comment: ""))
                     }
 
                     SoundItem(
                         icon: "figure.stand",
-                        title: "Body Scan express",
+                        title: NSLocalizedString("library.meditation.body_scan", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "body-scan" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "body-scan", title: "Body Scan express")
+                        playMeditation(id: "body-scan", title: NSLocalizedString("library.meditation.body_scan", comment: ""))
                     }
                 }
 
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "eye.fill",
-                        title: "Mindfulness de base",
+                        title: NSLocalizedString("library.meditation.mindfulness", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "mindfulness" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "mindfulness", title: "Mindfulness de base")
+                        playMeditation(id: "mindfulness", title: NSLocalizedString("library.meditation.mindfulness", comment: ""))
                     }
 
                     SoundItem(
                         icon: "leaf.fill",
-                        title: "Ancrage corporel / Grounding",
+                        title: NSLocalizedString("library.meditation.grounding", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "grounding" && soundPlayer.isPlaying
                     ) {
-                        playMeditation(id: "grounding", title: "Ancrage corporel / Grounding")
+                        playMeditation(id: "grounding", title: NSLocalizedString("library.meditation.grounding", comment: ""))
                     }
                 }
 
@@ -511,36 +511,36 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "sparkles",
-                            title: "Visualisation lieu sûr",
+                            title: NSLocalizedString("library.meditation.visualization", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "visualization" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "visualization", title: "Visualisation lieu sûr")
+                            playMeditation(id: "visualization", title: NSLocalizedString("library.meditation.visualization", comment: ""))
                         }
 
                         SoundItem(
                             icon: "heart.fill",
-                            title: "Auto-compassion",
+                            title: NSLocalizedString("library.meditation.compassion", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "compassion" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "compassion", title: "Auto-compassion")
+                            playMeditation(id: "compassion", title: NSLocalizedString("library.meditation.compassion", comment: ""))
                         }
                     }
 
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "brain.head.profile",
-                            title: "Méditation focus/clarté",
+                            title: NSLocalizedString("library.meditation.focus", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "focus-clarity" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "focus-clarity", title: "Méditation focus/clarté")
+                            playMeditation(id: "focus-clarity", title: NSLocalizedString("library.meditation.focus", comment: ""))
                         }
 
                         SoundItem(
                             icon: "moon.stars.fill",
-                            title: "Méditation sommeil / Yoga Nidra",
+                            title: NSLocalizedString("library.meditation.sleep", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "yoga-nidra" && soundPlayer.isPlaying
                         ) {
-                            playMeditation(id: "yoga-nidra", title: "Méditation sommeil / Yoga Nidra")
+                            playMeditation(id: "yoga-nidra", title: NSLocalizedString("library.meditation.sleep", comment: ""))
                         }
                     }
                 }
@@ -550,12 +550,12 @@ struct LibraryView: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                    withAnimation(.appSpring) {
                         showAllMeditation.toggle()
                     }
                 }) {
                     HStack(spacing: 6) {
-                        Text(showAllMeditation ? "Voir moins" : "Voir plus")
+                        Text(showAllMeditation ? NSLocalizedString("library.sounds.see_less", comment: "") : NSLocalizedString("library.sounds.see_more", comment: ""))
                             .font(.custom("Poppins-Medium", size: 13))
                             .foregroundColor(Color.appTheme)
 

@@ -50,7 +50,7 @@ struct UserSettings: Codable {
     // MARK: - Initialization
 
     init(
-        programStartDate: Date = Date(),
+        programStartDate: Date = UserSettings.calculateProgramStartDate(),
         onboardingScore: Int = 50,
         wakeUpTime: String = "07:00",
         bedTime: String = "23:00",
@@ -71,6 +71,32 @@ struct UserSettings: Codable {
         self.notificationsEnabled = notificationsEnabled
         self.morningReminderTime = morningReminderTime
         self.eveningReminderTime = eveningReminderTime
+    }
+
+    // MARK: - Smart Start Date Calculation
+
+    /// Calcule la date de début du programme de manière intelligente
+    /// Si l'inscription se fait après 16h, le programme commence demain (jour 0/66 aujourd'hui)
+    /// Sinon, il commence aujourd'hui à minuit (jour 1/66 aujourd'hui)
+    static func calculateProgramStartDate() -> Date {
+        let now = Date()
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: now)
+
+        // Si inscription après 16h, commencer demain (jour 0 aujourd'hui)
+        if hour >= 16 {
+            // Demain à minuit
+            if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
+               let tomorrowMidnight = calendar.startOfDay(for: tomorrow) as Date? {
+                print("📅 Program will start tomorrow at midnight (signup after 4pm) - Day 0/66 today")
+                return tomorrowMidnight
+            }
+        }
+
+        // Sinon, commencer aujourd'hui à minuit (jour 1 aujourd'hui)
+        let todayMidnight = calendar.startOfDay(for: now)
+        print("📅 Program starts today at midnight - Day 1/66 today")
+        return todayMidnight
     }
 
     // MARK: - Firestore Conversion
@@ -148,6 +174,7 @@ struct HabitTracking: Codable {
     var firstCompletedDate: Date?
     var lastCompletedDate: Date?
     var last7Days: [Bool] // Historique des 7 derniers jours
+    var completedDays: [Int] // Jours du programme complétés (1-66+)
 
     init(habitId: String, habitTitle: String) {
         self.habitId = habitId
@@ -158,6 +185,7 @@ struct HabitTracking: Codable {
         self.firstCompletedDate = nil
         self.lastCompletedDate = nil
         self.last7Days = [false, false, false, false, false, false, false]
+        self.completedDays = []
     }
 
     // MARK: - Firestore Conversion
@@ -169,7 +197,8 @@ struct HabitTracking: Codable {
             "currentStreak": currentStreak,
             "longestStreak": longestStreak,
             "totalCompletions": totalCompletions,
-            "last7Days": last7Days
+            "last7Days": last7Days,
+            "completedDays": completedDays
         ]
 
         if let firstCompletedDate = firstCompletedDate {
@@ -194,6 +223,7 @@ struct HabitTracking: Codable {
         tracking.longestStreak = data["longestStreak"] as? Int ?? 0
         tracking.totalCompletions = data["totalCompletions"] as? Int ?? 0
         tracking.last7Days = data["last7Days"] as? [Bool] ?? [false, false, false, false, false, false, false]
+        tracking.completedDays = data["completedDays"] as? [Int] ?? []
 
         if let timestamp = data["firstCompletedDate"] as? Timestamp {
             tracking.firstCompletedDate = timestamp.dateValue()

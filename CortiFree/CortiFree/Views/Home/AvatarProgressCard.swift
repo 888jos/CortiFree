@@ -9,13 +9,13 @@ import SwiftUI
 import FirebaseAuth
 
 struct AvatarProgressCard: View {
-    @State private var completedDays: Int = 23
-    @State private var currentDay: Int = 24
+    @State private var daysElapsed: Int = 0 // Nombre de jours écoulés depuis le début
     @State private var isPressed: Bool = false
     @State private var isFlipped: Bool = false
     @State private var startDate: Date = Date()
-    @State private var currentStreak: Int = 5
-    @State private var bestStreak: Int = 12
+    @State private var currentStreak: Int = 0
+    @State private var bestStreak: Int = 0
+    @State private var showBadgesScreen: Bool = false
 
     private let totalDays = 66
     private let columns = 8   // 8 colonnes pour cellules plus grandes
@@ -39,7 +39,7 @@ struct AvatarProgressCard: View {
                     axis: (x: 0, y: 1, z: 0)
                 )
         }
-        .frame(width: 240, height: 320)
+        .frame(width: 216, height: 320)  // 240 * 0.90 = 216 (réduction de 10%)
         .scaleEffect(isPressed ? 0.97 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         .onTapGesture {
@@ -51,6 +51,14 @@ struct AvatarProgressCard: View {
         .onAppear {
             loadProgress()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
+            // Reload streak when updated from TasksV2View
+            currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+            bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
+        }
+        .fullScreenCover(isPresented: $showBadgesScreen) {
+            BadgesListView()
+        }
     }
 
     // MARK: - Front Card (Recto)
@@ -61,20 +69,18 @@ struct AvatarProgressCard: View {
             Image("profile_avatar")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 240)
+                .frame(width: 216)
                 .frame(height: 320)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
 
             // Grid overlay INSIDE the image, in the last quarter
             VStack(spacing: 0) {
-                // Grid of 66 days with sequential reveal animation
+                // Grid of 66 days (no animation)
                 LazyVGrid(columns: Array(repeating: GridItem(.fixed(12), spacing: 3), count: columns), spacing: 3) {
                     ForEach(0..<totalDays, id: \.self) { day in
                         RoundedRectangle(cornerRadius: 2)
                             .fill(dayColor(for: day))
                             .frame(width: 12, height: 12)
-                            .opacity(day >= currentDay ? 0.3 : 1.0)
-                            .cascadeAppear(index: day, totalCount: totalDays, baseDelay: 0.01)
                     }
                 }
                 .padding(.horizontal, 12)
@@ -96,11 +102,8 @@ struct AvatarProgressCard: View {
                 .padding(.vertical, 6)
             }
             .padding(.bottom, 8)
-            .background(
-                Color.black.opacity(0.15)
-            )
         }
-        .frame(width: 240, height: 320)
+        .frame(width: 216, height: 320)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
@@ -109,148 +112,119 @@ struct AvatarProgressCard: View {
         .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
 
-    // MARK: - Back Card (Verso)
+    // MARK: - Back Card (Verso) - Redesigned
 
     private var backCard: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack(spacing: 6) {
-                Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 16))
+            // Header redesigné avec icônes
+            HStack(spacing: 8) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 14))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text("MA PROGRESSION")
-                    .font(.custom("Poppins-Bold", size: 16))
-                    .foregroundColor(.white)
+                Text(NSLocalizedString("avatar.my_progress", comment: ""))
+                    .font(.custom("Poppins-Medium", size: 13))
+                    .foregroundColor(.white.opacity(0.8))
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color(hex: "FF8800"))
+
+                    Text("\(currentStreak)")
+                        .font(Font.Poppins.custom(.bold, size: 14))
+                        .foregroundColor(.white)
+                }
             }
+            .padding(.horizontal, 20)
             .padding(.top, 20)
-            .padding(.bottom, 16)
 
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
-                    // Stats principales
-                    VStack(spacing: 8) {
-                        Text("\(completedDays)/\(totalDays) jours")
-                            .font(.custom("HankenGrotesk-Bold", size: 32))
-                            .foregroundColor(.white)
+            Spacer()
 
-                        Text("\(progressPercentage)% complété")
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
+            // Stat principale - Jours complétés avec gradient blanc-violet (aligné à gauche)
+            VStack(spacing: 4) {
+                Text("\(daysElapsed)/\(totalDays)")
+                    .font(Font.Poppins.custom(.bold, size: 56))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [
+                                Color.white,
+                                Color(hex: "B794F6")
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
 
-                    // Barre de progression
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.white.opacity(0.1))
-                                .frame(height: 8)
+                Text(NSLocalizedString("avatar.days", comment: ""))
+                    .font(.custom("Poppins-Regular", size: 14))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 24)
 
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color(hex: "B794F6"), Color(hex: "B794F6").opacity(0.7)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .frame(width: geo.size.width * (Double(completedDays) / Double(totalDays)), height: 8)
-                        }
-                    }
-                    .frame(height: 8)
-                    .padding(.horizontal, 16)
+            Spacer()
 
-                    Divider()
-                        .background(Color.white.opacity(0.2))
-                        .padding(.vertical, 8)
+            // Message motivationnel
+            Text(motivationalMessage)
+                .font(.custom("Poppins-Medium", size: 12))
+                .foregroundColor(.white.opacity(0.8))
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 24)
 
-                    // Streaks
-                    HStack(spacing: 20) {
-                        VStack(spacing: 4) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "flame.fill")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color(hex: "FF8800"))
-                                Text("\(currentStreak)j")
-                                    .font(.custom("HankenGrotesk-Bold", size: 20))
-                                    .foregroundColor(.white)
-                            }
-                            Text("Streak actuel")
-                                .font(.custom("Poppins-Regular", size: 10))
-                                .foregroundColor(.white.opacity(0.6))
-                        }
+            Spacer().frame(height: 12)
 
-                        VStack(spacing: 4) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "star.fill")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color(hex: "FFD700"))
-                                Text("\(bestStreak)j")
-                                    .font(.custom("HankenGrotesk-Bold", size: 20))
-                                    .foregroundColor(.white)
-                            }
-                            Text("Meilleur")
-                                .font(.custom("Poppins-Regular", size: 10))
-                                .foregroundColor(.white.opacity(0.6))
-                        }
-                    }
+            // Badge milestone avec preview cliquable
+            if let badgeInfo = nextBadgeInfo {
+                Button(action: {
+                    HapticManager.light()
+                    showBadgesScreen = true
+                }) {
+                    HStack(spacing: 10) {
+                        // Preview du badge
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "B794F6").opacity(0.2))
+                                .frame(width: 40, height: 40)
 
-                    Divider()
-                        .background(Color.white.opacity(0.2))
-                        .padding(.vertical, 8)
-
-                    // Dates
-                    VStack(spacing: 8) {
-                        HStack {
-                            Image(systemName: "calendar")
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.6))
-                            Text("Début: \(formatFullDate(startDate))")
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.8))
-                            Spacer()
-                        }
-
-                        HStack {
-                            Image(systemName: "flag.fill")
-                                .font(.system(size: 12))
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 18))
                                 .foregroundColor(Color(hex: "B794F6"))
-                            Text("Fin prévue: \(formatFullDate(endDate))")
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.8))
-                            Spacer()
                         }
-                    }
-                    .padding(.horizontal, 16)
 
-                    // Message motivant
-                    VStack(spacing: 8) {
-                        Text(motivationalMessage)
-                            .font(.custom("Poppins-SemiBold", size: 13))
-                            .foregroundColor(Color(hex: "B794F6"))
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(badgeInfo.title)
+                                .font(.custom("Poppins-SemiBold", size: 13))
+                                .foregroundColor(.white)
 
-                        if let nextMilestone = nextBadgeMilestone {
-                            Text(nextMilestone)
+                            Text(String(format: NSLocalizedString("avatar.next_badge", comment: ""), badgeInfo.daysLeft, badgeInfo.daysLeft > 1 ? NSLocalizedString("avatar.next_badge.plural", comment: "") : NSLocalizedString("avatar.next_badge.singular", comment: "")))
                                 .font(.custom("Poppins-Regular", size: 11))
-                                .foregroundColor(.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                                .lineLimit(2)
+                                .foregroundColor(Color(hex: "B794F6"))
                         }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(Color(hex: "B794F6"))
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "B794F6").opacity(0.15))
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color.white.opacity(0.05))
                     )
-                    .padding(.horizontal, 16)
                 }
-                .padding(.bottom, 16)
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 20)
             }
+
+            Spacer().frame(height: 20)
         }
-        .frame(width: 240, height: 320)
+        .frame(width: 216, height: 320)
         .background(
             LinearGradient(
                 colors: [
@@ -270,26 +244,43 @@ struct AvatarProgressCard: View {
     }
 
     private func dayColor(for day: Int) -> Color {
-        if day < completedDays {
-            return Color(hex: "B794F6") // Violet for completed
-        } else if day == currentDay - 1 {
-            return Color(hex: "B794F6").opacity(0.5) // Current day
+        if day < daysElapsed {
+            // Jours terminés - Violet plein
+            return Color(hex: "B794F6")
+        } else if day == daysElapsed {
+            // Jour en cours - Violet à 50% d'opacité
+            return Color(hex: "B794F6").opacity(0.5)
         } else {
-            return Color.white.opacity(0.2) // Future days
+            // Jours à venir - Gris
+            return Color.white.opacity(0.2)
         }
     }
 
     private func loadProgress() {
-        // Load from UserDefaults
-        if let savedDay = UserDefaults.standard.value(forKey: "currentProgramDay") as? Int {
-            currentDay = savedDay
-            completedDays = savedDay - 1
+        // Load program start date from UserDefaults
+        if let savedStartDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
+            startDate = savedStartDate
+
+            // Calculate days elapsed since start
+            let calendar = Calendar.current
+            let startOfToday = calendar.startOfDay(for: Date())
+            let startOfProgramDay = calendar.startOfDay(for: savedStartDate)
+
+            if let daysDifference = calendar.dateComponents([.day], from: startOfProgramDay, to: startOfToday).day {
+                daysElapsed = min(daysDifference, 66) // Cap at 66 days
+            }
+        } else {
+            // If no start date, use default
+            daysElapsed = 0
         }
 
-        // Load start date
-        if let savedDate = UserDefaults.standard.value(forKey: "programStartDate") as? Date {
-            startDate = savedDate
-        }
+        // Load current streak from UserDefaults
+        currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+
+        // Load best streak from UserDefaults
+        bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
+
+        print("📊 AvatarProgressCard loaded: Days elapsed: \(daysElapsed)/\(totalDays), Streak: \(currentStreak)")
     }
 
     private func getUserFirstName() -> String {
@@ -320,7 +311,7 @@ struct AvatarProgressCard: View {
 
     private var progressPercentage: Int {
         guard totalDays > 0 else { return 0 }
-        return Int((Double(completedDays) / Double(totalDays)) * 100)
+        return Int((Double(daysElapsed) / Double(totalDays)) * 100)
     }
 
     private var endDate: Date {
@@ -330,32 +321,248 @@ struct AvatarProgressCard: View {
     private var motivationalMessage: String {
         let percentage = progressPercentage
         if percentage < 10 {
-            return "Chaque grand voyage commence par un premier pas !"
+            return NSLocalizedString("avatar.motivation.0_10", comment: "")
         } else if percentage < 25 {
-            return "Tu es sur la bonne voie, continue comme ça !"
+            return NSLocalizedString("avatar.motivation.10_25", comment: "")
         } else if percentage < 50 {
-            return "Tu as déjà accompli \(percentage)% du chemin, bravo !"
+            return String(format: NSLocalizedString("avatar.motivation.25_50", comment: ""), percentage)
         } else if percentage < 75 {
-            return "Plus de la moitié ! Tu es incroyable !"
+            return NSLocalizedString("avatar.motivation.50_75", comment: "")
         } else if percentage < 100 {
-            return "La ligne d'arrivée est proche, ne lâche rien !"
+            return NSLocalizedString("avatar.motivation.75_100", comment: "")
         } else {
-            return "Programme complété ! Tu es une légende ! 🏆"
+            return NSLocalizedString("avatar.motivation.100", comment: "")
         }
     }
 
-    private var nextBadgeMilestone: String? {
+    private var nextBadgeInfo: (title: String, daysLeft: Int)? {
         let milestones = [3, 7, 14, 21, 30, 40, 50, 60, 66]
-        let badgeTitles = ["Débutant", "Motivé", "Déterminé", "Engagé", "Assidu", "Champion", "Invincible", "Légende", "Maître"]
+        let badgeTitles = [
+            NSLocalizedString("avatar.badge.beginner", comment: ""),
+            NSLocalizedString("avatar.badge.motivated", comment: ""),
+            NSLocalizedString("avatar.badge.determined", comment: ""),
+            NSLocalizedString("avatar.badge.engaged", comment: ""),
+            NSLocalizedString("avatar.badge.assiduous", comment: ""),
+            NSLocalizedString("avatar.badge.champion", comment: ""),
+            NSLocalizedString("avatar.badge.invincible", comment: ""),
+            NSLocalizedString("avatar.badge.legend", comment: ""),
+            NSLocalizedString("avatar.badge.master", comment: "")
+        ]
 
         for (index, milestone) in milestones.enumerated() {
-            if completedDays < milestone {
-                let daysLeft = milestone - completedDays
-                return "Plus que \(daysLeft) jour\(daysLeft > 1 ? "s" : "") pour le badge '\(badgeTitles[index])' !"
+            if daysElapsed < milestone {
+                let daysLeft = milestone - daysElapsed
+                return (title: badgeTitles[index], daysLeft: daysLeft)
             }
         }
 
         return nil // All badges unlocked
+    }
+}
+
+// MARK: - Badges List View
+
+struct BadgesListView: View {
+    @StateObject private var achievementService = AchievementService.shared
+    @StateObject private var habitBadgeService = HabitBadgeService.shared
+    @StateObject private var profileViewModel = ProfileViewModel()
+    @Environment(\.dismiss) var dismiss
+
+    private var streakAchievements: [Achievement] {
+        achievementService.achievements.filter { $0.category == .streak }
+    }
+
+    private var totalUnlockedBadges: Int {
+        achievementService.unlockedCount + habitBadgeService.unlockedBadgesCount
+    }
+
+    private var totalBadges: Int {
+        achievementService.totalCount + habitBadgeService.totalBadgesCount
+    }
+
+    private var globalBadgePercentage: Double {
+        guard totalBadges > 0 else { return 0 }
+        return Double(totalUnlockedBadges) / Double(totalBadges)
+    }
+
+    private func getHabitProgress(_ habitId: String) -> Int {
+        let stats = profileViewModel.habitProgress[habitId]
+        return stats?.completed ?? 0
+    }
+
+    private func getHabitTotal(_ habitId: String) -> Int {
+        let stats = profileViewModel.habitProgress[habitId]
+        return stats?.total ?? 0
+    }
+
+    var body: some View {
+        ZStack {
+            // Galaxy background
+            GalaxyBackgroundView(intensity: 1.0)
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    Button(action: {
+                        HapticManager.light()
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 44, height: 44)
+                    }
+
+                    Spacer()
+
+                    Text(NSLocalizedString("avatar.badges_title", comment: ""))
+                        .font(.custom("Poppins-Bold", size: 20))
+                        .foregroundColor(.white)
+
+                    Spacer()
+
+                    Color.clear.frame(width: 44, height: 44)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+
+                // Content
+                ScrollView {
+                    VStack(spacing: 32) {
+                        // Global Progress Header
+                        VStack(spacing: 12) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(NSLocalizedString("avatar.badges_title", comment: ""))
+                                        .font(Font.Poppins.custom(.bold, size: 24))
+                                        .foregroundColor(.white)
+
+                                    Text(String(format: NSLocalizedString("avatar.badges_unlocked", comment: ""), totalUnlockedBadges, totalBadges))
+                                        .font(.custom("Poppins-Regular", size: 14))
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+
+                                Spacer()
+                            }
+
+                            // Progress bar
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    Capsule()
+                                        .fill(Color.white.opacity(0.1))
+                                        .frame(height: 8)
+
+                                    Capsule()
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                        .frame(width: geo.size.width * globalBadgePercentage, height: 8)
+                                }
+                            }
+                            .frame(height: 8)
+
+                            Text(String(format: NSLocalizedString("avatar.badges_complete", comment: ""), Int(globalBadgePercentage * 100)))
+                                .font(.custom("Poppins-Regular", size: 12))
+                                .foregroundColor(.white.opacity(0.6))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        // SECTION 1: Streak Achievements (3x3 grid)
+                        VStack(spacing: 16) {
+                            // Section header
+                            HStack(spacing: 12) {
+                                Image(systemName: "flame.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(Color(hex: "FF8800"))
+
+                                Text(NSLocalizedString("avatar.streaks_section", comment: ""))
+                                    .font(.custom("Poppins-Bold", size: 16))
+                                    .foregroundColor(.white)
+
+                                Spacer()
+
+                                Text("\(streakAchievements.filter { $0.isUnlocked }.count)/\(streakAchievements.count)")
+                                    .font(.custom("Poppins-Regular", size: 14))
+                                    .foregroundColor(.white.opacity(0.6))
+                            }
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 12)
+
+                            // Grid 3 colonnes pour streaks
+                            LazyVGrid(columns: [
+                                GridItem(.flexible(), spacing: 16),
+                                GridItem(.flexible(), spacing: 16),
+                                GridItem(.flexible(), spacing: 16)
+                            ], spacing: 20) {
+                                ForEach(Array(streakAchievements.enumerated()), id: \.element.id) { index, achievement in
+                                    AchievementBadge(
+                                        achievement: achievement,
+                                        size: .medium
+                                    )
+                                }
+                            }
+                        }
+
+                        // Divider horizontal
+                        Rectangle()
+                            .fill(Color.white.opacity(0.15))
+                            .frame(height: 1)
+                            .padding(.vertical, 20)
+
+                        // SECTION 2: Habit Badges (3 per row)
+                        VStack(spacing: 16) {
+                            // Section header
+                            HStack(spacing: 12) {
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(Color(hex: "B794F6"))
+
+                                Text(NSLocalizedString("avatar.habits_section", comment: ""))
+                                    .font(.custom("Poppins-Bold", size: 16))
+                                    .foregroundColor(.white)
+
+                                Spacer()
+
+                                Text("\(habitBadgeService.unlockedBadgesCount)/\(habitBadgeService.totalBadgesCount)")
+                                    .font(.custom("Poppins-Regular", size: 14))
+                                    .foregroundColor(.white.opacity(0.6))
+                            }
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 12)
+
+                            // Grid 3 colonnes pour habits
+                            LazyVGrid(columns: [
+                                GridItem(.flexible(), spacing: 16),
+                                GridItem(.flexible(), spacing: 16),
+                                GridItem(.flexible(), spacing: 16)
+                            ], spacing: 20) {
+                                ForEach(Array(HabitBadge.allHabitIds.enumerated()), id: \.element) { index, habitId in
+                                    SingleEvolvingHabitBadge(
+                                        habitId: habitId,
+                                        badges: habitBadgeService.badges(for: habitId),
+                                        currentProgress: getHabitProgress(habitId),
+                                        totalTasks: getHabitTotal(habitId)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
+                }
+            }
+        }
+        .onAppear {
+            Task {
+                await profileViewModel.refreshProfile()
+                await habitBadgeService.loadHabitBadges()
+            }
+        }
     }
 }
 

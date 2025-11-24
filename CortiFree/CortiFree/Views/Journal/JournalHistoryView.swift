@@ -11,6 +11,11 @@ struct JournalHistoryView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = JournalViewModel()
 
+    // Undo functionality
+    @State private var showUndoToast = false
+    @State private var deletedEntry: JournalEntry?
+    @State private var undoWorkItem: DispatchWorkItem?
+
     var body: some View {
         ZStack {
             // Background
@@ -38,20 +43,35 @@ struct JournalHistoryView: View {
                     Spacer()
                 } else if viewModel.allEntries.isEmpty {
                     emptyState
+                        .transition(.slideUp)
                 } else {
                     // Timeline - vertical scroll
                     ScrollView(showsIndicators: false) {
                         LazyVStack(spacing: 0) {
-                            ForEach(viewModel.allEntries) { entry in
-                                TimelineEntryCard(entry: entry) {
-                                    await viewModel.deleteEntry(entry)
-                                }
+                            ForEach(Array(viewModel.allEntries.enumerated()), id: \.element.id) { index, entry in
+                                TimelineEntryCard(entry: entry, onDelete: {
+                                    deleteWithUndo(entry)
+                                }, onShare: {
+                                    shareEntry(entry)
+                                })
+                                .cascadeAppear(index: index, totalCount: viewModel.allEntries.count)
                             }
                         }
                         .padding(.horizontal, 24)
                         .padding(.top, 20)
                         .padding(.bottom, 40)
                     }
+                }
+
+                // Undo Toast
+                if showUndoToast {
+                    UndoToast(
+                        message: NSLocalizedString("journal_history.entry_deleted", comment: ""),
+                        duration: 5.0,
+                        undoAction: restoreEntry
+                    )
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(1000)
                 }
             }
         }
@@ -76,11 +96,11 @@ struct JournalHistoryView: View {
             Spacer()
 
             VStack(spacing: 4) {
-                Text("Mes Entrées")
-                    .font(.custom("HankenGrotesk-Bold", size: 20))
+                Text(NSLocalizedString("journal_history.title", comment: ""))
+                    .font(Font.Poppins.custom(.bold, size: 20))
                     .foregroundColor(.white)
 
-                Text("\(viewModel.allEntries.count) entrée\(viewModel.allEntries.count > 1 ? "s" : "")")
+                Text(viewModel.allEntries.count == 1 ? String(format: NSLocalizedString("journal_history.entries_count", comment: ""), viewModel.allEntries.count) : String(format: NSLocalizedString("journal_history.entries_count_plural", comment: ""), viewModel.allEntries.count))
                     .font(.custom("Poppins-Regular", size: 12))
                     .foregroundColor(.white.opacity(0.6))
             }
@@ -96,6 +116,81 @@ struct JournalHistoryView: View {
         .padding(.bottom, 16)
     }
 
+    // MARK: - Helper Functions
+
+    private func deleteWithUndo(_ entry: JournalEntry) {
+        HapticManager.medium()
+
+        // Cancel any pending permanent delete
+        undoWorkItem?.cancel()
+
+        // Store the entry for potential restoration
+        deletedEntry = entry
+
+        // Soft delete (remove from UI but keep reference)
+        Task {
+            await viewModel.deleteEntry(entry)
+        }
+
+        // Show undo toast
+        withAnimation(.appSpring) {
+            showUndoToast = true
+        }
+
+        // Schedule permanent delete after 5 seconds
+        let workItem = DispatchWorkItem {
+            withAnimation(.appSpring) {
+                showUndoToast = false
+            }
+            deletedEntry = nil
+        }
+
+        undoWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: workItem)
+    }
+
+    private func restoreEntry() {
+        HapticManager.light()
+
+        // Cancel permanent delete
+        undoWorkItem?.cancel()
+
+        // Restore entry if it exists
+        if deletedEntry != nil {
+            Task {
+                await viewModel.loadAllEntries() // Reload to restore entry
+            }
+        }
+
+        // Hide toast
+        withAnimation(.appSpring) {
+            showUndoToast = false
+        }
+
+        deletedEntry = nil
+    }
+
+    private func shareEntry(_ entry: JournalEntry) {
+        HapticManager.light()
+
+        let shareText = """
+        \(NSLocalizedString("journal_history.share_text_prefix", comment: ""))\(entry.createdAt.formatted(date: .long, time: .omitted))
+
+        \(entry.content)
+        \(NSLocalizedString("journal_history.share_text_suffix", comment: ""))
+        """
+
+        let activityController = UIActivityViewController(
+            activityItems: [shareText],
+            applicationActivities: nil
+        )
+
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootViewController = windowScene.windows.first?.rootViewController {
+            rootViewController.present(activityController, animated: true)
+        }
+    }
+
     // MARK: - Empty State
 
     private var emptyState: some View {
@@ -106,11 +201,11 @@ struct JournalHistoryView: View {
                 .font(.system(size: 60))
                 .foregroundColor(Color(hex: "B794F6").opacity(0.5))
 
-            Text("Aucune entrée pour le moment")
+            Text(NSLocalizedString("journal_history.empty_title", comment: ""))
                 .font(.custom("Poppins-SemiBold", size: 18))
                 .foregroundColor(.white)
 
-            Text("Commence à écrire ton journal quotidien")
+            Text(NSLocalizedString("journal_history.empty_subtitle", comment: ""))
                 .font(.custom("Poppins-Regular", size: 14))
                 .foregroundColor(.white.opacity(0.6))
                 .multilineTextAlignment(.center)
@@ -125,9 +220,9 @@ struct JournalHistoryView: View {
 
 struct TimelineEntryCard: View {
     let entry: JournalEntry
-    let onDelete: () async -> Void
+    let onDelete: () -> Void
+    let onShare: () -> Void
 
-    @State private var showDeleteConfirmation = false
     @State private var isExpanded = false
 
     private var previewText: String {
@@ -165,33 +260,22 @@ struct TimelineEntryCard: View {
 
             // Right: Entry content
             VStack(alignment: .leading, spacing: 12) {
-                // Mood + delete
-                HStack {
-                    if let mood = entry.mood {
-                        HStack(spacing: 6) {
-                            Circle()
-                                .fill(Color(hex: mood.color).opacity(0.3))
-                                .frame(width: 32, height: 32)
-                                .overlay(
-                                    Text(mood.emoji)
-                                        .font(.system(size: 18))
-                                )
+                // Mood indicator
+                if let mood = entry.mood {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(Color(hex: mood.color).opacity(0.3))
+                            .frame(width: 32, height: 32)
+                            .overlay(
+                                Text(mood.emoji)
+                                    .font(.system(size: 18))
+                            )
 
-                            Text(mood.displayName)
-                                .font(.custom("Poppins-SemiBold", size: 13))
-                                .foregroundColor(.white)
-                        }
-                    }
+                        Text(mood.displayName)
+                            .font(.custom("Poppins-SemiBold", size: 13))
+                            .foregroundColor(.white)
 
-                    Spacer()
-
-                    Button(action: {
-                        HapticManager.light()
-                        showDeleteConfirmation = true
-                    }) {
-                        Image(systemName: "trash")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.5))
+                        Spacer()
                     }
                 }
 
@@ -221,7 +305,7 @@ struct TimelineEntryCard: View {
                                 isExpanded.toggle()
                             }
                         }) {
-                            Text(isExpanded ? "Voir moins" : "Voir plus")
+                            Text(isExpanded ? NSLocalizedString("journal_history.see_less", comment: "") : NSLocalizedString("journal_history.see_more", comment: ""))
                                 .font(.custom("Poppins-Medium", size: 12))
                                 .foregroundColor(Color(hex: "B794F6"))
                         }
@@ -230,7 +314,7 @@ struct TimelineEntryCard: View {
                     Spacer()
 
                     if let wordCount = entry.wordCount {
-                        Text("\(wordCount) mots")
+                        Text(String(format: NSLocalizedString("journal_history.words_count", comment: ""), wordCount))
                             .font(.custom("Poppins-Regular", size: 11))
                             .foregroundColor(.white.opacity(0.5))
                     }
@@ -239,13 +323,22 @@ struct TimelineEntryCard: View {
             .padding(.vertical, 12)
             .padding(.bottom, 24)
         }
-        .confirmationDialog("Supprimer cette entrée ?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
-            Button("Supprimer", role: .destructive) {
-                Task {
-                    await onDelete()
-                }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                HapticManager.medium()
+                onDelete()
+            } label: {
+                Label(NSLocalizedString("journal_history.delete", comment: ""), systemImage: "trash")
             }
-            Button("Annuler", role: .cancel) {}
+        }
+        .swipeActions(edge: .leading) {
+            Button {
+                HapticManager.light()
+                onShare()
+            } label: {
+                Label(NSLocalizedString("journal_history.share", comment: ""), systemImage: "square.and.arrow.up")
+            }
+            .tint(.blue)
         }
     }
 

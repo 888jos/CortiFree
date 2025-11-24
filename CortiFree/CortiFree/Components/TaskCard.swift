@@ -106,7 +106,7 @@ struct HabitTaskCard: View {
                     // Middle info - centered vertically
                     VStack(alignment: .leading, spacing: 8) {
                         Text(title)
-                            .font(.custom("HankenGrotesk-Bold", size: 20))
+                            .font(Font.Poppins.custom(.bold, size: 20))
                             .foregroundColor(.white)
                             .lineLimit(2)
                             .fixedSize(horizontal: false, vertical: true)
@@ -197,9 +197,9 @@ struct HabitTaskCard: View {
                 }
             }
             .frame(width: 345, height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
                     .stroke(Color.white, lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)

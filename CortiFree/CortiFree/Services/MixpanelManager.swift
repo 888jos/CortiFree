@@ -698,12 +698,6 @@ class MixpanelManager {
         ])
     }
 
-    func trackMilestoneCompleted(milestoneDay: Int, milestoneTitle: String) {
-        track(event: "milestone_completed", properties: [
-            "milestone_day": milestoneDay,
-            "milestone_title": milestoneTitle
-        ])
-    }
 
     func trackHabitBadgeUnlocked(habitId: String, badgeLevel: String, tasksCompleted: Int) {
         track(event: "habit_badge_unlocked", properties: [
