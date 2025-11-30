@@ -12,6 +12,7 @@ struct HabitTaskDetailView: View {
     let task: HabitTask
     let onValidate: () -> Void
     let onSkip: () -> Void
+    var isCurrentDay: Bool = true // Defaults to true for backwards compatibility
     @Environment(\.dismiss) private var dismiss
     @State private var animateProgress: Bool = false
 
@@ -74,82 +75,78 @@ struct HabitTaskDetailView: View {
                             .padding(.horizontal, 32)
                             .padding(.top, 8)
 
-                        // Progress section
-                        VStack(alignment: .leading, spacing: 16) {
-                            // Progression grid on 66 days
-                            VStack(alignment: .leading, spacing: 12) {
-                                HStack(alignment: .top) {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(NSLocalizedString("task.detail.progression_66_days", comment: ""))
-                                            .font(.custom("Poppins-SemiBold", size: 16))
-                                            .foregroundColor(.white)
+                        // Progress section - width matches hexagon labels span
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(NSLocalizedString("task.detail.progression_66_days", comment: ""))
+                                        .font(.custom("Poppins-SemiBold", size: 16))
+                                        .foregroundColor(.white)
 
-                                        let occurrenceDays = getExpectedOccurrenceDays()
+                                    let occurrenceDays = getExpectedOccurrenceDays()
 
-                                        Text("\(occurrenceDays.count) \(NSLocalizedString("task.detail.occurrences", comment: ""))")
-                                            .font(.custom("Poppins-Regular", size: 11))
-                                            .foregroundColor(Color(hex: "B794F6"))
-                                    }
-
-                                    Spacer()
-
-                                    // Total completions - Top right in rectangle
-                                    HStack(spacing: 4) {
-                                        Text("\(task.totalCompletions)")
-                                            .font(Font.Poppins.custom(.bold, size: 14))
-                                            .foregroundColor(.white)
-
-                                        Text(NSLocalizedString("task.detail.this_month", comment: ""))
-                                            .font(.custom("Poppins-Regular", size: 10))
-                                            .foregroundColor(.white.opacity(0.6))
-                                    }
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .fill(Color(hex: "B794F6").opacity(0.2))
-                                    )
+                                    Text("\(occurrenceDays.count) \(NSLocalizedString("task.detail.occurrences", comment: ""))")
+                                        .font(.custom("Poppins-Regular", size: 11))
+                                        .foregroundColor(Color(hex: "B794F6"))
                                 }
 
-                                // Grid of squares - aligned to leading
-                                let occurrenceDays = getExpectedOccurrenceDays()
-                                let columns = getGridColumns(for: occurrenceDays.count)
+                                Spacer()
 
-                                LazyVGrid(
-                                    columns: Array(repeating: GridItem(.fixed(12), spacing: 3), count: columns),
-                                    alignment: .leading,
-                                    spacing: 3
-                                ) {
-                                    ForEach(occurrenceDays, id: \.self) { day in
-                                        RoundedRectangle(cornerRadius: 2)
-                                            .fill(squareColor(for: day))
-                                            .frame(width: 12, height: 12)
-                                    }
+                                // Total completions - Top right in rectangle
+                                HStack(spacing: 4) {
+                                    Text("\(task.totalCompletions)")
+                                        .font(Font.Poppins.custom(.bold, size: 14))
+                                        .foregroundColor(.white)
+
+                                    Text(NSLocalizedString("task.detail.this_month", comment: ""))
+                                        .font(.custom("Poppins-Regular", size: 10))
+                                        .foregroundColor(.white.opacity(0.6))
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color(hex: "B794F6").opacity(0.2))
+                                )
+                            }
+
+                            // Grid of squares - aligned to leading
+                            let occurrenceDays = getExpectedOccurrenceDays()
+
+                            LazyVGrid(
+                                columns: Array(repeating: GridItem(.fixed(12), spacing: 3), count: 12),
+                                alignment: .leading,
+                                spacing: 3
+                            ) {
+                                ForEach(occurrenceDays, id: \.self) { day in
+                                    RoundedRectangle(cornerRadius: 2)
+                                        .fill(squareColor(for: day))
+                                        .frame(width: 12, height: 12)
                                 }
                             }
-                            .padding(16)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(width: 240) // Width from heart icon to end of Sérénité
                         .padding(.horizontal, 24)
 
-                        // Impact section title
-                        VStack(spacing: 8) {
+                        // Impact section title - centered
+                        VStack(spacing: 4) {
                             Text(NSLocalizedString("task.detail.habit_improves", comment: ""))
-                                .font(Font.Poppins.custom(.bold, size: 20))
+                                .font(.custom("Poppins-SemiBold", size: 16))
                                 .foregroundColor(.white)
 
                             Text(NSLocalizedString("task.detail.cortifree_score_domains", comment: ""))
-                                .font(.custom("Poppins-Regular", size: 14))
-                                .foregroundColor(.white.opacity(0.6))
+                                .font(.custom("Poppins-Regular", size: 11))
+                                .foregroundColor(Color(hex: "B794F6"))
                         }
-                        .padding(.top, 16)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 8)
 
-                        // Radar chart for 6 CortiFree domains (reduced by 15%)
+                        // Radar chart for 6 CortiFree domains (reduced x0.75)
                         ZStack {
                             // Background hexagon grid
                             HexagonRadarGrid()
                                 .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                .frame(width: 238, height: 238)
+                                .frame(width: 178, height: 178)
 
                             // Filled hexagon based on impact
                             HexagonRadarFill(progress: getImpactProgress())
@@ -163,80 +160,80 @@ struct HabitTaskDetailView: View {
                                         endPoint: .bottom
                                     )
                                 )
-                                .frame(width: 238, height: 238)
+                                .frame(width: 178, height: 178)
 
                             // Stroke around the filled hexagon - positioned outside
                             HexagonRadarFill(progress: getImpactProgress())
                                 .stroke(
                                     Color(hex: "B794F6").opacity(0.5),
-                                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+                                    style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
                                 )
-                                .frame(width: 238, height: 238)
+                                .frame(width: 178, height: 178)
 
-                            // Labels at hexagon vertices (adjusted for 15% reduction)
+                            // Labels at hexagon vertices (adjusted for x0.75 reduction)
                             ZStack {
                                 // Global - Top
                                 HStack(spacing: 4) {
                                     Image(systemName: "star.fill")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 11))
                                     Text(NSLocalizedString("task.detail.domain.global", comment: ""))
-                                        .font(.custom("Poppins-SemiBold", size: 12))
+                                        .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
-                                .offset(x: 0, y: -143)
+                                .offset(x: 0, y: -107)
 
                                 // Sérénité - Top right
                                 HStack(spacing: 4) {
                                     Image(systemName: "leaf.fill")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 11))
                                     Text(NSLocalizedString("task.detail.domain.serenity", comment: ""))
-                                        .font(.custom("Poppins-SemiBold", size: 12))
+                                        .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
-                                .offset(x: 126, y: -70)
+                                .offset(x: 95, y: -52)
 
                                 // Sommeil - Bottom right
                                 HStack(spacing: 4) {
                                     Image(systemName: "moon.fill")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 11))
                                     Text(NSLocalizedString("task.detail.domain.sleep", comment: ""))
-                                        .font(.custom("Poppins-SemiBold", size: 12))
+                                        .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
-                                .offset(x: 126, y: 70)
+                                .offset(x: 95, y: 52)
 
                                 // Énergie - Bottom
                                 HStack(spacing: 4) {
                                     Image(systemName: "bolt.fill")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 11))
                                     Text(NSLocalizedString("task.detail.domain.energy", comment: ""))
-                                        .font(.custom("Poppins-SemiBold", size: 12))
+                                        .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
-                                .offset(x: 0, y: 143)
+                                .offset(x: 0, y: 107)
 
                                 // Focus - Bottom left
                                 HStack(spacing: 4) {
                                     Image(systemName: "target")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 11))
                                     Text(NSLocalizedString("task.detail.domain.focus", comment: ""))
-                                        .font(.custom("Poppins-SemiBold", size: 12))
+                                        .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
-                                .offset(x: -126, y: 70)
+                                .offset(x: -95, y: 52)
 
                                 // Équilibre - Top left
                                 HStack(spacing: 4) {
                                     Image(systemName: "heart.fill")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 11))
                                     Text(NSLocalizedString("task.detail.domain.balance", comment: ""))
-                                        .font(.custom("Poppins-SemiBold", size: 12))
+                                        .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
-                                .offset(x: -126, y: -70)
+                                .offset(x: -95, y: -52)
                             }
                         }
-                        .padding(.vertical, 48)
+                        .padding(.vertical, 32)
 
                         // Bottom spacing for buttons
                         Spacer(minLength: 120)
@@ -249,8 +246,9 @@ struct HabitTaskDetailView: View {
                 Spacer()
 
                 HStack(spacing: 12) {
-                    // Skip button (red)
+                    // Skip button (red when active, gray when disabled)
                     Button(action: {
+                        guard isCurrentDay else { return }
                         HapticManager.medium()
                         onSkip()
                         dismiss()
@@ -267,12 +265,14 @@ struct HabitTaskDetailView: View {
                         .frame(height: 56)
                         .background(
                             RoundedRectangle(cornerRadius: 28)
-                                .fill(Color(hex: "FF3B30"))
+                                .fill(isCurrentDay ? Color(hex: "FF3B30") : Color.gray.opacity(0.5))
                         )
                     }
+                    .disabled(!isCurrentDay)
 
-                    // Validate button (green)
+                    // Validate button (green when active, gray when disabled)
                     Button(action: {
+                        guard isCurrentDay else { return }
                         HapticManager.success()
                         onValidate()
                         dismiss()
@@ -289,9 +289,10 @@ struct HabitTaskDetailView: View {
                         .frame(height: 56)
                         .background(
                             RoundedRectangle(cornerRadius: 28)
-                                .fill(Color(hex: "34C759"))
+                                .fill(isCurrentDay ? Color(hex: "34C759") : Color.gray.opacity(0.5))
                         )
                     }
+                    .disabled(!isCurrentDay)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)

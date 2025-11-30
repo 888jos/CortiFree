@@ -25,7 +25,6 @@ struct TasksV2View: View {
     @State private var showSuccessCheckmark: Bool = false // Success checkmark animation trigger
     @State private var isRefreshing: Bool = false // Pull to refresh state
     @State private var showFutureWeekAlert: Bool = false // Show blocking screen for future weeks
-    @State private var showScoreDetail: Bool = false // Show score detail sheet
 
     // Undo functionality for skip action
     @State private var showUndoToast: Bool = false
@@ -308,24 +307,19 @@ struct TasksV2View: View {
 
                         Spacer()
 
-                        // Global Score (from CortiFreeRatingView for day 1) - Clickable
-                        Button(action: {
-                            HapticManager.light()
-                            showScoreDetail = true
-                        }) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "star.fill")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.white)
+                        // Global Score display
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 14))
+                                .foregroundColor(.white)
 
-                                Text("\(globalScore)")
-                                    .font(Font.Poppins.custom(.bold, size: 16))
-                                    .foregroundColor(.white)
+                            Text("\(globalScore)")
+                                .font(Font.Poppins.custom(.bold, size: 16))
+                                .foregroundColor(.white)
 
-                                Text("(+\(globalScoreIncrease))")
-                                    .font(.custom("Poppins-Regular", size: 12))
-                                    .foregroundColor(.white.opacity(0.5))
-                            }
+                            Text("(+\(globalScoreIncrease))")
+                                .font(.custom("Poppins-Regular", size: 12))
+                                .foregroundColor(.white.opacity(0.5))
                         }
                     }
                     .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -358,24 +352,16 @@ struct TasksV2View: View {
                             Button(action: {
                                 HapticManager.light()
                                 let targetDay = currentDay + 1
-                                // TEMPORARY: Disabled future week restriction for testing
-                                // TODO: Re-enable this validation check after testing
-                                // let currentWeek = WeeklyHabitProgression.currentWeek(for: actualDay)
-                                // let targetWeek = WeeklyHabitProgression.currentWeek(for: targetDay)
+                                let currentWeek = WeeklyHabitProgression.currentWeek(for: actualDay)
+                                let targetWeek = WeeklyHabitProgression.currentWeek(for: targetDay)
 
-                                // Allow navigation to any day (testing mode)
-                                withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
-                                    currentDay = targetDay
+                                if targetWeek <= currentWeek {
+                                    withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
+                                        currentDay = targetDay
+                                    }
+                                } else {
+                                    showFutureWeekAlert = true
                                 }
-
-                                // ORIGINAL CODE (commented for testing):
-                                // if targetWeek <= currentWeek {
-                                //     withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
-                                //         currentDay = targetDay
-                                //     }
-                                // } else {
-                                //     showFutureWeekAlert = true
-                                // }
                             }) {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 20, weight: .bold))
@@ -578,23 +564,25 @@ struct TasksV2View: View {
                                     }
                                 )
                                 .bouncePress()
-                                .cascadeAppear(index: index, totalCount: filteredTasks.count, baseDelay: 0.05)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
+                                        guard currentDay == actualDay else { return }
                                         HapticManager.medium()
                                         skipTaskWithUndo(task)
                                     } label: {
                                         Label("Passer", systemImage: "xmark.circle")
                                     }
+                                    .tint(currentDay == actualDay ? .red : .gray)
                                 }
-                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                .swipeActions(edge: .leading, allowsFullSwipe: currentDay == actualDay) {
                                     Button {
+                                        guard currentDay == actualDay else { return }
                                         HapticManager.success()
                                         validateTask(task)
                                     } label: {
                                         Label("Valider", systemImage: "checkmark.circle")
                                     }
-                                    .tint(.green)
+                                    .tint(currentDay == actualDay ? .green : .gray)
                                 }
                             }
                         }
@@ -616,8 +604,22 @@ struct TasksV2View: View {
             }
         }
         .fullScreenCover(item: $selectedTask) { task in
+            // Create task with correct streak (from getTaskStreak, not the stored value)
+            let taskWithCorrectStreak = HabitTask(
+                title: task.title,
+                frequency: task.frequency,
+                duration: task.duration,
+                frequencyText: task.frequencyText,
+                difficulty: task.difficulty,
+                streak: getTaskStreak(task),
+                imageName: task.imageName,
+                totalCompletions: task.totalCompletions,
+                last7Days: task.last7Days,
+                completedDays: task.completedDays,
+                impactAreas: task.impactAreas
+            )
             HabitTaskDetailView(
-                task: task,
+                task: taskWithCorrectStreak,
                 onValidate: {
                     validateTask(task)
                     selectedTask = nil
@@ -625,7 +627,8 @@ struct TasksV2View: View {
                 onSkip: {
                     skipTask(task)
                     selectedTask = nil
-                }
+                },
+                isCurrentDay: currentDay == actualDay
             )
         }
         .sheet(isPresented: $showAddTask) {
@@ -677,12 +680,6 @@ struct TasksV2View: View {
                 }
             }
         )
-        .sheet(isPresented: $showScoreDetail) {
-            ScoreDetailView(
-                globalScore: globalScore,
-                initialGlobalScore: initialGlobalScore
-            )
-        }
     }
 
     // Load data from Firebase
@@ -913,12 +910,10 @@ struct TasksV2View: View {
     }
 
     private func validateTask(_ task: HabitTask) {
-        // TEMPORARY: Disabled validation restriction for testing
-        // TODO: Re-enable this validation check after testing
-        // guard currentDay == actualDay else {
-        //     HapticManager.error()
-        //     return
-        // }
+        guard currentDay == actualDay else {
+            HapticManager.error()
+            return
+        }
 
         HapticManager.success()
 
@@ -1230,254 +1225,6 @@ struct FutureWeekBlockingView: View {
                     .fill(Color(hex: "1a0a2e"))
             )
             .padding(.horizontal, 32)
-        }
-    }
-}
-
-// MARK: - Score Detail View
-
-struct ScoreDetailView: View {
-    let globalScore: Int
-    let initialGlobalScore: Int
-
-    @Environment(\.dismiss) var dismiss
-    @State private var domainScores: UserDomainScores = UserDomainScores()
-    @State private var isLoading: Bool = true
-
-    private var scoreIncrease: Int {
-        return globalScore - initialGlobalScore
-    }
-
-    // Full 6-domain array for radar chart (Global + 5 domains)
-    // Radar chart expects values 0-1, so divide by 100
-    private var radarScores: [Double] {
-        let scores = [
-            domainScores.serenity,
-            domainScores.sleep,
-            domainScores.energy,
-            domainScores.focus,
-            domainScores.balance
-        ]
-        let global = scores.reduce(0, +) / Double(scores.count)
-        // Validate against NaN and normalize to 0-1 range
-        let validGlobal = (global.isNaN || !global.isFinite) ? 0.0 : global / 100.0
-        let validScores = scores.map { score in
-            let valid = (score.isNaN || !score.isFinite) ? 0.0 : score
-            return valid / 100.0  // Normalize to 0-1 range
-        }
-        return [validGlobal] + validScores
-    }
-
-    // Domain colors
-    private let domainColors: [Color] = [
-        Color(hex: "9B59B6"), // Sérénité
-        Color(hex: "E74C3C"), // Sommeil
-        Color(hex: "1ABC9C"), // Énergie
-        Color(hex: "2ECC71"), // Focus
-        Color(hex: "3498DB")  // Équilibre
-    ]
-
-    private let domainIcons: [String] = [
-        "leaf.fill",    // Sérénité
-        "moon.fill",    // Sommeil
-        "bolt.fill",    // Énergie
-        "target",       // Focus
-        "heart.fill"    // Équilibre
-    ]
-
-    private var domainNames: [String] {
-        [
-            NSLocalizedString("profile.domain.serenity", comment: ""),
-            NSLocalizedString("profile.domain.sleep", comment: ""),
-            NSLocalizedString("profile.domain.energy", comment: ""),
-            NSLocalizedString("profile.domain.focus", comment: ""),
-            NSLocalizedString("profile.domain.balance", comment: "")
-        ]
-    }
-
-    var body: some View {
-        ZStack {
-            // Background gradient
-            LinearGradient(
-                colors: [
-                    Color(hex: "1A1B3A"),
-                    Color(hex: "0D0E1F")
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                // Header
-                HStack {
-                    Spacer()
-
-                    Text("Détails du score")
-                        .font(.custom("Poppins-Bold", size: 20))
-                        .foregroundColor(.white)
-
-                    Spacer()
-
-                    Button(action: {
-                        HapticManager.light()
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(width: 44, height: 44)
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
-
-                if isLoading {
-                    Spacer()
-                    ProgressView()
-                        .tint(.white)
-                    Spacer()
-                } else {
-                    VStack(spacing: 28) {
-                        // Global Score Card
-                        VStack(spacing: 12) {
-                            Image(systemName: "star.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(Color(hex: "B794F6"))
-
-                            Text("\(globalScore)")
-                                .font(Font.Poppins.custom(.bold, size: 56))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [.white, Color(hex: "B794F6")],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                )
-
-                            Text("Score global")
-                                .font(.custom("Poppins-Medium", size: 16))
-                                .foregroundColor(.white.opacity(0.7))
-
-                            if scoreIncrease > 0 {
-                                Text("+\(scoreIncrease) depuis le début")
-                                    .font(.custom("Poppins-Regular", size: 14))
-                                    .foregroundColor(.green)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 32)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color.white.opacity(0.05))
-                        )
-                        .padding(.top, 20)
-
-                        // Hexagon radar with domain scores
-                        ZStack {
-                            // Hexagon radar
-                            HexagonRadarChart(
-                                progress: radarScores,
-                                color: Color(hex: "B794F6"),
-                                size: 280,
-                                showLabels: false
-                            )
-
-                            // Position the 6 scores around the hexagon (Global + 5 domains)
-
-                            // Global - Top (0°)
-                            SimpleDomainScore(
-                                icon: "star.fill",
-                                title: "Global",
-                                value: globalScore,
-                                color: Color(hex: "B794F6")
-                            )
-                            .offset(x: 0, y: -175)
-
-                            // Sérénité - Top right (60°)
-                            SimpleDomainScore(
-                                icon: domainIcons[0],
-                                title: domainNames[0],
-                                value: getDomainScore(index: 0),
-                                color: domainColors[0]
-                            )
-                            .offset(x: 155, y: -85)
-
-                            // Sommeil - Bottom right (120°)
-                            SimpleDomainScore(
-                                icon: domainIcons[1],
-                                title: domainNames[1],
-                                value: getDomainScore(index: 1),
-                                color: domainColors[1]
-                            )
-                            .offset(x: 155, y: 85)
-
-                            // Énergie - Bottom (180°)
-                            SimpleDomainScore(
-                                icon: domainIcons[2],
-                                title: domainNames[2],
-                                value: getDomainScore(index: 2),
-                                color: domainColors[2]
-                            )
-                            .offset(x: 0, y: 175)
-
-                            // Focus - Bottom left (240°)
-                            SimpleDomainScore(
-                                icon: domainIcons[3],
-                                title: domainNames[3],
-                                value: getDomainScore(index: 3),
-                                color: domainColors[3]
-                            )
-                            .offset(x: -155, y: 85)
-
-                            // Équilibre - Top left (300°)
-                            SimpleDomainScore(
-                                icon: domainIcons[4],
-                                title: domainNames[4],
-                                value: getDomainScore(index: 4),
-                                color: domainColors[4]
-                            )
-                            .offset(x: -155, y: -85)
-                        }
-                        .frame(height: 420)
-                        .padding(.horizontal, 24)
-
-                        Spacer()
-                    }
-                    .padding(.horizontal, 24)
-                }
-            }
-        }
-        .onAppear {
-            loadDomainScores()
-        }
-    }
-
-    private func getDomainScore(index: Int) -> Int {
-        let scores = [
-            domainScores.serenity,
-            domainScores.sleep,
-            domainScores.energy,
-            domainScores.focus,
-            domainScores.balance
-        ]
-        return Int(round(scores[index]))
-    }
-
-    private func loadDomainScores() {
-        Task {
-            do {
-                let scores = try await ImpactScoringService.shared.fetchCurrentScores()
-                await MainActor.run {
-                    self.domainScores = scores
-                    self.isLoading = false
-                }
-            } catch {
-                print("Error loading domain scores: \(error)")
-                await MainActor.run {
-                    self.isLoading = false
-                }
-            }
         }
     }
 }

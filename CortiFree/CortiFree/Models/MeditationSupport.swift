@@ -447,18 +447,13 @@ extension MeditationSupport {
         }
     }
 
+    var scientificSources: [String] {
+        return [NSLocalizedString("meditation_detail.source", comment: "")]
+    }
+
+    // Keep for backward compatibility
     var scientificSource: String {
-        switch meditationId {
-        case "conscious-breathing": return NSLocalizedString("meditation.conscious_breathing.source", comment: "")
-        case "body-scan": return NSLocalizedString("meditation.body_scan.source", comment: "")
-        case "mindfulness": return NSLocalizedString("meditation.mindfulness.source", comment: "")
-        case "grounding": return NSLocalizedString("meditation.grounding.source", comment: "")
-        case "visualization": return NSLocalizedString("meditation.visualization.source", comment: "")
-        case "compassion": return NSLocalizedString("meditation.compassion.source", comment: "")
-        case "focus-clarity": return NSLocalizedString("meditation.focus_clarity.source", comment: "")
-        case "yoga-nidra": return NSLocalizedString("meditation.yoga_nidra.source", comment: "")
-        default: return NSLocalizedString("meditation.default.source", comment: "")
-        }
+        return scientificSources.first ?? ""
     }
 }
 

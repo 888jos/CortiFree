@@ -350,15 +350,6 @@ struct ExerciseCard: View {
                         }
                         .foregroundColor(Color.appTheme.opacity(0.8))
 
-                        // XP reward
-                        HStack(spacing: 4) {
-                            Image(systemName: "star.fill")
-                                .font(.system(size: 10))
-                            Text("+\(exercise.xpReward) XP")
-                                .font(.custom("Poppins-Regular", size: 12))
-                        }
-                        .foregroundColor(Color(hex: "FFD700").opacity(0.8))
-
                         if exercise.isOptional {
                             Text("Optionnel")
                                 .font(.custom("Poppins-Regular", size: 11))

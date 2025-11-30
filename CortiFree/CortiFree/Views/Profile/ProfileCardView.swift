@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import Combine
 
 struct ProfileCardView: View {
     // Removed ProgressionManager - using scoring system instead
@@ -165,6 +166,10 @@ struct ProfileCardView: View {
         .shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 8)
         .onAppear {
             loadUserData()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ProfileUpdated"))) { _ in
+            // Refresh userName when profile is updated
+            userName = getUserName()
         }
     }
 

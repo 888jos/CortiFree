@@ -194,12 +194,12 @@ class FirebaseService: ObservableObject {
         stats.history[todayString] = completionRate
         stats.lastUpdated = Timestamp()
 
-        // Update streak
-        if completionRate >= 0.8 { // 80% completion
+        // Update streak - criteria: at least 1 task completed (completionRate > 0)
+        if completionRate > 0 {
             let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
             let yesterdayString = dateFormatter.string(from: yesterday)
 
-            if let yesterdayRate = stats.history[yesterdayString], yesterdayRate >= 0.8 {
+            if let yesterdayRate = stats.history[yesterdayString], yesterdayRate > 0 {
                 stats.streak += 1
             } else if stats.streak == 0 {
                 stats.streak = 1

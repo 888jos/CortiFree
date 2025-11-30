@@ -257,16 +257,22 @@ struct MeditationSupportView: View {
                             }
                         }
 
-                        // Source
-                        HStack(spacing: 8) {
-                            Image(systemName: "doc.text.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white.opacity(0.5))
+                        // Sources scientifiques (3 sources)
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(support.scientificSources, id: \.self) { source in
+                                HStack(alignment: .top, spacing: 8) {
+                                    Image(systemName: "doc.text.fill")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.white.opacity(0.5))
+                                        .frame(width: 16)
 
-                            Text(support.scientificSource)
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.6))
-                                .italic()
+                                    Text(source)
+                                        .font(.custom("Poppins-Regular", size: 11))
+                                        .foregroundColor(.white.opacity(0.6))
+                                        .italic()
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
                         }
                         .padding(.top, 8)
                     }

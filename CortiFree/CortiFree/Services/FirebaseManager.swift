@@ -182,36 +182,15 @@ class FirebaseManager: ObservableObject {
 
         try docRef.setData(from: task)
 
-        // Update daily progress
-        try await updateDailyProgress(
-            uid: uid,
-            date: getCurrentDate(),
-            xpEarned: task.xpEarned
-        )
-
-        // Update user's total XP
-        if let user = currentUser {
-            let newTotalXP = user.totalXP + task.xpEarned
-            let newLevel = calculateLevel(xp: newTotalXP)
-
-            try await updateUserProfile(uid: uid, updates: [
-                "totalXP": newTotalXP,
-                "level": newLevel
-            ])
-
-            // Check for level up
-            if newLevel > user.level {
-                // TODO: Implement trackLevelUp in MixpanelManager
-                // MixpanelManager.shared.trackLevelUp(newLevel: newLevel, totalXP: newTotalXP)
-            }
-        }
+        // Update daily progress (without XP)
+        try await updateDailyProgress(uid: uid, date: getCurrentDate())
 
         // Track with Mixpanel
         // TODO: Implement trackExerciseCompleted in MixpanelManager
         // MixpanelManager.shared.trackExerciseCompleted(...)
     }
 
-    private func updateDailyProgress(uid: String, date: String, xpEarned: Int) async throws {
+    private func updateDailyProgress(uid: String, date: String) async throws {
         let docRef = db.collection("users")
             .document(uid)
             .collection("routine_progress")
@@ -222,13 +201,12 @@ class FirebaseManager: ObservableObject {
         let document = try await docRef.getDocument()
 
         if document.exists {
-            // Update existing progress
+            // Update existing progress (XP removed)
             try await docRef.updateData([
-                "completedTasks": FieldValue.increment(Int64(1)),
-                "xpEarned": FieldValue.increment(Int64(xpEarned))
+                "completedTasks": FieldValue.increment(Int64(1))
             ])
         } else {
-            // Create new daily progress
+            // Create new daily progress (XP set to 0 by default)
             let progress = DailyProgress(
                 date: date,
                 weekNumber: currentUser?.currentWeek ?? 1,
@@ -236,7 +214,6 @@ class FirebaseManager: ObservableObject {
                 completedTasks: 1,
                 totalTasks: 20,
                 completionRate: 1.0 / 20.0,
-                xpEarned: xpEarned,
                 createdAt: Timestamp()
             )
 
@@ -347,14 +324,18 @@ class FirebaseManager: ObservableObject {
     // MARK: - Streak Management
 
     func updateStreak(uid: String) async throws {
-        guard let user = currentUser else { return }
+        // Fix race condition: capture user values atomically at start
+        guard let userSnapshot = currentUser else { return }
+        let currentStreakDays = userSnapshot.currentStreakDays
+        let currentLongestStreak = userSnapshot.longestStreakDays
 
         let today = getCurrentDate()
         let lastCompletedTasks = try await fetchCompletedTasksForToday(uid: uid, date: today)
 
+        // Global streak criteria: at least 1 task completed today
         if !lastCompletedTasks.isEmpty {
-            let newStreak = user.currentStreakDays + 1
-            let longestStreak = max(newStreak, user.longestStreakDays)
+            let newStreak = currentStreakDays + 1
+            let longestStreak = max(newStreak, currentLongestStreak)
 
             try await updateUserProfile(uid: uid, updates: [
                 "currentStreakDays": newStreak,
@@ -499,10 +480,34 @@ class FirebaseManager: ObservableObject {
             // Reset last completed date to nil (will be recalculated on next fetch)
             tracking.lastCompletedDate = nil
 
+            // Recalculate streak from remaining completed days
+            tracking.currentStreak = calculateStreakFromCompletedDays(tracking.completedDays)
+
             try await db.collection("users").document(uid)
                 .collection("habit_tracking").document(habitId)
                 .setData(tracking.toFirestore())
         }
+    }
+
+    /// Calculate the current streak from an array of completed program days
+    /// The streak counts consecutive days ending with the most recent completion
+    private func calculateStreakFromCompletedDays(_ days: [Int]) -> Int {
+        guard !days.isEmpty else { return 0 }
+
+        // Sort days in descending order (most recent first)
+        let sortedDays = days.sorted(by: >)
+        var streak = 1
+
+        // Count consecutive days from the most recent
+        for i in 0..<(sortedDays.count - 1) {
+            if sortedDays[i] - sortedDays[i + 1] == 1 {
+                streak += 1
+            } else {
+                break // Streak broken, stop counting
+            }
+        }
+
+        return streak
     }
 
     func fetchHabitCompletionHistory(uid: String, habitId: String, days: Int = 7) async throws -> [Bool] {

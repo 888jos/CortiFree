@@ -19,10 +19,32 @@ class AchievementService: ObservableObject {
     @Published var showAchievementPopup: Bool = false
 
     private let db = Firestore.firestore()
+    private var cancellables = Set<AnyCancellable>()
 
     private init() {
         Task {
             await loadAchievements()
+        }
+
+        // Listen for streak updates to refresh achievement progress
+        NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.updateStreakAchievementsProgress()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    // Update streak achievements progress when streak changes
+    private func updateStreakAchievementsProgress() {
+        let currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+        let streakAchievementIds = ["streak_3", "streak_7", "streak_14", "streak_21", "streak_30", "streak_40", "streak_50", "streak_60", "streak_66"]
+
+        for (index, achievement) in achievements.enumerated() {
+            if streakAchievementIds.contains(achievement.id) && !achievement.isUnlocked {
+                achievements[index].progress = currentStreak
+            }
         }
     }
 
@@ -48,8 +70,18 @@ class AchievementService: ObservableObject {
                 }
             }
 
+            // Update streak achievements with current streak from UserDefaults
+            let currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+            let streakAchievementIds = ["streak_3", "streak_7", "streak_14", "streak_21", "streak_30", "streak_40", "streak_50", "streak_60", "streak_66"]
+
+            for (index, achievement) in userAchievements.enumerated() {
+                if streakAchievementIds.contains(achievement.id) && !achievement.isUnlocked {
+                    userAchievements[index].progress = currentStreak
+                }
+            }
+
             achievements = userAchievements
-            print("✅ Loaded \(achievements.filter(\.isUnlocked).count)/\(achievements.count) achievements")
+            print("✅ Loaded \(achievements.filter(\.isUnlocked).count)/\(achievements.count) achievements (streak: \(currentStreak))")
         } catch {
             print("❌ Error loading achievements: \(error)")
         }
@@ -84,13 +116,9 @@ class AchievementService: ObservableObject {
             case "first_task":
                 achievement.progress = taskCompleted != nil ? 1 : 0
 
-            case "week_warrior":
-                achievement.progress = currentStreak
-
-            case "two_week_champion":
-                achievement.progress = currentStreak
-
-            case "month_master":
+            // All streak achievements use globalStreak from TasksV2View
+            case "streak_3", "streak_7", "streak_14", "streak_21", "streak_30", "streak_40", "streak_50", "streak_60", "streak_66",
+                 "week_warrior", "two_week_champion", "month_master":
                 achievement.progress = currentStreak
 
             case "triple_crown":

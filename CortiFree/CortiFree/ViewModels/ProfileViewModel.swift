@@ -17,6 +17,8 @@ class ProfileViewModel: ObservableObject {
     @Published var selectedPeriod: StatsPeriod = .week
     @Published var domainScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0] // Sérénité, Sommeil, Énergie, Focus, Équilibre
     @Published var potentialScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0]
+    @Published var onboardingGlobalScore: Int = 0 // Score global calculé pendant l'onboarding
+    @Published var onboardingDomainScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0] // Scores onboarding par domaine
     @Published var habitProgress: [String: (completed: Int, total: Int)] = [:] // Progress par habitude
 
     private let firebaseService = FirebaseService.shared
@@ -94,6 +96,24 @@ class ProfileViewModel: ObservableObject {
                             Double(scores["focus"] ?? 0),
                             Double(scores["balance"] ?? 0)
                         ]
+                    }
+
+                    // Load onboarding global score
+                    if let onboardingScore = data["onboardingScore"] as? Int {
+                        onboardingGlobalScore = onboardingScore
+                        print("📊 Onboarding score loaded: \(onboardingScore)")
+                    }
+
+                    // Load onboarding domain scores
+                    if let domainScoresData = data["domainScores"] as? [String: Int] {
+                        onboardingDomainScores = [
+                            Double(domainScoresData["serenity"] ?? 0),
+                            Double(domainScoresData["sleep"] ?? 0),
+                            Double(domainScoresData["energy"] ?? 0),
+                            Double(domainScoresData["focus"] ?? 0),
+                            Double(domainScoresData["balance"] ?? 0)
+                        ]
+                        print("📊 Onboarding domain scores loaded")
                     }
                 }
             }

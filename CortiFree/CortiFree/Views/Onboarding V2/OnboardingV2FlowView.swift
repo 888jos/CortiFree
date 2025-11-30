@@ -21,8 +21,6 @@ struct OnboardingV2FlowView: View {
     @State private var onboardingStartTime: Date?
 
     private let firebaseManager = FirebaseManager.shared
-    private let baselineService = BaselineService.shared
-    private let planGenerationService = PlanGenerationService.shared
 
     enum OnboardingStep {
         case welcome
@@ -179,31 +177,12 @@ struct OnboardingV2FlowView: View {
 
     private func saveDataAndGeneratePlan(result: HabitsQuizResult) {
         Task {
-            do {
-                // 1. Save baseline from quiz
-                try await baselineService.saveBaselineFromQuiz(result)
-                print("✅ Baseline saved successfully")
-
-                // 2. Generate personalized plan with anti-regression
-                let plan = try await planGenerationService.generatePersonalizedPlan(quizResult: result)
-                print("✅ Personalized plan generated with \(plan.focusHabits.count) focus habits")
-
-                // 3. Save quiz responses to Firebase (existing method)
-                if let overallData = overallQuizData {
-                    await saveOverallDataToFirebase(overallData)
-                }
-
-                // 4. Start baseline collection for validation (optional 7-day tracking)
-                try await baselineService.startBaselineCollection()
-                print("✅ 7-day baseline collection initiated")
-
-            } catch {
-                await MainActor.run {
-                    errorMessage = error.localizedDescription
-                    showError = true
-                }
-                print("❌ Error saving data: \(error)")
+            // Save quiz responses to Firebase
+            // Le plan est le même pour tous les utilisateurs (SimplifiedRoutineProgram)
+            if let overallData = overallQuizData {
+                await saveOverallDataToFirebase(overallData)
             }
+            print("✅ User data saved - using universal program for all users")
         }
     }
 

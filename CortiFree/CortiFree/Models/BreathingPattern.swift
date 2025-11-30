@@ -17,10 +17,39 @@ struct BreathingPattern: Identifiable {
     let inhaleDuration: Double
     let holdDuration: Double
     let exhaleDuration: Double
+    let holdOutDuration: Double // Pour box breathing (4 phases)
     let description: String
 
     var totalCycleDuration: Double {
-        inhaleDuration + holdDuration + exhaleDuration
+        inhaleDuration + holdDuration + exhaleDuration + holdOutDuration
+    }
+
+    /// Description courte pour l'affichage dans l'exercice (format: "4s - 2s - 6s")
+    var shortDescription: String {
+        if holdOutDuration > 0 {
+            // Box breathing: 4-4-4-4
+            return String(format: NSLocalizedString("breathing.rhythm.four_phases", comment: ""),
+                          Int(inhaleDuration), Int(holdDuration), Int(exhaleDuration), Int(holdOutDuration))
+        } else if holdDuration > 0 {
+            // 3 phases: 4-7-8
+            return String(format: NSLocalizedString("breathing.rhythm.three_phases", comment: ""),
+                          Int(inhaleDuration), Int(holdDuration), Int(exhaleDuration))
+        } else {
+            // 2 phases: 5-5
+            return String(format: NSLocalizedString("breathing.rhythm.two_phases", comment: ""),
+                          Int(inhaleDuration), Int(exhaleDuration))
+        }
+    }
+
+    // Init avec holdOutDuration par défaut à 0
+    init(name: String, displayName: String, inhaleDuration: Double, holdDuration: Double, exhaleDuration: Double, holdOutDuration: Double = 0, description: String) {
+        self.name = name
+        self.displayName = displayName
+        self.inhaleDuration = inhaleDuration
+        self.holdDuration = holdDuration
+        self.exhaleDuration = exhaleDuration
+        self.holdOutDuration = holdOutDuration
+        self.description = description
     }
 
     // MARK: - Preset Patterns
@@ -76,6 +105,7 @@ struct BreathingPattern: Identifiable {
         inhaleDuration: 4,
         holdDuration: 4,
         exhaleDuration: 4,
+        holdOutDuration: 4, // Box breathing: 4-4-4-4
         description: NSLocalizedString("breathing_pattern.box.description", comment: "")
     )
 

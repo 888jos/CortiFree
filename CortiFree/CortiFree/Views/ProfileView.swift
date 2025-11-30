@@ -8,6 +8,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import Combine
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -20,6 +21,7 @@ struct ProfileView: View {
     @State private var showEditProfile = false
     @State private var showAchievementsView = false
     @State private var selectedTab: ProfileTab = .score
+    @State private var firstName: String = ""
 
     enum ProfileTab {
         case score
@@ -171,7 +173,7 @@ struct ProfileView: View {
                     // Tab selector
                     tabSelector
                         .padding(.horizontal, 32)
-                        .padding(.top, 16)
+                        .offset(y: -32) // Remonter les tabs pour réduire l'espace avec la bannière
 
                     // Content based on selected tab with smooth transition
                     TabView(selection: $selectedTab) {
@@ -203,6 +205,7 @@ struct ProfileView: View {
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .animation(.appSpring, value: selectedTab)
+                    .offset(y: -32) // Remonter le contenu pour suivre les tabs
                 }
             }
         }
@@ -213,8 +216,11 @@ struct ProfileView: View {
         }
         .fullScreenCover(isPresented: $showEditProfile) {
             EditProfileView()
+                .environmentObject(authViewModel)
         }
         .onAppear {
+            // Initialize firstName
+            firstName = getUserFirstName()
             // Refresh profile data when view appears
             Task {
                 await viewModel.refreshProfile()
@@ -227,6 +233,10 @@ struct ProfileView: View {
             Task {
                 await viewModel.refreshProfile()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ProfileUpdated"))) { _ in
+            // Refresh firstName when profile is updated
+            firstName = getUserFirstName()
         }
     }
 
@@ -274,7 +284,7 @@ struct ProfileView: View {
                         ))
                         .frame(width: 80, height: 80)
 
-                    Text(String(getUserFirstName().prefix(1)).uppercased())
+                    Text(String((firstName.isEmpty ? getUserFirstName() : firstName).prefix(1)).uppercased())
                         .font(Font.Poppins.custom(.bold, size: 32))
                         .foregroundColor(.white)
                 }
@@ -308,7 +318,7 @@ struct ProfileView: View {
             // User Info
             VStack(alignment: .leading, spacing: 6) {
                 // Name
-                Text(getUserFirstName())
+                Text(firstName.isEmpty ? getUserFirstName() : firstName)
                     .font(Font.Poppins.custom(.bold, size: 20))
                     .foregroundColor(.white)
 
@@ -450,7 +460,8 @@ struct ProfileView: View {
                     icon: "star.fill",
                     title: NSLocalizedString("profile.score.global", comment: ""),
                     value: globalScore,
-                    color: Color(hex: "B794F6")
+                    color: Color(hex: "B794F6"),
+                    scoreDifference: !showPotentialScores && viewModel.onboardingGlobalScore > 0 ? globalScore - viewModel.onboardingGlobalScore : nil
                 )
                 .offset(x: 0, y: -135) // Reduced from -155 to -135
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -460,7 +471,8 @@ struct ProfileView: View {
                     icon: domainIcons[0],
                     title: domainNames[0],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 0] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 0] ?? 0.0)),
-                    color: domainColors[0]
+                    color: domainColors[0],
+                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 0] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 0] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 0] ?? 0.0)) : nil
                 )
                 .offset(x: 125, y: -65) // Reduced from 145/-75 to 125/-65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -470,7 +482,8 @@ struct ProfileView: View {
                     icon: domainIcons[1],
                     title: domainNames[1],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 1] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 1] ?? 0.0)),
-                    color: domainColors[1]
+                    color: domainColors[1],
+                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 1] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 1] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 1] ?? 0.0)) : nil
                 )
                 .offset(x: 125, y: 65) // Reduced from 145/75 to 125/65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -480,7 +493,8 @@ struct ProfileView: View {
                     icon: domainIcons[2],
                     title: domainNames[2],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 2] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 2] ?? 0.0)),
-                    color: domainColors[2]
+                    color: domainColors[2],
+                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 2] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 2] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 2] ?? 0.0)) : nil
                 )
                 .offset(x: 0, y: 135) // Reduced from 155 to 135
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -490,7 +504,8 @@ struct ProfileView: View {
                     icon: domainIcons[3],
                     title: domainNames[3],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 3] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 3] ?? 0.0)),
-                    color: domainColors[3]
+                    color: domainColors[3],
+                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 3] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 3] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 3] ?? 0.0)) : nil
                 )
                 .offset(x: -125, y: 65) // Reduced from -145/75 to -125/65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -500,7 +515,8 @@ struct ProfileView: View {
                     icon: domainIcons[4],
                     title: domainNames[4],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 4] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 4] ?? 0.0)),
-                    color: domainColors[4]
+                    color: domainColors[4],
+                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 4] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 4] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 4] ?? 0.0)) : nil
                 )
                 .offset(x: -125, y: -65) // Reduced from -145/-75 to -125/-65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -748,6 +764,7 @@ struct SimpleDomainScore: View {
     let title: String
     let value: Int
     let color: Color
+    var scoreDifference: Int? = nil // Différence avec le score onboarding
 
     var body: some View {
         HStack(alignment: .top, spacing: 6) {
@@ -760,9 +777,17 @@ struct SimpleDomainScore: View {
                     .font(.custom("Poppins-Medium", size: 11))
                     .foregroundColor(.white.opacity(0.8))
 
-                Text("\(value)")
-                    .font(Font.Poppins.custom(.bold, size: 20))
-                    .foregroundColor(.white)
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text("\(value)")
+                        .font(Font.Poppins.custom(.bold, size: 20))
+                        .foregroundColor(.white)
+
+                    if let diff = scoreDifference, diff > 0 {
+                        Text("(+\(diff))")
+                            .font(Font.Poppins.custom(.bold, size: 12))
+                            .foregroundColor(.green)
+                    }
+                }
             }
         }
     }

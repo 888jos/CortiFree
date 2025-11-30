@@ -61,9 +61,9 @@ struct BreathingExerciseDetailView: View {
             }
         }
         .fullScreenCover(isPresented: $showBreathingExercise) {
-            LibraryBreathingView(
+            BreathingDetailFlowView(
                 pattern: pattern,
-                totalDuration: Double(selectedDuration)
+                duration: Double(selectedDuration)
             ) {
                 showBreathingExercise = false
                 dismiss()
@@ -266,16 +266,22 @@ struct BreathingExerciseDetailView: View {
                             }
                         }
 
-                        // Source
-                        HStack(spacing: 8) {
-                            Image(systemName: "doc.text.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white.opacity(0.5))
+                        // Sources scientifiques (3 sources)
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(pattern.scientificSources, id: \.self) { source in
+                                HStack(alignment: .top, spacing: 8) {
+                                    Image(systemName: "doc.text.fill")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.white.opacity(0.5))
+                                        .frame(width: 16)
 
-                            Text(pattern.scientificSource)
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.6))
-                                .italic()
+                                    Text(source)
+                                        .font(.custom("Poppins-Regular", size: 11))
+                                        .foregroundColor(.white.opacity(0.6))
+                                        .italic()
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
                         }
                         .padding(.top, 8)
                     }
@@ -717,18 +723,8 @@ extension BreathingPattern {
         }
     }
 
-    var scientificSource: String {
-        switch name {
-        case "DeepAbdominal": return NSLocalizedString("breathing_pattern.deep_abdominal.source", comment: "")
-        case "4-7-8": return NSLocalizedString("breathing_pattern.four_seven_eight.source", comment: "")
-        case "Coherence": return NSLocalizedString("breathing_pattern.coherence.source", comment: "")
-        case "Slow66": return NSLocalizedString("breathing_pattern.slow66.source", comment: "")
-        case "Triangle": return NSLocalizedString("breathing_pattern.triangle.source", comment: "")
-        case "Box": return NSLocalizedString("breathing_pattern.box.source", comment: "")
-        case "Kapalabhati": return NSLocalizedString("breathing_pattern.kapalabhati.source", comment: "")
-        case "Bhastrika": return NSLocalizedString("breathing_pattern.bhastrika.source", comment: "")
-        default: return NSLocalizedString("breathing_pattern.default.source", comment: "")
-        }
+    var scientificSources: [String] {
+        return [NSLocalizedString("breathing_detail.source", comment: "")]
     }
 }
 

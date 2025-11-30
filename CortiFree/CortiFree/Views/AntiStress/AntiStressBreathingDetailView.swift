@@ -64,11 +64,18 @@ struct AntiStressBreathingDetailView: View {
             }
         }
         .fullScreenCover(isPresented: $showBreathingExercise) {
-            BreathingExerciseView(
-                exerciseType: exerciseType,
-                situation: situation,
-                viewModel: viewModel
-            )
+            if let pattern = exerciseType.breathingPattern {
+                BreathingDetailFlowView(
+                    pattern: pattern,
+                    duration: Double(selectedDuration)
+                ) {
+                    showBreathingExercise = false
+                    Task {
+                        await viewModel.completeExercise()
+                    }
+                    dismiss()
+                }
+            }
         }
     }
 
@@ -284,16 +291,22 @@ struct AntiStressBreathingDetailView: View {
                             }
                         }
 
-                        // Source
-                        HStack(spacing: 8) {
-                            Image(systemName: "doc.text.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white.opacity(0.5))
+                        // Sources scientifiques (3 sources)
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(scientificSources, id: \.self) { source in
+                                HStack(alignment: .top, spacing: 8) {
+                                    Image(systemName: "doc.text.fill")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.white.opacity(0.5))
+                                        .frame(width: 16)
 
-                            Text(scientificSource)
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.6))
-                                .italic()
+                                    Text(source)
+                                        .font(.custom("Poppins-Regular", size: 11))
+                                        .foregroundColor(.white.opacity(0.6))
+                                        .italic()
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
                         }
                         .padding(.top, 8)
                     }
@@ -363,8 +376,8 @@ struct AntiStressBreathingDetailView: View {
         }
     }
 
-    private var scientificSource: String {
-        return NSLocalizedString("breathing_detail.source", comment: "")
+    private var scientificSources: [String] {
+        return [NSLocalizedString("breathing_detail.source", comment: "")]
     }
 
     // MARK: - Benefits Section

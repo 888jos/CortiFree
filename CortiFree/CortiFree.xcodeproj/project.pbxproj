@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AEC92ED91A0100541E54 /* GoogleSignIn */; };
+		8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AECB2ED91A0100541E54 /* GoogleSignInSwift */; };
 		802C49B12EBBB2340084B356 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 802C49B02EBBB2340084B356 /* Lottie */; };
 		8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8077CC292ECF8AF400742806 /* Mixpanel */; };
 		8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9902EA8CBCA007C9606 /* FirebaseAuth */; };
@@ -69,10 +71,12 @@
 				80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */,
 				80F600D02E85D5BF008F58FB /* FirebaseAnalyticsCore in Frameworks */,
 				80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */,
+				8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */,
 				80F600CC2E85D5BF008F58FB /* FirebaseAI in Frameworks */,
 				8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */,
 				8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */,
 				802C49B12EBBB2340084B356 /* Lottie in Frameworks */,
+				8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +146,8 @@
 				8097F9922EA8CBCA007C9606 /* FirebaseFirestore */,
 				802C49B02EBBB2340084B356 /* Lottie */,
 				8077CC292ECF8AF400742806 /* Mixpanel */,
+				8021AEC92ED91A0100541E54 /* GoogleSignIn */,
+				8021AECB2ED91A0100541E54 /* GoogleSignInSwift */,
 			);
 			productName = CortiFree;
 			productReference = 80F600A02E85D4A0008F58FB /* CortiFree.app */;
@@ -227,6 +233,7 @@
 				80F600D52E85EAA9008F58FB /* XCRemoteSwiftPackageReference "Superwall-iOS" */,
 				802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				8077CC282ECF8AF400742806 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+				8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80F600A12E85D4A0008F58FB /* Products */;
@@ -430,19 +437,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9XGVT5L2P3;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIAppFonts = "Faro-BoldLucky.ttf Faro-DisplayLucky.ttf Faro-LightLucky.ttf Faro-RegularLucky.ttf Faro-SemiBoldLucky.ttf HankenGrotesk-Black.ttf HankenGrotesk-BlackItalic.ttf HankenGrotesk-Bold.ttf HankenGrotesk-BoldItalic.ttf HankenGrotesk-ExtraBold.ttf HankenGrotesk-ExtraBoldItalic.ttf HankenGrotesk-ExtraLight.ttf HankenGrotesk-ExtraLightItalic.ttf HankenGrotesk-Italic.ttf HankenGrotesk-Light.ttf HankenGrotesk-LightItalic.ttf HankenGrotesk-Medium.ttf HankenGrotesk-MediumItalic.ttf HankenGrotesk-Regular.ttf HankenGrotesk-SemiBold.ttf HankenGrotesk-SemiBoldItalic.ttf HankenGrotesk-Thin.ttf HankenGrotesk-ThinItalic.ttf";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
 				PRODUCT_BUNDLE_IDENTIFIER = Josbiot.App.CortiFree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -451,6 +454,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				SuperwallAPIKey = pk_JPmmC0H5be4yqTnw24VTm;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -464,19 +468,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9XGVT5L2P3;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIAppFonts = "Faro-BoldLucky.ttf Faro-DisplayLucky.ttf Faro-LightLucky.ttf Faro-RegularLucky.ttf Faro-SemiBoldLucky.ttf HankenGrotesk-Black.ttf HankenGrotesk-BlackItalic.ttf HankenGrotesk-Bold.ttf HankenGrotesk-BoldItalic.ttf HankenGrotesk-ExtraBold.ttf HankenGrotesk-ExtraBoldItalic.ttf HankenGrotesk-ExtraLight.ttf HankenGrotesk-ExtraLightItalic.ttf HankenGrotesk-Italic.ttf HankenGrotesk-Light.ttf HankenGrotesk-LightItalic.ttf HankenGrotesk-Medium.ttf HankenGrotesk-MediumItalic.ttf HankenGrotesk-Regular.ttf HankenGrotesk-SemiBold.ttf HankenGrotesk-SemiBoldItalic.ttf HankenGrotesk-Thin.ttf HankenGrotesk-ThinItalic.ttf";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
 				PRODUCT_BUNDLE_IDENTIFIER = Josbiot.App.CortiFree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -485,6 +485,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				SuperwallAPIKey = pk_JPmmC0H5be4yqTnw24VTm;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -607,6 +608,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-spm";
@@ -642,6 +651,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8021AEC92ED91A0100541E54 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		8021AECB2ED91A0100541E54 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
 		802C49B02EBBB2340084B356 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */;

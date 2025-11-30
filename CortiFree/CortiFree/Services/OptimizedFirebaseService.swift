@@ -51,41 +51,9 @@ class OptimizedFirebaseService {
                     print("❌ Batch write error: \(error)")
                 } else {
                     print("✅ Data saved successfully in background")
-
-                    // Generate plan asynchronously after save
-                    self.generatePlanInBackground(result)
+                    // Le plan est universel pour tous les utilisateurs (SimplifiedRoutineProgram)
                 }
             }
-        }
-    }
-
-    // MARK: - Lightweight Plan Generation
-
-    private func generatePlanInBackground(_ result: HabitsQuizResult) {
-        queue.async { [weak self] in
-            guard let self = self,
-                  let userId = Auth.auth().currentUser?.uid else { return }
-
-            // Simple plan generation without heavy computation
-            let focusHabits = self.quickDetermineFocusHabits(result)
-            let adaptationLevel = self.quickCalculateAdaptationLevel(result)
-
-            // Save minimal plan data
-            let planData: [String: Any] = [
-                "generatedAt": FieldValue.serverTimestamp(),
-                "focusHabits": focusHabits,
-                "adaptationLevel": adaptationLevel,
-                "baselineWakeTime": result.baselineData.wakeTime,
-                "status": "active"
-            ]
-
-            self.db.collection("users").document(userId)
-                .collection("personalized_plan").document("current")
-                .setData(planData) { error in
-                    if error == nil {
-                        print("✅ Plan generated in background")
-                    }
-                }
         }
     }
 
@@ -137,34 +105,6 @@ class OptimizedFirebaseService {
         ]
     }
 
-    private func quickDetermineFocusHabits(_ result: HabitsQuizResult) -> [String] {
-        var habits: [String] = []
-
-        // Quick determination based on lowest scores
-        if result.serenityScore < 50 {
-            habits.append(contentsOf: ["breathing", "meditation"])
-        }
-        if result.sleepScore < 50 {
-            habits.append("sleep")
-        }
-        if result.energyScore < 50 {
-            habits.append(contentsOf: ["water", "sport"])
-        }
-
-        // Return top 4 habits
-        return Array(habits.prefix(4))
-    }
-
-    private func quickCalculateAdaptationLevel(_ result: HabitsQuizResult) -> Int {
-        switch result.baselineData.preferredIntensity {
-        case "very_gentle": return 2
-        case "gentle": return 3
-        case "moderate": return 5
-        case "intensive": return 7
-        case "very_intensive": return 9
-        default: return 5
-        }
-    }
 }
 
 // MARK: - Simplified Onboarding Integration

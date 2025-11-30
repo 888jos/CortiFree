@@ -73,29 +73,14 @@ struct UserSettings: Codable {
         self.eveningReminderTime = eveningReminderTime
     }
 
-    // MARK: - Smart Start Date Calculation
+    // MARK: - Program Start Date Calculation
 
-    /// Calcule la date de début du programme de manière intelligente
-    /// Si l'inscription se fait après 16h, le programme commence demain (jour 0/66 aujourd'hui)
-    /// Sinon, il commence aujourd'hui à minuit (jour 1/66 aujourd'hui)
+    /// Calcule la date de début du programme
+    /// Le programme commence toujours aujourd'hui à minuit (jour 1)
+    /// Le passage au jour suivant se fait à minuit fuseau horaire utilisateur
     static func calculateProgramStartDate() -> Date {
-        let now = Date()
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: now)
-
-        // Si inscription après 16h, commencer demain (jour 0 aujourd'hui)
-        if hour >= 16 {
-            // Demain à minuit
-            if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
-               let tomorrowMidnight = calendar.startOfDay(for: tomorrow) as Date? {
-                print("📅 Program will start tomorrow at midnight (signup after 4pm) - Day 0/66 today")
-                return tomorrowMidnight
-            }
-        }
-
-        // Sinon, commencer aujourd'hui à minuit (jour 1 aujourd'hui)
-        let todayMidnight = calendar.startOfDay(for: now)
-        print("📅 Program starts today at midnight - Day 1/66 today")
+        let todayMidnight = Calendar.current.startOfDay(for: Date())
+        print("📅 Program starts today at midnight - Day 1/66")
         return todayMidnight
     }
 
@@ -239,9 +224,35 @@ struct HabitTracking: Codable {
     // MARK: - Helper Methods
 
     mutating func markCompleted(on date: Date = Date()) {
-        let calendar = Calendar.current
+        // Setup timezone-aware calendar
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone.current
 
-        // Update completion date
+        // Use startOfDay for proper day comparison
+        let todayStart = calendar.startOfDay(for: date)
+
+        // Calculate streak BEFORE updating lastCompletedDate
+        if let lastDate = lastCompletedDate {
+            let lastStart = calendar.startOfDay(for: lastDate)
+            let daysDiff = calendar.dateComponents([.day], from: lastStart, to: todayStart).day ?? 0
+
+            if daysDiff == 1 {
+                // Yesterday completed -> continue streak
+                currentStreak += 1
+            } else if daysDiff > 1 {
+                // Missed day(s) -> reset streak
+                currentStreak = 1
+            }
+            // daysDiff == 0: same day, don't change streak
+        } else {
+            // First completion ever
+            currentStreak = 1
+        }
+
+        // Update longest streak
+        longestStreak = max(longestStreak, currentStreak)
+
+        // Now update completion date
         lastCompletedDate = date
         if firstCompletedDate == nil {
             firstCompletedDate = date
@@ -249,20 +260,6 @@ struct HabitTracking: Codable {
 
         // Update total completions
         totalCompletions += 1
-
-        // Update streak
-        if let lastDate = lastCompletedDate {
-            let daysDiff = calendar.dateComponents([.day], from: lastDate, to: date).day ?? 0
-            if daysDiff <= 1 {
-                currentStreak += 1
-                longestStreak = max(longestStreak, currentStreak)
-            } else {
-                currentStreak = 1
-            }
-        } else {
-            currentStreak = 1
-            longestStreak = max(longestStreak, currentStreak)
-        }
 
         // Update last 7 days (shift array and add today as true)
         last7Days.removeFirst()

@@ -205,7 +205,7 @@ struct DailyProgress: Codable, Identifiable {
     var completedTasks: Int
     var totalTasks: Int
     var completionRate: Double
-    var xpEarned: Int
+    var xpEarned: Int = 0 // Deprecated - kept for backward compatibility
     var moodMorning: String?
     var moodEvening: String?
     var energyLevel: Int?
@@ -224,7 +224,7 @@ struct CompletedTask: Codable, Identifiable {
     var moment: String
     var completedAt: Timestamp
     var durationActualSeconds: Int
-    var xpEarned: Int
+    var xpEarned: Int = 0 // Deprecated - kept for backward compatibility
     var feedbackMood: String?
     var feedbackNote: String?
     var wasManual: Bool

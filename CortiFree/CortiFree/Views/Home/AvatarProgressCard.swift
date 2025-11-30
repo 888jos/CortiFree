@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import Combine
 
 struct AvatarProgressCard: View {
     @State private var daysElapsed: Int = 0 // Nombre de jours écoulés depuis le début
@@ -16,6 +17,7 @@ struct AvatarProgressCard: View {
     @State private var currentStreak: Int = 0
     @State private var bestStreak: Int = 0
     @State private var showBadgesScreen: Bool = false
+    @State private var firstName: String = ""
 
     private let totalDays = 66
     private let columns = 8   // 8 colonnes pour cellules plus grandes
@@ -56,6 +58,10 @@ struct AvatarProgressCard: View {
             currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
             bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ProfileUpdated"))) { _ in
+            // Refresh first name when profile is updated
+            firstName = getUserFirstName()
+        }
         .fullScreenCover(isPresented: $showBadgesScreen) {
             BadgesListView()
         }
@@ -94,7 +100,7 @@ struct AvatarProgressCard: View {
 
                     Spacer()
 
-                    Text(getUserFirstName())
+                    Text(firstName.isEmpty ? getUserFirstName() : firstName)
                         .font(.custom("Poppins-SemiBold", size: 10))
                         .foregroundColor(.white.opacity(0.9))
                 }
@@ -279,6 +285,9 @@ struct AvatarProgressCard: View {
 
         // Load best streak from UserDefaults
         bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
+
+        // Load first name
+        firstName = getUserFirstName()
 
         print("📊 AvatarProgressCard loaded: Days elapsed: \(daysElapsed)/\(totalDays), Streak: \(currentStreak)")
     }

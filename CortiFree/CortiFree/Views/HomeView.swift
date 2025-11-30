@@ -277,7 +277,6 @@ struct HomeView: View {
             ) {
                 showBreathingList = true
             }
-            .cascadeAppear(index: 0, baseDelay: 0.06)
 
             QuickActionButtonNew(
                 icon: "figure.mind.and.body",
@@ -286,7 +285,6 @@ struct HomeView: View {
             ) {
                 showMeditationList = true
             }
-            .cascadeAppear(index: 1, baseDelay: 0.06)
 
             QuickActionButtonNew(
                 icon: "waveform",
@@ -295,7 +293,6 @@ struct HomeView: View {
             ) {
                 showSoundsList = true
             }
-            .cascadeAppear(index: 2, baseDelay: 0.06)
 
             QuickActionButtonNew(
                 icon: "book.fill",
@@ -304,7 +301,6 @@ struct HomeView: View {
             ) {
                 showJournal = true
             }
-            .cascadeAppear(index: 3, baseDelay: 0.06)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)

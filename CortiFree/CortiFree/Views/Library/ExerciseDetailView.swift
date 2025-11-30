@@ -221,12 +221,12 @@ struct ExerciseDetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text("À propos")
+                Text(NSLocalizedString("exercise.about", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }
 
-            Text("Cet exercice de \(exercise.type.displayName.lowercased()) est conçu pour vous aider à vous détendre et retrouver votre calme intérieur.")
+            Text(String(format: NSLocalizedString("exercise.about_description", comment: ""), exercise.type.displayName.lowercased()))
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(Color(hex: "E5E5E5"))
                 .lineSpacing(8)
@@ -275,7 +275,7 @@ struct ExerciseDetailView: View {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 24))
 
-                    Text("Commencer l'exercice")
+                    Text(NSLocalizedString("exercise.start_exercise", comment: ""))
                         .font(.custom("Poppins-Bold", size: 18))
                 }
                 .foregroundColor(.white)
@@ -429,7 +429,7 @@ struct ExerciseTimerView: View {
                 HapticManager.light()
                 onComplete()
             }) {
-                Text("Arrêter")
+                Text(NSLocalizedString("exercise.stop", comment: ""))
                     .font(.custom("Poppins-Medium", size: 16))
                     .foregroundColor(Color.appTheme)
                     .padding(.horizontal, 40)
@@ -449,11 +449,11 @@ struct ExerciseTimerView: View {
                 .font(.system(size: 80))
                 .foregroundColor(Color.appTheme)
 
-            Text("Bravo !")
+            Text(NSLocalizedString("exercise.congrats", comment: ""))
                 .font(.custom("Poppins-SemiBold", size: 32))
                 .foregroundColor(.white)
 
-            Text("Tu as complété l'exercice")
+            Text(NSLocalizedString("exercise.completed_message", comment: ""))
                 .font(.custom("Poppins-Regular", size: 18))
                 .foregroundColor(.white.opacity(0.8))
 
@@ -461,7 +461,7 @@ struct ExerciseTimerView: View {
                 HapticManager.success()
                 onComplete()
             }) {
-                Text("Terminer")
+                Text(NSLocalizedString("exercise.finish", comment: ""))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
                     .frame(maxWidth: 200)

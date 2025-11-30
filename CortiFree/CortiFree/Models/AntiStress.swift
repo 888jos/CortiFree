@@ -132,10 +132,6 @@ enum AntiStressExerciseType: String, Codable {
         }
     }
 
-    var xpReward: Int {
-        return 5
-    }
-
     var icon: String {
         switch self {
         case .guidedBreathing: return "wind"
@@ -371,16 +367,34 @@ extension AntiStressExerciseType {
         }
     }
 
-    var scientificSource: String {
+    var scientificSources: [String] {
         switch self {
-        case .slowWalk: return NSLocalizedString("antistress.slow_walk.source", comment: "")
-        case .consciousStretching: return NSLocalizedString("antistress.conscious_stretching.source", comment: "")
-        case .audioRelaxation: return NSLocalizedString("antistress.audio_relaxation.source", comment: "")
-        case .whiteNoise: return NSLocalizedString("antistress.white_noise.source", comment: "")
-        case .positiveMantra: return NSLocalizedString("antistress.positive_mantra.source", comment: "")
-        case .visualMicroBreak: return NSLocalizedString("antistress.visual_micro_break.source", comment: "")
-        default: return NSLocalizedString("antistress.default.source", comment: "")
+        case .slowWalk:
+            return [NSLocalizedString("antistress.slow_walk.source", comment: "")]
+        case .consciousStretching:
+            return [NSLocalizedString("antistress.conscious_stretching.source", comment: "")]
+        case .audioRelaxation:
+            return [NSLocalizedString("antistress.audio_relaxation.source", comment: "")]
+        case .whiteNoise:
+            return [NSLocalizedString("antistress.white_noise.source", comment: "")]
+        case .positiveMantra:
+            return [NSLocalizedString("antistress.positive_mantra.source", comment: "")]
+        case .visualMicroBreak:
+            return [NSLocalizedString("antistress.visual_micro_break.source", comment: "")]
+        case .bodyScan:
+            return [NSLocalizedString("antistress.body_scan.source", comment: "")]
+        case .grounding5Senses:
+            return [NSLocalizedString("antistress.grounding_5_senses.source", comment: "")]
+        case .anchoring54321:
+            return [NSLocalizedString("antistress.anchoring_54321.source", comment: "")]
+        default:
+            return [NSLocalizedString("antistress.default.source", comment: "")]
         }
+    }
+
+    // Keep for backward compatibility
+    var scientificSource: String {
+        return scientificSources.first ?? ""
     }
 
     // Header gradient color based on exercise type
@@ -403,5 +417,29 @@ struct ExerciseCompletion: Codable {
     let situation: StressSituation
     let completedAt: Timestamp
     let duration: Int
-    let xpEarned: Int
+}
+
+// MARK: - Breathing Pattern Mapping
+
+extension AntiStressExerciseType {
+    /// Maps AntiStressExerciseType to BreathingPattern for unified breathing view
+    var breathingPattern: BreathingPattern? {
+        switch self {
+        case .guidedBreathing, .consciousBreathing:
+            return .deepAbdominal  // 4-2-6
+        case .cardiacCoherence:
+            return .coherence      // 5-0-5
+        case .boxBreathing:
+            return .boxBreathing   // 4-4-4-4
+        case .alternateBreathing:
+            return .fourSevenEight // 4-7-8
+        default:
+            return nil // Non-breathing exercises
+        }
+    }
+
+    /// Returns true if this exercise type is a breathing exercise
+    var isBreathingExercise: Bool {
+        return breathingPattern != nil
+    }
 }

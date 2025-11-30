@@ -15,7 +15,6 @@ class AntiStressViewModel: ObservableObject {
     @Published var currentSituation: StressSituation?
     @Published var currentExercise: AntiStressExerciseType?
     @Published var isExerciseComplete = false
-    @Published var xpEarned = 0
 
     private let firebaseService = FirebaseService.shared
     private var cancellables = Set<AnyCancellable>()
@@ -52,18 +51,12 @@ class AntiStressViewModel: ObservableObject {
         guard let situation = currentSituation,
               let exerciseType = currentExercise else { return }
 
-        // XP system removed - using scoring system instead
-        xpEarned = 0
-
         do {
-            // Note: XP update removed - using domain scoring system instead
-
-            // Save exercise completion
+            // Save exercise completion (XP removed)
             try await saveExerciseCompletion(
                 exerciseType: exerciseType,
                 situation: situation,
-                duration: exerciseType.duration,
-                xp: 0  // XP system deprecated
+                duration: exerciseType.duration
             )
 
             isExerciseComplete = true
@@ -75,8 +68,7 @@ class AntiStressViewModel: ObservableObject {
     private func saveExerciseCompletion(
         exerciseType: AntiStressExerciseType,
         situation: StressSituation,
-        duration: Int,
-        xp: Int
+        duration: Int
     ) async throws {
         guard let userId = firebaseService.currentUserId else { return }
 
@@ -85,11 +77,10 @@ class AntiStressViewModel: ObservableObject {
             exerciseType: exerciseType,
             situation: situation,
             completedAt: Timestamp(),
-            duration: duration,
-            xpEarned: xp
+            duration: duration
         )
 
-        // Save to exercises_done subcollection
+        // Save to exercises_done subcollection (XP removed)
         try await db.collection("users")
             .document(userId)
             .collection("exercises_done")
@@ -97,8 +88,7 @@ class AntiStressViewModel: ObservableObject {
                 "exerciseType": exerciseType.rawValue,
                 "situation": situation.rawValue,
                 "completedAt": completion.completedAt,
-                "duration": duration,
-                "xpEarned": xp
+                "duration": duration
             ])
 
         // Update user stats
@@ -115,6 +105,5 @@ class AntiStressViewModel: ObservableObject {
         currentSituation = nil
         currentExercise = nil
         isExerciseComplete = false
-        xpEarned = 0
     }
 }
