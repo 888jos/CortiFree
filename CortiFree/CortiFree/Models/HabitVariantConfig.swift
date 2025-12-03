@@ -22,13 +22,13 @@ struct HabitVariantConfig {
     static func wakeUpTitle(for week: Int) -> String {
         switch week {
         case 1:
-            return "Se lever avant 8h30"
+            return NSLocalizedString("habit.wake_before_8h30", comment: "")
         case 2, 3:
-            return "Se lever avant 8h"
+            return NSLocalizedString("habit.wake_before_8h", comment: "")
         case 4, 5:
-            return "Se lever avant 7h30"
+            return NSLocalizedString("habit.wake_before_7h30", comment: "")
         default: // 6-10
-            return "Se lever avant 7h"
+            return NSLocalizedString("habit.wake_before_7h", comment: "")
         }
     }
 
@@ -36,13 +36,13 @@ struct HabitVariantConfig {
     static func bedtimeTitle(for week: Int) -> String {
         switch week {
         case 1:
-            return "Se coucher avant 23h30"
+            return NSLocalizedString("habit.sleep_before_23h30", comment: "")
         case 2, 3:
-            return "Se coucher avant 23h"
+            return NSLocalizedString("habit.sleep_before_23h", comment: "")
         case 4, 5:
-            return "Se coucher avant 22h30"
+            return NSLocalizedString("habit.sleep_before_22h30", comment: "")
         default: // 6-10
-            return "Se coucher avant 22h"
+            return NSLocalizedString("habit.sleep_before_22h", comment: "")
         }
     }
 
@@ -63,38 +63,46 @@ struct HabitVariantConfig {
     }
 
     // Legacy - pour compatibilité (utilise semaine 10 par défaut)
-    static let sleepVariants: [HabitVariantInfo] = [
-        HabitVariantInfo(
-            imageName: "habit_sleep_morning",
-            title: "Se lever avant 7h",
-            frequency: "frequency.daily"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_sleep_night",
-            title: "Se coucher avant 22h",
-            frequency: "frequency.daily"
-        )
-    ]
+    static var sleepVariants: [HabitVariantInfo] {
+        [
+            HabitVariantInfo(
+                imageName: "habit_sleep_morning",
+                title: NSLocalizedString("habit.wake_before_7h", comment: ""),
+                frequency: "frequency.daily"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_sleep_night",
+                title: NSLocalizedString("habit.sleep_before_22h", comment: ""),
+                frequency: "frequency.daily"
+            )
+        ]
+    }
 
     // MARK: - Single Variants (1 seule variante)
 
-    static let breathingVariant = HabitVariantInfo(
-        imageName: "habit_breathe",
-        title: "Retrouver son souffle",
-        frequency: "frequency.daily"
-    )
+    static var breathingVariant: HabitVariantInfo {
+        HabitVariantInfo(
+            imageName: "habit_breathe",
+            title: NSLocalizedString("habit.breathing_title", comment: ""),
+            frequency: "frequency.daily"
+        )
+    }
 
-    static let meditationVariant = HabitVariantInfo(
-        imageName: "habit_meditate",
-        title: "Méditer en pleine conscience",
-        frequency: "frequency.daily"
-    )
+    static var meditationVariant: HabitVariantInfo {
+        HabitVariantInfo(
+            imageName: "habit_meditate",
+            title: NSLocalizedString("habit.meditation_title", comment: ""),
+            frequency: "frequency.daily"
+        )
+    }
 
-    static let journalVariant = HabitVariantInfo(
-        imageName: "habit_journal",
-        title: "Journaling quotidien",
-        frequency: "frequency.daily"
-    )
+    static var journalVariant: HabitVariantInfo {
+        HabitVariantInfo(
+            imageName: "habit_journal",
+            title: NSLocalizedString("habit.journal_title", comment: ""),
+            frequency: "frequency.daily"
+        )
+    }
 
     /// Retourne l'objectif d'eau selon la semaine
     static func waterTarget(for week: Int) -> String {
@@ -114,7 +122,7 @@ struct HabitVariantConfig {
     static func getWaterVariant(for week: Int) -> HabitVariantInfo {
         return HabitVariantInfo(
             imageName: "habit_water",
-            title: "Boire au moins \(waterTarget(for: week)) d'eau",
+            title: String(format: NSLocalizedString("habit.water_title", comment: ""), waterTarget(for: week)),
             frequency: "frequency.daily"
         )
     }
@@ -126,106 +134,114 @@ struct HabitVariantConfig {
     }
 
     // Legacy - pour compatibilité
-    static let waterVariant = HabitVariantInfo(
-        imageName: "habit_water",
-        title: "Boire au moins 2,5L d'eau",
-        frequency: "frequency.daily"
-    )
+    static var waterVariant: HabitVariantInfo {
+        HabitVariantInfo(
+            imageName: "habit_water",
+            title: NSLocalizedString("habit.water_title_legacy", comment: ""),
+            frequency: "frequency.daily"
+        )
+    }
 
     // MARK: - Nature Variants
 
-    static let natureVariants: [HabitVariantInfo] = [
-        HabitVariantInfo(
-            imageName: "habit_nature_balade",
-            title: "Balade en plein air",
-            frequency: "frequency.2x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_nature_randonnee",
-            title: "Trek nature",
-            frequency: "frequency.2x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_nature_velo",
-            title: "Rouler au grand air",
-            frequency: "frequency.2x_week"
-        )
-    ]
+    static var natureVariants: [HabitVariantInfo] {
+        [
+            HabitVariantInfo(
+                imageName: "habit_nature_balade",
+                title: NSLocalizedString("habit.nature_walk", comment: ""),
+                frequency: "frequency.2x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_nature_randonnee",
+                title: NSLocalizedString("habit.nature_trek", comment: ""),
+                frequency: "frequency.2x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_nature_velo",
+                title: NSLocalizedString("habit.nature_bike", comment: ""),
+                frequency: "frequency.2x_week"
+            )
+        ]
+    }
 
     // MARK: - Sport Variants
 
-    static let sportVariants: [HabitVariantInfo] = [
-        HabitVariantInfo(
-            imageName: "habit_sport_boxe",
-            title: "Séance de boxe",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_sport_corde",
-            title: "Cardio corde",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_sport_dance",
-            title: "Se libérer en dansant",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_sport_etirements",
-            title: "S'étirer en profondeur",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_sport_natation",
-            title: "Session piscine",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_sport_renforcement",
-            title: "Renforcement musculaire",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_sport_courir",
-            title: "Courir librement",
-            frequency: "frequency.3x_week"
-        )
-    ]
+    static var sportVariants: [HabitVariantInfo] {
+        [
+            HabitVariantInfo(
+                imageName: "habit_sport_boxe",
+                title: NSLocalizedString("habit.sport_boxing", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_sport_corde",
+                title: NSLocalizedString("habit.sport_jump_rope", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_sport_dance",
+                title: NSLocalizedString("habit.sport_dance", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_sport_etirements",
+                title: NSLocalizedString("habit.sport_stretching", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_sport_natation",
+                title: NSLocalizedString("habit.sport_swimming", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_sport_renforcement",
+                title: NSLocalizedString("habit.sport_strength", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_sport_courir",
+                title: NSLocalizedString("habit.sport_running", comment: ""),
+                frequency: "frequency.3x_week"
+            )
+        ]
+    }
 
     // MARK: - Social Variants
 
-    static let socialVariants: [HabitVariantInfo] = [
-        HabitVariantInfo(
-            imageName: "habit_social_creative",
-            title: "Moment créatif partagé",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_social_appel",
-            title: "Appeler un proche",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_social_cuisiner",
-            title: "Repas convivial",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_social_film",
-            title: "Soirée film",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_social_jeu",
-            title: "Soirée jeux",
-            frequency: "frequency.3x_week"
-        ),
-        HabitVariantInfo(
-            imageName: "habit_social_verre",
-            title: "Verre entre amis",
-            frequency: "frequency.3x_week"
-        )
-    ]
+    static var socialVariants: [HabitVariantInfo] {
+        [
+            HabitVariantInfo(
+                imageName: "habit_social_creative",
+                title: NSLocalizedString("habit.social_creative", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_social_appel",
+                title: NSLocalizedString("habit.social_call", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_social_cuisiner",
+                title: NSLocalizedString("habit.social_meal", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_social_film",
+                title: NSLocalizedString("habit.social_movie", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_social_jeu",
+                title: NSLocalizedString("habit.social_games", comment: ""),
+                frequency: "frequency.3x_week"
+            ),
+            HabitVariantInfo(
+                imageName: "habit_social_verre",
+                title: NSLocalizedString("habit.social_drinks", comment: ""),
+                frequency: "frequency.3x_week"
+            )
+        ]
+    }
 
     // MARK: - Get Variant for Day
 

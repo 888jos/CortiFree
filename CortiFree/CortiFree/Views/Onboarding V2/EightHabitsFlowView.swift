@@ -15,121 +15,123 @@ struct EightHabitsFlowView: View {
     @State private var screenViewTime: Date?
     @State private var viewedHabits: Set<Int> = []
 
-    // Les 8 habitudes avec leurs détails
-    private let habits: [Habit] = [
-        Habit(
-            icon: "wind",
-            title: "Respirer consciemment",
-            benefits: [
-                "Pratiquer des exercices de respiration profonde pendant 5 à 10 minutes active le système nerveux parasympathique et réduit le stress.",
-                "La cohérence cardiaque améliore la variabilité de la fréquence cardiaque et renforce la résilience au stress.",
-                "Une respiration consciente régulière améliore l'oxygénation des tissus et favorise la clarté mentale."
-            ],
-            impacts: [
-                HabitImpact(emoji: "🫁", title: "Capacité\npulmonaire", value: "+12%"),
-                HabitImpact(emoji: "😌", title: "Niveau de\nstress", value: "-15%"),
-                HabitImpact(emoji: "❤️", title: "Santé\ncardiaque", value: "+10%")
-            ]
-        ),
-        Habit(
-            icon: "figure.mind.and.body",
-            title: "Méditer",
-            benefits: [
-                "Méditer au moins 10 minutes par jour réduit les niveaux de cortisol et améliore la gestion du stress.",
-                "La méditation de pleine conscience renforce la clarté mentale et la régulation émotionnelle.",
-                "Une pratique régulière accroît la conscience de soi et favorise une meilleure prise de décision."
-            ],
-            impacts: [
-                HabitImpact(emoji: "🧘", title: "Résilience\némotionnelle", value: "+12%"),
-                HabitImpact(emoji: "📉", title: "Niveau de\ncortisol", value: "-14%"),
-                HabitImpact(emoji: "🧠", title: "Focus\nmental", value: "+10%")
-            ]
-        ),
-        Habit(
-            icon: "book.pages",
-            title: "Tenir un journal",
-            benefits: [
-                "Tenir un journal quotidien permet d'organiser ses pensées et de mieux comprendre ses émotions.",
-                "L'écriture expressive réduit l'anxiété et améliore la gestion du stress chronique.",
-                "La pratique du journaling favorise la gratitude et renforce le bien-être mental à long terme."
-            ],
-            impacts: [
-                HabitImpact(emoji: "✍️", title: "Clarté\nmentale", value: "+15%"),
-                HabitImpact(emoji: "💭", title: "Gestion\némotions", value: "+12%"),
-                HabitImpact(emoji: "🙏", title: "Niveau de\ngratitude", value: "+18%")
-            ]
-        ),
-        Habit(
-            icon: "figure.walk",
-            title: "Faire du sport",
-            benefits: [
-                "Bouger au moins 30 minutes par jour stimule la circulation sanguine et renforce le système cardiovasculaire.",
-                "L'activité physique régulière libère des endorphines qui améliorent l'humeur et réduisent le stress.",
-                "Le mouvement quotidien maintient la mobilité articulaire et prévient les douleurs chroniques."
-            ],
-            impacts: [
-                HabitImpact(emoji: "💪", title: "Tonus\nmusculaire", value: "+10%"),
-                HabitImpact(emoji: "😊", title: "Niveau\nd'endorphines", value: "+14%"),
-                HabitImpact(emoji: "🦴", title: "Santé\narticulaire", value: "+12%")
-            ]
-        ),
-        Habit(
-            icon: "drop.fill",
-            title: "Boire de l'eau",
-            benefits: [
-                "Boire suffisamment d'eau maintient une hydratation optimale et améliore les fonctions cognitives.",
-                "Une bonne hydratation favorise l'élimination des toxines et améliore la santé de la peau.",
-                "L'eau aide à réguler la température corporelle et soutient la digestion."
-            ],
-            impacts: [
-                HabitImpact(emoji: "💧", title: "Niveau\nd'hydratation", value: "+20%"),
-                HabitImpact(emoji: "🧠", title: "Clarté\nmentale", value: "+12%"),
-                HabitImpact(emoji: "✨", title: "Qualité\npeau", value: "+14%")
-            ]
-        ),
-        Habit(
-            icon: "tree.fill",
-            title: "Passer du temps en nature",
-            benefits: [
-                "Passer du temps dans la nature réduit le cortisol et améliore l'humeur générale.",
-                "Le contact avec la nature renforce le système immunitaire et favorise la récupération mentale.",
-                "Les activités en plein air augmentent les niveaux d'énergie et améliorent la qualité du sommeil."
-            ],
-            impacts: [
-                HabitImpact(emoji: "🌳", title: "Connexion\nnature", value: "+20%"),
-                HabitImpact(emoji: "🛡️", title: "Système\nimmunitaire", value: "+12%"),
-                HabitImpact(emoji: "⚡", title: "Niveau\nd'énergie", value: "+14%")
-            ]
-        ),
-        Habit(
-            icon: "moon.zzz.fill",
-            title: "Suivre une routine sommeil",
-            benefits: [
-                "Une routine de sommeil régulière améliore la qualité et la durée du repos nocturne.",
-                "Un sommeil de qualité renforce le système immunitaire et favorise la récupération physique.",
-                "Dormir suffisamment améliore la concentration, la mémoire et l'humeur."
-            ],
-            impacts: [
-                HabitImpact(emoji: "😴", title: "Qualité\nsommeil", value: "+22%"),
-                HabitImpact(emoji: "⚡", title: "Niveau\nd'énergie", value: "+18%"),
-                HabitImpact(emoji: "🧠", title: "Performance\ncognitive", value: "+16%")
-            ]
-        ),
-        Habit(
-            icon: "person.2.fill",
-            title: "Se connecter socialement",
-            benefits: [
-                "Les interactions sociales positives réduisent le stress et améliorent le bien-être émotionnel.",
-                "Le soutien social renforce la résilience et aide à mieux gérer les défis quotidiens.",
-                "Cultiver des relations enrichissantes augmente le sentiment d'appartenance et de bonheur."
-            ],
-            impacts: [
-                HabitImpact(emoji: "👥", title: "Lien\nsocial", value: "+20%"),
-                HabitImpact(emoji: "😊", title: "Bien-être\némotionnel", value: "+16%"),
-                HabitImpact(emoji: "💪", title: "Résilience", value: "+14%")
-            ]
-        )
-    ]
+    // Les 8 habitudes avec leurs détails (localisés)
+    private var habits: [Habit] {
+        [
+            Habit(
+                icon: "wind",
+                titleKey: "onboarding_v2.eight_habits.breathing.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.breathing.benefit_1",
+                    "onboarding_v2.eight_habits.breathing.benefit_2",
+                    "onboarding_v2.eight_habits.breathing.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "🫁", titleKey: "onboarding_v2.eight_habits.impact.lung_capacity", value: "+12%"),
+                    HabitImpact(emoji: "😌", titleKey: "onboarding_v2.eight_habits.impact.stress_level", value: "-15%"),
+                    HabitImpact(emoji: "❤️", titleKey: "onboarding_v2.eight_habits.impact.heart_health", value: "+10%")
+                ]
+            ),
+            Habit(
+                icon: "figure.mind.and.body",
+                titleKey: "onboarding_v2.eight_habits.meditation.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.meditation.benefit_1",
+                    "onboarding_v2.eight_habits.meditation.benefit_2",
+                    "onboarding_v2.eight_habits.meditation.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "🧘", titleKey: "onboarding_v2.eight_habits.impact.emotional_resilience", value: "+12%"),
+                    HabitImpact(emoji: "📉", titleKey: "onboarding_v2.eight_habits.impact.cortisol_level", value: "-14%"),
+                    HabitImpact(emoji: "🧠", titleKey: "onboarding_v2.eight_habits.impact.mental_focus", value: "+10%")
+                ]
+            ),
+            Habit(
+                icon: "book.pages",
+                titleKey: "onboarding_v2.eight_habits.journal.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.journal.benefit_1",
+                    "onboarding_v2.eight_habits.journal.benefit_2",
+                    "onboarding_v2.eight_habits.journal.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "✍️", titleKey: "onboarding_v2.eight_habits.impact.mental_clarity", value: "+15%"),
+                    HabitImpact(emoji: "💭", titleKey: "onboarding_v2.eight_habits.impact.emotion_management", value: "+12%"),
+                    HabitImpact(emoji: "🙏", titleKey: "onboarding_v2.eight_habits.impact.gratitude_level", value: "+18%")
+                ]
+            ),
+            Habit(
+                icon: "figure.walk",
+                titleKey: "onboarding_v2.eight_habits.sport.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.sport.benefit_1",
+                    "onboarding_v2.eight_habits.sport.benefit_2",
+                    "onboarding_v2.eight_habits.sport.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "💪", titleKey: "onboarding_v2.eight_habits.impact.muscle_tone", value: "+10%"),
+                    HabitImpact(emoji: "😊", titleKey: "onboarding_v2.eight_habits.impact.endorphin_level", value: "+14%"),
+                    HabitImpact(emoji: "🦴", titleKey: "onboarding_v2.eight_habits.impact.joint_health", value: "+12%")
+                ]
+            ),
+            Habit(
+                icon: "drop.fill",
+                titleKey: "onboarding_v2.eight_habits.water.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.water.benefit_1",
+                    "onboarding_v2.eight_habits.water.benefit_2",
+                    "onboarding_v2.eight_habits.water.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "💧", titleKey: "onboarding_v2.eight_habits.impact.hydration_level", value: "+20%"),
+                    HabitImpact(emoji: "🧠", titleKey: "onboarding_v2.eight_habits.impact.mental_clarity", value: "+12%"),
+                    HabitImpact(emoji: "✨", titleKey: "onboarding_v2.eight_habits.impact.skin_quality", value: "+14%")
+                ]
+            ),
+            Habit(
+                icon: "tree.fill",
+                titleKey: "onboarding_v2.eight_habits.nature.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.nature.benefit_1",
+                    "onboarding_v2.eight_habits.nature.benefit_2",
+                    "onboarding_v2.eight_habits.nature.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "🌳", titleKey: "onboarding_v2.eight_habits.impact.nature_connection", value: "+20%"),
+                    HabitImpact(emoji: "🛡️", titleKey: "onboarding_v2.eight_habits.impact.immune_system", value: "+12%"),
+                    HabitImpact(emoji: "⚡", titleKey: "onboarding_v2.eight_habits.impact.energy_level", value: "+14%")
+                ]
+            ),
+            Habit(
+                icon: "moon.zzz.fill",
+                titleKey: "onboarding_v2.eight_habits.sleep.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.sleep.benefit_1",
+                    "onboarding_v2.eight_habits.sleep.benefit_2",
+                    "onboarding_v2.eight_habits.sleep.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "😴", titleKey: "onboarding_v2.eight_habits.impact.sleep_quality", value: "+22%"),
+                    HabitImpact(emoji: "⚡", titleKey: "onboarding_v2.eight_habits.impact.energy_level", value: "+18%"),
+                    HabitImpact(emoji: "🧠", titleKey: "onboarding_v2.eight_habits.impact.cognitive_performance", value: "+16%")
+                ]
+            ),
+            Habit(
+                icon: "person.2.fill",
+                titleKey: "onboarding_v2.eight_habits.social.title",
+                benefitKeys: [
+                    "onboarding_v2.eight_habits.social.benefit_1",
+                    "onboarding_v2.eight_habits.social.benefit_2",
+                    "onboarding_v2.eight_habits.social.benefit_3"
+                ],
+                impacts: [
+                    HabitImpact(emoji: "👥", titleKey: "onboarding_v2.eight_habits.impact.social_bond", value: "+20%"),
+                    HabitImpact(emoji: "😊", titleKey: "onboarding_v2.eight_habits.impact.emotional_wellbeing", value: "+16%"),
+                    HabitImpact(emoji: "💪", titleKey: "onboarding_v2.eight_habits.impact.resilience", value: "+14%")
+                ]
+            )
+        ]
+    }
 
     private var currentHabit: Habit {
         habits[currentHabitIndex]
@@ -513,15 +515,27 @@ struct EightHabitsFlowView: View {
         var attributedString = AttributedString(text)
         attributedString.foregroundColor = .white
 
-        // Bénéfices complets à mettre en bleu
+        // Keywords to highlight in both languages
         let keywords = [
-            "réduit le stress",
-            "améliore l'humeur",
-            "renforce le système immunitaire",
-            "améliore la qualité du sommeil",
-            "améliore la concentration",
-            "favorise la clarté mentale",
-            "augmente les niveaux d'énergie"
+            // French
+            "réduit le stress", "améliore l'humeur", "renforce le système immunitaire",
+            "améliore la qualité du sommeil", "améliore la concentration",
+            "favorise la clarté mentale", "augmente les niveaux d'énergie",
+            "réduit le cortisol", "réduit l'anxiété", "améliore la régulation émotionnelle",
+            "réduit la rumination", "produit des endorphines", "réduit le stress",
+            "améliore l'énergie", "améliore la concentration", "réduit la fatigue mentale",
+            "régule l'humeur", "abaisse la tension artérielle", "renforce le système immunitaire",
+            "consolide la mémoire", "régule les émotions", "réduit le sentiment d'isolement",
+            "améliore la résilience au stress", "augmente le bien-être",
+            // English
+            "reduces cortisol", "reduces anxiety", "improves heart rate variability",
+            "calms the mind", "increases gray matter", "improves emotional regulation",
+            "clarifies", "reduces rumination", "improves sleep quality",
+            "produces natural endorphins", "reduces stress", "improves daily energy",
+            "improves concentration", "reduces mental fatigue", "regulates mood",
+            "lowers blood pressure", "improves mood", "strengthens immune system",
+            "consolidates memory", "regulates emotions", "reduces feelings of isolation",
+            "improves stress resilience", "increases wellbeing"
         ]
 
         for keyword in keywords {
@@ -567,15 +581,27 @@ struct EightHabitsFlowView: View {
 
 struct Habit {
     let icon: String
-    let title: String
-    let benefits: [String]
+    let titleKey: String
+    let benefitKeys: [String]
     let impacts: [HabitImpact]
+
+    var title: String {
+        titleKey.localized
+    }
+
+    var benefits: [String] {
+        benefitKeys.map { $0.localized }
+    }
 }
 
 struct HabitImpact {
     let emoji: String
-    let title: String
+    let titleKey: String
     let value: String
+
+    var title: String {
+        titleKey.localized
+    }
 }
 
 // MARK: - Habit Card

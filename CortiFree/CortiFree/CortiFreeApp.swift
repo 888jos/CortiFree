@@ -71,8 +71,8 @@ struct CortiFreeApp: App {
     var body: some Scene {
         WindowGroup {
             if authViewModel.isAuthenticated {
-                // User is authenticated - check if onboarding is completed
-                if UserDefaults.standard.bool(forKey: "onboardingV2Completed") {
+                // User is authenticated - check if onboarding is completed (local or synced from Firestore)
+                if authViewModel.hasCompletedOnboarding || UserDefaults.standard.bool(forKey: "onboardingV2Completed") {
                     // Onboarding completed - show main app
                     ContentView()
                         .environmentObject(authViewModel)

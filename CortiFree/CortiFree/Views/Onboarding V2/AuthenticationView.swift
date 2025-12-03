@@ -79,35 +79,12 @@ struct AuthenticationView: View {
                 Spacer()
 
                 // Lottie animation
-                LottieView(filename: "Tomato plant", loopMode: .loop)
+                LottieView(filename: "Flower Animation", loopMode: .loop)
                     .frame(width: 320, height: 320)
                     .padding(.bottom, 32)
 
                 // Authentication buttons
                 VStack(spacing: 16) {
-                    // Continue with Email (moved to top position)
-                    Button(action: {
-                        HapticManager.light()
-                        showEmailAuth = true
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "envelope.fill")
-                                .font(.system(size: 18))
-                                .foregroundColor(.white)
-
-                            Text("onboarding_v2.auth.email_button".localized)
-                                .font(.custom("Poppins-Medium", size: 16))
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
-                    }
-                    .padding(.horizontal, 32)
-
                     // Continue with Apple
                     Button(action: {
                         HapticManager.light()
@@ -137,18 +114,35 @@ struct AuthenticationView: View {
                         showGoogleAuth = true
                     }) {
                         HStack(spacing: 12) {
-                            // Google "G" logo
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Color.white)
-                                    .frame(width: 20, height: 20)
-
-                                Text("G")
-                                    .font(.custom("Poppins-Bold", size: 14))
-                                    .foregroundColor(Color(hex: "4285F4"))
-                            }
+                            Image("GoogleLogoWhite")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 22, height: 22)
 
                             Text("onboarding_v2.auth.google_button".localized)
+                                .font(.custom("Poppins-Medium", size: 16))
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 54)
+                        .background(
+                            RoundedRectangle(cornerRadius: 40)
+                                .stroke(Color.white, lineWidth: 2)
+                        )
+                    }
+                    .padding(.horizontal, 32)
+
+                    // Continue with Email
+                    Button(action: {
+                        HapticManager.light()
+                        showEmailAuth = true
+                    }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "envelope.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(.white)
+
+                            Text("onboarding_v2.auth.email_button".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -314,8 +308,28 @@ struct EmailAuthView: View {
     @State private var isSignUp = true
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showPassword = false
+    @State private var showGoogleAuth = false
+    @State private var showAppleAuth = false
+    @FocusState private var focusedField: Field?
+
+    enum Field {
+        case username, email, password, confirmPassword
+    }
 
     var onComplete: () -> Void
+
+    private var passwordsMatch: Bool {
+        password == confirmPassword && !confirmPassword.isEmpty
+    }
+
+    private var isFormValid: Bool {
+        if isSignUp {
+            return !username.isEmpty && !email.isEmpty && !password.isEmpty && password.count >= 6 && passwordsMatch
+        } else {
+            return !email.isEmpty && !password.isEmpty
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -347,48 +361,167 @@ struct EmailAuthView: View {
                 .padding(.horizontal, 24)
                 .padding(.top, 50)
 
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
                         // Title
-                        Text(isSignUp ? "onboarding_v2.auth.create_account".localized : "onboarding_v2.auth.login".localized)
-                            .font(.custom("Poppins-Bold", size: 28))
-                            .foregroundColor(.white)
-                            .padding(.top, 20)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(isSignUp ? "onboarding_v2.auth.create_account".localized : "onboarding_v2.auth.login".localized)
+                                .font(.custom("Poppins-Bold", size: 28))
+                                .foregroundColor(.white)
+
+                            Text(isSignUp ? "onboarding_v2.auth.enter_info".localized : "onboarding_v2.auth.enter_credentials".localized)
+                                .font(.custom("Poppins-Regular", size: 16))
+                                .foregroundColor(.white.opacity(0.85))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 32)
+                        .padding(.top, 20)
 
                         // Form fields
                         VStack(spacing: 16) {
+                            // Username (only for sign up)
                             if isSignUp {
-                                TextField("", text: $username, prompt: Text("onboarding_v2.auth.first_name".localized).foregroundColor(.white.opacity(0.6)))
-                                    .textFieldStyle(CustomTextFieldStyle())
-                                    .colorScheme(.dark)
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text("onboarding_v2.auth.first_name_label".localized)
+                                        .font(.custom("Poppins-Medium", size: 14))
+                                        .foregroundColor(.white)
+
+                                    TextField("", text: $username, prompt: Text("onboarding_v2.auth.first_name".localized).foregroundColor(.white.opacity(0.5)))
+                                        .font(.custom("Poppins-Regular", size: 16))
+                                        .foregroundColor(.white)
+                                        .focused($focusedField, equals: .username)
+                                        .padding(14)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(Color.white.opacity(0.1))
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 12)
+                                                        .stroke(focusedField == .username ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                                )
+                                        )
+                                        .tint(.white)
+                                }
                             }
 
-                            TextField("", text: $email, prompt: Text("onboarding_v2.auth.email_placeholder".localized).foregroundColor(.white.opacity(0.6)))
-                                .textFieldStyle(CustomTextFieldStyle())
-                                .keyboardType(.emailAddress)
-                                .autocapitalization(.none)
-                                .colorScheme(.dark)
+                            // Email
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Email")
+                                    .font(.custom("Poppins-Medium", size: 14))
+                                    .foregroundColor(.white)
 
-                            SecureField("", text: $password, prompt: Text("onboarding_v2.auth.password_placeholder".localized).foregroundColor(.white.opacity(0.6)))
-                                .textFieldStyle(CustomTextFieldStyle())
-                                .textContentType(.oneTimeCode)
-                                .colorScheme(.dark)
+                                TextField("", text: $email, prompt: Text("onboarding_v2.auth.email_placeholder".localized).foregroundColor(.white.opacity(0.5)))
+                                    .font(.custom("Poppins-Regular", size: 16))
+                                    .foregroundColor(.white)
+                                    .textInputAutocapitalization(.never)
+                                    .keyboardType(.emailAddress)
+                                    .focused($focusedField, equals: .email)
+                                    .padding(14)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color.white.opacity(0.1))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(focusedField == .email ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                            )
+                                    )
+                                    .tint(.white)
+                            }
 
+                            // Password
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("onboarding_v2.auth.password_label".localized)
+                                    .font(.custom("Poppins-Medium", size: 14))
+                                    .foregroundColor(.white)
+
+                                HStack {
+                                    if showPassword {
+                                        TextField("", text: $password, prompt: Text(isSignUp ? "onboarding_v2.auth.password_min_chars".localized : "••••••••").foregroundColor(.white.opacity(0.5)))
+                                            .font(.custom("Poppins-Regular", size: 16))
+                                            .foregroundColor(.white)
+                                            .textInputAutocapitalization(.never)
+                                            .focused($focusedField, equals: .password)
+                                    } else {
+                                        SecureField("", text: $password, prompt: Text(isSignUp ? "onboarding_v2.auth.password_min_chars".localized : "••••••••").foregroundColor(.white.opacity(0.5)))
+                                            .font(.custom("Poppins-Regular", size: 16))
+                                            .foregroundColor(.white)
+                                            .textInputAutocapitalization(.never)
+                                            .textContentType(.oneTimeCode)
+                                            .focused($focusedField, equals: .password)
+                                    }
+
+                                    Button(action: { showPassword.toggle() }) {
+                                        Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                }
+                                .padding(14)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.white.opacity(0.1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(focusedField == .password ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                        )
+                                )
+                                .tint(.white)
+                            }
+
+                            // Confirm Password (only for sign up)
                             if isSignUp {
-                                SecureField("", text: $confirmPassword, prompt: Text("onboarding_v2.auth.confirm_password".localized).foregroundColor(.white.opacity(0.6)))
-                                    .textFieldStyle(CustomTextFieldStyle())
-                                    .textContentType(.oneTimeCode)
-                                    .colorScheme(.dark)
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text("onboarding_v2.auth.confirm_password_label".localized)
+                                        .font(.custom("Poppins-Medium", size: 14))
+                                        .foregroundColor(.white)
+
+                                    HStack {
+                                        SecureField("", text: $confirmPassword, prompt: Text("onboarding_v2.auth.confirm_placeholder".localized).foregroundColor(.white.opacity(0.5)))
+                                            .font(.custom("Poppins-Regular", size: 16))
+                                            .foregroundColor(.white)
+                                            .textInputAutocapitalization(.never)
+                                            .textContentType(.oneTimeCode)
+                                            .focused($focusedField, equals: .confirmPassword)
+
+                                        if passwordsMatch {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundColor(.green)
+                                        }
+                                    }
+                                    .padding(14)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color.white.opacity(0.1))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(
+                                                        focusedField == .confirmPassword ?
+                                                        (passwordsMatch ? Color.green : Color.red) :
+                                                            Color.white.opacity(0.3),
+                                                        lineWidth: 1.5
+                                                    )
+                                            )
+                                    )
+                                    .tint(.white)
+                                }
                             }
                         }
                         .padding(.horizontal, 32)
 
                         // Error message
                         if let errorMessage = errorMessage {
-                            Text(errorMessage)
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.red)
-                                .padding(.horizontal, 32)
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.red)
+                                Text(errorMessage)
+                                    .font(.custom("Poppins-Regular", size: 14))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(12)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.red.opacity(0.2))
+                            )
+                            .padding(.horizontal, 32)
                         }
 
                         // Submit button
@@ -407,7 +540,8 @@ struct EmailAuthView: View {
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 40))
                         .padding(.horizontal, 32)
-                        .disabled(isLoading)
+                        .disabled(isLoading || !isFormValid)
+                        .opacity(isLoading || !isFormValid ? 0.6 : 1.0)
 
                         // Toggle sign up/in
                         Button(action: {
@@ -418,10 +552,89 @@ struct EmailAuthView: View {
                                 .font(.custom("Poppins-Regular", size: 14))
                                 .foregroundColor(.white.opacity(0.8))
                         }
+
+                        // Divider - Autre méthode
+                        HStack(spacing: 16) {
+                            Rectangle()
+                                .fill(Color.white.opacity(0.3))
+                                .frame(height: 1)
+                            Text("onboarding_v2.auth.other_method".localized)
+                                .font(.custom("Poppins-Regular", size: 14))
+                                .foregroundColor(.white.opacity(0.6))
+                            Rectangle()
+                                .fill(Color.white.opacity(0.3))
+                                .frame(height: 1)
+                        }
+                        .padding(.horizontal, 32)
+                        .padding(.top, 8)
+
+                        // Other auth methods
+                        HStack(spacing: 16) {
+                            // Apple
+                            Button(action: {
+                                HapticManager.light()
+                                showAppleAuth = true
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "apple.logo")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.white)
+
+                                    Text("Apple")
+                                        .font(.custom("Poppins-Medium", size: 14))
+                                        .foregroundColor(.white)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 48)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 24)
+                                        .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+                                )
+                            }
+
+                            // Google
+                            Button(action: {
+                                HapticManager.light()
+                                showGoogleAuth = true
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image("GoogleLogoWhite")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 18, height: 18)
+
+                                    Text("Google")
+                                        .font(.custom("Poppins-Medium", size: 14))
+                                        .foregroundColor(.white)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 48)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 24)
+                                        .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 32)
                     }
                     .padding(.bottom, 40)
                 }
             }
+        }
+        .onTapGesture {
+            focusedField = nil
+        }
+        .fullScreenCover(isPresented: $showAppleAuth) {
+            AppleAuthView(onComplete: {
+                showAppleAuth = false
+                onComplete()
+            })
+        }
+        .fullScreenCover(isPresented: $showGoogleAuth) {
+            GoogleAuthView(onComplete: {
+                showGoogleAuth = false
+                onComplete()
+            })
         }
     }
 
@@ -475,25 +688,46 @@ struct EmailAuthView: View {
 struct GoogleAuthView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var languageManager = LanguageManager.shared
-    @State private var email = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showEmailAuth = false
+    @State private var showAppleAuth = false
 
     var onComplete: () -> Void
 
     var body: some View {
         ZStack {
-            // Background (same as EmailAuthView)
+            // Background
             LinearGradient(
-                colors: [
-                    Color(hex: "1F0140"),
-                    Color(hex: "0B011B"),
-                    Color(hex: "01000C")
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
+                gradient: Gradient(colors: [
+                    Color(hex: "0A0A2E"),
+                    Color(hex: "1A1A4E")
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
             )
             .ignoresSafeArea()
+
+            // Stars
+            GeometryReader { geometry in
+                ForEach(0..<50, id: \.self) { index in
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: CGFloat.random(in: 1...3))
+                        .position(
+                            x: CGFloat.random(in: 0...geometry.size.width),
+                            y: CGFloat.random(in: 0...geometry.size.height)
+                        )
+                }
+            }
+
+            // Planet silhouette
+            GeometryReader { geometry in
+                Ellipse()
+                    .fill(Color(hex: "050520"))
+                    .frame(width: geometry.size.width * 1.5, height: 600)
+                    .offset(x: -geometry.size.width * 0.25, y: geometry.size.height - 375)
+            }
 
             VStack(spacing: 32) {
                 // Close button at top
@@ -515,16 +749,10 @@ struct GoogleAuthView: View {
 
                 // Google logo and title
                 VStack(spacing: 24) {
-                    // Google "G" logo (large)
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.white)
-                            .frame(width: 80, height: 80)
-
-                        Text("G")
-                            .font(.custom("Poppins-Bold", size: 48))
-                            .foregroundColor(Color(hex: "4285F4"))
-                    }
+                    Image("GoogleLogoWhite")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
 
                     Text("onboarding_v2.auth.google_title".localized)
                         .font(.custom("Poppins-Bold", size: 28))
@@ -552,11 +780,11 @@ struct GoogleAuthView: View {
                 Button(action: handleGoogleSignIn) {
                     if isLoading {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "1A1A4E")))
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "0A0A2E")))
                     } else {
                         Text("onboarding_v2.auth.google_sign_in".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(Color(hex: "1A1A4E"))
+                            .foregroundColor(Color(hex: "0A0A2E"))
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -564,9 +792,84 @@ struct GoogleAuthView: View {
                 .background(Color.white)
                 .clipShape(RoundedRectangle(cornerRadius: 40))
                 .padding(.horizontal, 32)
-                .padding(.bottom, 50)
                 .disabled(isLoading)
+
+                // Divider - Autre méthode
+                HStack(spacing: 16) {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(height: 1)
+                    Text("onboarding_v2.auth.other_method".localized)
+                        .font(.custom("Poppins-Regular", size: 14))
+                        .foregroundColor(.white.opacity(0.6))
+                    Rectangle()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(height: 1)
+                }
+                .padding(.horizontal, 32)
+                .padding(.top, 8)
+
+                // Other auth methods
+                HStack(spacing: 16) {
+                    // Apple
+                    Button(action: {
+                        HapticManager.light()
+                        showAppleAuth = true
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "apple.logo")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+
+                            Text("Apple")
+                                .font(.custom("Poppins-Medium", size: 14))
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+                        )
+                    }
+
+                    // Email
+                    Button(action: {
+                        HapticManager.light()
+                        showEmailAuth = true
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "envelope.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+
+                            Text("Email")
+                                .font(.custom("Poppins-Medium", size: 14))
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+                        )
+                    }
+                }
+                .padding(.horizontal, 32)
+                .padding(.bottom, 50)
             }
+        }
+        .fullScreenCover(isPresented: $showAppleAuth) {
+            AppleAuthView(onComplete: {
+                showAppleAuth = false
+                onComplete()
+            })
+        }
+        .fullScreenCover(isPresented: $showEmailAuth) {
+            EmailAuthView(onComplete: {
+                showEmailAuth = false
+                onComplete()
+            })
         }
     }
 
@@ -666,6 +969,8 @@ struct AppleAuthView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showEmailAuth = false
+    @State private var showGoogleAuth = false
 
     var onComplete: () -> Void
 
@@ -673,15 +978,35 @@ struct AppleAuthView: View {
         ZStack {
             // Background
             LinearGradient(
-                colors: [
-                    Color(hex: "1F0140"),
-                    Color(hex: "0B011B"),
-                    Color(hex: "01000C")
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
+                gradient: Gradient(colors: [
+                    Color(hex: "0A0A2E"),
+                    Color(hex: "1A1A4E")
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
             )
             .ignoresSafeArea()
+
+            // Stars
+            GeometryReader { geometry in
+                ForEach(0..<50, id: \.self) { index in
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: CGFloat.random(in: 1...3))
+                        .position(
+                            x: CGFloat.random(in: 0...geometry.size.width),
+                            y: CGFloat.random(in: 0...geometry.size.height)
+                        )
+                }
+            }
+
+            // Planet silhouette
+            GeometryReader { geometry in
+                Ellipse()
+                    .fill(Color(hex: "050520"))
+                    .frame(width: geometry.size.width * 1.5, height: 600)
+                    .offset(x: -geometry.size.width * 0.25, y: geometry.size.height - 375)
+            }
 
             VStack(spacing: 32) {
                 // Close button at top
@@ -741,8 +1066,72 @@ struct AppleAuthView: View {
                 .frame(height: 54)
                 .cornerRadius(40)
                 .padding(.horizontal, 32)
-                .padding(.bottom, 50)
                 .disabled(isLoading)
+
+                // Divider - Autre méthode
+                HStack(spacing: 16) {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(height: 1)
+                    Text("onboarding_v2.auth.other_method".localized)
+                        .font(.custom("Poppins-Regular", size: 14))
+                        .foregroundColor(.white.opacity(0.6))
+                    Rectangle()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(height: 1)
+                }
+                .padding(.horizontal, 32)
+                .padding(.top, 8)
+
+                // Other auth methods
+                HStack(spacing: 16) {
+                    // Google
+                    Button(action: {
+                        HapticManager.light()
+                        showGoogleAuth = true
+                    }) {
+                        HStack(spacing: 8) {
+                            Image("GoogleLogoWhite")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
+
+                            Text("Google")
+                                .font(.custom("Poppins-Medium", size: 14))
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+                        )
+                    }
+
+                    // Email
+                    Button(action: {
+                        HapticManager.light()
+                        showEmailAuth = true
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "envelope.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+
+                            Text("Email")
+                                .font(.custom("Poppins-Medium", size: 14))
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+                        )
+                    }
+                }
+                .padding(.horizontal, 32)
+                .padding(.bottom, 50)
             }
 
             // Loading overlay
@@ -754,6 +1143,18 @@ struct AppleAuthView: View {
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     .scaleEffect(1.5)
             }
+        }
+        .fullScreenCover(isPresented: $showGoogleAuth) {
+            GoogleAuthView(onComplete: {
+                showGoogleAuth = false
+                onComplete()
+            })
+        }
+        .fullScreenCover(isPresented: $showEmailAuth) {
+            EmailAuthView(onComplete: {
+                showEmailAuth = false
+                onComplete()
+            })
         }
     }
 

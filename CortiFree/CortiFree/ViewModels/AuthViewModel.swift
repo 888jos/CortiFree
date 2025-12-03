@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 import Combine
 
 @MainActor
@@ -17,6 +18,7 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var successMessage: String?
+    @Published var hasCompletedOnboarding = false
 
     private let firebase = UnifiedFirebaseService.shared
     private var cancellables = Set<AnyCancellable>()
@@ -30,6 +32,16 @@ class AuthViewModel: ObservableObject {
     private func checkAuthState() {
         isAuthenticated = firebase.auth.isAuthenticated
         currentUser = firebase.auth.currentUser
+
+        // Vérifier le statut d'onboarding local
+        hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "onboardingV2Completed")
+
+        // Si authentifié, synchroniser avec Firestore
+        if isAuthenticated, let user = currentUser {
+            Task {
+                await syncOnboardingStatus(userId: user.uid)
+            }
+        }
     }
 
     // Écouter les changements d'état d'authentification
@@ -94,6 +106,10 @@ class AuthViewModel: ObservableObject {
         do {
             let user = try await firebase.auth.signIn(email: email, password: password)
             currentUser = user
+
+            // Vérifier si l'utilisateur a déjà complété l'onboarding
+            await syncOnboardingStatus(userId: user.uid)
+
             isAuthenticated = true
             successMessage = NSLocalizedString("auth.success.login", comment: "")
         } catch let error as CoreError {
@@ -153,5 +169,28 @@ class AuthViewModel: ObservableObject {
     func clearMessages() {
         errorMessage = nil
         successMessage = nil
+    }
+
+    // Synchroniser le statut d'onboarding avec Firestore
+    func syncOnboardingStatus(userId: String) async {
+        do {
+            let db = Firestore.firestore()
+            let document = try await db.collection("users").document(userId).getDocument()
+
+            if let data = document.data(),
+               let onboardingCompleted = data["onboardingCompleted"] as? Bool,
+               onboardingCompleted {
+                // L'utilisateur a déjà fait l'onboarding, mettre à jour UserDefaults
+                UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
+                hasCompletedOnboarding = true
+                #if DEBUG
+                print("✅ Onboarding déjà complété - synchronisé depuis Firestore")
+                #endif
+            }
+        } catch {
+            #if DEBUG
+            print("⚠️ Impossible de vérifier le statut d'onboarding: \(error.localizedDescription)")
+            #endif
+        }
     }
 }

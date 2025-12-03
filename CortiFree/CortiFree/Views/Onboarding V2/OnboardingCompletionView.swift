@@ -14,7 +14,18 @@ struct OnboardingCompletionView: View {
     let onboardingStartTime: Date?
     let onViewPlan: () -> Void
 
+    @StateObject private var storeKit = StoreKitManager.shared
     @State private var hasTrackedCompletion = false
+    @State private var isPurchasing = false
+    @State private var purchaseError: String?
+
+    // DEBUG: Set to true to bypass paywall during development
+    // Change to false before shipping to App Store!
+    #if DEBUG
+    private let bypassPaywallForTesting = true
+    #else
+    private let bypassPaywallForTesting = false
+    #endif
 
     // Get user name from UserDefaults
     private var userName: String {
@@ -40,28 +51,68 @@ struct OnboardingCompletionView: View {
     }
 
     var body: some View {
-        CustomPaywallView(
-            onComplete: {
-                // User skipped paywall - complete onboarding
-                onViewPlan()
-            },
-            onPurchase: { planType in
-                // TODO: Handle actual purchase with StoreKit
-                print("Purchase requested: \(planType)")
-                // For now, complete onboarding after purchase
-                onViewPlan()
-            },
-            onRestore: {
-                // TODO: Handle restore purchases
-                print("Restore purchases requested")
-            },
-            userName: userName,
-            baselineScores: baselineScores,
-            potentialScores: potentialScores
-        )
-        .onAppear {
-            // Track onboarding completion (once)
-            trackOnboardingCompletion()
+        Group {
+            if bypassPaywallForTesting {
+                // DEBUG: Skip paywall and go directly to app
+                Color.clear
+                    .onAppear {
+                        trackOnboardingCompletion()
+                        onViewPlan()
+                    }
+            } else {
+                CustomPaywallView(
+                    onComplete: {
+                        // User skipped paywall - complete onboarding
+                        onViewPlan()
+                    },
+                    onPurchase: { planType in
+                        Task {
+                            isPurchasing = true
+                            purchaseError = nil
+
+                            // Map plan type to product ID
+                            let productID = planType == "yearly"
+                                ? StoreKitManager.yearlyProductID
+                                : StoreKitManager.monthlyProductID
+
+                            let success = await storeKit.purchase(productID)
+
+                            isPurchasing = false
+
+                            if success {
+                                // Purchase successful - complete onboarding
+                                onViewPlan()
+                            } else if let error = storeKit.errorMessage {
+                                purchaseError = error
+                            }
+                        }
+                    },
+                    onRestore: {
+                        Task {
+                            isPurchasing = true
+                            purchaseError = nil
+
+                            let success = await storeKit.restorePurchases()
+
+                            isPurchasing = false
+
+                            if success {
+                                // Restore successful - complete onboarding
+                                onViewPlan()
+                            } else {
+                                purchaseError = "Aucun achat à restaurer"
+                            }
+                        }
+                    },
+                    userName: userName,
+                    baselineScores: baselineScores,
+                    potentialScores: potentialScores
+                )
+                .onAppear {
+                    // Track onboarding completion (once)
+                    trackOnboardingCompletion()
+                }
+            }
         }
     }
 

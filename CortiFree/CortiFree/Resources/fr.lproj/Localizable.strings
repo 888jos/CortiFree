@@ -43,6 +43,24 @@
 "tasks.todo" = "À faire";
 "tasks.done" = "Fait";
 "tasks.skipped" = "Passé";
+"tasks.day_counter" = "Jour %d/66";
+"tasks.day_counter_extended" = "Jour %d";
+"tasks.error_loading" = "Erreur de chargement";
+"tasks.retry" = "Réessayer";
+"tasks.skip" = "Passer";
+"tasks.validate" = "Valider";
+"tasks.task_skipped" = "Tâche passée";
+"tasks.empty.todo_title" = "Aucune tâche à faire";
+"tasks.empty.todo_message" = "Toutes vos tâches sont complétées ou ignorées pour aujourd'hui";
+"tasks.empty.done_title" = "Aucune tâche complétée";
+"tasks.empty.done_message" = "Complétez des tâches pour les voir ici";
+"tasks.empty.skipped_title" = "Aucune tâche ignorée";
+"tasks.empty.skipped_message" = "Les tâches ignorées apparaîtront ici";
+"tasks.week_locked_title" = "Semaine %d verrouillée";
+"tasks.week_locked_current" = "Tu es actuellement à la semaine %d de ton programme.";
+"tasks.week_locked_unlock" = "Les tâches de la semaine %d se déverrouilleront automatiquement quand tu atteindras cette semaine.";
+"tasks.week_locked_encouragement" = "Continue ton excellent travail ! 💪";
+"tasks.understood" = "Compris";
 
 // MARK: - Habits
 "habit.breathe" = "Exercices de respiration";
@@ -53,6 +71,46 @@
 "habit.nature" = "Temps dans la nature";
 "habit.sleep" = "Se réveiller à 7h";
 "habit.social" = "Interactions sociales";
+
+// MARK: - Habit Variant Titles
+// Sleep variants (progressive)
+"habit.wake_before_8h30" = "Se réveiller avant 8h30";
+"habit.wake_before_8h" = "Se réveiller avant 8h";
+"habit.wake_before_7h30" = "Se réveiller avant 7h30";
+"habit.wake_before_7h" = "Se réveiller avant 7h";
+"habit.sleep_before_23h30" = "Se coucher avant 23h30";
+"habit.sleep_before_23h" = "Se coucher avant 23h";
+"habit.sleep_before_22h30" = "Se coucher avant 22h30";
+"habit.sleep_before_22h" = "Se coucher avant 22h";
+
+// Single variants
+"habit.breathing_title" = "Exercice de respiration";
+"habit.meditation_title" = "Méditer 10 minutes";
+"habit.journal_title" = "Écrire dans son journal";
+"habit.water_title" = "Boire au moins %@";
+"habit.water_title_legacy" = "Boire au moins 2,5L d'eau";
+
+// Nature variants
+"habit.nature_walk" = "Balade en plein air";
+"habit.nature_trek" = "Trek nature";
+"habit.nature_bike" = "Rouler au grand air";
+
+// Sport variants
+"habit.sport_boxing" = "Séance de boxe";
+"habit.sport_jump_rope" = "Cardio corde";
+"habit.sport_dance" = "Se libérer en dansant";
+"habit.sport_stretching" = "S'étirer en profondeur";
+"habit.sport_swimming" = "Session piscine";
+"habit.sport_strength" = "Renforcement musculaire";
+"habit.sport_running" = "Courir librement";
+
+// Social variants
+"habit.social_creative" = "Moment créatif partagé";
+"habit.social_call" = "Appeler un proche";
+"habit.social_meal" = "Repas convivial";
+"habit.social_movie" = "Soirée film";
+"habit.social_games" = "Soirée jeux";
+"habit.social_drinks" = "Verre entre amis";
 
 // MARK: - Frequency
 "frequency.daily" = "Tous les jours";
@@ -2236,6 +2294,7 @@
 "task.detail.progression_66_days" = "Progression sur 66 jours";
 "task.detail.occurrences" = "occurrences";
 "task.detail.this_month" = "ce mois";
+"task.detail.total" = "en tout";
 "task.detail.habit_improves" = "Cette habitude améliore";
 "task.detail.cortifree_score_domains" = "Ton score CortiFree dans ces domaines";
 "task.detail.domain.global" = "Global";
@@ -2679,6 +2738,14 @@
 "onboarding_v2.auth.token_error" = "Impossible de récupérer le token";
 "onboarding_v2.auth.apple_title" = "Connexion avec Apple";
 "onboarding_v2.auth.apple_description" = "Connecte-toi rapidement et en toute sécurité avec ton compte Apple";
+"onboarding_v2.auth.other_method" = "Autre méthode";
+"onboarding_v2.auth.enter_info" = "Entrez vos informations";
+"onboarding_v2.auth.enter_credentials" = "Entrez vos identifiants";
+"onboarding_v2.auth.first_name_label" = "Prénom";
+"onboarding_v2.auth.password_label" = "Mot de passe";
+"onboarding_v2.auth.password_min_chars" = "Min. 6 caractères";
+"onboarding_v2.auth.confirm_password_label" = "Confirmer le mot de passe";
+"onboarding_v2.auth.confirm_placeholder" = "Confirmez";
 
 // Loading Analysis
 "onboarding_v2.loading.title" = "Calcul en cours";
@@ -2870,6 +2937,30 @@
 "onboarding_v2.eight_habits.intro_below" = "ci-dessous.";
 "onboarding_v2.eight_habits.intro_see_change" = "Découvre comment ta vie va changer en 66 jours\ngrâce à ces 8 habitudes :";
 "onboarding_v2.eight_habits.impact_title" = "Impact après 10 semaines";
+
+// Labels d'impact pour les habitudes
+"onboarding_v2.eight_habits.impact.lung_capacity" = "Capacité\npulmonaire";
+"onboarding_v2.eight_habits.impact.stress_level" = "Niveau de\nstress";
+"onboarding_v2.eight_habits.impact.heart_health" = "Santé\ncardiaque";
+"onboarding_v2.eight_habits.impact.emotional_resilience" = "Résilience\némotionnelle";
+"onboarding_v2.eight_habits.impact.cortisol_level" = "Niveau de\ncortisol";
+"onboarding_v2.eight_habits.impact.mental_focus" = "Focus\nmental";
+"onboarding_v2.eight_habits.impact.mental_clarity" = "Clarté\nmentale";
+"onboarding_v2.eight_habits.impact.emotion_management" = "Gestion des\némotions";
+"onboarding_v2.eight_habits.impact.gratitude_level" = "Niveau de\ngratitude";
+"onboarding_v2.eight_habits.impact.muscle_tone" = "Tonus\nmusculaire";
+"onboarding_v2.eight_habits.impact.endorphin_level" = "Niveau\nd'endorphines";
+"onboarding_v2.eight_habits.impact.joint_health" = "Santé\narticulaire";
+"onboarding_v2.eight_habits.impact.hydration_level" = "Niveau\nd'hydratation";
+"onboarding_v2.eight_habits.impact.skin_quality" = "Qualité\nde la peau";
+"onboarding_v2.eight_habits.impact.nature_connection" = "Connexion\nnature";
+"onboarding_v2.eight_habits.impact.immune_system" = "Système\nimmunitaire";
+"onboarding_v2.eight_habits.impact.energy_level" = "Niveau\nd'énergie";
+"onboarding_v2.eight_habits.impact.sleep_quality" = "Qualité du\nsommeil";
+"onboarding_v2.eight_habits.impact.cognitive_performance" = "Performance\ncognitive";
+"onboarding_v2.eight_habits.impact.social_bond" = "Lien\nsocial";
+"onboarding_v2.eight_habits.impact.emotional_wellbeing" = "Bien-être\némotionnel";
+"onboarding_v2.eight_habits.impact.resilience" = "Résilience";
 
 // MARK: - Onboarding V2 - Week Progress View  
 "onboarding_v2.week_progress.your_journey" = "Ton parcours";

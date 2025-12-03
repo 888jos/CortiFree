@@ -270,11 +270,11 @@ class MixpanelManager {
         track(event: "onboarding_habits_quiz_completed", properties: properties)
     }
 
-    func trackOnboardingMarketingData(acquisitionChannel: String, previousAppExperience: String) {
-        track(event: "onboarding_quiz_marketing_data", properties: [
-            "acquisition_channel": acquisitionChannel,
-            "previous_app_experience": previousAppExperience
-        ])
+    func trackOnboardingMarketingData(acquisitionChannel: String?, previousAppExperience: String?) {
+        var properties: [String: MixpanelType] = [:]
+        if let channel = acquisitionChannel { properties["acquisition_channel"] = channel }
+        if let experience = previousAppExperience { properties["previous_app_experience"] = experience }
+        track(event: "onboarding_quiz_marketing_data", properties: properties)
     }
 
     // 5-7. Explanation Screens
@@ -923,5 +923,44 @@ class MixpanelManager {
 
     func reset() {
         Mixpanel.mainInstance().reset()
+    }
+
+    // MARK: - Purchase Tracking
+
+    func trackPurchase(productId: String, price: Decimal, currency: String) {
+        let properties: [String: any MixpanelType] = [
+            "product_id": productId,
+            "price": NSDecimalNumber(decimal: price).doubleValue,
+            "currency": currency,
+            "timestamp": Date().timeIntervalSince1970
+        ]
+
+        track(event: "subscription_purchased", properties: properties)
+    }
+
+    func trackRestorePurchases(success: Bool, productIds: [String]?) {
+        var properties: [String: any MixpanelType] = [
+            "success": success
+        ]
+
+        if let ids = productIds {
+            properties["restored_products"] = ids.joined(separator: ",")
+        }
+
+        track(event: "purchases_restored", properties: properties)
+    }
+
+    // MARK: - Auth View Tracking
+
+    func trackAuthViewDisplayed() {
+        track(event: "auth_view_displayed")
+    }
+
+    func trackLoginViewDisplayed() {
+        track(event: "login_view_displayed")
+    }
+
+    func trackSignupViewDisplayed() {
+        track(event: "signup_view_displayed")
     }
 }

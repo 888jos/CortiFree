@@ -94,11 +94,11 @@ struct HabitTaskDetailView: View {
 
                                 // Total completions - Top right in rectangle
                                 HStack(spacing: 4) {
-                                    Text("\(task.totalCompletions)")
+                                    Text("\(task.completedDays.count)")
                                         .font(Font.Poppins.custom(.bold, size: 14))
                                         .foregroundColor(.white)
 
-                                    Text(NSLocalizedString("task.detail.this_month", comment: ""))
+                                    Text(NSLocalizedString("task.detail.total", comment: ""))
                                         .font(.custom("Poppins-Regular", size: 10))
                                         .foregroundColor(.white.opacity(0.6))
                                 }

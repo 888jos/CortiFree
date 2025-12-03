@@ -328,7 +328,7 @@ struct TasksV2View: View {
 
                     // Day counter
                     HStack {
-                        Text(currentDay <= 66 ? "Jour \(currentDay)/66" : "Jour \(currentDay)")
+                        Text(currentDay <= 66 ? String(format: NSLocalizedString("tasks.day_counter", comment: ""), currentDay) : String(format: NSLocalizedString("tasks.day_counter_extended", comment: ""), currentDay))
                             .font(Font.Poppins.custom(.bold, size: 48))
                             .foregroundColor(.white)
 
@@ -374,7 +374,7 @@ struct TasksV2View: View {
                     .padding(.horizontal, AppConstants.Layout.paddingLarge)
 
                     // Encouragement text
-                    Text("Tu fais du super boulot. Continue !")
+                    Text(NSLocalizedString("tasks.encouragement", comment: ""))
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -478,7 +478,7 @@ struct TasksV2View: View {
 
                                 // Error message
                                 VStack(spacing: 8) {
-                                    Text("Erreur de chargement")
+                                    Text(NSLocalizedString("tasks.error_loading", comment: ""))
                                         .font(Font.Poppins.custom(.semiBold, size: 20))
                                         .foregroundColor(.white)
 
@@ -495,7 +495,7 @@ struct TasksV2View: View {
                                     loadingError = nil
                                     loadFirebaseData()
                                 }) {
-                                    Text("Réessayer")
+                                    Text(NSLocalizedString("tasks.retry", comment: ""))
                                         .font(Font.Poppins.custom(.semiBold, size: 16))
                                         .foregroundColor(.black)
                                         .padding(.horizontal, 32)
@@ -572,7 +572,7 @@ struct TasksV2View: View {
                                         HapticManager.medium()
                                         skipTaskWithUndo(task)
                                     } label: {
-                                        Label("Passer", systemImage: "xmark.circle")
+                                        Label(NSLocalizedString("tasks.skip", comment: ""), systemImage: "xmark.circle")
                                     }
                                     .tint(currentDay == actualDay ? .red : .gray)
                                 }
@@ -582,7 +582,7 @@ struct TasksV2View: View {
                                         HapticManager.success()
                                         validateTask(task)
                                     } label: {
-                                        Label("Valider", systemImage: "checkmark.circle")
+                                        Label(NSLocalizedString("tasks.validate", comment: ""), systemImage: "checkmark.circle")
                                     }
                                     .tint(currentDay == actualDay ? .green : .gray)
                                 }
@@ -596,7 +596,7 @@ struct TasksV2View: View {
                 // Undo Toast
                 if showUndoToast {
                     UndoToast(
-                        message: "Tâche passée",
+                        message: NSLocalizedString("tasks.task_skipped", comment: ""),
                         duration: 5.0,
                         undoAction: restoreSkippedTask
                     )
@@ -830,22 +830,22 @@ struct TasksV2View: View {
     private var emptyStateTitle: String {
         switch selectedTab {
         case .todos:
-            return "Aucune tâche à faire"
+            return NSLocalizedString("tasks.empty.todo_title", comment: "")
         case .done:
-            return "Aucune tâche complétée"
+            return NSLocalizedString("tasks.empty.done_title", comment: "")
         case .skipped:
-            return "Aucune tâche ignorée"
+            return NSLocalizedString("tasks.empty.skipped_title", comment: "")
         }
     }
 
     private var emptyStateMessage: String {
         switch selectedTab {
         case .todos:
-            return "Toutes vos tâches sont complétées ou ignorées pour aujourd'hui"
+            return NSLocalizedString("tasks.empty.todo_message", comment: "")
         case .done:
-            return "Complétez des tâches pour les voir ici"
+            return NSLocalizedString("tasks.empty.done_message", comment: "")
         case .skipped:
-            return "Les tâches ignorées apparaîtront ici"
+            return NSLocalizedString("tasks.empty.skipped_message", comment: "")
         }
     }
 
@@ -1187,24 +1187,24 @@ struct FutureWeekBlockingView: View {
                     .foregroundColor(Color(hex: "B794F6"))
 
                 // Title
-                Text("Semaine \(currentWeek + 1) verrouillée")
+                Text(String(format: NSLocalizedString("tasks.week_locked_title", comment: ""), currentWeek + 1))
                     .font(Font.Poppins.custom(.bold, size: 24))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
 
                 // Explanation
                 VStack(spacing: 12) {
-                    Text("Tu es actuellement à la semaine \(currentWeek) de ton programme.")
+                    Text(String(format: NSLocalizedString("tasks.week_locked_current", comment: ""), currentWeek))
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
 
-                    Text("Les tâches de la semaine \(currentWeek + 1) se déverrouilleront automatiquement quand tu atteindras cette semaine.")
+                    Text(String(format: NSLocalizedString("tasks.week_locked_unlock", comment: ""), currentWeek + 1))
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.7))
                         .multilineTextAlignment(.center)
 
-                    Text("Continue ton excellent travail ! 💪")
+                    Text(NSLocalizedString("tasks.week_locked_encouragement", comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 15))
                         .foregroundColor(Color(hex: "B794F6"))
                         .multilineTextAlignment(.center)
@@ -1216,7 +1216,7 @@ struct FutureWeekBlockingView: View {
                     HapticManager.medium()
                     onDismiss()
                 }) {
-                    Text("Compris")
+                    Text(NSLocalizedString("tasks.understood", comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

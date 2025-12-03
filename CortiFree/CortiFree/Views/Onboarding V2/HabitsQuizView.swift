@@ -3,10 +3,10 @@
 //  CortiFree
 //
 //  Created by Claude on 11/11/2025.
-//  Quiz de prise de conscience du stress - 12 questions situationnelles
+//  Quiz de prise de conscience du stress - 11 questions situationnelles
 //  Q1-Q8: Questions pour calculer les scores (stress, sommeil, énergie, focus)
-//  Q9-Q10: Questions marketing (acquisition, expérience apps)
-//  Q11-Q12: Objectif et temps disponible
+//  Q9: Question marketing (expérience apps)
+//  Q10-Q11: Objectif et temps disponible
 //
 
 import SwiftUI
@@ -17,12 +17,12 @@ struct HabitsQuizView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentQuestionIndex: Int = 0
     @State private var selectedAnswer: Int? = nil
-    @State private var answers: [Int] = Array(repeating: 0, count: 12)
+    @State private var answers: [Int] = Array(repeating: 0, count: 11)
     @State private var isGoingBack: Bool = false
     @State private var questionStartTime: Date?
     @State private var quizStartTime: Date?
 
-    private let totalQuestions = 12
+    private let totalQuestions = 11
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -246,9 +246,9 @@ struct HabitsQuizView: View {
             primaryGoal: result.primaryGoal
         )
 
-        // Track additional marketing data
+        // Track additional marketing data (acquisitionChannel now tracked in OverallQuizView)
         MixpanelManager.shared.trackOnboardingMarketingData(
-            acquisitionChannel: result.acquisitionChannel,
+            acquisitionChannel: nil,
             previousAppExperience: result.previousAppExperience
         )
 
@@ -374,24 +374,10 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [15, 40, 70, 100]
         ),
 
-        // ============ PHASE 2: MARKETING (Q9-Q10) ============
+        // ============ PHASE 2: MARKETING (Q9) ============
         // Questions pour analytics (pas de scoring)
 
-        // Q9 - ACQUISITION: Comment découvert
-        HabitsQuestion(
-            text: "onboarding_v2.habits.q9".localized,
-            options: [
-                "onboarding_v2.habits.q9_opt1".localized,
-                "onboarding_v2.habits.q9_opt2".localized,
-                "onboarding_v2.habits.q9_opt3".localized,
-                "onboarding_v2.habits.q9_opt4".localized,
-                "onboarding_v2.habits.q9_opt5".localized,
-                "onboarding_v2.habits.q9_opt6".localized
-            ],
-            scoring: [0, 0, 0, 0, 0, 0] // Pas de scoring, juste tracking
-        ),
-
-        // Q10 - EXPÉRIENCE: Apps similaires
+        // Q9 - EXPÉRIENCE: Apps similaires
         HabitsQuestion(
             text: "onboarding_v2.habits.q10".localized,
             options: [
@@ -403,9 +389,9 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [0, 0, 0, 0] // Pas de scoring, juste tracking
         ),
 
-        // ============ PHASE 3: ENGAGEMENT (Q11-Q12) ============
+        // ============ PHASE 3: ENGAGEMENT (Q10-Q11) ============
 
-        // Q11 - OBJECTIF: Ce qu'ils veulent améliorer
+        // Q10 - OBJECTIF: Ce qu'ils veulent améliorer
         HabitsQuestion(
             text: "onboarding_v2.habits.q11".localized,
             options: [
@@ -418,7 +404,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [0, 0, 0, 0, 0] // Utilisé pour primaryGoal
         ),
 
-        // Q12 - TEMPS: Disponibilité quotidienne
+        // Q11 - TEMPS: Disponibilité quotidienne
         HabitsQuestion(
             text: "onboarding_v2.habits.q12".localized,
             options: [
@@ -530,32 +516,26 @@ struct HabitsQuizResult {
     /// Pour compatibilité - pas de baseline, retourne valeur fixe
     var habitsScore: Int { globalScore }
 
-    // MARK: - Marketing Data (Q9-Q10)
+    // MARK: - Marketing Data (Q9)
 
-    /// Canal d'acquisition (Q9)
-    var acquisitionChannel: String {
-        let channels = ["App Store", "Instagram", "TikTok", "Bouche à oreille", "Publicité", "Autre"]
-        return channels[safe: answers[8]] ?? "Autre"
-    }
-
-    /// Expérience avec apps similaires (Q10)
+    /// Expérience avec apps similaires (Q9)
     var previousAppExperience: String {
         let experiences = ["Première app", "A arrêté", "En utilise une autre", "Plusieurs essayées"]
-        return experiences[safe: answers[9]] ?? "Première app"
+        return experiences[safe: answers[8]] ?? "Première app"
     }
 
-    // MARK: - Objectif et disponibilité (Q11-Q12)
+    // MARK: - Objectif et disponibilité (Q10-Q11)
 
-    /// Objectif principal choisi par l'user (Q11)
+    /// Objectif principal choisi par l'user (Q10)
     var primaryGoal: String {
         let goals = ["sleep", "stress", "energy", "focus", "balance"]
-        return goals[safe: answers[10]] ?? "balance"
+        return goals[safe: answers[9]] ?? "balance"
     }
 
-    /// Temps disponible par jour en minutes (Q12)
+    /// Temps disponible par jour en minutes (Q11)
     var availableTime: Int {
         let times = [10, 22, 37, 52, 75]
-        return times[safe: answers[11]] ?? 22
+        return times[safe: answers[10]] ?? 22
     }
 
     // MARK: - Compatibilité baselineData (simplifié)
@@ -616,13 +596,12 @@ extension Array {
 
 #Preview {
     HabitsQuizView { result in
-        print("Quiz completed (12 questions):")
+        print("Quiz completed (11 questions):")
         print("- Stress/Sérénité: \(result.stressScore)")
         print("- Sommeil: \(result.sleepScore)")
         print("- Énergie: \(result.energyScore)")
         print("- Focus: \(result.focusScore)")
         print("- Global: \(result.globalScore)")
-        print("- Canal acquisition: \(result.acquisitionChannel)")
         print("- Expérience apps: \(result.previousAppExperience)")
         print("- Objectif: \(result.primaryGoal)")
         print("- Temps disponible: \(result.availableTime) min")

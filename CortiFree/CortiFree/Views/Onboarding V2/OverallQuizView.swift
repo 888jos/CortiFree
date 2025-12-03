@@ -17,12 +17,13 @@ struct OverallQuizView: View {
     @State private var selectedGender: Int? = nil
     @State private var selectedAge: Int? = nil
     @State private var selectedReasons: Set<Int> = []
+    @State private var selectedAcquisition: Int? = nil
     @State private var selectedDuration: Int? = nil
     @State private var isGoingBack: Bool = false
     @State private var quizStartTime: Date?
     @FocusState private var isTextFieldFocused: Bool
 
-    private let totalQuestions = 5
+    private let totalQuestions = 6
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -76,15 +77,22 @@ struct OverallQuizView: View {
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 3 {
-                        reasonQuestion
+                        acquisitionQuestion
                             .id(3)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 4 {
-                        durationQuestion
+                        reasonQuestion
                             .id(4)
+                            .transition(.asymmetric(
+                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                removal: .move(edge: isGoingBack ? .trailing : .leading)
+                            ))
+                    } else if currentQuestionIndex == 5 {
+                        durationQuestion
+                            .id(5)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
@@ -402,7 +410,119 @@ struct OverallQuizView: View {
         }
     }
 
-    // MARK: - Question 3: Reason (Multiple Choice)
+    // MARK: - Question 4: Acquisition (How discovered CortiFree)
+
+    private var acquisitionQuestion: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Question text
+            Text("onboarding_v2.habits.q9".localized)
+                .font(.custom("Poppins-Medium", size: 18))
+                .foregroundColor(.white)
+                .lineSpacing(4)
+                .padding(.horizontal, 32)
+                .padding(.top, 20)
+                .padding(.bottom, 20)
+
+            // Answer buttons
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 22) {
+                    OverallAnswerButton(
+                        number: 1,
+                        text: "onboarding_v2.habits.q9_opt1".localized,
+                        isSelected: selectedAcquisition == 0,
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedAcquisition = 0
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                currentQuestionIndex += 1
+                            }
+                        }
+                    )
+
+                    OverallAnswerButton(
+                        number: 2,
+                        text: "onboarding_v2.habits.q9_opt2".localized,
+                        isSelected: selectedAcquisition == 1,
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedAcquisition = 1
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                currentQuestionIndex += 1
+                            }
+                        }
+                    )
+
+                    OverallAnswerButton(
+                        number: 3,
+                        text: "onboarding_v2.habits.q9_opt3".localized,
+                        isSelected: selectedAcquisition == 2,
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedAcquisition = 2
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                currentQuestionIndex += 1
+                            }
+                        }
+                    )
+
+                    OverallAnswerButton(
+                        number: 4,
+                        text: "onboarding_v2.habits.q9_opt4".localized,
+                        isSelected: selectedAcquisition == 3,
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedAcquisition = 3
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                currentQuestionIndex += 1
+                            }
+                        }
+                    )
+
+                    OverallAnswerButton(
+                        number: 5,
+                        text: "onboarding_v2.habits.q9_opt5".localized,
+                        isSelected: selectedAcquisition == 4,
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedAcquisition = 4
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                currentQuestionIndex += 1
+                            }
+                        }
+                    )
+
+                    OverallAnswerButton(
+                        number: 6,
+                        text: "onboarding_v2.habits.q9_opt6".localized,
+                        isSelected: selectedAcquisition == 5,
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedAcquisition = 5
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                currentQuestionIndex += 1
+                            }
+                        }
+                    )
+                }
+                .padding(.horizontal, 34)
+                .padding(.bottom, 40)
+            }
+        }
+    }
+
+    // MARK: - Question 5: Reason (Multiple Choice)
 
     private var reasonQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -468,7 +588,7 @@ struct OverallQuizView: View {
 
                     OverallAnswerButton(
                         number: 4,
-                        text: "onboarding_v2.overall.reason_focus".localized,
+                        text: "onboarding_v2.overall.reason_mental".localized,
                         isSelected: selectedReasons.contains(3),
                         onTap: {
                             HapticManager.light()
@@ -484,7 +604,7 @@ struct OverallQuizView: View {
 
                     OverallAnswerButton(
                         number: 5,
-                        text: "onboarding_v2.overall.reason_mental".localized,
+                        text: "onboarding_v2.overall.reason_difficult".localized,
                         isSelected: selectedReasons.contains(4),
                         onTap: {
                             HapticManager.light()
@@ -500,7 +620,7 @@ struct OverallQuizView: View {
 
                     OverallAnswerButton(
                         number: 6,
-                        text: "onboarding_v2.overall.reason_difficult".localized,
+                        text: "onboarding_v2.overall.reason_habits".localized,
                         isSelected: selectedReasons.contains(5),
                         onTap: {
                             HapticManager.light()
@@ -509,22 +629,6 @@ struct OverallQuizView: View {
                                     selectedReasons.remove(5)
                                 } else {
                                     selectedReasons.insert(5)
-                                }
-                            }
-                        }
-                    )
-
-                    OverallAnswerButton(
-                        number: 7,
-                        text: "onboarding_v2.overall.reason_habits".localized,
-                        isSelected: selectedReasons.contains(6),
-                        onTap: {
-                            HapticManager.light()
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                if selectedReasons.contains(6) {
-                                    selectedReasons.remove(6)
-                                } else {
-                                    selectedReasons.insert(6)
                                 }
                             }
                         }
@@ -667,11 +771,18 @@ struct OverallQuizView: View {
             "onboarding_v2.overall.age_45_54".localized,
             "onboarding_v2.overall.age_55_plus".localized
         ]
+        let acquisitionOptions = [
+            "App Store",
+            "Instagram",
+            "TikTok",
+            "Bouche à oreille",
+            "Publicité",
+            "Autre"
+        ]
         let reasonOptions = [
             "onboarding_v2.overall.reason_sleep".localized,
             "onboarding_v2.overall.reason_anxiety".localized,
             "onboarding_v2.overall.reason_energy".localized,
-            "onboarding_v2.overall.reason_focus".localized,
             "onboarding_v2.overall.reason_mental".localized,
             "onboarding_v2.overall.reason_difficult".localized,
             "onboarding_v2.overall.reason_habits".localized
@@ -685,11 +796,13 @@ struct OverallQuizView: View {
         ]
 
         let selectedReasonTexts = selectedReasons.sorted().map { reasonOptions[$0] }
+        let acquisitionChannel = acquisitionOptions[selectedAcquisition ?? 5]
 
         let data = OverallQuizData(
             firstName: firstName.trimmingCharacters(in: .whitespacesAndNewlines),
             gender: genderOptions[selectedGender ?? 0],
             age: ageOptions[selectedAge ?? 0],
+            acquisitionChannel: acquisitionChannel,
             reasons: selectedReasonTexts,
             duration: durationOptions[selectedDuration ?? 0]
         )
@@ -706,6 +819,12 @@ struct OverallQuizView: View {
             stressReasons: selectedReasonTexts,
             stressDuration: durationOptions[selectedDuration ?? 0],
             timeToComplete: totalTime
+        )
+
+        // Track acquisition channel separately
+        MixpanelManager.shared.trackOnboardingMarketingData(
+            acquisitionChannel: acquisitionChannel,
+            previousAppExperience: nil
         )
 
         onComplete(data)
@@ -782,6 +901,7 @@ struct OverallQuizData {
     let firstName: String
     let gender: String
     let age: String
+    let acquisitionChannel: String
     let reasons: [String]
     let duration: String
 }

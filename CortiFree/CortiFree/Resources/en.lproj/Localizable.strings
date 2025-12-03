@@ -216,6 +216,24 @@
 "tasks.todo" = "To do";
 "tasks.done" = "Done";
 "tasks.skipped" = "Skipped";
+"tasks.day_counter" = "Day %d/66";
+"tasks.day_counter_extended" = "Day %d";
+"tasks.error_loading" = "Loading error";
+"tasks.retry" = "Retry";
+"tasks.skip" = "Skip";
+"tasks.validate" = "Validate";
+"tasks.task_skipped" = "Task skipped";
+"tasks.empty.todo_title" = "No tasks to do";
+"tasks.empty.todo_message" = "All your tasks are completed or skipped for today";
+"tasks.empty.done_title" = "No tasks completed";
+"tasks.empty.done_message" = "Complete tasks to see them here";
+"tasks.empty.skipped_title" = "No skipped tasks";
+"tasks.empty.skipped_message" = "Skipped tasks will appear here";
+"tasks.week_locked_title" = "Week %d locked";
+"tasks.week_locked_current" = "You are currently on week %d of your program.";
+"tasks.week_locked_unlock" = "Week %d tasks will automatically unlock when you reach this week.";
+"tasks.week_locked_encouragement" = "Keep up the great work! 💪";
+"tasks.understood" = "Got it";
 
 // MARK: - Habits
 "habit.wake_before_7" = "Wake up before 7am";
@@ -250,6 +268,46 @@
 "habit.nature" = "Time in nature";
 "habit.sleep" = "Wake up at 7am";
 "habit.social" = "Social interactions";
+
+// MARK: - Habit Variant Titles
+// Sleep variants (progressive)
+"habit.wake_before_8h30" = "Wake up before 8:30am";
+"habit.wake_before_8h" = "Wake up before 8am";
+"habit.wake_before_7h30" = "Wake up before 7:30am";
+"habit.wake_before_7h" = "Wake up before 7am";
+"habit.sleep_before_23h30" = "Go to bed before 11:30pm";
+"habit.sleep_before_23h" = "Go to bed before 11pm";
+"habit.sleep_before_22h30" = "Go to bed before 10:30pm";
+"habit.sleep_before_22h" = "Go to bed before 10pm";
+
+// Single variants
+"habit.breathing_title" = "Breathing exercise";
+"habit.meditation_title" = "Meditate 10 minutes";
+"habit.journal_title" = "Write in your journal";
+"habit.water_title" = "Drink at least %@";
+"habit.water_title_legacy" = "Drink at least 2.5L of water";
+
+// Nature variants
+"habit.nature_walk" = "Outdoor walk";
+"habit.nature_trek" = "Nature trek";
+"habit.nature_bike" = "Ride in the fresh air";
+
+// Sport variants
+"habit.sport_boxing" = "Boxing session";
+"habit.sport_jump_rope" = "Jump rope cardio";
+"habit.sport_dance" = "Free yourself dancing";
+"habit.sport_stretching" = "Deep stretching";
+"habit.sport_swimming" = "Swimming session";
+"habit.sport_strength" = "Strength training";
+"habit.sport_running" = "Run freely";
+
+// Social variants
+"habit.social_creative" = "Creative moment together";
+"habit.social_call" = "Call a loved one";
+"habit.social_meal" = "Shared meal";
+"habit.social_movie" = "Movie night";
+"habit.social_games" = "Game night";
+"habit.social_drinks" = "Drinks with friends";
 
 // MARK: - Habit Details
 "habit.days" = "days";
@@ -2507,6 +2565,7 @@
 "task.detail.progression_66_days" = "66-day progression";
 "task.detail.occurrences" = "occurrences";
 "task.detail.this_month" = "this month";
+"task.detail.total" = "total";
 "task.detail.habit_improves" = "This habit improves";
 "task.detail.cortifree_score_domains" = "Your CortiFree score in these areas";
 "task.detail.domain.global" = "Global";
@@ -2834,6 +2893,14 @@
 "onboarding_v2.auth.token_error" = "Unable to retrieve token";
 "onboarding_v2.auth.apple_title" = "Sign in with Apple";
 "onboarding_v2.auth.apple_description" = "Sign in quickly and securely with your Apple account";
+"onboarding_v2.auth.other_method" = "Other method";
+"onboarding_v2.auth.enter_info" = "Enter your information";
+"onboarding_v2.auth.enter_credentials" = "Enter your credentials";
+"onboarding_v2.auth.first_name_label" = "First name";
+"onboarding_v2.auth.password_label" = "Password";
+"onboarding_v2.auth.password_min_chars" = "Min. 6 characters";
+"onboarding_v2.auth.confirm_password_label" = "Confirm password";
+"onboarding_v2.auth.confirm_placeholder" = "Confirm";
 
 // MARK: - Onboarding V2 - Loading Analysis
 "onboarding_v2.loading.title" = "Calculating";
@@ -3016,6 +3083,30 @@
 "onboarding_v2.eight_habits.intro_see_change" = "Discover how your life will change in 66 days\nthanks to these 8 habits:";
 "onboarding_v2.eight_habits.impact_title" = "Impact after 10 weeks";
 
+// Impact labels for habits
+"onboarding_v2.eight_habits.impact.lung_capacity" = "Lung\ncapacity";
+"onboarding_v2.eight_habits.impact.stress_level" = "Stress\nlevel";
+"onboarding_v2.eight_habits.impact.heart_health" = "Heart\nhealth";
+"onboarding_v2.eight_habits.impact.emotional_resilience" = "Emotional\nresilience";
+"onboarding_v2.eight_habits.impact.cortisol_level" = "Cortisol\nlevel";
+"onboarding_v2.eight_habits.impact.mental_focus" = "Mental\nfocus";
+"onboarding_v2.eight_habits.impact.mental_clarity" = "Mental\nclarity";
+"onboarding_v2.eight_habits.impact.emotion_management" = "Emotion\nmanagement";
+"onboarding_v2.eight_habits.impact.gratitude_level" = "Gratitude\nlevel";
+"onboarding_v2.eight_habits.impact.muscle_tone" = "Muscle\ntone";
+"onboarding_v2.eight_habits.impact.endorphin_level" = "Endorphin\nlevel";
+"onboarding_v2.eight_habits.impact.joint_health" = "Joint\nhealth";
+"onboarding_v2.eight_habits.impact.hydration_level" = "Hydration\nlevel";
+"onboarding_v2.eight_habits.impact.skin_quality" = "Skin\nquality";
+"onboarding_v2.eight_habits.impact.nature_connection" = "Nature\nconnection";
+"onboarding_v2.eight_habits.impact.immune_system" = "Immune\nsystem";
+"onboarding_v2.eight_habits.impact.energy_level" = "Energy\nlevel";
+"onboarding_v2.eight_habits.impact.sleep_quality" = "Sleep\nquality";
+"onboarding_v2.eight_habits.impact.cognitive_performance" = "Cognitive\nperformance";
+"onboarding_v2.eight_habits.impact.social_bond" = "Social\nbond";
+"onboarding_v2.eight_habits.impact.emotional_wellbeing" = "Emotional\nwellbeing";
+"onboarding_v2.eight_habits.impact.resilience" = "Resilience";
+
 // MARK: - Onboarding V2 - Week Progress View
 "onboarding_v2.week_progress.your_journey" = "Your journey";
 "onboarding_v2.week_progress.week" = "Week";
@@ -3171,3 +3262,64 @@
 
 // Common
 "common.save" = "Save";
+
+// MARK: - Settings View Sections
+"settings.section.profile" = "Profile & Language";
+"settings.section.statistics" = "Statistics";
+"settings.section.privacy" = "Privacy & Security";
+"settings.section.about" = "About & Support";
+
+// MARK: - Settings Alerts
+"settings.alert.signout.title" = "Log out";
+"settings.alert.signout.message" = "Are you sure you want to log out of your account?";
+"settings.alert.delete.title" = "Delete account";
+"settings.alert.delete.message" = "This action is irreversible. All your data will be permanently deleted.";
+"settings.alert.delete.button" = "Delete";
+"settings.alert.language_restart.message" = "The app will restart to apply the language change.";
+"settings.alert.reset_defaults.title" = "Reset settings";
+"settings.alert.reset_defaults.message" = "This will reset all settings to their default values.";
+"settings.alert.reset_defaults.button" = "Reset";
+"settings.alert.clear_data.title" = "Clear all data";
+"settings.alert.clear_data.message" = "This will delete all your local data. This action cannot be undone.";
+"settings.alert.clear_data.button" = "Clear";
+
+// MARK: - Settings Statistics Section
+"settings.streak.title" = "Current streak";
+"settings.streak.subtitle" = "Consecutive days of activity";
+"settings.streak.days" = "%d days";
+"settings.program.title" = "Program progress";
+"settings.program.subtitle" = "Current week and day";
+"settings.program.week_day" = "Week %d, Day %d";
+
+// MARK: - Settings Sync
+"settings.sync.last_sync" = "Last sync: %@";
+"settings.sync.error" = "Sync error: %@";
+"settings.sync.auto" = "Automatic sync enabled";
+
+// MARK: - Settings Subscription
+"settings.subscription.status" = "Subscription status";
+"settings.subscription.manage" = "Manage subscription";
+"settings.subscription.manage_subtitle" = "Modify or cancel";
+"settings.subscription.restore" = "Restore purchases";
+"settings.signout" = "Log out";
+
+// MARK: - Settings Privacy
+"settings.privacy.policy" = "Privacy Policy";
+"settings.privacy.terms" = "Terms of Use";
+"settings.privacy.delete_account" = "Delete my account";
+"settings.privacy.delete_account_subtitle" = "Irreversible action";
+"settings.privacy.icloud_subtitle" = "Sync your data across devices";
+
+// MARK: - Settings About
+"settings.about.version" = "Version";
+"settings.about.contact" = "Contact support";
+"settings.about.faq" = "FAQ";
+"settings.about.rate" = "Rate the app";
+"settings.about.rate_subtitle" = "Help us improve";
+"settings.about.follow" = "Follow CortiFree";
+
+// MARK: - Settings Notifications
+"settings.notifications.subtitle" = "Receive daily reminders";
+
+// MARK: - Task Detail
+"task.detail.total" = "total";
