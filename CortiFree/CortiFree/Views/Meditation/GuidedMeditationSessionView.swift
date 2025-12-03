@@ -11,7 +11,7 @@ import SwiftUI
 struct GuidedMeditationSessionView: View {
     let support: MeditationSupport
     @Environment(\.dismiss) var dismiss
-    @StateObject private var planetSettings = PlanetSettings.shared
+    @ObservedObject private var planetSettings = PlanetSettings.shared
 
     @State private var currentStepIndex = 0
     @State private var isCompleted = false

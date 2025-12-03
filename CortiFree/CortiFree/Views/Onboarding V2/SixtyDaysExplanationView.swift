@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SixtyDaysExplanationView: View {
     let onContinue: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var screenViewTime: Date?
 
     var body: some View {
@@ -22,7 +23,7 @@ struct SixtyDaysExplanationView: View {
                     // Title with gradient on "66 jours"
                     VStack(spacing: 6) {
                         // Première partie
-                        Text("Des études scientifiques le confirment : ")
+                        Text("onboarding_v2.sixty_days.studies_confirm".localized)
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(Color(hex: "B794F6").opacity(0.8))
                             .multilineTextAlignment(.center)
@@ -32,7 +33,7 @@ struct SixtyDaysExplanationView: View {
                     .padding(.bottom, 12)
 
                     // "66 jours" - Grande police avec gradient
-                    Text("66 jours")
+                    Text("onboarding_v2.sixty_days.days".localized)
                         .font(.custom("Faro-BoldLucky", size: 64))
                         .foregroundStyle(
                             LinearGradient(
@@ -51,12 +52,12 @@ struct SixtyDaysExplanationView: View {
 
                     // Deuxième partie
                     VStack(spacing: 6) {
-                        Text("c'est le temps nécessaire pour ancrer une ")
+                        Text("onboarding_v2.sixty_days.time_needed".localized)
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(Color(hex: "B794F6").opacity(0.8))
                             .multilineTextAlignment(.center)
 
-                        Text(" habitude et transformer réellement sa vie.")
+                        Text("onboarding_v2.sixty_days.habit_transform".localized)
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(Color(hex: "B794F6").opacity(0.8))
                             .multilineTextAlignment(.center)
@@ -68,13 +69,13 @@ struct SixtyDaysExplanationView: View {
                     VStack(spacing: 16) {
                         HStack(spacing: 16) {
                             BenefitStatCard(
-                                title: "Boostez votre énergie",
+                                title: "onboarding_v2.sixty_days.boost_energy".localized,
                                 percentage: "38%",
                                 color: Color(hex: "B794F6")
                             )
 
                             BenefitStatCard(
-                                title: "Réduisez la fatigue",
+                                title: "onboarding_v2.sixty_days.reduce_fatigue".localized,
                                 percentage: "15%",
                                 color: Color(hex: "B794F6")
                             )
@@ -82,13 +83,13 @@ struct SixtyDaysExplanationView: View {
 
                         HStack(spacing: 16) {
                             BenefitStatCard(
-                                title: "Gagnez en sérénité",
+                                title: "onboarding_v2.sixty_days.gain_serenity".localized,
                                 percentage: "27%",
                                 color: Color(hex: "B794F6")
                             )
 
                             BenefitStatCard(
-                                title: "Améliorez votre focus",
+                                title: "onboarding_v2.sixty_days.improve_focus".localized,
                                 percentage: "24%",
                                 color: Color(hex: "B794F6")
                             )
@@ -99,7 +100,7 @@ struct SixtyDaysExplanationView: View {
 
                     // Scientific Research Section
                     VStack(alignment: .leading, spacing: 0) {
-                        Text("Recherche scientifique")
+                        Text("onboarding_v2.sixty_days.scientific_research".localized)
                             .font(.custom("Poppins-SemiBold", size: 20))
                             .foregroundColor(.white)
 
@@ -174,7 +175,7 @@ struct SixtyDaysExplanationView: View {
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
 
-                        Text("Suivant")
+                        Text("onboarding_v2.sixty_days.next".localized)
                             .font(.custom("Poppins-SemiBold", size: 18))
                             .foregroundColor(.white)
                     }

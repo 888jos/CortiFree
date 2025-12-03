@@ -514,7 +514,7 @@ struct JournalHomeView: View {
 
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "fr_FR")
+        formatter.locale = LanguageManager.shared.currentLanguage.locale
         formatter.dateFormat = "EEEE d MMMM yyyy"
         return formatter.string(from: date).capitalized
     }

@@ -11,6 +11,7 @@ import SwiftUI
 struct OverallQuizView: View {
     let onComplete: (OverallQuizData) -> Void
 
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentQuestionIndex: Int = 0
     @State private var firstName: String = ""
     @State private var selectedGender: Int? = nil
@@ -153,10 +154,8 @@ struct OverallQuizView: View {
             .frame(height: 8)
             .padding(.horizontal, 16)
 
-            // Language flag (right)
-            Text("🇫🇷 FRA")
-                .font(.custom("Poppins-Medium", size: 10))
-                .foregroundColor(.white)
+            // Language selector button (right)
+            LanguageSelectorButton()
                 .padding(.trailing, 30)
         }
         .frame(height: 20)
@@ -167,7 +166,7 @@ struct OverallQuizView: View {
     private var firstNameQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
-            Text("Comment puis-je t'appeler ?")
+            Text("onboarding_v2.overall.name_question".localized)
                 .font(.custom("Poppins-Medium", size: 18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
@@ -179,7 +178,7 @@ struct OverallQuizView: View {
             VStack(spacing: 20) {
                 ZStack(alignment: .leading) {
                     if firstName.isEmpty {
-                        Text("Ton prénom")
+                        Text("onboarding_v2.overall.name_placeholder".localized)
                             .foregroundColor(Color.white.opacity(0.5))
                             .font(.custom("Poppins-Medium", size: 16))
                             .padding(.horizontal, 20)
@@ -233,7 +232,7 @@ struct OverallQuizView: View {
     private var genderQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
-            Text("Quel est ton genre ?")
+            Text("onboarding_v2.overall.gender_question".localized)
                 .font(.custom("Poppins-Medium", size: 18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
@@ -245,7 +244,7 @@ struct OverallQuizView: View {
             VStack(spacing: 22) {
                 OverallAnswerButton(
                     number: 1,
-                    text: "Homme",
+                    text: "onboarding_v2.overall.gender_male".localized,
                     isSelected: selectedGender == 0,
                     onTap: {
                         HapticManager.light()
@@ -260,7 +259,7 @@ struct OverallQuizView: View {
 
                 OverallAnswerButton(
                     number: 2,
-                    text: "Femme",
+                    text: "onboarding_v2.overall.gender_female".localized,
                     isSelected: selectedGender == 1,
                     onTap: {
                         HapticManager.light()
@@ -275,7 +274,7 @@ struct OverallQuizView: View {
 
                 OverallAnswerButton(
                     number: 3,
-                    text: "Préfère ne pas dire",
+                    text: "onboarding_v2.overall.gender_other".localized,
                     isSelected: selectedGender == 2,
                     onTap: {
                         HapticManager.light()
@@ -298,7 +297,7 @@ struct OverallQuizView: View {
     private var ageQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
-            Text("Quel âge as-tu ?")
+            Text("onboarding_v2.overall.age_question".localized)
                 .font(.custom("Poppins-Medium", size: 18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
@@ -310,7 +309,7 @@ struct OverallQuizView: View {
             VStack(spacing: 22) {
                 OverallAnswerButton(
                     number: 1,
-                    text: "18-24 ans",
+                    text: "onboarding_v2.overall.age_under_18".localized,
                     isSelected: selectedAge == 0,
                     onTap: {
                         HapticManager.light()
@@ -319,14 +318,13 @@ struct OverallQuizView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             currentQuestionIndex += 1
-                            selectedAge = nil
                         }
                     }
                 )
 
                 OverallAnswerButton(
                     number: 2,
-                    text: "25-34 ans",
+                    text: "onboarding_v2.overall.age_18_24".localized,
                     isSelected: selectedAge == 1,
                     onTap: {
                         HapticManager.light()
@@ -335,14 +333,13 @@ struct OverallQuizView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             currentQuestionIndex += 1
-                            selectedAge = nil
                         }
                     }
                 )
 
                 OverallAnswerButton(
                     number: 3,
-                    text: "35-44 ans",
+                    text: "onboarding_v2.overall.age_25_34".localized,
                     isSelected: selectedAge == 2,
                     onTap: {
                         HapticManager.light()
@@ -351,14 +348,13 @@ struct OverallQuizView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             currentQuestionIndex += 1
-                            selectedAge = nil
                         }
                     }
                 )
 
                 OverallAnswerButton(
                     number: 4,
-                    text: "45-54 ans",
+                    text: "onboarding_v2.overall.age_35_44".localized,
                     isSelected: selectedAge == 3,
                     onTap: {
                         HapticManager.light()
@@ -367,14 +363,13 @@ struct OverallQuizView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             currentQuestionIndex += 1
-                            selectedAge = nil
                         }
                     }
                 )
 
                 OverallAnswerButton(
                     number: 5,
-                    text: "55-64 ans",
+                    text: "onboarding_v2.overall.age_45_54".localized,
                     isSelected: selectedAge == 4,
                     onTap: {
                         HapticManager.light()
@@ -383,14 +378,13 @@ struct OverallQuizView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             currentQuestionIndex += 1
-                            selectedAge = nil
                         }
                     }
                 )
 
                 OverallAnswerButton(
                     number: 6,
-                    text: "65 ans et plus",
+                    text: "onboarding_v2.overall.age_55_plus".localized,
                     isSelected: selectedAge == 5,
                     onTap: {
                         HapticManager.light()
@@ -399,7 +393,6 @@ struct OverallQuizView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             currentQuestionIndex += 1
-                            selectedAge = nil
                         }
                     }
                 )
@@ -414,7 +407,7 @@ struct OverallQuizView: View {
     private var reasonQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
-            Text("Qu'est-ce qui t'a poussé à télécharger CortiFree aujourd'hui ?")
+            Text("onboarding_v2.overall.reason_question".localized)
                 .font(.custom("Poppins-Medium", size: 18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
@@ -423,109 +416,143 @@ struct OverallQuizView: View {
                 .padding(.bottom, 20)
 
             // Answer buttons
-            VStack(spacing: 22) {
-                OverallAnswerButton(
-                    number: 1,
-                    text: "Je dors très mal",
-                    isSelected: selectedReasons.contains(0),
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            if selectedReasons.contains(0) {
-                                selectedReasons.remove(0)
-                            } else {
-                                selectedReasons.insert(0)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 22) {
+                    OverallAnswerButton(
+                        number: 1,
+                        text: "onboarding_v2.overall.reason_sleep".localized,
+                        isSelected: selectedReasons.contains(0),
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if selectedReasons.contains(0) {
+                                    selectedReasons.remove(0)
+                                } else {
+                                    selectedReasons.insert(0)
+                                }
                             }
                         }
-                    }
-                )
+                    )
 
-                OverallAnswerButton(
-                    number: 2,
-                    text: "Je me sens anxieux en permanence",
-                    isSelected: selectedReasons.contains(1),
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            if selectedReasons.contains(1) {
-                                selectedReasons.remove(1)
-                            } else {
-                                selectedReasons.insert(1)
+                    OverallAnswerButton(
+                        number: 2,
+                        text: "onboarding_v2.overall.reason_anxiety".localized,
+                        isSelected: selectedReasons.contains(1),
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if selectedReasons.contains(1) {
+                                    selectedReasons.remove(1)
+                                } else {
+                                    selectedReasons.insert(1)
+                                }
                             }
                         }
-                    }
-                )
+                    )
 
-                OverallAnswerButton(
-                    number: 3,
-                    text: "Je suis constamment épuisé",
-                    isSelected: selectedReasons.contains(2),
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            if selectedReasons.contains(2) {
-                                selectedReasons.remove(2)
-                            } else {
-                                selectedReasons.insert(2)
+                    OverallAnswerButton(
+                        number: 3,
+                        text: "onboarding_v2.overall.reason_energy".localized,
+                        isSelected: selectedReasons.contains(2),
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if selectedReasons.contains(2) {
+                                    selectedReasons.remove(2)
+                                } else {
+                                    selectedReasons.insert(2)
+                                }
                             }
                         }
-                    }
-                )
+                    )
 
-                OverallAnswerButton(
-                    number: 4,
-                    text: "Je n'arrive plus à me concentrer",
-                    isSelected: selectedReasons.contains(3),
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            if selectedReasons.contains(3) {
-                                selectedReasons.remove(3)
-                            } else {
-                                selectedReasons.insert(3)
+                    OverallAnswerButton(
+                        number: 4,
+                        text: "onboarding_v2.overall.reason_focus".localized,
+                        isSelected: selectedReasons.contains(3),
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if selectedReasons.contains(3) {
+                                    selectedReasons.remove(3)
+                                } else {
+                                    selectedReasons.insert(3)
+                                }
                             }
                         }
-                    }
-                )
+                    )
 
-                OverallAnswerButton(
-                    number: 5,
-                    text: "Je veux améliorer mon bien-être",
-                    isSelected: selectedReasons.contains(4),
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            if selectedReasons.contains(4) {
-                                selectedReasons.remove(4)
-                            } else {
-                                selectedReasons.insert(4)
+                    OverallAnswerButton(
+                        number: 5,
+                        text: "onboarding_v2.overall.reason_mental".localized,
+                        isSelected: selectedReasons.contains(4),
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if selectedReasons.contains(4) {
+                                    selectedReasons.remove(4)
+                                } else {
+                                    selectedReasons.insert(4)
+                                }
                             }
                         }
-                    }
-                )
+                    )
 
-                // Continue button
-                if !selectedReasons.isEmpty {
-                    Button(action: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            currentQuestionIndex += 1
+                    OverallAnswerButton(
+                        number: 6,
+                        text: "onboarding_v2.overall.reason_difficult".localized,
+                        isSelected: selectedReasons.contains(5),
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if selectedReasons.contains(5) {
+                                    selectedReasons.remove(5)
+                                } else {
+                                    selectedReasons.insert(5)
+                                }
+                            }
                         }
-                    }) {
-                        Text(StringKeys.Common.continueButton)
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 54)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 40))
+                    )
+
+                    OverallAnswerButton(
+                        number: 7,
+                        text: "onboarding_v2.overall.reason_habits".localized,
+                        isSelected: selectedReasons.contains(6),
+                        onTap: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if selectedReasons.contains(6) {
+                                    selectedReasons.remove(6)
+                                } else {
+                                    selectedReasons.insert(6)
+                                }
+                            }
+                        }
+                    )
+
+                    // Continue button
+                    if !selectedReasons.isEmpty {
+                        Button(action: {
+                            HapticManager.light()
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                currentQuestionIndex += 1
+                            }
+                        }) {
+                            Text(StringKeys.Common.continueButton)
+                                .font(.custom("Poppins-SemiBold", size: 16))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 40))
+                        }
+                        .padding(.top, 8)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
-                    .padding(.top, 8)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
+                .padding(.horizontal, 34)
+                .padding(.bottom, 40)
             }
-            .padding(.horizontal, 34)
-            .padding(.bottom, 40)
         }
     }
 
@@ -534,7 +561,7 @@ struct OverallQuizView: View {
     private var durationQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
-            Text("Depuis combien de temps ressens-tu ces difficultés ?")
+            Text("onboarding_v2.overall.duration_question".localized)
                 .font(.custom("Poppins-Medium", size: 18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
@@ -546,7 +573,7 @@ struct OverallQuizView: View {
             VStack(spacing: 22) {
                 OverallAnswerButton(
                     number: 1,
-                    text: "Quelques semaines",
+                    text: "onboarding_v2.overall.duration_weeks".localized,
                     isSelected: selectedDuration == 0,
                     onTap: {
                         HapticManager.light()
@@ -561,7 +588,7 @@ struct OverallQuizView: View {
 
                 OverallAnswerButton(
                     number: 2,
-                    text: "2 à 6 mois",
+                    text: "onboarding_v2.overall.duration_2_6_months".localized,
                     isSelected: selectedDuration == 1,
                     onTap: {
                         HapticManager.light()
@@ -576,7 +603,7 @@ struct OverallQuizView: View {
 
                 OverallAnswerButton(
                     number: 3,
-                    text: "6 mois à 1 an",
+                    text: "onboarding_v2.overall.duration_6_12_months".localized,
                     isSelected: selectedDuration == 2,
                     onTap: {
                         HapticManager.light()
@@ -591,7 +618,7 @@ struct OverallQuizView: View {
 
                 OverallAnswerButton(
                     number: 4,
-                    text: "Plus d'un an",
+                    text: "onboarding_v2.overall.duration_1_year_plus".localized,
                     isSelected: selectedDuration == 3,
                     onTap: {
                         HapticManager.light()
@@ -606,7 +633,7 @@ struct OverallQuizView: View {
 
                 OverallAnswerButton(
                     number: 5,
-                    text: "Plusieurs années",
+                    text: "onboarding_v2.overall.duration_years".localized,
                     isSelected: selectedDuration == 4,
                     onTap: {
                         HapticManager.light()
@@ -627,16 +654,35 @@ struct OverallQuizView: View {
     // MARK: - Complete Quiz
 
     private func completeQuiz() {
-        let genderOptions = ["Homme", "Femme", "Préfère ne pas dire"]
-        let ageOptions = ["18-24 ans", "25-34 ans", "35-44 ans", "45-54 ans", "55-64 ans", "65 ans et plus"]
-        let reasonOptions = [
-            "Je dors très mal",
-            "Je me sens anxieux en permanence",
-            "Je suis constamment épuisé",
-            "Je n'arrive plus à me concentrer",
-            "Je veux améliorer mon bien-être"
+        let genderOptions = [
+            "onboarding_v2.overall.gender_male".localized,
+            "onboarding_v2.overall.gender_female".localized,
+            "onboarding_v2.overall.gender_other".localized
         ]
-        let durationOptions = ["Quelques semaines", "2 à 6 mois", "6 mois à 1 an", "Plus d'un an", "Plusieurs années"]
+        let ageOptions = [
+            "onboarding_v2.overall.age_under_18".localized,
+            "onboarding_v2.overall.age_18_24".localized,
+            "onboarding_v2.overall.age_25_34".localized,
+            "onboarding_v2.overall.age_35_44".localized,
+            "onboarding_v2.overall.age_45_54".localized,
+            "onboarding_v2.overall.age_55_plus".localized
+        ]
+        let reasonOptions = [
+            "onboarding_v2.overall.reason_sleep".localized,
+            "onboarding_v2.overall.reason_anxiety".localized,
+            "onboarding_v2.overall.reason_energy".localized,
+            "onboarding_v2.overall.reason_focus".localized,
+            "onboarding_v2.overall.reason_mental".localized,
+            "onboarding_v2.overall.reason_difficult".localized,
+            "onboarding_v2.overall.reason_habits".localized
+        ]
+        let durationOptions = [
+            "onboarding_v2.overall.duration_weeks".localized,
+            "onboarding_v2.overall.duration_2_6_months".localized,
+            "onboarding_v2.overall.duration_6_12_months".localized,
+            "onboarding_v2.overall.duration_1_year_plus".localized,
+            "onboarding_v2.overall.duration_years".localized
+        ]
 
         let selectedReasonTexts = selectedReasons.sorted().map { reasonOptions[$0] }
 

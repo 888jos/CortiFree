@@ -47,12 +47,13 @@ class OptimizedFirebaseService {
 
             // 3. Execute batch write (single network call)
             batch.commit { error in
+                #if DEBUG
                 if let error = error {
                     print("❌ Batch write error: \(error)")
                 } else {
                     print("✅ Data saved successfully in background")
-                    // Le plan est universel pour tous les utilisateurs (SimplifiedRoutineProgram)
                 }
+                #endif
             }
         }
     }
@@ -78,8 +79,8 @@ class OptimizedFirebaseService {
             "preferences": [
                 "availableTime": baseline.availableTime,
                 "preferredIntensity": baseline.preferredIntensity,
-                "hasPhysicalLimitations": result.hasPhysicalLimitations,
-                "preferredTimeOfDay": result.preferredTimeOfDay,
+                "hasPhysicalLimitations": false, // Removed from quiz
+                "preferredTimeOfDay": "morning", // Default value
                 "primaryGoal": result.primaryGoal
             ],
             "domainScores": [

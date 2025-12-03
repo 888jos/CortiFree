@@ -3,9 +3,10 @@
 //  CortiFree
 //
 //  Created by Claude on 11/11/2025.
-//  Enhanced Quiz: 25 questions including baseline assessment
-//  Q1-10: Baseline habits to prevent regression
-//  Q11-25: Domain assessment for personalized scoring
+//  Quiz de prise de conscience du stress - 12 questions situationnelles
+//  Q1-Q8: Questions pour calculer les scores (stress, sommeil, énergie, focus)
+//  Q9-Q10: Questions marketing (acquisition, expérience apps)
+//  Q11-Q12: Objectif et temps disponible
 //
 
 import SwiftUI
@@ -13,18 +14,15 @@ import SwiftUI
 struct HabitsQuizView: View {
     let onComplete: (HabitsQuizResult) -> Void
 
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentQuestionIndex: Int = 0
     @State private var selectedAnswer: Int? = nil
-    @State private var energySliderValue: Double = 5.0
-    @State private var waterSliderValue: Double = 1.5
-    @State private var wakeTimeHour: Int = 7
-    @State private var wakeTimeMinute: Int = 0
-    @State private var answers: [Int] = Array(repeating: 0, count: 12) // Optimized to 12 questions
+    @State private var answers: [Int] = Array(repeating: 0, count: 12)
     @State private var isGoingBack: Bool = false
-    @State private var questionStartTime: Date? // Track time spent on each question
-    @State private var quizStartTime: Date? // Track total quiz time
+    @State private var questionStartTime: Date?
+    @State private var quizStartTime: Date?
 
-    private let totalQuestions = 12 // Optimized from 25 to 12
+    private let totalQuestions = 12
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -137,10 +135,8 @@ struct HabitsQuizView: View {
             .frame(height: 8)
             .padding(.horizontal, 16)
 
-            // Language flag (right)
-            Text("🇫🇷 FRA")
-                .font(.custom("Poppins-Medium", size: 10))
-                .foregroundColor(.white)
+            // Language selector button (right)
+            LanguageSelectorButton()
                 .padding(.trailing, 30)
         }
         .frame(height: 20)
@@ -207,55 +203,6 @@ struct HabitsQuizView: View {
         .padding(.bottom, 40)
     }
 
-    // MARK: - Energy Slider Question (Q11)
-
-    private var energySliderQuestion: some View {
-        VStack(spacing: 24) {
-            // Slider
-            VStack(spacing: 12) {
-                Slider(value: $energySliderValue, in: 0...10, step: 1)
-                    .accentColor(Color(hex: "B794F6"))
-                    .padding(.horizontal, 34)
-
-                // Value display
-                Text("\(Int(energySliderValue))")
-                    .font(.custom("Poppins-Bold", size: 48))
-                    .foregroundColor(Color(hex: "B794F6"))
-
-                // Labels
-                HStack {
-                    Text("😴 Épuisé")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white.opacity(0.7))
-
-                    Spacer()
-
-                    Text("🤩 Plein d'énergie")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                .padding(.horizontal, 34)
-            }
-
-            // Continue button
-            Button(action: {
-                HapticManager.light()
-                answers[currentQuestionIndex] = Int(energySliderValue)
-                advanceToNextQuestion()
-            }) {
-                Text(StringKeys.Common.continueButton)
-                    .font(.custom("Poppins-SemiBold", size: 16))
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 54)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 40))
-            }
-            .padding(.horizontal, 34)
-            .padding(.bottom, 40)
-        }
-    }
-
     // MARK: - Navigation
 
     private func advanceToNextQuestion() {
@@ -279,7 +226,7 @@ struct HabitsQuizView: View {
         // Calculate total time spent on quiz
         let totalTime = quizStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
 
-        // Track quiz completion with all scores
+        // Track quiz completion with scores and marketing data
         MixpanelManager.shared.trackOnboardingHabitsQuizCompleted(
             totalTime: totalTime,
             serenityScore: result.serenityScore,
@@ -289,14 +236,20 @@ struct HabitsQuizView: View {
             habitsScore: result.habitsScore,
             balanceScore: result.balanceScore,
             globalScore: result.globalScore,
-            baselineWakeTime: result.baselineData.wakeTime,
-            baselineSleepDuration: result.baselineData.sleepDuration,
-            baselineWaterIntake: result.baselineData.waterIntake,
-            baselineExerciseFrequency: result.baselineData.exerciseFrequency,
-            baselineMeditationFrequency: result.baselineData.meditationFrequency,
-            baselineAvailableTime: String(result.baselineData.availableTime),
+            baselineWakeTime: nil,
+            baselineSleepDuration: nil,
+            baselineWaterIntake: nil,
+            baselineExerciseFrequency: nil,
+            baselineMeditationFrequency: nil,
+            baselineAvailableTime: String(result.availableTime),
             hasPhysicalLimitations: nil,
             primaryGoal: result.primaryGoal
+        )
+
+        // Track additional marketing data
+        MixpanelManager.shared.trackOnboardingMarketingData(
+            acquisitionChannel: result.acquisitionChannel,
+            previousAppExperience: result.previousAppExperience
         )
 
         onComplete(result)
@@ -322,166 +275,160 @@ struct HabitsQuestion {
 
 func getAllHabitsQuestions() -> [HabitsQuestion] {
     return [
-        // ============ PHASE 1: SYMPTÔMES (Q1-Q4) ============
-        // Identifier l'état mental et physique actuel
+        // ============ PHASE 1: PRISE DE CONSCIENCE (Q1-Q8) ============
+        // Questions situationnelles pour calculer les scores
 
-        // Q1 - SÉRÉNITÉ: Pensées en boucle
+        // Q1 - STRESS: Détente après le travail
         HabitsQuestion(
-            text: "As-tu des pensées qui tournent en boucle dans ta tête ?",
+            text: "onboarding_v2.habits.q1".localized,
             options: [
-                "Tout le temps, sans arrêt",
-                "Presque tous les jours",
-                "Quelques fois par semaine",
-                "Non, mon esprit est calme"
+                "onboarding_v2.habits.q1_opt1".localized,
+                "onboarding_v2.habits.q1_opt2".localized,
+                "onboarding_v2.habits.q1_opt3".localized,
+                "onboarding_v2.habits.q1_opt4".localized
             ],
-            scoring: [10, 40, 70, 100]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // Q2 - ÉNERGIE: Niveau d'énergie quotidien
+        // Q2 - ÉNERGIE: Impact sur la vie sociale
         HabitsQuestion(
-            text: "Quel est ton niveau d'énergie au quotidien ?",
+            text: "onboarding_v2.habits.q2".localized,
             options: [
-                "Épuisé, je n'ai aucune énergie",
-                "Fatigué, je manque d'énergie",
-                "Moyen, ça va",
-                "Bon, j'ai de l'énergie",
-                "Excellent, plein d'énergie"
+                "onboarding_v2.habits.q2_opt1".localized,
+                "onboarding_v2.habits.q2_opt2".localized,
+                "onboarding_v2.habits.q2_opt3".localized,
+                "onboarding_v2.habits.q2_opt4".localized
             ],
-            scoring: [10, 35, 60, 80, 100]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // Q3 - FOCUS: Capacité de concentration
+        // Q3 - SOMMEIL: Réveils nocturnes
         HabitsQuestion(
-            text: "Combien de temps peux-tu rester concentré sur une tâche ?",
+            text: "onboarding_v2.habits.q3".localized,
             options: [
-                "Moins de 15 minutes, mon esprit papillonne",
-                "15-30 minutes puis je me déconcentre",
-                "30-60 minutes avant de décrocher",
-                "Plus d'une heure sans problème"
+                "onboarding_v2.habits.q3_opt1".localized,
+                "onboarding_v2.habits.q3_opt2".localized,
+                "onboarding_v2.habits.q3_opt3".localized,
+                "onboarding_v2.habits.q3_opt4".localized
             ],
-            scoring: [10, 40, 70, 100]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // Q4 - SOMMEIL: Temps d'endormissement
+        // Q4 - STRESS PHYSIQUE: Tensions corporelles
         HabitsQuestion(
-            text: "Combien de temps te faut-il pour t'endormir le soir ?",
+            text: "onboarding_v2.habits.q4".localized,
             options: [
-                "Plus d'une heure",
-                "30-60 minutes",
-                "15-30 minutes",
-                "Moins de 15 minutes"
+                "onboarding_v2.habits.q4_opt1".localized,
+                "onboarding_v2.habits.q4_opt2".localized,
+                "onboarding_v2.habits.q4_opt3".localized,
+                "onboarding_v2.habits.q4_opt4".localized
             ],
-            scoring: [10, 40, 75, 100]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // ============ PHASE 2: CONTEXTE (Q5-Q6) ============
-        // Comprendre l'environnement et les contraintes
-
-        // Q5 - SOCIAL: Interactions sociales
+        // Q5 - FOCUS: Capacité de concentration
         HabitsQuestion(
-            text: "Combien de fois par semaine as-tu des interactions sociales significatives ?",
+            text: "onboarding_v2.habits.q5".localized,
             options: [
-                "Jamais ou presque",
-                "1-2 fois par semaine",
-                "3-4 fois par semaine",
-                "5-6 fois par semaine",
-                "Tous les jours"
+                "onboarding_v2.habits.q5_opt1".localized,
+                "onboarding_v2.habits.q5_opt2".localized,
+                "onboarding_v2.habits.q5_opt3".localized,
+                "onboarding_v2.habits.q5_opt4".localized
             ],
-            scoring: [10, 35, 60, 80, 100]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // Q6 - CONTRAINTES: Limitations physiques
+        // Q6 - CHARGE MENTALE: Se sentir submergé
         HabitsQuestion(
-            text: "As-tu des limitations physiques qui pourraient affecter certaines habitudes ?",
+            text: "onboarding_v2.habits.q6".localized,
             options: [
-                "Oui, plusieurs limitations importantes",
-                "Quelques limitations mineures",
-                "Non, aucune limitation"
+                "onboarding_v2.habits.q6_opt1".localized,
+                "onboarding_v2.habits.q6_opt2".localized,
+                "onboarding_v2.habits.q6_opt3".localized,
+                "onboarding_v2.habits.q6_opt4".localized
             ],
-            scoring: [30, 65, 100]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // ============ PHASE 3: BASELINE HABITS (Q7-Q12) ============
-        // Mesurer les habitudes actuelles pour éviter la régression
-
-        // Q7 - BASELINE SOMMEIL: Heure de réveil
+        // Q7 - DIGITAL/SOMMEIL: Déconnexion écrans
         HabitsQuestion(
-            text: "À quelle heure te réveilles-tu habituellement ?",
+            text: "onboarding_v2.habits.q7".localized,
             options: [
-                "Avant 6h00",
-                "Entre 6h00 et 7h00",
-                "Entre 7h00 et 8h00",
-                "Entre 8h00 et 9h00",
-                "Après 9h00"
+                "onboarding_v2.habits.q7_opt1".localized,
+                "onboarding_v2.habits.q7_opt2".localized,
+                "onboarding_v2.habits.q7_opt3".localized,
+                "onboarding_v2.habits.q7_opt4".localized
             ],
-            scoring: [100, 90, 70, 50, 30]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // Q8 - BASELINE SOMMEIL: Durée de sommeil
+        // Q8 - ÉNERGIE: Niveau fin de journée
         HabitsQuestion(
-            text: "Combien d'heures dors-tu actuellement par nuit ?",
+            text: "onboarding_v2.habits.q8".localized,
             options: [
-                "Moins de 5 heures",
-                "5-6 heures",
-                "6-7 heures",
-                "7-8 heures",
-                "Plus de 8 heures"
+                "onboarding_v2.habits.q8_opt1".localized,
+                "onboarding_v2.habits.q8_opt2".localized,
+                "onboarding_v2.habits.q8_opt3".localized,
+                "onboarding_v2.habits.q8_opt4".localized
             ],
-            scoring: [20, 40, 60, 90, 100]
+            scoring: [15, 40, 70, 100]
         ),
 
-        // Q9 - BASELINE HYDRATATION: Consommation d'eau
+        // ============ PHASE 2: MARKETING (Q9-Q10) ============
+        // Questions pour analytics (pas de scoring)
+
+        // Q9 - ACQUISITION: Comment découvert
         HabitsQuestion(
-            text: "Quelle quantité d'eau bois-tu par jour actuellement ?",
+            text: "onboarding_v2.habits.q9".localized,
             options: [
-                "Moins de 0.5L",
-                "0.5L à 1L",
-                "1L à 1.5L",
-                "1.5L à 2L",
-                "2L à 2.5L",
-                "Plus de 2.5L"
+                "onboarding_v2.habits.q9_opt1".localized,
+                "onboarding_v2.habits.q9_opt2".localized,
+                "onboarding_v2.habits.q9_opt3".localized,
+                "onboarding_v2.habits.q9_opt4".localized,
+                "onboarding_v2.habits.q9_opt5".localized,
+                "onboarding_v2.habits.q9_opt6".localized
             ],
-            scoring: [10, 25, 45, 65, 85, 100]
+            scoring: [0, 0, 0, 0, 0, 0] // Pas de scoring, juste tracking
         ),
 
-        // Q10 - BASELINE SPORT: Fréquence d'exercice
+        // Q10 - EXPÉRIENCE: Apps similaires
         HabitsQuestion(
-            text: "Combien de fois fais-tu du sport/exercice par semaine actuellement ?",
+            text: "onboarding_v2.habits.q10".localized,
             options: [
-                "Jamais",
-                "1 fois par semaine",
-                "2-3 fois par semaine",
-                "4-5 fois par semaine",
-                "6-7 fois par semaine"
+                "onboarding_v2.habits.q10_opt1".localized,
+                "onboarding_v2.habits.q10_opt2".localized,
+                "onboarding_v2.habits.q10_opt3".localized,
+                "onboarding_v2.habits.q10_opt4".localized
             ],
-            scoring: [0, 25, 50, 75, 100]
+            scoring: [0, 0, 0, 0] // Pas de scoring, juste tracking
         ),
 
-        // Q11 - BASELINE MINDFULNESS: Pratique méditation
+        // ============ PHASE 3: ENGAGEMENT (Q11-Q12) ============
+
+        // Q11 - OBJECTIF: Ce qu'ils veulent améliorer
         HabitsQuestion(
-            text: "Pratiques-tu déjà la méditation ou la pleine conscience ?",
+            text: "onboarding_v2.habits.q11".localized,
             options: [
-                "Jamais essayé",
-                "J'ai essayé mais j'ai arrêté",
-                "Occasionnellement (1-2x/mois)",
-                "Régulièrement (1-2x/semaine)",
-                "Souvent (3-5x/semaine)",
-                "Tous les jours"
+                "onboarding_v2.habits.q11_opt1".localized,
+                "onboarding_v2.habits.q11_opt2".localized,
+                "onboarding_v2.habits.q11_opt3".localized,
+                "onboarding_v2.habits.q11_opt4".localized,
+                "onboarding_v2.habits.q11_opt5".localized
             ],
-            scoring: [0, 15, 30, 50, 75, 100]
+            scoring: [0, 0, 0, 0, 0] // Utilisé pour primaryGoal
         ),
 
-        // Q12 - FAISABILITÉ: Temps disponible (CRUCIAL - dernière question)
+        // Q12 - TEMPS: Disponibilité quotidienne
         HabitsQuestion(
-            text: "Combien de temps peux-tu consacrer aux nouvelles habitudes par jour ?",
+            text: "onboarding_v2.habits.q12".localized,
             options: [
-                "Moins de 15 minutes",
-                "15-30 minutes",
-                "30-45 minutes",
-                "45-60 minutes",
-                "Plus d'1 heure"
+                "onboarding_v2.habits.q12_opt1".localized,
+                "onboarding_v2.habits.q12_opt2".localized,
+                "onboarding_v2.habits.q12_opt3".localized,
+                "onboarding_v2.habits.q12_opt4".localized,
+                "onboarding_v2.habits.q12_opt5".localized
             ],
-            scoring: [30, 50, 70, 85, 100]
+            scoring: [10, 30, 50, 75, 100]
         )
     ]
 }
@@ -545,78 +492,92 @@ struct HabitsAnswerButton: View {
 struct HabitsQuizResult {
     let answers: [Int]
 
-    // MARK: - Baseline Data (Q7-Q12)
+    // MARK: - Domain Scores (Q1-Q8)
+
+    /// Score de stress/sérénité (Q1 détente + Q4 tensions + Q6 submergé)
+    var stressScore: Int {
+        calculateDomainScore(questionIndices: [0, 3, 5])
+    }
+
+    /// Alias pour compatibilité
+    var serenityScore: Int { stressScore }
+
+    /// Score de sommeil (Q3 réveils nuit + Q7 écrans)
+    var sleepScore: Int {
+        calculateDomainScore(questionIndices: [2, 6])
+    }
+
+    /// Score d'énergie (Q2 annuler plans + Q8 niveau fin journée)
+    var energyScore: Int {
+        calculateDomainScore(questionIndices: [1, 7])
+    }
+
+    /// Score de focus/concentration (Q5)
+    var focusScore: Int {
+        calculateDomainScore(questionIndices: [4])
+    }
+
+    /// Score global (moyenne des 4 domaines)
+    var globalScore: Int {
+        (stressScore + sleepScore + energyScore + focusScore) / 4
+    }
+
+    /// Score d'équilibre (stress + focus)
+    var balanceScore: Int {
+        (stressScore + focusScore) / 2
+    }
+
+    /// Pour compatibilité - pas de baseline, retourne valeur fixe
+    var habitsScore: Int { globalScore }
+
+    // MARK: - Marketing Data (Q9-Q10)
+
+    /// Canal d'acquisition (Q9)
+    var acquisitionChannel: String {
+        let channels = ["App Store", "Instagram", "TikTok", "Bouche à oreille", "Publicité", "Autre"]
+        return channels[safe: answers[8]] ?? "Autre"
+    }
+
+    /// Expérience avec apps similaires (Q10)
+    var previousAppExperience: String {
+        let experiences = ["Première app", "A arrêté", "En utilise une autre", "Plusieurs essayées"]
+        return experiences[safe: answers[9]] ?? "Première app"
+    }
+
+    // MARK: - Objectif et disponibilité (Q11-Q12)
+
+    /// Objectif principal choisi par l'user (Q11)
+    var primaryGoal: String {
+        let goals = ["sleep", "stress", "energy", "focus", "balance"]
+        return goals[safe: answers[10]] ?? "balance"
+    }
+
+    /// Temps disponible par jour en minutes (Q12)
+    var availableTime: Int {
+        let times = [10, 22, 37, 52, 75]
+        return times[safe: answers[11]] ?? 22
+    }
+
+    // MARK: - Compatibilité baselineData (simplifié)
+
+    /// BaselineData simplifié pour compatibilité avec PlanGenerationService
     var baselineData: BaselineHabits {
         BaselineHabits(
-            wakeTime: getWakeTimeFromAnswer(answers[6]),           // Q7
-            sleepDuration: getSleepDurationFromAnswer(answers[7]), // Q8
-            waterIntake: getWaterIntakeFromAnswer(answers[8]),     // Q9
-            exerciseFrequency: getExerciseFrequencyFromAnswer(answers[9]), // Q10
-            exerciseDuration: 30,  // DEFAULT: question removed, reasonable default
-            meditationFrequency: getMeditationFrequencyFromAnswer(answers[10]), // Q11
-            meditationDuration: 5, // DEFAULT: question removed, reasonable default
-            breathingFrequency: 0, // DEFAULT: question removed, assume not practiced
-            availableTime: getAvailableTimeFromAnswer(answers[11]), // Q12
-            preferredIntensity: "moderate" // DEFAULT: question removed, moderate pace
+            wakeTime: "07:30",
+            sleepDuration: 7.0,
+            waterIntake: 1.5,
+            exerciseFrequency: 2,
+            exerciseDuration: 30,
+            meditationFrequency: 0,
+            meditationDuration: 5,
+            breathingFrequency: 0,
+            availableTime: availableTime,
+            preferredIntensity: "moderate"
         )
     }
 
-    // MARK: - Domain Scores (Q1-Q12 optimized)
-    var serenityScore: Int {
-        calculateDomainScore(questionIndices: [0]) // Q1: Pensées en boucle
-    }
-
-    var sleepScore: Int {
-        // Q4 (temps endormissement) + Q7 (heure réveil) + Q8 (durée sommeil)
-        calculateDomainScore(questionIndices: [3, 6, 7])
-    }
-
-    var energyScore: Int {
-        calculateDomainScore(questionIndices: [1]) // Q2: Niveau d'énergie
-    }
-
-    var focusScore: Int {
-        calculateDomainScore(questionIndices: [2]) // Q3: Concentration
-    }
-
-    var habitsScore: Int {
-        // Q5 (social) + Q9 (eau) + Q10 (sport) + Q11 (méditation)
-        calculateDomainScore(questionIndices: [4, 8, 9, 10])
-    }
-
-    var globalScore: Int {
-        (serenityScore + sleepScore + energyScore + focusScore + habitsScore) / 5
-    }
-
-    var balanceScore: Int {
-        (serenityScore + focusScore) / 2
-    }
-
-    // MARK: - Additional Insights
-    var hasPhysicalLimitations: Bool {
-        answers[5] < 2 // Q6 - physical limitations (0 or 1 = has limitations)
-    }
-
-    var preferredTimeOfDay: String {
-        // Default to morning since question was removed
-        "morning"
-    }
-
-    var primaryGoal: String {
-        // Determine from symptoms: highest priority from low scores
-        if serenityScore < sleepScore && serenityScore < energyScore {
-            return "stress"
-        } else if sleepScore < energyScore {
-            return "sleep"
-        } else if energyScore < focusScore {
-            return "energy"
-        } else if focusScore < 50 {
-            return "focus"
-        }
-        return "balance"
-    }
-
     // MARK: - Helper Methods
+
     private func calculateDomainScore(questionIndices: [Int]) -> Int {
         let questions = getAllHabitsQuestions()
         var total = 0
@@ -627,46 +588,22 @@ struct HabitsQuizResult {
             total += scoring[safe: answerIndex] ?? 0
         }
 
-        return total / questionIndices.count
-    }
-
-    // Baseline extraction methods
-    private func getWakeTimeFromAnswer(_ answer: Int) -> String {
-        ["05:30", "06:30", "07:30", "08:30", "09:30"][answer]
-    }
-
-    private func getSleepDurationFromAnswer(_ answer: Int) -> Double {
-        [4.5, 5.5, 6.5, 7.5, 8.5][answer]
-    }
-
-    private func getWaterIntakeFromAnswer(_ answer: Int) -> Double {
-        [0.5, 0.75, 1.25, 1.75, 2.25, 2.75][answer]
-    }
-
-    private func getExerciseFrequencyFromAnswer(_ answer: Int) -> Int {
-        [0, 1, 3, 5, 7][answer]
-    }
-
-    private func getMeditationFrequencyFromAnswer(_ answer: Int) -> Int {
-        [0, 0, 1, 2, 4, 7][answer]
-    }
-
-    private func getAvailableTimeFromAnswer(_ answer: Int) -> Int {
-        [10, 22, 37, 52, 75][answer]
+        return total / max(questionIndices.count, 1)
     }
 }
 
-// MARK: - Baseline Habits Structure
+// MARK: - Baseline Habits Structure (Compatibilité)
+
 struct BaselineHabits {
     let wakeTime: String
     let sleepDuration: Double
     let waterIntake: Double
-    let exerciseFrequency: Int // per week
-    let exerciseDuration: Int // minutes
-    let meditationFrequency: Int // per week
-    let meditationDuration: Int // minutes
-    let breathingFrequency: Int // per week
-    let availableTime: Int // minutes per day
+    let exerciseFrequency: Int
+    let exerciseDuration: Int
+    let meditationFrequency: Int
+    let meditationDuration: Int
+    let breathingFrequency: Int
+    let availableTime: Int
     let preferredIntensity: String
 }
 
@@ -680,13 +617,14 @@ extension Array {
 #Preview {
     HabitsQuizView { result in
         print("Quiz completed (12 questions):")
-        print("- Sérénité: \(result.serenityScore)")
+        print("- Stress/Sérénité: \(result.stressScore)")
         print("- Sommeil: \(result.sleepScore)")
         print("- Énergie: \(result.energyScore)")
         print("- Focus: \(result.focusScore)")
-        print("- Habitudes: \(result.habitsScore)")
         print("- Global: \(result.globalScore)")
-        print("- Équilibre: \(result.balanceScore)")
-        print("- Baseline: \(result.baselineData)")
+        print("- Canal acquisition: \(result.acquisitionChannel)")
+        print("- Expérience apps: \(result.previousAppExperience)")
+        print("- Objectif: \(result.primaryGoal)")
+        print("- Temps disponible: \(result.availableTime) min")
     }
 }

@@ -12,6 +12,7 @@ import FirebaseFirestore
 struct CortiFreeRatingView: View {
     let habitsQuizResult: HabitsQuizResult
     let onContinue: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var selectedTab: RatingTab = .current
     @State private var animateProgress: Bool = false
     @State private var currentStartProgress: [Double] = []
@@ -27,13 +28,13 @@ struct CortiFreeRatingView: View {
 
     private var currentScores: [Int] {
         let scores = [
-            min(habitsQuizResult.serenityScore, 80),
-            min(habitsQuizResult.sleepScore, 80),
-            min(habitsQuizResult.energyScore, 80),
-            min(habitsQuizResult.focusScore, 80),
-            min(habitsQuizResult.balanceScore, 80)
+            min(habitsQuizResult.serenityScore, 65),
+            min(habitsQuizResult.sleepScore, 65),
+            min(habitsQuizResult.energyScore, 65),
+            min(habitsQuizResult.focusScore, 65),
+            min(habitsQuizResult.balanceScore, 65)
         ]
-        let globalScore = min(scores.reduce(0, +) / scores.count, 80)
+        let globalScore = min(scores.reduce(0, +) / scores.count, 65)
         return [globalScore] + scores
     }
 
@@ -67,7 +68,7 @@ struct CortiFreeRatingView: View {
                     // Title
                     VStack(spacing: 4) {
                         if selectedTab == .current {
-                            Text("Ton évalutation actuelle")
+                            Text("onboarding_v2.rating.current_title".localized)
                                 .font(Font.Poppins.custom(.bold, size: 28))
                                 .foregroundStyle(
                                     LinearGradient(
@@ -79,7 +80,7 @@ struct CortiFreeRatingView: View {
                                 .multilineTextAlignment(.center)
                         } else {
                             VStack(spacing: 0) {
-                                Text("Ton évaluation potentielle")
+                                Text("onboarding_v2.rating.potential_title".localized)
                                     .font(Font.Poppins.custom(.bold, size: 28))
                                     .foregroundStyle(
                                         LinearGradient(
@@ -88,7 +89,7 @@ struct CortiFreeRatingView: View {
                                             endPoint: .bottom
                                         )
                                     )
-                                Text("après 66 jours")
+                                Text("onboarding_v2.rating.after_66_days".localized)
                                     .font(Font.Poppins.custom(.bold, size: 28))
                                     .foregroundStyle(
                                         LinearGradient(
@@ -113,20 +114,20 @@ struct CortiFreeRatingView: View {
                     ], spacing: 16) {
                         if selectedTab == .current {
                             // Current ratings - Using real quiz data
-                            CortiFreeStatCard(icon: "star.fill", title: "Global", value: currentScores[0], progress: currentProgress[0], color: Color(hex: "B794F6"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[0] : currentStartProgress[0])
-                            CortiFreeStatCard(icon: "leaf.fill", title: "Sérénité", value: currentScores[1], progress: currentProgress[1], color: Color(hex: "9B59B6"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[1] : currentStartProgress[1])
-                            CortiFreeStatCard(icon: "moon.fill", title: "Sommeil", value: currentScores[2], progress: currentProgress[2], color: Color(hex: "E74C3C"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[2] : currentStartProgress[2])
-                            CortiFreeStatCard(icon: "bolt.fill", title: "Énergie", value: currentScores[3], progress: currentProgress[3], color: Color(hex: "1ABC9C"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[3] : currentStartProgress[3])
-                            CortiFreeStatCard(icon: "target", title: "Focus", value: currentScores[4], progress: currentProgress[4], color: Color(hex: "2ECC71"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[4] : currentStartProgress[4])
-                            CortiFreeStatCard(icon: "heart.fill", title: "Équilibre", value: currentScores[5], progress: currentProgress[5], color: Color(hex: "3498DB"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[5] : currentStartProgress[5])
+                            CortiFreeStatCard(icon: "star.fill", title: "onboarding_v2.rating.global".localized, value: currentScores[0], progress: currentProgress[0], color: Color(hex: "B794F6"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[0] : currentStartProgress[0])
+                            CortiFreeStatCard(icon: "leaf.fill", title: "onboarding_v2.rating.serenity".localized, value: currentScores[1], progress: currentProgress[1], color: Color(hex: "9B59B6"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[1] : currentStartProgress[1])
+                            CortiFreeStatCard(icon: "moon.fill", title: "onboarding_v2.rating.sleep".localized, value: currentScores[2], progress: currentProgress[2], color: Color(hex: "E74C3C"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[2] : currentStartProgress[2])
+                            CortiFreeStatCard(icon: "bolt.fill", title: "onboarding_v2.rating.energy".localized, value: currentScores[3], progress: currentProgress[3], color: Color(hex: "1ABC9C"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[3] : currentStartProgress[3])
+                            CortiFreeStatCard(icon: "target", title: "onboarding_v2.rating.focus".localized, value: currentScores[4], progress: currentProgress[4], color: Color(hex: "2ECC71"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[4] : currentStartProgress[4])
+                            CortiFreeStatCard(icon: "heart.fill", title: "onboarding_v2.rating.balance".localized, value: currentScores[5], progress: currentProgress[5], color: Color(hex: "3498DB"), increase: nil, isCurrent: true, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[5] : currentStartProgress[5])
                         } else {
                             // Potential ratings - Calculated from current scores
-                            CortiFreeStatCard(icon: "star.fill", title: "Global", value: potentialScores[0], progress: potentialProgress[0], color: Color(hex: "B794F6"), increase: increases[0], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[0] : currentStartProgress[0])
-                            CortiFreeStatCard(icon: "leaf.fill", title: "Sérénité", value: potentialScores[1], progress: potentialProgress[1], color: Color(hex: "9B59B6"), increase: increases[1], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[1] : currentStartProgress[1])
-                            CortiFreeStatCard(icon: "moon.fill", title: "Sommeil", value: potentialScores[2], progress: potentialProgress[2], color: Color(hex: "E74C3C"), increase: increases[2], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[2] : currentStartProgress[2])
-                            CortiFreeStatCard(icon: "bolt.fill", title: "Énergie", value: potentialScores[3], progress: potentialProgress[3], color: Color(hex: "1ABC9C"), increase: increases[3], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[3] : currentStartProgress[3])
-                            CortiFreeStatCard(icon: "target", title: "Focus", value: potentialScores[4], progress: potentialProgress[4], color: Color(hex: "2ECC71"), increase: increases[4], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[4] : currentStartProgress[4])
-                            CortiFreeStatCard(icon: "heart.fill", title: "Équilibre", value: potentialScores[5], progress: potentialProgress[5], color: Color(hex: "3498DB"), increase: increases[5], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[5] : currentStartProgress[5])
+                            CortiFreeStatCard(icon: "star.fill", title: "onboarding_v2.rating.global".localized, value: potentialScores[0], progress: potentialProgress[0], color: Color(hex: "B794F6"), increase: increases[0], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[0] : currentStartProgress[0])
+                            CortiFreeStatCard(icon: "leaf.fill", title: "onboarding_v2.rating.serenity".localized, value: potentialScores[1], progress: potentialProgress[1], color: Color(hex: "9B59B6"), increase: increases[1], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[1] : currentStartProgress[1])
+                            CortiFreeStatCard(icon: "moon.fill", title: "onboarding_v2.rating.sleep".localized, value: potentialScores[2], progress: potentialProgress[2], color: Color(hex: "E74C3C"), increase: increases[2], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[2] : currentStartProgress[2])
+                            CortiFreeStatCard(icon: "bolt.fill", title: "onboarding_v2.rating.energy".localized, value: potentialScores[3], progress: potentialProgress[3], color: Color(hex: "1ABC9C"), increase: increases[3], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[3] : currentStartProgress[3])
+                            CortiFreeStatCard(icon: "target", title: "onboarding_v2.rating.focus".localized, value: potentialScores[4], progress: potentialProgress[4], color: Color(hex: "2ECC71"), increase: increases[4], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[4] : currentStartProgress[4])
+                            CortiFreeStatCard(icon: "heart.fill", title: "onboarding_v2.rating.balance".localized, value: potentialScores[5], progress: potentialProgress[5], color: Color(hex: "3498DB"), increase: increases[5], isCurrent: false, animateProgress: animateProgress, startProgress: currentStartProgress.isEmpty ? currentProgress[5] : currentStartProgress[5])
                         }
                     }
                     .padding(.horizontal, 24)
@@ -158,7 +159,7 @@ struct CortiFreeRatingView: View {
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 18, weight: .semibold))
 
-                            Text("Voir le potentiel")
+                            Text("onboarding_v2.rating.see_potential".localized)
                                 .font(.custom("Poppins-SemiBold", size: 18))
                         }
                         .foregroundColor(.white)
@@ -285,9 +286,13 @@ struct CortiFreeRatingView: View {
                     // Note: UserSettings and program start date will be initialized
                     // in HomeView.onAppear after user passes paywall
 
+                    #if DEBUG
                     print("✅ Successfully saved detailed onboarding scores")
+                    #endif
                 } catch {
+                    #if DEBUG
                     print("❌ Error saving onboarding scores: \(error)")
+                    #endif
                 }
             }
 

@@ -10,6 +10,7 @@ import SwiftUI
 
 struct EightHabitsIntroView: View {
     let onContinue: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
 
     // Ordre: Respiration, Méditation, Journal, Sport, Eau, Nature, Sommeil, Social
     private let habits: [(image: String, icon: String)] = [
@@ -31,7 +32,7 @@ struct EightHabitsIntroView: View {
 
             VStack(spacing: 0) {
                 // Title
-                Text("Les 8 habitudes clés")
+                Text("onboarding_v2.eight_habits.intro_title".localized)
                     .font(.custom("Poppins-Bold", size: 32))
                     .foregroundStyle(
                         LinearGradient(
@@ -46,22 +47,25 @@ struct EightHabitsIntroView: View {
                 // Description text
                 VStack(spacing: 4) {
                     HStack(spacing: 4) {
-                        Text("Des études montrent que pour réinitialiser votre")
+                        Text("onboarding_v2.eight_habits.intro_studies".localized)
+                            .font(.custom("Poppins-Regular", size: 16))
+                            .foregroundColor(.white)
+                        Text("onboarding_v2.eight_habits.intro_reset".localized)
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(.white)
                     }
 
                     HStack(spacing: 4) {
-                        Text("vie, vous avez besoin des")
+                        Text("onboarding_v2.eight_habits.intro_life".localized)
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(.white)
 
-                        Text("8 habitudes")
+                        Text("onboarding_v2.eight_habits.intro_fundamental".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(Color(hex: "B794F6"))
                     }
 
-                    Text("fondamentales ci-dessous.")
+                    Text("onboarding_v2.eight_habits.intro_below".localized)
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(Color(hex: "B794F6"))
                 }
@@ -89,18 +93,12 @@ struct EightHabitsIntroView: View {
                 Spacer()
 
                 // Bottom text
-                VStack(spacing: 4) {
-                    Text("Voir comment ta vie changera en 66 jours")
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.white)
-
-                    Text("grâce à ces 8 habitudes :")
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.white)
-                }
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 24)
+                Text("onboarding_v2.eight_habits.intro_see_change".localized)
+                    .font(.custom("Poppins-Regular", size: 16))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 24)
 
                 // Continue button
                 Button(action: {

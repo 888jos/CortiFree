@@ -125,7 +125,9 @@ class TasksViewModel: ObservableObject {
 
             isLoading = false
         } catch {
+            #if DEBUG
             print("Error loading tasks: \(error.localizedDescription)")
+            #endif
             isLoading = false
         }
     }
@@ -140,7 +142,9 @@ class TasksViewModel: ObservableObject {
         }
 
         if needsMigration {
+            #if DEBUG
             print("🔄 Migrating default tasks with missing properties...")
+            #endif
 
             // Delete all old default tasks
             for task in defaultTasksInDB {
@@ -294,7 +298,9 @@ class TasksViewModel: ObservableObject {
             try await firebaseService.updateDailyProgress(completionRate: completionPercentage)
 
         } catch {
+            #if DEBUG
             print("Error toggling task: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -309,7 +315,9 @@ class TasksViewModel: ObservableObject {
                 tasks.removeAll { $0.id == task.id }
             }
         } catch {
+            #if DEBUG
             print("Error deleting task: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -339,11 +347,15 @@ class TasksViewModel: ObservableObject {
                 // If frequency is recurring, handle recurrence logic
                 if let frequency = task.taskFrequency, frequency != .once {
                     // Future: implement recurring task logic
+                    #if DEBUG
                     print("Recurring task created: \(frequency.displayName)")
+                    #endif
                 }
 
             } catch {
+                #if DEBUG
                 print("Error adding custom task: \(error.localizedDescription)")
+                #endif
             }
         }
     }

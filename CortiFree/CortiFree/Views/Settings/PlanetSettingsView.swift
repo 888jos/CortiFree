@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PlanetSettingsView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var planetSettings = PlanetSettings.shared
+    @ObservedObject private var planetSettings = PlanetSettings.shared
 
     var body: some View {
         ZStack {

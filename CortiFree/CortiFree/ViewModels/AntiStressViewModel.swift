@@ -61,7 +61,9 @@ class AntiStressViewModel: ObservableObject {
 
             isExerciseComplete = true
         } catch {
+            #if DEBUG
             print("Error completing exercise: \(error.localizedDescription)")
+            #endif
         }
     }
 

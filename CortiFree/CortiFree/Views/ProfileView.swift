@@ -13,8 +13,8 @@ import Combine
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = ProfileViewModel()
-    @StateObject private var achievementService = AchievementService.shared
-    @StateObject private var habitBadgeService = HabitBadgeService.shared
+    @ObservedObject private var achievementService = AchievementService.shared
+    @ObservedObject private var habitBadgeService = HabitBadgeService.shared
     @State private var showSettings = false
     @State private var showProgression = false
     @State private var showPotentialScores = false

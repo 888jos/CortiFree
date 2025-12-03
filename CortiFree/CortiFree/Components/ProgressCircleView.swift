@@ -13,7 +13,7 @@ struct ProgressCircleView: View {
     let progress: Double
     let size: CGFloat
 
-    @StateObject private var planetSettings = PlanetSettings.shared
+    @ObservedObject private var planetSettings = PlanetSettings.shared
 
     var body: some View {
         ZStack {

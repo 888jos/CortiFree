@@ -10,7 +10,7 @@ import SwiftUI
 struct LevelUpPopupView: View {
     let level: Level
     @Binding var isPresented: Bool
-    @StateObject private var planetSettings = PlanetSettings.shared
+    @ObservedObject private var planetSettings = PlanetSettings.shared
 
     @State private var scale: CGFloat = 0.5
     @State private var opacity: Double = 0

@@ -40,7 +40,9 @@ class MixpanelManager {
         registerSuperProperties()
 
         isInitialized = true
+        #if DEBUG
         print("[Mixpanel] ✅ Initialized successfully with EU server")
+        #endif
 
         // Send a test event to verify connection
         track(event: "app_opened")
@@ -266,6 +268,13 @@ class MixpanelManager {
         if let goal = primaryGoal { properties["primary_goal"] = goal }
 
         track(event: "onboarding_habits_quiz_completed", properties: properties)
+    }
+
+    func trackOnboardingMarketingData(acquisitionChannel: String, previousAppExperience: String) {
+        track(event: "onboarding_quiz_marketing_data", properties: [
+            "acquisition_channel": acquisitionChannel,
+            "previous_app_experience": previousAppExperience
+        ])
     }
 
     // 5-7. Explanation Screens

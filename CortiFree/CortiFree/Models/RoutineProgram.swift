@@ -289,7 +289,7 @@ struct RoutineProgram: Identifiable, Codable {
 
     static let allPrograms: [RoutineProgram] = [
         masterMind
-        // TODO: Add other 3 routines (sleep, energy, stress)
+        // Additional routines (sleep, energy, stress) can be added here
     ]
 
     static func program(forId id: String) -> RoutineProgram? {

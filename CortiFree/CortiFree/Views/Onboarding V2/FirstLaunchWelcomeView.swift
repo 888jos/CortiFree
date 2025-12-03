@@ -11,6 +11,7 @@ import SwiftUI
 struct FirstLaunchWelcomeView: View {
     let onContinue: () -> Void
 
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var showContent = false
     @State private var showBenefits = false
     @State private var showButton = false
@@ -31,16 +32,19 @@ struct FirstLaunchWelcomeView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     // Main title
                     if showContent {
-                        Text("Bienvenue dans\nCortiFree")
+                        Text("onboarding_v2.welcome.title".localized)
                             .font(.custom("Poppins-Bold", size: 36))
                             .foregroundColor(.white)
                             .lineSpacing(4)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.7)
+                            .fixedSize(horizontal: false, vertical: true)
                             .transition(.opacity.combined(with: .move(edge: .top)))
                     }
 
                     // Subtitle
                     if showContent {
-                        Text("Ton compagnon personnel pour une vie sans stress")
+                        Text("onboarding_v2.welcome.subtitle".localized)
                             .font(.custom("Poppins-Regular", size: 18))
                             .foregroundColor(.white.opacity(0.85))
                             .lineSpacing(6)
@@ -51,9 +55,9 @@ struct FirstLaunchWelcomeView: View {
                     // Key benefits
                     if showBenefits {
                         VStack(alignment: .leading, spacing: 16) {
-                            BenefitRow(icon: "sparkles", text: "Plan personnalisé à ton stress")
-                            BenefitRow(icon: "chart.line.uptrend.xyaxis", text: "Suivi quotidien de tes progrès")
-                            BenefitRow(icon: "heart.fill", text: "Techniques scientifiquement prouvées")
+                            BenefitRow(icon: "sparkles", text: "onboarding_v2.welcome.benefit_1".localized)
+                            BenefitRow(icon: "chart.line.uptrend.xyaxis", text: "onboarding_v2.welcome.benefit_2".localized)
+                            BenefitRow(icon: "heart.fill", text: "onboarding_v2.welcome.benefit_3".localized)
                         }
                         .padding(.top, 16)
                         .transition(.opacity.combined(with: .move(edge: .leading)))
@@ -80,7 +84,7 @@ struct FirstLaunchWelcomeView: View {
                             onContinue()
                         }) {
                             HStack(spacing: 12) {
-                                Text("Commencer")
+                                Text("onboarding_v2.welcome.start_button".localized)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                                     .foregroundColor(Color(hex: "1A1A4E"))
 
@@ -103,7 +107,7 @@ struct FirstLaunchWelcomeView: View {
                         }
 
                         // Time estimate
-                        Text("Prends 15 minutes")
+                        Text("onboarding_v2.welcome.time_estimate".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.6))
                     }

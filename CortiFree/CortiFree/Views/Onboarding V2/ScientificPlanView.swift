@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ScientificPlanView: View {
     let onContinue: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var screenViewTime: Date?
 
     var body: some View {
@@ -20,7 +21,7 @@ struct ScientificPlanView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     // Title
-                    Text("L'approche scientifique de CortiFree")
+                    Text("onboarding_v2.scientific.approach_title".localized)
                         .font(Font.Poppins.custom(.bold, size: 28))
                         .foregroundStyle(
                             LinearGradient(
@@ -39,25 +40,25 @@ struct ScientificPlanView: View {
                         // Harvard Quote
                         ScientificQuoteCard(
                             logoImage: "logo_harvard",
-                            quote: "Les habitudes se forment par des actions répétées dans des contextes stables, et il faut des semaines, voire des mois, pour qu'elles deviennent automatiques.",
-                            highlightedText: "actions répétées dans des contextes stables",
-                            source: "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology,"
+                            quote: "onboarding_v2.scientific.harvard_quote".localized,
+                            highlightedText: "onboarding_v2.scientific.harvard_highlight".localized,
+                            source: "onboarding_v2.scientific.harvard_source".localized
                         )
 
                         // UCL Quote
                         ScientificQuoteCard(
                             logoImage: "logo_ucl",
-                            quote: "96 participants ont adopté un comportement quotidien, et l'automaticité a été modélisée pour atteindre un plateau à une moyenne de 66 jours, avec une plage de 18 à 254 jours.",
-                            highlightedText: "moyenne de 66 jours, avec une plage de 18 à 254 jours",
-                            source: "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology."
+                            quote: "onboarding_v2.scientific.ucl_quote".localized,
+                            highlightedText: "onboarding_v2.scientific.ucl_highlight".localized,
+                            source: "onboarding_v2.scientific.ucl_source".localized
                         )
 
                         // Atomic Habits Quote
                         ScientificQuoteCard(
                             logoImage: "logo_atomic_habits",
-                            quote: "En moyenne, il faut plus de deux mois avant qu'un nouveau comportement ne devienne automatique — 66 jours pour être exact.",
-                            highlightedText: "plus de deux mois",
-                            source: "Clear, J. (2018). Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones. Avery."
+                            quote: "onboarding_v2.scientific.atomic_quote".localized,
+                            highlightedText: "onboarding_v2.scientific.atomic_highlight".localized,
+                            source: "onboarding_v2.scientific.atomic_source".localized
                         )
                     }
                     .padding(.horizontal, 24)
@@ -65,8 +66,8 @@ struct ScientificPlanView: View {
 
                     // Badges
                     HStack(spacing: 16) {
-                        BadgeView(text: "+1 500 citations\nGoogle Scholar")
-                        BadgeView(text: "+1 000 000\nexemplaires vendus")
+                        BadgeView(text: "onboarding_v2.scientific.citations".localized)
+                        BadgeView(text: "onboarding_v2.scientific.copies_sold".localized)
                     }
                     .padding(.horizontal, 24)
                     .padding(.bottom, 120)
@@ -92,7 +93,7 @@ struct ScientificPlanView: View {
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
 
-                        Text("Suivant")
+                        Text("onboarding_v2.scientific.next".localized)
                             .font(.custom("Poppins-SemiBold", size: 18))
                             .foregroundColor(.white)
                     }

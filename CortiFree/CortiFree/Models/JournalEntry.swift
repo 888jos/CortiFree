@@ -63,12 +63,12 @@ enum Mood: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .awful: return "Terrible"
-        case .angry: return "Colère"
-        case .low: return "Faible"
-        case .okay: return "Neutre"
-        case .good: return "Bien"
-        case .amazing: return "Génial"
+        case .awful: return NSLocalizedString("mood.awful", comment: "")
+        case .angry: return NSLocalizedString("mood.angry", comment: "")
+        case .low: return NSLocalizedString("mood.low", comment: "")
+        case .okay: return NSLocalizedString("mood.okay", comment: "")
+        case .good: return NSLocalizedString("mood.good", comment: "")
+        case .amazing: return NSLocalizedString("mood.amazing", comment: "")
         }
     }
 

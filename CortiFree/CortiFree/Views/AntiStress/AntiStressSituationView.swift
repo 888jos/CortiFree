@@ -29,7 +29,7 @@ struct AntiStressSituationView: View {
                     VStack(spacing: 32) {
                         // Header
                         VStack(spacing: 12) {
-                            Text("Dans quelle situation es-tu ?")
+                            Text(NSLocalizedString("antistress.situation.title", comment: ""))
                                 .font(.custom("Poppins-SemiBold", size: 24))
                                 .foregroundStyle(
                                     LinearGradient(
@@ -40,7 +40,7 @@ struct AntiStressSituationView: View {
                                 )
                                 .multilineTextAlignment(.center)
 
-                            Text("Sélectionne ton état actuel pour recevoir des exercices anti-stress personnalisés.")
+                            Text(NSLocalizedString("antistress.situation.subtitle", comment: ""))
                                 .font(.custom("Poppins-Regular", size: 14))
                                 .foregroundColor(.white.opacity(0.7))
                                 .multilineTextAlignment(.center)

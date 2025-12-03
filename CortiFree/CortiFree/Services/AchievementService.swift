@@ -81,9 +81,13 @@ class AchievementService: ObservableObject {
             }
 
             achievements = userAchievements
+            #if DEBUG
             print("✅ Loaded \(achievements.filter(\.isUnlocked).count)/\(achievements.count) achievements (streak: \(currentStreak))")
+            #endif
         } catch {
+            #if DEBUG
             print("❌ Error loading achievements: \(error)")
+            #endif
         }
     }
 
@@ -99,7 +103,9 @@ class AchievementService: ObservableObject {
                 .document(achievement.id)
                 .setData(achievement.toFirestore, merge: true)
         } catch {
+            #if DEBUG
             print("❌ Error saving achievement: \(error)")
+            #endif
         }
     }
 
@@ -140,7 +146,9 @@ class AchievementService: ObservableObject {
             if achievement.progress >= achievement.requirement {
                 achievement.unlockedAt = Date()
                 unlocked.append(achievement)
+                #if DEBUG
                 print("🏆 Achievement unlocked: \(achievement.title)")
+                #endif
             }
 
             achievements[index] = achievement

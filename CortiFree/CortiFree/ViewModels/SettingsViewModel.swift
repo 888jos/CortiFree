@@ -242,11 +242,15 @@ class SettingsViewModel: ObservableObject {
                     .setData(settingsData, merge: true)
 
                 lastSyncDate = Date()
+                #if DEBUG
                 print("✅ Settings synced to Firebase")
+                #endif
 
             } catch {
                 syncError = error.localizedDescription
+                #if DEBUG
                 print("❌ Firebase sync error: \(error.localizedDescription)")
+                #endif
             }
 
             isSyncing = false
@@ -315,11 +319,15 @@ class SettingsViewModel: ObservableObject {
             }
 
             lastSyncDate = Date()
+            #if DEBUG
             print("✅ Settings loaded from Firebase")
+            #endif
 
         } catch {
             syncError = error.localizedDescription
+            #if DEBUG
             print("❌ Firebase load error: \(error.localizedDescription)")
+            #endif
         }
 
         isSyncing = false
@@ -386,7 +394,9 @@ class SettingsViewModel: ObservableObject {
                     self.subscriptionStatus = premium ? StringKeys.Settings.subscriptionPremium : StringKeys.Settings.subscriptionFree
                 }
             } catch {
+                #if DEBUG
                 print("Error loading subscription status: \(error)")
+                #endif
             }
         }
     }

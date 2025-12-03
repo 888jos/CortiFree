@@ -16,7 +16,7 @@ struct GroundingExerciseView: View {
     @State private var currentStep = 0
     @State private var showCompletion = false
     @State private var showConfetti = false
-    @StateObject private var voiceOverManager = VoiceOverManager.shared
+    @ObservedObject private var voiceOverManager = VoiceOverManager.shared
 
     let steps = [
         GroundingStep(

@@ -14,8 +14,8 @@ struct BreathingDetailFlowView: View {
     let onComplete: () -> Void
 
     @Environment(\.dismiss) var dismiss
-    @StateObject private var planetSettings = PlanetSettings.shared
-    @StateObject private var voiceOverManager = VoiceOverManager.shared
+    @ObservedObject private var planetSettings = PlanetSettings.shared
+    @ObservedObject private var voiceOverManager = VoiceOverManager.shared
 
     // Timer
     @State private var timeRemaining: TimeInterval

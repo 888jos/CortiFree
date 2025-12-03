@@ -39,7 +39,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         MixpanelManager.shared.initialize()
 
         // Initialize TaskManager with optimization
+        #if DEBUG
         print("🚀 Initializing TaskManager...")
+        #endif
         _ = TaskManager.shared
 
         // Apply fixes

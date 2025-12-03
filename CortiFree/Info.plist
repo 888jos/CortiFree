@@ -26,7 +26,10 @@
         <false/>
     </dict>
     <key>UILaunchScreen</key>
-    <dict/>
+    <dict>
+        <key>UIColorName</key>
+        <string>LaunchScreenBackground</string>
+    </dict>
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
@@ -61,5 +64,18 @@
     <string>Cette information sera utilisée pour vous proposer des publicités personnalisées.</string>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.559047783915-e7oca1vj0ssv0rqlb7m2o3vla5ii8ks8</string>
+            </array>
+        </dict>
+    </array>
+    <key>GIDClientID</key>
+    <string>559047783915-e7oca1vj0ssv0rqlb7m2o3vla5ii8ks8.apps.googleusercontent.com</string>
 </dict>
 </plist>

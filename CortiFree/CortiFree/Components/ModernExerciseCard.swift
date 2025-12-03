@@ -123,7 +123,7 @@ struct ModernExerciseCard: View {
     // MARK: - Subviews
 
     private var percentageBadge: some View {
-        Text(isTopMatch ? "Recommandé à \(exercise.matchPercentage)%" : "\(exercise.matchPercentage)%")
+        Text(isTopMatch ? String(format: NSLocalizedString("antistress.recommended_at", comment: ""), exercise.matchPercentage) : "\(exercise.matchPercentage)%")
             .font(.custom("Poppins-SemiBold", size: isTopMatch ? 12 : 13))
             .foregroundColor(.black)
             .padding(.horizontal, 6)

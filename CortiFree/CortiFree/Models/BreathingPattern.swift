@@ -142,12 +142,19 @@ struct BreathingPattern: Identifiable {
 // MARK: - Breathing Phase
 
 enum BreathingPhase: String {
-    case inhale = "Inspire"
-    case hold = "Maintiens"
-    case exhale = "Expire"
+    case inhale
+    case hold
+    case exhale
 
     var displayText: String {
-        return self.rawValue
+        switch self {
+        case .inhale:
+            return NSLocalizedString("breathing.phase.inhale", comment: "")
+        case .hold:
+            return NSLocalizedString("breathing.phase.hold", comment: "")
+        case .exhale:
+            return NSLocalizedString("breathing.phase.exhale", comment: "")
+        }
     }
 
     var glowIntensity: Double {

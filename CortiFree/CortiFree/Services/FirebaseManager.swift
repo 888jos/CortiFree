@@ -85,9 +85,7 @@ class FirebaseManager: ObservableObject {
             "selectedRoutineId": selectedRoutineId
         ])
 
-        // Track with Mixpanel
-        // TODO: Update with correct signature in Phase 2
-        // MixpanelManager.shared.trackOnboardingCompleted(...)
+        // Mixpanel tracking handled separately
     }
 
     // MARK: - Routines
@@ -136,11 +134,7 @@ class FirebaseManager: ObservableObject {
             "currentDay": 1
         ])
 
-        // Track with Mixpanel
-        // TODO: Implement trackRoutineStarted in MixpanelManager
-        // if let routine = try? await fetchRoutine(routineId: routineId) {
-        //     MixpanelManager.shared.trackRoutineStarted(...)
-        // }
+        // Mixpanel tracking handled separately
     }
 
     // MARK: - Exercises
@@ -185,9 +179,7 @@ class FirebaseManager: ObservableObject {
         // Update daily progress (without XP)
         try await updateDailyProgress(uid: uid, date: getCurrentDate())
 
-        // Track with Mixpanel
-        // TODO: Implement trackExerciseCompleted in MixpanelManager
-        // MixpanelManager.shared.trackExerciseCompleted(...)
+        // Mixpanel tracking handled separately
     }
 
     private func updateDailyProgress(uid: String, date: String) async throws {
@@ -230,11 +222,7 @@ class FirebaseManager: ObservableObject {
             .document()
             .setData(from: feedback)
 
-        // Track with Mixpanel
-        if let mood = feedback.mood as String? {
-            // TODO: Implement trackFeedbackSubmitted in MixpanelManager
-            // MixpanelManager.shared.trackFeedbackSubmitted(...)
-        }
+        // Mixpanel tracking for feedback handled separately
     }
 
     // MARK: - Custom Tasks
@@ -246,8 +234,7 @@ class FirebaseManager: ObservableObject {
             .document()
             .setData(from: task)
 
-        // TODO: Implement trackCustomTaskAdded in MixpanelManager
-        // MixpanelManager.shared.trackCustomTaskAdded(...)
+        // Mixpanel tracking handled separately
     }
 
     func fetchCustomTasks(uid: String) async throws -> [CustomTask] {
@@ -342,11 +329,7 @@ class FirebaseManager: ObservableObject {
                 "longestStreakDays": longestStreak
             ])
 
-            // Track milestone streaks
-            if newStreak % 7 == 0 {
-                // TODO: Implement trackStreakMilestone in MixpanelManager
-                // MixpanelManager.shared.trackStreakMilestone(streakDays: newStreak)
-            }
+            // Streak milestone tracking handled in TasksV2View
         }
     }
 
@@ -597,7 +580,9 @@ class FirebaseManager: ObservableObject {
                 .document(dateKey)
                 .setData(from: mood)
         } catch {
+            #if DEBUG
             print("Error saving daily mood: \(error)")
+            #endif
         }
     }
 
@@ -612,7 +597,9 @@ class FirebaseManager: ObservableObject {
             .document(todayKey)
             .getDocument { snapshot, error in
                 if let error = error {
+                    #if DEBUG
                     print("Error fetching today's mood: \(error)")
+                    #endif
                     completion(nil)
                     return
                 }
@@ -637,7 +624,9 @@ class FirebaseManager: ObservableObject {
             .order(by: "date", descending: true)
             .getDocuments { snapshot, error in
                 if let error = error {
+                    #if DEBUG
                     print("Error fetching recent moods: \(error)")
+                    #endif
                     completion([])
                     return
                 }

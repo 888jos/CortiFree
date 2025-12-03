@@ -25,7 +25,9 @@ class AppFixes {
     func optimizeTaskManager() {
         // Limiter le chargement des tasks
         UserDefaults.standard.set(10, forKey: "maxTasksToLoad")
+        #if DEBUG
         print("✅ TaskManager optimisé : 10 tasks max")
+        #endif
     }
 
     // MARK: - Fix Fonts
@@ -40,10 +42,14 @@ class AppFixes {
 
         for fontName in fontNames {
             if UIFont(name: fontName, size: 12) == nil {
+                #if DEBUG
                 print("⚠️ Font manquante : \(fontName)")
+                #endif
                 // Fallback to system font
             } else {
+                #if DEBUG
                 print("✅ Font disponible : \(fontName)")
+                #endif
             }
         }
     }
@@ -71,6 +77,8 @@ extension AppFixes {
         // Simplement limiter le nombre de tasks au lieu de modifier TaskManager
         UserDefaults.standard.set(["Respiration", "Méditation", "Journal"], forKey: "essentialCategories")
         UserDefaults.standard.set(3, forKey: "maxTasksPerCategory")
+        #if DEBUG
         print("✅ Task loading optimized - will load only essential categories")
+        #endif
     }
 }

@@ -27,7 +27,7 @@ class DailyTodoViewModel: ObservableObject {
     // Charger tous les to-dos
     func loadTodos() async {
         guard let userId = userId else {
-            errorMessage = "Vous devez être connecté pour accéder aux to-dos"
+            errorMessage = NSLocalizedString("error.auth.login_required_todos", comment: "")
             return
         }
 
@@ -37,7 +37,7 @@ class DailyTodoViewModel: ObservableObject {
         do {
             todos = try await service.loadTodos(for: userId)
         } catch {
-            errorMessage = "Erreur lors du chargement: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.todo.load_failed", comment: ""), error.localizedDescription)
         }
 
         isLoading = false
@@ -48,7 +48,7 @@ class DailyTodoViewModel: ObservableObject {
         guard !title.isEmpty else { return }
 
         guard let userId = userId else {
-            errorMessage = "Vous devez être connecté pour créer des to-dos"
+            errorMessage = NSLocalizedString("error.auth.login_required_create_todos", comment: "")
             return
         }
 
@@ -65,14 +65,14 @@ class DailyTodoViewModel: ObservableObject {
             try await service.createTodo(newTodo)
             await loadTodos()
         } catch {
-            errorMessage = "Erreur lors de la création: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.todo.create_failed", comment: ""), error.localizedDescription)
         }
     }
 
     // Basculer la complétion d'un to-do
     func toggleCompletion(_ todo: DailyTodo) async {
         guard userId != nil else {
-            errorMessage = "Vous devez être connecté"
+            errorMessage = NSLocalizedString("error.auth.login_required", comment: "")
             return
         }
 
@@ -82,14 +82,14 @@ class DailyTodoViewModel: ObservableObject {
 
             // XP system removed - using scoring system instead
         } catch {
-            errorMessage = "Erreur lors de la mise à jour: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.todo.update_failed", comment: ""), error.localizedDescription)
         }
     }
 
     // Supprimer un to-do
     func deleteTodo(_ todo: DailyTodo) async {
         guard userId != nil else {
-            errorMessage = "Vous devez être connecté"
+            errorMessage = NSLocalizedString("error.auth.login_required", comment: "")
             return
         }
 
@@ -97,7 +97,7 @@ class DailyTodoViewModel: ObservableObject {
             try await service.deleteTodo(todo)
             await loadTodos()
         } catch {
-            errorMessage = "Erreur lors de la suppression: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.todo.delete_failed", comment: ""), error.localizedDescription)
         }
     }
 
@@ -106,7 +106,7 @@ class DailyTodoViewModel: ObservableObject {
         guard !newTitle.isEmpty else { return }
 
         guard userId != nil else {
-            errorMessage = "Vous devez être connecté"
+            errorMessage = NSLocalizedString("error.auth.login_required", comment: "")
             return
         }
 
@@ -114,7 +114,7 @@ class DailyTodoViewModel: ObservableObject {
             try await service.updateTodoTitle(todo, newTitle: newTitle)
             await loadTodos()
         } catch {
-            errorMessage = "Erreur lors de la mise à jour: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.todo.update_failed", comment: ""), error.localizedDescription)
         }
     }
 

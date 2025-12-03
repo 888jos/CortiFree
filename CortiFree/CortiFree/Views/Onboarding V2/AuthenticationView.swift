@@ -11,11 +11,15 @@ import AuthenticationServices
 import FirebaseAuth
 import FirebaseFirestore
 import Lottie
+import GoogleSignIn
+import GoogleSignInSwift
 
 struct AuthenticationView: View {
     @Environment(\.dismiss) var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var showEmailAuth = false
     @State private var showGoogleAuth = false
+    @State private var showAppleAuth = false
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -63,7 +67,7 @@ struct AuthenticationView: View {
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
 
-                    Text("crée ton compte pour accéder à ton diagnostic personnalisé")
+                    Text("onboarding_v2.auth.create_account_message".localized)
                         .font(.custom("Poppins-Regular", size: 18))
                         .foregroundColor(.white.opacity(0.85))
                         .fixedSize(horizontal: false, vertical: true)
@@ -91,7 +95,7 @@ struct AuthenticationView: View {
                                 .font(.system(size: 18))
                                 .foregroundColor(.white)
 
-                            Text("Continuer avec Email")
+                            Text("onboarding_v2.auth.email_button".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -104,17 +108,17 @@ struct AuthenticationView: View {
                     }
                     .padding(.horizontal, 32)
 
-                    // Continue with Apple (temporarily disabled)
+                    // Continue with Apple
                     Button(action: {
                         HapticManager.light()
-                        errorMessage = "Apple Sign In sera disponible prochainement"
+                        showAppleAuth = true
                     }) {
                         HStack(spacing: 12) {
                             Image(systemName: "apple.logo")
                                 .font(.system(size: 20))
                                 .foregroundColor(.white)
 
-                            Text("Continuer avec Apple")
+                            Text("onboarding_v2.auth.apple_button".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -126,8 +130,6 @@ struct AuthenticationView: View {
                         )
                     }
                     .padding(.horizontal, 32)
-                    .opacity(0.5)
-                    .disabled(true)
 
                     // Continue with Google
                     Button(action: {
@@ -146,7 +148,7 @@ struct AuthenticationView: View {
                                     .foregroundColor(Color(hex: "4285F4"))
                             }
 
-                            Text("Continuer avec Google")
+                            Text("onboarding_v2.auth.google_button".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -212,6 +214,21 @@ struct AuthenticationView: View {
                 onComplete()
             })
         }
+        .fullScreenCover(isPresented: $showAppleAuth) {
+            AppleAuthView(onComplete: {
+                showAppleAuth = false
+
+                // Track auth completion
+                if let userId = Auth.auth().currentUser?.uid {
+                    MixpanelManager.shared.trackOnboardingAuthenticationCompleted(
+                        authMethod: "apple",
+                        userId: userId
+                    )
+                }
+
+                onComplete()
+            })
+        }
         .onAppear {
             // Track authentication screen view
             MixpanelManager.shared.trackOnboardingAuthenticationViewed(firstName: firstName)
@@ -224,13 +241,13 @@ struct AuthenticationView: View {
         switch result {
         case .success(let authorization):
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                errorMessage = "Erreur d'authentification Apple"
+                errorMessage = NSLocalizedString("error.auth.apple_error", comment: "")
                 return
             }
 
             guard let appleIDToken = appleIDCredential.identityToken,
                   let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                errorMessage = "Impossible de récupérer le token"
+                errorMessage = NSLocalizedString("error.auth.token_error", comment: "")
                 return
             }
 
@@ -280,8 +297,7 @@ struct AuthenticationView: View {
     }
 
     private func handleGoogleSignIn() {
-        // TODO: Implement Google Sign In with GoogleSignIn SDK
-        // For now, show email auth as fallback
+        // Google Sign In not implemented - fallback to email auth
         showEmailAuth = true
     }
 }
@@ -290,6 +306,7 @@ struct AuthenticationView: View {
 
 struct EmailAuthView: View {
     @Environment(\.dismiss) var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
@@ -333,7 +350,7 @@ struct EmailAuthView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Title
-                        Text(isSignUp ? "Créer un compte" : "Connexion")
+                        Text(isSignUp ? "onboarding_v2.auth.create_account".localized : "onboarding_v2.auth.login".localized)
                             .font(.custom("Poppins-Bold", size: 28))
                             .foregroundColor(.white)
                             .padding(.top, 20)
@@ -341,24 +358,24 @@ struct EmailAuthView: View {
                         // Form fields
                         VStack(spacing: 16) {
                             if isSignUp {
-                                TextField("", text: $username, prompt: Text("Prénom").foregroundColor(.white.opacity(0.6)))
+                                TextField("", text: $username, prompt: Text("onboarding_v2.auth.first_name".localized).foregroundColor(.white.opacity(0.6)))
                                     .textFieldStyle(CustomTextFieldStyle())
                                     .colorScheme(.dark)
                             }
 
-                            TextField("", text: $email, prompt: Text("Email").foregroundColor(.white.opacity(0.6)))
+                            TextField("", text: $email, prompt: Text("onboarding_v2.auth.email_placeholder".localized).foregroundColor(.white.opacity(0.6)))
                                 .textFieldStyle(CustomTextFieldStyle())
                                 .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
                                 .colorScheme(.dark)
 
-                            SecureField("", text: $password, prompt: Text("Mot de passe").foregroundColor(.white.opacity(0.6)))
+                            SecureField("", text: $password, prompt: Text("onboarding_v2.auth.password_placeholder".localized).foregroundColor(.white.opacity(0.6)))
                                 .textFieldStyle(CustomTextFieldStyle())
                                 .textContentType(.oneTimeCode)
                                 .colorScheme(.dark)
 
                             if isSignUp {
-                                SecureField("", text: $confirmPassword, prompt: Text("Confirmer le mot de passe").foregroundColor(.white.opacity(0.6)))
+                                SecureField("", text: $confirmPassword, prompt: Text("onboarding_v2.auth.confirm_password".localized).foregroundColor(.white.opacity(0.6)))
                                     .textFieldStyle(CustomTextFieldStyle())
                                     .textContentType(.oneTimeCode)
                                     .colorScheme(.dark)
@@ -380,7 +397,7 @@ struct EmailAuthView: View {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "1A1A4E")))
                             } else {
-                                Text(isSignUp ? "Créer mon compte" : "Se connecter")
+                                Text(isSignUp ? "onboarding_v2.auth.create_my_account".localized : "onboarding_v2.auth.sign_in".localized)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                                     .foregroundColor(Color(hex: "1A1A4E"))
                             }
@@ -397,7 +414,7 @@ struct EmailAuthView: View {
                             isSignUp.toggle()
                             errorMessage = nil
                         }) {
-                            Text(isSignUp ? "Déjà un compte ? Se connecter" : "Pas de compte ? S'inscrire")
+                            Text(isSignUp ? "onboarding_v2.auth.already_account_login".localized : "onboarding_v2.auth.no_account_signup".localized)
                                 .font(.custom("Poppins-Regular", size: 14))
                                 .foregroundColor(.white.opacity(0.8))
                         }
@@ -413,18 +430,18 @@ struct EmailAuthView: View {
 
         // Validation
         guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Veuillez remplir tous les champs"
+            errorMessage = "onboarding_v2.auth.fill_all_fields".localized
             return
         }
 
         if isSignUp {
             guard !username.isEmpty else {
-                errorMessage = "Veuillez entrer votre prénom"
+                errorMessage = "onboarding_v2.auth.enter_first_name".localized
                 return
             }
 
             guard password == confirmPassword else {
-                errorMessage = "Les mots de passe ne correspondent pas"
+                errorMessage = "onboarding_v2.auth.passwords_dont_match".localized
                 return
             }
         }
@@ -457,6 +474,7 @@ struct EmailAuthView: View {
 
 struct GoogleAuthView: View {
     @Environment(\.dismiss) var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var email = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -508,12 +526,12 @@ struct GoogleAuthView: View {
                             .foregroundColor(Color(hex: "4285F4"))
                     }
 
-                    Text("Continuer avec Google")
+                    Text("onboarding_v2.auth.google_title".localized)
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
-                    Text("Connecte-toi avec ton compte Google pour accéder à ton espace personnalisé")
+                    Text("onboarding_v2.auth.google_description".localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.85))
                         .multilineTextAlignment(.center)
@@ -536,7 +554,7 @@ struct GoogleAuthView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "1A1A4E")))
                     } else {
-                        Text("Se connecter avec Google")
+                        Text("onboarding_v2.auth.google_sign_in".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(Color(hex: "1A1A4E"))
                     }
@@ -553,8 +571,266 @@ struct GoogleAuthView: View {
     }
 
     private func handleGoogleSignIn() {
-        // TODO: Implement actual Google Sign In with GoogleSignIn SDK
-        errorMessage = "Google Sign In n'est pas encore implémenté. Utilise l'authentification par email pour le moment."
+        isLoading = true
+        errorMessage = nil
+
+        // Get the root view controller
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            errorMessage = "onboarding_v2.auth.google_launch_error".localized
+            isLoading = false
+            return
+        }
+
+        // Get the client ID from GoogleService-Info.plist
+        guard let clientID = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String else {
+            errorMessage = "onboarding_v2.auth.google_config_missing".localized
+            isLoading = false
+            return
+        }
+
+        // Configure Google Sign In
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+
+        // Start Google Sign In flow
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { result, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    self.errorMessage = "Erreur Google Sign In: \(error.localizedDescription)"
+                }
+                return
+            }
+
+            guard let user = result?.user,
+                  let idToken = user.idToken?.tokenString else {
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    self.errorMessage = "onboarding_v2.auth.google_info_error".localized
+                }
+                return
+            }
+
+            // Create Firebase credential with Google tokens
+            let credential = GoogleAuthProvider.credential(
+                withIDToken: idToken,
+                accessToken: user.accessToken.tokenString
+            )
+
+            // Sign in to Firebase with Google credential
+            Task {
+                do {
+                    let authResult = try await Auth.auth().signIn(with: credential)
+
+                    // Create/update user profile in Firestore
+                    let userData: [String: Any] = [
+                        "uid": authResult.user.uid,
+                        "email": authResult.user.email ?? "",
+                        "firstName": user.profile?.givenName ?? "Utilisateur",
+                        "displayName": user.profile?.name ?? "Utilisateur",
+                        "photoURL": user.profile?.imageURL(withDimension: 200)?.absoluteString ?? "",
+                        "createdAt": Timestamp(date: Date()),
+                        "authProvider": "google",
+                        "lastLoginAt": Timestamp(date: Date())
+                    ]
+
+                    try await Firestore.firestore()
+                        .collection("users")
+                        .document(authResult.user.uid)
+                        .setData(userData, merge: true)
+
+                    // Save firstName to UserDefaults for offline access
+                    UserDefaults.standard.set(user.profile?.givenName ?? "Utilisateur", forKey: "userFirstName")
+
+                    await MainActor.run {
+                        isLoading = false
+                        HapticManager.success()
+                        onComplete()
+                    }
+                } catch {
+                    await MainActor.run {
+                        isLoading = false
+                        errorMessage = "Erreur Firebase: \(error.localizedDescription)"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Apple Authentication View
+
+struct AppleAuthView: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+
+    var onComplete: () -> Void
+
+    var body: some View {
+        ZStack {
+            // Background
+            LinearGradient(
+                colors: [
+                    Color(hex: "1F0140"),
+                    Color(hex: "0B011B"),
+                    Color(hex: "01000C")
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 32) {
+                // Close button at top
+                HStack {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 20))
+                            .foregroundColor(.white)
+                            .frame(width: 44, height: 44)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 50)
+
+                Spacer()
+
+                // Apple logo and title
+                VStack(spacing: 24) {
+                    // Apple logo (large)
+                    Image(systemName: "apple.logo")
+                        .font(.system(size: 60))
+                        .foregroundColor(.white)
+
+                    Text("onboarding_v2.auth.apple_title".localized)
+                        .font(.custom("Poppins-Bold", size: 28))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+
+                    Text("onboarding_v2.auth.apple_description".localized)
+                        .font(.custom("Poppins-Regular", size: 16))
+                        .foregroundColor(.white.opacity(0.85))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                }
+
+                Spacer()
+
+                // Error message
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                        .font(.custom("Poppins-Regular", size: 14))
+                        .foregroundColor(.red)
+                        .padding(.horizontal, 32)
+                }
+
+                // Sign in with Apple button
+                SignInWithAppleButton(.signIn) { request in
+                    request.requestedScopes = [.fullName, .email]
+                } onCompletion: { result in
+                    handleAppleSignIn(result)
+                }
+                .signInWithAppleButtonStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+                .cornerRadius(40)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 50)
+                .disabled(isLoading)
+            }
+
+            // Loading overlay
+            if isLoading {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.5)
+            }
+        }
+    }
+
+    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
+        switch result {
+        case .success(let authorization):
+            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                errorMessage = "onboarding_v2.auth.apple_error".localized
+                return
+            }
+
+            guard let appleIDToken = appleIDCredential.identityToken,
+                  let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                errorMessage = "onboarding_v2.auth.token_error".localized
+                return
+            }
+
+            isLoading = true
+
+            Task {
+                do {
+                    let credential = OAuthProvider.appleCredential(
+                        withIDToken: idTokenString,
+                        rawNonce: nil,
+                        fullName: appleIDCredential.fullName
+                    )
+
+                    let authResult = try await Auth.auth().signIn(with: credential)
+
+                    // Get name from Apple credential (only provided on first sign-in)
+                    let firstName = appleIDCredential.fullName?.givenName
+                    let displayName = [appleIDCredential.fullName?.givenName, appleIDCredential.fullName?.familyName]
+                        .compactMap { $0 }
+                        .joined(separator: " ")
+
+                    // Create/update user profile in Firestore
+                    var userData: [String: Any] = [
+                        "uid": authResult.user.uid,
+                        "email": authResult.user.email ?? appleIDCredential.email ?? "",
+                        "createdAt": Timestamp(date: Date()),
+                        "authProvider": "apple",
+                        "lastLoginAt": Timestamp(date: Date())
+                    ]
+
+                    // Only add name fields if we got them (first sign-in only)
+                    if let firstName = firstName, !firstName.isEmpty {
+                        userData["firstName"] = firstName
+                        UserDefaults.standard.set(firstName, forKey: "userFirstName")
+                    }
+                    if !displayName.isEmpty {
+                        userData["displayName"] = displayName
+                    }
+
+                    try await Firestore.firestore()
+                        .collection("users")
+                        .document(authResult.user.uid)
+                        .setData(userData, merge: true)
+
+                    await MainActor.run {
+                        isLoading = false
+                        HapticManager.success()
+                        onComplete()
+                    }
+                } catch {
+                    await MainActor.run {
+                        isLoading = false
+                        errorMessage = "Erreur Firebase: \(error.localizedDescription)"
+                    }
+                }
+            }
+
+        case .failure(let error):
+            // Don't show error for user cancellation
+            if (error as NSError).code != ASAuthorizationError.canceled.rawValue {
+                errorMessage = "Erreur Apple Sign In: \(error.localizedDescription)"
+            }
+        }
     }
 }
 

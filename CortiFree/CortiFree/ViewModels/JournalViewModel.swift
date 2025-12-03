@@ -23,12 +23,12 @@ class JournalViewModel: ObservableObject {
     /// Save simplified journal entry with optional photo
     func saveEntry(content: String, mood: Mood?, photoURL: String?, wordCount: Int, entryId: String? = nil) async {
         guard let userId = Auth.auth().currentUser?.uid else {
-            errorMessage = "Utilisateur non connecté"
+            errorMessage = NSLocalizedString("error.auth.not_connected", comment: "")
             return
         }
 
         guard !content.isEmpty else {
-            errorMessage = "Le contenu ne peut pas être vide"
+            errorMessage = NSLocalizedString("error.journal.empty_content", comment: "")
             return
         }
 
@@ -54,7 +54,7 @@ class JournalViewModel: ObservableObject {
             try await journalService.saveEntry(entry)
             await loadAllEntries()
         } catch {
-            errorMessage = "Erreur lors de la sauvegarde: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.journal.save_failed", comment: ""), error.localizedDescription)
         }
 
         isLoading = false
@@ -70,12 +70,12 @@ class JournalViewModel: ObservableObject {
     /// Save entry with legacy format
     func saveEntry(meditationId: String, meditationType: String, prompt: String?, content: String, mood: Mood? = nil, tags: [String]? = nil, reloadAll: Bool = false) async {
         guard let userId = Auth.auth().currentUser?.uid else {
-            errorMessage = "Utilisateur non connecté"
+            errorMessage = NSLocalizedString("error.auth.not_connected", comment: "")
             return
         }
 
         guard !content.isEmpty else {
-            errorMessage = "Le contenu ne peut pas être vide"
+            errorMessage = NSLocalizedString("error.journal.empty_content", comment: "")
             return
         }
 
@@ -109,7 +109,7 @@ class JournalViewModel: ObservableObject {
                 await loadEntries(for: meditationId)
             }
         } catch {
-            errorMessage = "Erreur lors de la sauvegarde: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.journal.save_failed", comment: ""), error.localizedDescription)
         }
 
         isLoading = false
@@ -123,7 +123,7 @@ class JournalViewModel: ObservableObject {
         do {
             entries = try await journalService.loadEntries(for: meditationId)
         } catch {
-            errorMessage = "Erreur lors du chargement: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.journal.load_failed", comment: ""), error.localizedDescription)
         }
 
         isLoading = false
@@ -138,7 +138,7 @@ class JournalViewModel: ObservableObject {
             allEntries = try await journalService.loadAllEntries()
             entries = allEntries // Keep both for compatibility
         } catch {
-            errorMessage = "Erreur lors du chargement: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.journal.load_failed", comment: ""), error.localizedDescription)
         }
 
         isLoading = false
@@ -152,7 +152,7 @@ class JournalViewModel: ObservableObject {
         do {
             entries = try await journalService.loadEntries(byType: type)
         } catch {
-            errorMessage = "Erreur lors du chargement: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.journal.load_failed", comment: ""), error.localizedDescription)
         }
 
         isLoading = false
@@ -165,7 +165,7 @@ class JournalViewModel: ObservableObject {
             entries.removeAll { $0.id == entry.id }
             allEntries.removeAll { $0.id == entry.id }
         } catch {
-            errorMessage = "Erreur lors de la suppression: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("error.journal.delete_failed", comment: ""), error.localizedDescription)
         }
     }
 }

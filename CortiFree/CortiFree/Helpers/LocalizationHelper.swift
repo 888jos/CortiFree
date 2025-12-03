@@ -9,14 +9,15 @@
 import Foundation
 
 extension String {
-    /// Retourne la chaîne localisée correspondant à la clé
+    /// Retourne la chaîne localisée correspondant à la clé en utilisant la langue courante du LanguageManager
     var localized: String {
-        return NSLocalizedString(self, comment: "")
+        return LanguageManager.shared.localizedString(for: self)
     }
 
     /// Retourne la chaîne localisée avec des arguments
     func localized(_ arguments: CVarArg...) -> String {
-        return String(format: NSLocalizedString(self, comment: ""), arguments: arguments)
+        let localizedString = LanguageManager.shared.localizedString(for: self)
+        return String(format: localizedString, arguments: arguments)
     }
 }
 

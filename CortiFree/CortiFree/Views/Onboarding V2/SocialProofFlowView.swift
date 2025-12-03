@@ -11,6 +11,7 @@ import SwiftUI
 struct SocialProofFlowView: View {
     @State private var currentPage = 0
     @Environment(\.dismiss) var dismiss
+    @ObservedObject var languageManager = LanguageManager.shared
     var onComplete: () -> Void
 
     var body: some View {
@@ -53,6 +54,7 @@ struct SocialProofFlowView: View {
 
 struct TestimonialsView: View {
     var onContinue: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var screenViewTime: Date?
 
     private let testimonials = [
@@ -107,7 +109,7 @@ struct TestimonialsView: View {
                 VStack(spacing: 0) {
                     // Title
                     VStack(spacing: 12) {
-                        Text("Des milliers de vies changées grâce à CortiFree")
+                        Text("onboarding_v2.testimonials.title".localized)
                             .font(.custom("Poppins-Bold", size: 24))
                             .foregroundStyle(
                                 LinearGradient(
@@ -119,9 +121,9 @@ struct TestimonialsView: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)
 
-                        (Text("Découvre comment des personnes comme toi ont retrouvé leur ")
+                        (Text("onboarding_v2.testimonials.subtitle_part1".localized)
                             .foregroundColor(.white.opacity(0.85)) +
-                        Text("sérénité")
+                        Text("onboarding_v2.testimonials.subtitle_highlight".localized)
                             .foregroundColor(Color(hex: "B794F6")))
                             .font(.custom("Poppins-Regular", size: 16))
                             .multilineTextAlignment(.center)
@@ -211,7 +213,7 @@ struct TestimonialCard: View {
                         .font(.custom("Poppins-SemiBold", size: 15))
                         .foregroundColor(.white)
 
-                    Text("• \(testimonial.age) ans")
+                    Text(String(format: "onboarding_v2.testimonials.age_format".localized, testimonial.age))
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -412,18 +414,21 @@ struct StressEvolutionChart: View {
 struct GoalsSelectionView: View {
     @State private var selectedGoals: Set<Int> = []
     @State private var screenViewTime: Date?
+    @ObservedObject var languageManager = LanguageManager.shared
     var onContinue: () -> Void
 
-    private let goals = [
-        "Réduire mon stress",
-        "Mieux dormir",
-        "Améliorer ma concentration",
-        "Retrouver mon énergie",
-        "Gérer mes émotions",
-        "Me sentir plus calme",
-        "Réduire mon anxiété",
-        "Améliorer ma santé mentale"
-    ]
+    private var goals: [String] {
+        [
+            "onboarding_v2.goals.reduce_stress".localized,
+            "onboarding_v2.goals.sleep_better".localized,
+            "onboarding_v2.goals.improve_focus".localized,
+            "onboarding_v2.goals.regain_energy".localized,
+            "onboarding_v2.goals.manage_emotions".localized,
+            "onboarding_v2.goals.feel_calmer".localized,
+            "onboarding_v2.goals.reduce_anxiety".localized,
+            "onboarding_v2.goals.improve_mental_health".localized
+        ]
+    }
 
     private let goalColors = [
         Color(hex: "FF6B6B"), // Red-pink
@@ -440,12 +445,12 @@ struct GoalsSelectionView: View {
         VStack(spacing: 0) {
             // Title
             VStack(spacing: 12) {
-                Text("Tes objectifs")
+                Text("onboarding_v2.goals.title".localized)
                     .font(.custom("Poppins-Bold", size: 32))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
 
-                Text("Sélectionne ce que tu souhaites améliorer")
+                Text("onboarding_v2.goals.subtitle".localized)
                     .font(.custom("Poppins-Regular", size: 16))
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
@@ -493,7 +498,7 @@ struct GoalsSelectionView: View {
                 UserDefaults.standard.set(Array(selectedGoals), forKey: "selectedGoals")
                 onContinue()
             }) {
-                Text("Commencer mon programme")
+                Text("onboarding_v2.goals.start_program".localized)
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(Color(hex: "1A1A4E"))
                     .frame(maxWidth: .infinity)

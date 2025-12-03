@@ -47,8 +47,8 @@ class BaselineService {
             "preferences": [
                 "availableTime": baseline.availableTime,
                 "preferredIntensity": baseline.preferredIntensity,
-                "hasPhysicalLimitations": result.hasPhysicalLimitations,
-                "preferredTimeOfDay": result.preferredTimeOfDay,
+                "hasPhysicalLimitations": false, // Removed from quiz
+                "preferredTimeOfDay": "morning", // Default value
                 "primaryGoal": result.primaryGoal
             ],
 

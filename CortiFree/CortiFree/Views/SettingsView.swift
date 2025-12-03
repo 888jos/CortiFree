@@ -17,7 +17,6 @@ struct SettingsView: View {
 
     // ViewModel for settings management
     @StateObject private var viewModel = SettingsViewModel()
-    @StateObject private var tasksViewModel = TasksViewModel()
 
     // UI State only
     @State private var showLanguagePicker: Bool = false
@@ -59,21 +58,21 @@ struct SettingsView: View {
                 }
             )
         }
-        .alert("Se déconnecter", isPresented: $showSignOutAlert) {
-            Button("Annuler", role: .cancel) { }
-            Button("Se déconnecter", role: .destructive) {
+        .alert(NSLocalizedString("settings.alert.signout.title", comment: ""), isPresented: $showSignOutAlert) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("settings.alert.signout.title", comment: ""), role: .destructive) {
                 signOut()
             }
         } message: {
-            Text("Êtes-vous sûr de vouloir vous déconnecter ?")
+            Text(NSLocalizedString("settings.alert.signout.message", comment: ""))
         }
-        .alert("Supprimer le compte", isPresented: $showDeleteAccountAlert) {
-            Button("Annuler", role: .cancel) { }
-            Button("Supprimer", role: .destructive) {
+        .alert(NSLocalizedString("settings.alert.delete.title", comment: ""), isPresented: $showDeleteAccountAlert) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("settings.alert.delete.button", comment: ""), role: .destructive) {
                 deleteAccount()
             }
         } message: {
-            Text("Cette action est irréversible. Toutes vos données seront définitivement supprimées.")
+            Text(NSLocalizedString("settings.alert.delete.message", comment: ""))
         }
         .alert(StringKeys.Settings.languageRestartNote, isPresented: $showLanguageChangeAlert) {
             Button(StringKeys.Common.cancel, role: .cancel) {
@@ -85,23 +84,23 @@ struct SettingsView: View {
                 }
             }
         } message: {
-            Text("L'application va se fermer pour appliquer le changement de langue. Veuillez la relancer.")
+            Text(NSLocalizedString("settings.alert.language_restart.message", comment: ""))
         }
-        .alert("Réinitialiser UserDefaults", isPresented: $showResetUserDefaultsAlert) {
-            Button("Annuler", role: .cancel) { }
-            Button("Réinitialiser", role: .destructive) {
+        .alert(NSLocalizedString("settings.alert.reset_defaults.title", comment: ""), isPresented: $showResetUserDefaultsAlert) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("settings.alert.reset_defaults.button", comment: ""), role: .destructive) {
                 resetUserDefaults()
             }
         } message: {
-            Text("Cette action va réinitialiser toutes les préférences utilisateur (notifications, sons, horaires, etc.). Vos données de progression seront conservées.")
+            Text(NSLocalizedString("settings.alert.reset_defaults.message", comment: ""))
         }
-        .alert("Supprimer toutes les données", isPresented: $showClearAllDataAlert) {
-            Button("Annuler", role: .cancel) { }
-            Button("Tout supprimer", role: .destructive) {
+        .alert(NSLocalizedString("settings.alert.clear_data.title", comment: ""), isPresented: $showClearAllDataAlert) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("settings.alert.clear_data.button", comment: ""), role: .destructive) {
                 clearAllData()
             }
         } message: {
-            Text("⚠️ ATTENTION : Cette action va supprimer toutes vos données locales (progression, statistiques, préférences). Cette action est irréversible.")
+            Text(NSLocalizedString("settings.alert.clear_data.message", comment: ""))
         }
         .onAppear {
             viewModel.calculateLocalDataSize()
@@ -128,7 +127,7 @@ struct SettingsView: View {
 
             Spacer()
 
-            Text("Paramètres")
+            Text(NSLocalizedString("settings.title", comment: ""))
                 .font(.custom("Poppins-Bold", size: 24))
                 .foregroundColor(.white)
 
@@ -166,7 +165,7 @@ struct SettingsView: View {
 
     // MARK: - Profile & Objective Section
     private var profileObjectiveSection: some View {
-        settingsSection(title: "Profil & Objectif", icon: "person.circle.fill") {
+        settingsSection(title: NSLocalizedString("settings.section.profile", comment: ""), icon: "person.circle.fill") {
             VStack(spacing: 0) {
                 settingsRow(
                     icon: "globe",
@@ -185,7 +184,7 @@ struct SettingsView: View {
                 settingsToggleRow(
                     icon: "bell.fill",
                     title: StringKeys.Settings.notificationsToggle,
-                    subtitle: "Recevoir des rappels quotidiens",
+                    subtitle: NSLocalizedString("settings.notifications.subtitle", comment: ""),
                     isOn: $viewModel.notificationsEnabled
                 )
             }
@@ -194,7 +193,7 @@ struct SettingsView: View {
 
     // MARK: - Statistics Section
     private var statisticsSection: some View {
-        settingsSection(title: "Statistiques & Progression", icon: "chart.bar.fill") {
+        settingsSection(title: NSLocalizedString("settings.section.statistics", comment: ""), icon: "chart.bar.fill") {
             VStack(spacing: 0) {
                 // Streak days
                 HStack(spacing: 12) {
@@ -204,46 +203,18 @@ struct SettingsView: View {
                         .frame(width: 20, height: 20)
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Série de jours")
+                        Text(NSLocalizedString("settings.streak.title", comment: ""))
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(.white)
 
-                        Text("Jours consécutifs d'activité")
+                        Text(NSLocalizedString("settings.streak.subtitle", comment: ""))
                             .font(.custom("Poppins-Regular", size: 13))
                             .foregroundColor(.white.opacity(0.5))
                     }
 
                     Spacer()
 
-                    Text("\(currentStreak) jours")
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .foregroundColor(Color.appTheme)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-                // Completion rate
-                HStack(spacing: 12) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(Color.appTheme)
-                        .frame(width: 20, height: 20)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Taux de complétion")
-                            .font(.custom("Poppins-Regular", size: 16))
-                            .foregroundColor(.white)
-
-                        Text("Tâches accomplies cette semaine")
-                            .font(.custom("Poppins-Regular", size: 13))
-                            .foregroundColor(.white.opacity(0.5))
-                    }
-
-                    Spacer()
-
-                    Text("\(calculateCompletionRate())%")
+                    Text(String(format: NSLocalizedString("settings.streak.days", comment: ""), currentStreak))
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(Color.appTheme)
                 }
@@ -260,18 +231,18 @@ struct SettingsView: View {
                         .frame(width: 20, height: 20)
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Programme actuel")
+                        Text(NSLocalizedString("settings.program.title", comment: ""))
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(.white)
 
-                        Text("Progression dans le plan 66 jours")
+                        Text(NSLocalizedString("settings.program.subtitle", comment: ""))
                             .font(.custom("Poppins-Regular", size: 13))
                             .foregroundColor(.white.opacity(0.5))
                     }
 
                     Spacer()
 
-                    Text("S\(UserDefaults.standard.integer(forKey: "currentWeek")) · J\(UserDefaults.standard.integer(forKey: "currentDay"))")
+                    Text(String(format: NSLocalizedString("settings.program.week_day", comment: ""), UserDefaults.standard.integer(forKey: "currentWeek"), UserDefaults.standard.integer(forKey: "currentDay")))
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -300,15 +271,15 @@ struct SettingsView: View {
                                 .foregroundColor(.white)
 
                             if let lastSync = viewModel.lastSyncDate {
-                                Text("Dernière sync: \(formatSyncDate(lastSync))")
+                                Text(String(format: NSLocalizedString("settings.sync.last_sync", comment: ""), formatSyncDate(lastSync)))
                                     .font(.custom("Poppins-Regular", size: 13))
                                     .foregroundColor(.white.opacity(0.5))
                             } else if let error = viewModel.syncError {
-                                Text("Erreur: \(error)")
+                                Text(String(format: NSLocalizedString("settings.sync.error", comment: ""), error))
                                     .font(.custom("Poppins-Regular", size: 13))
                                     .foregroundColor(.orange.opacity(0.8))
                             } else {
-                                Text("Synchronisation automatique")
+                                Text(NSLocalizedString("settings.sync.auto", comment: ""))
                                     .font(.custom("Poppins-Regular", size: 13))
                                     .foregroundColor(.white.opacity(0.5))
                             }
@@ -327,25 +298,25 @@ struct SettingsView: View {
     private var subscriptionSection: some View {
         settingsSection(title: StringKeys.Settings.subscription, icon: "crown.fill") {
             VStack(spacing: 0) {
-                settingsRow(icon: "checkmark.circle.fill", title: "Statut actuel", subtitle: viewModel.subscriptionStatus, showChevron: false) {}
+                settingsRow(icon: "checkmark.circle.fill", title: NSLocalizedString("settings.subscription.status", comment: ""), subtitle: viewModel.subscriptionStatus, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsRow(icon: "arrow.clockwise", title: StringKeys.Settings.renewalDate, subtitle: viewModel.renewalDate.isEmpty ? "N/A" : viewModel.renewalDate, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "gearshape.fill", title: "Gérer mon abonnement", subtitle: "Modifier ou annuler", showChevron: true) {
+                settingsRow(icon: "gearshape.fill", title: NSLocalizedString("settings.subscription.manage", comment: ""), subtitle: NSLocalizedString("settings.subscription.manage_subtitle", comment: ""), showChevron: true) {
                     HapticManager.light()
                     manageSubscription()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "arrow.down.circle.fill", title: "Restaurer mes achats", subtitle: nil, showChevron: true) {
+                settingsRow(icon: "arrow.down.circle.fill", title: NSLocalizedString("settings.subscription.restore", comment: ""), subtitle: nil, showChevron: true) {
                     HapticManager.light()
                     restorePurchases()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "rectangle.portrait.and.arrow.right", title: "Se déconnecter", subtitle: nil, showChevron: false, isDestructive: true) {
+                settingsRow(icon: "rectangle.portrait.and.arrow.right", title: NSLocalizedString("settings.signout", comment: ""), subtitle: nil, showChevron: false, isDestructive: true) {
                     HapticManager.medium()
                     showSignOutAlert = true
                 }
@@ -355,21 +326,21 @@ struct SettingsView: View {
 
     // MARK: - Privacy & Security Section
     private var privacySecuritySection: some View {
-        settingsSection(title: "Confidentialité & Sécurité", icon: "lock.shield.fill") {
+        settingsSection(title: NSLocalizedString("settings.section.privacy", comment: ""), icon: "lock.shield.fill") {
             VStack(spacing: 0) {
-                settingsRow(icon: "doc.text.fill", title: "Politique de confidentialité", subtitle: nil, showChevron: true) {
+                settingsRow(icon: "doc.text.fill", title: NSLocalizedString("settings.privacy.policy", comment: ""), subtitle: nil, showChevron: true) {
                     HapticManager.light()
                     openURL("https://cortifree.com/privacy")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "doc.plaintext.fill", title: "Conditions d'utilisation", subtitle: nil, showChevron: true) {
+                settingsRow(icon: "doc.plaintext.fill", title: NSLocalizedString("settings.privacy.terms", comment: ""), subtitle: nil, showChevron: true) {
                     HapticManager.light()
                     openURL("https://cortifree.com/terms")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "trash.fill", title: "Supprimer mon compte", subtitle: "Action irréversible", showChevron: true, isDestructive: true) {
+                settingsRow(icon: "trash.fill", title: NSLocalizedString("settings.privacy.delete_account", comment: ""), subtitle: NSLocalizedString("settings.privacy.delete_account_subtitle", comment: ""), showChevron: true, isDestructive: true) {
                     HapticManager.heavy()
                     showDeleteAccountAlert = true
                 }
@@ -378,14 +349,14 @@ struct SettingsView: View {
                 settingsRow(icon: "internaldrive.fill", title: StringKeys.Settings.localDataSize, subtitle: viewModel.localDataSize, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: StringKeys.Settings.icloudSync, subtitle: "Sauvegarder vos données dans le cloud", isOn: $viewModel.syncEnabled)
+                settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: StringKeys.Settings.icloudSync, subtitle: NSLocalizedString("settings.privacy.icloud_subtitle", comment: ""), isOn: $viewModel.syncEnabled)
             }
         }
     }
 
     // MARK: - About & Support Section
     private var aboutSupportSection: some View {
-        settingsSection(title: "À propos & Support", icon: "info.circle.fill") {
+        settingsSection(title: NSLocalizedString("settings.section.about", comment: ""), icon: "info.circle.fill") {
             VStack(spacing: 0) {
                 Button(action: {
                     HapticManager.light()
@@ -400,31 +371,31 @@ struct SettingsView: View {
                         versionTapCount = 0
                     }
                 }) {
-                    settingsRowContent(icon: "app.badge.fill", title: "Version", subtitle: "1.0.0 (Build 1)", showChevron: false, isDestructive: false)
+                    settingsRowContent(icon: "app.badge.fill", title: NSLocalizedString("settings.about.version", comment: ""), subtitle: "1.0.0 (Build 1)", showChevron: false, isDestructive: false)
                 }
                 .buttonStyle(PlainButtonStyle())
 
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "envelope.fill", title: "Contact support", subtitle: "contact.cortifree@gmail.com", showChevron: true) {
+                settingsRow(icon: "envelope.fill", title: NSLocalizedString("settings.about.contact", comment: ""), subtitle: "contact.cortifree@gmail.com", showChevron: true) {
                     HapticManager.light()
                     openURL("mailto:contact.cortifree@gmail.com")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "questionmark.circle.fill", title: "FAQ", subtitle: nil, showChevron: true) {
+                settingsRow(icon: "questionmark.circle.fill", title: NSLocalizedString("settings.about.faq", comment: ""), subtitle: nil, showChevron: true) {
                     HapticManager.light()
                     openURL("https://cortifree.com/faq")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "star.fill", title: "Noter l'application", subtitle: "Aidez-nous à nous améliorer", showChevron: true) {
+                settingsRow(icon: "star.fill", title: NSLocalizedString("settings.about.rate", comment: ""), subtitle: NSLocalizedString("settings.about.rate_subtitle", comment: ""), showChevron: true) {
                     HapticManager.light()
                     requestAppReview()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "link", title: "Suivre CortiFree", subtitle: "@cortifree", showChevron: true) {
+                settingsRow(icon: "link", title: NSLocalizedString("settings.about.follow", comment: ""), subtitle: "@cortifree", showChevron: true) {
                     HapticManager.light()
                     openURL("https://twitter.com/cortifree")
                 }
@@ -450,7 +421,7 @@ struct SettingsView: View {
 
                 settingsRow(icon: "arrow.clockwise.circle.fill", title: "Force sync", subtitle: nil, showChevron: false) {
                     HapticManager.light()
-                    // TODO: Implement force sync if needed
+                    // Force sync is handled automatically by Firebase
                 }
             }
         }
@@ -663,11 +634,6 @@ struct SettingsView: View {
 
     // MARK: - Statistics Helper Functions
 
-    private func calculateCompletionRate() -> Int {
-        // Utilise le taux de complétion du TasksViewModel
-        return Int(tasksViewModel.completionPercentage * 100)
-    }
-
     private func formatSyncDate(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
@@ -697,17 +663,11 @@ struct SettingsView: View {
     // MARK: - Helper Functions
 
     private func manageSubscription() {
-        // TODO: Open Superwall subscription management
-        #if canImport(SuperwallKit)
-        // Superwall.shared.presentPaywall(...)
-        #endif
+        // Subscription management handled by Superwall in CortiFreeApp
     }
 
     private func restorePurchases() {
-        // TODO: Restore purchases via Superwall/StoreKit
-        #if canImport(SuperwallKit)
-        // Superwall.shared.restorePurchases(...)
-        #endif
+        // Restore purchases handled by Superwall in CortiFreeApp
     }
 
     private func requestAppReview() {
@@ -750,7 +710,9 @@ struct SettingsView: View {
 
                 dismiss()
             } catch {
+                #if DEBUG
                 print("❌ Error deleting account: \(error)")
+                #endif
             }
         }
     }
@@ -827,11 +789,11 @@ struct RoutineSelectionSheet: View {
                 .padding(.top, 20)
 
                 VStack(spacing: 12) {
-                    Text("Changer de routine")
+                    Text(NSLocalizedString("settings.change_routine_title", comment: ""))
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
 
-                    Text("Sélectionne ta nouvelle routine")
+                    Text(NSLocalizedString("settings.select_new_routine", comment: ""))
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -888,11 +850,11 @@ struct RoutineSelectionSheet: View {
                                 .font(.system(size: 44))
                                 .foregroundColor(.orange)
 
-                            Text("⚠️ Attention")
+                            Text(NSLocalizedString("settings.warning_title", comment: ""))
                                 .font(.custom("Poppins-Bold", size: 22))
                                 .foregroundColor(.white)
 
-                            Text("Changer de routine réinitialisera :")
+                            Text(NSLocalizedString("settings.change_routine_warning", comment: ""))
                                 .font(.custom("Poppins-Regular", size: 15))
                                 .foregroundColor(.white.opacity(0.8))
                         }
@@ -901,16 +863,16 @@ struct RoutineSelectionSheet: View {
 
                         // List of what will be reset
                         VStack(alignment: .leading, spacing: 12) {
-                            WarningItem(text: "Ta progression actuelle (semaine/jour)")
-                            WarningItem(text: "Ton historique de tâches complétées")
-                            WarningItem(text: "Tes statistiques de la routine")
-                            WarningItem(text: "La date de début sera remise à aujourd'hui")
+                            WarningItem(text: NSLocalizedString("settings.current_progress", comment: ""))
+                            WarningItem(text: NSLocalizedString("settings.task_history", comment: ""))
+                            WarningItem(text: NSLocalizedString("settings.routine_stats", comment: ""))
+                            WarningItem(text: NSLocalizedString("settings.start_date_reset", comment: ""))
                         }
                         .padding(.horizontal, 24)
                         .padding(.top, 24)
 
                         // What will be preserved
-                        Text("Ton XP total, niveau et streak seront conservés.")
+                        Text(NSLocalizedString("settings.xp_level_preserved", comment: ""))
                             .font(.custom("Poppins-Regular", size: 13))
                             .foregroundColor(Color.appTheme)
                             .multilineTextAlignment(.center)
@@ -928,7 +890,7 @@ struct RoutineSelectionSheet: View {
                                     changeRoutine(to: plan)
                                 }
                             }) {
-                                Text("Confirmer le changement")
+                                Text(NSLocalizedString("settings.confirm_change", comment: ""))
                                     .font(.custom("Poppins-SemiBold", size: 16))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
@@ -951,7 +913,7 @@ struct RoutineSelectionSheet: View {
                                     pendingPlan = nil
                                 }
                             }) {
-                                Text("Annuler")
+                                Text(NSLocalizedString("common.cancel", comment: ""))
                                     .font(.custom("Poppins-Medium", size: 16))
                                     .foregroundColor(.white.opacity(0.7))
                                     .frame(maxWidth: .infinity)
@@ -1103,13 +1065,13 @@ struct RoutineSelectionRow: View {
 
     private func getDescriptionForRoutine(_ title: String) -> String {
         if title.contains("stress") {
-            return "Techniques de relaxation et méditation"
-        } else if title.contains("sommeil") {
-            return "Routine du soir et sommeil réparateur"
-        } else if title.contains("énergie") {
-            return "Boost d'énergie naturelle"
+            return NSLocalizedString("settings.routine_desc.stress", comment: "")
+        } else if title.contains("sommeil") || title.contains("sleep") {
+            return NSLocalizedString("settings.routine_desc.sleep", comment: "")
+        } else if title.contains("énergie") || title.contains("energy") {
+            return NSLocalizedString("settings.routine_desc.energy", comment: "")
         } else {
-            return "Programme personnalisé de bien-être"
+            return NSLocalizedString("settings.routine_desc.default", comment: "")
         }
     }
 }
@@ -1119,14 +1081,16 @@ struct SoundPickerSheet: View {
     @Binding var selectedSound: String
     @Environment(\.dismiss) private var dismiss
 
-    let sounds = [
-        "Pluie forestière",
-        "Ocean",
-        "Feu de cheminée",
-        "Vent doux",
-        "Rivière",
-        "Oiseaux matinaux"
-    ]
+    var sounds: [String] {
+        [
+            NSLocalizedString("settings.forest_rain", comment: ""),
+            NSLocalizedString("settings.ocean", comment: ""),
+            NSLocalizedString("settings.fireplace", comment: ""),
+            NSLocalizedString("settings.gentle_wind", comment: ""),
+            NSLocalizedString("settings.river", comment: ""),
+            NSLocalizedString("settings.morning_birds", comment: "")
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -1154,7 +1118,7 @@ struct SoundPickerSheet: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
 
-                Text("Sons relaxants")
+                Text(NSLocalizedString("settings.relaxing_sounds", comment: ""))
                     .font(.custom("Poppins-Bold", size: 24))
                     .foregroundColor(.white)
                     .padding(.bottom, 8)

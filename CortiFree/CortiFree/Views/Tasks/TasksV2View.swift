@@ -10,8 +10,8 @@ import SwiftUI
 import FirebaseAuth
 
 struct TasksV2View: View {
-    @StateObject private var achievementService = AchievementService.shared
-    @StateObject private var habitBadgeService = HabitBadgeService.shared
+    @ObservedObject private var achievementService = AchievementService.shared
+    @ObservedObject private var habitBadgeService = HabitBadgeService.shared
     @State private var selectedTask: HabitTask?
     @State private var selectedTab: TaskTab = .todos
     @State private var taskStatuses: [String: [String: TaskStatus]] = [:] // [day: [taskTitle: status]]
@@ -65,9 +65,8 @@ struct TasksV2View: View {
         let week = WeeklyHabitProgression.currentWeek(for: currentDay)
         let dayOfWeek = (currentDay - 1) % 7 // 0 = lundi, 6 = dimanche
 
-        // 1. SE LEVER AVANT 7H (matin)
-        let sleepProgression = WeeklyHabitProgression.sleepProgression(week: week)
-        let sleepVariants = HabitVariantConfig.getSleepVariants()
+        // 1. SE LEVER (matin) - titre dynamique selon la semaine
+        let sleepVariants = HabitVariantConfig.getSleepVariants(forDay: currentDay)
 
         // Ajouter "Se lever avant 7h"
         if sleepVariants.count > 0 {
@@ -90,13 +89,14 @@ struct TasksV2View: View {
         // 2. RESPIRATION (matin)
         let breathingProgression = WeeklyHabitProgression.breathingProgression(week: week)
         let breathingDuration = WeeklyHabitProgression.formatProgressionDisplay(breathingProgression)
+        let breathingVariant = HabitVariantConfig.getBreathingVariant()
         // Afficher seulement certains jours selon fréquence
         let showBreathing = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: breathingProgression.frequencyPerWeek)
 
         if showBreathing {
             let breathingData = habitTracking[AppConstants.Habits.ID.breathing]
             dailyTasks.append(HabitTask(
-                title: StringKeys.HabitTitles.breathing,
+                title: breathingVariant.title,
                 frequency: breathingDuration, // For compatibility
                 duration: breathingDuration,
                 frequencyText: breathingProgression.formattedFrequency,
@@ -113,12 +113,13 @@ struct TasksV2View: View {
         // 3. MÉDITATION (matin)
         let meditationProgression = WeeklyHabitProgression.meditationProgression(week: week)
         let meditationDuration = WeeklyHabitProgression.formatProgressionDisplay(meditationProgression)
+        let meditationVariant = HabitVariantConfig.getMeditationVariant()
         let showMeditation = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: meditationProgression.frequencyPerWeek)
 
         if showMeditation {
             let meditationData = habitTracking[AppConstants.Habits.ID.meditation]
             dailyTasks.append(HabitTask(
-                title: StringKeys.HabitTitles.meditation,
+                title: meditationVariant.title,
                 frequency: meditationDuration,
                 duration: meditationDuration,
                 frequencyText: meditationProgression.formattedFrequency,
@@ -132,19 +133,18 @@ struct TasksV2View: View {
             ))
         }
 
-        // 4. HYDRATATION (toute la journée)
-        let waterProgression = WeeklyHabitProgression.waterProgression(week: week)
-        let waterQuantity = waterProgression.formattedQuantity ?? AppConstants.Habits.defaultWaterQuantity
+        // 4. HYDRATATION (toute la journée) - titre dynamique selon la semaine
+        let waterVariant = HabitVariantConfig.getWaterVariant(forDay: currentDay)
         let waterData = habitTracking[AppConstants.Habits.ID.water]
 
         dailyTasks.append(HabitTask(
-            title: "Boire au minimum \(waterQuantity) d'eau",
+            title: waterVariant.title,
             frequency: "", // For compatibility
             duration: "", // Pas de durée pour l'eau
             frequencyText: StringKeys.Frequency.daily,
             difficulty: AppConstants.Habits.Difficulty.easy,
             streak: waterData?.currentStreak ?? 0,
-            imageName: "habit_water",
+            imageName: waterVariant.imageName,
             totalCompletions: waterData?.totalCompletions ?? 0,
             last7Days: waterData?.last7Days ?? [false, false, false, false, false, false, false],
             completedDays: waterData?.completedDays ?? [],
@@ -219,18 +219,19 @@ struct TasksV2View: View {
         // 8. JOURNAL (soir)
         let journalProgression = WeeklyHabitProgression.journalProgression(week: week)
         let journalDuration = WeeklyHabitProgression.formatProgressionDisplay(journalProgression)
+        let journalVariant = HabitVariantConfig.getJournalVariant()
         let showJournal = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: journalProgression.frequencyPerWeek)
 
         if showJournal {
             let journalData = habitTracking[AppConstants.Habits.ID.journal]
             dailyTasks.append(HabitTask(
-                title: StringKeys.HabitTitles.journal,
+                title: journalVariant.title,
                 frequency: journalDuration,
                 duration: journalDuration,
                 frequencyText: journalProgression.formattedFrequency,
                 difficulty: AppConstants.Habits.Difficulty.medium,
                 streak: journalData?.currentStreak ?? 0,
-                imageName: "habit_journal",
+                imageName: journalVariant.imageName,
                 totalCompletions: journalData?.totalCompletions ?? 0,
                 last7Days: journalData?.last7Days ?? [false, false, false, false, false, false, false],
                 completedDays: journalData?.completedDays ?? [],
@@ -355,13 +356,14 @@ struct TasksV2View: View {
                                 let currentWeek = WeeklyHabitProgression.currentWeek(for: actualDay)
                                 let targetWeek = WeeklyHabitProgression.currentWeek(for: targetDay)
 
-                                if targetWeek <= currentWeek {
-                                    withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
-                                        currentDay = targetDay
-                                    }
-                                } else {
-                                    showFutureWeekAlert = true
+                                // TESTING: Week lock disabled for testing
+                                // if targetWeek <= currentWeek {
+                                withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
+                                    currentDay = targetDay
                                 }
+                                // } else {
+                                //     showFutureWeekAlert = true
+                                // }
                             }) {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 20, weight: .bold))
@@ -759,7 +761,9 @@ struct TasksV2View: View {
                     updateGlobalStreak()
                 }
             } catch {
+                #if DEBUG
                 print("Error loading Firebase data: \(error)")
+                #endif
                 // Set error state for UI display
                 await MainActor.run {
                     self.loadingError = error.localizedDescription
@@ -929,10 +933,9 @@ struct TasksV2View: View {
 
         taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .done
 
-        // Update task streak
+        // Toujours recalculer les streaks normalement
+        // Skip = "pas encore fait", donc valider après un skip continue le streak normalement
         updateTaskStreak(task)
-
-        // Update global streak
         updateGlobalStreak()
 
         // Save to Firebase and apply impact scoring
@@ -983,7 +986,9 @@ struct TasksV2View: View {
                     await habitBadgeService.checkHabitBadges(habitId: habitId, tasksCompleted: stats.completed)
                 }
             } catch {
+                #if DEBUG
                 print("Error saving task validation: \(error)")
+                #endif
             }
         }
 
@@ -1015,18 +1020,19 @@ struct TasksV2View: View {
         case "habit_journal":
             return "journal"
         default:
+            #if DEBUG
             print("⚠️ Unknown habit image: \(task.imageName)")
+            #endif
             return "unknown"
         }
     }
 
     private func skipTask(_ task: HabitTask) {
-        // TEMPORARY: Disabled skip restriction for testing
-        // TODO: Re-enable this validation check after testing
-        // guard currentDay == actualDay else {
-        //     HapticManager.error()
-        //     return
-        // }
+        // Only allow skipping on the current day
+        guard currentDay == actualDay else {
+            HapticManager.error()
+            return
+        }
 
         HapticManager.medium()
 
@@ -1041,11 +1047,9 @@ struct TasksV2View: View {
 
         taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .skipped
 
-        // Reset task streak to 0
-        taskStreaks[taskKey(task)] = 0
-
-        // Update global streak (in case this was the only task keeping the streak alive)
-        updateGlobalStreak()
+        // NE PAS toucher aux streaks - skip = "pas encore fait"
+        // Les streaks seront recalculés correctement quand on valide
+        // Ou au début du jour suivant si jamais validé
 
         // Save skip status to Firebase and reverse points if task was previously validated
         Task {
@@ -1079,7 +1083,9 @@ struct TasksV2View: View {
                     }
                 }
             } catch {
+                #if DEBUG
                 print("Error saving skip status: \(error)")
+                #endif
             }
         }
     }
@@ -1142,7 +1148,9 @@ struct TasksV2View: View {
                         status: "todo"
                     )
                 } catch {
+                    #if DEBUG
                     print("Error restoring task status: \(error)")
+                    #endif
                 }
             }
         }

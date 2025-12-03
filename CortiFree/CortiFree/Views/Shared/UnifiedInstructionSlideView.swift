@@ -35,7 +35,7 @@ struct UnifiedInstructionSlideView: View {
     let onComplete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var voiceOverManager = VoiceOverManager.shared
+    @ObservedObject private var voiceOverManager = VoiceOverManager.shared
     @State private var currentSlide = 0
     @State private var pulseAnimation = false
     @State private var showConfetti = false

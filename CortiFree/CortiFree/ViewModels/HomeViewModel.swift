@@ -45,7 +45,9 @@ class HomeViewModel: ObservableObject {
             isLoading = false
         } catch {
             // Gestion silencieuse si pas de données (première utilisation)
+            #if DEBUG
             print("📊 Home: Initializing with default values")
+            #endif
             isLoading = false
         }
     }
@@ -64,7 +66,9 @@ class HomeViewModel: ObservableObject {
     private func handleLevelUp(level: Int) {
         triggerHaptic(.heavy)
         // TODO: Show confetti animation
+        #if DEBUG
         print("🎉 Level Up! Now at level \(level)")
+        #endif
     }
 
     private func calculateWeekProgress(tasks: [TaskItem]) async {

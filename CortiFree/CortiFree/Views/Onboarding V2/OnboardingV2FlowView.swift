@@ -71,7 +71,7 @@ struct OnboardingV2FlowView: View {
 
         case .reassurance:
             ReassuranceView(
-                userName: overallQuizData?.firstName ?? "Utilisateur",
+                userName: overallQuizData?.firstName ?? "common.user_fallback".localized,
                 onStartQuiz: {
                     currentStep = .habitsQuiz
                 }
@@ -101,7 +101,7 @@ struct OnboardingV2FlowView: View {
 
         case .authentication:
             AuthenticationView(
-                firstName: overallQuizData?.firstName ?? "Utilisateur",
+                firstName: overallQuizData?.firstName ?? "common.user_fallback".localized,
                 onComplete: {
                     currentStep = .loading
                 }
@@ -132,13 +132,17 @@ struct OnboardingV2FlowView: View {
 
         case .eightHabits:
             EightHabitsFlowView(onComplete: {
+                #if DEBUG
                 print("✅ OnboardingV2FlowView: Transition .eightHabits → .notificationPermissions")
+                #endif
                 currentStep = .notificationPermissions
             })
 
         case .notificationPermissions:
             NotificationPermissionsView(onContinue: {
+                #if DEBUG
                 print("✅ OnboardingV2FlowView: Transition .notificationPermissions → .habitsProgress")
+                #endif
                 currentStep = .habitsProgress
             })
 
@@ -149,7 +153,9 @@ struct OnboardingV2FlowView: View {
 
         case .socialProof:
             SocialProofFlowView(onComplete: {
+                #if DEBUG
                 print("✅ OnboardingV2FlowView: Transition .socialProof → .complete")
+                #endif
                 // Generate personalized plan based on quiz results
                 if let habitsResult = habitsQuizResult {
                     saveDataAndGeneratePlan(result: habitsResult)
@@ -182,7 +188,9 @@ struct OnboardingV2FlowView: View {
             if let overallData = overallQuizData {
                 await saveOverallDataToFirebase(overallData)
             }
+            #if DEBUG
             print("✅ User data saved - using universal program for all users")
+            #endif
         }
     }
 
@@ -205,9 +213,13 @@ struct OnboardingV2FlowView: View {
                 .collection("users")
                 .document(userId)
                 .setData(userData, merge: true)
+            #if DEBUG
             print("✅ User profile updated")
+            #endif
         } catch {
+            #if DEBUG
             print("❌ Error updating user profile: \(error)")
+            #endif
         }
     }
 }

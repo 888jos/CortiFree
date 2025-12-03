@@ -10,6 +10,7 @@ import SwiftUI
 
 struct NotificationPermissionsView: View {
     let onContinue: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
 
     @State private var enableStreak: Bool = true
     @State private var enableDailyRitual: Bool = true
@@ -31,7 +32,7 @@ struct NotificationPermissionsView: View {
 
             VStack(spacing: 0) {
                 // Title
-                Text("Reste motivé chaque jour")
+                Text("onboarding_v2.notifications.stay_motivated".localized)
                     .font(.custom("Poppins-Bold", size: 28))
                     .foregroundStyle(
                         LinearGradient(
@@ -46,7 +47,7 @@ struct NotificationPermissionsView: View {
                     .padding(.bottom, 12)
 
                 // Subtitle
-                Text("Active les notifications pour ne jamais perdre ta routine et suivre tes progrès")
+                Text("onboarding_v2.notifications.activate_subtitle".localized)
                     .font(.custom("Poppins-Regular", size: 16))
                     .foregroundColor(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
@@ -57,20 +58,20 @@ struct NotificationPermissionsView: View {
                 // Notification options
                 VStack(spacing: 16) {
                     NotificationToggleCard(
-                        title: "Rappel de routine quotidienne",
-                        description: "Rappel personnalisable pour tes sessions quotidiennes et maintenir ta constance",
+                        title: "onboarding_v2.notifications.daily_routine".localized,
+                        description: "onboarding_v2.notifications.daily_routine_desc".localized,
                         isEnabled: $enableStreak
                     )
 
                     NotificationToggleCard(
-                        title: "Série en danger",
-                        description: "Préserve ta motivation : on te rappelle si tu risques de perdre ta série du jour",
+                        title: "onboarding_v2.notifications.streak_danger".localized,
+                        description: "onboarding_v2.notifications.streak_danger_desc".localized,
                         isEnabled: $enableDailyRitual
                     )
 
                     NotificationToggleCard(
-                        title: "Moment de réflexion",
-                        description: "Rappel en soirée pour prendre quelques minutes et noter tes pensées du jour",
+                        title: "onboarding_v2.notifications.reflection_moment".localized,
+                        description: "onboarding_v2.notifications.reflection_moment_desc".localized,
                         isEnabled: $enableWeeklyReport
                     )
                 }
@@ -80,7 +81,9 @@ struct NotificationPermissionsView: View {
 
                 // Continue button
                 Button(action: {
+                    #if DEBUG
                     print("🔔 NotificationPermissionsView: Bouton Suivant cliqué - Navigation vers HabitsProgress")
+                    #endif
                     HapticManager.medium()
 
                     // Track permission request
@@ -98,7 +101,7 @@ struct NotificationPermissionsView: View {
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
 
-                        Text("Suivant")
+                        Text("onboarding_v2.notifications.next".localized)
                             .font(.custom("Poppins-SemiBold", size: 18))
                             .foregroundColor(.white)
                     }
@@ -126,10 +129,12 @@ struct NotificationPermissionsView: View {
     }
 
     private func requestNotificationPermissions() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+            #if DEBUG
             if granted {
                 print("✅ Notification permissions granted")
             }
+            #endif
         }
     }
 }

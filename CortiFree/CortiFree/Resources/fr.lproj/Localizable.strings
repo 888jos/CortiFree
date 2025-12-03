@@ -417,6 +417,30 @@
 "journal.mood.hide" = "Masquer";
 "journal.mood.change" = "Changer";
 
+// Mood emotions
+"mood.awful" = "Terrible";
+"mood.angry" = "Colère";
+"mood.low" = "Faible";
+"mood.okay" = "Neutre";
+"mood.good" = "Bien";
+"mood.amazing" = "Génial";
+
+// MARK: - Badge Levels
+"badge.level.bronze" = "Bronze";
+"badge.level.silver" = "Argent";
+"badge.level.gold" = "Or";
+"badge.level.diamond" = "Diamant";
+
+// MARK: - Badge Habits
+"badge.habit.meditation" = "Méditation";
+"badge.habit.breathing" = "Respiration";
+"badge.habit.journal" = "Journal";
+"badge.habit.sport" = "Sport";
+"badge.habit.water" = "Eau";
+"badge.habit.nature" = "Nature";
+"badge.habit.social" = "Social";
+"badge.habit.sleep" = "Sommeil";
+
 // MARK: - Additional Common Keys
 "common.continue" = "Continuer";
 "common.next" = "Suivant";
@@ -434,6 +458,9 @@
 "breathing.rhythm.three_phases" = "Inspire %ds - Retiens %ds - Expire %ds";
 "breathing.rhythm.four_phases" = "Inspire %ds - Retiens %ds - Expire %ds - Retiens %ds";
 "breathing.completion.title" = "Tu as repris le contrôle";
+"breathing.phase.inhale" = "Inspire";
+"breathing.phase.hold" = "Maintiens";
+"breathing.phase.exhale" = "Expire";
 
 // MARK: - Onboarding V2 - Overall Quiz
 "onboarding.overall_quiz.title" = "Quelques questions pour commencer";
@@ -1528,11 +1555,11 @@
 "breathing_detail.start_exercise" = "Commencer l'exercice";
 
 // How it works texts
-"breathing_detail.how_it_works.deep_abdominal" = "Respire profondément avec ton ventre pour activer naturellement le système nerveux parasympathique et créer un état de calme immédiat dans tout ton corps";
-"breathing_detail.how_it_works.cardiac_coherence" = "Respire à un rythme de six cycles par minute pour créer un équilibre optimal entre ton cœur et ton cerveau réduisant ainsi le cortisol mesurable";
-"breathing_detail.how_it_works.box_breathing" = "La technique utilisée par les forces spéciales pour maintenir le calme dans le stress intense en respirant sur quatre temps égaux synchronisant ton rythme cardiaque";
-"breathing_detail.how_it_works.alternate_breathing" = "Une respiration alternée qui calme instantanément ton système nerveux en équilibrant les deux hémisphères de ton cerveau pour favoriser sommeil profond et réparateur";
-"breathing_detail.how_it_works.default" = "Suis attentivement le rythme respiratoire guidé pour activer ta réponse de relaxation naturelle et retrouver rapidement un état de calme profond et durable";
+"breathing_detail.how_it_works.deep_abdominal" = "Respire profondément avec le ventre pour activer le système nerveux parasympathique et créer un calme immédiat.";
+"breathing_detail.how_it_works.cardiac_coherence" = "Respire à six cycles par minute pour synchroniser cœur et cerveau, réduisant naturellement le cortisol.";
+"breathing_detail.how_it_works.box_breathing" = "Technique des forces spéciales : respire sur quatre temps égaux pour rester calme sous pression.";
+"breathing_detail.how_it_works.alternate_breathing" = "Respiration alternée qui équilibre les deux hémisphères du cerveau pour favoriser un sommeil profond.";
+"breathing_detail.how_it_works.default" = "Suis le rythme respiratoire guidé pour activer ta relaxation naturelle et retrouver le calme.";
 
 // Scientific evidence texts (3 bullet points, 10-12 mots max, 1 source)
 "breathing_detail.evidence.cardiac_coherence_1" = "Baisse du cortisol de 23% en 3 semaines";
@@ -1678,7 +1705,7 @@
 "meditation_detail.title" = "Méditation guidée";
 "meditation_detail.subtitle" = "Recentre ton esprit et retrouve le calme";
 "meditation_detail.how_it_works" = "Comment ça marche ?";
-"meditation_detail.how_it_works_text" = "Concentre toute ton attention sur ta respiration naturelle pour apaiser ton esprit et créer un espace de calme intérieur profond en observant sans jugement tes pensées";
+"meditation_detail.how_it_works_text" = "Concentre ton attention sur ta respiration pour apaiser l'esprit et créer un calme intérieur profond.";
 "meditation_detail.scientific_data" = "Données scientifiques";
 "meditation_detail.benefits" = "Bienfaits";
 "meditation_detail.start_meditation" = "Commencer la méditation";
@@ -2275,12 +2302,34 @@
 // MARK: - AntiStress
 
 // Stress Situations
+"antistress.situation.title" = "Dans quelle situation es-tu ?";
+"antistress.situation.subtitle" = "Sélectionne ton état actuel pour recevoir des exercices anti-stress personnalisés.";
 "antistress.situation.overwhelmed" = "Je me sens submergé";
 "antistress.situation.insomnia" = "Je n'arrive pas à dormir";
 "antistress.situation.physical_tension" = "Je suis tendu physiquement";
 "antistress.situation.before_event" = "Je stresse avant un événement";
 "antistress.situation.anxiety" = "J'ai de l'anxiété";
 "antistress.situation.need_energy" = "J'ai besoin d'énergie";
+
+// Anti-Stress Recommendation
+"antistress.recommended_at" = "Recommandé à %d%%";
+
+// MARK: - Exercise Descriptions
+"antistress.exercise.guided_breathing.desc" = "Ralentis ton rythme cardiaque";
+"antistress.exercise.grounding_5_senses.desc" = "Reconnecte avec le moment présent";
+"antistress.exercise.conscious_stretching.desc" = "Relâche les tensions physiques";
+"antistress.exercise.cardiac_coherence.desc" = "Équilibre ton système nerveux";
+"antistress.exercise.audio_relaxation.desc" = "Laisse-toi guider par le son";
+"antistress.exercise.body_scan.desc" = "Détends chaque partie de ton corps";
+"antistress.exercise.box_breathing.desc" = "Technique de respiration militaire";
+"antistress.exercise.anchoring_54321.desc" = "Ramène-toi dans l'instant présent";
+"antistress.exercise.positive_mantra.desc" = "Renforce ta confiance intérieure";
+"antistress.exercise.visual_micro_break.desc" = "Repose tes yeux et ton esprit";
+"antistress.exercise.alternate_breathing.desc" = "Équilibre tes deux hémisphères";
+"antistress.exercise.slow_walk.desc" = "Marche en pleine conscience";
+"antistress.exercise.conscious_breathing.desc" = "Retrouve ton calme naturel";
+"antistress.exercise.meditation_2_min.desc" = "Courte méditation guidée";
+"antistress.exercise.white_noise.desc" = "Sons apaisants pour te détendre";
 
 // MARK: - Exercise Recommendation Page
 "antistress.recommendation.title" = "Exercices recommandés";
@@ -2303,7 +2352,7 @@
 "antistress.body_scan.category_badge" = "ANCRAGE";
 "antistress.body_scan.title" = "Scan corporel";
 "antistress.body_scan.subtitle" = "Détends chaque partie de ton corps";
-"antistress.body_scan.how_it_works_text" = "Scanne mentalement chaque partie de ton corps de la tête aux pieds pour relâcher progressivement toutes les tensions musculaires accumulées et retrouver un état de détente profonde complète";
+"antistress.body_scan.how_it_works_text" = "Scanne mentalement ton corps de la tête aux pieds pour relâcher les tensions et retrouver une détente profonde.";
 "antistress.body_scan.benefit_1" = "Relaxation profonde";
 "antistress.body_scan.benefit_2" = "Libère tensions";
 "antistress.body_scan.benefit_3" = "Meilleur sommeil";
@@ -2317,7 +2366,7 @@
 "antistress.grounding_5_senses.category_badge" = "ANCRAGE";
 "antistress.grounding_5_senses.title" = "Ancrage 5 sens";
 "antistress.grounding_5_senses.subtitle" = "Reconnecte avec le moment présent en utilisant tes cinq sens";
-"antistress.grounding_5_senses.how_it_works_text" = "Utilise chacun de tes cinq sens pour te reconnecter fermement au moment présent en observant attentivement ton environnement immédiat ce qui interrompt le cycle des pensées anxieuses et ramène ton attention ici et maintenant";
+"antistress.grounding_5_senses.how_it_works_text" = "Active tes cinq sens pour te reconnecter au présent, interrompant le cycle des pensées anxieuses.";
 "antistress.grounding_5_senses.benefit_1" = "Stoppe l'anxiété";
 "antistress.grounding_5_senses.benefit_2" = "Ancre au présent";
 "antistress.grounding_5_senses.benefit_3" = "Calme l'esprit";
@@ -2331,7 +2380,7 @@
 "antistress.anchoring_54321.category_badge" = "ANCRAGE";
 "antistress.anchoring_54321.title" = "Technique 54321";
 "antistress.anchoring_54321.subtitle" = "Ramène-toi dans l'instant présent avec tes cinq sens";
-"antistress.anchoring_54321.how_it_works_text" = "Observe cinq choses que tu vois, quatre que tu touches, trois que tu entends, deux que tu sens et une que tu goûtes pour ancrer fermement ton attention dans le moment présent et calmer ton système nerveux";
+"antistress.anchoring_54321.how_it_works_text" = "Observe 5 choses que tu vois, 4 que tu touches, 3 que tu entends, 2 que tu sens et 1 que tu goûtes.";
 "antistress.anchoring_54321.benefit_1" = "Stoppe la panique";
 "antistress.anchoring_54321.benefit_2" = "Ramène au présent";
 "antistress.anchoring_54321.benefit_3" = "Calme rapide";
@@ -2463,3 +2512,517 @@
 // Default AntiStress
 "antistress.default.subtitle" = "Exercice de relaxation pour retrouver ton calme";
 "antistress.default.source" = "Journal of Behavioral Medicine (2018)";
+
+// MARK: - Onboarding V2
+
+// Welcome Screen
+"onboarding_v2.welcome.title" = "Bienvenue dans\nCortiFree";
+"onboarding_v2.welcome.subtitle" = "Ton compagnon personnel pour une vie sans stress";
+"onboarding_v2.welcome.benefit_1" = "Plan personnalisé à ton stress";
+"onboarding_v2.welcome.benefit_2" = "Suivi quotidien de tes progrès";
+"onboarding_v2.welcome.benefit_3" = "Techniques scientifiquement prouvées";
+"onboarding_v2.welcome.start_button" = "Commencer";
+"onboarding_v2.welcome.time_estimate" = "Prends 15 minutes";
+
+// Overall Quiz
+"onboarding_v2.overall.name_question" = "Comment puis-je t'appeler ?";
+"onboarding_v2.overall.name_placeholder" = "Ton prénom";
+"onboarding_v2.overall.gender_question" = "Tu es...";
+"onboarding_v2.overall.gender_male" = "Homme";
+"onboarding_v2.overall.gender_female" = "Femme";
+"onboarding_v2.overall.gender_other" = "Préfère ne pas dire";
+"onboarding_v2.overall.age_question" = "Quel âge as-tu ?";
+"onboarding_v2.overall.age_under_18" = "-18 ans";
+"onboarding_v2.overall.age_18_24" = "18-24 ans";
+"onboarding_v2.overall.age_25_34" = "25-34 ans";
+"onboarding_v2.overall.age_35_44" = "35-44 ans";
+"onboarding_v2.overall.age_45_54" = "45-54 ans";
+"onboarding_v2.overall.age_55_plus" = "55 ans et plus";
+"onboarding_v2.overall.reason_question" = "Qu'est-ce qui t'amène à télécharger CortiFree aujourd'hui ?";
+"onboarding_v2.overall.reason_sleep" = "Je dors mal ou pas assez";
+"onboarding_v2.overall.reason_anxiety" = "Je ressens de l'anxiété ou du stress";
+"onboarding_v2.overall.reason_energy" = "Je manque d'énergie au quotidien";
+"onboarding_v2.overall.reason_focus" = "J'ai du mal à me concentrer";
+"onboarding_v2.overall.reason_mental" = "Je veux prendre soin de ma santé mentale";
+"onboarding_v2.overall.reason_difficult" = "Je traverse une période difficile";
+"onboarding_v2.overall.reason_habits" = "Je cherche à développer de bonnes habitudes";
+"onboarding_v2.overall.duration_question" = "Depuis combien de temps ?";
+"onboarding_v2.overall.duration_weeks" = "Quelques semaines";
+"onboarding_v2.overall.duration_2_6_months" = "2 à 6 mois";
+"onboarding_v2.overall.duration_6_12_months" = "6 mois à 1 an";
+"onboarding_v2.overall.duration_1_year_plus" = "Plus d'un an";
+"onboarding_v2.overall.duration_years" = "Plusieurs années";
+
+// Reassurance View
+"onboarding_v2.reassurance.greeting" = "Merci";
+"onboarding_v2.reassurance.message_part1" = "Tu n'es pas seul(e). Le stress touche plus de";
+"onboarding_v2.reassurance.message_part2" = "des adultes en France.";
+"onboarding_v2.reassurance.message_part3" = "La bonne nouvelle ? Ensemble, nous allons créer ton plan personnalisé pour reprendre le contrôle.";
+"onboarding_v2.reassurance.start_quiz" = "Commencer le quiz";
+
+// Habits Quiz - Questions
+"onboarding_v2.habits.q1" = "Quand tu rentres le soir, arrives-tu à te détendre rapidement ?";
+"onboarding_v2.habits.q1_opt1" = "Jamais";
+"onboarding_v2.habits.q1_opt2" = "Rarement";
+"onboarding_v2.habits.q1_opt3" = "Parfois";
+"onboarding_v2.habits.q1_opt4" = "Souvent";
+"onboarding_v2.habits.q2" = "As-tu déjà annulé des plans avec des proches à cause de la fatigue ou du stress ?";
+"onboarding_v2.habits.q2_opt1" = "Très souvent";
+"onboarding_v2.habits.q2_opt2" = "Souvent";
+"onboarding_v2.habits.q2_opt3" = "Parfois";
+"onboarding_v2.habits.q2_opt4" = "Jamais";
+"onboarding_v2.habits.q3" = "Te réveilles-tu la nuit en pensant au lendemain ?";
+"onboarding_v2.habits.q3_opt1" = "Presque chaque nuit";
+"onboarding_v2.habits.q3_opt2" = "Plusieurs fois par semaine";
+"onboarding_v2.habits.q3_opt3" = "Rarement";
+"onboarding_v2.habits.q3_opt4" = "Jamais";
+"onboarding_v2.habits.q4" = "Ressens-tu des tensions physiques (nuque, épaules, mâchoire) au quotidien ?";
+"onboarding_v2.habits.q4_opt1" = "En permanence";
+"onboarding_v2.habits.q4_opt2" = "Souvent";
+"onboarding_v2.habits.q4_opt3" = "Parfois";
+"onboarding_v2.habits.q4_opt4" = "Rarement";
+"onboarding_v2.habits.q5" = "Combien de temps peux-tu rester concentré sans être distrait ?";
+"onboarding_v2.habits.q5_opt1" = "Moins de 15 minutes";
+"onboarding_v2.habits.q5_opt2" = "15-30 minutes";
+"onboarding_v2.habits.q5_opt3" = "30-60 minutes";
+"onboarding_v2.habits.q5_opt4" = "Plus d'une heure";
+"onboarding_v2.habits.q6" = "À quelle fréquence te sens-tu submergé par tes responsabilités ?";
+"onboarding_v2.habits.q6_opt1" = "Tous les jours";
+"onboarding_v2.habits.q6_opt2" = "Plusieurs fois par semaine";
+"onboarding_v2.habits.q6_opt3" = "1-2 fois par semaine";
+"onboarding_v2.habits.q6_opt4" = "Rarement";
+"onboarding_v2.habits.q7" = "As-tu du mal à déconnecter des écrans le soir ?";
+"onboarding_v2.habits.q7_opt1" = "Toujours";
+"onboarding_v2.habits.q7_opt2" = "Souvent";
+"onboarding_v2.habits.q7_opt3" = "Parfois";
+"onboarding_v2.habits.q7_opt4" = "Jamais";
+"onboarding_v2.habits.q8" = "Quel est ton niveau d'énergie en fin de journée ?";
+"onboarding_v2.habits.q8_opt1" = "Épuisé(e)";
+"onboarding_v2.habits.q8_opt2" = "Fatigué(e)";
+"onboarding_v2.habits.q8_opt3" = "Correct";
+"onboarding_v2.habits.q8_opt4" = "Plein(e) d'énergie";
+"onboarding_v2.habits.q9" = "Comment as-tu entendu parler de CortiFree ?";
+"onboarding_v2.habits.q9_opt1" = "App Store";
+"onboarding_v2.habits.q9_opt2" = "Instagram";
+"onboarding_v2.habits.q9_opt3" = "TikTok";
+"onboarding_v2.habits.q9_opt4" = "Bouche à oreille";
+"onboarding_v2.habits.q9_opt5" = "Publicité";
+"onboarding_v2.habits.q9_opt6" = "Autre";
+"onboarding_v2.habits.q10" = "As-tu déjà essayé d'autres apps de bien-être ou méditation ?";
+"onboarding_v2.habits.q10_opt1" = "Non, jamais";
+"onboarding_v2.habits.q10_opt2" = "Oui, mais j'ai arrêté";
+"onboarding_v2.habits.q10_opt3" = "Oui, j'en utilise encore une";
+"onboarding_v2.habits.q10_opt4" = "Oui, j'en ai essayé plusieurs";
+"onboarding_v2.habits.q11" = "Qu'est-ce que tu aimerais le plus améliorer ?";
+"onboarding_v2.habits.q11_opt1" = "Mieux dormir";
+"onboarding_v2.habits.q11_opt2" = "Réduire mon stress";
+"onboarding_v2.habits.q11_opt3" = "Avoir plus d'énergie";
+"onboarding_v2.habits.q11_opt4" = "Mieux me concentrer";
+"onboarding_v2.habits.q11_opt5" = "Un meilleur équilibre global";
+"onboarding_v2.habits.q12" = "Combien de temps peux-tu consacrer par jour à ton bien-être ?";
+"onboarding_v2.habits.q12_opt1" = "Moins de 15 minutes";
+"onboarding_v2.habits.q12_opt2" = "15-30 minutes";
+"onboarding_v2.habits.q12_opt3" = "30-45 minutes";
+"onboarding_v2.habits.q12_opt4" = "45-60 minutes";
+"onboarding_v2.habits.q12_opt5" = "Plus d'une heure";
+
+// Sixty Days Explanation
+"onboarding_v2.sixty_days.title" = "Pourquoi 60 jours ?";
+"onboarding_v2.sixty_days.intro" = "Des études scientifiques le confirment :";
+"onboarding_v2.sixty_days.habit_time" = "Il faut en moyenne 66 jours pour qu'un nouveau comportement devienne automatique.";
+"onboarding_v2.sixty_days.explanation" = "Notre programme de 60 jours est conçu pour t'accompagner dans cette transformation, étape par étape.";
+"onboarding_v2.sixty_days.source" = "Source : European Journal of Social Psychology";
+
+// Scientific Plan
+"onboarding_v2.scientific.title" = "Un plan scientifique";
+"onboarding_v2.scientific.subtitle" = "Basé sur les dernières recherches en neurosciences";
+"onboarding_v2.scientific.point_1" = "Techniques validées par des études cliniques";
+"onboarding_v2.scientific.point_2" = "Progression adaptée à ton rythme";
+"onboarding_v2.scientific.point_3" = "Suivi personnalisé de tes progrès";
+
+// Authentication
+"onboarding_v2.auth.title" = "Crée ton compte";
+"onboarding_v2.auth.subtitle" = "pour accéder à ton diagnostic et ton plan personnalisé";
+"onboarding_v2.auth.email_placeholder" = "Email";
+"onboarding_v2.auth.password_placeholder" = "Mot de passe";
+"onboarding_v2.auth.signup_button" = "S'inscrire";
+"onboarding_v2.auth.login_button" = "Se connecter";
+"onboarding_v2.auth.google_button" = "Continuer avec Google";
+"onboarding_v2.auth.apple_button" = "Continuer avec Apple";
+"onboarding_v2.auth.or_separator" = "ou";
+"onboarding_v2.auth.have_account" = "Déjà un compte ?";
+"onboarding_v2.auth.no_account" = "Pas encore de compte ?";
+"onboarding_v2.auth.forgot_password" = "Mot de passe oublié ?";
+"onboarding_v2.auth.privacy_notice" = "En continuant, tu acceptes nos Conditions d'utilisation et notre Politique de confidentialité";
+"onboarding_v2.auth.create_account_message" = "crée ton compte pour accéder à ton diagnostic personnalisé";
+"onboarding_v2.auth.email_button" = "Continuer avec Email";
+"onboarding_v2.auth.apple_coming_soon" = "Apple Sign In sera disponible prochainement";
+"onboarding_v2.auth.create_account" = "Créer un compte";
+"onboarding_v2.auth.login" = "Connexion";
+"onboarding_v2.auth.first_name" = "Prénom";
+"onboarding_v2.auth.confirm_password" = "Confirmer le mot de passe";
+"onboarding_v2.auth.create_my_account" = "Créer mon compte";
+"onboarding_v2.auth.sign_in" = "Se connecter";
+"onboarding_v2.auth.already_account_login" = "Déjà un compte ? Se connecter";
+"onboarding_v2.auth.no_account_signup" = "Pas de compte ? S'inscrire";
+"onboarding_v2.auth.fill_all_fields" = "Veuillez remplir tous les champs";
+"onboarding_v2.auth.enter_first_name" = "Veuillez entrer votre prénom";
+"onboarding_v2.auth.passwords_dont_match" = "Les mots de passe ne correspondent pas";
+"onboarding_v2.auth.error" = "Erreur";
+"onboarding_v2.auth.google_title" = "Continuer avec Google";
+"onboarding_v2.auth.google_description" = "Connecte-toi avec ton compte Google pour accéder à ton espace personnalisé";
+"onboarding_v2.auth.google_sign_in" = "Se connecter avec Google";
+"onboarding_v2.auth.google_launch_error" = "Impossible de lancer l'authentification Google";
+"onboarding_v2.auth.google_config_missing" = "Configuration Google Sign In manquante";
+"onboarding_v2.auth.google_info_error" = "Impossible de récupérer les informations Google";
+"onboarding_v2.auth.apple_error" = "Erreur d'authentification Apple";
+"onboarding_v2.auth.token_error" = "Impossible de récupérer le token";
+"onboarding_v2.auth.apple_title" = "Connexion avec Apple";
+"onboarding_v2.auth.apple_description" = "Connecte-toi rapidement et en toute sécurité avec ton compte Apple";
+
+// Loading Analysis
+"onboarding_v2.loading.title" = "Calcul en cours";
+"onboarding_v2.loading.analyzing" = "Analyse de tes réponses...";
+"onboarding_v2.loading.creating_plan" = "Création de ton plan personnalisé...";
+"onboarding_v2.loading.preparing" = "Préparation de tes exercices...";
+"onboarding_v2.loading.calculating" = "Calcul en cours";
+"onboarding_v2.loading.understanding" = "Compréhension des réponses";
+"onboarding_v2.loading.profile_analysis" = "Analyse de ton profil";
+"onboarding_v2.loading.data_processing" = "Traitement des données";
+"onboarding_v2.loading.personalizing" = "Personnalisation du parcours";
+"onboarding_v2.loading.plan_creation" = "Création du plan";
+"onboarding_v2.loading.finalizing" = "Finalisation des recommandations";
+"onboarding_v2.loading.see_plan" = "Voir mon plan de 66 jours";
+
+// CortiFree Rating
+"onboarding_v2.rating.title" = "Ton score CortiFree";
+"onboarding_v2.rating.current_label" = "Actuel";
+"onboarding_v2.rating.potential_label" = "Potentiel";
+"onboarding_v2.rating.see_potential" = "Voir mon potentiel";
+
+// Eight Habits Intro
+"onboarding_v2.eight_habits.intro_title" = "Les 8 habitudes clés";
+"onboarding_v2.eight_habits.intro_subtitle" = "pour une vie sereine";
+
+// Eight Habits Flow - Breathing
+"onboarding_v2.eight_habits.breathing.title" = "Respirer consciemment";
+"onboarding_v2.eight_habits.breathing.subtitle" = "Active ton système nerveux parasympathique";
+"onboarding_v2.eight_habits.breathing.benefit_1" = "Réduit le cortisol en 5 minutes";
+"onboarding_v2.eight_habits.breathing.benefit_2" = "Améliore la variabilité cardiaque";
+"onboarding_v2.eight_habits.breathing.benefit_3" = "Calme instantanément le mental";
+
+// Eight Habits Flow - Meditation
+"onboarding_v2.eight_habits.meditation.title" = "Méditer en pleine conscience";
+"onboarding_v2.eight_habits.meditation.subtitle" = "Renforce ta capacité d'attention";
+"onboarding_v2.eight_habits.meditation.benefit_1" = "Augmente la matière grise";
+"onboarding_v2.eight_habits.meditation.benefit_2" = "Réduit l'anxiété de 58%";
+"onboarding_v2.eight_habits.meditation.benefit_3" = "Améliore la régulation émotionnelle";
+
+// Eight Habits Flow - Journal
+"onboarding_v2.eight_habits.journal.title" = "Écrire ses pensées";
+"onboarding_v2.eight_habits.journal.subtitle" = "Libère ton mental du stress accumulé";
+"onboarding_v2.eight_habits.journal.benefit_1" = "Clarifie les pensées confuses";
+"onboarding_v2.eight_habits.journal.benefit_2" = "Réduit les ruminations de 40%";
+"onboarding_v2.eight_habits.journal.benefit_3" = "Améliore la qualité du sommeil";
+
+// Eight Habits Flow - Sport
+"onboarding_v2.eight_habits.sport.title" = "Bouger régulièrement";
+"onboarding_v2.eight_habits.sport.subtitle" = "Libère les tensions physiques";
+"onboarding_v2.eight_habits.sport.benefit_1" = "Produit des endorphines naturelles";
+"onboarding_v2.eight_habits.sport.benefit_2" = "Réduit le stress de 75%";
+"onboarding_v2.eight_habits.sport.benefit_3" = "Améliore l'énergie quotidienne";
+
+// Eight Habits Flow - Water
+"onboarding_v2.eight_habits.water.title" = "S'hydrater suffisamment";
+"onboarding_v2.eight_habits.water.subtitle" = "Optimise les fonctions cérébrales";
+"onboarding_v2.eight_habits.water.benefit_1" = "Améliore la concentration de 30%";
+"onboarding_v2.eight_habits.water.benefit_2" = "Réduit la fatigue mentale";
+"onboarding_v2.eight_habits.water.benefit_3" = "Régule l'humeur";
+
+// Eight Habits Flow - Nature
+"onboarding_v2.eight_habits.nature.title" = "Se connecter à la nature";
+"onboarding_v2.eight_habits.nature.subtitle" = "Réduit naturellement le cortisol";
+"onboarding_v2.eight_habits.nature.benefit_1" = "Baisse la pression artérielle";
+"onboarding_v2.eight_habits.nature.benefit_2" = "Améliore l'humeur de 60%";
+"onboarding_v2.eight_habits.nature.benefit_3" = "Renforce le système immunitaire";
+
+// Eight Habits Flow - Sleep
+"onboarding_v2.eight_habits.sleep.title" = "Dormir suffisamment";
+"onboarding_v2.eight_habits.sleep.subtitle" = "Répare le corps et l'esprit";
+"onboarding_v2.eight_habits.sleep.benefit_1" = "Consolide la mémoire";
+"onboarding_v2.eight_habits.sleep.benefit_2" = "Régule les émotions";
+"onboarding_v2.eight_habits.sleep.benefit_3" = "Renforce le système immunitaire";
+
+// Eight Habits Flow - Social
+"onboarding_v2.eight_habits.social.title" = "Cultiver les liens sociaux";
+"onboarding_v2.eight_habits.social.subtitle" = "Libère l'ocytocine naturellement";
+"onboarding_v2.eight_habits.social.benefit_1" = "Réduit le sentiment d'isolement";
+"onboarding_v2.eight_habits.social.benefit_2" = "Améliore la résilience au stress";
+"onboarding_v2.eight_habits.social.benefit_3" = "Augmente le bien-être de 50%";
+
+// Week Progress
+"onboarding_v2.week_progress.title" = "Ta progression";
+"onboarding_v2.week_progress.week_label" = "Semaine";
+"onboarding_v2.week_progress.week1_desc" = "Découverte et premiers pas";
+"onboarding_v2.week_progress.week5_desc" = "Habitudes en construction";
+"onboarding_v2.week_progress.week10_desc" = "Transformation durable";
+
+// Notification Permissions
+"onboarding_v2.notifications.title" = "Reste motivé(e) chaque jour";
+"onboarding_v2.notifications.subtitle" = "Des rappels bienveillants pour maintenir ta progression";
+"onboarding_v2.notifications.benefit_1" = "Rappels personnalisés à tes moments clés";
+"onboarding_v2.notifications.benefit_2" = "Messages motivants quotidiens";
+"onboarding_v2.notifications.benefit_3" = "Célébration de tes victoires";
+"onboarding_v2.notifications.enable_button" = "Activer les notifications";
+"onboarding_v2.notifications.skip_button" = "Plus tard";
+
+// Social Proof - Stats
+"onboarding_v2.social_proof.users_count" = "+50 000 utilisateurs";
+"onboarding_v2.social_proof.rating" = "4.8/5";
+"onboarding_v2.social_proof.stress_reduction" = "-47% de stress en moyenne";
+
+// Social Proof - Testimonials
+"onboarding_v2.testimonial.1_name" = "Sophie";
+"onboarding_v2.testimonial.1_age" = "32 ans";
+"onboarding_v2.testimonial.1_text" = "Après 2 semaines, je dors enfin bien. CortiFree a changé ma vie.";
+"onboarding_v2.testimonial.2_name" = "Thomas";
+"onboarding_v2.testimonial.2_age" = "28 ans";
+"onboarding_v2.testimonial.2_text" = "Les exercices de respiration m'ont vraiment aidé à gérer mon anxiété.";
+"onboarding_v2.testimonial.3_name" = "Marie";
+"onboarding_v2.testimonial.3_age" = "45 ans";
+"onboarding_v2.testimonial.3_text" = "Simple, efficace et scientifique. Je recommande à 100%.";
+"onboarding_v2.testimonial.4_name" = "Lucas";
+"onboarding_v2.testimonial.4_age" = "35 ans";
+"onboarding_v2.testimonial.4_text" = "Mes collègues ont remarqué que j'étais plus serein au travail.";
+
+// Paywall
+"onboarding_v2.paywall.title" = "Ton plan est prêt";
+"onboarding_v2.paywall.subtitle" = "Commence ta transformation aujourd'hui";
+"onboarding_v2.paywall.feature_1" = "Plan personnalisé 60 jours";
+"onboarding_v2.paywall.feature_2" = "Exercices illimités";
+"onboarding_v2.paywall.feature_3" = "Suivi de progression";
+"onboarding_v2.paywall.feature_4" = "Sons relaxants premium";
+"onboarding_v2.paywall.yearly_label" = "Annuel";
+"onboarding_v2.paywall.yearly_price" = "59,99 €/an";
+"onboarding_v2.paywall.yearly_monthly" = "soit 4,99 €/mois";
+"onboarding_v2.paywall.weekly_label" = "Hebdomadaire";
+"onboarding_v2.paywall.weekly_price" = "6,99 €/semaine";
+"onboarding_v2.paywall.best_value" = "Meilleure offre";
+"onboarding_v2.paywall.try_free" = "Essayer gratuitement";
+"onboarding_v2.paywall.restore" = "Restaurer mes achats";
+"onboarding_v2.paywall.terms" = "Conditions d'utilisation";
+"onboarding_v2.paywall.privacy" = "Politique de confidentialité";
+"onboarding_v2.paywall.skip" = "Continuer sans abonnement";
+"onboarding_v2.paywall.countdown" = "Offre spéciale expire dans";
+"onboarding_v2.paywall.guarantee" = "Garantie satisfait ou remboursé 7 jours";
+
+"onboarding_v2.reassurance.time_estimate" = "Prends 2 minutes";
+
+// MARK: - Onboarding V2 - Rating View (additional keys)
+"onboarding_v2.rating.current_title" = "Ton évaluation actuelle";
+"onboarding_v2.rating.potential_title" = "Ton évaluation potentielle";
+"onboarding_v2.rating.after_66_days" = "après 66 jours";
+"onboarding_v2.rating.global" = "Global";
+"onboarding_v2.rating.serenity" = "Sérénité";
+"onboarding_v2.rating.sleep" = "Sommeil";
+"onboarding_v2.rating.energy" = "Énergie";
+"onboarding_v2.rating.focus" = "Focus";
+"onboarding_v2.rating.balance" = "Équilibre";
+
+// MARK: - Onboarding V2 - Sixty Days View
+"onboarding_v2.sixty_days.studies_confirm" = "Des études scientifiques le confirment :";
+"onboarding_v2.sixty_days.days" = "66 jours";
+"onboarding_v2.sixty_days.time_needed" = "c'est le temps nécessaire pour ancrer une";
+"onboarding_v2.sixty_days.habit_transform" = "habitude et transformer réellement sa vie.";
+"onboarding_v2.sixty_days.boost_energy" = "Boostez votre énergie";
+"onboarding_v2.sixty_days.reduce_fatigue" = "Réduisez la fatigue";
+"onboarding_v2.sixty_days.gain_serenity" = "Gagnez en sérénité";
+"onboarding_v2.sixty_days.improve_focus" = "Améliorez votre focus";
+"onboarding_v2.sixty_days.scientific_research" = "Recherche scientifique";
+"onboarding_v2.sixty_days.next" = "Suivant";
+
+// MARK: - Onboarding V2 - Scientific Plan View
+"onboarding_v2.scientific.approach_title" = "L'approche scientifique de CortiFree";
+"onboarding_v2.scientific.next" = "Suivant";
+"onboarding_v2.scientific.citations" = "+1 500 citations\nGoogle Scholar";
+"onboarding_v2.scientific.copies_sold" = "+1 000 000\nexemplaires vendus";
+"onboarding_v2.scientific.harvard_quote" = "Les habitudes se forment par des actions répétées dans des contextes stables, et il faut des semaines, voire des mois, pour qu'elles deviennent automatiques.";
+"onboarding_v2.scientific.harvard_highlight" = "actions répétées dans des contextes stables";
+"onboarding_v2.scientific.harvard_source" = "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology,";
+"onboarding_v2.scientific.ucl_quote" = "96 participants ont adopté un comportement quotidien, et l'automaticité a été modélisée pour atteindre un plateau à une moyenne de 66 jours, avec une plage de 18 à 254 jours.";
+"onboarding_v2.scientific.ucl_highlight" = "moyenne de 66 jours, avec une plage de 18 à 254 jours";
+"onboarding_v2.scientific.ucl_source" = "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology.";
+"onboarding_v2.scientific.atomic_quote" = "En moyenne, il faut plus de deux mois avant qu'un nouveau comportement ne devienne automatique — 66 jours pour être exact.";
+"onboarding_v2.scientific.atomic_highlight" = "plus de deux mois";
+"onboarding_v2.scientific.atomic_source" = "Clear, J. (2018). Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones. Avery.";
+
+// MARK: - Onboarding V2 - Loading View
+"onboarding_v2.loading.analyzing" = "Analyse en cours...";
+"onboarding_v2.loading.creating_plan" = "Création de ton plan personnalisé...";
+"onboarding_v2.loading.preparing" = "Préparation de tes exercices...";
+"onboarding_v2.loading.complete" = "C'est prêt !";
+
+// MARK: - Onboarding V2 - Eight Habits Intro
+"onboarding_v2.eight_habits.intro_studies" = "Les études le montrent :";
+"onboarding_v2.eight_habits.intro_reset" = "pour réinitialiser sa";
+"onboarding_v2.eight_habits.intro_life" = "vie, il faut les";
+"onboarding_v2.eight_habits.intro_fundamental" = "8 habitudes fondamentales";
+"onboarding_v2.eight_habits.intro_below" = "ci-dessous.";
+"onboarding_v2.eight_habits.intro_see_change" = "Découvre comment ta vie va changer en 66 jours\ngrâce à ces 8 habitudes :";
+"onboarding_v2.eight_habits.impact_title" = "Impact après 10 semaines";
+
+// MARK: - Onboarding V2 - Week Progress View  
+"onboarding_v2.week_progress.your_journey" = "Ton parcours";
+"onboarding_v2.week_progress.week" = "Semaine";
+"onboarding_v2.week_progress.discovery" = "Découverte et premiers pas";
+"onboarding_v2.week_progress.building" = "Habitudes en construction";
+"onboarding_v2.week_progress.transformation" = "Transformation durable";
+
+// MARK: - Onboarding V2 - Notification Permissions
+"onboarding_v2.notifications.stay_motivated" = "Reste motivé(e) chaque jour";
+"onboarding_v2.notifications.gentle_reminders" = "Des rappels bienveillants pour maintenir ta progression";
+"onboarding_v2.notifications.personalized" = "Rappels personnalisés à tes moments clés";
+"onboarding_v2.notifications.daily_messages" = "Messages motivants quotidiens";
+"onboarding_v2.notifications.celebrate" = "Célébration de tes victoires";
+"onboarding_v2.notifications.enable" = "Activer les notifications";
+"onboarding_v2.notifications.later" = "Plus tard";
+"onboarding_v2.notifications.activate_subtitle" = "Active les notifications pour ne jamais perdre ta routine et suivre tes progrès";
+"onboarding_v2.notifications.daily_routine" = "Rappel de routine quotidienne";
+"onboarding_v2.notifications.daily_routine_desc" = "Rappel personnalisable pour tes sessions quotidiennes et maintenir ta constance";
+"onboarding_v2.notifications.streak_danger" = "Série en danger";
+"onboarding_v2.notifications.streak_danger_desc" = "Préserve ta motivation : on te rappelle si tu risques de perdre ta série du jour";
+"onboarding_v2.notifications.reflection_moment" = "Moment de réflexion";
+"onboarding_v2.notifications.reflection_moment_desc" = "Rappel en soirée pour prendre quelques minutes et noter tes pensées du jour";
+"onboarding_v2.notifications.next" = "Suivant";
+
+// MARK: - Common Onboarding
+"onboarding_v2.common.next" = "Suivant";
+"onboarding_v2.common.continue" = "Continuer";
+"onboarding_v2.common.skip" = "Passer";
+
+// MARK: - Common Fallbacks
+"common.user_fallback" = "Utilisateur";
+
+// MARK: - Onboarding V2 - Testimonials View
+"onboarding_v2.testimonials.title" = "Des milliers de vies changées grâce à CortiFree";
+"onboarding_v2.testimonials.subtitle_part1" = "Découvre comment des personnes comme toi ont retrouvé leur ";
+"onboarding_v2.testimonials.subtitle_highlight" = "sérénité";
+"onboarding_v2.testimonials.age_format" = "• %d ans";
+
+// MARK: - Onboarding V2 - Goals Selection View
+"onboarding_v2.goals.title" = "Tes objectifs";
+"onboarding_v2.goals.subtitle" = "Sélectionne ce que tu souhaites améliorer";
+"onboarding_v2.goals.reduce_stress" = "Réduire mon stress";
+"onboarding_v2.goals.sleep_better" = "Mieux dormir";
+"onboarding_v2.goals.improve_focus" = "Améliorer ma concentration";
+"onboarding_v2.goals.regain_energy" = "Retrouver mon énergie";
+"onboarding_v2.goals.manage_emotions" = "Gérer mes émotions";
+"onboarding_v2.goals.feel_calmer" = "Me sentir plus calme";
+"onboarding_v2.goals.reduce_anxiety" = "Réduire mon anxiété";
+"onboarding_v2.goals.improve_mental_health" = "Améliorer ma santé mentale";
+"onboarding_v2.goals.start_program" = "Commencer mon programme";
+
+// MARK: - Onboarding V2 - Habits Progress View
+"onboarding_v2.habits_progress.loading" = "Chargement de tes habitudes...";
+"onboarding_v2.habits_progress.loading_chart" = "Chargement du graphique...";
+"onboarding_v2.habits_progress.description_part1" = "Chaque semaine, tes tâches deviennent ";
+"onboarding_v2.habits_progress.description_highlight" = "progressivement plus difficiles";
+"onboarding_v2.habits_progress.description_part2" = " pour rafraîchir ton système dopaminergique.";
+"onboarding_v2.habits_progress.with_cortifree" = "Avec CortiFree";
+"onboarding_v2.habits_progress.without_cortifree" = "Sans CortiFree";
+"onboarding_v2.habits_progress.by_week" = "D'ici la semaine %d, tu ";
+"onboarding_v2.habits_progress.week_number" = "Semaine %d";
+"onboarding_v2.habits_progress.breathing_title" = "Respirer consciemment";
+"onboarding_v2.habits_progress.breathing_stat" = "pratiqueras la respiration consciente 1h par semaine.";
+"onboarding_v2.habits_progress.meditation_title" = "Méditer";
+"onboarding_v2.habits_progress.meditation_stat" = "méditeras 1h30 par semaine.";
+"onboarding_v2.habits_progress.journal_title" = "Tenir un journal";
+"onboarding_v2.habits_progress.journal_stat" = "tiendras un journal 7 fois par semaine.";
+"onboarding_v2.habits_progress.sport_title" = "Faire du sport";
+"onboarding_v2.habits_progress.sport_stat" = "feras du sport 3h30 par semaine.";
+"onboarding_v2.habits_progress.water_title" = "Boire de l'eau";
+"onboarding_v2.habits_progress.water_stat" = "boiras 2,5L d'eau par jour.";
+"onboarding_v2.habits_progress.nature_title" = "Passer du temps en nature";
+"onboarding_v2.habits_progress.nature_stat" = "passeras 3h30 en nature par semaine.";
+"onboarding_v2.habits_progress.sleep_title" = "Suivre une routine sommeil";
+"onboarding_v2.habits_progress.sleep_stat" = "dormiras 8 heures par nuit.";
+"onboarding_v2.habits_progress.social_title" = "Se connecter socialement";
+"onboarding_v2.habits_progress.social_stat" = "te connecteras socialement 4 fois par semaine.";
+
+// MARK: - Onboarding V2 - Week Progress View
+"onboarding_v2.week_progress.date_separator" = "au";
+
+
+// MARK: - Auth Success Messages
+"auth.success.account_created" = "Compte créé avec succès !";
+"auth.success.login" = "Connexion réussie !";
+"auth.success.logout" = "Déconnexion réussie";
+"auth.success.reset_email_sent" = "Email de réinitialisation envoyé !";
+
+// MARK: - Error Messages
+"error.auth.not_connected" = "Utilisateur non connecté";
+"error.auth.login_required" = "Vous devez être connecté";
+"error.auth.login_required_todos" = "Vous devez être connecté pour accéder aux to-dos";
+"error.auth.login_required_create_todos" = "Vous devez être connecté pour créer des to-dos";
+"error.auth.apple_error" = "Erreur d'authentification Apple";
+"error.auth.token_error" = "Impossible de récupérer le token";
+"error.journal.empty_content" = "Le contenu ne peut pas être vide";
+"error.journal.save_failed" = "Erreur lors de la sauvegarde: %@";
+"error.journal.load_failed" = "Erreur lors du chargement: %@";
+"error.journal.delete_failed" = "Erreur lors de la suppression: %@";
+"error.todo.load_failed" = "Erreur lors du chargement: %@";
+"error.todo.create_failed" = "Erreur lors de la création: %@";
+"error.todo.update_failed" = "Erreur lors de la mise à jour: %@";
+"error.todo.delete_failed" = "Erreur lors de la suppression: %@";
+
+// MARK: - Edit Profile
+"editprofile.title" = "Mon profil";
+"editprofile.change_photo" = "Touchez pour changer la photo";
+"editprofile.section.personal_info" = "Informations personnelles";
+"editprofile.first_name" = "Prénom";
+"editprofile.email" = "Email";
+"editprofile.section.goals" = "Objectifs après 66 jours";
+"editprofile.section.account" = "Gestion du compte";
+"editprofile.restart_program" = "Recommencer le programme";
+"editprofile.logout" = "Se déconnecter";
+"editprofile.delete_account" = "Supprimer mon compte";
+
+// Edit Profile - Habits
+"editprofile.habit.breathing" = "Respiration";
+"editprofile.habit.meditation" = "Méditation";
+"editprofile.habit.journal" = "Journal";
+"editprofile.habit.sport" = "Sport";
+"editprofile.habit.hydration" = "Hydratation";
+"editprofile.habit.nature" = "Nature";
+"editprofile.habit.social" = "Social";
+"editprofile.habit.sleep" = "Sommeil";
+
+// Edit Profile - Goals
+"editprofile.goal.breathing" = "1h/sem";
+"editprofile.goal.meditation" = "1h30/sem";
+"editprofile.goal.journal" = "7x/sem";
+"editprofile.goal.sport" = "3h30/sem";
+"editprofile.goal.hydration" = "2,5L/jour";
+"editprofile.goal.nature" = "3h30/sem";
+"editprofile.goal.social" = "4x/sem";
+"editprofile.goal.sleep" = "8h/nuit";
+
+// Edit Profile - Alerts
+"editprofile.alert.restart.title" = "Recommencer le programme";
+"editprofile.alert.restart.button" = "Recommencer";
+"editprofile.alert.restart.message" = "Tu vas recommencer le programme au jour 1. Ta progression actuelle sera réinitialisée.";
+"editprofile.alert.delete.title" = "Supprimer le compte";
+"editprofile.alert.delete.button" = "Supprimer";
+"editprofile.alert.delete.message" = "Cette action est irréversible. Toutes tes données seront définitivement supprimées.";
+"editprofile.alert.logout.title" = "Se déconnecter";
+"editprofile.alert.logout.button" = "Déconnecter";
+"editprofile.alert.logout.message" = "Tu seras déconnecté de ton compte CortiFree.";
+
+// MARK: - Settings Additional
+"settings.routine_desc.stress" = "Techniques de relaxation et méditation";
+"settings.routine_desc.sleep" = "Routine du soir et sommeil réparateur";
+"settings.routine_desc.energy" = "Boost d'énergie naturelle";
+"settings.routine_desc.default" = "Programme personnalisé de bien-être";
+
+// Common
+"common.save" = "Enregistrer";

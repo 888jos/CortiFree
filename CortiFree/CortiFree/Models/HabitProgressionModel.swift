@@ -85,15 +85,13 @@ struct WeeklyHabitProgression {
         )
     }
 
-    // Journal: 7x/sem (quotidien) 5min → 10min
+    // Journal: 7x/sem (quotidien) 5min fixe
     static func journalProgression(week: Int) -> HabitProgression {
-        let clampedWeek = min(max(week, 1), 10)
-
         // Frequency: Daily (7x/sem)
         let frequency = 7
 
-        // Duration: 5 → 10 minutes
-        let duration = 5 + (5 * (clampedWeek - 1)) / 9
+        // Duration: toujours 5 minutes
+        let duration = 5
 
         return HabitProgression(
             frequencyPerWeek: frequency,

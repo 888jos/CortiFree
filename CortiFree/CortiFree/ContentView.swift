@@ -11,7 +11,7 @@ struct ContentView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var selectedTab: Tab = .home
     @ObservedObject private var soundPlayer = SoundPlayer.shared
-    @StateObject private var planetSettings = PlanetSettings.shared
+    @ObservedObject private var planetSettings = PlanetSettings.shared
     @State private var isScrolling = false
     @State private var scrollTimer: Timer?
 

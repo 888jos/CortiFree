@@ -10,7 +10,7 @@ import FirebaseAuth
 import Combine
 
 struct AvatarProgressCard: View {
-    @State private var daysElapsed: Int = 0 // Nombre de jours écoulés depuis le début
+    @State private var currentProgramDay: Int = 1 // Jour actuel du programme (1-66), synced with TasksV2
     @State private var isPressed: Bool = false
     @State private var isFlipped: Bool = false
     @State private var startDate: Date = Date()
@@ -151,7 +151,7 @@ struct AvatarProgressCard: View {
 
             // Stat principale - Jours complétés avec gradient blanc-violet (aligné à gauche)
             VStack(spacing: 4) {
-                Text("\(daysElapsed)/\(totalDays)")
+                Text("\(currentProgramDay)/\(totalDays)")
                     .font(Font.Poppins.custom(.bold, size: 56))
                     .foregroundStyle(
                         LinearGradient(
@@ -250,10 +250,14 @@ struct AvatarProgressCard: View {
     }
 
     private func dayColor(for day: Int) -> Color {
-        if day < daysElapsed {
+        // day is 0-indexed, currentProgramDay is 1-indexed
+        // - Past days: day < currentProgramDay - 1
+        // - Current day: day == currentProgramDay - 1
+        // - Future days: day > currentProgramDay - 1
+        if day < currentProgramDay - 1 {
             // Jours terminés - Violet plein
             return Color(hex: "B794F6")
-        } else if day == daysElapsed {
+        } else if day == currentProgramDay - 1 {
             // Jour en cours - Violet à 50% d'opacité
             return Color(hex: "B794F6").opacity(0.5)
         } else {
@@ -263,21 +267,26 @@ struct AvatarProgressCard: View {
     }
 
     private func loadProgress() {
-        // Load program start date from UserDefaults
-        if let savedStartDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
-            startDate = savedStartDate
-
-            // Calculate days elapsed since start
-            let calendar = Calendar.current
-            let startOfToday = calendar.startOfDay(for: Date())
-            let startOfProgramDay = calendar.startOfDay(for: savedStartDate)
-
-            if let daysDifference = calendar.dateComponents([.day], from: startOfProgramDay, to: startOfToday).day {
-                daysElapsed = min(daysDifference, 66) // Cap at 66 days
+        // Load current program day from Firebase UserSettings (same source as TasksV2)
+        Task {
+            guard let userId = Auth.auth().currentUser?.uid else {
+                // Fallback to UserDefaults calculation
+                loadFromUserDefaults()
+                return
             }
-        } else {
-            // If no start date, use default
-            daysElapsed = 0
+
+            do {
+                if let settings = try await FirebaseManager.shared.fetchUserSettings(uid: userId) {
+                    await MainActor.run {
+                        currentProgramDay = min(settings.currentProgramDay, 66)
+                        startDate = settings.programStartDate
+                    }
+                } else {
+                    loadFromUserDefaults()
+                }
+            } catch {
+                loadFromUserDefaults()
+            }
         }
 
         // Load current streak from UserDefaults
@@ -289,7 +298,26 @@ struct AvatarProgressCard: View {
         // Load first name
         firstName = getUserFirstName()
 
-        print("📊 AvatarProgressCard loaded: Days elapsed: \(daysElapsed)/\(totalDays), Streak: \(currentStreak)")
+        #if DEBUG
+        print("📊 AvatarProgressCard loaded: Day \(currentProgramDay)/\(totalDays), Streak: \(currentStreak)")
+        #endif
+    }
+
+    private func loadFromUserDefaults() {
+        // Fallback: Calculate from programStartDate if Firebase fails
+        if let savedStartDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
+            startDate = savedStartDate
+
+            let calendar = Calendar.current
+            let startOfToday = calendar.startOfDay(for: Date())
+            let startOfProgramDay = calendar.startOfDay(for: savedStartDate)
+
+            if let daysDifference = calendar.dateComponents([.day], from: startOfProgramDay, to: startOfToday).day {
+                currentProgramDay = min(daysDifference + 1, 66) // +1 because day 1 is the start day
+            }
+        } else {
+            currentProgramDay = 1
+        }
     }
 
     private func getUserFirstName() -> String {
@@ -320,7 +348,7 @@ struct AvatarProgressCard: View {
 
     private var progressPercentage: Int {
         guard totalDays > 0 else { return 0 }
-        return Int((Double(daysElapsed) / Double(totalDays)) * 100)
+        return Int((Double(currentProgramDay) / Double(totalDays)) * 100)
     }
 
     private var endDate: Date {
@@ -359,8 +387,8 @@ struct AvatarProgressCard: View {
         ]
 
         for (index, milestone) in milestones.enumerated() {
-            if daysElapsed < milestone {
-                let daysLeft = milestone - daysElapsed
+            if currentProgramDay < milestone {
+                let daysLeft = milestone - currentProgramDay
                 return (title: badgeTitles[index], daysLeft: daysLeft)
             }
         }
@@ -372,8 +400,8 @@ struct AvatarProgressCard: View {
 // MARK: - Badges List View
 
 struct BadgesListView: View {
-    @StateObject private var achievementService = AchievementService.shared
-    @StateObject private var habitBadgeService = HabitBadgeService.shared
+    @ObservedObject private var achievementService = AchievementService.shared
+    @ObservedObject private var habitBadgeService = HabitBadgeService.shared
     @StateObject private var profileViewModel = ProfileViewModel()
     @Environment(\.dismiss) var dismiss
 

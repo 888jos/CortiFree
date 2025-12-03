@@ -9,20 +9,23 @@
 import SwiftUI
 
 struct LoadingAnalysisView: View {
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var displayedProgress: Int = 0
-    @State private var currentSubtitle: String = "Compréhension des réponses"
+    @State private var currentSubtitle: String = "onboarding_v2.loading.understanding".localized
     @State private var showResultsButton: Bool = false
     @State private var screenViewTime: Date?
     let onComplete: () -> Void
 
-    private let subtitles = [
-        "Compréhension des réponses",
-        "Analyse de ton profil",
-        "Traitement des données",
-        "Personnalisation du parcours",
-        "Création du plan",
-        "Finalisation des recommandations"
-    ]
+    private var subtitles: [String] {
+        [
+            "onboarding_v2.loading.understanding".localized,
+            "onboarding_v2.loading.profile_analysis".localized,
+            "onboarding_v2.loading.data_processing".localized,
+            "onboarding_v2.loading.personalizing".localized,
+            "onboarding_v2.loading.plan_creation".localized,
+            "onboarding_v2.loading.finalizing".localized
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -66,7 +69,7 @@ struct LoadingAnalysisView: View {
                 // Title and subtitle grouped together with reduced spacing
                 VStack(spacing: 12) {
                     // Title
-                    Text("Calcul en cours")
+                    Text("onboarding_v2.loading.calculating".localized)
                         .font(.custom("Poppins-Bold", size: 32))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -98,7 +101,7 @@ struct LoadingAnalysisView: View {
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.black)
 
-                            Text("Voir mon plan de 66 jours")
+                            Text("onboarding_v2.loading.see_plan".localized)
                                 .font(.custom("Poppins-SemiBold", size: 16))
                                 .foregroundColor(.black)
                         }

@@ -29,27 +29,37 @@ class TaskManager: ObservableObject {
     // MARK: - Load Local JSON Database
 
     func loadTaskDatabase() {
+        #if DEBUG
         print("🔄 Starting to load task database...")
+        #endif
 
         guard let url = Bundle.main.url(forResource: "TASKS_DATABASE", withExtension: "json") else {
+            #if DEBUG
             print("❌ TASKS_DATABASE.json not found in bundle")
             print("📦 Bundle path: \(Bundle.main.bundlePath)")
+            #endif
             DispatchQueue.main.async {
                 self.isLoaded = true // Set to true anyway to stop loading spinner
             }
             return
         }
 
+        #if DEBUG
         print("✅ Found JSON at: \(url.path)")
+        #endif
 
         do {
             let data = try Data(contentsOf: url)
+            #if DEBUG
             print("📄 Loaded \(data.count) bytes of JSON data")
+            #endif
 
             let decoder = JSONDecoder()
             let database = try decoder.decode(TaskDatabase.self, from: data)
+            #if DEBUG
             print("✅ Successfully decoded database")
             print("📊 Categories: \(database.categories.count)")
+            #endif
 
             // Extract all tasks from all categories
             var tasks: [TaskDetail] = []
@@ -57,7 +67,9 @@ class TaskManager: ObservableObject {
             var categoryDict: [TaskCategoryType: [TaskDetail]] = [:]
 
             for category in database.categories {
+                #if DEBUG
                 print("📁 Processing category: \(category.name) with \(category.tasks.count) tasks")
+                #endif
                 for task in category.tasks {
                     tasks.append(task)
                     taskDict[task.id] = task
@@ -76,33 +88,43 @@ class TaskManager: ObservableObject {
                 self.tasksById = taskDict
                 self.tasksByCategory = categoryDict
                 self.isLoaded = true
+                #if DEBUG
                 print("✅ Loaded \(tasks.count) tasks from database")
                 print("🎯 isLoaded set to: \(self.isLoaded)")
+                #endif
             }
         } catch let DecodingError.keyNotFound(key, context) {
+            #if DEBUG
             print("❌ Decoding error - Key not found: \(key)")
             print("   Context: \(context.debugDescription)")
             print("   Coding path: \(context.codingPath)")
+            #endif
             DispatchQueue.main.async {
                 self.isLoaded = true
             }
         } catch let DecodingError.typeMismatch(type, context) {
+            #if DEBUG
             print("❌ Decoding error - Type mismatch for type: \(type)")
             print("   Context: \(context.debugDescription)")
             print("   Coding path: \(context.codingPath)")
+            #endif
             DispatchQueue.main.async {
                 self.isLoaded = true
             }
         } catch let DecodingError.valueNotFound(type, context) {
+            #if DEBUG
             print("❌ Decoding error - Value not found for type: \(type)")
             print("   Context: \(context.debugDescription)")
             print("   Coding path: \(context.codingPath)")
+            #endif
             DispatchQueue.main.async {
                 self.isLoaded = true
             }
         } catch {
+            #if DEBUG
             print("❌ Error loading task database: \(error)")
             print("   Error details: \(error.localizedDescription)")
+            #endif
             DispatchQueue.main.async {
                 self.isLoaded = true
             }
@@ -172,7 +194,9 @@ class TaskManager: ObservableObject {
             "completedTaskIds": FieldValue.arrayUnion([taskId])
         ])
 
+        #if DEBUG
         print("✅ Task \(taskId) marked as completed")
+        #endif
     }
 
     // Create daily program for user
@@ -190,7 +214,9 @@ class TaskManager: ObservableObject {
             .collection("dailyPrograms")
             .addDocument(from: program)
 
+        #if DEBUG
         print("✅ Created daily program: \(docRef.documentID)")
+        #endif
         return docRef.documentID
     }
 

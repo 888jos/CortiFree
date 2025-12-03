@@ -43,10 +43,10 @@ struct HabitBadge: Identifiable, Codable {
 
         var displayName: String {
             switch self {
-            case .bronze: return "Bronze"
-            case .silver: return "Argent"
-            case .gold: return "Or"
-            case .diamond: return "Diamant"
+            case .bronze: return NSLocalizedString("badge.level.bronze", comment: "")
+            case .silver: return NSLocalizedString("badge.level.silver", comment: "")
+            case .gold: return NSLocalizedString("badge.level.gold", comment: "")
+            case .diamond: return NSLocalizedString("badge.level.diamond", comment: "")
             }
         }
 
@@ -174,14 +174,14 @@ extension HabitBadge {
     /// Nom affiché de l'habitude
     static func habitDisplayName(_ habitId: String) -> String {
         switch habitId {
-        case "meditation": return "Méditation"
-        case "breathing": return "Respiration"
-        case "journal": return "Journal"
-        case "sport": return "Sport"
-        case "water": return "Eau"
-        case "nature": return "Nature"
-        case "social": return "Social"
-        case "sleep": return "Sommeil"
+        case "meditation": return NSLocalizedString("badge.habit.meditation", comment: "")
+        case "breathing": return NSLocalizedString("badge.habit.breathing", comment: "")
+        case "journal": return NSLocalizedString("badge.habit.journal", comment: "")
+        case "sport": return NSLocalizedString("badge.habit.sport", comment: "")
+        case "water": return NSLocalizedString("badge.habit.water", comment: "")
+        case "nature": return NSLocalizedString("badge.habit.nature", comment: "")
+        case "social": return NSLocalizedString("badge.habit.social", comment: "")
+        case "sleep": return NSLocalizedString("badge.habit.sleep", comment: "")
         default: return habitId.capitalized
         }
     }

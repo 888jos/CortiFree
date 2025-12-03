@@ -80,7 +80,9 @@ struct UserSettings: Codable {
     /// Le passage au jour suivant se fait à minuit fuseau horaire utilisateur
     static func calculateProgramStartDate() -> Date {
         let todayMidnight = Calendar.current.startOfDay(for: Date())
+        #if DEBUG
         print("📅 Program starts today at midnight - Day 1/66")
+        #endif
         return todayMidnight
     }
 

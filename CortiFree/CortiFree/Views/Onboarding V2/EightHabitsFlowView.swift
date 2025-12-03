@@ -10,6 +10,7 @@ import SwiftUI
 
 struct EightHabitsFlowView: View {
     let onComplete: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentHabitIndex: Int = 0
     @State private var screenViewTime: Date?
     @State private var viewedHabits: Set<Int> = []
@@ -143,7 +144,7 @@ struct EightHabitsFlowView: View {
             // Main scrollable content
             VStack(spacing: 0) {
                 // Title
-                Text("Les 8 habitudes clés")
+                Text("onboarding_v2.eight_habits.intro_title".localized)
                     .font(.custom("Faro-BoldLucky", size: 32))
                     .foregroundStyle(
                         LinearGradient(
@@ -347,7 +348,7 @@ struct EightHabitsFlowView: View {
                     // Impact section - Single rectangle
                     VStack(alignment: .leading, spacing: 16) {
                         // Title inside rectangle
-                        Text("Impact après 10 semaines")
+                        Text("onboarding_v2.eight_habits.impact_title".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundStyle(
                                 LinearGradient(
@@ -452,7 +453,9 @@ struct EightHabitsFlowView: View {
                 Spacer()
 
                 Button(action: {
+                    #if DEBUG
                     print("🔘 EightHabitsFlowView: Bouton Continuer cliqué - Navigation vers NotificationPermissions")
+                    #endif
                     HapticManager.medium()
 
                     // Track continue action with analytics

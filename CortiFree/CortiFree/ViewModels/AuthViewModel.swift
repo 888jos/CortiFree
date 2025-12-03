@@ -69,7 +69,7 @@ class AuthViewModel: ObservableObject {
             let user = try await firebase.auth.signUp(email: email, password: password, displayName: username)
             currentUser = user
             isAuthenticated = true
-            successMessage = "Compte créé avec succès !"
+            successMessage = NSLocalizedString("auth.success.account_created", comment: "")
         } catch let error as CoreError {
             errorMessage = error.errorDescription
             ErrorHandler.shared.handle(error, context: "AuthViewModel.signUp", showToUser: false)
@@ -95,7 +95,7 @@ class AuthViewModel: ObservableObject {
             let user = try await firebase.auth.signIn(email: email, password: password)
             currentUser = user
             isAuthenticated = true
-            successMessage = "Connexion réussie !"
+            successMessage = NSLocalizedString("auth.success.login", comment: "")
         } catch let error as CoreError {
             errorMessage = error.errorDescription
             ErrorHandler.shared.handle(error, context: "AuthViewModel.signIn", showToUser: false)
@@ -114,7 +114,7 @@ class AuthViewModel: ObservableObject {
                 try await firebase.auth.signOut()
                 currentUser = nil
                 isAuthenticated = false
-                successMessage = "Déconnexion réussie"
+                successMessage = NSLocalizedString("auth.success.logout", comment: "")
             } catch let error as CoreError {
                 errorMessage = error.errorDescription
                 ErrorHandler.shared.handle(error, context: "AuthViewModel.signOut", showToUser: false)
@@ -137,7 +137,7 @@ class AuthViewModel: ObservableObject {
 
         do {
             try await firebase.auth.resetPassword(email: email)
-            successMessage = "Email de réinitialisation envoyé !"
+            successMessage = NSLocalizedString("auth.success.reset_email_sent", comment: "")
         } catch let error as CoreError {
             errorMessage = error.errorDescription
             ErrorHandler.shared.handle(error, context: "AuthViewModel.resetPassword", showToUser: false)

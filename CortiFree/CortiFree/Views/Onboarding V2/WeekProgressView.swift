@@ -8,10 +8,10 @@
 
 import SwiftUI
 import Foundation
-import Darwin
 
 struct WeekProgressView: View {
     let onContinue: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentWeek: Int = 1
     @State private var screenViewTime: Date?
 
@@ -34,13 +34,17 @@ struct WeekProgressView: View {
         let week10End = calendar.date(byAdding: .day, value: 7, to: week10Start)!
 
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "fr_FR")
+        // Use language-appropriate locale
+        let localeIdentifier = languageManager.currentLanguage == .french ? "fr_FR" : "en_US"
+        formatter.locale = Locale(identifier: localeIdentifier)
         formatter.dateFormat = "d MMM"
 
+        let toSeparator = "onboarding_v2.week_progress.date_separator".localized
+
         return [
-            (1, "\(formatter.string(from: week1Start)) au \(formatter.string(from: week1End))", StringKeys.Onboarding.WeekProgress.week1Message, Color(hex: "D32F2F"), [0.18, 0.25, 0.22, 0.15, 0.20, 0.24]),
-            (5, "\(formatter.string(from: week5Start)) au \(formatter.string(from: week5End))", StringKeys.Onboarding.WeekProgress.week5Message, Color(hex: "E67E22"), [0.52, 0.48, 0.55, 0.45, 0.50, 0.53]),
-            (10, "\(formatter.string(from: week10Start)) au \(formatter.string(from: week10End))", StringKeys.Onboarding.WeekProgress.week10Message, Color(hex: "27AE60"), [0.95, 0.92, 0.98, 0.90, 0.94, 0.96])
+            (1, "\(formatter.string(from: week1Start)) \(toSeparator) \(formatter.string(from: week1End))", StringKeys.Onboarding.WeekProgress.week1Message, Color(hex: "D32F2F"), [0.18, 0.25, 0.22, 0.15, 0.20, 0.24]),
+            (5, "\(formatter.string(from: week5Start)) \(toSeparator) \(formatter.string(from: week5End))", StringKeys.Onboarding.WeekProgress.week5Message, Color(hex: "E67E22"), [0.52, 0.48, 0.55, 0.45, 0.50, 0.53]),
+            (10, "\(formatter.string(from: week10Start)) \(toSeparator) \(formatter.string(from: week10End))", StringKeys.Onboarding.WeekProgress.week10Message, Color(hex: "27AE60"), [0.95, 0.92, 0.98, 0.90, 0.94, 0.96])
         ]
     }
 

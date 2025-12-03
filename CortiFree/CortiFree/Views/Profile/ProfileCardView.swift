@@ -11,7 +11,7 @@ import Combine
 
 struct ProfileCardView: View {
     // Removed ProgressionManager - using scoring system instead
-    @State private var daysElapsed: Int = 0 // Nombre de jours écoulés depuis le début
+    @State private var currentProgramDay: Int = 1 // Jour actuel du programme (1-66), synced with TasksV2
     @State private var userName: String = ""
     @State private var userLevel: String = "" // Deprecated - no longer using levels
     @State private var globalScore: Int = 0
@@ -62,9 +62,9 @@ struct ProfileCardView: View {
 
                 // Stats row
                 HStack(spacing: 32) {
-                    // Days elapsed
+                    // Days elapsed (current program day)
                     VStack(spacing: 2) {
-                        Text("\(daysElapsed)")
+                        Text("\(currentProgramDay)")
                             .font(.custom("Poppins-Bold", size: 20))
                             .foregroundColor(.white)
                         Text("jours")
@@ -106,26 +106,27 @@ struct ProfileCardView: View {
 
             // Progress Grid Section (1/3 de la carte)
             VStack(spacing: 12) {
-                // Title
+                // Title - aligned left
                 HStack {
-                    Text(NSLocalizedString("profile.program_subtitle", comment: ""))
-                        .font(.custom("Poppins-Medium", size: 14))
+                    Text("Jour \(min(currentProgramDay, 66))/66")
+                        .font(.custom("Poppins-SemiBold", size: 14))
                         .foregroundColor(.white.opacity(0.8))
 
                     Spacer()
-
-                    Text("Jour \(min(daysElapsed + 1, 66))/66")
-                        .font(.custom("Poppins-SemiBold", size: 12))
-                        .foregroundColor(.white.opacity(0.6))
                 }
                 .padding(.horizontal, 16)
 
                 // Grid of 66 days - 9 columns x 8 rows (last row has 3 empty spaces)
+                // day index is 0-based, currentProgramDay is 1-based
+                // - Past days: day < currentProgramDay - 1 (indices 0 to currentProgramDay-2)
+                // - Current day: day == currentProgramDay - 1
+                // - Future days: day > currentProgramDay - 1
                 LazyVGrid(columns: Array(repeating: GridItem(.fixed(28), spacing: 3), count: columns), spacing: 3) {
                     ForEach(0..<totalDays, id: \.self) { day in
                         DaySquare(
                             dayNumber: day + 1,
-                            isCompleted: day < daysElapsed
+                            isCompleted: day < currentProgramDay - 1,
+                            isCurrentDay: day == currentProgramDay - 1
                         )
                     }
                 }
@@ -171,6 +172,16 @@ struct ProfileCardView: View {
             // Refresh userName when profile is updated
             userName = getUserName()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
+            // Refresh streak when updated from TasksV2
+            if let savedStreak = UserDefaults.standard.value(forKey: "streakDays") as? Int {
+                globalStreak = savedStreak
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskValidated"))) { _ in
+            // Reload data when tasks are validated
+            loadUserData()
+        }
     }
 
     // MARK: - Helper Functions
@@ -199,31 +210,53 @@ struct ProfileCardView: View {
     }
 
     private func loadUserData() {
-        // Load program start date from UserDefaults
-        if let savedStartDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
-            programStartDate = savedStartDate
-
-            // Calculate days elapsed since start
-            let calendar = Calendar.current
-            let startOfToday = calendar.startOfDay(for: Date())
-            let startOfProgramDay = calendar.startOfDay(for: savedStartDate)
-
-            if let daysDifference = calendar.dateComponents([.day], from: startOfProgramDay, to: startOfToday).day {
-                daysElapsed = min(daysDifference, 66) // Cap at 66 days
+        // Load current program day from UserSettings (same source as TasksV2)
+        Task {
+            guard let userId = Auth.auth().currentUser?.uid else {
+                // Fallback to UserDefaults calculation
+                loadFromUserDefaults()
+                return
             }
-        } else {
-            // If no start date, use default
-            daysElapsed = 0
+
+            do {
+                if let settings = try await FirebaseManager.shared.fetchUserSettings(uid: userId) {
+                    await MainActor.run {
+                        currentProgramDay = min(settings.currentProgramDay, 66)
+                    }
+                } else {
+                    loadFromUserDefaults()
+                }
+            } catch {
+                loadFromUserDefaults()
+            }
         }
 
+        // Load score and streak
         if let savedScore = UserDefaults.standard.value(forKey: "globalScore") as? Int {
             globalScore = savedScore
         } else {
             globalScore = 45 // Default
         }
 
-        if let savedStreak = UserDefaults.standard.value(forKey: "globalStreak") as? Int {
+        if let savedStreak = UserDefaults.standard.value(forKey: "streakDays") as? Int {
             globalStreak = savedStreak
+        }
+    }
+
+    private func loadFromUserDefaults() {
+        // Fallback: Calculate from programStartDate if Firebase fails
+        if let savedStartDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
+            programStartDate = savedStartDate
+
+            let calendar = Calendar.current
+            let startOfToday = calendar.startOfDay(for: Date())
+            let startOfProgramDay = calendar.startOfDay(for: savedStartDate)
+
+            if let daysDifference = calendar.dateComponents([.day], from: startOfProgramDay, to: startOfToday).day {
+                currentProgramDay = min(daysDifference + 1, 66) // +1 because day 1 is the start day
+            }
+        } else {
+            currentProgramDay = 1
         }
     }
 }
@@ -232,11 +265,22 @@ struct ProfileCardView: View {
 struct DaySquare: View {
     let dayNumber: Int
     let isCompleted: Bool
+    let isCurrentDay: Bool
 
     var body: some View {
         RoundedRectangle(cornerRadius: 4)
-            .fill(isCompleted ? Color(hex: "B794F6") : Color.white.opacity(0.15))
+            .fill(squareColor)
             .frame(width: 28, height: 28)
+    }
+
+    private var squareColor: Color {
+        if isCurrentDay {
+            return Color(hex: "B794F6").opacity(0.5)  // Jour actuel = 50%
+        } else if isCompleted {
+            return Color(hex: "B794F6")  // Jours passés = plein
+        } else {
+            return Color.white.opacity(0.15)  // Jours futurs = gris
+        }
     }
 }
 

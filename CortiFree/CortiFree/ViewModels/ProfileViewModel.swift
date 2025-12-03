@@ -73,9 +73,13 @@ class ProfileViewModel: ObservableObject {
                 currentScores.balance
             ]
 
+            #if DEBUG
             print("📊 Profile scores loaded: Sérénité=\(currentScores.serenity), Sommeil=\(currentScores.sleep), Énergie=\(currentScores.energy), Focus=\(currentScores.focus), Équilibre=\(currentScores.balance)")
+            #endif
         } catch {
+            #if DEBUG
             print("⚠️ Failed to load domain scores: \(error)")
+            #endif
         }
 
         do {
@@ -101,7 +105,9 @@ class ProfileViewModel: ObservableObject {
                     // Load onboarding global score
                     if let onboardingScore = data["onboardingScore"] as? Int {
                         onboardingGlobalScore = onboardingScore
+                        #if DEBUG
                         print("📊 Onboarding score loaded: \(onboardingScore)")
+                        #endif
                     }
 
                     // Load onboarding domain scores
@@ -113,12 +119,16 @@ class ProfileViewModel: ObservableObject {
                             Double(domainScoresData["focus"] ?? 0),
                             Double(domainScoresData["balance"] ?? 0)
                         ]
+                        #if DEBUG
                         print("📊 Onboarding domain scores loaded")
+                        #endif
                     }
                 }
             }
         } catch {
+            #if DEBUG
             print("⚠️ Failed to load potential scores: \(error)")
+            #endif
         }
 
         do {
@@ -126,9 +136,13 @@ class ProfileViewModel: ObservableObject {
             let progress = try await TaskStatusService.shared.calculateHabitProgress()
             habitProgress = progress
 
+            #if DEBUG
             print("📊 Habit progress loaded: Méditation=\(progress["meditation"]?.completed ?? 0)/\(progress["meditation"]?.total ?? 0), Respiration=\(progress["breathing"]?.completed ?? 0)/\(progress["breathing"]?.total ?? 0)")
+            #endif
         } catch {
+            #if DEBUG
             print("❌ Failed to load habit progress: \(error)")
+            #endif
         }
 
         isLoading = false

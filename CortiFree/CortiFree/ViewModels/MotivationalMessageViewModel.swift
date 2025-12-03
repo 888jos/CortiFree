@@ -42,15 +42,21 @@ class MotivationalMessageViewModel: ObservableObject {
         // Get from Firebase Auth displayName (same as ProfileCardView)
         if let displayName = user.displayName, !displayName.isEmpty {
             firstName = displayName.components(separatedBy: " ").first ?? displayName
+            #if DEBUG
             print("✅ MotivationalMessageViewModel: Loaded firstName = '\(firstName)' from Firebase Auth")
+            #endif
         } else {
             // Fallback to email username if displayName not available
             if let email = user.email {
                 firstName = email.components(separatedBy: "@").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+                #if DEBUG
                 print("✅ MotivationalMessageViewModel: Loaded firstName = '\(firstName)' from email")
+                #endif
             } else {
                 firstName = NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+                #if DEBUG
                 print("⚠️ MotivationalMessageViewModel: No displayName or email, using default")
+                #endif
             }
         }
     }

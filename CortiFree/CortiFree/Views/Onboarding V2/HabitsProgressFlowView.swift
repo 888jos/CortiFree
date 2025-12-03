@@ -10,6 +10,7 @@ import SwiftUI
 
 struct HabitsProgressFlowView: View {
     let onComplete: () -> Void
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentHabitIndex: Int = 0
     @State private var currentWeek: Int = 1
     @State private var shouldRenderChart = false
@@ -17,104 +18,106 @@ struct HabitsProgressFlowView: View {
     @State private var screenViewTime: Date?
 
     // Les habitudes avec leurs statistiques de progression
-    private let habitProgresses: [HabitProgress] = [
-        HabitProgress(
-            icon: "wind",
-            title: "Respirer consciemment",
-            yAxisLabel: "",
-            yAxisValues: ["15 min", "30 min", "45 min", "1h"],
-            currentValue: "1h",
-            weekNumber: 10,
-            statMessage: "pratiqueras la respiration consciente 1h par semaine.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 0
-        ),
-        HabitProgress(
-            icon: "figure.mind.and.body",
-            title: "Méditer",
-            yAxisLabel: "",
-            yAxisValues: ["20 min", "40 min", "1h", "1h20", "1h40"],
-            currentValue: "1h30",
-            weekNumber: 10,
-            statMessage: "méditeras 1h30 par semaine.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 1
-        ),
-        HabitProgress(
-            icon: "book.pages",
-            title: "Tenir un journal",
-            yAxisLabel: "",
-            yAxisValues: ["2x", "3x", "5x", "7x"],
-            currentValue: "7x",
-            weekNumber: 10,
-            statMessage: "tiendras un journal 7 fois par semaine.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 2
-        ),
-        HabitProgress(
-            icon: "figure.walk",
-            title: "Faire du sport",
-            yAxisLabel: "",
-            yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
-            currentValue: "3h30",
-            weekNumber: 10,
-            statMessage: "feras du sport 3h30 par semaine.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 3
-        ),
-        HabitProgress(
-            icon: "drop.fill",
-            title: "Boire de l'eau",
-            yAxisLabel: "",
-            yAxisValues: ["1.5L", "2L", "2.5L", "3L"],
-            currentValue: "2,5L",
-            weekNumber: 10,
-            statMessage: "boiras 2,5L d'eau par jour.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 4
-        ),
-        HabitProgress(
-            icon: "tree.fill",
-            title: "Passer du temps en nature",
-            yAxisLabel: "",
-            yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
-            currentValue: "3h30",
-            weekNumber: 10,
-            statMessage: "passeras 3h30 en nature par semaine.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 5
-        ),
-        HabitProgress(
-            icon: "moon.zzz.fill",
-            title: "Suivre une routine sommeil",
-            yAxisLabel: "",
-            yAxisValues: ["6h", "6.5h", "7h", "7.5h", "8h"],
-            currentValue: "8h",
-            weekNumber: 10,
-            statMessage: "dormiras 8 heures par nuit.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 6
-        ),
-        HabitProgress(
-            icon: "person.2.fill",
-            title: "Se connecter socialement",
-            yAxisLabel: "",
-            yAxisValues: ["3x", "4x", "5x", "6x"],
-            currentValue: "4x",
-            weekNumber: 10,
-            statMessage: "te connecteras socialement 4 fois par semaine.",
-            maxValue: 4.0,
-            currentProgress: 3.7,
-            curveStyle: 7
-        )
-    ]
+    private var habitProgresses: [HabitProgress] {
+        [
+            HabitProgress(
+                icon: "wind",
+                title: "onboarding_v2.habits_progress.breathing_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["15 min", "30 min", "45 min", "1h"],
+                currentValue: "1h",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.breathing_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 0
+            ),
+            HabitProgress(
+                icon: "figure.mind.and.body",
+                title: "onboarding_v2.habits_progress.meditation_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["20 min", "40 min", "1h", "1h20", "1h40"],
+                currentValue: "1h30",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.meditation_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 1
+            ),
+            HabitProgress(
+                icon: "book.pages",
+                title: "onboarding_v2.habits_progress.journal_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["2x", "3x", "5x", "7x"],
+                currentValue: "7x",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.journal_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 2
+            ),
+            HabitProgress(
+                icon: "figure.walk",
+                title: "onboarding_v2.habits_progress.sport_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
+                currentValue: "3h30",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.sport_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 3
+            ),
+            HabitProgress(
+                icon: "drop.fill",
+                title: "onboarding_v2.habits_progress.water_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["1.5L", "2L", "2.5L", "3L"],
+                currentValue: "2,5L",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.water_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 4
+            ),
+            HabitProgress(
+                icon: "tree.fill",
+                title: "onboarding_v2.habits_progress.nature_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
+                currentValue: "3h30",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.nature_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 5
+            ),
+            HabitProgress(
+                icon: "moon.zzz.fill",
+                title: "onboarding_v2.habits_progress.sleep_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["6h", "6.5h", "7h", "7.5h", "8h"],
+                currentValue: "8h",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.sleep_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 6
+            ),
+            HabitProgress(
+                icon: "person.2.fill",
+                title: "onboarding_v2.habits_progress.social_title".localized,
+                yAxisLabel: "",
+                yAxisValues: ["3x", "4x", "5x", "6x"],
+                currentValue: "4x",
+                weekNumber: 10,
+                statMessage: "onboarding_v2.habits_progress.social_stat".localized,
+                maxValue: 4.0,
+                currentProgress: 3.7,
+                curveStyle: 7
+            )
+        ]
+    }
 
     private var currentHabitProgress: HabitProgress {
         habitProgresses[currentHabitIndex]
@@ -128,7 +131,7 @@ struct HabitsProgressFlowView: View {
             if !shouldRenderChart {
                 // Loading state - show simple UI without heavy computation
                 VStack(spacing: 20) {
-                    Text("Chargement de tes habitudes...")
+                    Text("onboarding_v2.habits_progress.loading".localized)
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -141,15 +144,15 @@ struct HabitsProgressFlowView: View {
             VStack(spacing: 0) {
                 // Description text
                 VStack(spacing: 0) {
-                    Text("Chaque semaine, tes tâches deviennent ")
+                    Text("onboarding_v2.habits_progress.description_part1".localized)
                         .font(.custom("Poppins-Regular", size: 17))
                         .foregroundColor(.white)
                     +
-                    Text("progressivement plus difficiles")
+                    Text("onboarding_v2.habits_progress.description_highlight".localized)
                         .font(.custom("Poppins-SemiBold", size: 17))
                         .foregroundColor(Color(hex: "B794F6"))
                     +
-                    Text(" pour rafraîchir ton système dopaminergique.")
+                    Text("onboarding_v2.habits_progress.description_part2".localized)
                         .font(.custom("Poppins-Regular", size: 17))
                         .foregroundColor(.white)
                 }
@@ -237,7 +240,7 @@ struct HabitsProgressFlowView: View {
                                 .scaleEffect(1.2)
 
                             if shouldRenderChart {
-                                Text("Chargement du graphique...")
+                                Text("onboarding_v2.habits_progress.loading_chart".localized)
                                     .font(.custom("Poppins-Regular", size: 12))
                                     .foregroundColor(.white.opacity(0.6))
                             }
@@ -261,7 +264,7 @@ struct HabitsProgressFlowView: View {
                         Circle()
                             .fill(Color(hex: "B794F6"))
                             .frame(width: 12, height: 12)
-                        Text("Avec CortiFree")
+                        Text("onboarding_v2.habits_progress.with_cortifree".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white)
                     }
@@ -270,7 +273,7 @@ struct HabitsProgressFlowView: View {
                         Circle()
                             .fill(Color.gray.opacity(0.5))
                             .frame(width: 12, height: 12)
-                        Text("Sans CortiFree")
+                        Text("onboarding_v2.habits_progress.without_cortifree".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.7))
                     }
@@ -289,7 +292,7 @@ struct HabitsProgressFlowView: View {
                         .padding(.top, 2)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("D'ici la semaine \(currentHabitProgress.weekNumber), tu ")
+                        Text(String(format: "onboarding_v2.habits_progress.by_week".localized, currentHabitProgress.weekNumber))
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white)
                         +
@@ -488,7 +491,7 @@ struct HabitProgressChart: View {
                         )
 
                         // Week indicator below the line
-                        Text("Semaine \(currentWeek)")
+                        Text(String(format: "onboarding_v2.habits_progress.week_number".localized, currentWeek))
                             .font(.custom("Poppins-SemiBold", size: 12))
                             .foregroundColor(Color(hex: "B794F6"))
                             .position(x: curveX, y: chartGeometry.size.height + 20)

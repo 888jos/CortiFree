@@ -89,7 +89,9 @@ class ImpactScoringService {
         // Sauvegarder
         try await saveCurrentScores(currentScores)
 
+        #if DEBUG
         print("✅ Impact appliqué pour \(habitId): +\(impact.serenity) Sérénité, +\(impact.sleep) Sommeil, +\(impact.energy) Énergie, +\(impact.focus) Focus, +\(impact.balance) Équilibre")
+        #endif
 
         return currentScores
     }
@@ -115,7 +117,9 @@ class ImpactScoringService {
         // Sauvegarder
         try await saveCurrentScores(currentScores)
 
+        #if DEBUG
         print("⚠️ Impact retiré pour \(habitId)")
+        #endif
 
         return currentScores
     }

@@ -13,6 +13,7 @@ struct ReassuranceView: View {
     let userName: String
     let onStartQuiz: () -> Void
 
+    @ObservedObject var languageManager = LanguageManager.shared
     @State private var displayedText: String = ""
     @State private var currentCharacterIndex: Int = 0
     @State private var player: AVPlayer?
@@ -20,12 +21,16 @@ struct ReassuranceView: View {
     @State private var showButton: Bool = false
     @State private var screenViewTime: Date?
 
-    private let fullText: String
+    private var fullText: String {
+        let message1 = "onboarding_v2.reassurance.message_part1".localized
+        let message2 = "onboarding_v2.reassurance.message_part2".localized
+        let message3 = "onboarding_v2.reassurance.message_part3".localized
+        return "\(userName) \(message1)\n\n\(message2)\n\n\(message3)"
+    }
 
     init(userName: String, onStartQuiz: @escaping () -> Void) {
         self.userName = userName
         self.onStartQuiz = onStartQuiz
-        self.fullText = "\(userName) ce n'est pas grave. Tu n'es pas seul(e).\n\nDes milliers de personnes comme toi ont déjà retrouvé leur sérénité avec CortiFree.\n\nMaintenant, on va procéder à un quiz rapide pour mieux comprendre ta situation et personnaliser ton parcours."
     }
 
     var body: some View {
@@ -93,7 +98,7 @@ struct ReassuranceView: View {
                             onStartQuiz()
                         }) {
                             HStack(spacing: 12) {
-                                Text("Commencer le quiz")
+                                Text("onboarding_v2.reassurance.start_quiz".localized)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                                     .foregroundColor(Color(hex: "1A1A4E"))
 
@@ -116,7 +121,7 @@ struct ReassuranceView: View {
                         }
 
                         // Time estimate (centered below button)
-                        Text("Prends 2 minutes")
+                        Text("onboarding_v2.reassurance.time_estimate".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.6))
                     }
@@ -192,8 +197,8 @@ struct ReassuranceView: View {
             HapticManager.light()
         }
 
-        // Continue animation with slight delay (reduced by 80% from original)
-        let delay: Double = fullText[index].isWhitespace ? 0.002 : 0.01
+        // Continue animation with slight delay (x0.6 slower)
+        let delay: Double = fullText[index].isWhitespace ? 0.012 : 0.06
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             animateNextCharacter()
         }

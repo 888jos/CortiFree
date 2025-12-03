@@ -75,29 +75,29 @@ struct EditProfileView: View {
                 saveProfilePhoto(image)
             }
         }
-        .alert("Recommencer le programme", isPresented: $showRestartAlert) {
-            Button("Annuler", role: .cancel) { }
-            Button("Recommencer", role: .destructive) {
+        .alert(NSLocalizedString("editprofile.alert.restart.title", comment: ""), isPresented: $showRestartAlert) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("editprofile.alert.restart.button", comment: ""), role: .destructive) {
                 restartProgram()
             }
         } message: {
-            Text("Tu vas recommencer le programme au jour 1. Ta progression actuelle sera réinitialisée.")
+            Text(NSLocalizedString("editprofile.alert.restart.message", comment: ""))
         }
-        .alert("Supprimer le compte", isPresented: $showDeleteAlert) {
-            Button("Annuler", role: .cancel) { }
-            Button("Supprimer", role: .destructive) {
+        .alert(NSLocalizedString("editprofile.alert.delete.title", comment: ""), isPresented: $showDeleteAlert) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("editprofile.alert.delete.button", comment: ""), role: .destructive) {
                 deleteAccount()
             }
         } message: {
-            Text("Cette action est irréversible. Toutes tes données seront définitivement supprimées.")
+            Text(NSLocalizedString("editprofile.alert.delete.message", comment: ""))
         }
-        .alert("Se déconnecter", isPresented: $showLogoutAlert) {
-            Button("Annuler", role: .cancel) { }
-            Button("Déconnecter", role: .destructive) {
+        .alert(NSLocalizedString("editprofile.alert.logout.title", comment: ""), isPresented: $showLogoutAlert) {
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("editprofile.alert.logout.button", comment: ""), role: .destructive) {
                 logout()
             }
         } message: {
-            Text("Tu seras déconnecté de ton compte CortiFree.")
+            Text(NSLocalizedString("editprofile.alert.logout.message", comment: ""))
         }
     }
 
@@ -117,7 +117,7 @@ struct EditProfileView: View {
 
             Spacer()
 
-            Text("Mon profil")
+            Text(NSLocalizedString("editprofile.title", comment: ""))
                 .font(.custom(AppConstants.Fonts.bold, size: 20))
                 .foregroundColor(.white)
 
@@ -131,7 +131,7 @@ struct EditProfileView: View {
                     ProgressView()
                         .tint(.white)
                 } else {
-                    Text("Enregistrer")
+                    Text(NSLocalizedString("common.save", comment: ""))
                         .font(.custom(AppConstants.Fonts.semiBold, size: 16))
                         .foregroundColor(AppConstants.Colors.primaryGreen)
                 }
@@ -198,7 +198,7 @@ struct EditProfileView: View {
                 }
             }
 
-            Text("Touchez pour changer la photo")
+            Text(NSLocalizedString("editprofile.change_photo", comment: ""))
                 .font(.custom(AppConstants.Fonts.regular, size: 13))
                 .foregroundColor(.white.opacity(0.6))
         }
@@ -215,7 +215,7 @@ struct EditProfileView: View {
                     .font(.system(size: 18))
                     .foregroundColor(AppConstants.Colors.violet)
 
-                Text("Informations personnelles")
+                Text(NSLocalizedString("editprofile.section.personal_info", comment: ""))
                     .font(.custom(AppConstants.Fonts.semiBold, size: 16))
                     .foregroundColor(.white.opacity(0.8))
 
@@ -224,7 +224,7 @@ struct EditProfileView: View {
 
             // First Name (editable)
             VStack(alignment: .leading, spacing: 8) {
-                Text("Prénom")
+                Text(NSLocalizedString("editprofile.first_name", comment: ""))
                     .font(.custom(AppConstants.Fonts.medium, size: 13))
                     .foregroundColor(.white.opacity(0.6))
 
@@ -240,7 +240,7 @@ struct EditProfileView: View {
 
             // Email (read-only)
             VStack(alignment: .leading, spacing: 8) {
-                Text("Email")
+                Text(NSLocalizedString("editprofile.email", comment: ""))
                     .font(.custom(AppConstants.Fonts.medium, size: 13))
                     .foregroundColor(.white.opacity(0.6))
 
@@ -263,10 +263,6 @@ struct EditProfileView: View {
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                .fill(Color.white.opacity(0.05))
-        )
     }
 
     // MARK: - Goals Section (66 Days Objectives)
@@ -279,7 +275,7 @@ struct EditProfileView: View {
                     .font(.system(size: 18))
                     .foregroundColor(AppConstants.Colors.primaryGreen)
 
-                Text("Objectifs après 66 jours")
+                Text(NSLocalizedString("editprofile.section.goals", comment: ""))
                     .font(.custom(AppConstants.Fonts.semiBold, size: 16))
                     .foregroundColor(.white.opacity(0.8))
 
@@ -288,21 +284,17 @@ struct EditProfileView: View {
 
             // 8 Habits with final objectives (aligned with HabitsProgressFlowView)
             VStack(spacing: 12) {
-                goalRow(icon: "wind", name: "Respiration", objective: "1h/sem", color: AppConstants.Colors.domainSerenity)
-                goalRow(icon: "brain.head.profile", name: "Méditation", objective: "1h30/sem", color: AppConstants.Colors.violet)
-                goalRow(icon: "book.fill", name: "Journal", objective: "7x/sem", color: AppConstants.Colors.journalReflection)
-                goalRow(icon: "figure.run", name: "Sport", objective: "3h30/sem", color: AppConstants.Colors.domainEnergy)
-                goalRow(icon: "drop.fill", name: "Hydratation", objective: "2,5L/jour", color: .blue)
-                goalRow(icon: "leaf.fill", name: "Nature", objective: "3h30/sem", color: AppConstants.Colors.domainFocus)
-                goalRow(icon: "person.2.fill", name: "Social", objective: "4x/sem", color: AppConstants.Colors.domainBalance)
-                goalRow(icon: "moon.stars.fill", name: "Sommeil", objective: "8h/nuit", color: AppConstants.Colors.domainSleep)
+                goalRow(icon: "wind", name: NSLocalizedString("editprofile.habit.breathing", comment: ""), objective: NSLocalizedString("editprofile.goal.breathing", comment: ""), color: AppConstants.Colors.domainSerenity)
+                goalRow(icon: "brain.head.profile", name: NSLocalizedString("editprofile.habit.meditation", comment: ""), objective: NSLocalizedString("editprofile.goal.meditation", comment: ""), color: AppConstants.Colors.violet)
+                goalRow(icon: "book.fill", name: NSLocalizedString("editprofile.habit.journal", comment: ""), objective: NSLocalizedString("editprofile.goal.journal", comment: ""), color: AppConstants.Colors.journalReflection)
+                goalRow(icon: "figure.run", name: NSLocalizedString("editprofile.habit.sport", comment: ""), objective: NSLocalizedString("editprofile.goal.sport", comment: ""), color: AppConstants.Colors.domainEnergy)
+                goalRow(icon: "drop.fill", name: NSLocalizedString("editprofile.habit.hydration", comment: ""), objective: NSLocalizedString("editprofile.goal.hydration", comment: ""), color: .blue)
+                goalRow(icon: "leaf.fill", name: NSLocalizedString("editprofile.habit.nature", comment: ""), objective: NSLocalizedString("editprofile.goal.nature", comment: ""), color: AppConstants.Colors.domainFocus)
+                goalRow(icon: "person.2.fill", name: NSLocalizedString("editprofile.habit.social", comment: ""), objective: NSLocalizedString("editprofile.goal.social", comment: ""), color: AppConstants.Colors.domainBalance)
+                goalRow(icon: "moon.stars.fill", name: NSLocalizedString("editprofile.habit.sleep", comment: ""), objective: NSLocalizedString("editprofile.goal.sleep", comment: ""), color: AppConstants.Colors.domainSleep)
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                .fill(Color.white.opacity(0.05))
-        )
     }
 
     // MARK: - Goal Row
@@ -341,7 +333,7 @@ struct EditProfileView: View {
                     .font(.system(size: 18))
                     .foregroundColor(.white.opacity(0.6))
 
-                Text("Gestion du compte")
+                Text(NSLocalizedString("editprofile.section.account", comment: ""))
                     .font(.custom(AppConstants.Fonts.semiBold, size: 16))
                     .foregroundColor(.white.opacity(0.8))
 
@@ -357,7 +349,7 @@ struct EditProfileView: View {
                     Image(systemName: "arrow.counterclockwise")
                         .font(.system(size: 16, weight: .semibold))
 
-                    Text("Recommencer le programme")
+                    Text(NSLocalizedString("editprofile.restart_program", comment: ""))
                         .font(.custom(AppConstants.Fonts.semiBold, size: 15))
 
                     Spacer()
@@ -383,7 +375,7 @@ struct EditProfileView: View {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                         .font(.system(size: 16, weight: .semibold))
 
-                    Text("Se déconnecter")
+                    Text(NSLocalizedString("editprofile.logout", comment: ""))
                         .font(.custom(AppConstants.Fonts.semiBold, size: 15))
 
                     Spacer()
@@ -409,7 +401,7 @@ struct EditProfileView: View {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 16, weight: .semibold))
 
-                    Text("Supprimer mon compte")
+                    Text(NSLocalizedString("editprofile.delete_account", comment: ""))
                         .font(.custom(AppConstants.Fonts.semiBold, size: 15))
 
                     Spacer()
@@ -427,10 +419,6 @@ struct EditProfileView: View {
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                .fill(Color.white.opacity(0.05))
-        )
     }
 
     // MARK: - App Version Footer
@@ -504,7 +492,9 @@ struct EditProfileView: View {
                     dismiss()
                 }
             } catch {
+                #if DEBUG
                 print("Error saving profile: \(error)")
+                #endif
                 await MainActor.run {
                     isSaving = false
                     HapticManager.error()
@@ -521,7 +511,9 @@ struct EditProfileView: View {
         // Compress and convert to base64
         guard let imageData = image.jpegData(compressionQuality: 0.7),
               let base64String = imageData.base64EncodedString() as String? else {
+            #if DEBUG
             print("Error: Could not convert image to base64")
+            #endif
             return
         }
 
@@ -531,10 +523,14 @@ struct EditProfileView: View {
                     uid: uid,
                     updates: ["profilePhotoBase64": base64String]
                 )
+                #if DEBUG
                 print("✅ Profile photo saved successfully")
+                #endif
                 HapticManager.success()
             } catch {
+                #if DEBUG
                 print("Error saving profile photo: \(error)")
+                #endif
                 HapticManager.error()
             }
         }
@@ -561,9 +557,13 @@ struct EditProfileView: View {
                     var settings = UserSettings()
                     settings.programStartDate = Date()
                     try await FirebaseManager.shared.saveUserSettings(uid: uid, settings: settings)
+                    #if DEBUG
                     print("✅ Program restarted to day 1")
+                    #endif
                 } catch {
+                    #if DEBUG
                     print("❌ Error resetting program: \(error)")
+                    #endif
                 }
             }
         }
@@ -596,7 +596,9 @@ struct EditProfileView: View {
                     dismiss()
                 }
             } catch {
+                #if DEBUG
                 print("❌ Error deleting account: \(error)")
+                #endif
                 HapticManager.error()
             }
         }

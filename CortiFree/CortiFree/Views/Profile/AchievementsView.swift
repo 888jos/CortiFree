@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AchievementsView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var achievementService = AchievementService.shared
+    @ObservedObject private var achievementService = AchievementService.shared
 
     @State private var selectedCategory: Achievement.AchievementCategory? = nil
     @State private var selectedAchievement: Achievement? = nil
