@@ -730,4 +730,5 @@ extension BreathingPattern {
 
 #Preview {
     BreathingExerciseDetailView(pattern: .fourSevenEight)
+        .environment(\.locale, Locale(identifier: "en"))
 }

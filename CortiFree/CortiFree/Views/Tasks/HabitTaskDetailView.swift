@@ -539,12 +539,13 @@ struct HabitTask: Identifiable {
         // Convert weights to ImpactArea array
         // Scale weights to display values (multiply by ~100 for better visual)
         // Sort by descending impact value to show most important first
+        let isFrench = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
         var areas = [
-            ImpactArea(icon: "leaf.fill", title: "Sérénité", increaseValue: Int(impact.serenity * 100), color: Color(hex: "9B59B6")),
-            ImpactArea(icon: "moon.fill", title: "Sommeil", increaseValue: Int(impact.sleep * 100), color: Color(hex: "E74C3C")),
-            ImpactArea(icon: "bolt.fill", title: "Énergie", increaseValue: Int(impact.energy * 100), color: Color(hex: "1ABC9C")),
+            ImpactArea(icon: "leaf.fill", title: isFrench ? "Sérénité" : "Serenity", increaseValue: Int(impact.serenity * 100), color: Color(hex: "9B59B6")),
+            ImpactArea(icon: "moon.fill", title: isFrench ? "Sommeil" : "Sleep", increaseValue: Int(impact.sleep * 100), color: Color(hex: "E74C3C")),
+            ImpactArea(icon: "bolt.fill", title: isFrench ? "Énergie" : "Energy", increaseValue: Int(impact.energy * 100), color: Color(hex: "1ABC9C")),
             ImpactArea(icon: "target", title: "Focus", increaseValue: Int(impact.focus * 100), color: Color(hex: "2ECC71")),
-            ImpactArea(icon: "heart.fill", title: "Équilibre", increaseValue: Int(impact.balance * 100), color: Color(hex: "3498DB"))
+            ImpactArea(icon: "heart.fill", title: isFrench ? "Équilibre" : "Balance", increaseValue: Int(impact.balance * 100), color: Color(hex: "3498DB"))
         ]
 
         // Sort by impact value (descending) and keep only top 4
@@ -564,10 +565,10 @@ struct ImpactArea {
 
 #Preview {
     let mockTask = HabitTask(
-        title: "S'hydrater régulièrement",
+        title: "Stay Hydrated",
         frequency: "2.5L",
         duration: "2.5L",
-        frequencyText: "Quotidien",
+        frequencyText: "Daily",
         difficulty: 1,
         streak: 17,
         imageName: "habit_water",
@@ -582,4 +583,5 @@ struct ImpactArea {
         onValidate: { print("Validated") },
         onSkip: { print("Skipped") }
     )
+    .environment(\.locale, Locale(identifier: "en"))
 }

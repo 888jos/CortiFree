@@ -68,11 +68,18 @@ struct CortiFreeApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var authViewModel = AuthViewModel()
 
+    // DEBUG: Set to true to skip onboarding and go directly to HomeView
+    #if DEBUG
+    private let skipOnboardingForTesting = true
+    #else
+    private let skipOnboardingForTesting = false
+    #endif
+
     var body: some Scene {
         WindowGroup {
             if authViewModel.isAuthenticated {
                 // User is authenticated - check if onboarding is completed (local or synced from Firestore)
-                if authViewModel.hasCompletedOnboarding || UserDefaults.standard.bool(forKey: "onboardingV2Completed") {
+                if skipOnboardingForTesting || authViewModel.hasCompletedOnboarding || UserDefaults.standard.bool(forKey: "onboardingV2Completed") {
                     // Onboarding completed - show main app
                     ContentView()
                         .environmentObject(authViewModel)

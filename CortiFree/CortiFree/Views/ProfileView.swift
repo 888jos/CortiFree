@@ -1137,4 +1137,5 @@ struct HabitBadgeDetailSheet: View {
 
 #Preview {
     ProfileView()
+        .environment(\.locale, Locale(identifier: "en"))
 }

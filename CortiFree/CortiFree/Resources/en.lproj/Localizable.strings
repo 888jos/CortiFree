@@ -2759,9 +2759,9 @@
 
 // MARK: - Onboarding V2 - Reassurance View
 "onboarding_v2.reassurance.greeting" = "Thank you";
-"onboarding_v2.reassurance.message_part1" = "You're not alone. Stress affects more than";
-"onboarding_v2.reassurance.message_part2" = "of adults in France.";
-"onboarding_v2.reassurance.message_part3" = "The good news? Together, we'll create your personalized plan to take back control.";
+"onboarding_v2.reassurance.message_part1" = "it's okay. You're not alone.";
+"onboarding_v2.reassurance.message_part2" = "Thousands of people like you have already found their serenity with CortiFree.";
+"onboarding_v2.reassurance.message_part3" = "Now, we'll do a quick quiz to better understand your situation and personalize your journey.";
 "onboarding_v2.reassurance.start_quiz" = "Start the quiz";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)

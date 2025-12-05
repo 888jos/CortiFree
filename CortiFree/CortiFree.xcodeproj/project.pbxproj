@@ -10,6 +10,7 @@
 		8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AEC92ED91A0100541E54 /* GoogleSignIn */; };
 		8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AECB2ED91A0100541E54 /* GoogleSignInSwift */; };
 		802C49B12EBBB2340084B356 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 802C49B02EBBB2340084B356 /* Lottie */; };
+		805FAB462EE1EE930056E9D2 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 805FAB452EE1EE930056E9D2 /* Products.storekit */; };
 		8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8077CC292ECF8AF400742806 /* Mixpanel */; };
 		8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9902EA8CBCA007C9606 /* FirebaseAuth */; };
 		8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9922EA8CBCA007C9606 /* FirebaseFirestore */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		805FAB452EE1EE930056E9D2 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		80F600A02E85D4A0008F58FB /* CortiFree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CortiFree.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		80F600AD2E85D4A0008F58FB /* CortiFreeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CortiFreeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		80F600B72E85D4A0008F58FB /* CortiFreeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CortiFreeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +102,7 @@
 		80F600972E85D4A0008F58FB = {
 			isa = PBXGroup;
 			children = (
+				805FAB452EE1EE930056E9D2 /* Products.storekit */,
 				80F600A22E85D4A0008F58FB /* CortiFree */,
 				80F600B02E85D4A0008F58FB /* CortiFreeTests */,
 				80F600BA2E85D4A0008F58FB /* CortiFreeUITests */,
@@ -252,6 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				805FAB462EE1EE930056E9D2 /* Products.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

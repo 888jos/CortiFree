@@ -832,4 +832,5 @@ struct BreathingExerciseItem: View {
 
 #Preview {
     LibraryView()
+        .environment(\.locale, Locale(identifier: "en"))
 }

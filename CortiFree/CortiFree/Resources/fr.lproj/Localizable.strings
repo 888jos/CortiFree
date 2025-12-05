@@ -2614,9 +2614,9 @@
 
 // Reassurance View
 "onboarding_v2.reassurance.greeting" = "Merci";
-"onboarding_v2.reassurance.message_part1" = "Tu n'es pas seul(e). Le stress touche plus de";
-"onboarding_v2.reassurance.message_part2" = "des adultes en France.";
-"onboarding_v2.reassurance.message_part3" = "La bonne nouvelle ? Ensemble, nous allons créer ton plan personnalisé pour reprendre le contrôle.";
+"onboarding_v2.reassurance.message_part1" = "c'est ok. Tu n'es pas seul(e).";
+"onboarding_v2.reassurance.message_part2" = "Des milliers de personnes comme toi ont déjà trouvé leur sérénité avec CortiFree.";
+"onboarding_v2.reassurance.message_part3" = "Maintenant, nous allons faire un petit quiz pour mieux comprendre ta situation et personnaliser ton parcours.";
 "onboarding_v2.reassurance.start_quiz" = "Commencer le quiz";
 
 // Habits Quiz - Questions

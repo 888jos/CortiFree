@@ -14,7 +14,15 @@ struct AddTaskManuallyView: View {
     @State private var frequency: String = "1x/jour"
     @State private var difficulty: Int = 2
 
-    private let frequencyOptions = ["Tous les jours", "1x/jour", "2x/jour", "3x/semaine", "2x/semaine", "1x/semaine"]
+    private var isFrench: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+    }
+
+    private var frequencyOptions: [String] {
+        isFrench
+            ? ["Tous les jours", "1x/jour", "2x/jour", "3x/semaine", "2x/semaine", "1x/semaine"]
+            : ["Every day", "1x/day", "2x/day", "3x/week", "2x/week", "1x/week"]
+    }
 
     var body: some View {
         ZStack {
@@ -36,7 +44,7 @@ struct AddTaskManuallyView: View {
 
                     Spacer()
 
-                    Text("Nouvelle tâche")
+                    Text(isFrench ? "Nouvelle tâche" : "New Task")
                         .font(Font.Poppins.custom(.bold, size: 20))
                         .foregroundColor(.white)
 
@@ -53,11 +61,11 @@ struct AddTaskManuallyView: View {
                     VStack(spacing: 24) {
                         // Title input
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Titre de la tâche")
+                            Text(isFrench ? "Titre de la tâche" : "Task Title")
                                 .font(.custom("Poppins-SemiBold", size: 14))
                                 .foregroundColor(.white)
 
-                            TextField("Ex: Faire du yoga", text: $taskTitle)
+                            TextField(isFrench ? "Ex: Faire du yoga" : "Ex: Do yoga", text: $taskTitle)
                                 .font(.custom("Poppins-Regular", size: 16))
                                 .foregroundColor(.white)
                                 .padding(16)
@@ -74,7 +82,7 @@ struct AddTaskManuallyView: View {
 
                         // Frequency picker
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Fréquence")
+                            Text(isFrench ? "Fréquence" : "Frequency")
                                 .font(.custom("Poppins-SemiBold", size: 14))
                                 .foregroundColor(.white)
 
@@ -111,7 +119,7 @@ struct AddTaskManuallyView: View {
 
                         // Difficulty selector
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Difficulté")
+                            Text(isFrench ? "Difficulté" : "Difficulty")
                                 .font(.custom("Poppins-SemiBold", size: 14))
                                 .foregroundColor(.white)
 

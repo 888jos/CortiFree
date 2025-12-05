@@ -73,6 +73,10 @@ class StoreKitManager: ObservableObject {
     func purchase(_ productID: String) async -> Bool {
         guard let product = products.first(where: { $0.id == productID }) else {
             errorMessage = "Produit non trouvé"
+            #if DEBUG
+            print("❌ StoreKit: Product '\(productID)' not found in loaded products: \(products.map { $0.id })")
+            print("💡 Tip: Make sure StoreKit Configuration file is set in scheme and products are configured")
+            #endif
             return false
         }
 

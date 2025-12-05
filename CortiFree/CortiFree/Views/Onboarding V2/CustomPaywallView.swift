@@ -7,11 +7,15 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct CustomPaywallView: View {
     let onComplete: () -> Void
     let onPurchase: (String) -> Void // "monthly" or "yearly"
     let onRestore: () -> Void
+
+    // StoreKit Manager for real prices
+    @StateObject private var storeKit = StoreKitManager.shared
 
     // User data from onboarding
     var userName: String = "toi"
@@ -30,6 +34,55 @@ struct CustomPaywallView: View {
 
     private var isFrench: Bool {
         Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+    }
+
+    // MARK: - Dynamic Prices from StoreKit
+
+    private var monthlyPrice: String {
+        storeKit.monthlyProduct?.displayPrice ?? "9,99 €"
+    }
+
+    private var yearlyPrice: String {
+        storeKit.yearlyProduct?.displayPrice ?? "34,99 €"
+    }
+
+    private var monthlyDecimalPrice: Decimal {
+        storeKit.monthlyProduct?.price ?? 9.99
+    }
+
+    private var yearlyDecimalPrice: Decimal {
+        storeKit.yearlyProduct?.price ?? 34.99
+    }
+
+    // Calculate monthly equivalent for yearly subscription
+    private var yearlyMonthlyEquivalent: String {
+        let yearlyPrice = yearlyDecimalPrice
+        let monthlyEquivalent = yearlyPrice / 12
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = storeKit.yearlyProduct?.priceFormatStyle.currencyCode ?? "EUR"
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: monthlyEquivalent as NSDecimalNumber) ?? "2,92 €"
+    }
+
+    // Calculate discount percentage: (monthly×12 - yearly) / (monthly×12) × 100
+    private var discountPercentage: Int {
+        let monthlyTotal = monthlyDecimalPrice * 12
+        let yearly = yearlyDecimalPrice
+        guard monthlyTotal > 0 else { return 71 }
+        let discount = ((monthlyTotal - yearly) / monthlyTotal) * 100
+        return Int(NSDecimalNumber(decimal: discount).doubleValue.rounded())
+    }
+
+    // Daily price for yearly subscription
+    private var dailyPrice: String {
+        let yearlyPrice = yearlyDecimalPrice
+        let dailyEquivalent = yearlyPrice / 365
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = storeKit.yearlyProduct?.priceFormatStyle.currencyCode ?? "EUR"
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: dailyEquivalent as NSDecimalNumber) ?? "0,10 €"
     }
 
     // Les habitudes avec leurs statistiques de progression (same as HabitsProgressFlowView)
@@ -215,7 +268,11 @@ struct CustomPaywallView: View {
                     onDismissToPaywall: {
                         showSpecialOfferPopup = false
                     },
-                    countdownSeconds: countdownSeconds
+                    countdownSeconds: countdownSeconds,
+                    yearlyPrice: yearlyPrice,
+                    yearlyMonthlyEquivalent: yearlyMonthlyEquivalent,
+                    discountPercentage: discountPercentage,
+                    dailyPrice: dailyPrice
                 )
                 .transition(.opacity)
             }
@@ -227,7 +284,12 @@ struct CustomPaywallView: View {
                     userName: userName,
                     onPurchase: onPurchase,
                     onRestore: onRestore,
-                    countdownSeconds: countdownSeconds
+                    countdownSeconds: countdownSeconds,
+                    monthlyPrice: monthlyPrice,
+                    yearlyPrice: yearlyPrice,
+                    yearlyMonthlyEquivalent: yearlyMonthlyEquivalent,
+                    discountPercentage: discountPercentage,
+                    dailyPrice: dailyPrice
                 )
                 .transition(.opacity)
             }
@@ -854,9 +916,40 @@ struct CustomPaywallView: View {
     // MARK: - Helper Methods
 
     private func startCountdown() {
+        // Check if we have a saved end time
+        let endTimeKey = "paywallCountdownEndTime"
+        let userDefaults = UserDefaults.standard
+
+        if let savedEndTime = userDefaults.object(forKey: endTimeKey) as? Date {
+            // Calculate remaining time
+            let remaining = Int(savedEndTime.timeIntervalSinceNow)
+            if remaining > 0 {
+                countdownSeconds = remaining
+            } else {
+                // Timer expired, restart at 30 minutes
+                let newEndTime = Date().addingTimeInterval(30 * 60)
+                userDefaults.set(newEndTime, forKey: endTimeKey)
+                countdownSeconds = 30 * 60
+            }
+        } else {
+            // First time - set end time to 30 minutes from now
+            let endTime = Date().addingTimeInterval(Double(countdownSeconds))
+            userDefaults.set(endTime, forKey: endTimeKey)
+        }
+
+        // Start the timer
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            if countdownSeconds > 0 {
-                countdownSeconds -= 1
+            // Recalculate from saved end time to handle background
+            if let savedEndTime = userDefaults.object(forKey: endTimeKey) as? Date {
+                let remaining = Int(savedEndTime.timeIntervalSinceNow)
+                if remaining > 0 {
+                    countdownSeconds = remaining
+                } else {
+                    // Timer reached 0, restart at 30 minutes
+                    let newEndTime = Date().addingTimeInterval(30 * 60)
+                    userDefaults.set(newEndTime, forKey: endTimeKey)
+                    countdownSeconds = 30 * 60
+                }
             }
         }
     }
@@ -1157,6 +1250,12 @@ struct PaywallSpecialOfferPopup: View {
     let onDismissToPaywall: () -> Void
     let countdownSeconds: Int
 
+    // Dynamic prices from StoreKit
+    var yearlyPrice: String = "34,99 €"
+    var yearlyMonthlyEquivalent: String = "2,92 €"
+    var discountPercentage: Int = 71
+    var dailyPrice: String = "0,10 €"
+
     @State private var showConfetti: Bool = false
 
     private var isFrench: Bool {
@@ -1218,7 +1317,7 @@ struct PaywallSpecialOfferPopup: View {
                 VStack(spacing: 20) {
                     // Discount percentage (uniform white text)
                     HStack(spacing: 8) {
-                        Text("71%")
+                        Text("\(discountPercentage)%")
                             .font(.custom("Poppins-Bold", size: 56))
                             .foregroundColor(.white)
                         Text(isFrench ? "de réduction" : "discount")
@@ -1227,7 +1326,7 @@ struct PaywallSpecialOfferPopup: View {
                     }
 
                     // Monthly equivalent badge
-                    Text(isFrench ? "Seulement 2,92 € par mois" : "Only 2.92 € per month")
+                    Text(isFrench ? "Seulement \(yearlyMonthlyEquivalent) par mois" : "Only \(yearlyMonthlyEquivalent) per month")
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .padding(.horizontal, 24)
@@ -1238,13 +1337,13 @@ struct PaywallSpecialOfferPopup: View {
                         )
 
                     // Price
-                    Text("34,99 €/\(isFrench ? "an" : "yr") - \(isFrench ? "au plus bas" : "lowest price")")
+                    Text("\(yearlyPrice)/\(isFrench ? "an" : "yr") - \(isFrench ? "au plus bas" : "lowest price")")
                         .font(.custom("Poppins-Medium", size: 16))
                         .foregroundColor(.white.opacity(0.7))
 
                     // Benefits list
                     VStack(alignment: .leading, spacing: 10) {
-                        OfferBenefitRow(text: isFrench ? "Seulement 0,10 € par jour" : "Only 0.10 € per day")
+                        OfferBenefitRow(text: isFrench ? "Seulement \(dailyPrice) par jour" : "Only \(dailyPrice) per day")
                         OfferBenefitRow(text: isFrench ? "Programme CortiFree de 66 jours" : "66-day CortiFree program")
                         OfferBenefitRow(text: isFrench ? "Transforme ta vie pour toujours" : "Transform your life forever")
                         OfferBenefitRow(text: isFrench ? "Accès illimité" : "Unlimited access")
@@ -1371,6 +1470,24 @@ struct OfferBenefitRow: View {
     }
 }
 
+// MARK: - Feature Bullet (purple star + white text)
+
+struct PaywallFeatureBullet: View {
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "star.fill")
+                .font(.system(size: 14))
+                .foregroundColor(Color(hex: "B794F6"))
+
+            Text(text)
+                .font(.custom("Poppins-Medium", size: 15))
+                .foregroundColor(.white)
+        }
+    }
+}
+
 // MARK: - Start Program Screen
 
 struct PaywallStartProgramScreen: View {
@@ -1379,6 +1496,13 @@ struct PaywallStartProgramScreen: View {
     let onPurchase: (String) -> Void
     let onRestore: () -> Void
     let countdownSeconds: Int
+
+    // Dynamic prices from StoreKit
+    var monthlyPrice: String = "9,99 €"
+    var yearlyPrice: String = "34,99 €"
+    var yearlyMonthlyEquivalent: String = "2,92 €"
+    var discountPercentage: Int = 71
+    var dailyPrice: String = "0,10 €"
 
     @State private var selectedPlan: String = "yearly"
     @State private var showSpecialOffer: Bool = false
@@ -1437,37 +1561,33 @@ struct PaywallStartProgramScreen: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
                         // Main title
-                        VStack(spacing: 8) {
-                            Text(isFrench
-                                 ? "Tu es le personnage principal.\nDans 66 jours, ton retour épique\ncommence."
-                                 : "You are the main character.\nIn 66 days, your epic comeback\nbegins.")
-                                .font(.custom("Poppins-Bold", size: 22))
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                                .lineSpacing(4)
+                        Text(isFrench
+                             ? "Tu es le personnage principal.\nDans 66 jours, ton retour épique\ncommence."
+                             : "You are the main character.\nIn 66 days, your epic comeback\nbegins.")
+                            .font(.custom("Poppins-Bold", size: 22))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(4)
+                            .padding(.horizontal, 24)
+                            .padding(.top, 16)
 
-                            Text(isFrench
-                                 ? "Obtenez un accès complet à CortiFree incluant la génération illimitée de programmes, une planification scientifique de tâches, le suivi des rituels quotidiens et des améliorations + bien plus encore !"
-                                 : "Get full access to CortiFree including unlimited program generation, scientific task planning, daily ritual tracking and improvements + much more!")
-                                .font(.custom("Poppins-Regular", size: 14))
-                                .foregroundColor(Color(hex: "B794F6"))
-                                .multilineTextAlignment(.center)
-                                .lineSpacing(3)
-                                .padding(.top, 8)
+                        // Features list with purple star icons
+                        VStack(alignment: .leading, spacing: 14) {
+                            PaywallFeatureBullet(text: isFrench ? "Programme personnalisé de 66 jours" : "Personalized 66-day program")
+                            PaywallFeatureBullet(text: isFrench ? "Exercices de respiration guidés" : "Guided breathing exercises")
+                            PaywallFeatureBullet(text: isFrench ? "Suivi quotidien de tes progrès" : "Daily progress tracking")
+                            PaywallFeatureBullet(text: isFrench ? "Méditations anti-stress" : "Anti-stress meditations")
+                            PaywallFeatureBullet(text: isFrench ? "Rappels intelligents" : "Smart reminders")
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 16)
-
-                        // App screenshots carousel
-                        AppScreenshotsCarousel()
-                            .frame(height: 280)
+                        .padding(.horizontal, 32)
+                        .padding(.vertical, 20)
 
                         // Pricing options side by side
                         HStack(spacing: 12) {
                             // Monthly option
                             ProgramPlanCard(
                                 title: isFrench ? "MENSUEL" : "MONTHLY",
-                                price: "9,99 €",
+                                price: monthlyPrice,
                                 period: isFrench ? "/mo" : "/mo",
                                 subtitle: isFrench ? "Plan de base" : "Basic plan",
                                 badgeText: nil,
@@ -1481,10 +1601,10 @@ struct PaywallStartProgramScreen: View {
                             // Yearly option (with badge)
                             ProgramPlanCard(
                                 title: isFrench ? "ANNUEL" : "YEARLY",
-                                price: "34,99 €",
+                                price: yearlyPrice,
                                 period: isFrench ? "/an" : "/yr",
-                                subtitle: isFrench ? "Seulement 2,92 € par mois !" : "Only 2.92 € per month!",
-                                badgeText: isFrench ? "ÉCONOMISEZ 71 %" : "SAVE 71%",
+                                subtitle: isFrench ? "Seulement \(yearlyMonthlyEquivalent) par mois !" : "Only \(yearlyMonthlyEquivalent) per month!",
+                                badgeText: isFrench ? "ÉCONOMISEZ \(discountPercentage) %" : "SAVE \(discountPercentage)%",
                                 isSelected: selectedPlan == "yearly",
                                 onTap: {
                                     HapticManager.light()
@@ -1554,7 +1674,11 @@ struct PaywallStartProgramScreen: View {
                         showSpecialOffer = false
                         isPresented = false
                     },
-                    countdownSeconds: countdownSeconds
+                    countdownSeconds: countdownSeconds,
+                    yearlyPrice: yearlyPrice,
+                    yearlyMonthlyEquivalent: yearlyMonthlyEquivalent,
+                    discountPercentage: discountPercentage,
+                    dailyPrice: dailyPrice
                 )
                 .transition(.opacity)
             }

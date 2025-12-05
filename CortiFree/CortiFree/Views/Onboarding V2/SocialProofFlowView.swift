@@ -9,9 +9,7 @@
 import SwiftUI
 
 struct SocialProofFlowView: View {
-    @State private var currentPage = 0
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var languageManager = LanguageManager.shared
     var onComplete: () -> Void
 
     var body: some View {
@@ -20,32 +18,10 @@ struct SocialProofFlowView: View {
             GalaxyBackgroundView()
                 .ignoresSafeArea()
 
-            ZStack {
-                // Screen 1: Testimonials
-                if currentPage == 0 {
-                    TestimonialsView(onContinue: {
-                        withAnimation {
-                            currentPage = 1
-                        }
-                    })
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
-                }
-
-                // Screen 2: Goals Selection (BeforeAfterStats removed)
-                if currentPage == 1 {
-                    GoalsSelectionView(onContinue: {
-                        onComplete()
-                    })
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
-                }
-            }
-            .ignoresSafeArea()
+            // Single screen: Testimonials → onComplete directly
+            TestimonialsView(onContinue: {
+                onComplete()
+            })
         }
     }
 }
@@ -57,50 +33,103 @@ struct TestimonialsView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var screenViewTime: Date?
 
-    private let testimonials = [
-        Testimonial(
-            name: "Sophie",
-            age: 31,
-            title: "Ma vie a changé",
-            text: "Avant CortiFree, je dormais mal et je me sentais épuisée tout le temps. Après deux semaines, j'ai remarqué que je me réveillais plus reposée et que mon stress au boulot avait diminué. L'app m'appris des exercices simples de respiration mais qui font une vraie différence. Je recommande à tous ceux qui se sentent débordés par leur quotidien.",
-            rating: 5
-        ),
-        Testimonial(
-            name: "Julien",
-            age: 28,
-            title: "Enfin du calme",
-            text: "J'étais sceptique, mais CortiFree m'a surpris. Mon anxiété était constante à cause du travail, et je ne savais plus me concentrer. Grâce aux sessions guidées et aux rappels, j'ai repris le contrôle petit à petit. Après un mois, mes collègues ont même remarqué que j'étais plus détendu. Vraiment utile !",
-            rating: 5
-        ),
-        Testimonial(
-            name: "Claire",
-            age: 34,
-            title: "Un regain d'énergie",
-            text: "Entre les enfants et mon job, j'étais à bout et mes migraines revenaient souvent. CortiFree m'a aidé à identifier mes triggers de stress et à les gérer. Aujourd'hui, je me sens plus sereine et j'ai retrouvé de l'énergie pour profiter de ma famille.",
-            rating: 5
-        ),
-        Testimonial(
-            name: "Marc",
-            age: 42,
-            title: "Meilleur sommeil",
-            text: "Je me réveillais plusieurs fois par nuit et je traînais une fatigue constante. CortiFree m'a appris des techniques de relaxation qui ont transformé mes nuits. Maintenant je dors profondément et je me réveille en forme. Un changement radical pour ma qualité de vie.",
-            rating: 5
-        ),
-        Testimonial(
-            name: "Emma",
-            age: 26,
-            title: "Plus sereine",
-            text: "Mon stress au quotidien me rendait irritable et fatiguée. Avec CortiFree, j'ai découvert comment mieux gérer mes émotions et prendre du recul. Les exercices sont simples mais efficaces. Je me sens tellement mieux dans ma peau maintenant !",
-            rating: 5
-        ),
-        Testimonial(
-            name: "Thomas",
-            age: 37,
-            title: "Concentration retrouvée",
-            text: "J'avais du mal à me concentrer plus de 10 minutes et ça impactait mon travail. Les techniques de pleine conscience de CortiFree ont vraiment fait la différence. Aujourd'hui je peux me focaliser sur mes tâches pendant des heures sans perdre le fil.",
-            rating: 5
-        )
-    ]
+    private var isFrench: Bool {
+        languageManager.currentLanguage == .french
+    }
+
+    private var testimonials: [Testimonial] {
+        if isFrench {
+            return [
+                Testimonial(
+                    name: "Sophie",
+                    age: 31,
+                    title: "Ma vie a changé",
+                    text: "Avant CortiFree, je dormais mal et je me sentais épuisée tout le temps. Après deux semaines, j'ai remarqué que je me réveillais plus reposée et que mon stress au boulot avait diminué. L'app m'appris des exercices simples de respiration mais qui font une vraie différence. Je recommande à tous ceux qui se sentent débordés par leur quotidien.",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Julien",
+                    age: 28,
+                    title: "Enfin du calme",
+                    text: "J'étais sceptique, mais CortiFree m'a surpris. Mon anxiété était constante à cause du travail, et je ne savais plus me concentrer. Grâce aux sessions guidées et aux rappels, j'ai repris le contrôle petit à petit. Après un mois, mes collègues ont même remarqué que j'étais plus détendu. Vraiment utile !",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Claire",
+                    age: 34,
+                    title: "Un regain d'énergie",
+                    text: "Entre les enfants et mon job, j'étais à bout et mes migraines revenaient souvent. CortiFree m'a aidé à identifier mes triggers de stress et à les gérer. Aujourd'hui, je me sens plus sereine et j'ai retrouvé de l'énergie pour profiter de ma famille.",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Marc",
+                    age: 42,
+                    title: "Meilleur sommeil",
+                    text: "Je me réveillais plusieurs fois par nuit et je traînais une fatigue constante. CortiFree m'a appris des techniques de relaxation qui ont transformé mes nuits. Maintenant je dors profondément et je me réveille en forme. Un changement radical pour ma qualité de vie.",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Emma",
+                    age: 26,
+                    title: "Plus sereine",
+                    text: "Mon stress au quotidien me rendait irritable et fatiguée. Avec CortiFree, j'ai découvert comment mieux gérer mes émotions et prendre du recul. Les exercices sont simples mais efficaces. Je me sens tellement mieux dans ma peau maintenant !",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Thomas",
+                    age: 37,
+                    title: "Concentration retrouvée",
+                    text: "J'avais du mal à me concentrer plus de 10 minutes et ça impactait mon travail. Les techniques de pleine conscience de CortiFree ont vraiment fait la différence. Aujourd'hui je peux me focaliser sur mes tâches pendant des heures sans perdre le fil.",
+                    rating: 5
+                )
+            ]
+        } else {
+            return [
+                Testimonial(
+                    name: "Sophie",
+                    age: 31,
+                    title: "My life has changed",
+                    text: "Before CortiFree, I slept poorly and felt exhausted all the time. After two weeks, I noticed I was waking up more rested and my work stress had decreased. The app taught me simple breathing exercises that make a real difference. I recommend it to anyone who feels overwhelmed by daily life.",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Julien",
+                    age: 28,
+                    title: "Finally some peace",
+                    text: "I was skeptical, but CortiFree surprised me. My anxiety was constant because of work, and I couldn't focus anymore. Thanks to the guided sessions and reminders, I gradually regained control. After a month, my colleagues even noticed I was more relaxed. Really useful!",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Claire",
+                    age: 34,
+                    title: "A boost of energy",
+                    text: "Between the kids and my job, I was exhausted and my migraines kept coming back. CortiFree helped me identify my stress triggers and manage them. Today, I feel calmer and I've regained the energy to enjoy time with my family.",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Marc",
+                    age: 42,
+                    title: "Better sleep",
+                    text: "I used to wake up several times a night and carried constant fatigue. CortiFree taught me relaxation techniques that transformed my nights. Now I sleep deeply and wake up refreshed. A radical change for my quality of life.",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Emma",
+                    age: 26,
+                    title: "More serene",
+                    text: "My daily stress made me irritable and tired. With CortiFree, I discovered how to better manage my emotions and step back. The exercises are simple but effective. I feel so much better now!",
+                    rating: 5
+                ),
+                Testimonial(
+                    name: "Thomas",
+                    age: 37,
+                    title: "Focus restored",
+                    text: "I struggled to focus for more than 10 minutes and it was affecting my work. CortiFree's mindfulness techniques really made a difference. Today I can focus on my tasks for hours without losing track.",
+                    rating: 5
+                )
+            ]
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {

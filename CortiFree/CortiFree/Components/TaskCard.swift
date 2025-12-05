@@ -22,6 +22,23 @@ struct HabitTaskCard: View {
     @State private var isPressed = false
     @State private var showExerciseView = false
 
+    private var isFrench: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+    }
+
+    // Translate frequency text based on locale
+    private var localizedFrequency: String {
+        if isFrench { return frequencyText }
+        // Translate common French frequencies to English
+        switch frequencyText.lowercased() {
+        case "quotidien": return "Daily"
+        case "3x/sem", "3x/semaine": return "3x/week"
+        case "2x/sem", "2x/semaine": return "2x/week"
+        case "1x/sem", "1x/semaine": return "1x/week"
+        default: return frequencyText
+        }
+    }
+
     var body: some View {
         Button(action: {
             HapticManager.light()
@@ -131,7 +148,7 @@ struct HabitTaskCard: View {
                                     .font(.system(size: 12))
                                     .foregroundColor(.white)
 
-                                Text(frequencyText)
+                                Text(localizedFrequency)
                                     .font(.custom("Poppins-Regular", size: 13))
                                     .foregroundColor(.white.opacity(0.7))
                             }
@@ -152,7 +169,7 @@ struct HabitTaskCard: View {
                                         .frame(width: 3, height: 12)
                                 }
 
-                                Text("Difficulté")
+                                Text(isFrench ? "Difficulté" : "Difficulty")
                                     .font(.custom("Poppins-Regular", size: 13))
                                     .foregroundColor(.white.opacity(0.7))
                             }

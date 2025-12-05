@@ -22,7 +22,7 @@ struct OnboardingCompletionView: View {
     // DEBUG: Set to true to bypass paywall during development
     // Change to false before shipping to App Store!
     #if DEBUG
-    private let bypassPaywallForTesting = true
+    private let bypassPaywallForTesting = false // DISABLED FOR PRODUCTION
     #else
     private let bypassPaywallForTesting = false
     #endif

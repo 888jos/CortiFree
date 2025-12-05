@@ -202,7 +202,7 @@ struct WeekProgressView: View {
                     // Button
                     Button(action: {
                         HapticManager.medium()
-                        if currentWeek < weekData.last!.week {
+                        if let lastWeek = weekData.last, currentWeek < lastWeek.week {
                             // Go to next demo week
                             if let nextIndex = weekData.firstIndex(where: { $0.week > currentWeek }) {
                                 withAnimation {

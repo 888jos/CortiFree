@@ -334,4 +334,5 @@ struct InfoCard: View {
             taskDescription: "La technique de respiration 4-7-8 active le système nerveux parasympathique, réduisant instantanément les niveaux de cortisol. En inspirant 4 secondes, retenant 7 secondes et expirant 8 secondes, vous signalez à votre corps qu'il est en sécurité."
         )
     )
+    .environment(\.locale, Locale(identifier: "en"))
 }

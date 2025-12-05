@@ -356,14 +356,14 @@ struct TasksV2View: View {
                                 let currentWeek = WeeklyHabitProgression.currentWeek(for: actualDay)
                                 let targetWeek = WeeklyHabitProgression.currentWeek(for: targetDay)
 
-                                // TESTING: Week lock disabled for testing
-                                // if targetWeek <= currentWeek {
-                                withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
-                                    currentDay = targetDay
+                                // Week lock: prevent navigating to future weeks
+                                if targetWeek <= currentWeek {
+                                    withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
+                                        currentDay = targetDay
+                                    }
+                                } else {
+                                    showFutureWeekAlert = true
                                 }
-                                // } else {
-                                //     showFutureWeekAlert = true
-                                // }
                             }) {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 20, weight: .bold))
@@ -1239,4 +1239,5 @@ struct FutureWeekBlockingView: View {
 
 #Preview {
     TasksV2View()
+        .environment(\.locale, Locale(identifier: "en"))
 }
