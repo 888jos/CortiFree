@@ -96,7 +96,6 @@ class OptimizedFirebaseService {
 
     private func prepareProfileData(_ data: OverallQuizData) -> [String: Any] {
         return [
-            "firstName": data.firstName,
             "age": data.age,
             "gender": data.gender,
             "stressReasons": data.reasons,

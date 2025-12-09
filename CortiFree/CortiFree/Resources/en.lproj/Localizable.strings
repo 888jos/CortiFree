@@ -284,7 +284,7 @@
 "habit.breathing_title" = "Breathing exercise";
 "habit.meditation_title" = "Meditate 10 minutes";
 "habit.journal_title" = "Write in your journal";
-"habit.water_title" = "Drink at least %@";
+"habit.water_title" = "Drink at least %@ of water";
 "habit.water_title_legacy" = "Drink at least 2.5L of water";
 
 // Nature variants
@@ -927,6 +927,44 @@
 "badge.habit.nature" = "Nature";
 "badge.habit.social" = "Social";
 "badge.habit.sleep" = "Sleep";
+
+// MARK: - Achievement Titles (Streak)
+"achievement.streak_3.title" = "Beginner";
+"achievement.streak_7.title" = "Motivated";
+"achievement.streak_14.title" = "Determined";
+"achievement.streak_21.title" = "Engaged";
+"achievement.streak_30.title" = "Dedicated";
+"achievement.streak_40.title" = "Champion";
+"achievement.streak_50.title" = "Invincible";
+"achievement.streak_60.title" = "Legend";
+"achievement.streak_66.title" = "Master";
+
+// MARK: - Achievement Descriptions (Streak)
+"achievement.streak_3.description" = "Maintain a 3-day streak";
+"achievement.streak_7.description" = "Maintain a 7-day streak";
+"achievement.streak_14.description" = "Maintain a 14-day streak";
+"achievement.streak_21.description" = "Maintain a 21-day streak";
+"achievement.streak_30.description" = "Maintain a 30-day streak";
+"achievement.streak_40.description" = "Maintain a 40-day streak";
+"achievement.streak_50.description" = "Maintain a 50-day streak";
+"achievement.streak_60.description" = "Maintain a 60-day streak";
+"achievement.streak_66.description" = "Maintain a 66-day streak - Full program!";
+
+// MARK: - Achievement Unlock Popup
+"achievement.unlocked" = "Achievement Unlocked!";
+"achievement.category.streak" = "Streak";
+"achievement.category.completion" = "Completion";
+"achievement.category.habit" = "Habit";
+"achievement.category.special" = "Special";
+
+// MARK: - Achievements View
+"achievements.title" = "Achievements";
+"achievements.unlocked_count" = "%d/%d Unlocked";
+"achievements.category.all" = "All";
+"achievements.unlocked_date" = "Unlocked %@";
+"achievements.progress" = "Progress: %d/%d";
+"achievements.not_started" = "Not started yet";
+"achievements.close" = "Close";
 
 // MARK: - Additional Common Keys
 "common.continue" = "Continue";
@@ -3076,8 +3114,8 @@
 
 // MARK: - Onboarding V2 - Eight Habits Intro
 "onboarding_v2.eight_habits.intro_studies" = "Studies show that:";
-"onboarding_v2.eight_habits.intro_reset" = "to reset your";
-"onboarding_v2.eight_habits.intro_life" = "life, you need the";
+"onboarding_v2.eight_habits.intro_reset" = "to lower your";
+"onboarding_v2.eight_habits.intro_life" = "cortisol levels, you need the";
 "onboarding_v2.eight_habits.intro_fundamental" = "8 fundamental habits";
 "onboarding_v2.eight_habits.intro_below" = "below.";
 "onboarding_v2.eight_habits.intro_see_change" = "Discover how your life will change in 66 days\nthanks to these 8 habits:";
@@ -3306,6 +3344,7 @@
 // MARK: - Settings Privacy
 "settings.privacy.policy" = "Privacy Policy";
 "settings.privacy.terms" = "Terms of Use";
+"settings.privacy.legal_notice" = "Legal Notice";
 "settings.privacy.delete_account" = "Delete my account";
 "settings.privacy.delete_account_subtitle" = "Irreversible action";
 "settings.privacy.icloud_subtitle" = "Sync your data across devices";

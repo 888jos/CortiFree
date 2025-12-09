@@ -52,6 +52,21 @@ struct WeekProgressView: View {
         weekData.first { $0.week == currentWeek } ?? weekData[0]
     }
 
+    // Force week titles to display correctly (Week 1, Week 5, Week 10)
+    private func getWeekTitle() -> String {
+        let isFrench = languageManager.currentLanguage == .french
+        switch currentWeek {
+        case 1:
+            return isFrench ? "Semaine 1" : "Week 1"
+        case 5:
+            return isFrench ? "Semaine 5" : "Week 5"
+        case 10:
+            return isFrench ? "Semaine 10" : "Week 10"
+        default:
+            return isFrench ? "Semaine \(currentWeek)" : "Week \(currentWeek)"
+        }
+    }
+
     var body: some View {
         ZStack {
             // Background with current week color gradient
@@ -66,8 +81,8 @@ struct WeekProgressView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Week title
-                Text(String(format: StringKeys.Onboarding.WeekProgress.weekNumber, currentWeekData.week))
+                // Week title - Force display of week number based on screen index
+                Text(getWeekTitle())
                     .font(Font.Poppins.custom(.bold, size: 40))
                     .foregroundColor(.white)
                     .padding(.top, 100)

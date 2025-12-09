@@ -75,15 +75,22 @@ struct OnboardingCompletionView: View {
                                 ? StoreKitManager.yearlyProductID
                                 : StoreKitManager.monthlyProductID
 
-                            let success = await storeKit.purchase(productID)
+                            let result = await storeKit.purchase(productID)
 
                             isPurchasing = false
 
-                            if success {
+                            switch result {
+                            case .success:
                                 // Purchase successful - complete onboarding
                                 onViewPlan()
-                            } else if let error = storeKit.errorMessage {
-                                purchaseError = error
+                            case .cancelled:
+                                // User cancelled - no error message needed
+                                break
+                            case .pending:
+                                // Ask to Buy or other pending state
+                                purchaseError = "Achat en attente d'approbation"
+                            case .failed(let error):
+                                purchaseError = error.localizedDescription
                             }
                         }
                     },
@@ -109,6 +116,11 @@ struct OnboardingCompletionView: View {
                     potentialScores: potentialScores
                 )
                 .onAppear {
+                    // Track paywall/completion screen viewed
+                    MixpanelManager.shared.trackOnboardingCompletionViewed(
+                        quizAnswersCount: habitsQuizResult?.answers.count ?? 0,
+                        hasQuizData: habitsQuizResult != nil
+                    )
                     // Track onboarding completion (once)
                     trackOnboardingCompletion()
                 }

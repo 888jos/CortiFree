@@ -23,7 +23,6 @@ struct AuthenticationView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
 
-    let firstName: String
     var onComplete: () -> Void
 
     var body: some View {
@@ -61,15 +60,11 @@ struct AuthenticationView: View {
             }
 
             VStack(spacing: 0) {
-                // Personalized message at top
+                // Message at top
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("\(firstName),")
-                        .font(.custom("Poppins-Bold", size: 28))
-                        .foregroundColor(.white)
-
-                    Text("onboarding_v2.auth.create_account_message".localized)
+                    Text("onboarding_v2.auth.create_account_message".localized.prefix(1).uppercased() + "onboarding_v2.auth.create_account_message".localized.dropFirst())
                         .font(.custom("Poppins-Regular", size: 18))
-                        .foregroundColor(.white.opacity(0.85))
+                        .foregroundColor(.white)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -225,7 +220,7 @@ struct AuthenticationView: View {
         }
         .onAppear {
             // Track authentication screen view
-            MixpanelManager.shared.trackOnboardingAuthenticationViewed(firstName: firstName)
+            MixpanelManager.shared.trackOnboardingAuthenticationViewed(firstName: "")
         }
     }
 
@@ -1251,5 +1246,5 @@ struct CustomTextFieldStyle: TextFieldStyle {
 }
 
 #Preview {
-    AuthenticationView(firstName: "Sophie", onComplete: {})
+    AuthenticationView(onComplete: {})
 }

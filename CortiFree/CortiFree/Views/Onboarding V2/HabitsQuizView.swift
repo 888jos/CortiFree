@@ -70,12 +70,24 @@ struct HabitsQuizView: View {
             // Track quiz started
             quizStartTime = Date()
             questionStartTime = Date()
-            // Quiz start is tracked by first question view
+            MixpanelManager.shared.trackOnboardingHabitsQuizViewed()
+            trackQuestionViewed(0)
         }
-        .onChange(of: currentQuestionIndex) { _ in
+        .onChange(of: currentQuestionIndex) { _, newValue in
             // Reset timer when question changes
             questionStartTime = Date()
+            trackQuestionViewed(newValue)
         }
+    }
+
+    // MARK: - Question Tracking
+
+    private func trackQuestionViewed(_ index: Int) {
+        let question = getQuestion(at: index)
+        MixpanelManager.shared.trackOnboardingQuizQuestionViewed(
+            questionNumber: index + 1,
+            questionText: question.text
+        )
     }
 
     // MARK: - Header Section

@@ -10,7 +10,6 @@ import SwiftUI
 import AVKit
 
 struct ReassuranceView: View {
-    let userName: String
     let onStartQuiz: () -> Void
 
     @ObservedObject var languageManager = LanguageManager.shared
@@ -25,11 +24,10 @@ struct ReassuranceView: View {
         let message1 = "onboarding_v2.reassurance.message_part1".localized
         let message2 = "onboarding_v2.reassurance.message_part2".localized
         let message3 = "onboarding_v2.reassurance.message_part3".localized
-        return "\(userName) \(message1)\n\n\(message2)\n\n\(message3)"
+        return "\(message1)\n\n\(message2)\n\n\(message3)"
     }
 
-    init(userName: String, onStartQuiz: @escaping () -> Void) {
-        self.userName = userName
+    init(onStartQuiz: @escaping () -> Void) {
         self.onStartQuiz = onStartQuiz
     }
 
@@ -135,7 +133,7 @@ struct ReassuranceView: View {
         .onAppear {
             // Track screen view
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingReassuranceViewed(userName: userName)
+            MixpanelManager.shared.trackOnboardingReassuranceViewed(userName: "")
 
             setupVideo()
             startTextAnimation()
@@ -233,5 +231,5 @@ struct VideoPlayerBackground: UIViewRepresentable {
 }
 
 #Preview {
-    ReassuranceView(userName: "Sophie", onStartQuiz: {})
+    ReassuranceView(onStartQuiz: {})
 }

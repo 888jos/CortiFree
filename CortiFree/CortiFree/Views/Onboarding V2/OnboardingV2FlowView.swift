@@ -139,7 +139,6 @@ struct OnboardingV2FlowView: View {
 
         case .reassurance:
             ReassuranceView(
-                userName: overallQuizData?.firstName ?? "common.user_fallback".localized,
                 onStartQuiz: {
                     currentStep = .habitsQuiz
                 }
@@ -169,7 +168,6 @@ struct OnboardingV2FlowView: View {
 
         case .authentication:
             AuthenticationView(
-                firstName: overallQuizData?.firstName ?? "common.user_fallback".localized,
                 onComplete: {
                     currentStep = .loading
                 }
@@ -247,11 +245,14 @@ struct OnboardingV2FlowView: View {
         savedCheckpoint = ""
         hasSeenPaywall = false // Reset for potential future use
 
+        // Set routine start date for program progress tracking
+        UserDefaults.standard.set(Date(), forKey: "routineStartDate")
+
         // Using @AppStorage, this will automatically trigger view update
         isOnboardingComplete = true
 
         #if DEBUG
-        print("✅ Onboarding completed - checkpoints cleared")
+        print("✅ Onboarding completed - checkpoints cleared, routineStartDate set")
         #endif
     }
 
@@ -275,7 +276,6 @@ struct OnboardingV2FlowView: View {
 
         // Save user profile
         let userData: [String: Any] = [
-            "firstName": data.firstName,
             "age": data.age,
             "gender": data.gender,
             "stressReasons": data.reasons,

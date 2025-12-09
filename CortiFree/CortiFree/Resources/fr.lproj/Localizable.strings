@@ -87,7 +87,7 @@
 "habit.breathing_title" = "Exercice de respiration";
 "habit.meditation_title" = "Méditer 10 minutes";
 "habit.journal_title" = "Écrire dans son journal";
-"habit.water_title" = "Boire au moins %@";
+"habit.water_title" = "Boire au moins %@ d'eau";
 "habit.water_title_legacy" = "Boire au moins 2,5L d'eau";
 
 // Nature variants
@@ -498,6 +498,44 @@
 "badge.habit.nature" = "Nature";
 "badge.habit.social" = "Social";
 "badge.habit.sleep" = "Sommeil";
+
+// MARK: - Achievement Titles (Streak)
+"achievement.streak_3.title" = "Débutant";
+"achievement.streak_7.title" = "Motivé";
+"achievement.streak_14.title" = "Déterminé";
+"achievement.streak_21.title" = "Engagé";
+"achievement.streak_30.title" = "Assidu";
+"achievement.streak_40.title" = "Champion";
+"achievement.streak_50.title" = "Invincible";
+"achievement.streak_60.title" = "Légende";
+"achievement.streak_66.title" = "Maître";
+
+// MARK: - Achievement Descriptions (Streak)
+"achievement.streak_3.description" = "Maintiens un streak de 3 jours";
+"achievement.streak_7.description" = "Maintiens un streak de 7 jours";
+"achievement.streak_14.description" = "Maintiens un streak de 14 jours";
+"achievement.streak_21.description" = "Maintiens un streak de 21 jours";
+"achievement.streak_30.description" = "Maintiens un streak de 30 jours";
+"achievement.streak_40.description" = "Maintiens un streak de 40 jours";
+"achievement.streak_50.description" = "Maintiens un streak de 50 jours";
+"achievement.streak_60.description" = "Maintiens un streak de 60 jours";
+"achievement.streak_66.description" = "Maintiens un streak de 66 jours - Programme complet !";
+
+// MARK: - Achievement Unlock Popup
+"achievement.unlocked" = "Succès débloqué !";
+"achievement.category.streak" = "Série";
+"achievement.category.completion" = "Complétion";
+"achievement.category.habit" = "Habitude";
+"achievement.category.special" = "Spécial";
+
+// MARK: - Achievements View
+"achievements.title" = "Succès";
+"achievements.unlocked_count" = "%d/%d Débloqués";
+"achievements.category.all" = "Tous";
+"achievements.unlocked_date" = "Débloqué le %@";
+"achievements.progress" = "Progression : %d/%d";
+"achievements.not_started" = "Pas encore commencé";
+"achievements.close" = "Fermer";
 
 // MARK: - Additional Common Keys
 "common.continue" = "Continuer";
@@ -2931,8 +2969,8 @@
 
 // MARK: - Onboarding V2 - Eight Habits Intro
 "onboarding_v2.eight_habits.intro_studies" = "Les études le montrent :";
-"onboarding_v2.eight_habits.intro_reset" = "pour réinitialiser sa";
-"onboarding_v2.eight_habits.intro_life" = "vie, il faut les";
+"onboarding_v2.eight_habits.intro_reset" = "pour réduire ton taux";
+"onboarding_v2.eight_habits.intro_life" = "de cortisol, il te faut les";
 "onboarding_v2.eight_habits.intro_fundamental" = "8 habitudes fondamentales";
 "onboarding_v2.eight_habits.intro_below" = "ci-dessous.";
 "onboarding_v2.eight_habits.intro_see_change" = "Découvre comment ta vie va changer en 66 jours\ngrâce à ces 8 habitudes :";
@@ -3117,3 +3155,17 @@
 
 // Common
 "common.save" = "Enregistrer";
+
+// MARK: - Settings Sections (SettingsView)
+"settings.section.profile" = "Profil";
+"settings.section.statistics" = "Statistiques";
+"settings.section.privacy" = "Confidentialité & Sécurité";
+"settings.section.about" = "À propos";
+
+// MARK: - Settings Privacy Section
+"settings.privacy.policy" = "Politique de confidentialité";
+"settings.privacy.terms" = "Conditions d'utilisation";
+"settings.privacy.legal_notice" = "Mentions légales";
+"settings.privacy.delete_account" = "Supprimer mon compte";
+"settings.privacy.delete_account_subtitle" = "Action irréversible";
+"settings.privacy.icloud_subtitle" = "Synchroniser vos données entre appareils";

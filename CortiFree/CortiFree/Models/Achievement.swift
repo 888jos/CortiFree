@@ -10,8 +10,8 @@ import FirebaseFirestore
 
 struct Achievement: Identifiable, Codable, Equatable {
     let id: String
-    let title: String
-    let description: String
+    let titleKey: String
+    let descriptionKey: String
     let icon: String // SF Symbol name
     let category: AchievementCategory
     let requirement: Int // Number needed to unlock
@@ -27,6 +27,16 @@ struct Achievement: Identifiable, Codable, Equatable {
         return min(Double(progress) / Double(requirement), 1.0)
     }
 
+    /// Localized title
+    var title: String {
+        NSLocalizedString(titleKey, comment: "")
+    }
+
+    /// Localized description
+    var description: String {
+        NSLocalizedString(descriptionKey, comment: "")
+    }
+
     enum AchievementCategory: String, Codable {
         case streak
         case completion
@@ -40,72 +50,72 @@ struct Achievement: Identifiable, Codable, Equatable {
         // Streak achievements (9 badges: 3j, 7j, 14j, 21j, 30j, 40j, 50j, 60j, 66j)
         Achievement(
             id: "streak_3",
-            title: "Débutant",
-            description: "Maintiens un streak de 3 jours",
+            titleKey: "achievement.streak_3.title",
+            descriptionKey: "achievement.streak_3.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 3
         ),
         Achievement(
             id: "streak_7",
-            title: "Motivé",
-            description: "Maintiens un streak de 7 jours",
+            titleKey: "achievement.streak_7.title",
+            descriptionKey: "achievement.streak_7.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 7
         ),
         Achievement(
             id: "streak_14",
-            title: "Déterminé",
-            description: "Maintiens un streak de 14 jours",
+            titleKey: "achievement.streak_14.title",
+            descriptionKey: "achievement.streak_14.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 14
         ),
         Achievement(
             id: "streak_21",
-            title: "Engagé",
-            description: "Maintiens un streak de 21 jours",
+            titleKey: "achievement.streak_21.title",
+            descriptionKey: "achievement.streak_21.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 21
         ),
         Achievement(
             id: "streak_30",
-            title: "Assidu",
-            description: "Maintiens un streak de 30 jours",
+            titleKey: "achievement.streak_30.title",
+            descriptionKey: "achievement.streak_30.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 30
         ),
         Achievement(
             id: "streak_40",
-            title: "Champion",
-            description: "Maintiens un streak de 40 jours",
+            titleKey: "achievement.streak_40.title",
+            descriptionKey: "achievement.streak_40.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 40
         ),
         Achievement(
             id: "streak_50",
-            title: "Invincible",
-            description: "Maintiens un streak de 50 jours",
+            titleKey: "achievement.streak_50.title",
+            descriptionKey: "achievement.streak_50.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 50
         ),
         Achievement(
             id: "streak_60",
-            title: "Légende",
-            description: "Maintiens un streak de 60 jours",
+            titleKey: "achievement.streak_60.title",
+            descriptionKey: "achievement.streak_60.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 60
         ),
         Achievement(
             id: "streak_66",
-            title: "Maître",
-            description: "Maintiens un streak de 66 jours - Programme complet!",
+            titleKey: "achievement.streak_66.title",
+            descriptionKey: "achievement.streak_66.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 66

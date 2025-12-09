@@ -461,7 +461,7 @@ struct ProfileView: View {
                     title: NSLocalizedString("profile.score.global", comment: ""),
                     value: globalScore,
                     color: Color(hex: "B794F6"),
-                    scoreDifference: !showPotentialScores && viewModel.onboardingGlobalScore > 0 ? globalScore - viewModel.onboardingGlobalScore : nil
+                    scoreDifference: viewModel.onboardingGlobalScore > 0 ? globalScore - viewModel.onboardingGlobalScore : nil
                 )
                 .offset(x: 0, y: -135) // Reduced from -155 to -135
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -472,7 +472,7 @@ struct ProfileView: View {
                     title: domainNames[0],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 0] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 0] ?? 0.0)),
                     color: domainColors[0],
-                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 0] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 0] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 0] ?? 0.0)) : nil
+                    scoreDifference: viewModel.onboardingDomainScores[safe: 0] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 0] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 0] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 0] ?? 0.0)) : nil
                 )
                 .offset(x: 125, y: -65) // Reduced from 145/-75 to 125/-65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -483,7 +483,7 @@ struct ProfileView: View {
                     title: domainNames[1],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 1] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 1] ?? 0.0)),
                     color: domainColors[1],
-                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 1] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 1] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 1] ?? 0.0)) : nil
+                    scoreDifference: viewModel.onboardingDomainScores[safe: 1] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 1] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 1] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 1] ?? 0.0)) : nil
                 )
                 .offset(x: 125, y: 65) // Reduced from 145/75 to 125/65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -494,7 +494,7 @@ struct ProfileView: View {
                     title: domainNames[2],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 2] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 2] ?? 0.0)),
                     color: domainColors[2],
-                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 2] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 2] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 2] ?? 0.0)) : nil
+                    scoreDifference: viewModel.onboardingDomainScores[safe: 2] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 2] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 2] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 2] ?? 0.0)) : nil
                 )
                 .offset(x: 0, y: 135) // Reduced from 155 to 135
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -505,7 +505,7 @@ struct ProfileView: View {
                     title: domainNames[3],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 3] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 3] ?? 0.0)),
                     color: domainColors[3],
-                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 3] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 3] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 3] ?? 0.0)) : nil
+                    scoreDifference: viewModel.onboardingDomainScores[safe: 3] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 3] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 3] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 3] ?? 0.0)) : nil
                 )
                 .offset(x: -125, y: 65) // Reduced from -145/75 to -125/65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -516,7 +516,7 @@ struct ProfileView: View {
                     title: domainNames[4],
                     value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 4] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 4] ?? 0.0)),
                     color: domainColors[4],
-                    scoreDifference: !showPotentialScores && viewModel.onboardingDomainScores[safe: 4] ?? 0 > 0 ? Int(round(viewModel.domainScores[safe: 4] ?? 0.0)) - Int(round(viewModel.onboardingDomainScores[safe: 4] ?? 0.0)) : nil
+                    scoreDifference: viewModel.onboardingDomainScores[safe: 4] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 4] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 4] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 4] ?? 0.0)) : nil
                 )
                 .offset(x: -125, y: -65) // Reduced from -145/-75 to -125/-65
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
@@ -664,15 +664,6 @@ struct ProfileView: View {
         }
         .overlay(
             Group {
-                // Achievement unlock popup
-                if achievementService.showAchievementPopup, let achievement = achievementService.newlyUnlockedAchievement {
-                    AchievementUnlockView(achievement: achievement) {
-                        achievementService.showAchievementPopup = false
-                    }
-                    .transition(.opacity)
-                }
-
-
                 // Habit badge unlock popup
                 if habitBadgeService.showBadgePopup, let badge = habitBadgeService.newlyUnlockedBadge {
                     BadgeEvolutionView(badge: badge, isPresented: $habitBadgeService.showBadgePopup)

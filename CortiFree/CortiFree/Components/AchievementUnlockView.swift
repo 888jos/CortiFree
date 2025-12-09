@@ -77,7 +77,7 @@ struct AchievementUnlockView: View {
                 // Card content
                 VStack(spacing: 16) {
                     // Title
-                    Text("Achievement Unlocked!")
+                    Text("achievement.unlocked".localized)
                         .font(Font.Poppins.custom(.bold, size: 22))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -121,7 +121,7 @@ struct AchievementUnlockView: View {
                 Button(action: {
                     dismissCard()
                 }) {
-                    Text("Continue")
+                    Text("common.continue".localized)
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -244,13 +244,13 @@ struct AchievementUnlockView: View {
     private var categoryName: String {
         switch achievement.category {
         case .streak:
-            return "Streak"
+            return "achievement.category.streak".localized
         case .completion:
-            return "Completion"
+            return "achievement.category.completion".localized
         case .habit:
-            return "Habit"
+            return "achievement.category.habit".localized
         case .special:
-            return "Special"
+            return "achievement.category.special".localized
         }
     }
 }
@@ -258,9 +258,9 @@ struct AchievementUnlockView: View {
 #Preview {
     AchievementUnlockView(
         achievement: Achievement(
-            id: "week_warrior",
-            title: "Week Warrior",
-            description: "Complete 7 days in a row",
+            id: "streak_7",
+            titleKey: "achievement.streak_7.title",
+            descriptionKey: "achievement.streak_7.description",
             icon: "flame.fill",
             category: .streak,
             requirement: 7,

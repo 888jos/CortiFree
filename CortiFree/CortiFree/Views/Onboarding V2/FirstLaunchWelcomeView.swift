@@ -158,7 +158,7 @@ private struct BenefitRow: View {
     let text: String
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             // Icon with purple gradient background
             ZStack {
                 Circle()
@@ -180,6 +180,7 @@ private struct BenefitRow: View {
                 .font(.custom("Poppins-Regular", size: 16))
                 .foregroundColor(.white)
                 .lineSpacing(4)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

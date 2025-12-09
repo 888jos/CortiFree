@@ -13,7 +13,6 @@ struct OverallQuizView: View {
 
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentQuestionIndex: Int = 0
-    @State private var firstName: String = ""
     @State private var selectedGender: Int? = nil
     @State private var selectedAge: Int? = nil
     @State private var selectedReasons: Set<Int> = []
@@ -21,9 +20,9 @@ struct OverallQuizView: View {
     @State private var selectedDuration: Int? = nil
     @State private var isGoingBack: Bool = false
     @State private var quizStartTime: Date?
-    @FocusState private var isTextFieldFocused: Bool
+    @State private var questionStartTime: Date?
 
-    private let totalQuestions = 6
+    private let totalQuestions = 5
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -56,43 +55,36 @@ struct OverallQuizView: View {
 
                     // Sliding content
                     if currentQuestionIndex == 0 {
-                        firstNameQuestion
+                        genderQuestion
                             .id(0)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 1 {
-                        genderQuestion
+                        ageQuestion
                             .id(1)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 2 {
-                        ageQuestion
+                        acquisitionQuestion
                             .id(2)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 3 {
-                        acquisitionQuestion
+                        reasonQuestion
                             .id(3)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 4 {
-                        reasonQuestion
-                            .id(4)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
-                                removal: .move(edge: isGoingBack ? .trailing : .leading)
-                            ))
-                    } else if currentQuestionIndex == 5 {
                         durationQuestion
-                            .id(5)
+                            .id(4)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
@@ -106,8 +98,51 @@ struct OverallQuizView: View {
         .animation(.easeInOut(duration: 0.5), value: currentQuestionIndex)
         .onAppear {
             quizStartTime = Date()
+            questionStartTime = Date()
             MixpanelManager.shared.trackOnboardingOverallQuizViewed()
+            // Track first question viewed
+            trackQuestionViewed(0)
         }
+        .onChange(of: currentQuestionIndex) { _, newIndex in
+            questionStartTime = Date()
+            trackQuestionViewed(newIndex)
+        }
+    }
+
+    // MARK: - Question Tracking
+
+    private func trackQuestionViewed(_ index: Int) {
+        let questionTexts = [
+            "Genre",
+            "Âge",
+            "Comment as-tu découvert CortiFree ?",
+            "Raisons du stress",
+            "Durée du stress"
+        ]
+        MixpanelManager.shared.trackOnboardingQuizQuestionViewed(
+            questionNumber: index + 1,
+            questionText: questionTexts[safe: index] ?? "Question \(index + 1)",
+            quizType: "overall"
+        )
+    }
+
+    private func trackQuestionAnswered(_ index: Int, answerIndex: Int, answerText: String) {
+        let questionTexts = [
+            "Genre",
+            "Âge",
+            "Comment as-tu découvert CortiFree ?",
+            "Raisons du stress",
+            "Durée du stress"
+        ]
+        let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
+        MixpanelManager.shared.trackOnboardingQuizQuestionAnswered(
+            questionNumber: index + 1,
+            questionText: questionTexts[safe: index] ?? "Question \(index + 1)",
+            answerIndex: answerIndex,
+            answerText: answerText,
+            timeToAnswer: timeToAnswer,
+            quizType: "overall"
+        )
     }
 
     // MARK: - Header Section
@@ -169,73 +204,7 @@ struct OverallQuizView: View {
         .frame(height: 20)
     }
 
-    // MARK: - Question 1: First Name (Text Input)
-
-    private var firstNameQuestion: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Question text
-            Text("onboarding_v2.overall.name_question".localized)
-                .font(.custom("Poppins-Medium", size: 18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-
-            // Text input for first name
-            VStack(spacing: 20) {
-                ZStack(alignment: .leading) {
-                    if firstName.isEmpty {
-                        Text("onboarding_v2.overall.name_placeholder".localized)
-                            .foregroundColor(Color.white.opacity(0.5))
-                            .font(.custom("Poppins-Medium", size: 16))
-                            .padding(.horizontal, 20)
-                    }
-
-                    TextField("", text: $firstName)
-                        .font(.custom("Poppins-Medium", size: 16))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                }
-                .frame(height: 54)
-                .background(
-                    RoundedRectangle(cornerRadius: 40)
-                        .fill(Color(hex: "131146").opacity(0.8))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 40)
-                                    .stroke(Color(hex: "1B1864"), lineWidth: 2)
-                            )
-                    )
-                    .focused($isTextFieldFocused)
-                    .onAppear {
-                        isTextFieldFocused = true
-                    }
-
-                // Continue button
-                if !firstName.isEmpty {
-                    Button(action: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            currentQuestionIndex += 1
-                        }
-                    }) {
-                        Text(StringKeys.Common.continueButton)
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 54)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 40))
-                    }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
-            }
-            .padding(.horizontal, 34)
-            .padding(.bottom, 40)
-        }
-    }
-
-    // MARK: - Question 2: Gender
+    // MARK: - Question 1: Gender
 
     private var genderQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -256,6 +225,7 @@ struct OverallQuizView: View {
                     isSelected: selectedGender == 0,
                     onTap: {
                         HapticManager.light()
+                        trackQuestionAnswered(0, answerIndex: 0, answerText: "onboarding_v2.overall.gender_male".localized)
                         withAnimation(.easeInOut(duration: 0.5)) {
                             selectedGender = 0
                         }
@@ -271,6 +241,7 @@ struct OverallQuizView: View {
                     isSelected: selectedGender == 1,
                     onTap: {
                         HapticManager.light()
+                        trackQuestionAnswered(0, answerIndex: 1, answerText: "onboarding_v2.overall.gender_female".localized)
                         withAnimation(.easeInOut(duration: 0.5)) {
                             selectedGender = 1
                         }
@@ -286,6 +257,7 @@ struct OverallQuizView: View {
                     isSelected: selectedGender == 2,
                     onTap: {
                         HapticManager.light()
+                        trackQuestionAnswered(0, answerIndex: 2, answerText: "onboarding_v2.overall.gender_other".localized)
                         withAnimation(.easeInOut(duration: 0.5)) {
                             selectedGender = 2
                         }
@@ -300,7 +272,7 @@ struct OverallQuizView: View {
         }
     }
 
-    // MARK: - Question 3: Age
+    // MARK: - Question 2: Age
 
     private var ageQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -315,102 +287,38 @@ struct OverallQuizView: View {
 
             // Answer buttons
             VStack(spacing: 22) {
-                OverallAnswerButton(
-                    number: 1,
-                    text: "onboarding_v2.overall.age_under_18".localized,
-                    isSelected: selectedAge == 0,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedAge = 0
+                ForEach(0..<6, id: \.self) { index in
+                    let ageTexts = [
+                        "onboarding_v2.overall.age_under_18".localized,
+                        "onboarding_v2.overall.age_18_24".localized,
+                        "onboarding_v2.overall.age_25_34".localized,
+                        "onboarding_v2.overall.age_35_44".localized,
+                        "onboarding_v2.overall.age_45_54".localized,
+                        "onboarding_v2.overall.age_55_plus".localized
+                    ]
+                    OverallAnswerButton(
+                        number: index + 1,
+                        text: ageTexts[index],
+                        isSelected: selectedAge == index,
+                        onTap: {
+                            HapticManager.light()
+                            trackQuestionAnswered(1, answerIndex: index, answerText: ageTexts[index])
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedAge = index
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                currentQuestionIndex += 1
+                            }
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 2,
-                    text: "onboarding_v2.overall.age_18_24".localized,
-                    isSelected: selectedAge == 1,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedAge = 1
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 3,
-                    text: "onboarding_v2.overall.age_25_34".localized,
-                    isSelected: selectedAge == 2,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedAge = 2
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 4,
-                    text: "onboarding_v2.overall.age_35_44".localized,
-                    isSelected: selectedAge == 3,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedAge = 3
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 5,
-                    text: "onboarding_v2.overall.age_45_54".localized,
-                    isSelected: selectedAge == 4,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedAge = 4
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 6,
-                    text: "onboarding_v2.overall.age_55_plus".localized,
-                    isSelected: selectedAge == 5,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedAge = 5
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
-                    }
-                )
+                    )
+                }
             }
             .padding(.horizontal, 34)
             .padding(.bottom, 40)
         }
     }
 
-    // MARK: - Question 4: Acquisition (How discovered CortiFree)
+    // MARK: - Question 3: Acquisition (How discovered CortiFree)
 
     private var acquisitionQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -426,95 +334,31 @@ struct OverallQuizView: View {
             // Answer buttons
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 22) {
-                    OverallAnswerButton(
-                        number: 1,
-                        text: "onboarding_v2.habits.q9_opt1".localized,
-                        isSelected: selectedAcquisition == 0,
-                        onTap: {
-                            HapticManager.light()
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                selectedAcquisition = 0
+                    ForEach(0..<6, id: \.self) { index in
+                        let acquisitionTexts = [
+                            "onboarding_v2.habits.q9_opt1".localized,
+                            "onboarding_v2.habits.q9_opt2".localized,
+                            "onboarding_v2.habits.q9_opt3".localized,
+                            "onboarding_v2.habits.q9_opt4".localized,
+                            "onboarding_v2.habits.q9_opt5".localized,
+                            "onboarding_v2.habits.q9_opt6".localized
+                        ]
+                        OverallAnswerButton(
+                            number: index + 1,
+                            text: acquisitionTexts[index],
+                            isSelected: selectedAcquisition == index,
+                            onTap: {
+                                HapticManager.light()
+                                trackQuestionAnswered(2, answerIndex: index, answerText: acquisitionTexts[index])
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    selectedAcquisition = index
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                    currentQuestionIndex += 1
+                                }
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
-                            }
-                        }
-                    )
-
-                    OverallAnswerButton(
-                        number: 2,
-                        text: "onboarding_v2.habits.q9_opt2".localized,
-                        isSelected: selectedAcquisition == 1,
-                        onTap: {
-                            HapticManager.light()
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                selectedAcquisition = 1
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
-                            }
-                        }
-                    )
-
-                    OverallAnswerButton(
-                        number: 3,
-                        text: "onboarding_v2.habits.q9_opt3".localized,
-                        isSelected: selectedAcquisition == 2,
-                        onTap: {
-                            HapticManager.light()
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                selectedAcquisition = 2
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
-                            }
-                        }
-                    )
-
-                    OverallAnswerButton(
-                        number: 4,
-                        text: "onboarding_v2.habits.q9_opt4".localized,
-                        isSelected: selectedAcquisition == 3,
-                        onTap: {
-                            HapticManager.light()
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                selectedAcquisition = 3
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
-                            }
-                        }
-                    )
-
-                    OverallAnswerButton(
-                        number: 5,
-                        text: "onboarding_v2.habits.q9_opt5".localized,
-                        isSelected: selectedAcquisition == 4,
-                        onTap: {
-                            HapticManager.light()
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                selectedAcquisition = 4
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
-                            }
-                        }
-                    )
-
-                    OverallAnswerButton(
-                        number: 6,
-                        text: "onboarding_v2.habits.q9_opt6".localized,
-                        isSelected: selectedAcquisition == 5,
-                        onTap: {
-                            HapticManager.light()
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                selectedAcquisition = 5
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
                 .padding(.horizontal, 34)
                 .padding(.bottom, 40)
@@ -522,7 +366,7 @@ struct OverallQuizView: View {
         }
     }
 
-    // MARK: - Question 5: Reason (Multiple Choice)
+    // MARK: - Question 4: Reason (Multiple Choice)
 
     private var reasonQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -638,6 +482,16 @@ struct OverallQuizView: View {
                     if !selectedReasons.isEmpty {
                         Button(action: {
                             HapticManager.light()
+                            let reasonTexts = [
+                                "onboarding_v2.overall.reason_sleep".localized,
+                                "onboarding_v2.overall.reason_anxiety".localized,
+                                "onboarding_v2.overall.reason_energy".localized,
+                                "onboarding_v2.overall.reason_mental".localized,
+                                "onboarding_v2.overall.reason_difficult".localized,
+                                "onboarding_v2.overall.reason_habits".localized
+                            ]
+                            let selectedTexts = selectedReasons.sorted().compactMap { reasonTexts[safe: $0] }.joined(separator: ", ")
+                            trackQuestionAnswered(3, answerIndex: selectedReasons.count, answerText: selectedTexts)
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 currentQuestionIndex += 1
                             }
@@ -660,7 +514,7 @@ struct OverallQuizView: View {
         }
     }
 
-    // MARK: - Question 4: Duration
+    // MARK: - Question 5: Duration
 
     private var durationQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -675,80 +529,30 @@ struct OverallQuizView: View {
 
             // Answer buttons
             VStack(spacing: 22) {
-                OverallAnswerButton(
-                    number: 1,
-                    text: "onboarding_v2.overall.duration_weeks".localized,
-                    isSelected: selectedDuration == 0,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedDuration = 0
+                ForEach(0..<5, id: \.self) { index in
+                    let durationTexts = [
+                        "onboarding_v2.overall.duration_weeks".localized,
+                        "onboarding_v2.overall.duration_2_6_months".localized,
+                        "onboarding_v2.overall.duration_6_12_months".localized,
+                        "onboarding_v2.overall.duration_1_year_plus".localized,
+                        "onboarding_v2.overall.duration_years".localized
+                    ]
+                    OverallAnswerButton(
+                        number: index + 1,
+                        text: durationTexts[index],
+                        isSelected: selectedDuration == index,
+                        onTap: {
+                            HapticManager.light()
+                            trackQuestionAnswered(4, answerIndex: index, answerText: durationTexts[index])
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedDuration = index
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                completeQuiz()
+                            }
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            completeQuiz()
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 2,
-                    text: "onboarding_v2.overall.duration_2_6_months".localized,
-                    isSelected: selectedDuration == 1,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedDuration = 1
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            completeQuiz()
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 3,
-                    text: "onboarding_v2.overall.duration_6_12_months".localized,
-                    isSelected: selectedDuration == 2,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedDuration = 2
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            completeQuiz()
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 4,
-                    text: "onboarding_v2.overall.duration_1_year_plus".localized,
-                    isSelected: selectedDuration == 3,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedDuration = 3
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            completeQuiz()
-                        }
-                    }
-                )
-
-                OverallAnswerButton(
-                    number: 5,
-                    text: "onboarding_v2.overall.duration_years".localized,
-                    isSelected: selectedDuration == 4,
-                    onTap: {
-                        HapticManager.light()
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedDuration = 4
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            completeQuiz()
-                        }
-                    }
-                )
+                    )
+                }
             }
             .padding(.horizontal, 34)
             .padding(.bottom, 40)
@@ -799,7 +603,6 @@ struct OverallQuizView: View {
         let acquisitionChannel = acquisitionOptions[selectedAcquisition ?? 5]
 
         let data = OverallQuizData(
-            firstName: firstName.trimmingCharacters(in: .whitespacesAndNewlines),
             gender: genderOptions[selectedGender ?? 0],
             age: ageOptions[selectedAge ?? 0],
             acquisitionChannel: acquisitionChannel,
@@ -813,7 +616,7 @@ struct OverallQuizView: View {
         let ageInt = extractAgeFromString(ageString)
 
         MixpanelManager.shared.trackOnboardingOverallQuizCompleted(
-            firstName: firstName,
+            firstName: "",
             age: ageInt,
             gender: genderOptions[selectedGender ?? 0],
             stressReasons: selectedReasonTexts,
@@ -898,7 +701,6 @@ struct OverallAnswerButton: View {
 // MARK: - Data Model
 
 struct OverallQuizData {
-    let firstName: String
     let gender: String
     let age: String
     let acquisitionChannel: String
@@ -911,7 +713,6 @@ struct OverallQuizData {
 #Preview {
     OverallQuizView { data in
         print("Quiz completed:")
-        print("- Name: \(data.firstName)")
         print("- Gender: \(data.gender)")
         print("- Age: \(data.age)")
         print("- Reasons: \(data.reasons.joined(separator: ", "))")

@@ -139,22 +139,32 @@ class MixpanelManager {
         Mixpanel.mainInstance().people.increment(property: property, by: amount)
     }
 
-    // MARK: - 🎯 ONBOARDING V2 FLOW (16 screens)
+    // MARK: - 🎯 ONBOARDING - SIMPLIFIÉ (viewed + clicked pour chaque écran)
 
     // 1. Welcome Screen
     func trackOnboardingWelcomeViewed() {
         track(event: "onboarding_welcome_viewed")
     }
 
-    func trackOnboardingWelcomeContinue(timeSpent: Double) {
-        track(event: "onboarding_welcome_continue_clicked", properties: [
-            "time_spent_on_screen": timeSpent
+    func trackOnboardingWelcomeContinue(timeSpent: Double = 0) {
+        track(event: "onboarding_welcome_clicked")
+    }
+
+    // 2. Overall Quiz (5 questions: genre, âge, découverte, raisons stress, durée stress)
+    func trackOnboardingOverallQuizViewed() {
+        track(event: "onboarding_overall_quiz_viewed")
+    }
+
+    func trackOnboardingOverallQuizQuestionViewed(questionNumber: Int) {
+        track(event: "onboarding_overall_quiz_question_viewed", properties: [
+            "question_number": questionNumber
         ])
     }
 
-    // 2. Overall Quiz
-    func trackOnboardingOverallQuizViewed() {
-        track(event: "onboarding_overall_quiz_viewed")
+    func trackOnboardingOverallQuizQuestionClicked(questionNumber: Int) {
+        track(event: "onboarding_overall_quiz_question_clicked", properties: [
+            "question_number": questionNumber
+        ])
     }
 
     func trackOnboardingOverallQuizCompleted(
@@ -165,46 +175,16 @@ class MixpanelManager {
         stressDuration: String,
         timeToComplete: Double
     ) {
-        track(event: "onboarding_overall_quiz_completed", properties: [
-            "first_name": firstName,
-            "age": age,
-            "gender": gender,
-            "stress_reasons": stressReasons,
-            "stress_duration": stressDuration,
-            "time_to_complete": timeToComplete
-        ])
+        track(event: "onboarding_overall_quiz_clicked")
     }
 
-    // 3. Reassurance View
-    func trackOnboardingReassuranceViewed(userName: String) {
-        track(event: "onboarding_reassurance_viewed", properties: [
-            "user_name": userName
-        ])
-    }
-
-    func trackOnboardingReassuranceStartQuiz(timeSpent: Double) {
-        track(event: "onboarding_reassurance_start_quiz_clicked", properties: [
-            "time_spent_on_screen": timeSpent
-        ])
-    }
-
-    // Alias for consistency
-    func trackOnboardingReassuranceContinue(timeSpent: Double) {
-        trackOnboardingReassuranceStartQuiz(timeSpent: timeSpent)
-    }
-
-    // 4. Habits Quiz (12 questions)
-    func trackOnboardingHabitsQuizStarted() {
-        track(event: "onboarding_habits_quiz_started", properties: [
-            "total_questions": 12
-        ])
-    }
-
-    func trackOnboardingQuizQuestionViewed(questionNumber: Int, questionText: String) {
-        track(event: "onboarding_quiz_question_viewed", properties: [
-            "question_number": questionNumber,
-            "question_text": questionText
-        ])
+    // Legacy support - redirects to new format
+    func trackOnboardingQuizQuestionViewed(questionNumber: Int, questionText: String, quizType: String = "habits") {
+        if quizType == "overall" {
+            trackOnboardingOverallQuizQuestionViewed(questionNumber: questionNumber)
+        } else {
+            trackOnboardingHabitsQuizQuestionViewed(questionNumber: questionNumber)
+        }
     }
 
     func trackOnboardingQuizQuestionAnswered(
@@ -212,21 +192,48 @@ class MixpanelManager {
         questionText: String,
         answerIndex: Int,
         answerText: String,
-        timeToAnswer: Double
+        timeToAnswer: Double,
+        quizType: String = "habits"
     ) {
-        track(event: "onboarding_quiz_question_answered", properties: [
-            "question_number": questionNumber,
-            "question_text": questionText,
-            "answer_index": answerIndex,
-            "answer_text": answerText,
-            "time_to_answer": timeToAnswer
+        if quizType == "overall" {
+            trackOnboardingOverallQuizQuestionClicked(questionNumber: questionNumber)
+        } else {
+            trackOnboardingHabitsQuizQuestionClicked(questionNumber: questionNumber)
+        }
+    }
+
+    // 3. Reassurance View
+    func trackOnboardingReassuranceViewed(userName: String = "") {
+        track(event: "onboarding_reassurance_viewed")
+    }
+
+    func trackOnboardingReassuranceStartQuiz(timeSpent: Double = 0) {
+        track(event: "onboarding_reassurance_clicked")
+    }
+
+    func trackOnboardingReassuranceContinue(timeSpent: Double = 0) {
+        track(event: "onboarding_reassurance_clicked")
+    }
+
+    // 4. Habits Quiz (11 questions)
+    func trackOnboardingHabitsQuizViewed() {
+        track(event: "onboarding_habits_quiz_viewed")
+    }
+
+    func trackOnboardingHabitsQuizQuestionViewed(questionNumber: Int) {
+        track(event: "onboarding_habits_quiz_question_viewed", properties: [
+            "question_number": questionNumber
+        ])
+    }
+
+    func trackOnboardingHabitsQuizQuestionClicked(questionNumber: Int) {
+        track(event: "onboarding_habits_quiz_question_clicked", properties: [
+            "question_number": questionNumber
         ])
     }
 
     func trackOnboardingQuizBackClicked(fromQuestionNumber: Int) {
-        track(event: "onboarding_quiz_back_clicked", properties: [
-            "from_question_number": fromQuestionNumber
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
     func trackOnboardingHabitsQuizCompleted(
@@ -247,181 +254,128 @@ class MixpanelManager {
         hasPhysicalLimitations: Bool?,
         primaryGoal: String?
     ) {
-        var properties: [String: MixpanelType] = [
-            "total_time": totalTime,
-            "serenity_score": serenityScore,
-            "sleep_score": sleepScore,
-            "energy_score": energyScore,
-            "focus_score": focusScore,
-            "habits_score": habitsScore,
-            "balance_score": balanceScore,
-            "global_score": globalScore
-        ]
-
-        if let wakeTime = baselineWakeTime { properties["baseline_wake_time"] = wakeTime }
-        if let sleepDuration = baselineSleepDuration { properties["baseline_sleep_duration"] = sleepDuration }
-        if let waterIntake = baselineWaterIntake { properties["baseline_water_intake"] = waterIntake }
-        if let exerciseFreq = baselineExerciseFrequency { properties["baseline_exercise_frequency"] = exerciseFreq }
-        if let meditationFreq = baselineMeditationFrequency { properties["baseline_meditation_frequency"] = meditationFreq }
-        if let availableTime = baselineAvailableTime { properties["baseline_available_time"] = availableTime }
-        if let limitations = hasPhysicalLimitations { properties["has_physical_limitations"] = limitations }
-        if let goal = primaryGoal { properties["primary_goal"] = goal }
-
-        track(event: "onboarding_habits_quiz_completed", properties: properties)
+        track(event: "onboarding_habits_quiz_clicked")
     }
 
     func trackOnboardingMarketingData(acquisitionChannel: String?, previousAppExperience: String?) {
-        var properties: [String: MixpanelType] = [:]
-        if let channel = acquisitionChannel { properties["acquisition_channel"] = channel }
-        if let experience = previousAppExperience { properties["previous_app_experience"] = experience }
-        track(event: "onboarding_quiz_marketing_data", properties: properties)
+        // Gardé pour compatibilité mais simplifié
     }
 
-    // 5-7. Explanation Screens
+    // 5. Sixty Days Explanation
     func trackOnboardingSixtyDaysExplanationViewed() {
-        track(event: "onboarding_sixty_days_explanation_viewed")
+        track(event: "onboarding_sixty_days_viewed")
     }
 
     func trackOnboardingSixtyDaysContinue() {
-        track(event: "onboarding_sixty_days_continue_clicked")
+        track(event: "onboarding_sixty_days_clicked")
     }
 
-    func trackOnboardingSixtyDaysExplanationContinue(timeSpent: Double) {
-        track(event: "onboarding_sixty_days_continue_clicked", properties: [
-            "time_spent": timeSpent
-        ])
+    func trackOnboardingSixtyDaysExplanationContinue(timeSpent: Double = 0) {
+        track(event: "onboarding_sixty_days_clicked")
     }
 
+    // 6. Scientific Plan
     func trackOnboardingScientificPlanViewed() {
         track(event: "onboarding_scientific_plan_viewed")
     }
 
     func trackOnboardingScientificPlanContinue() {
-        track(event: "onboarding_scientific_plan_continue_clicked")
+        track(event: "onboarding_scientific_plan_clicked")
     }
 
     func trackOnboardingScientificPlanContinue(timeSpent: Double) {
-        track(event: "onboarding_scientific_plan_continue_clicked", properties: [
-            "time_spent": timeSpent
-        ])
+        track(event: "onboarding_scientific_plan_clicked")
     }
 
-    // 8. Authentication
-    func trackOnboardingAuthenticationViewed(firstName: String) {
-        track(event: "onboarding_authentication_viewed", properties: [
-            "first_name": firstName
-        ])
+    // 7. Authentication
+    func trackOnboardingAuthenticationViewed(firstName: String = "") {
+        track(event: "onboarding_authentication_viewed")
     }
 
     func trackOnboardingAuthenticationCompleted(authMethod: String, userId: String) {
-        track(event: "onboarding_authentication_completed", properties: [
-            "auth_method": authMethod,
-            "user_id": userId
-        ])
-    }
-
-    func trackOnboardingAuthenticationFailed(error: String, authMethod: String) {
-        track(event: "onboarding_authentication_failed", properties: [
-            "error_message": error,
+        track(event: "onboarding_authentication_clicked", properties: [
             "auth_method": authMethod
         ])
     }
 
-    // 9. Loading Analysis
+    func trackOnboardingAuthenticationFailed(error: String, authMethod: String) {
+        // Gardé pour debug
+    }
+
+    // 8. Loading Analysis
     func trackOnboardingLoadingAnalysisViewed() {
         track(event: "onboarding_loading_analysis_viewed")
     }
 
-    func trackOnboardingLoadingAnalysisCompleted(loadingDuration: Double) {
-        track(event: "onboarding_loading_analysis_completed", properties: [
-            "loading_duration": loadingDuration
-        ])
+    func trackOnboardingLoadingAnalysisCompleted(loadingDuration: Double = 0) {
+        track(event: "onboarding_loading_analysis_clicked")
     }
 
-    func trackOnboardingLoadingAnalysisComplete(timeSpent: Double) {
-        trackOnboardingLoadingAnalysisCompleted(loadingDuration: timeSpent)
+    func trackOnboardingLoadingAnalysisComplete(timeSpent: Double = 0) {
+        track(event: "onboarding_loading_analysis_clicked")
     }
 
-    // 10. CortiFree Rating
+    // 9. CortiFree Rating
     func trackOnboardingCortiFreeRatingViewed(
-        serenityScore: Int,
-        sleepScore: Int,
-        energyScore: Int,
-        focusScore: Int,
-        habitsScore: Int
+        serenityScore: Int = 0,
+        sleepScore: Int = 0,
+        energyScore: Int = 0,
+        focusScore: Int = 0,
+        habitsScore: Int = 0
     ) {
-        track(event: "onboarding_cortifree_rating_viewed", properties: [
-            "serenity_score": serenityScore,
-            "sleep_score": sleepScore,
-            "energy_score": energyScore,
-            "focus_score": focusScore,
-            "habits_score": habitsScore
-        ])
+        track(event: "onboarding_cortifree_rating_viewed")
     }
 
     func trackOnboardingRatingDomainViewed(domainName: String, domainScore: Int) {
-        track(event: "onboarding_rating_domain_viewed", properties: [
-            "domain_name": domainName,
-            "domain_score": domainScore
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
-    func trackOnboardingRatingContinue(timeSpent: Double) {
-        track(event: "onboarding_rating_continue_clicked", properties: [
-            "time_spent_viewing_scores": timeSpent
-        ])
+    func trackOnboardingRatingContinue(timeSpent: Double = 0) {
+        track(event: "onboarding_cortifree_rating_clicked")
     }
 
-    // 11-12. Eight Habits Flow
+    // 10. Eight Habits Intro
     func trackOnboardingEightHabitsIntroViewed() {
         track(event: "onboarding_eight_habits_intro_viewed")
     }
 
     func trackOnboardingEightHabitsIntroContinue() {
-        track(event: "onboarding_eight_habits_intro_continue_clicked")
+        track(event: "onboarding_eight_habits_intro_clicked")
     }
 
+    // 11. Week Progress
     func trackOnboardingWeekProgressViewed() {
         track(event: "onboarding_week_progress_viewed")
     }
 
     func trackOnboardingWeekProgressContinue() {
-        track(event: "onboarding_week_progress_continue_clicked")
+        track(event: "onboarding_week_progress_clicked")
     }
 
+    // 12. Eight Habits Flow
     func trackOnboardingEightHabitsFlowViewed() {
         track(event: "onboarding_eight_habits_flow_viewed")
     }
 
     func trackOnboardingHabitCarouselChanged(habitIndex: Int, habitTitle: String, navigationMethod: String) {
-        track(event: "onboarding_habit_carousel_changed", properties: [
-            "habit_index": habitIndex,
-            "habit_title": habitTitle,
-            "navigation_method": navigationMethod
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
-    func trackOnboardingEightHabitsContinue(habitsViewedCount: Int, timeSpent: Double) {
-        track(event: "onboarding_eight_habits_continue_clicked", properties: [
-            "habits_viewed_count": habitsViewedCount,
-            "time_spent_on_screen": timeSpent
-        ])
+    func trackOnboardingEightHabitsContinue(habitsViewedCount: Int = 0, timeSpent: Double = 0) {
+        track(event: "onboarding_eight_habits_flow_clicked")
     }
 
     // 13. Notification Permissions
     func trackOnboardingNotificationPermissionsViewed() {
-        track(event: "onboarding_notification_permissions_viewed")
+        track(event: "onboarding_notifications_viewed")
     }
 
     func trackOnboardingNotificationPermissionViewed() {
-        trackOnboardingNotificationPermissionsViewed()
+        track(event: "onboarding_notifications_viewed")
     }
 
     func trackOnboardingNotificationToggleChanged(notificationType: String, enabled: Bool) {
-        track(event: "onboarding_notification_toggle_changed", properties: [
-            "notification_type": notificationType,
-            "enabled": enabled
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
     func trackOnboardingNotificationPermissionRequested(
@@ -429,33 +383,19 @@ class MixpanelManager {
         dailyRitualEnabled: Bool,
         weeklyReportEnabled: Bool
     ) {
-        track(event: "onboarding_notification_permission_requested", properties: [
-            "streak_enabled": streakEnabled,
-            "daily_ritual_enabled": dailyRitualEnabled,
-            "weekly_report_enabled": weeklyReportEnabled
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
     func trackOnboardingNotificationPermissionsContinue(
-        streakEnabled: Bool,
-        dailyRitualEnabled: Bool,
-        weeklyReportEnabled: Bool
+        streakEnabled: Bool = false,
+        dailyRitualEnabled: Bool = false,
+        weeklyReportEnabled: Bool = false
     ) {
-        track(event: "onboarding_notification_permissions_continue_clicked", properties: [
-            "streak_enabled": streakEnabled,
-            "daily_ritual_enabled": dailyRitualEnabled,
-            "weekly_report_enabled": weeklyReportEnabled
-        ])
+        track(event: "onboarding_notifications_clicked")
     }
 
     func trackOnboardingNotificationPermissionsGranted(granted: Bool) {
-        if granted {
-            track(event: "onboarding_notification_permissions_granted", properties: [
-                "permissions_granted": true
-            ])
-        } else {
-            track(event: "onboarding_notification_permissions_denied")
-        }
+        // Pas nécessaire pour le funnel basique
     }
 
     // 14. Habits Progress Flow
@@ -464,103 +404,68 @@ class MixpanelManager {
     }
 
     func trackOnboardingProgressHabitSelected(habitIndex: Int, habitTitle: String) {
-        track(event: "onboarding_progress_habit_selected", properties: [
-            "habit_index": habitIndex,
-            "habit_title": habitTitle
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
     func trackOnboardingProgressChartInteracted(habitIndex: Int, weekNumber: Int, habitTitle: String) {
-        track(event: "onboarding_progress_chart_interacted", properties: [
-            "habit_index": habitIndex,
-            "week_number": weekNumber,
-            "habit_title": habitTitle
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
-    func trackOnboardingProgressContinue(timeSpent: Double) {
-        track(event: "onboarding_progress_continue_clicked", properties: [
-            "time_spent_on_screen": timeSpent
-        ])
+    func trackOnboardingProgressContinue(timeSpent: Double = 0) {
+        track(event: "onboarding_habits_progress_clicked")
     }
 
-    // 15. Social Proof Flow
+    // 15. Testimonials
     func trackOnboardingTestimonialsViewed() {
         track(event: "onboarding_testimonials_viewed")
     }
 
     func trackOnboardingTestimonialsScrolled(testimonialsViewed: Int, scrollDepth: Double) {
-        track(event: "onboarding_testimonials_scrolled", properties: [
-            "testimonials_viewed_count": testimonialsViewed,
-            "scroll_depth": scrollDepth
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
     func trackOnboardingTestimonialsContinue() {
-        track(event: "onboarding_testimonials_continue_clicked")
+        track(event: "onboarding_testimonials_clicked")
     }
 
+    // 16. Goals Selection
     func trackOnboardingGoalsSelectionViewed() {
         track(event: "onboarding_goals_selection_viewed")
     }
 
     func trackOnboardingGoalToggled(goalText: String, selected: Bool) {
-        track(event: "onboarding_goal_toggled", properties: [
-            "goal_text": goalText,
-            "selected": selected
-        ])
+        // Pas nécessaire pour le funnel basique
     }
 
     func trackOnboardingGoalsSelectionCompleted(selectedGoals: [String]) {
-        track(event: "onboarding_goals_selection_completed", properties: [
-            "selected_goals": selectedGoals,
-            "goals_count": selectedGoals.count
-        ])
+        track(event: "onboarding_goals_selection_clicked")
     }
 
-    // 16. Onboarding Completion ⭐⭐ CRITICAL
-    func trackOnboardingCompletionViewed(quizAnswersCount: Int, hasQuizData: Bool) {
-        track(event: "onboarding_completion_viewed", properties: [
-            "quiz_answers_count": quizAnswersCount,
-            "has_quiz_data": hasQuizData
-        ])
+    // 17. Onboarding Completion (Paywall)
+    func trackOnboardingCompletionViewed(quizAnswersCount: Int = 0, hasQuizData: Bool = false) {
+        track(event: "onboarding_paywall_viewed")
     }
 
     func trackOnboardingViewPlanClicked() {
-        track(event: "onboarding_view_plan_clicked")
+        track(event: "onboarding_paywall_clicked")
     }
 
     func trackOnboardingCompleted(
-        totalTime: Double?,
-        quizGlobalScore: Int?,
-        selectedGoalsCount: Int?,
-        notificationsEnabled: Bool?,
-        userId: String?,
-        firstName: String?,
-        age: Int?,
-        gender: String?
+        totalTime: Double? = nil,
+        quizGlobalScore: Int? = nil,
+        selectedGoalsCount: Int? = nil,
+        notificationsEnabled: Bool? = nil,
+        userId: String? = nil,
+        firstName: String? = nil,
+        age: Int? = nil,
+        gender: String? = nil
     ) {
-        var properties: [String: MixpanelType] = [:]
-
-        if let totalTime = totalTime { properties["total_time"] = totalTime }
-        if let score = quizGlobalScore { properties["quiz_global_score"] = score }
-        if let count = selectedGoalsCount { properties["selected_goals_count"] = count }
-        if let notifs = notificationsEnabled { properties["notifications_enabled"] = notifs }
-        if let uid = userId { properties["user_id"] = uid }
-        if let name = firstName { properties["first_name"] = name }
-        if let userAge = age { properties["age"] = userAge }
-        if let userGender = gender { properties["gender"] = userGender }
-
-        track(event: "onboarding_completed", properties: properties)
+        track(event: "onboarding_completed")
     }
 
-    // Onboarding Drop-off
+    // Onboarding Drop-off (plus nécessaire avec les funnels viewed/clicked)
     func trackOnboardingDroppedOff(stepName: String, stepNumber: Int, timeSpentTotal: Double) {
-        track(event: "onboarding_dropped_off", properties: [
-            "step_name": stepName,
-            "step_number": stepNumber,
-            "time_spent_total": timeSpentTotal
-        ])
+        // Pas nécessaire - le drop-off se calcule automatiquement dans Mixpanel
     }
 
     // MARK: - 🏠 HOME VIEW

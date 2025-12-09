@@ -18,29 +18,11 @@ import SwiftUI
     )
 }
 
-#Preview("Gift Card") {
-    PaywallGiftCardScreen(
-        isPresented: .constant(true),
-        onContinue: {},
-        onDismiss: {}
-    )
-}
-
-#Preview("Special Offer") {
-    PaywallSpecialOfferPopup(
-        isPresented: .constant(true),
-        onPurchase: { _ in },
-        onDismissToPaywall: {},
-        countdownSeconds: 1799
-    )
-}
-
 #Preview("Start Program") {
     PaywallStartProgramScreen(
         isPresented: .constant(true),
         userName: "Sophie",
         onPurchase: { _ in },
-        onRestore: {},
-        countdownSeconds: 1799
+        onRestore: {}
     )
 }

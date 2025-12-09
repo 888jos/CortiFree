@@ -377,26 +377,21 @@ class SettingsViewModel: ObservableObject {
     }
 
     private func loadSubscriptionStatus() {
-        // TODO: Integrate with Superwall or RevenueCat
-        // For now, check Firebase user profile
-        guard let userId = userId else {
-            isPremium = false
-            subscriptionStatus = StringKeys.Settings.subscriptionFree
-            return
-        }
-
         Task {
-            do {
-                let snapshot = try await db.collection("users").document(userId).getDocument()
-                if let data = snapshot.data(),
-                   let premium = data["isPremium"] as? Bool {
-                    self.isPremium = premium
-                    self.subscriptionStatus = premium ? StringKeys.Settings.subscriptionPremium : StringKeys.Settings.subscriptionFree
-                }
-            } catch {
-                #if DEBUG
-                print("Error loading subscription status: \(error)")
-                #endif
+            // Check StoreKit for active subscription
+            let isSubscribed = StoreKitManager.shared.isSubscribed
+            self.isPremium = isSubscribed
+            self.subscriptionStatus = isSubscribed ? StringKeys.Settings.subscriptionPremium : StringKeys.Settings.subscriptionFree
+
+            // Get renewal/expiration date
+            if let expirationDate = await StoreKitManager.shared.getSubscriptionExpirationDate() {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                formatter.locale = Locale.current
+                self.renewalDate = formatter.string(from: expirationDate)
+            } else {
+                self.renewalDate = ""
             }
         }
     }

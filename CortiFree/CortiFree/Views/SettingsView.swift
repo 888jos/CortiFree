@@ -1,6 +1,7 @@
 import SwiftUI
 import SafariServices
 import FirebaseAuth
+import FirebaseFirestore
 import StoreKit
 
 struct SettingsView: View {
@@ -31,7 +32,10 @@ struct SettingsView: View {
     @State private var pendingLanguage: String?
     @State private var showResetUserDefaultsAlert: Bool = false
     @State private var showClearAllDataAlert: Bool = false
-    @State private var currentStreak: Int = 0
+    @State private var showBugReport: Bool = false
+    @State private var bugReportText: String = ""
+    @State private var bugReportScreenshot: UIImage? = nil
+    @State private var showBugReportSuccess: Bool = false
 
     var body: some View {
         ZStack {
@@ -104,12 +108,23 @@ struct SettingsView: View {
         }
         .onAppear {
             viewModel.calculateLocalDataSize()
-            // Load initial streak value
-            currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
-            // Reload streak when updated from TasksV2View
-            currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+        .sheet(isPresented: $showBugReport) {
+            BugReportSheet(
+                bugReportText: $bugReportText,
+                bugReportScreenshot: $bugReportScreenshot,
+                onSubmit: { submitBugReport() },
+                onCancel: {
+                    showBugReport = false
+                    bugReportText = ""
+                    bugReportScreenshot = nil
+                }
+            )
+        }
+        .alert("Bug envoyé !", isPresented: $showBugReportSuccess) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Merci pour votre retour ! Nous examinerons votre rapport rapidement.")
         }
     }
 
@@ -147,7 +162,6 @@ struct SettingsView: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 profileObjectiveSection
-                statisticsSection
                 subscriptionSection
                 privacySecuritySection
                 aboutSupportSection
@@ -191,128 +205,16 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Statistics Section
-    private var statisticsSection: some View {
-        settingsSection(title: NSLocalizedString("settings.section.statistics", comment: ""), icon: "chart.bar.fill") {
-            VStack(spacing: 0) {
-                // Streak days
-                HStack(spacing: 12) {
-                    Image(systemName: "flame.fill")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.orange)
-                        .frame(width: 20, height: 20)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(NSLocalizedString("settings.streak.title", comment: ""))
-                            .font(.custom("Poppins-Regular", size: 16))
-                            .foregroundColor(.white)
-
-                        Text(NSLocalizedString("settings.streak.subtitle", comment: ""))
-                            .font(.custom("Poppins-Regular", size: 13))
-                            .foregroundColor(.white.opacity(0.5))
-                    }
-
-                    Spacer()
-
-                    Text(String(format: NSLocalizedString("settings.streak.days", comment: ""), currentStreak))
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .foregroundColor(Color.appTheme)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-                // Current week/day
-                HStack(spacing: 12) {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.white)
-                        .frame(width: 20, height: 20)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(NSLocalizedString("settings.program.title", comment: ""))
-                            .font(.custom("Poppins-Regular", size: 16))
-                            .foregroundColor(.white)
-
-                        Text(NSLocalizedString("settings.program.subtitle", comment: ""))
-                            .font(.custom("Poppins-Regular", size: 13))
-                            .foregroundColor(.white.opacity(0.5))
-                    }
-
-                    Spacer()
-
-                    Text(String(format: NSLocalizedString("settings.program.week_day", comment: ""), UserDefaults.standard.integer(forKey: "currentWeek"), UserDefaults.standard.integer(forKey: "currentDay")))
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-                // Firebase sync status (if enabled)
-                if viewModel.syncEnabled {
-                    HStack(spacing: 12) {
-                        if viewModel.isSyncing {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                                .frame(width: 20, height: 20)
-                        } else {
-                            Image(systemName: viewModel.syncError == nil ? "checkmark.icloud.fill" : "exclamationmark.icloud.fill")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(viewModel.syncError == nil ? .green : .orange)
-                                .frame(width: 20, height: 20)
-                        }
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(viewModel.isSyncing ? StringKeys.Settings.syncing : StringKeys.Settings.syncStatus)
-                                .font(.custom("Poppins-Regular", size: 16))
-                                .foregroundColor(.white)
-
-                            if let lastSync = viewModel.lastSyncDate {
-                                Text(String(format: NSLocalizedString("settings.sync.last_sync", comment: ""), formatSyncDate(lastSync)))
-                                    .font(.custom("Poppins-Regular", size: 13))
-                                    .foregroundColor(.white.opacity(0.5))
-                            } else if let error = viewModel.syncError {
-                                Text(String(format: NSLocalizedString("settings.sync.error", comment: ""), error))
-                                    .font(.custom("Poppins-Regular", size: 13))
-                                    .foregroundColor(.orange.opacity(0.8))
-                            } else {
-                                Text(NSLocalizedString("settings.sync.auto", comment: ""))
-                                    .font(.custom("Poppins-Regular", size: 13))
-                                    .foregroundColor(.white.opacity(0.5))
-                            }
-                        }
-
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                }
-            }
-        }
-    }
-
     // MARK: - Subscription Section
     private var subscriptionSection: some View {
-        settingsSection(title: StringKeys.Settings.subscription, icon: "crown.fill") {
+        settingsSection(title: "Abonnement", icon: "crown.fill") {
             VStack(spacing: 0) {
                 settingsRow(icon: "checkmark.circle.fill", title: NSLocalizedString("settings.subscription.status", comment: ""), subtitle: viewModel.subscriptionStatus, showChevron: false) {}
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-                settingsRow(icon: "arrow.clockwise", title: StringKeys.Settings.renewalDate, subtitle: viewModel.renewalDate.isEmpty ? "N/A" : viewModel.renewalDate, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsRow(icon: "gearshape.fill", title: NSLocalizedString("settings.subscription.manage", comment: ""), subtitle: NSLocalizedString("settings.subscription.manage_subtitle", comment: ""), showChevron: true) {
                     HapticManager.light()
                     manageSubscription()
-                }
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-                settingsRow(icon: "arrow.down.circle.fill", title: NSLocalizedString("settings.subscription.restore", comment: ""), subtitle: nil, showChevron: true) {
-                    HapticManager.light()
-                    restorePurchases()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
@@ -330,13 +232,19 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 settingsRow(icon: "doc.text.fill", title: NSLocalizedString("settings.privacy.policy", comment: ""), subtitle: nil, showChevron: true) {
                     HapticManager.light()
-                    openURL("https://cortifree.com/privacy")
+                    LegalDocumentsHelper.openPrivacyPolicy()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsRow(icon: "doc.plaintext.fill", title: NSLocalizedString("settings.privacy.terms", comment: ""), subtitle: nil, showChevron: true) {
                     HapticManager.light()
-                    openURL("https://cortifree.com/terms")
+                    LegalDocumentsHelper.openTerms()
+                }
+                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+
+                settingsRow(icon: "building.columns.fill", title: NSLocalizedString("settings.privacy.legal_notice", comment: ""), subtitle: nil, showChevron: true) {
+                    HapticManager.light()
+                    LegalDocumentsHelper.openLegalNotice()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
@@ -346,7 +254,7 @@ struct SettingsView: View {
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "internaldrive.fill", title: StringKeys.Settings.localDataSize, subtitle: viewModel.localDataSize, showChevron: false) {}
+                settingsRow(icon: "internaldrive.fill", title: "Données locales", subtitle: viewModel.localDataSize, showChevron: false) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: StringKeys.Settings.icloudSync, subtitle: NSLocalizedString("settings.privacy.icloud_subtitle", comment: ""), isOn: $viewModel.syncEnabled)
@@ -383,9 +291,9 @@ struct SettingsView: View {
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "questionmark.circle.fill", title: NSLocalizedString("settings.about.faq", comment: ""), subtitle: nil, showChevron: true) {
+                settingsRow(icon: "ladybug.fill", title: "Signaler un bug", subtitle: "Aidez-nous à améliorer l'app", showChevron: true) {
                     HapticManager.light()
-                    openURL("https://cortifree.com/faq")
+                    showBugReport = true
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
@@ -632,15 +540,6 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Statistics Helper Functions
-
-    private func formatSyncDate(_ date: Date) -> String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-        formatter.locale = Locale(identifier: appLanguage)
-        return formatter.localizedString(for: date, relativeTo: Date())
-    }
-
     // MARK: - Language Change
 
     private func applyLanguageChange(_ newLanguage: String) {
@@ -663,11 +562,10 @@ struct SettingsView: View {
     // MARK: - Helper Functions
 
     private func manageSubscription() {
-        // Subscription management handled by Superwall in CortiFreeApp
-    }
-
-    private func restorePurchases() {
-        // Restore purchases handled by Superwall in CortiFreeApp
+        // Open App Store subscription management
+        if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+            UIApplication.shared.open(url)
+        }
     }
 
     private func requestAppReview() {
@@ -697,8 +595,15 @@ struct SettingsView: View {
 
         Task {
             do {
-                // Delete Firebase account
-                try await Auth.auth().currentUser?.delete()
+                guard let user = Auth.auth().currentUser else { return }
+                let userId = user.uid
+
+                // Delete user data from Firestore first
+                let db = Firestore.firestore()
+                try await db.collection("users").document(userId).delete()
+
+                // Delete Firebase auth account
+                try await user.delete()
 
                 // Clear all local data
                 let domain = Bundle.main.bundleIdentifier!
@@ -712,6 +617,67 @@ struct SettingsView: View {
             } catch {
                 #if DEBUG
                 print("❌ Error deleting account: \(error)")
+                #endif
+            }
+        }
+    }
+
+    // MARK: - Bug Report
+
+    private func submitBugReport() {
+        HapticManager.success()
+
+        Task {
+            do {
+                let db = Firestore.firestore()
+                let userId = Auth.auth().currentUser?.uid ?? "anonymous"
+                let userEmail = Auth.auth().currentUser?.email ?? "unknown"
+
+                var reportData: [String: Any] = [
+                    "userId": userId,
+                    "userEmail": userEmail,
+                    "description": bugReportText,
+                    "appVersion": "1.0.0",
+                    "iosVersion": UIDevice.current.systemVersion,
+                    "deviceModel": UIDevice.current.model,
+                    "createdAt": FieldValue.serverTimestamp(),
+                    "status": "new"
+                ]
+
+                // Upload screenshot if available (resized to fit Firestore limit)
+                if let screenshot = bugReportScreenshot {
+                    // Resize image to max 800px width to stay under Firestore 1MB limit
+                    let maxWidth: CGFloat = 800
+                    let scale = min(maxWidth / screenshot.size.width, 1.0)
+                    let newSize = CGSize(width: screenshot.size.width * scale, height: screenshot.size.height * scale)
+
+                    UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+                    screenshot.draw(in: CGRect(origin: .zero, size: newSize))
+                    let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+                    UIGraphicsEndImageContext()
+
+                    if let resized = resizedImage,
+                       let imageData = resized.jpegData(compressionQuality: 0.5) {
+                        let base64String = imageData.base64EncodedString()
+                        reportData["screenshotBase64"] = base64String
+                    }
+                }
+
+                // Save to Firestore
+                try await db.collection("bug_reports").addDocument(data: reportData)
+
+                // Reset form and close
+                bugReportText = ""
+                bugReportScreenshot = nil
+                showBugReport = false
+                showBugReportSuccess = true
+
+                #if DEBUG
+                print("✅ Bug report submitted successfully")
+                #endif
+            } catch {
+                #if DEBUG
+                print("❌ Error submitting bug report: \(error)")
                 #endif
             }
         }
@@ -1295,6 +1261,114 @@ extension FileManager {
         }
 
         return size
+    }
+}
+
+// MARK: - Bug Report Sheet Component
+
+struct BugReportSheet: View {
+    @Binding var bugReportText: String
+    @Binding var bugReportScreenshot: UIImage?
+    let onSubmit: () -> Void
+    let onCancel: () -> Void
+
+    @State private var showImagePicker: Bool = false
+
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color(hex: "01000C").ignoresSafeArea()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text("Décrivez le problème")
+                            .font(.custom("Poppins-SemiBold", size: 16))
+                            .foregroundColor(.white)
+
+                        TextEditor(text: $bugReportText)
+                            .frame(minHeight: 150)
+                            .padding(12)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(12)
+                            .foregroundColor(.white)
+                            .scrollContentBackground(.hidden)
+
+                        Text("Ajouter une capture d'écran (optionnel)")
+                            .font(.custom("Poppins-SemiBold", size: 16))
+                            .foregroundColor(.white)
+
+                        if let screenshot = bugReportScreenshot {
+                            ZStack(alignment: .topTrailing) {
+                                Image(uiImage: screenshot)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxHeight: 200)
+                                    .cornerRadius(12)
+
+                                Button(action: {
+                                    bugReportScreenshot = nil
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 24))
+                                        .foregroundColor(.white)
+                                        .background(Circle().fill(Color.black.opacity(0.5)))
+                                }
+                                .padding(8)
+                            }
+                        } else {
+                            Button(action: {
+                                showImagePicker = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "photo.on.rectangle.angled")
+                                        .font(.system(size: 20))
+                                    Text("Choisir une image")
+                                        .font(.custom("Poppins-Medium", size: 14))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color.white.opacity(0.1))
+                                .cornerRadius(12)
+                            }
+                        }
+
+                        Spacer(minLength: 20)
+
+                        Button(action: {
+                            onSubmit()
+                        }) {
+                            Text("Envoyer le rapport")
+                                .font(.custom("Poppins-SemiBold", size: 16))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(
+                                    bugReportText.isEmpty
+                                        ? Color.gray.opacity(0.5)
+                                        : Color(hex: "B794F6")
+                                )
+                                .cornerRadius(12)
+                        }
+                        .disabled(bugReportText.isEmpty)
+                    }
+                    .padding(24)
+                }
+            }
+            .navigationTitle("Signaler un bug")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Annuler") {
+                        onCancel()
+                    }
+                    .foregroundColor(.white)
+                }
+            }
+            .sheet(isPresented: $showImagePicker) {
+                ImagePicker(image: $bugReportScreenshot)
+            }
+        }
     }
 }
 

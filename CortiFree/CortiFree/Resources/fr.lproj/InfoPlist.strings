@@ -18,4 +18,3 @@
 "NSMotionUsageDescription" = "CortiFree utilise le suivi de mouvement pour surveiller votre activité physique et fournir de meilleures recommandations d'exercices.";
 "NSHealthShareUsageDescription" = "CortiFree lit les données de santé pour fournir des insights bien-être personnalisés et suivre vos progrès.";
 "NSHealthUpdateUsageDescription" = "CortiFree enregistre vos données de méditation et d'exercices dans Apple Santé pour vous donner une vue complète de votre bien-être.";
-"NSUserTrackingUsageDescription" = "CortiFree utilise ces informations pour vous offrir une expérience meilleure et plus personnalisée.";

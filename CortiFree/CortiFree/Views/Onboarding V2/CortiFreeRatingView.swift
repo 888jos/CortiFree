@@ -234,6 +234,15 @@ struct CortiFreeRatingView: View {
         .onAppear {
             screenViewTime = Date()
 
+            // Track screen viewed with scores
+            MixpanelManager.shared.trackOnboardingCortiFreeRatingViewed(
+                serenityScore: habitsQuizResult.serenityScore,
+                sleepScore: habitsQuizResult.sleepScore,
+                energyScore: habitsQuizResult.energyScore,
+                focusScore: habitsQuizResult.focusScore,
+                habitsScore: habitsQuizResult.habitsScore
+            )
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.easeOut(duration: 0.8)) {
                     animateProgress = true

@@ -60,8 +60,6 @@
     <array>
         <string>audio</string>
     </array>
-    <key>NSUserTrackingUsageDescription</key>
-    <string>Cette information sera utilisée pour vous proposer des publicités personnalisées.</string>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
     <key>CFBundleURLTypes</key>

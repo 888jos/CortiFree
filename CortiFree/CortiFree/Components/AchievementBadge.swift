@@ -146,9 +146,9 @@ struct AchievementBadge: View {
                 // Unlocked
                 AchievementBadge(
                     achievement: Achievement(
-                        id: "test1",
-                        title: "Test Badge",
-                        description: "Test",
+                        id: "streak_3",
+                        titleKey: "achievement.streak_3.title",
+                        descriptionKey: "achievement.streak_3.description",
                         icon: "star.fill",
                         category: .streak,
                         requirement: 1,
@@ -161,9 +161,9 @@ struct AchievementBadge: View {
                 // Locked with progress
                 AchievementBadge(
                     achievement: Achievement(
-                        id: "test2",
-                        title: "Locked Badge",
-                        description: "Test",
+                        id: "streak_7",
+                        titleKey: "achievement.streak_7.title",
+                        descriptionKey: "achievement.streak_7.description",
                         icon: "flame.fill",
                         category: .streak,
                         requirement: 10,

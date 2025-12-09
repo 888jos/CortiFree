@@ -187,7 +187,9 @@ struct LibraryView: View {
                     backgroundImage: "button_blog",
                     strokeColor: Color(hex: "27154D")
                 ) {
-                    // Navigate to Blog
+                    if let url = URL(string: "https://cortifree.framer.website/blog") {
+                        UIApplication.shared.open(url)
+                    }
                 }
             }
 

@@ -21,8 +21,6 @@ struct HomeView: View {
     @State private var showSoundsList = false
     @State private var showJournal = false
     @State private var showSettings = false
-    @State private var showOnboardingV2 = false
-    @State private var showPaywallTest = false
     @State private var currentTime = Date() // For countdown updates
 
     // Smart scroll detection
@@ -154,36 +152,6 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
         }
-        .fullScreenCover(isPresented: $showOnboardingV2) {
-            OnboardingV2FlowView()
-        }
-        .fullScreenCover(isPresented: $showPaywallTest) {
-            CustomPaywallView(
-                onComplete: { showPaywallTest = false },
-                onPurchase: { plan in
-                    Task {
-                        let productID = plan == "yearly"
-                            ? StoreKitManager.yearlyProductID
-                            : StoreKitManager.monthlyProductID
-
-                        print("🛒 Purchasing: \(productID)")
-                        let success = await StoreKitManager.shared.purchase(productID)
-                        print("🛒 Purchase result: \(success)")
-
-                        if success {
-                            showPaywallTest = false
-                        }
-                    }
-                },
-                onRestore: {
-                    Task {
-                        print("🔄 Restoring purchases...")
-                        let success = await StoreKitManager.shared.restorePurchases()
-                        print("🔄 Restore result: \(success)")
-                    }
-                }
-            )
-        }
         .onAppear {
             // Refresh motivational message to pick up any name changes from profile edit
             motivationalVM.refreshMessage()
@@ -237,41 +205,6 @@ struct HomeView: View {
                 .foregroundColor(.white)
 
             Spacer()
-
-            // Refresh quote button
-            Button(action: {
-                HapticManager.light()
-                motivationalVM.generateMessage()
-            }) {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 22))
-                    .foregroundColor(.white.opacity(0.8))
-            }
-            .padding(.trailing, 12)
-
-            // Test Paywall button (DEBUG)
-            #if DEBUG
-            Button(action: {
-                HapticManager.light()
-                showPaywallTest = true
-            }) {
-                Image(systemName: "creditcard.fill")
-                    .font(.system(size: 22))
-                    .foregroundColor(Color(hex: "B794F6"))
-            }
-            .padding(.trailing, 12)
-            #endif
-
-            // Onboarding V2 button
-            Button(action: {
-                HapticManager.light()
-                showOnboardingV2 = true
-            }) {
-                Image(systemName: "person.circle.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(AppConstants.Colors.primaryGreen)
-            }
-            .padding(.trailing, 12)
 
             // Settings button
             Button(action: {

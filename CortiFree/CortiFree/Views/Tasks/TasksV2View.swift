@@ -86,12 +86,12 @@ struct TasksV2View: View {
             ))
         }
 
-        // 2. RESPIRATION (matin)
+        // 2. RESPIRATION (matin) - Offset 1 pour disperser
         let breathingProgression = WeeklyHabitProgression.breathingProgression(week: week)
         let breathingDuration = WeeklyHabitProgression.formatProgressionDisplay(breathingProgression)
         let breathingVariant = HabitVariantConfig.getBreathingVariant()
         // Afficher seulement certains jours selon fréquence
-        let showBreathing = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: breathingProgression.frequencyPerWeek)
+        let showBreathing = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: breathingProgression.frequencyPerWeek, habitOffset: 1)
 
         if showBreathing {
             let breathingData = habitTracking[AppConstants.Habits.ID.breathing]
@@ -110,11 +110,11 @@ struct TasksV2View: View {
             ))
         }
 
-        // 3. MÉDITATION (matin)
+        // 3. MÉDITATION (matin) - Offset 3 pour disperser par rapport à respiration
         let meditationProgression = WeeklyHabitProgression.meditationProgression(week: week)
         let meditationDuration = WeeklyHabitProgression.formatProgressionDisplay(meditationProgression)
         let meditationVariant = HabitVariantConfig.getMeditationVariant()
-        let showMeditation = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: meditationProgression.frequencyPerWeek)
+        let showMeditation = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: meditationProgression.frequencyPerWeek, habitOffset: 3)
 
         if showMeditation {
             let meditationData = habitTracking[AppConstants.Habits.ID.meditation]
@@ -151,10 +151,10 @@ struct TasksV2View: View {
             impactAreas: HabitTask.getImpactAreas(for: "habit_water")
         ))
 
-        // 5. SPORT (journée) - Variante selon le jour
+        // 5. SPORT (journée) - Variante selon le jour - Offset 0
         let sportProgression = WeeklyHabitProgression.sportProgression(week: week)
         let sportDuration = WeeklyHabitProgression.formatProgressionDisplay(sportProgression)
-        let showSport = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: sportProgression.frequencyPerWeek)
+        let showSport = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: sportProgression.frequencyPerWeek, habitOffset: 0)
 
         if showSport, let sportVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.sport) {
             let sportData = habitTracking[AppConstants.Habits.ID.sport]
@@ -173,10 +173,10 @@ struct TasksV2View: View {
             ))
         }
 
-        // 6. NATURE (après-midi)
+        // 6. NATURE (après-midi) - Offset 2 pour décaler par rapport à sport
         let natureProgression = WeeklyHabitProgression.natureProgression(week: week)
         let natureDuration = WeeklyHabitProgression.formatProgressionDisplay(natureProgression)
-        let showNature = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: natureProgression.frequencyPerWeek)
+        let showNature = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: natureProgression.frequencyPerWeek, habitOffset: 2)
 
         if showNature, let natureVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.nature) {
             let natureData = habitTracking[AppConstants.Habits.ID.nature]
@@ -195,9 +195,9 @@ struct TasksV2View: View {
             ))
         }
 
-        // 7. SOCIAL (soirée)
+        // 7. SOCIAL (soirée) - Offset 4 pour décaler par rapport à sport et nature
         let socialProgression = WeeklyHabitProgression.socialProgression(week: week)
-        let showSocial = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: socialProgression.frequencyPerWeek)
+        let showSocial = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: socialProgression.frequencyPerWeek, habitOffset: 4)
 
         if showSocial, let socialVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.social) {
             let socialData = habitTracking[AppConstants.Habits.ID.social]
@@ -262,16 +262,24 @@ struct TasksV2View: View {
 
     // Helper function to determine if a task should be shown on a given day
     private func shouldShowTask(dayOfWeek: Int, frequencyPerWeek: Int) -> Bool {
+        return shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: frequencyPerWeek, habitOffset: 0)
+    }
+
+    /// Version avec offset pour disperser nature, social et sport sur des jours différents
+    private func shouldShowTask(dayOfWeek: Int, frequencyPerWeek: Int, habitOffset: Int) -> Bool {
         if frequencyPerWeek >= 7 { return true } // Daily
+
+        // Appliquer l'offset pour décaler les jours selon l'habitude
+        let adjustedDay = (dayOfWeek + habitOffset) % 7
 
         // Distribuer les tâches de manière équilibrée dans la semaine
         switch frequencyPerWeek {
-        case 1: return dayOfWeek == 3 // Mercredi seulement
-        case 2: return dayOfWeek == 1 || dayOfWeek == 4 // Mardi et vendredi
-        case 3: return dayOfWeek == 0 || dayOfWeek == 2 || dayOfWeek == 5 // Lundi, mercredi, samedi
-        case 4: return dayOfWeek != 2 && dayOfWeek != 5 // Tous sauf mercredi et samedi
-        case 5: return dayOfWeek != 6 && dayOfWeek != 3 // Tous sauf dimanche et jeudi
-        case 6: return dayOfWeek != 0 // Tous sauf lundi
+        case 1: return adjustedDay == 3 // Un jour par semaine
+        case 2: return adjustedDay == 1 || adjustedDay == 4 // 2 jours espacés
+        case 3: return adjustedDay == 0 || adjustedDay == 2 || adjustedDay == 5 // 3 jours espacés
+        case 4: return adjustedDay != 2 && adjustedDay != 5 // Tous sauf 2 jours
+        case 5: return adjustedDay != 6 && adjustedDay != 3 // Tous sauf 2 jours
+        case 6: return adjustedDay != 0 // Tous sauf 1 jour
         default: return true
         }
     }
@@ -318,7 +326,7 @@ struct TasksV2View: View {
                                 .font(Font.Poppins.custom(.bold, size: 16))
                                 .foregroundColor(.white)
 
-                            Text("(+\(globalScoreIncrease))")
+                            Text("(\(globalScoreIncrease >= 0 ? "+" : "")\(globalScoreIncrease))")
                                 .font(.custom("Poppins-Regular", size: 12))
                                 .foregroundColor(.white.opacity(0.5))
                         }
@@ -775,15 +783,29 @@ struct TasksV2View: View {
     }
 
     // Check if previous days were missed (no validation) and reset streaks accordingly
+    // IMPORTANT: We check the day BEFORE yesterday, not yesterday
+    // This gives the user the current day to maintain their streak
+    // Example: Day 3 starts, user had streak of 2 (days 1 & 2)
+    // - We check day 1 (actualDay - 2), not day 2
+    // - Streak stays at 2 until end of day 3
+    // - If user validates on day 3 -> streak becomes 3
+    // - If day 3 ends with no validation -> streak resets on day 4
     private func checkAndResetStreaksIfNeeded() {
-        // Check if the previous day had at least one validation
-        if actualDay > 1 {
-            let previousDay = actualDay - 1
-            let previousDayStatuses = taskStatuses[dayKey(previousDay)] ?? [:]
-            let hadValidation = previousDayStatuses.values.contains(.done)
+        // Only check if we're at least on day 3 (need day before yesterday to exist)
+        if actualDay > 2 {
+            let dayBeforeYesterday = actualDay - 2
+            let dayBeforeYesterdayStatuses = taskStatuses[dayKey(dayBeforeYesterday)] ?? [:]
+            let hadValidationDayBeforeYesterday = dayBeforeYesterdayStatuses.values.contains(.done)
 
-            if !hadValidation {
-                // Previous day had no validations, reset global streak
+            // Also check yesterday
+            let yesterday = actualDay - 1
+            let yesterdayStatuses = taskStatuses[dayKey(yesterday)] ?? [:]
+            let hadValidationYesterday = yesterdayStatuses.values.contains(.done)
+
+            // Reset streak only if BOTH day before yesterday AND yesterday had no validation
+            // This means the user missed a full day without doing anything
+            if !hadValidationDayBeforeYesterday && !hadValidationYesterday {
+                // Missed at least one full day, reset streak
                 globalStreak = 0
 
                 // Also reset all task streaks
@@ -792,11 +814,17 @@ struct TasksV2View: View {
                     taskStreaks[key] = 0
                 }
             } else {
-                // Previous day had validations, update streaks normally
+                // Update streaks normally based on completion history
                 updateGlobalStreak()
                 for task in tasks {
                     updateTaskStreak(task)
                 }
+            }
+        } else {
+            // Day 1 or 2: just update streaks normally (no reset possible yet)
+            updateGlobalStreak()
+            for task in tasks {
+                updateTaskStreak(task)
             }
         }
     }

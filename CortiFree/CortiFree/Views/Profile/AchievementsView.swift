@@ -41,11 +41,11 @@ struct AchievementsView: View {
                     Spacer()
 
                     VStack(spacing: 4) {
-                        Text("Achievements")
+                        Text("achievements.title".localized)
                             .font(Font.Poppins.custom(.bold, size: 24))
                             .foregroundColor(.white)
 
-                        Text("\(achievementService.unlockedCount)/\(achievementService.totalCount) Unlocked")
+                        Text(String(format: "achievements.unlocked_count".localized, achievementService.unlockedCount, achievementService.totalCount))
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.7))
                     }
@@ -91,7 +91,7 @@ struct AchievementsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         CategoryFilterButton(
-                            title: "All",
+                            title: "achievements.category.all".localized,
                             isSelected: selectedCategory == nil,
                             color: Color(hex: "B794F6")
                         ) {
@@ -99,7 +99,7 @@ struct AchievementsView: View {
                         }
 
                         CategoryFilterButton(
-                            title: "Streak",
+                            title: "achievement.category.streak".localized,
                             isSelected: selectedCategory == .streak,
                             color: Color(hex: "FF8800")
                         ) {
@@ -107,7 +107,7 @@ struct AchievementsView: View {
                         }
 
                         CategoryFilterButton(
-                            title: "Completion",
+                            title: "achievement.category.completion".localized,
                             isSelected: selectedCategory == .completion,
                             color: Color(hex: "2ECC71")
                         ) {
@@ -115,7 +115,7 @@ struct AchievementsView: View {
                         }
 
                         CategoryFilterButton(
-                            title: "Habit",
+                            title: "achievement.category.habit".localized,
                             isSelected: selectedCategory == .habit,
                             color: Color(hex: "B794F6")
                         ) {
@@ -124,7 +124,7 @@ struct AchievementsView: View {
 
 
                         CategoryFilterButton(
-                            title: "Special",
+                            title: "achievement.category.special".localized,
                             isSelected: selectedCategory == .special,
                             color: Color(hex: "E74C3C")
                         ) {
@@ -244,14 +244,14 @@ struct AchievementDetailView: View {
                                 .font(.system(size: 14))
                                 .foregroundColor(Color(hex: "2ECC71"))
 
-                            Text("Unlocked \(formatDate(unlockedAt))")
+                            Text(String(format: "achievements.unlocked_date".localized, formatDate(unlockedAt)))
                                 .font(.custom("Poppins-Medium", size: 14))
                                 .foregroundColor(.white.opacity(0.7))
                         }
                         .padding(.top, 8)
                     } else if achievement.progress > 0 {
                         VStack(spacing: 8) {
-                            Text("Progress: \(achievement.progress)/\(achievement.requirement)")
+                            Text(String(format: "achievements.progress".localized, achievement.progress, achievement.requirement))
                                 .font(.custom("Poppins-SemiBold", size: 16))
                                 .foregroundColor(.white)
 
@@ -271,7 +271,7 @@ struct AchievementDetailView: View {
                         }
                         .padding(.top, 8)
                     } else {
-                        Text("Not started yet")
+                        Text("achievements.not_started".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.5))
                             .padding(.top, 8)
@@ -285,7 +285,7 @@ struct AchievementDetailView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    Text("Close")
+                    Text("achievements.close".localized)
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

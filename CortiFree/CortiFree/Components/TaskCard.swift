@@ -89,7 +89,7 @@ struct HabitTaskCard: View {
 
                 // Content overlay
                 VStack(alignment: .leading, spacing: 0) {
-                    // Top section: Streak (left) + Info icon (right)
+                    // Top section: Streak (left) + Category badge (right)
                     HStack {
                         // Streak badge (flamme) with pulse animation
                         HStack(spacing: 4) {
@@ -110,10 +110,20 @@ struct HabitTaskCard: View {
 
                         Spacer()
 
-                        // Info icon
-                        Image(systemName: "info.circle.fill")
-                            .font(.system(size: 14))
-                            .foregroundColor(.black.opacity(0.4))
+                        // Category badge
+                        HStack(spacing: 4) {
+                            Image(systemName: getCategoryIcon())
+                                .font(.system(size: 10, weight: .medium))
+                            Text(getCategoryName())
+                                .font(.custom("Poppins-Medium", size: 10))
+                        }
+                        .foregroundColor(.white.opacity(0.9))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.35))
+                        )
                     }
                     .padding(.top, 12)
                     .padding(.horizontal, 12)
@@ -286,13 +296,63 @@ struct HabitTaskCard: View {
         let habitId = getHabitId(for: imageName)
         switch habitId {
         case "meditation":
-            return "Méditer"
+            return isFrench ? "Méditer" : "Meditate"
         case "breathing":
-            return "Respirer"
+            return isFrench ? "Respirer" : "Breathe"
         case "journal":
-            return "Écrire"
+            return isFrench ? "Écrire" : "Write"
         default:
-            return "Ouvrir"
+            return isFrench ? "Ouvrir" : "Open"
+        }
+    }
+
+    // Helper to get category icon based on habit type
+    private func getCategoryIcon() -> String {
+        let habitId = getHabitId(for: imageName)
+        switch habitId {
+        case "sleep":
+            return "moon.fill"
+        case "breathing":
+            return "wind"
+        case "meditation":
+            return "brain.head.profile"
+        case "water":
+            return "drop.fill"
+        case "sport":
+            return "figure.run"
+        case "nature":
+            return "leaf.fill"
+        case "social":
+            return "person.2.fill"
+        case "journal":
+            return "book.fill"
+        default:
+            return "star.fill"
+        }
+    }
+
+    // Helper to get category name based on habit type
+    private func getCategoryName() -> String {
+        let habitId = getHabitId(for: imageName)
+        switch habitId {
+        case "sleep":
+            return isFrench ? "Sommeil" : "Sleep"
+        case "breathing":
+            return isFrench ? "Respiration" : "Breathing"
+        case "meditation":
+            return isFrench ? "Méditation" : "Meditation"
+        case "water":
+            return isFrench ? "Hydratation" : "Hydration"
+        case "sport":
+            return "Sport"
+        case "nature":
+            return "Nature"
+        case "social":
+            return "Social"
+        case "journal":
+            return "Journal"
+        default:
+            return isFrench ? "Habitude" : "Habit"
         }
     }
 }
