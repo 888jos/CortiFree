@@ -38,13 +38,14 @@ struct OverallQuizView: View {
             GalaxyBackgroundView(intensity: 1.0)
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Navigation header
-                headerSection
-                    .padding(.top, 50)
-
-                // Question content with fixed title
+            ScrollView {
                 VStack(spacing: 0) {
+                    // Navigation header
+                    headerSection
+                        .padding(.top, 50)
+
+                    // Question content with fixed title
+                    VStack(spacing: 0) {
                     // Fixed Question Number Title
                     Text("Question #\(currentQuestionNumber)")
                         .font(.custom("Poppins-Bold", size: 24))
@@ -92,7 +93,8 @@ struct OverallQuizView: View {
                     }
                 }
 
-                Spacer()
+                    Spacer(minLength: 100)
+                }
             }
         }
         .animation(.easeInOut(duration: 0.5), value: currentQuestionIndex)

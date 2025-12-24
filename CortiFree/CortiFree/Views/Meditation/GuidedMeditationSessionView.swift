@@ -24,7 +24,7 @@ struct GuidedMeditationSessionView: View {
     }
 
     private var currentStep: String {
-        guard currentStepIndex < allSteps.count else { return "Session terminée" }
+        guard currentStepIndex < allSteps.count else { return NSLocalizedString("meditation.session.completed", comment: "") }
         return allSteps[currentStepIndex]
     }
 
@@ -127,7 +127,7 @@ struct GuidedMeditationSessionView: View {
 
     private var progressIndicator: some View {
         VStack(spacing: 8) {
-            Text("Étape \(currentStepIndex + 1) sur \(allSteps.count)")
+            Text(String(format: NSLocalizedString("meditation.session.step_progress", comment: ""), currentStepIndex + 1, allSteps.count))
                 .font(.custom("Poppins-Medium", size: 14))
                 .foregroundColor(Color(hex: "B0B8D4"))
 
@@ -227,7 +227,7 @@ struct GuidedMeditationSessionView: View {
                 }
             }) {
                 HStack(spacing: 12) {
-                    Text(isLastStep ? "Terminer" : "Suivant")
+                    Text(isLastStep ? NSLocalizedString("meditation.session.finish", comment: "") : NSLocalizedString("meditation.session.next", comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 17))
 
                     Image(systemName: isLastStep ? "checkmark.circle.fill" : "chevron.right")

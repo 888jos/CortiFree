@@ -14,6 +14,23 @@ import Lottie
 import GoogleSignIn
 import GoogleSignInSwift
 
+// Pre-computed star positions to avoid random in Canvas (fixes iPad freeze) - shared across all auth views
+private let authStarPositions: [(CGFloat, CGFloat, CGFloat)] = [
+    (0.12, 0.15, 2.0), (0.25, 0.32, 1.5), (0.38, 0.08, 2.5), (0.45, 0.42, 1.8),
+    (0.58, 0.22, 2.2), (0.65, 0.55, 1.6), (0.72, 0.18, 2.8), (0.82, 0.38, 1.4),
+    (0.15, 0.62, 2.4), (0.28, 0.78, 1.9), (0.42, 0.88, 2.1), (0.55, 0.72, 1.7),
+    (0.68, 0.85, 2.6), (0.78, 0.68, 1.3), (0.88, 0.92, 2.3), (0.92, 0.12, 1.8),
+    (0.08, 0.48, 2.7), (0.18, 0.28, 1.2), (0.32, 0.58, 2.9), (0.48, 0.12, 1.5),
+    (0.62, 0.38, 2.0), (0.75, 0.48, 1.9), (0.85, 0.58, 2.4), (0.95, 0.78, 1.6),
+    (0.22, 0.92, 2.2), (0.35, 0.42, 1.4), (0.52, 0.62, 2.5), (0.63, 0.08, 1.8),
+    (0.73, 0.28, 2.1), (0.83, 0.82, 1.7), (0.05, 0.72, 2.6), (0.95, 0.32, 1.3),
+    (0.12, 0.38, 2.8), (0.28, 0.52, 1.5), (0.42, 0.68, 2.3), (0.58, 0.82, 1.9),
+    (0.72, 0.62, 2.7), (0.88, 0.48, 1.4), (0.15, 0.82, 2.0), (0.38, 0.22, 1.8),
+    (0.52, 0.38, 2.4), (0.68, 0.12, 1.6), (0.78, 0.92, 2.2), (0.92, 0.62, 1.7),
+    (0.08, 0.58, 2.5), (0.25, 0.68, 1.3), (0.45, 0.78, 2.9), (0.65, 0.42, 1.5),
+    (0.82, 0.22, 2.1), (0.95, 0.88, 1.8)
+]
+
 struct AuthenticationView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var languageManager = LanguageManager.shared
@@ -38,15 +55,15 @@ struct AuthenticationView: View {
             )
             .ignoresSafeArea()
 
-            // Stars
+            // Stars - using pre-computed positions
             GeometryReader { geometry in
-                ForEach(0..<50, id: \.self) { index in
+                ForEach(Array(authStarPositions.enumerated()), id: \.offset) { index, star in
                     Circle()
                         .fill(Color.white)
-                        .frame(width: CGFloat.random(in: 1...3))
+                        .frame(width: star.2)
                         .position(
-                            x: CGFloat.random(in: 0...geometry.size.width),
-                            y: CGFloat.random(in: 0...geometry.size.height)
+                            x: star.0 * geometry.size.width,
+                            y: star.1 * geometry.size.height
                         )
                 }
             }
@@ -75,8 +92,8 @@ struct AuthenticationView: View {
 
                 // Lottie animation
                 LottieView(filename: "Flower Animation", loopMode: .loop)
-                    .frame(width: 320, height: 320)
-                    .padding(.bottom, 32)
+                    .responsiveFrame(width: 320, height: 320)
+                    .responsivePadding(.bottom, 32)
 
                 // Authentication buttons
                 VStack(spacing: 16) {
@@ -703,15 +720,15 @@ struct GoogleAuthView: View {
             )
             .ignoresSafeArea()
 
-            // Stars
+            // Stars - using pre-computed positions
             GeometryReader { geometry in
-                ForEach(0..<50, id: \.self) { index in
+                ForEach(Array(authStarPositions.enumerated()), id: \.offset) { index, star in
                     Circle()
                         .fill(Color.white)
-                        .frame(width: CGFloat.random(in: 1...3))
+                        .frame(width: star.2)
                         .position(
-                            x: CGFloat.random(in: 0...geometry.size.width),
-                            y: CGFloat.random(in: 0...geometry.size.height)
+                            x: star.0 * geometry.size.width,
+                            y: star.1 * geometry.size.height
                         )
                 }
             }
@@ -982,15 +999,15 @@ struct AppleAuthView: View {
             )
             .ignoresSafeArea()
 
-            // Stars
+            // Stars - using pre-computed positions
             GeometryReader { geometry in
-                ForEach(0..<50, id: \.self) { index in
+                ForEach(Array(authStarPositions.enumerated()), id: \.offset) { index, star in
                     Circle()
                         .fill(Color.white)
-                        .frame(width: CGFloat.random(in: 1...3))
+                        .frame(width: star.2)
                         .position(
-                            x: CGFloat.random(in: 0...geometry.size.width),
-                            y: CGFloat.random(in: 0...geometry.size.height)
+                            x: star.0 * geometry.size.width,
+                            y: star.1 * geometry.size.height
                         )
                 }
             }

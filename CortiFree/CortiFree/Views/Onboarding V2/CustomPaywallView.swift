@@ -8,6 +8,8 @@
 
 import SwiftUI
 import StoreKit
+import FirebaseAuth
+import FirebaseFirestore
 
 struct CustomPaywallView: View {
     let onComplete: () -> Void
@@ -18,11 +20,11 @@ struct CustomPaywallView: View {
     @ObservedObject private var storeKit = StoreKitManager.shared
 
     // User data from onboarding
-    var userName: String = "toi"
     var baselineScores: [Double] = [0.4, 0.35, 0.45, 0.5, 0.4] // Sérénité, Sommeil, Énergie, Focus, Équilibre
     var potentialScores: [Double] = [0.85, 0.80, 0.90, 0.88, 0.82]
 
     @State private var selectedPlan: PaywallPlan = .yearly
+    @State private var userName: String = ""
     @State private var radarAnimationProgress: Double = 0.0 // 0.0 = week 0, 1.0 = week 10
     @State private var currentHabitIndex: Int = 0
     @State private var currentWeek: Int = 1
@@ -32,7 +34,7 @@ struct CustomPaywallView: View {
     @State private var purchaseErrorMessage: String = ""
 
     private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+        Locale.current.language.languageCode?.identifier == "fr"
     }
 
     // MARK: - Dynamic Prices from StoreKit (Real App Store Connect prices)
@@ -78,7 +80,7 @@ struct CustomPaywallView: View {
         [
             PaywallHabitProgress(
                 icon: "wind",
-                title: isFrench ? "Respirer consciemment" : "Breathe Consciously",
+                title: isFrench ? "Respirer consciemment / sem." : "Breathe Consciously / week",
                 yAxisValues: ["15 min", "30 min", "45 min", "1h"],
                 currentValue: "1h",
                 statMessage: isFrench ? "pratiqueras la respiration consciente 1h par semaine." : "will practice conscious breathing 1h per week.",
@@ -86,7 +88,7 @@ struct CustomPaywallView: View {
             ),
             PaywallHabitProgress(
                 icon: "figure.mind.and.body",
-                title: isFrench ? "Méditer" : "Meditate",
+                title: isFrench ? "Méditer / sem." : "Meditate / week",
                 yAxisValues: ["20 min", "40 min", "1h", "1h20", "1h40"],
                 currentValue: "1h30",
                 statMessage: isFrench ? "méditeras 1h30 par semaine." : "will meditate 1h30 per week.",
@@ -94,7 +96,7 @@ struct CustomPaywallView: View {
             ),
             PaywallHabitProgress(
                 icon: "book.pages",
-                title: isFrench ? "Tenir un journal" : "Keep a Journal",
+                title: isFrench ? "Tenir un journal / sem." : "Keep a Journal / week",
                 yAxisValues: ["2x", "3x", "5x", "7x"],
                 currentValue: "7x",
                 statMessage: isFrench ? "tiendras un journal 7 fois par semaine." : "will journal 7 times per week.",
@@ -102,7 +104,7 @@ struct CustomPaywallView: View {
             ),
             PaywallHabitProgress(
                 icon: "figure.walk",
-                title: isFrench ? "Faire du sport" : "Exercise",
+                title: isFrench ? "Faire du sport / sem." : "Exercise / week",
                 yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
                 currentValue: "3h30",
                 statMessage: isFrench ? "feras du sport 3h30 par semaine." : "will exercise 3h30 per week.",
@@ -110,7 +112,7 @@ struct CustomPaywallView: View {
             ),
             PaywallHabitProgress(
                 icon: "drop.fill",
-                title: isFrench ? "Boire de l'eau" : "Drink Water",
+                title: isFrench ? "Boire de l'eau / jour" : "Drink Water / day",
                 yAxisValues: ["1.5L", "2L", "2.5L", "3L"],
                 currentValue: "2,5L",
                 statMessage: isFrench ? "boiras 2,5L d'eau par jour." : "will drink 2.5L of water per day.",
@@ -118,7 +120,7 @@ struct CustomPaywallView: View {
             ),
             PaywallHabitProgress(
                 icon: "tree.fill",
-                title: isFrench ? "Passer du temps en nature" : "Spend Time in Nature",
+                title: isFrench ? "Temps en nature / sem." : "Time in Nature / week",
                 yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
                 currentValue: "3h30",
                 statMessage: isFrench ? "passeras 3h30 en nature par semaine." : "will spend 3h30 in nature per week.",
@@ -126,7 +128,7 @@ struct CustomPaywallView: View {
             ),
             PaywallHabitProgress(
                 icon: "moon.zzz.fill",
-                title: isFrench ? "Suivre une routine sommeil" : "Follow a Sleep Routine",
+                title: isFrench ? "Routine sommeil / jour" : "Sleep Routine / day",
                 yAxisValues: ["6h", "6.5h", "7h", "7.5h", "8h"],
                 currentValue: "8h",
                 statMessage: isFrench ? "dormiras 8 heures par nuit." : "will sleep 8 hours per night.",
@@ -134,7 +136,7 @@ struct CustomPaywallView: View {
             ),
             PaywallHabitProgress(
                 icon: "person.2.fill",
-                title: isFrench ? "Se connecter socialement" : "Connect Socially",
+                title: isFrench ? "Connexion sociale / sem." : "Social Connection / week",
                 yAxisValues: ["1x", "2x", "3x", "4x"],
                 currentValue: "4x",
                 statMessage: isFrench ? "te connecteras socialement 4 fois par semaine." : "will connect socially 4 times per week.",
@@ -236,7 +238,55 @@ struct CustomPaywallView: View {
             }
         }
         .onAppear {
+            loadUserName()
             startRadarAnimation()
+        }
+    }
+
+    // MARK: - Load User Name
+
+    private func loadUserName() {
+        if let user = Auth.auth().currentUser {
+            // Priority 1: displayName from Firebase Auth (Google/Apple Sign In)
+            if let displayName = user.displayName, !displayName.isEmpty {
+                // Extract first name from display name
+                userName = displayName.components(separatedBy: " ").first ?? displayName
+            }
+            // Priority 2: Check Firestore for firstName field (Email Sign In)
+            else {
+                Task {
+                    do {
+                        let db = Firestore.firestore()
+                        let document = try await db.collection("users").document(user.uid).getDocument()
+
+                        if let firstName = document.data()?["firstName"] as? String, !firstName.isEmpty {
+                            await MainActor.run {
+                                userName = firstName
+                            }
+                        } else {
+                            // Fallback: use email prefix
+                            if let email = user.email {
+                                let emailPrefix = email.components(separatedBy: "@").first ?? ""
+                                await MainActor.run {
+                                    userName = emailPrefix.isEmpty ? "vous" : emailPrefix
+                                }
+                            } else {
+                                await MainActor.run {
+                                    userName = "vous"
+                                }
+                            }
+                        }
+                    } catch {
+                        // Fallback if Firestore fails
+                        print("Error loading user firstName: \(error)")
+                        await MainActor.run {
+                            userName = "vous"
+                        }
+                    }
+                }
+            }
+        } else {
+            userName = "vous"
         }
     }
 
@@ -262,17 +312,6 @@ struct CustomPaywallView: View {
 
     private var headerSection: some View {
         VStack(spacing: 16) {
-            // Checkmark icon
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.3), lineWidth: 2)
-                    .frame(width: 50, height: 50)
-
-                Image(systemName: "checkmark")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(.white)
-            }
-
             // Title
             Text(isFrench
                  ? "Dans 66 jours, tu auras\ntransformé ta vie."
@@ -608,10 +647,10 @@ struct CustomPaywallView: View {
 
             // Hexagon radar chart - switches between two states
             ZStack {
-                // Background hexagon grid (fixed size)
+                // Background hexagon grid (responsive size)
                 HexagonRadarGrid()
                     .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    .frame(width: 165, height: 165)
+                    .responsiveFrame(width: 165, height: 165)
 
                 // Filled irregular hexagon - either small red OR large green
                 HexagonRadarFill(progress: hexagonIsLarge ? largeProgress : smallProgress)
@@ -625,17 +664,17 @@ struct CustomPaywallView: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 165, height: 165)
+                    .responsiveFrame(width: 165, height: 165)
 
                 // Stroke around the filled hexagon
                 HexagonRadarFill(progress: hexagonIsLarge ? largeProgress : smallProgress)
                     .stroke((hexagonIsLarge ? Color(hex: "27AE60") : Color(hex: "D32F2F")).opacity(0.8), lineWidth: 3)
-                    .frame(width: 165, height: 165)
+                    .responsiveFrame(width: 165, height: 165)
 
                 // Labels (using larger frame for positioning)
-                PaywallRadarLabels(size: 165, isFrench: isFrench)
+                PaywallRadarLabels(size: ResponsiveLayout.cardWidth(base: 165), isFrench: isFrench)
             }
-            .frame(width: 280, height: 280)
+            .responsiveFrame(width: 280, height: 280)
             .padding(.vertical, 8)
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -751,7 +790,7 @@ struct PaywallBenefitRow: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "checkmark")
                 .font(.system(size: 14, weight: .bold))
-                .foregroundColor(Color(hex: "10B981"))
+                .foregroundColor(Color(hex: "8B5CF6"))
                 .frame(width: 20)
 
             Text(LocalizedStringKey(text))
@@ -805,12 +844,12 @@ struct PaywallFeatureListRow: View {
                     if isNew {
                         Text("NEW")
                             .font(.custom("Poppins-Bold", size: 9))
-                            .foregroundColor(Color(hex: "10B981"))
+                            .foregroundColor(Color(hex: "8B5CF6"))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(
                                 RoundedRectangle(cornerRadius: 4)
-                                    .stroke(Color(hex: "10B981"), lineWidth: 1)
+                                    .stroke(Color(hex: "8B5CF6"), lineWidth: 1)
                             )
                     }
                 }
@@ -986,7 +1025,7 @@ struct PaywallStartProgramScreen: View {
     @State private var selectedPlan: String = "yearly"
 
     private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+        Locale.current.language.languageCode?.identifier == "fr"
     }
 
     // Dynamic prices from StoreKit
@@ -1116,26 +1155,80 @@ struct PaywallStartProgramScreen: View {
                         }
                         .padding(.horizontal, 24)
 
-                        // Per month equivalent for yearly
+                        // Price breakdown - More visible for Apple Review compliance
                         if selectedPlan == "yearly" {
-                            Text(isFrench
-                                 ? "Soit seulement \(yearlyMonthlyEquivalent)/mois"
-                                 : "That's only \(yearlyMonthlyEquivalent)/month")
-                                .font(.custom("Poppins-Medium", size: 14))
-                                .foregroundColor(Color(hex: "10B981"))
-                                .padding(.top, 4)
+                            VStack(spacing: 6) {
+                                // Monthly equivalent - More prominent
+                                HStack(spacing: 4) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(Color(hex: "8B5CF6"))
+                                    Text(isFrench
+                                         ? "Soit seulement \(yearlyMonthlyEquivalent)/mois"
+                                         : "That's only \(yearlyMonthlyEquivalent)/month")
+                                        .font(.custom("Poppins-SemiBold", size: 15))
+                                        .foregroundColor(Color(hex: "8B5CF6"))
+                                }
+                            }
+                            .padding(.top, 8)
+                            .padding(.bottom, 4)
                         }
+
+                        // APPLE REQUIREMENT 3.1.2: Explicit subscription pricing information
+                        // Must be displayed BEFORE the purchase button
+                        VStack(spacing: 6) {
+                            // Subscription name and full price
+                            VStack(spacing: 2) {
+                                Text(selectedPlan == "yearly"
+                                     ? (isFrench ? "Abonnement annuel CortiFree" : "CortiFree Annual Subscription")
+                                     : (isFrench ? "Abonnement mensuel CortiFree" : "CortiFree Monthly Subscription"))
+                                    .font(.custom("Poppins-SemiBold", size: 15))
+                                    .foregroundColor(.white.opacity(0.9))
+
+                                // Full price with period
+                                if selectedPlan == "yearly" {
+                                    Text(isFrench
+                                         ? "\(yearlyPrice) / an (\(yearlyMonthlyEquivalent) / mois)"
+                                         : "\(yearlyPrice) per year (\(yearlyMonthlyEquivalent) per month)")
+                                        .font(.custom("Poppins-Medium", size: 14))
+                                        .foregroundColor(Color(hex: "8B5CF6"))
+                                } else {
+                                    Text(isFrench
+                                         ? "\(monthlyPrice) / mois"
+                                         : "\(monthlyPrice) per month")
+                                        .font(.custom("Poppins-Medium", size: 14))
+                                        .foregroundColor(Color(hex: "8B5CF6"))
+                                }
+                            }
+
+                            // Auto-renewal and cancellation notice (MUST be before button per Apple 3.1.2)
+                            Text(isFrench
+                                 ? "Renouvellement automatique • Résiliable à tout moment"
+                                 : "Auto-renewing • Cancel anytime")
+                                .font(.custom("Poppins-Regular", size: 11))
+                                .foregroundColor(.white.opacity(0.5))
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 2)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 12)
 
                         // Spacer to push content up and leave room for fixed button
                         Spacer()
-                            .frame(height: 160)
+                            .frame(height: 220)
                     }
                 }
+            }
 
-                // Fixed bottom section
+            // Fixed bottom section - OVERLAY (outside ScrollView for proper hit testing)
+            VStack {
+                Spacer()
+
                 VStack(spacing: 12) {
-                    // CTA Button
+                    // CTA Button - Increased height for iPad accessibility
                     Button(action: {
+                        print("🔥 Purchase button tapped - Plan: \(selectedPlan)")
                         HapticManager.medium()
                         onPurchase(selectedPlan)
                     }) {
@@ -1143,14 +1236,17 @@ struct PaywallStartProgramScreen: View {
                             Text(selectedPlan == "yearly"
                                  ? (isFrench ? "Commencer mon essai gratuit" : "Start my free trial")
                                  : (isFrench ? "S'abonner maintenant" : "Subscribe now"))
-                                .font(.custom("Poppins-Bold", size: 17))
+                                .font(.custom("Poppins-Bold", size: ResponsiveLayout.fontSize(base: 17)))
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.8)
+                                .multilineTextAlignment(.center)
 
                             Image(systemName: "arrow.right")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: ResponsiveLayout.fontSize(base: 16), weight: .semibold))
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .frame(height: ResponsiveLayout.isIPad ? 64 : 56)
                         .background(
                             LinearGradient(
                                 colors: [Color(hex: "7C3AED"), Color(hex: "5B21B6")],
@@ -1161,6 +1257,7 @@ struct PaywallStartProgramScreen: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: Color(hex: "7C3AED").opacity(0.4), radius: 12, x: 0, y: 6)
                     }
+                    .buttonStyle(.plain)
                     .padding(.horizontal, 24)
 
                     // Free trial info text when yearly is selected
@@ -1168,7 +1265,7 @@ struct PaywallStartProgramScreen: View {
                         HStack(spacing: 6) {
                             Image(systemName: "checkmark.shield.fill")
                                 .font(.system(size: 12))
-                                .foregroundColor(Color(hex: "10B981"))
+                                .foregroundColor(Color(hex: "8B5CF6"))
                             Text(isFrench
                                  ? "3 jours gratuits, puis \(yearlyPrice)/an"
                                  : "3 days free, then \(yearlyPrice)/year")
@@ -1177,10 +1274,10 @@ struct PaywallStartProgramScreen: View {
                         }
                     }
 
-                    // Legal disclaimer - auto-renewal notice (Apple requirement)
+                    // Legal disclaimer - Detailed cancellation instructions (additional info, not replacement)
                     Text(isFrench
-                         ? "Abonnement à renouvellement automatique. Annulation possible à tout moment dans Réglages > App Store > Abonnements."
-                         : "Auto-renewable subscription. Cancel anytime in Settings > App Store > Subscriptions.")
+                         ? "Annulation dans Réglages > App Store > Abonnements."
+                         : "Cancel in Settings > App Store > Subscriptions.")
                         .font(.custom("Poppins-Regular", size: 10))
                         .foregroundColor(.white.opacity(0.4))
                         .multilineTextAlignment(.center)
@@ -1238,6 +1335,7 @@ struct PaywallStartProgramScreen: View {
                     .allowsHitTesting(false)
                 )
             }
+            .ignoresSafeArea(edges: .bottom)
         }
     }
 }
@@ -1343,7 +1441,7 @@ struct ProgramPlanCard: View {
     private let cardHeight: CGFloat = 140
 
     private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+        Locale.current.language.languageCode?.identifier == "fr"
     }
 
     var body: some View {
@@ -1358,7 +1456,7 @@ struct ProgramPlanCard: View {
                             .foregroundColor(.white)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(Color(hex: "10B981"))
+                            .background(Color(hex: "8B5CF6"))
                             .clipShape(RoundedRectangle(cornerRadius: 6))
                     } else {
                         // Invisible spacer to maintain alignment
@@ -1391,7 +1489,7 @@ struct ProgramPlanCard: View {
                             Text(trial)
                                 .font(.custom("Poppins-Medium", size: 11))
                         }
-                        .foregroundColor(Color(hex: "10B981"))
+                        .foregroundColor(Color(hex: "8B5CF6"))
                         .padding(.top, 2)
                     } else {
                         // Spacer for alignment

@@ -15,6 +15,16 @@ struct EightHabitsFlowView: View {
     @State private var screenViewTime: Date?
     @State private var viewedHabits: Set<Int> = []
 
+    // Pre-computed star positions to avoid random in Canvas (fixes iPad freeze)
+    private let starPositions: [(CGFloat, CGFloat, CGFloat, CGFloat)] = [
+        (0.15, 0.3, 1.2, 0.5), (0.25, 0.6, 2.1, 0.7), (0.35, 0.2, 1.5, 0.4),
+        (0.45, 0.7, 2.3, 0.8), (0.55, 0.4, 1.8, 0.6), (0.65, 0.8, 2.0, 0.5),
+        (0.75, 0.3, 1.4, 0.3), (0.85, 0.6, 2.2, 0.7), (0.2, 0.5, 1.6, 0.4),
+        (0.4, 0.35, 2.4, 0.6), (0.6, 0.55, 1.3, 0.5), (0.8, 0.45, 1.9, 0.8),
+        (0.3, 0.75, 2.5, 0.4), (0.5, 0.25, 1.7, 0.6), (0.7, 0.65, 2.0, 0.3),
+        (0.9, 0.35, 1.5, 0.7)
+    ]
+
     // Les 8 habitudes avec leurs détails (localisés)
     private var habits: [Habit] {
         [
@@ -137,6 +147,19 @@ struct EightHabitsFlowView: View {
         habits[currentHabitIndex]
     }
 
+    // Adaptive sizing for iPad
+    private var isIPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
+
+    private var cardWidth: CGFloat {
+        isIPad ? 240 : 180
+    }
+
+    private var cardHeight: CGFloat {
+        isIPad ? 190 : 140
+    }
+
     var body: some View {
         ZStack {
             // Solid dark purple background
@@ -144,19 +167,20 @@ struct EightHabitsFlowView: View {
                 .ignoresSafeArea()
 
             // Main scrollable content
-            VStack(spacing: 0) {
-                // Title
-                Text("onboarding_v2.eight_habits.intro_title".localized)
-                    .font(.custom("Faro-BoldLucky", size: 32))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.white, Color(hex: "B794F6")],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Title
+                    Text("onboarding_v2.eight_habits.intro_title".localized)
+                        .font(.custom("Faro-BoldLucky", size: 32))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.white, Color(hex: "B794F6")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .padding(.top, 60)
-                    .padding(.bottom, 24)
+                        .padding(.top, 60)
+                        .padding(.bottom, 24)
 
                 // Habit carousel with navigation arrows and dark starry background
                 ZStack {
@@ -194,20 +218,11 @@ struct EightHabitsFlowView: View {
                     }
                     .frame(height: 180)
 
-                    // Simple stars without gradient
+                    // Simple stars without gradient - using pre-computed positions
                     Canvas { context, size in
-                        // Add some simple stars
-                        let starPositions: [(CGFloat, CGFloat)] = [
-                            (0.15, 0.3), (0.25, 0.6), (0.35, 0.2), (0.45, 0.7),
-                            (0.55, 0.4), (0.65, 0.8), (0.75, 0.3), (0.85, 0.6),
-                            (0.2, 0.5), (0.4, 0.35), (0.6, 0.55), (0.8, 0.45),
-                            (0.3, 0.75), (0.5, 0.25), (0.7, 0.65), (0.9, 0.35)
-                        ]
-
-                        for (x, y) in starPositions {
+                        for (x, y, starSize, opacity) in starPositions {
                             let starX = x * size.width
                             let starY = y * size.height
-                            let starSize = CGFloat.random(in: 1.0...2.5)
 
                             let rect = CGRect(
                                 x: starX - starSize / 2,
@@ -218,7 +233,7 @@ struct EightHabitsFlowView: View {
 
                             context.fill(
                                 Path(ellipseIn: rect),
-                                with: .color(.white.opacity(Double.random(in: 0.3...0.8)))
+                                with: .color(.white.opacity(opacity))
                             )
                         }
                     }
@@ -250,10 +265,10 @@ struct EightHabitsFlowView: View {
                         // Previous habit (left, 40% cut off on the left edge)
                         // Always visible - wraps to last habit when at index 0
                         let previousIndex = (currentHabitIndex - 1 + habits.count) % habits.count
-                        HabitCard(habit: habits[previousIndex], habitIndex: previousIndex)
+                        HabitCard(habit: habits[previousIndex], habitIndex: previousIndex, cardWidth: cardWidth, cardHeight: cardHeight)
                             .opacity(0.3)
                             .scaleEffect(0.85)
-                            .offset(x: -183)
+                            .offset(x: isIPad ? -243 : -183)
                             .onTapGesture {
                                 HapticManager.light()
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -262,16 +277,16 @@ struct EightHabitsFlowView: View {
                             }
 
                         // Current habit (center, full opacity)
-                        HabitCard(habit: currentHabit, isSelected: true, habitIndex: currentHabitIndex)
+                        HabitCard(habit: currentHabit, isSelected: true, habitIndex: currentHabitIndex, cardWidth: cardWidth, cardHeight: cardHeight)
                             .opacity(1.0)
 
                         // Next habit (right, 40% cut off on the right edge)
                         // Always visible - wraps to first habit when at last index
                         let nextIndex = (currentHabitIndex + 1) % habits.count
-                        HabitCard(habit: habits[nextIndex], habitIndex: nextIndex)
+                        HabitCard(habit: habits[nextIndex], habitIndex: nextIndex, cardWidth: cardWidth, cardHeight: cardHeight)
                             .opacity(0.3)
                             .scaleEffect(0.85)
-                            .offset(x: 183)
+                            .offset(x: isIPad ? 243 : 183)
                             .onTapGesture {
                                 HapticManager.light()
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -328,9 +343,8 @@ struct EightHabitsFlowView: View {
                 .clipped()
                 .padding(.bottom, 24)
 
-                // Benefits list
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
+                // Benefits list (now inside main VStack, not nested ScrollView)
+                VStack(alignment: .leading, spacing: 16) {
                         ForEach(currentHabit.benefits, id: \.self) { benefit in
                             HStack(alignment: .top, spacing: 12) {
                                 Image(systemName: "star.fill")
@@ -444,7 +458,10 @@ struct EightHabitsFlowView: View {
                             )
                     )
                     .padding(.horizontal, 24)
-                    .padding(.bottom, 120)
+                    .padding(.bottom, 140)
+
+                    // Spacer to ensure scrollability
+                    Spacer(minLength: 20)
                 }
                 .id(currentHabitIndex)
             }
@@ -610,6 +627,8 @@ struct HabitCard: View {
     let habit: Habit
     var isSelected: Bool = false
     var habitIndex: Int = 0
+    var cardWidth: CGFloat = 180
+    var cardHeight: CGFloat = 140
 
     private var backgroundImage: String {
         switch habitIndex {
@@ -639,14 +658,14 @@ struct HabitCard: View {
                 .minimumScaleFactor(0.8)
                 .padding(.horizontal, 12)
         }
-        .frame(width: 180, height: 140)
+        .frame(width: cardWidth, height: cardHeight)
         .background(
             ZStack {
                 // Background image
                 Image(backgroundImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 180, height: 140)
+                    .frame(width: cardWidth, height: cardHeight)
                     .clipShape(RoundedRectangle(cornerRadius: 24))
 
                 // Dark overlay for readability

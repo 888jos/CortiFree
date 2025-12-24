@@ -30,9 +30,10 @@ struct NotificationPermissionsView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Title
-                Text("onboarding_v2.notifications.stay_motivated".localized)
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Title
+                    Text("onboarding_v2.notifications.stay_motivated".localized)
                     .font(.custom("Poppins-Bold", size: 28))
                     .foregroundStyle(
                         LinearGradient(
@@ -77,10 +78,10 @@ struct NotificationPermissionsView: View {
                 }
                 .padding(.horizontal, 24)
 
-                Spacer()
+                    Spacer(minLength: 100)
 
-                // Continue button
-                Button(action: {
+                    // Continue button
+                    Button(action: {
                     #if DEBUG
                     print("🔔 NotificationPermissionsView: Bouton Suivant cliqué - Navigation vers HabitsProgress")
                     #endif
@@ -117,9 +118,10 @@ struct NotificationPermissionsView: View {
                                 )
                             )
                     )
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 40)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 40)
             }
         }
         .onAppear {

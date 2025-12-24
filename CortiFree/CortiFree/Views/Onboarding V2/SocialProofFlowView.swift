@@ -226,7 +226,7 @@ struct TestimonialCard: View {
             ZStack {
                 Circle()
                     .fill(Color(hex: "53D7D9").opacity(0.3))
-                    .frame(width: 50, height: 50)
+                    .responsiveFrame(width: 50, height: 50)
 
                 Text(String(testimonial.name.prefix(1)))
                     .font(.custom("Poppins-Bold", size: 20))

@@ -445,7 +445,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.3;
 				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
 				PRODUCT_BUNDLE_IDENTIFIER = Josbiot.App.CortiFree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -477,7 +477,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.3;
 				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
 				PRODUCT_BUNDLE_IDENTIFIER = Josbiot.App.CortiFree;
 				PRODUCT_NAME = "$(TARGET_NAME)";

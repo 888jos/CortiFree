@@ -64,12 +64,13 @@ struct CortiFreeRatingView: View {
             // Galaxy background
             GalaxyBackgroundView(intensity: 1.0)
 
-            VStack(spacing: 0) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
                     // Title
                     VStack(spacing: 4) {
                         if selectedTab == .current {
                             Text("onboarding_v2.rating.current_title".localized)
-                                .font(Font.Poppins.custom(.bold, size: 28))
+                                .font(Font.Poppins.custom(.bold, size: ResponsiveLayout.fontSize(base: 28)))
                                 .foregroundStyle(
                                     LinearGradient(
                                         colors: [.white, Color(hex: "B794F6")],
@@ -80,8 +81,10 @@ struct CortiFreeRatingView: View {
                                 .multilineTextAlignment(.center)
                         } else {
                             VStack(spacing: 0) {
-                                Text("onboarding_v2.rating.potential_title".localized)
-                                    .font(Font.Poppins.custom(.bold, size: 28))
+                                (Text("onboarding_v2.rating.potential_title".localized)
+                                    + Text(" ")
+                                    + Text("onboarding_v2.rating.after_66_days".localized))
+                                    .font(Font.Poppins.custom(.bold, size: ResponsiveLayout.fontSize(base: 28)))
                                     .foregroundStyle(
                                         LinearGradient(
                                             colors: [.white, Color(hex: "B794F6")],
@@ -89,23 +92,16 @@ struct CortiFreeRatingView: View {
                                             endPoint: .bottom
                                         )
                                     )
-                                Text("onboarding_v2.rating.after_66_days".localized)
-                                    .font(Font.Poppins.custom(.bold, size: 28))
-                                    .foregroundStyle(
-                                        LinearGradient(
-                                            colors: [.white, Color(hex: "B794F6")],
-                                            startPoint: .top,
-                                            endPoint: .bottom
-                                        )
-                                    )
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(nil)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                             .multilineTextAlignment(.center)
                         }
                     }
                     .padding(.horizontal, 32)
-                    .padding(.top, 40)
-                    .padding(.bottom, selectedTab == .potential ? 30 : 60)
-                    .frame(height: 130)
+                    .responsivePadding(.top, 40)
+                    .responsivePadding(.bottom, selectedTab == .potential ? 30 : 60)
 
                     // Stats Grid
                     LazyVGrid(columns: [
@@ -131,10 +127,9 @@ struct CortiFreeRatingView: View {
                         }
                     }
                     .padding(.horizontal, 24)
-                    .padding(.top, selectedTab == .potential ? 0 : 0)
-                    .padding(.bottom, 120)
 
-                Spacer()
+                    Spacer(minLength: 180)
+                }
             }
 
             // Bottom button

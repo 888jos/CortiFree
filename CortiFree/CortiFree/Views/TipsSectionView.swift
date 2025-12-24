@@ -1188,20 +1188,7 @@ struct TipCard: Identifiable {
                 TipContentSection(
                     icon: "heart.fill",
                     title: NSLocalizedString("tips.card.emergency_kit.section4.title", comment: ""),
-                    content: """
-                    Tu as le DROIT de :
-
-                    • Annuler des plans
-                    • Dire \"Je ne peux pas aujourd'hui\"
-                    • Prendre une journée de repos mental
-                    • Déléguer ce qui peut l'être
-                    • Mettre ton téléphone en mode avion
-
-                    Prendre soin de toi ≠ Égoïsme.
-                    C'est de la SURVIE.
-
-                    Si tu ne vas pas bien, tu ne peux aider personne.
-                    """
+                    content: NSLocalizedString("tips.card.emergency_kit.section4.content", comment: "")
                 ),
                 TipContentSection(
                     icon: "checkmark.circle.fill",

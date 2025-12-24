@@ -27,9 +27,10 @@ struct FirstLaunchWelcomeView: View {
             Color.black.opacity(0.4)
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Top section: Title + Description + Benefits
-                VStack(alignment: .leading, spacing: 24) {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Top section: Title + Description + Benefits
+                    VStack(alignment: .leading, spacing: 24) {
                     // Main title
                     if showContent {
                         Text("onboarding_v2.welcome.title".localized)
@@ -115,6 +116,7 @@ struct FirstLaunchWelcomeView: View {
                     .padding(.horizontal, 40)
                     .padding(.bottom, 50)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
                 }
             }
         }

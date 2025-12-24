@@ -1758,6 +1758,53 @@
 "library.meditation.focus" = "Focus meditation";
 "library.meditation.sleep" = "Sleep meditation";
 
+// MARK: - Exercise Instructions
+
+// Generic Exercise
+"exercise.generic.enjoy_time" = "Take this time for yourself";
+"exercise.generic.finish_now" = "Finish now";
+
+// Guided Meditation Session
+"meditation.session.completed" = "Session completed";
+"meditation.session.step_progress" = "Step %d of %d";
+"meditation.session.finish" = "Finish";
+"meditation.session.next" = "Next";
+
+// Compassion Meditation - Enhanced Affirmations
+"meditation.compassion.enhanced_step_1.title" = "Place your hand on your heart";
+"meditation.compassion.enhanced_step_1.subtitle" = "Feel its warmth, its rhythm";
+"meditation.compassion.enhanced_step_2.subtitle" = "Repeat 3 times, really feel each word";
+"meditation.compassion.enhanced_step_3.subtitle" = "Let this truth enter you";
+"meditation.compassion.enhanced_step_4.subtitle" = "Feel the gentleness of these words";
+"meditation.compassion.enhanced_step_5.subtitle" = "Breathe with kindness";
+"meditation.compassion.enhanced_step_6.subtitle" = "You are worthy of all the love in the world";
+"meditation.compassion.enhanced_step_7.subtitle" = "End gently, keep this warmth within you";
+
+// Grounding Exercise - 5 Senses
+"exercise.grounding_basic.step_1.sense" = "Sight";
+"exercise.grounding_basic.step_1.instruction" = "Name 5 things you see";
+"exercise.grounding_basic.step_1.subtitle" = "Look around you";
+
+"exercise.grounding_basic.step_2.sense" = "Touch";
+"exercise.grounding_basic.step_2.instruction" = "Name 4 things you touch";
+"exercise.grounding_basic.step_2.subtitle" = "Feel the textures";
+
+"exercise.grounding_basic.step_3.sense" = "Hearing";
+"exercise.grounding_basic.step_3.instruction" = "Name 3 sounds you hear";
+"exercise.grounding_basic.step_3.subtitle" = "Listen carefully";
+
+"exercise.grounding_basic.step_4.sense" = "Smell";
+"exercise.grounding_basic.step_4.instruction" = "Name 2 smells you sense";
+"exercise.grounding_basic.step_4.subtitle" = "Breathe deeply";
+
+"exercise.grounding_basic.step_5.sense" = "Taste";
+"exercise.grounding_basic.step_5.instruction" = "Name 1 taste";
+"exercise.grounding_basic.step_5.subtitle" = "Focus on your mouth";
+
+// Exercise Buttons
+"exercise.button.next" = "Next";
+"exercise.button.finish" = "Finish";
+
 // MARK: - Breathing Detail View
 "breathing_detail.category_badge" = "BREATHING";
 "breathing_detail.how_it_works" = "How it works?";
@@ -1807,10 +1854,10 @@
 "breathing_pattern.four_seven_eight.detailed_description" = "A powerful method to instantly calm your nervous system by controlling your breathing in a precise rhythm that reduces anxiety and facilitates rapid falling asleep";
 "breathing_pattern.coherence.detailed_description" = "Breathe at a rhythm of six cycles per minute to create optimal balance between your heart and brain, thereby measurably reducing cortisol";
 "breathing_pattern.slow66.detailed_description" = "Extend each breathing phase to six seconds to progressively slow your heart rate and signal to your body that it's time to rest deeply";
-"breathing_pattern.triangle.detailed_description" = "Equalize the three phases of your breath to create a regular rhythm that quickly soothes your mind and reduces all physical tensions accumulated during your day";
+"breathing_pattern.triangle.detailed_description" = "Equalize the three phases of your breath to create a regular rhythm that soothes your mind and reduces all accumulated physical tensions";
 "breathing_pattern.box.detailed_description" = "The technique used by special forces to maintain calm in intense stress by breathing in four equal beats that synchronize your heart rate";
-"breathing_pattern.kapalabhati.detailed_description" = "A dynamic yogic technique that cleanses your respiratory system and stimulates your vital energy through rapid and active exhalations that intensely oxygenate your brain and body";
-"breathing_pattern.bhastrika.detailed_description" = "A powerful and rhythmic breath that generates intense internal heat and boosts your physical energy by dramatically increasing the oxygenation of your entire organism and nervous system";
+"breathing_pattern.kapalabhati.detailed_description" = "A dynamic yogic technique that cleanses your respiratory system and stimulates vital energy through rapid exhalations that intensely oxygenate brain and body";
+"breathing_pattern.bhastrika.detailed_description" = "A powerful rhythmic breath that generates intense heat and boosts physical energy by dramatically increasing oxygenation of your organism and nervous system";
 
 // MARK: - Breathing Pattern Benefits
 "breathing_pattern.deep_abdominal.benefit_1" = "Activates vagus nerve";
@@ -1900,14 +1947,14 @@
 "breathing_pattern.default.source" = "Sources: Scientific Research";
 
 // MARK: - Meditation Detailed Descriptions
-"meditation.conscious_breathing.detailed_description" = "Simply observe your natural breath without trying to change it. This activates your parasympathetic nervous system, reducing stress hormones and creating an immediate state of calm that spreads throughout your entire body naturally.";
-"meditation.body_scan.detailed_description" = "Mentally scan your body from head to toe, bringing awareness to each area. Notice sensations without judgment and consciously release accumulated tensions, bringing rapid relaxation and developing deep body awareness and connection.";
-"meditation.mindfulness.detailed_description" = "Learn to observe your thoughts like clouds passing through the sky, without judgment or attachment. This practice develops present-moment awareness, reduces mental rumination, and improves your ability to respond mindfully rather than react impulsively.";
-"meditation.grounding.detailed_description" = "The 5-4-3-2-1 anchoring technique uses your five senses to reconnect you instantly to the present moment. By engaging with what you can see, touch, hear, smell, and taste, you interrupt anxiety cycles and stop panic attacks.";
-"meditation.visualization.detailed_description" = "Create a detailed mental sanctuary, a safe place where you feel completely at peace. By vividly imagining this refuge with all your senses, you can access it anytime to reduce stress, calm anxiety, and restore inner peace.";
-"meditation.compassion.detailed_description" = "Treat yourself with the same kindness, understanding, and patience you would naturally offer a dear friend. This self-compassion practice reduces harsh self-criticism, cultivates inner warmth, and strengthens your self-esteem and emotional resilience over time.";
-"meditation.focus_clarity.detailed_description" = "Train your mind like a muscle by repeatedly bringing attention back to a single focal point. This mental exercise strengthens your concentration capacity, reduces distractions, improves decision-making clarity, and enhances your ability to maintain sustained focus.";
-"meditation.yoga_nidra.detailed_description" = "Yoga Nidra guides you into deep relaxation while maintaining awareness. This practice systematically relaxes every part of your body and mind, preparing you for restorative sleep and helping you access profound states of rest and recovery.";
+"meditation.conscious_breathing.detailed_description" = "Observe your natural breath without changing it. Activates your parasympathetic system, reduces stress hormones and creates immediate calm throughout your entire body.";
+"meditation.body_scan.detailed_description" = "Scan your body from head to toe. Notice sensations in each area without judgment and consciously release all accumulated tensions for rapid relaxation.";
+"meditation.mindfulness.detailed_description" = "Observe your thoughts like clouds passing, without judgment or attachment. Develops present-moment awareness, reduces mental rumination and improves mindful responses over impulses.";
+"meditation.grounding.detailed_description" = "Use your five senses to reconnect instantly to the present moment. Engage with what you see, touch, hear, smell and taste. Interrupts anxiety cycles immediately.";
+"meditation.visualization.detailed_description" = "Create a safe mental sanctuary where you feel completely at peace. Imagine this refuge with all your senses. Access it anytime to reduce stress and anxiety.";
+"meditation.compassion.detailed_description" = "Treat yourself with the same kindness and patience you'd offer a dear friend. This practice reduces self-criticism, cultivates inner warmth and strengthens your self-esteem.";
+"meditation.focus_clarity.detailed_description" = "Train your mind like a muscle by bringing attention back to a single focal point. Strengthens concentration, reduces distractions and improves decision-making clarity and sustained focus.";
+"meditation.yoga_nidra.detailed_description" = "Yoga Nidra guides you into deep relaxation while maintaining awareness. Systematically relaxes every part of body and mind for restorative sleep and profound rest.";
 
 // MARK: - Meditation Benefits
 "meditation.conscious_breathing.benefit_1" = "Reduces anxiety";
@@ -1998,7 +2045,7 @@
 // MARK: - Anti-Stress Exercises
 
 // MARK: - Slow Walk
-"antistress.slow_walk.detailed_description" = "Walk slowly and mindfully to reconnect with your body and the present moment by observing every physical sensation and each step you take on the ground. This practice activates your parasympathetic nervous system, bringing immediate calm to your racing thoughts and stressed body.";
+"antistress.slow_walk.detailed_description" = "Walk slowly and mindfully to reconnect with your body. Observe every physical sensation and each step. Activates your parasympathetic system bringing immediate calm to racing thoughts.";
 
 "antistress.slow_walk.benefit_1" = "Immediate grounding";
 "antistress.slow_walk.benefit_2" = "Mental calm";
@@ -2009,9 +2056,10 @@
 "antistress.slow_walk.evidence_2" = "Improves body awareness and reduces tension";
 "antistress.slow_walk.evidence_3" = "Promotes natural endorphin production";
 "antistress.slow_walk.source" = "Journal of Environmental Psychology (2019)";
+"antistress.slow_walk.subtitle" = "Mindful walk to recenter yourself";
 
 // MARK: - Conscious Stretching
-"antistress.conscious_stretching.detailed_description" = "Stretch gently while focusing all your attention on each muscle you engage to progressively release physical tensions accumulated in your body throughout the day. This conscious stretching practice combines movement with awareness, creating a powerful mind-body connection that melts away stress and restores vitality.";
+"antistress.conscious_stretching.detailed_description" = "Stretch gently while focusing attention on each muscle. Progressively release physical tensions accumulated throughout the day. Combines movement with awareness creating mind-body connection that melts stress and restores vitality.";
 
 "antistress.conscious_stretching.benefit_1" = "Releases tensions";
 "antistress.conscious_stretching.benefit_2" = "Flexibility";
@@ -2022,9 +2070,10 @@
 "antistress.conscious_stretching.evidence_2" = "Improves blood circulation and oxygenation";
 "antistress.conscious_stretching.evidence_3" = "Decreases stress-related chronic pain";
 "antistress.conscious_stretching.source" = "Physical Therapy Journal (2017)";
+"antistress.conscious_stretching.subtitle" = "Gentle stretches to release tension";
 
 // MARK: - Audio Relaxation
-"antistress.audio_relaxation.detailed_description" = "Listen carefully to guided audio that will progressively lead you toward a state of deep relaxation by relaxing each part of your body and calming your mind completely. The soothing voice and carefully crafted instructions work together to activate your natural relaxation response, melting away stress and tension.";
+"antistress.audio_relaxation.detailed_description" = "Listen to guided audio that progressively leads you toward deep relaxation. Soothing voice and crafted instructions activate your natural relaxation response, melting away stress and tension completely.";
 
 "antistress.audio_relaxation.benefit_1" = "Deep relaxation";
 "antistress.audio_relaxation.benefit_2" = "Inner calm";
@@ -2035,9 +2084,10 @@
 "antistress.audio_relaxation.evidence_2" = "Reduces stress-related brain activity";
 "antistress.audio_relaxation.evidence_3" = "Improves sleep quality by 40%";
 "antistress.audio_relaxation.source" = "Sleep Medicine Reviews (2018)";
+"antistress.audio_relaxation.subtitle" = "Deep relaxation through guided listening";
 
 // MARK: - White Noise
-"antistress.white_noise.detailed_description" = "Let yourself be soothed by calming sounds that will mask disturbing environmental noises to create a relaxing sound bubble that calms your nervous system and promotes your mental concentration. White noise works by providing consistent auditory stimulation that helps your brain focus and relax simultaneously.";
+"antistress.white_noise.detailed_description" = "Let calming sounds soothe you and mask disturbing noises. Creates a relaxing sound bubble that calms your nervous system and promotes concentration by providing consistent auditory stimulation.";
 
 "antistress.white_noise.benefit_1" = "Concentration";
 "antistress.white_noise.benefit_2" = "Sound calm";
@@ -2048,9 +2098,10 @@
 "antistress.white_noise.evidence_2" = "Improves falling asleep by 38%";
 "antistress.white_noise.evidence_3" = "Reduces excessive mental activity";
 "antistress.white_noise.source" = "Journal of Sleep Research (2017)";
+"antistress.white_noise.subtitle" = "Calming sounds to soothe the mind";
 
 // MARK: - Positive Mantra
-"antistress.positive_mantra.detailed_description" = "Consciously repeat powerful positive affirmations to reprogram your mind by replacing negative thoughts with constructive beliefs that strengthen your confidence and personal self-esteem. This ancient practice, now validated by neuroscience, creates new neural pathways that support wellbeing and resilience against stress and adversity.";
+"antistress.positive_mantra.detailed_description" = "Repeat powerful positive affirmations to reprogram your mind. Replace negative thoughts with constructive beliefs that strengthen confidence and self-esteem. Creates new neural pathways supporting wellbeing and resilience against stress.";
 
 "antistress.positive_mantra.benefit_1" = "Confidence";
 "antistress.positive_mantra.benefit_2" = "Positive thoughts";
@@ -2061,9 +2112,10 @@
 "antistress.positive_mantra.evidence_2" = "Strengthens confidence and self-esteem";
 "antistress.positive_mantra.evidence_3" = "Reduces anticipatory anxiety";
 "antistress.positive_mantra.source" = "Journal of Clinical Psychology (2018)";
+"antistress.positive_mantra.subtitle" = "Positive affirmations to strengthen the mind";
 
 // MARK: - Visual Micro Break
-"antistress.visual_micro_break.detailed_description" = "Rest your tired eyes by focusing your gaze on a distant point or closing your eyelids to relieve accumulated eye fatigue and prevent headaches. In our screen-dominated world, regular visual breaks are essential to maintain eye health and prevent digital eye strain symptoms that affect productivity.";
+"antistress.visual_micro_break.detailed_description" = "Rest tired eyes by gazing at a distant point or closing eyelids. Relieves accumulated eye fatigue and prevents headaches. Regular visual breaks maintain eye health and prevent digital strain.";
 
 "antistress.visual_micro_break.benefit_1" = "Rests eyes";
 "antistress.visual_micro_break.benefit_2" = "Visual clarity";
@@ -2797,7 +2849,7 @@
 
 // MARK: - Onboarding V2 - Reassurance View
 "onboarding_v2.reassurance.greeting" = "Thank you";
-"onboarding_v2.reassurance.message_part1" = "it's okay. You're not alone.";
+"onboarding_v2.reassurance.message_part1" = "You're not alone in this situation.";
 "onboarding_v2.reassurance.message_part2" = "Thousands of people like you have already found their serenity with CortiFree.";
 "onboarding_v2.reassurance.message_part3" = "Now, we'll do a quick quiz to better understand your situation and personalize your journey.";
 "onboarding_v2.reassurance.start_quiz" = "Start the quiz";
@@ -2843,30 +2895,35 @@
 "onboarding_v2.habits.q8_opt2" = "Tired";
 "onboarding_v2.habits.q8_opt3" = "Okay";
 "onboarding_v2.habits.q8_opt4" = "Full of energy";
-"onboarding_v2.habits.q9" = "How did you hear about CortiFree?";
-"onboarding_v2.habits.q9_opt1" = "App Store";
-"onboarding_v2.habits.q9_opt2" = "Instagram";
-"onboarding_v2.habits.q9_opt3" = "TikTok";
-"onboarding_v2.habits.q9_opt4" = "Word of mouth";
-"onboarding_v2.habits.q9_opt5" = "Advertisement";
-"onboarding_v2.habits.q9_opt6" = "Other";
-"onboarding_v2.habits.q10" = "Have you tried other wellness or meditation apps before?";
-"onboarding_v2.habits.q10_opt1" = "No, never";
-"onboarding_v2.habits.q10_opt2" = "Yes, but I stopped";
-"onboarding_v2.habits.q10_opt3" = "Yes, I still use one";
-"onboarding_v2.habits.q10_opt4" = "Yes, I've tried several";
-"onboarding_v2.habits.q11" = "What would you most like to improve?";
-"onboarding_v2.habits.q11_opt1" = "Sleep better";
-"onboarding_v2.habits.q11_opt2" = "Reduce my stress";
-"onboarding_v2.habits.q11_opt3" = "Have more energy";
-"onboarding_v2.habits.q11_opt4" = "Focus better";
-"onboarding_v2.habits.q11_opt5" = "Better overall balance";
-"onboarding_v2.habits.q12" = "How much time can you dedicate daily to your wellbeing?";
-"onboarding_v2.habits.q12_opt1" = "Less than 15 minutes";
-"onboarding_v2.habits.q12_opt2" = "15-30 minutes";
-"onboarding_v2.habits.q12_opt3" = "30-45 minutes";
-"onboarding_v2.habits.q12_opt4" = "45-60 minutes";
-"onboarding_v2.habits.q12_opt5" = "More than an hour";
+"onboarding_v2.habits.q9" = "How do you feel about your physical appearance lately?";
+"onboarding_v2.habits.q9_opt1" = "I feel good in my skin, confident and energetic";
+"onboarding_v2.habits.q9_opt2" = "A few imperfections bother me but overall it's okay";
+"onboarding_v2.habits.q9_opt3" = "I struggle with my reflection, visible fatigue and dull skin";
+"onboarding_v2.habits.q9_opt4" = "I don't recognize myself: dark circles, gray complexion, weight changes";
+"onboarding_v2.habits.q10" = "How did you hear about CortiFree?";
+"onboarding_v2.habits.q10_opt1" = "App Store";
+"onboarding_v2.habits.q10_opt2" = "Instagram";
+"onboarding_v2.habits.q10_opt3" = "TikTok";
+"onboarding_v2.habits.q10_opt4" = "Word of mouth";
+"onboarding_v2.habits.q10_opt5" = "Advertisement";
+"onboarding_v2.habits.q10_opt6" = "Other";
+"onboarding_v2.habits.q11" = "Have you tried other wellness or meditation apps before?";
+"onboarding_v2.habits.q11_opt1" = "No, never";
+"onboarding_v2.habits.q11_opt2" = "Yes, but I stopped";
+"onboarding_v2.habits.q11_opt3" = "Yes, I still use one";
+"onboarding_v2.habits.q11_opt4" = "Yes, I've tried several";
+"onboarding_v2.habits.q12" = "What would you most like to improve?";
+"onboarding_v2.habits.q12_opt1" = "Sleep better";
+"onboarding_v2.habits.q12_opt2" = "Reduce my stress";
+"onboarding_v2.habits.q12_opt3" = "Have more energy";
+"onboarding_v2.habits.q12_opt4" = "Focus better";
+"onboarding_v2.habits.q12_opt5" = "Better overall balance";
+"onboarding_v2.habits.q13" = "How much time can you dedicate daily to your wellbeing?";
+"onboarding_v2.habits.q13_opt1" = "Less than 15 minutes";
+"onboarding_v2.habits.q13_opt2" = "15-30 minutes";
+"onboarding_v2.habits.q13_opt3" = "30-45 minutes";
+"onboarding_v2.habits.q13_opt4" = "45-60 minutes";
+"onboarding_v2.habits.q13_opt5" = "More than an hour";
 
 // MARK: - Onboarding V2 - Sixty Days Explanation
 "onboarding_v2.sixty_days.title" = "Why 60 days?";
@@ -2963,6 +3020,7 @@
 // MARK: - Onboarding V2 - Eight Habits Intro
 "onboarding_v2.eight_habits.intro_title" = "The 8 key habits";
 "onboarding_v2.eight_habits.intro_subtitle" = "for a serene life";
+"onboarding_v2.eight_habits.intro_description" = "To reduce your cortisol levels, you need the 8 fundamental habits below.";
 
 // MARK: - Onboarding V2 - Eight Habits Details
 "onboarding_v2.eight_habits.breathing.title" = "Breathe consciously";
@@ -3321,6 +3379,16 @@
 "settings.alert.clear_data.message" = "This will delete all your local data. This action cannot be undone.";
 "settings.alert.clear_data.button" = "Clear";
 
+// MARK: - Settings Bug Report
+"settings.bug_report.title" = "Report a bug";
+"settings.bug_report.subtitle" = "Help us improve the app";
+"settings.bug_report.description_label" = "Describe the problem";
+"settings.bug_report.screenshot_label" = "Add a screenshot (optional)";
+"settings.bug_report.choose_image" = "Choose an image";
+"settings.bug_report.submit" = "Send report";
+"settings.bug_report.cancel" = "Cancel";
+"settings.bug_report.success" = "Bug report sent!";
+
 // MARK: - Settings Statistics Section
 "settings.streak.title" = "Current streak";
 "settings.streak.subtitle" = "Consecutive days of activity";
@@ -3362,3 +3430,41 @@
 
 // MARK: - Task Detail
 "task.detail.total" = "total";
+
+// MARK: - Onboarding V2 - Custom Paywall
+"onboarding_v2.paywall.title" = "Your personalized 66-day plan is ready";
+"onboarding_v2.paywall.promise_stress" = "Reduce your stress and cortisol in just 66 days";
+"onboarding_v2.paywall.promise_habits" = "Master the 8 key habits to transform your life";
+"onboarding_v2.paywall.promise_science" = "Based on neuroscience and clinical studies";
+"onboarding_v2.paywall.benefit_plan" = "Your personalized 66-day plan";
+"onboarding_v2.paywall.benefit_tracking" = "Daily progress tracking";
+"onboarding_v2.paywall.benefit_exercises" = "Anti-stress exercises on demand";
+"onboarding_v2.paywall.benefit_support" = "24/7 support and guidance";
+"onboarding_v2.paywall.chart_title" = "%@'s improvement in 66 days";
+"onboarding_v2.paywall.without_app" = "Without CortiFree";
+"onboarding_v2.paywall.start_today" = "If you start today";
+"onboarding_v2.paywall.transformed_by" = "you'll be transformed by";
+"onboarding_v2.paywall.feature_program_title" = "Your personalized program";
+"onboarding_v2.paywall.feature_program_desc" = "A custom plan adapted to your stress profile and goals";
+"onboarding_v2.paywall.feature_exercises_title" = "Anti-stress exercises";
+"onboarding_v2.paywall.feature_exercises_desc" = "Breathing, meditation, grounding techniques available 24/7";
+"onboarding_v2.paywall.feature_tracking_title" = "Progress tracking";
+"onboarding_v2.paywall.feature_tracking_desc" = "Visualize your evolution and stay motivated every day";
+"onboarding_v2.paywall.feature_support_title" = "Continuous support";
+"onboarding_v2.paywall.feature_support_desc" = "Expert advice and personalized recommendations";
+"onboarding_v2.paywall.start_program" = "Start my program";
+"onboarding_v2.paywall.restore" = "Restore purchases";
+"onboarding_v2.paywall.terms" = "Terms of Service";
+"onboarding_v2.paywall.privacy" = "Privacy Policy";
+"onboarding_v2.paywall.start_screen_title" = "Ready to transform your life?";
+"onboarding_v2.paywall.start_screen_subtitle" = "Choose the plan that suits you best";
+"onboarding_v2.paywall.start_feature_1" = "66-day personalized program";
+"onboarding_v2.paywall.start_feature_2" = "Anti-stress exercises 24/7";
+"onboarding_v2.paywall.start_feature_3" = "Daily progress tracking";
+"onboarding_v2.paywall.start_feature_4" = "Expert support";
+"onboarding_v2.paywall.start_feature_5" = "Science-backed techniques";
+"onboarding_v2.paywall.subscribe_yearly" = "Subscribe for %@/year";
+"onboarding_v2.paywall.subscribe_monthly" = "Subscribe for %@/month";
+"onboarding_v2.paywall.best_value" = "Best value";
+"onboarding_v2.paywall.most_popular" = "Most popular";
+"onboarding_v2.paywall.legal" = "Subscription auto-renews unless canceled 24 hours before the end of the current period.";

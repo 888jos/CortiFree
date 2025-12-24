@@ -245,6 +245,7 @@ class MixpanelManager {
         habitsScore: Int,
         balanceScore: Int,
         globalScore: Int,
+        appearanceConcern: String,
         baselineWakeTime: String?,
         baselineSleepDuration: Double?,
         baselineWaterIntake: Double?,
@@ -254,7 +255,25 @@ class MixpanelManager {
         hasPhysicalLimitations: Bool?,
         primaryGoal: String?
     ) {
-        track(event: "onboarding_habits_quiz_clicked")
+        track(event: "onboarding_habits_quiz_clicked", properties: [
+            "total_time": totalTime,
+            "serenity_score": serenityScore,
+            "sleep_score": sleepScore,
+            "energy_score": energyScore,
+            "focus_score": focusScore,
+            "habits_score": habitsScore,
+            "balance_score": balanceScore,
+            "global_score": globalScore,
+            "appearance_concern": appearanceConcern,
+            "baseline_wake_time": baselineWakeTime ?? "",
+            "baseline_sleep_duration": baselineSleepDuration ?? 0.0,
+            "baseline_water_intake": baselineWaterIntake ?? 0.0,
+            "baseline_exercise_frequency": baselineExerciseFrequency ?? 0,
+            "baseline_meditation_frequency": baselineMeditationFrequency ?? 0,
+            "baseline_available_time": baselineAvailableTime ?? "",
+            "has_physical_limitations": hasPhysicalLimitations ?? false,
+            "primary_goal": primaryGoal ?? ""
+        ])
     }
 
     func trackOnboardingMarketingData(acquisitionChannel: String?, previousAppExperience: String?) {

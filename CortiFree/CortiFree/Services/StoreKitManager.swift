@@ -154,15 +154,45 @@ class StoreKitManager: ObservableObject {
 
     /// Charge les produits depuis App Store Connect
     func loadProducts() async {
-        guard !isLoading else { return }
+        guard !isLoading else {
+            #if DEBUG
+            print("⚠️ StoreKit: loadProducts() appelé alors qu'un chargement est déjà en cours")
+            #endif
+            return
+        }
 
         isLoading = true
         errorMessage = nil
         productsLoaded = false
 
+        #if DEBUG
+        print("🔄 StoreKit: Début du chargement des produits...")
+        print("   📋 Product IDs demandés: \(Self.allProductIDs)")
+        print("   🌐 Environnement: \(AppStore.canMakePayments ? "Paiements autorisés" : "⚠️ PAIEMENTS DÉSACTIVÉS")")
+        #endif
+
         do {
             // Requête vers l'App Store pour récupérer les vrais produits
+            #if DEBUG
+            print("   🔍 Envoi de la requête vers App Store Connect...")
+            #endif
+
             products = try await Product.products(for: Self.allProductIDs)
+
+            #if DEBUG
+            print("   ✅ Réponse reçue: \(products.count) produit(s)")
+
+            // Si aucun produit n'est retourné, diagnostiquer
+            if products.isEmpty {
+                print("   ⚠️ AUCUN PRODUIT RETOURNÉ - Vérifications nécessaires:")
+                print("      1. Les Product IDs existent-ils dans App Store Connect?")
+                print("         • \(Self.yearlyProductID)")
+                print("         • \(Self.monthlyProductID)")
+                print("      2. Les produits sont-ils en statut 'Ready to Submit'?")
+                print("      3. Êtes-vous connecté avec un compte Sandbox?")
+                print("      4. Les Product IDs correspondent-ils exactement (casse sensible)?")
+            }
+            #endif
 
             // Trier: annuel en premier
             products.sort { product1, product2 in
@@ -177,6 +207,8 @@ class StoreKitManager: ObservableObject {
             print("📦 StoreKit: Chargé \(products.count) produits depuis App Store Connect")
             for product in products {
                 print("   ✓ \(product.id): \(product.displayPrice)")
+                print("     └─ Prix brut: \(product.price)")
+                print("     └─ Devise: \(product.priceFormatStyle.currencyCode ?? "N/A")")
                 if let subscription = product.subscription {
                     print("     └─ Période: \(subscription.subscriptionPeriod.value) \(subscription.subscriptionPeriod.unit)")
                     if let intro = subscription.introductoryOffer {
@@ -190,25 +222,68 @@ class StoreKitManager: ObservableObject {
             productsLoaded = false
 
             #if DEBUG
-            print("❌ StoreKit: Erreur de chargement des produits")
-            print("   \(error.localizedDescription)")
+            print("❌ StoreKit: ERREUR de chargement des produits")
+            print("   📝 Description: \(error.localizedDescription)")
+            print("   🔍 Type d'erreur: \(type(of: error))")
+            print("   💡 Erreur complète: \(error)")
+
+            // Erreurs StoreKit courantes
+            if let storeError = error as? StoreKitError {
+                print("   🛠️ StoreKitError détecté:")
+                switch storeError {
+                case .networkError:
+                    print("      → Problème de connexion réseau")
+                case .userCancelled:
+                    print("      → Utilisateur a annulé")
+                case .notAvailableInStorefront:
+                    print("      → Produits non disponibles dans ce storefront")
+                case .notEntitled:
+                    print("      → Pas de droit d'accès")
+                case .unknown:
+                    print("      → Erreur inconnue")
+                @unknown default:
+                    print("      → Erreur non gérée: \(storeError)")
+                }
+            }
+
+            print("   ⚠️ DIAGNOSTICS RECOMMANDÉS:")
+            print("      • Vérifier la connexion Internet")
+            print("      • Se déconnecter/reconnecter du compte Sandbox")
+            print("      • Vérifier que les produits existent dans App Store Connect")
+            print("      • Vérifier que les Product IDs correspondent exactement")
             #endif
         }
 
         isLoading = false
+
+        #if DEBUG
+        print("🏁 StoreKit: Fin du chargement - isLoading: false, productsLoaded: \(productsLoaded)")
+        #endif
     }
 
     // MARK: - Purchase
 
     /// Achète un produit par son ID
     func purchase(_ productID: String) async -> PurchaseResult {
+        #if DEBUG
+        print("🛒 StoreKit: Tentative d'achat pour Product ID: \(productID)")
+        print("   📦 Produits disponibles: \(products.map { $0.id })")
+        print("   🔢 Nombre de produits: \(products.count)")
+        #endif
+
         guard let product = products.first(where: { $0.id == productID }) else {
             errorMessage = "Produit non trouvé"
             #if DEBUG
-            print("❌ StoreKit: Produit '\(productID)' non trouvé")
+            print("❌ StoreKit: Produit '\(productID)' NON TROUVÉ dans la liste des produits chargés")
+            print("   ⚠️ Raison probable: loadProducts() n'a pas réussi à charger les produits")
+            print("   💡 productsLoaded: \(productsLoaded)")
             #endif
             return .failed(StoreError.productNotFound)
         }
+
+        #if DEBUG
+        print("   ✅ Produit trouvé: \(product.displayName) - \(product.displayPrice)")
+        #endif
 
         return await purchase(product)
     }

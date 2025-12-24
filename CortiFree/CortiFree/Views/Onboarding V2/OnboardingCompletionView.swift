@@ -27,28 +27,6 @@ struct OnboardingCompletionView: View {
     private let bypassPaywallForTesting = false
     #endif
 
-    // Get user name from UserDefaults
-    private var userName: String {
-        UserDefaults.standard.string(forKey: "userFirstName") ?? "toi"
-    }
-
-    // Calculate scores from quiz result
-    private var baselineScores: [Double] {
-        guard let result = habitsQuizResult else {
-            return [0.4, 0.35, 0.45, 0.5, 0.4]
-        }
-        return [
-            Double(result.serenityScore) / 100.0,
-            Double(result.sleepScore) / 100.0,
-            Double(result.energyScore) / 100.0,
-            Double(result.focusScore) / 100.0,
-            Double(result.balanceScore) / 100.0
-        ]
-    }
-
-    private var potentialScores: [Double] {
-        [0.85, 0.80, 0.90, 0.88, 0.82]
-    }
 
     var body: some View {
         Group {
@@ -110,10 +88,7 @@ struct OnboardingCompletionView: View {
                                 purchaseError = "Aucun achat à restaurer"
                             }
                         }
-                    },
-                    userName: userName,
-                    baselineScores: baselineScores,
-                    potentialScores: potentialScores
+                    }
                 )
                 .onAppear {
                     // Track paywall/completion screen viewed
@@ -160,26 +135,35 @@ struct OnboardingCompletionView: View {
         // TODO: Get actual notifications permission status
         let notificationsEnabled = false // Placeholder
 
+        // Get user name from Auth
+        let currentUser = Auth.auth().currentUser
+        let firstName: String? = {
+            if let displayName = currentUser?.displayName, !displayName.isEmpty {
+                return displayName.components(separatedBy: " ").first
+            }
+            return UserDefaults.standard.string(forKey: "userFirstName")
+        }()
+
         // Track complete onboarding with all data
         MixpanelManager.shared.trackOnboardingCompleted(
             totalTime: totalTime,
             quizGlobalScore: result.globalScore,
             selectedGoalsCount: 1, // Derived from quiz
             notificationsEnabled: notificationsEnabled,
-            userId: Auth.auth().currentUser?.uid,
-            firstName: userName,
+            userId: currentUser?.uid,
+            firstName: firstName,
             age: nil,
             gender: nil
         )
 
         // Set user profile if authenticated
-        if let userId = Auth.auth().currentUser?.uid {
+        if let userId = currentUser?.uid {
             MixpanelManager.shared.identify(userId: userId)
 
             // Set user profile with quiz data
             MixpanelManager.shared.setUserProfile(
-                firstName: userName,
-                email: Auth.auth().currentUser?.email,
+                firstName: firstName,
+                email: currentUser?.email,
                 age: nil,
                 gender: nil,
                 globalScore: result.globalScore,

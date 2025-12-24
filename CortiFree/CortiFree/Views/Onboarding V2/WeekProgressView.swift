@@ -125,7 +125,7 @@ struct WeekProgressView: View {
                         // Background hexagon grid
                         HexagonRadarGrid()
                             .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                            .frame(width: 280, height: 280)
+                            .responsiveFrame(width: 280, height: 280)
 
                         // Filled hexagon based on progress with gradient
                         HexagonRadarFill(progress: currentWeekData.progress)
@@ -139,7 +139,7 @@ struct WeekProgressView: View {
                                     endPoint: .bottom
                                 )
                             )
-                            .frame(width: 280, height: 280)
+                            .responsiveFrame(width: 280, height: 280)
 
                         // Stroke around the filled hexagon
                         HexagonRadarFill(progress: currentWeekData.progress)
@@ -147,7 +147,7 @@ struct WeekProgressView: View {
                                 currentWeekData.color.opacity(0.5),
                                 lineWidth: 8
                             )
-                            .frame(width: 280, height: 280)
+                            .responsiveFrame(width: 280, height: 280)
 
                         // Labels at hexagon vertices
                         ZStack {

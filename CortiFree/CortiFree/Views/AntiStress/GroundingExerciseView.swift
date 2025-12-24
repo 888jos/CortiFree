@@ -20,42 +20,42 @@ struct GroundingExerciseView: View {
 
     let steps = [
         GroundingStep(
-            sense: "Vue",
+            sense: NSLocalizedString("exercise.grounding_basic.step_1.sense", comment: ""),
             icon: "eye.fill",
-            instruction: "Nomme 5 choses que tu vois",
-            subtitle: "Regarde autour de toi",
+            instruction: NSLocalizedString("exercise.grounding_basic.step_1.instruction", comment: ""),
+            subtitle: NSLocalizedString("exercise.grounding_basic.step_1.subtitle", comment: ""),
             count: 5,
             color: "73DE85"
         ),
         GroundingStep(
-            sense: "Toucher",
+            sense: NSLocalizedString("exercise.grounding_basic.step_2.sense", comment: ""),
             icon: "hand.raised.fill",
-            instruction: "Nomme 4 choses que tu touches",
-            subtitle: "Ressens les textures",
+            instruction: NSLocalizedString("exercise.grounding_basic.step_2.instruction", comment: ""),
+            subtitle: NSLocalizedString("exercise.grounding_basic.step_2.subtitle", comment: ""),
             count: 4,
             color: "66BB6A"
         ),
         GroundingStep(
-            sense: "Ouïe",
+            sense: NSLocalizedString("exercise.grounding_basic.step_3.sense", comment: ""),
             icon: "ear.fill",
-            instruction: "Nomme 3 sons que tu entends",
-            subtitle: "Écoute attentivement",
+            instruction: NSLocalizedString("exercise.grounding_basic.step_3.instruction", comment: ""),
+            subtitle: NSLocalizedString("exercise.grounding_basic.step_3.subtitle", comment: ""),
             count: 3,
             color: "00FF88"
         ),
         GroundingStep(
-            sense: "Odorat",
+            sense: NSLocalizedString("exercise.grounding_basic.step_4.sense", comment: ""),
             icon: "nose.fill",
-            instruction: "Nomme 2 odeurs que tu sens",
-            subtitle: "Respire profondément",
+            instruction: NSLocalizedString("exercise.grounding_basic.step_4.instruction", comment: ""),
+            subtitle: NSLocalizedString("exercise.grounding_basic.step_4.subtitle", comment: ""),
             count: 2,
             color: "9B7BF1"
         ),
         GroundingStep(
-            sense: "Goût",
+            sense: NSLocalizedString("exercise.grounding_basic.step_5.sense", comment: ""),
             icon: "mouth.fill",
-            instruction: "Nomme 1 goût",
-            subtitle: "Concentre-toi sur ta bouche",
+            instruction: NSLocalizedString("exercise.grounding_basic.step_5.instruction", comment: ""),
+            subtitle: NSLocalizedString("exercise.grounding_basic.step_5.subtitle", comment: ""),
             count: 1,
             color: "FF6B9D"
         )
@@ -200,7 +200,7 @@ struct GroundingExerciseView: View {
                     HapticManager.light()
                     nextStep()
                 }) {
-                    Text(currentStep < steps.count - 1 ? "Suivant" : "Terminer")
+                    Text(currentStep < steps.count - 1 ? NSLocalizedString("exercise.button.next", comment: "") : NSLocalizedString("exercise.button.finish", comment: ""))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

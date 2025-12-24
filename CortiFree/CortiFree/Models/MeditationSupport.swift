@@ -766,50 +766,50 @@ extension MeditationSupport {
         // Pour les affirmations (compassion)
         return [
             UnifiedInstructionStep(
-                title: "Place ta main sur ton cœur",
-                subtitle: "Sens sa chaleur, son rythme",
+                title: NSLocalizedString("meditation.compassion.enhanced_step_1.title", comment: ""),
+                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_1.subtitle", comment: ""),
                 icon: "hand.raised.fill",
                 color: "B388FF",
                 estimatedDuration: "15 sec"
             ),
             UnifiedInstructionStep(
                 title: affirmations[0],
-                subtitle: "Répète 3 fois, ressens vraiment chaque mot",
+                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_2.subtitle", comment: ""),
                 icon: "heart.fill",
                 color: "8C9EFF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
                 title: affirmations[1],
-                subtitle: "Laisse cette vérité entrer en toi",
+                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_3.subtitle", comment: ""),
                 icon: "star.fill",
                 color: "B388FF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
                 title: affirmations[2],
-                subtitle: "Sens la douceur de ces mots",
+                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_4.subtitle", comment: ""),
                 icon: "sparkles",
                 color: "8C9EFF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
                 title: affirmations[3],
-                subtitle: "Respire avec bienveillance",
+                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_5.subtitle", comment: ""),
                 icon: "wind",
                 color: "B388FF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
                 title: affirmations[4],
-                subtitle: "Tu es digne de tout l'amour du monde",
+                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_6.subtitle", comment: ""),
                 icon: "hands.and.sparkles.fill",
                 color: "8C9EFF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
                 title: affirmations[5],
-                subtitle: "Termine en douceur, garde cette chaleur en toi",
+                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_7.subtitle", comment: ""),
                 icon: "face.smiling.fill",
                 color: "B388FF",
                 estimatedDuration: "30 sec"

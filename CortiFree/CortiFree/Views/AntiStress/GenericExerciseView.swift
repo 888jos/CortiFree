@@ -90,7 +90,7 @@ struct GenericExerciseView: View {
                         .foregroundColor(.white)
                         .monospacedDigit()
 
-                    Text("Prends ce temps pour toi")
+                    Text(NSLocalizedString("exercise.generic.enjoy_time", comment: ""))
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -102,7 +102,7 @@ struct GenericExerciseView: View {
                     HapticManager.medium()
                     completeExercise()
                 }) {
-                    Text("Terminer maintenant")
+                    Text(NSLocalizedString("exercise.generic.finish_now", comment: ""))
                         .font(.custom("Poppins-Medium", size: 16))
                         .foregroundColor(.white.opacity(0.6))
                         .padding(.bottom, 40)

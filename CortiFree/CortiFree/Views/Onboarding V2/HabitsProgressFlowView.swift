@@ -141,7 +141,8 @@ struct HabitsProgressFlowView: View {
                 }
             }
 
-            VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 0) {
                 // Description text
                 VStack(spacing: 0) {
                     Text("onboarding_v2.habits_progress.description_part1".localized)
@@ -161,8 +162,8 @@ struct HabitsProgressFlowView: View {
                 .lineSpacing(2)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 28)
-                .padding(.top, 70)
-                .padding(.bottom, 28)
+                .responsivePadding(.top, ResponsiveLayout.isIPad ? 50 : 70)
+                .responsivePadding(.bottom, 28)
                 .opacity(shouldRenderChart ? 1 : 0)
 
                 // Habit icons row
@@ -305,7 +306,8 @@ struct HabitsProgressFlowView: View {
                 .animation(nil, value: currentHabitIndex)
                 .opacity(shouldRenderChart ? 1 : 0)
 
-                Spacer()
+                    Spacer(minLength: ResponsiveLayout.isIPad ? 180 : 120)
+                }
             }
             .opacity(shouldRenderChart ? 1 : 0)
 

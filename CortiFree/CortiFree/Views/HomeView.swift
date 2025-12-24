@@ -21,6 +21,8 @@ struct HomeView: View {
     @State private var showSoundsList = false
     @State private var showJournal = false
     @State private var showSettings = false
+    @State private var showPaywall = false
+    @State private var showOnboarding = false
     @State private var currentTime = Date() // For countdown updates
 
     // Smart scroll detection
@@ -119,6 +121,33 @@ struct HomeView: View {
                                     .padding(.top, 20)
                                     .offset(y: scrollOffset * 0.6)
 
+                                // DEBUG: Quick access buttons for testing
+                                #if DEBUG
+                                VStack(spacing: 12) {
+                                    Button("🔄 Quick Access: Onboarding") {
+                                        showOnboarding = true
+                                    }
+                                    .font(.custom("Poppins-Medium", size: 14))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 44)
+                                    .background(Color.orange.opacity(0.3))
+                                    .cornerRadius(12)
+
+                                    Button("💳 Quick Access: Paywall") {
+                                        showPaywall = true
+                                    }
+                                    .font(.custom("Poppins-Medium", size: 14))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 44)
+                                    .background(Color.purple.opacity(0.3))
+                                    .cornerRadius(12)
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.top, 16)
+                                #endif
+
                                 // Anti-Stress Button - rapprocher
                                 antiStressButton
                                     .padding(.top, 16)
@@ -151,6 +180,18 @@ struct HomeView: View {
         }
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
+        }
+        .fullScreenCover(isPresented: $showPaywall) {
+            CustomPaywallView(
+                onComplete: {
+                    showPaywall = false
+                },
+                onPurchase: { _ in },
+                onRestore: {}
+            )
+        }
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingV2FlowView()
         }
         .onAppear {
             // Refresh motivational message to pick up any name changes from profile edit
@@ -459,7 +500,7 @@ struct QuickActionButtonNew: View {
                 Image(systemName: icon)
                     .font(.system(size: 24))
                     .foregroundColor(.white)
-                    .frame(width: 60, height: 60)
+                    .responsiveFrame(width: 60, height: 60)
                     .background(
                         Circle()
                             .fill(AppConstants.Colors.darkBackground)
@@ -471,10 +512,10 @@ struct QuickActionButtonNew: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
-                    .frame(width: 70, height: 32)
+                    .responsiveFrame(width: 70, height: 32)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(width: 70)
+            .responsiveWidth(70)
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
         }

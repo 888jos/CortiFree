@@ -47,9 +47,10 @@ struct ReassuranceView: View {
             Color.black.opacity(0.5)
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Animated text at top (centered)
-                VStack(spacing: 32) {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Animated text at top (centered)
+                    VStack(spacing: 32) {
                     Text(displayedText)
                         .font(.custom("Poppins-Regular", size: 18))
                         .foregroundColor(.white.opacity(0.95))
@@ -79,10 +80,10 @@ struct ReassuranceView: View {
                 }
                 .padding(.top, 80)
 
-                Spacer()
+                    Spacer(minLength: 100)
 
-                // Bottom button section (appear after badges)
-                if showButton {
+                    // Bottom button section (appear after badges)
+                    if showButton {
                     VStack(spacing: 12) {
                         Button(action: {
                             HapticManager.medium()
@@ -127,6 +128,7 @@ struct ReassuranceView: View {
                     .padding(.horizontal, 40)
                     .padding(.bottom, 50)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                 }
             }
         }
@@ -195,8 +197,8 @@ struct ReassuranceView: View {
             HapticManager.light()
         }
 
-        // Continue animation with slight delay (x0.6 slower)
-        let delay: Double = fullText[index].isWhitespace ? 0.012 : 0.06
+        // Continue animation with slight delay (x1.25 faster)
+        let delay: Double = fullText[index].isWhitespace ? 0.0096 : 0.048
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             animateNextCharacter()
         }

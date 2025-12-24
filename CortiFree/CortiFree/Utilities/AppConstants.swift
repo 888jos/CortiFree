@@ -73,26 +73,26 @@ enum AppConstants {
 
     // MARK: - Font Sizes
     enum FontSize {
-        // Titles
-        static let largeTitle: CGFloat = 32
-        static let title: CGFloat = 28
-        static let title2: CGFloat = 24
-        static let title3: CGFloat = 20
+        // Titles - responsive for iPad
+        static var largeTitle: CGFloat { ResponsiveLayout.fontSize(base: 32) }
+        static var title: CGFloat { ResponsiveLayout.fontSize(base: 28) }
+        static var title2: CGFloat { ResponsiveLayout.fontSize(base: 24) }
+        static var title3: CGFloat { ResponsiveLayout.fontSize(base: 20) }
 
-        // Body
-        static let body: CGFloat = 16
-        static let bodyLarge: CGFloat = 18
-        static let bodySmall: CGFloat = 14
+        // Body - responsive for iPad
+        static var body: CGFloat { ResponsiveLayout.fontSize(base: 16) }
+        static var bodyLarge: CGFloat { ResponsiveLayout.fontSize(base: 18) }
+        static var bodySmall: CGFloat { ResponsiveLayout.fontSize(base: 14) }
 
-        // Caption
-        static let caption: CGFloat = 12
-        static let caption2: CGFloat = 10
+        // Caption - responsive for iPad
+        static var caption: CGFloat { ResponsiveLayout.fontSize(base: 12) }
+        static var caption2: CGFloat { ResponsiveLayout.fontSize(base: 10) }
 
-        // Specific use cases
-        static let badge: CGFloat = 10
-        static let button: CGFloat = 16
-        static let countdown: CGFloat = 48
-        static let level: CGFloat = 36
+        // Specific use cases - responsive for iPad
+        static var badge: CGFloat { ResponsiveLayout.fontSize(base: 10) }
+        static var button: CGFloat { ResponsiveLayout.fontSize(base: 16) }
+        static var countdown: CGFloat { ResponsiveLayout.fontSize(base: 48) }
+        static var level: CGFloat { ResponsiveLayout.fontSize(base: 36) }
     }
 
     // MARK: - Animation
@@ -148,71 +148,71 @@ enum AppConstants {
 
     // MARK: - Layout
     enum Layout {
-        // Corner radius
-        static let cornerRadius: CGFloat = 16
-        static let cornerRadiusSmall: CGFloat = 12
-        static let cornerRadiusLarge: CGFloat = 20
-        static let cornerRadiusXLarge: CGFloat = 30
+        // Corner radius - responsive for iPad
+        static var cornerRadius: CGFloat { ResponsiveLayout.padding(base: 16) }
+        static var cornerRadiusSmall: CGFloat { ResponsiveLayout.padding(base: 12) }
+        static var cornerRadiusLarge: CGFloat { ResponsiveLayout.padding(base: 20) }
+        static var cornerRadiusXLarge: CGFloat { ResponsiveLayout.padding(base: 30) }
 
-        // Padding
-        static let paddingXSmall: CGFloat = 4
-        static let paddingSmall: CGFloat = 8
-        static let paddingMedium: CGFloat = 16
-        static let paddingLarge: CGFloat = 24
-        static let paddingXLarge: CGFloat = 32
+        // Padding - responsive for iPad
+        static var paddingXSmall: CGFloat { ResponsiveLayout.padding(base: 4) }
+        static var paddingSmall: CGFloat { ResponsiveLayout.padding(base: 8) }
+        static var paddingMedium: CGFloat { ResponsiveLayout.padding(base: 16) }
+        static var paddingLarge: CGFloat { ResponsiveLayout.padding(base: 24) }
+        static var paddingXLarge: CGFloat { ResponsiveLayout.padding(base: 32) }
 
-        // Spacing
-        static let spacingXSmall: CGFloat = 4
-        static let spacingSmall: CGFloat = 8
-        static let spacingMedium: CGFloat = 12
-        static let spacingLarge: CGFloat = 16
-        static let spacingXLarge: CGFloat = 20
-        static let spacingXXLarge: CGFloat = 24
+        // Spacing - responsive for iPad
+        static var spacingXSmall: CGFloat { ResponsiveLayout.spacing(base: 4) }
+        static var spacingSmall: CGFloat { ResponsiveLayout.spacing(base: 8) }
+        static var spacingMedium: CGFloat { ResponsiveLayout.spacing(base: 12) }
+        static var spacingLarge: CGFloat { ResponsiveLayout.spacing(base: 16) }
+        static var spacingXLarge: CGFloat { ResponsiveLayout.spacing(base: 20) }
+        static var spacingXXLarge: CGFloat { ResponsiveLayout.spacing(base: 24) }
 
-        // Icon sizes
-        static let iconSmall: CGFloat = 16
-        static let iconMedium: CGFloat = 20
-        static let iconLarge: CGFloat = 24
-        static let iconXLarge: CGFloat = 32
+        // Icon sizes - responsive for iPad
+        static var iconSmall: CGFloat { ResponsiveLayout.cardWidth(base: 16) }
+        static var iconMedium: CGFloat { ResponsiveLayout.cardWidth(base: 20) }
+        static var iconLarge: CGFloat { ResponsiveLayout.cardWidth(base: 24) }
+        static var iconXLarge: CGFloat { ResponsiveLayout.cardWidth(base: 32) }
 
-        // Card dimensions
-        static let cardHeight: CGFloat = 120
-        static let cardHeightSmall: CGFloat = 80
-        static let cardHeightLarge: CGFloat = 160
+        // Card dimensions - responsive for iPad
+        static var cardHeight: CGFloat { ResponsiveLayout.cardHeight(base: 120) }
+        static var cardHeightSmall: CGFloat { ResponsiveLayout.cardHeight(base: 80) }
+        static var cardHeightLarge: CGFloat { ResponsiveLayout.cardHeight(base: 160) }
 
-        // Button dimensions
-        static let buttonHeight: CGFloat = 50
-        static let buttonHeightSmall: CGFloat = 40
-        static let buttonHeightLarge: CGFloat = 60
-        static let antiStressButtonHeight: CGFloat = 54
-        static let antiStressButtonWidth: CGFloat = 336
+        // Button dimensions - responsive for iPad
+        static var buttonHeight: CGFloat { ResponsiveLayout.cardHeight(base: 50) }
+        static var buttonHeightSmall: CGFloat { ResponsiveLayout.cardHeight(base: 40) }
+        static var buttonHeightLarge: CGFloat { ResponsiveLayout.cardHeight(base: 60) }
+        static var antiStressButtonHeight: CGFloat { ResponsiveLayout.cardHeight(base: 54) }
+        static var antiStressButtonWidth: CGFloat { ResponsiveLayout.cardWidth(base: 336) }
 
-        // Specific widths
-        static let progressBarHeight: CGFloat = 8
+        // Specific widths - responsive for iPad
+        static var progressBarHeight: CGFloat { ResponsiveLayout.cardHeight(base: 8) }
         static let dividerHeight: CGFloat = 1
-        static let shadowRadius: CGFloat = 10
+        static var shadowRadius: CGFloat { ResponsiveLayout.padding(base: 10) }
 
-        // Header dimensions
-        static let headerHeight: CGFloat = 60
-        static let bannerHeight: CGFloat = 220
-        static let avatarSize: CGFloat = 80
+        // Header dimensions - responsive for iPad
+        static var headerHeight: CGFloat { ResponsiveLayout.cardHeight(base: 60) }
+        static var bannerHeight: CGFloat { ResponsiveLayout.cardHeight(base: 220) }
+        static var avatarSize: CGFloat { ResponsiveLayout.cardWidth(base: 80) }
 
-        // Profile specific
-        static let profileBannerHeight: CGFloat = 220
-        static let profileAvatarSize: CGFloat = 80
-        static let radarChartSize: CGFloat = 256
+        // Profile specific - responsive for iPad
+        static var profileBannerHeight: CGFloat { ResponsiveLayout.cardHeight(base: 220) }
+        static var profileAvatarSize: CGFloat { ResponsiveLayout.cardWidth(base: 80) }
+        static var radarChartSize: CGFloat { ResponsiveLayout.cardWidth(base: 256) }
 
-        // Task card dimensions
-        static let taskCardSpacing: CGFloat = 16
-        static let taskCardPadding: CGFloat = 20
+        // Task card dimensions - responsive for iPad
+        static var taskCardSpacing: CGFloat { ResponsiveLayout.spacing(base: 16) }
+        static var taskCardPadding: CGFloat { ResponsiveLayout.padding(base: 20) }
 
-        // Journal dimensions
-        static let journalHeaderHeight: CGFloat = 140
-        static let journalSegmentHeight: CGFloat = 44
-        static let journalStatCardHeight: CGFloat = 100
+        // Journal dimensions - responsive for iPad
+        static var journalHeaderHeight: CGFloat { ResponsiveLayout.cardHeight(base: 140) }
+        static var journalSegmentHeight: CGFloat { ResponsiveLayout.cardHeight(base: 44) }
+        static var journalStatCardHeight: CGFloat { ResponsiveLayout.cardHeight(base: 100) }
 
-        // Task view specific
-        static let taskBottomPadding: CGFloat = 100
+        // Task view specific - responsive for iPad
+        static var taskBottomPadding: CGFloat { ResponsiveLayout.padding(base: 100) }
         static let taskSkeletonCount: Int = 5
     }
 

@@ -1597,6 +1597,51 @@
 "meditation.yoga_nidra.step_5.subtitle" = "Si tu t'endors, c'est parfait - c'est le but";
 "meditation.yoga_nidra.step_5.duration" = "3 min";
 
+// MARK: - Meditation - Compassion (Enhanced Affirmations)
+"meditation.compassion.enhanced_step_1.title" = "Place ta main sur ton cœur";
+"meditation.compassion.enhanced_step_1.subtitle" = "Sens sa chaleur, son rythme";
+"meditation.compassion.enhanced_step_2.subtitle" = "Répète 3 fois, ressens vraiment chaque mot";
+"meditation.compassion.enhanced_step_3.subtitle" = "Laisse cette vérité entrer en toi";
+"meditation.compassion.enhanced_step_4.subtitle" = "Sens la douceur de ces mots";
+"meditation.compassion.enhanced_step_5.subtitle" = "Respire avec bienveillance";
+"meditation.compassion.enhanced_step_6.subtitle" = "Tu es digne de tout l'amour du monde";
+"meditation.compassion.enhanced_step_7.subtitle" = "Termine en douceur, garde cette chaleur en toi";
+
+// MARK: - Generic Exercise
+"exercise.generic.enjoy_time" = "Prends ce temps pour toi";
+"exercise.generic.finish_now" = "Terminer maintenant";
+
+// MARK: - Guided Meditation Session
+"meditation.session.completed" = "Session terminée";
+"meditation.session.step_progress" = "Étape %d sur %d";
+"meditation.session.finish" = "Terminer";
+"meditation.session.next" = "Suivant";
+
+// Grounding Exercise - 5 Senses
+"exercise.grounding_basic.step_1.sense" = "Vue";
+"exercise.grounding_basic.step_1.instruction" = "Nomme 5 choses que tu vois";
+"exercise.grounding_basic.step_1.subtitle" = "Regarde autour de toi";
+
+"exercise.grounding_basic.step_2.sense" = "Toucher";
+"exercise.grounding_basic.step_2.instruction" = "Nomme 4 choses que tu touches";
+"exercise.grounding_basic.step_2.subtitle" = "Ressens les textures";
+
+"exercise.grounding_basic.step_3.sense" = "Ouïe";
+"exercise.grounding_basic.step_3.instruction" = "Nomme 3 sons que tu entends";
+"exercise.grounding_basic.step_3.subtitle" = "Écoute attentivement";
+
+"exercise.grounding_basic.step_4.sense" = "Odorat";
+"exercise.grounding_basic.step_4.instruction" = "Nomme 2 odeurs que tu sens";
+"exercise.grounding_basic.step_4.subtitle" = "Respire profondément";
+
+"exercise.grounding_basic.step_5.sense" = "Goût";
+"exercise.grounding_basic.step_5.instruction" = "Nomme 1 goût";
+"exercise.grounding_basic.step_5.subtitle" = "Concentre-toi sur ta bouche";
+
+// Exercise Buttons
+"exercise.button.next" = "Suivant";
+"exercise.button.finish" = "Terminer";
+
 // MARK: - Library View
 "library.title" = "Librairie";
 "library.category.learn" = "Apprendre";
@@ -1819,11 +1864,11 @@
 "meditation_detail.benefit.mental_clarity" = "Clarté mentale";
 
 // MARK: - Meditation Detailed Descriptions (max 35 mots)
-"meditation.conscious_breathing.detailed_description" = "Observe simplement ta respiration naturelle sans chercher à la modifier. Cela active ton système nerveux parasympathique, réduit les hormones du stress et crée un état de calme immédiat qui se diffuse dans tout ton corps.";
-"meditation.body_scan.detailed_description" = "Scanne mentalement ton corps de la tête aux pieds en portant attention à chaque zone. Observe les sensations sans jugement et relâche consciemment les tensions accumulées pour une relaxation rapide et profonde.";
-"meditation.mindfulness.detailed_description" = "Apprends à observer tes pensées comme des nuages qui passent dans le ciel, sans jugement ni attachement. Cette pratique développe la conscience du moment présent et réduit les ruminations mentales épuisantes.";
-"meditation.grounding.detailed_description" = "La technique d'ancrage 5-4-3-2-1 utilise tes cinq sens pour te reconnecter instantanément au moment présent. En t'appuyant sur ce que tu vois, touches, entends, sens et goûtes, tu interromps les cycles d'anxiété.";
-"meditation.visualization.detailed_description" = "Crée un sanctuaire mental détaillé, un lieu sûr où tu te sens complètement en paix. En imaginant vivement ce refuge avec tous tes sens, tu peux y accéder à tout moment pour réduire le stress.";
+"meditation.conscious_breathing.detailed_description" = "Observe ta respiration naturelle sans la modifier. Active ton système parasympathique, réduit le stress et crée un calme immédiat dans tout ton corps.";
+"meditation.body_scan.detailed_description" = "Scanne ton corps de la tête aux pieds. Observe chaque zone, ressens les sensations sans jugement et relâche consciemment toutes les tensions accumulées.";
+"meditation.mindfulness.detailed_description" = "Observe tes pensées comme des nuages qui passent, sans jugement. Développe la conscience du moment présent et réduis les ruminations mentales épuisantes.";
+"meditation.grounding.detailed_description" = "Utilise tes cinq sens pour te reconnecter au moment présent. Nomme ce que tu vois, touches, entends, sens et goûtes. Interromps instantanément les cycles d'anxiété.";
+"meditation.visualization.detailed_description" = "Crée un lieu sûr dans ton esprit où tu te sens complètement en paix. Imagine ce refuge avec tous tes sens. Accèdes-y à tout moment pour réduire le stress.";
 "meditation.compassion.detailed_description" = "Traite-toi avec la même gentillesse et patience que tu offrirais naturellement à un ami cher. Cette pratique d'auto-compassion réduit l'autocritique sévère et renforce ton estime de toi durablement.";
 "meditation.focus_clarity.detailed_description" = "Entraîne ton esprit comme un muscle en ramenant ton attention vers un point focal unique. Cet exercice mental renforce ta capacité de concentration, réduit les distractions et améliore ta clarté décisionnelle.";
 "meditation.yoga_nidra.detailed_description" = "Le Yoga Nidra te guide vers une relaxation profonde tout en maintenant la conscience. Cette pratique relaxe systématiquement chaque partie de ton corps et esprit pour un sommeil réparateur.";
@@ -2652,7 +2697,7 @@
 
 // Reassurance View
 "onboarding_v2.reassurance.greeting" = "Merci";
-"onboarding_v2.reassurance.message_part1" = "c'est ok. Tu n'es pas seul(e).";
+"onboarding_v2.reassurance.message_part1" = "Tu n'es pas seul(e) dans cette situation.";
 "onboarding_v2.reassurance.message_part2" = "Des milliers de personnes comme toi ont déjà trouvé leur sérénité avec CortiFree.";
 "onboarding_v2.reassurance.message_part3" = "Maintenant, nous allons faire un petit quiz pour mieux comprendre ta situation et personnaliser ton parcours.";
 "onboarding_v2.reassurance.start_quiz" = "Commencer le quiz";
@@ -2698,30 +2743,35 @@
 "onboarding_v2.habits.q8_opt2" = "Fatigué(e)";
 "onboarding_v2.habits.q8_opt3" = "Correct";
 "onboarding_v2.habits.q8_opt4" = "Plein(e) d'énergie";
-"onboarding_v2.habits.q9" = "Comment as-tu entendu parler de CortiFree ?";
-"onboarding_v2.habits.q9_opt1" = "App Store";
-"onboarding_v2.habits.q9_opt2" = "Instagram";
-"onboarding_v2.habits.q9_opt3" = "TikTok";
-"onboarding_v2.habits.q9_opt4" = "Bouche à oreille";
-"onboarding_v2.habits.q9_opt5" = "Publicité";
-"onboarding_v2.habits.q9_opt6" = "Autre";
-"onboarding_v2.habits.q10" = "As-tu déjà essayé d'autres apps de bien-être ou méditation ?";
-"onboarding_v2.habits.q10_opt1" = "Non, jamais";
-"onboarding_v2.habits.q10_opt2" = "Oui, mais j'ai arrêté";
-"onboarding_v2.habits.q10_opt3" = "Oui, j'en utilise encore une";
-"onboarding_v2.habits.q10_opt4" = "Oui, j'en ai essayé plusieurs";
-"onboarding_v2.habits.q11" = "Qu'est-ce que tu aimerais le plus améliorer ?";
-"onboarding_v2.habits.q11_opt1" = "Mieux dormir";
-"onboarding_v2.habits.q11_opt2" = "Réduire mon stress";
-"onboarding_v2.habits.q11_opt3" = "Avoir plus d'énergie";
-"onboarding_v2.habits.q11_opt4" = "Mieux me concentrer";
-"onboarding_v2.habits.q11_opt5" = "Un meilleur équilibre global";
-"onboarding_v2.habits.q12" = "Combien de temps peux-tu consacrer par jour à ton bien-être ?";
-"onboarding_v2.habits.q12_opt1" = "Moins de 15 minutes";
-"onboarding_v2.habits.q12_opt2" = "15-30 minutes";
-"onboarding_v2.habits.q12_opt3" = "30-45 minutes";
-"onboarding_v2.habits.q12_opt4" = "45-60 minutes";
-"onboarding_v2.habits.q12_opt5" = "Plus d'une heure";
+"onboarding_v2.habits.q9" = "Comment te sens-tu par rapport à ton apparence physique ces derniers temps ?";
+"onboarding_v2.habits.q9_opt1" = "Je me sens bien dans ma peau, confiant(e) et énergique";
+"onboarding_v2.habits.q9_opt2" = "Quelques imperfections me dérangent mais ça va globalement";
+"onboarding_v2.habits.q9_opt3" = "J'ai du mal avec mon reflet, fatigue visible et peau terne";
+"onboarding_v2.habits.q9_opt4" = "Je ne me reconnais plus : cernes, teint gris, prise/perte de poids";
+"onboarding_v2.habits.q10" = "Comment as-tu entendu parler de CortiFree ?";
+"onboarding_v2.habits.q10_opt1" = "App Store";
+"onboarding_v2.habits.q10_opt2" = "Instagram";
+"onboarding_v2.habits.q10_opt3" = "TikTok";
+"onboarding_v2.habits.q10_opt4" = "Bouche à oreille";
+"onboarding_v2.habits.q10_opt5" = "Publicité";
+"onboarding_v2.habits.q10_opt6" = "Autre";
+"onboarding_v2.habits.q11" = "As-tu déjà essayé d'autres apps de bien-être ou méditation ?";
+"onboarding_v2.habits.q11_opt1" = "Non, jamais";
+"onboarding_v2.habits.q11_opt2" = "Oui, mais j'ai arrêté";
+"onboarding_v2.habits.q11_opt3" = "Oui, j'en utilise encore une";
+"onboarding_v2.habits.q11_opt4" = "Oui, j'en ai essayé plusieurs";
+"onboarding_v2.habits.q12" = "Qu'est-ce que tu aimerais le plus améliorer ?";
+"onboarding_v2.habits.q12_opt1" = "Mieux dormir";
+"onboarding_v2.habits.q12_opt2" = "Réduire mon stress";
+"onboarding_v2.habits.q12_opt3" = "Avoir plus d'énergie";
+"onboarding_v2.habits.q12_opt4" = "Mieux me concentrer";
+"onboarding_v2.habits.q12_opt5" = "Un meilleur équilibre global";
+"onboarding_v2.habits.q13" = "Combien de temps peux-tu consacrer par jour à ton bien-être ?";
+"onboarding_v2.habits.q13_opt1" = "Moins de 15 minutes";
+"onboarding_v2.habits.q13_opt2" = "15-30 minutes";
+"onboarding_v2.habits.q13_opt3" = "30-45 minutes";
+"onboarding_v2.habits.q13_opt4" = "45-60 minutes";
+"onboarding_v2.habits.q13_opt5" = "Plus d'une heure";
 
 // Sixty Days Explanation
 "onboarding_v2.sixty_days.title" = "Pourquoi 60 jours ?";
@@ -2808,6 +2858,7 @@
 // Eight Habits Intro
 "onboarding_v2.eight_habits.intro_title" = "Les 8 habitudes clés";
 "onboarding_v2.eight_habits.intro_subtitle" = "pour une vie sereine";
+"onboarding_v2.eight_habits.intro_description" = "Pour réduire ton taux de cortisol, il te faut les 8 habitudes fondamentales ci-dessous.";
 
 // Eight Habits Flow - Breathing
 "onboarding_v2.eight_habits.breathing.title" = "Respirer consciemment";
@@ -3169,3 +3220,51 @@
 "settings.privacy.delete_account" = "Supprimer mon compte";
 "settings.privacy.delete_account_subtitle" = "Action irréversible";
 "settings.privacy.icloud_subtitle" = "Synchroniser vos données entre appareils";
+
+// MARK: - Settings Bug Report
+"settings.bug_report.title" = "Signaler un bug";
+"settings.bug_report.subtitle" = "Aidez-nous à améliorer l'app";
+"settings.bug_report.description_label" = "Décrivez le problème";
+"settings.bug_report.screenshot_label" = "Ajouter une capture d'écran (optionnel)";
+"settings.bug_report.choose_image" = "Choisir une image";
+"settings.bug_report.submit" = "Envoyer le rapport";
+"settings.bug_report.cancel" = "Annuler";
+"settings.bug_report.success" = "Bug envoyé !";
+
+// MARK: - Onboarding V2 - Custom Paywall
+"onboarding_v2.paywall.title" = "Ton plan personnalisé en 66 jours est prêt";
+"onboarding_v2.paywall.promise_stress" = "Réduis ton stress et ton cortisol en seulement 66 jours";
+"onboarding_v2.paywall.promise_habits" = "Maîtrise les 8 habitudes clés pour transformer ta vie";
+"onboarding_v2.paywall.promise_science" = "Basé sur les neurosciences et études cliniques";
+"onboarding_v2.paywall.benefit_plan" = "Ton plan personnalisé de 66 jours";
+"onboarding_v2.paywall.benefit_tracking" = "Suivi quotidien de tes progrès";
+"onboarding_v2.paywall.benefit_exercises" = "Exercices anti-stress à la demande";
+"onboarding_v2.paywall.benefit_support" = "Support et accompagnement 24/7";
+"onboarding_v2.paywall.chart_title" = "Amélioration de %@ en 66 jours";
+"onboarding_v2.paywall.without_app" = "Sans CortiFree";
+"onboarding_v2.paywall.start_today" = "Si tu commences aujourd'hui";
+"onboarding_v2.paywall.transformed_by" = "tu seras transformé(e) le";
+"onboarding_v2.paywall.feature_program_title" = "Ton programme personnalisé";
+"onboarding_v2.paywall.feature_program_desc" = "Un plan sur mesure adapté à ton profil de stress et tes objectifs";
+"onboarding_v2.paywall.feature_exercises_title" = "Exercices anti-stress";
+"onboarding_v2.paywall.feature_exercises_desc" = "Respiration, méditation, ancrage disponibles 24/7";
+"onboarding_v2.paywall.feature_tracking_title" = "Suivi de progression";
+"onboarding_v2.paywall.feature_tracking_desc" = "Visualise ton évolution et reste motivé(e) chaque jour";
+"onboarding_v2.paywall.feature_support_title" = "Accompagnement continu";
+"onboarding_v2.paywall.feature_support_desc" = "Conseils d'experts et recommandations personnalisées";
+"onboarding_v2.paywall.start_program" = "Démarrer mon programme";
+"onboarding_v2.paywall.restore" = "Restaurer mes achats";
+"onboarding_v2.paywall.terms" = "Conditions d'utilisation";
+"onboarding_v2.paywall.privacy" = "Politique de confidentialité";
+"onboarding_v2.paywall.start_screen_title" = "Prêt(e) à transformer ta vie ?";
+"onboarding_v2.paywall.start_screen_subtitle" = "Choisis le plan qui te convient le mieux";
+"onboarding_v2.paywall.start_feature_1" = "Programme personnalisé de 66 jours";
+"onboarding_v2.paywall.start_feature_2" = "Exercices anti-stress 24/7";
+"onboarding_v2.paywall.start_feature_3" = "Suivi quotidien de tes progrès";
+"onboarding_v2.paywall.start_feature_4" = "Support d'experts";
+"onboarding_v2.paywall.start_feature_5" = "Techniques scientifiquement prouvées";
+"onboarding_v2.paywall.subscribe_yearly" = "S'abonner pour %@/an";
+"onboarding_v2.paywall.subscribe_monthly" = "S'abonner pour %@/mois";
+"onboarding_v2.paywall.best_value" = "Meilleur rapport";
+"onboarding_v2.paywall.most_popular" = "Le plus populaire";
+"onboarding_v2.paywall.legal" = "L'abonnement se renouvelle automatiquement sauf annulation 24h avant la fin de la période.";
