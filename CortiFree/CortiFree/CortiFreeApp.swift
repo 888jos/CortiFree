@@ -10,6 +10,8 @@ import UIKit
 import FirebaseCore
 import FirebaseFirestore
 import SuperwallKit
+import RevenueCat
+import UserNotifications
 #if canImport(GoogleSignIn)
 import GoogleSignIn
 #endif
@@ -17,7 +19,7 @@ import GoogleSignIn
 import Mixpanel
 #endif
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
@@ -27,10 +29,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // DO NOT configure Firestore settings here - it crashes the app
         // Firestore will use default settings
 
-        // Configurer Superwall seulement si activé
-        if UserDefaults.standard.bool(forKey: "superwallEnabled") != false {
-            Superwall.configure(apiKey: "pk_JPmmC0H5be4yqTnw24VTm")
+        // Set notification delegate
+        UNUserNotificationCenter.current().delegate = self
+
+        // Configure RevenueCat SDK
+        #if DEBUG
+        print("🔧 Configuring RevenueCat SDK")
+        #endif
+        Task { @MainActor in
+            RevenueCatManager.shared.configure()
         }
+
+        // Configurer Superwall (toujours actif)
+        Superwall.configure(apiKey: "pk_JPmmC0H5be4yqTnw24VTm")
+        print("✅ Superwall configured with API key")
 
         // Register custom fonts
         FontManager.registerFonts()
@@ -61,12 +73,58 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         #endif
         return false
     }
+
+    // MARK: - UNUserNotificationCenterDelegate
+
+    /// User tapped notification
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let notificationId = response.notification.request.identifier
+
+        MixpanelManager.shared.track(
+            event: "notification_clicked",
+            properties: [
+                "notification_id": notificationId,
+                "action": response.actionIdentifier
+            ]
+        )
+
+        #if DEBUG
+        print("🔔 Notification clicked: \(notificationId)")
+        #endif
+
+        completionHandler()
+    }
+
+    /// Notification received while app in foreground
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let notificationId = notification.request.identifier
+
+        MixpanelManager.shared.track(
+            event: "notification_received",
+            properties: [
+                "notification_id": notificationId,
+                "app_state": "foreground"
+            ]
+        )
+
+        #if DEBUG
+        print("🔔 Notification received (foreground): \(notificationId)")
+        #endif
+
+        // Show notification banner and play sound even when app is in foreground
+        completionHandler([.banner, .sound])
+    }
 }
 
 @main
 struct CortiFreeApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var authViewModel = AuthViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     // DEBUG: Set to true to skip onboarding and go directly to HomeView
     #if DEBUG
@@ -92,6 +150,46 @@ struct CortiFreeApp: App {
                 AuthView()
                     .environmentObject(authViewModel)
             }
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            handleScenePhaseChange(oldPhase: oldPhase, newPhase: newPhase)
+        }
+    }
+
+    // MARK: - Scene Phase Handling
+
+    private func handleScenePhaseChange(oldPhase: ScenePhase, newPhase: ScenePhase) {
+        switch newPhase {
+        case .background:
+            // User left the app - schedule re-engagement notifications if onboarding incomplete
+            scheduleReengagementIfNeeded()
+
+        case .active:
+            #if DEBUG
+            print("📱 App became active")
+            #endif
+
+        case .inactive:
+            break
+
+        @unknown default:
+            break
+        }
+    }
+
+    private func scheduleReengagementIfNeeded() {
+        // Only schedule if onboarding is NOT complete
+        let onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingV2Completed")
+
+        if !onboardingCompleted {
+            NotificationService.shared.scheduleOnboardingReengagementNotifications()
+            #if DEBUG
+            print("📱 App went to background - re-engagement notifications scheduled")
+            #endif
+        } else {
+            #if DEBUG
+            print("📱 App went to background - onboarding complete, no re-engagement needed")
+            #endif
         }
     }
 }

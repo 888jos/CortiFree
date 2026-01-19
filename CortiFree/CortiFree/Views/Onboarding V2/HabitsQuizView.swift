@@ -3,10 +3,11 @@
 //  CortiFree
 //
 //  Created by Claude on 11/11/2025.
-//  Quiz de prise de conscience du stress - 11 questions situationnelles
+//  Quiz de prise de conscience du stress - 13 questions situationnelles
 //  Q1-Q8: Questions pour calculer les scores (stress, sommeil, énergie, focus)
-//  Q9: Question marketing (expérience apps)
-//  Q10-Q11: Objectif et temps disponible
+//  Q9: Question apparence physique (profil uniquement, pas de scoring)
+//  Q10-Q11: Questions marketing (acquisition, expérience apps)
+//  Q12-Q13: Objectif et temps disponible
 //
 
 import SwiftUI
@@ -17,12 +18,12 @@ struct HabitsQuizView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentQuestionIndex: Int = 0
     @State private var selectedAnswer: Int? = nil
-    @State private var answers: [Int] = Array(repeating: 0, count: 12)
+    @State private var answers: [Int] = Array(repeating: 0, count: 13)
     @State private var isGoingBack: Bool = false
     @State private var questionStartTime: Date?
     @State private var quizStartTime: Date?
 
-    private let totalQuestions = 12
+    private let totalQuestions = 13
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -564,7 +565,7 @@ struct HabitsQuizResult {
 
     /// Réponse apparence physique (Q9) - pour profil uniquement
     var appearanceConcern: String {
-        let concerns = ["Bien dans ma peau", "Quelques imperfections", "Fatigue visible", "Ne me reconnais plus"]
+        let concerns = ["Bien dans ma peau", "Quelques imperfections", "Fatigue visible", "Cernes et teint gris"]
         return concerns[safe: answers[8]] ?? "Bien dans ma peau"
     }
 

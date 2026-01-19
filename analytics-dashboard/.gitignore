@@ -1,0 +1,17 @@
+# Firebase Configuration (contient des secrets)
+firebase-config.js
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*

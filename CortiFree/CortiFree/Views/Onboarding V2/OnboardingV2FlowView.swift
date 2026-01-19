@@ -17,6 +17,7 @@ struct OnboardingV2FlowView: View {
     @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
     @AppStorage("onboardingCheckpoint") private var savedCheckpoint: String = ""
     @AppStorage("hasSeenPaywall") private var hasSeenPaywall: Bool = false
+    @AppStorage("onboardingLanguage") private var onboardingLanguage: String = "en" // Track language used
     @State private var overallQuizData: OverallQuizData?
     @State private var habitsQuizResult: HabitsQuizResult?
     @State private var showError = false
@@ -79,6 +80,13 @@ struct OnboardingV2FlowView: View {
                 onboardingStartTime = Date()
             }
 
+            // Detect and save language on first load
+            if onboardingLanguage.isEmpty || onboardingLanguage == "en" {
+                let systemLanguage = Locale.current.language.languageCode?.identifier ?? "en"
+                onboardingLanguage = systemLanguage.hasPrefix("fr") ? "fr" : "en"
+                print("🌍 Detected onboarding language: \(onboardingLanguage)")
+            }
+
             // Resume from checkpoint or paywall if applicable
             resumeFromCheckpoint()
         }
@@ -113,9 +121,13 @@ struct OnboardingV2FlowView: View {
     private func saveCheckpoint(_ step: OnboardingStep) {
         savedCheckpoint = step.rawValue
 
+        // Save checkpoint for re-engagement notifications
+        UserDefaults.standard.set(step.rawValue, forKey: "last_onboarding_checkpoint")
+
         // Mark paywall as seen when reaching complete step
         if step == .complete {
             hasSeenPaywall = true
+            UserDefaults.standard.set(true, forKey: "saw_paywall_without_accepting")
         }
 
         #if DEBUG
@@ -169,6 +181,8 @@ struct OnboardingV2FlowView: View {
         case .authentication:
             AuthenticationView(
                 onComplete: {
+                    // Mark user as authenticated for re-engagement tracking
+                    UserDefaults.standard.set(true, forKey: "user_is_authenticated")
                     currentStep = .loading
                 }
             )
@@ -233,8 +247,13 @@ struct OnboardingV2FlowView: View {
             OnboardingCompletionView(
                 habitsQuizResult: habitsQuizResult,
                 onboardingStartTime: onboardingStartTime,
+                language: onboardingLanguage, // Pass detected language
                 onViewPlan: {
+                    // After paywall acceptance (trial started), complete onboarding
                     completeOnboarding()
+
+                    // Schedule trial notifications
+                    NotificationService.shared.scheduleTrialNotifications()
                 }
             )
         }
@@ -245,8 +264,34 @@ struct OnboardingV2FlowView: View {
         savedCheckpoint = ""
         hasSeenPaywall = false // Reset for potential future use
 
+        // Clear re-engagement tracking
+        UserDefaults.standard.set("completed", forKey: "last_onboarding_checkpoint")
+        UserDefaults.standard.set(false, forKey: "saw_paywall_without_accepting")
+
+        // Cancel all re-engagement notifications
+        NotificationService.shared.cancelReengagementNotifications()
+
         // Set routine start date for program progress tracking
         UserDefaults.standard.set(Date(), forKey: "routineStartDate")
+
+        // Update Firestore onboardingCompleted field
+        if let userId = Auth.auth().currentUser?.uid {
+            Task {
+                do {
+                    try await Firestore.firestore()
+                        .collection("users")
+                        .document(userId)
+                        .setData(["onboardingCompleted": true], merge: true)
+                    #if DEBUG
+                    print("✅ Firestore onboardingCompleted set to true")
+                    #endif
+                } catch {
+                    #if DEBUG
+                    print("⚠️ Failed to update Firestore onboardingCompleted: \(error.localizedDescription)")
+                    #endif
+                }
+            }
+        }
 
         // Using @AppStorage, this will automatically trigger view update
         isOnboardingComplete = true

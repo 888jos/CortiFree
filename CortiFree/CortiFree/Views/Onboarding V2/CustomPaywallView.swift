@@ -10,6 +10,7 @@ import SwiftUI
 import StoreKit
 import FirebaseAuth
 import FirebaseFirestore
+import SuperwallKit
 
 struct CustomPaywallView: View {
     let onComplete: () -> Void
@@ -32,9 +33,10 @@ struct CustomPaywallView: View {
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
     @State private var purchaseErrorMessage: String = ""
+    @StateObject private var superwallDelegate = SuperwallDelegateHandler()
 
     private var isFrench: Bool {
-        Locale.current.language.languageCode?.identifier == "fr"
+        LanguageManager.shared.currentLanguage == .french
     }
 
     // MARK: - Dynamic Prices from StoreKit (Real App Store Connect prices)
@@ -225,21 +227,32 @@ struct CustomPaywallView: View {
                 Spacer()
                 floatingCTASection
             }
-
-            // Start program screen overlay
-            if showStartProgramScreen {
-                PaywallStartProgramScreen(
-                    isPresented: $showStartProgramScreen,
-                    userName: userName,
-                    onPurchase: onPurchase,
-                    onRestore: onRestore
-                )
-                .transition(.opacity)
-            }
         }
         .onAppear {
             loadUserName()
             startRadarAnimation()
+
+            // Setup Superwall delegate
+            superwallDelegate.onComplete = {
+                // When user completes purchase or closes paywall
+                onComplete()
+            }
+            Superwall.shared.delegate = superwallDelegate
+        }
+        .onChange(of: showStartProgramScreen) { shouldShow in
+            if shouldShow {
+                // Trigger Superwall paywall instead of custom screen
+                // IMPORTANT: Replace "trigger" with the exact placement name from your Superwall dashboard
+                let placement = "trigger"
+
+                print("🌍 [CustomPaywall] Triggering Superwall with placement: \(placement)")
+                Superwall.shared.register(placement: placement)
+
+                // Reset the flag after triggering
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showStartProgramScreen = false
+                }
+            }
         }
     }
 
@@ -700,7 +713,7 @@ struct CustomPaywallView: View {
                 .frame(height: 56)
                 .background(
                     RoundedRectangle(cornerRadius: 28)
-                        .fill(Color(hex: "B794F6"))
+                        .fill(Color(hex: "8B5CF6"))
                 )
             }
 
@@ -1025,7 +1038,7 @@ struct PaywallStartProgramScreen: View {
     @State private var selectedPlan: String = "yearly"
 
     private var isFrench: Bool {
-        Locale.current.language.languageCode?.identifier == "fr"
+        LanguageManager.shared.currentLanguage == .french
     }
 
     // Dynamic prices from StoreKit
@@ -1441,7 +1454,7 @@ struct ProgramPlanCard: View {
     private let cardHeight: CGFloat = 140
 
     private var isFrench: Bool {
-        Locale.current.language.languageCode?.identifier == "fr"
+        LanguageManager.shared.currentLanguage == .french
     }
 
     var body: some View {

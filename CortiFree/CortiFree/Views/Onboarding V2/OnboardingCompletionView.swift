@@ -8,13 +8,16 @@
 
 import SwiftUI
 import FirebaseAuth
+import SuperwallKit
 
 struct OnboardingCompletionView: View {
     let habitsQuizResult: HabitsQuizResult?
     let onboardingStartTime: Date?
+    let language: String // Language detected during onboarding ("en" or "fr")
     let onViewPlan: () -> Void
 
     @StateObject private var storeKit = StoreKitManager.shared
+    @StateObject private var superwallDelegate = SuperwallDelegateHandler()
     @State private var hasTrackedCompletion = false
     @State private var isPurchasing = false
     @State private var purchaseError: String?
@@ -29,76 +32,40 @@ struct OnboardingCompletionView: View {
 
 
     var body: some View {
-        Group {
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                colors: [
+                    Color(hex: "0A0515"),
+                    Color(hex: "1a0a2e")
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        }
+        .onAppear {
             if bypassPaywallForTesting {
                 // DEBUG: Skip paywall and go directly to app
-                Color.clear
-                    .onAppear {
-                        trackOnboardingCompletion()
-                        onViewPlan()
-                    }
+                trackOnboardingCompletion()
+                onViewPlan()
             } else {
-                CustomPaywallView(
-                    onComplete: {
-                        // User skipped paywall - complete onboarding
-                        onViewPlan()
-                    },
-                    onPurchase: { planType in
-                        Task {
-                            isPurchasing = true
-                            purchaseError = nil
-
-                            // Map plan type to product ID
-                            let productID = planType == "yearly"
-                                ? StoreKitManager.yearlyProductID
-                                : StoreKitManager.monthlyProductID
-
-                            let result = await storeKit.purchase(productID)
-
-                            isPurchasing = false
-
-                            switch result {
-                            case .success:
-                                // Purchase successful - complete onboarding
-                                onViewPlan()
-                            case .cancelled:
-                                // User cancelled - no error message needed
-                                break
-                            case .pending:
-                                // Ask to Buy or other pending state
-                                purchaseError = "Achat en attente d'approbation"
-                            case .failed(let error):
-                                purchaseError = error.localizedDescription
-                            }
-                        }
-                    },
-                    onRestore: {
-                        Task {
-                            isPurchasing = true
-                            purchaseError = nil
-
-                            let success = await storeKit.restorePurchases()
-
-                            isPurchasing = false
-
-                            if success {
-                                // Restore successful - complete onboarding
-                                onViewPlan()
-                            } else {
-                                purchaseError = "Aucun achat à restaurer"
-                            }
-                        }
-                    }
+                // Track paywall/completion screen viewed
+                MixpanelManager.shared.trackOnboardingCompletionViewed(
+                    quizAnswersCount: habitsQuizResult?.answers.count ?? 0,
+                    hasQuizData: habitsQuizResult != nil
                 )
-                .onAppear {
-                    // Track paywall/completion screen viewed
-                    MixpanelManager.shared.trackOnboardingCompletionViewed(
-                        quizAnswersCount: habitsQuizResult?.answers.count ?? 0,
-                        hasQuizData: habitsQuizResult != nil
-                    )
-                    // Track onboarding completion (once)
-                    trackOnboardingCompletion()
-                }
+                // Track onboarding completion (once)
+                trackOnboardingCompletion()
+
+                // Setup Superwall delegate callback
+                superwallDelegate.onComplete = onViewPlan
+                Superwall.shared.delegate = superwallDelegate
+
+                // Show Superwall paywall with language-specific placement
+                let placement = language == "fr" ? "trigger_fr" : "trigger"
+                print("🌍 Showing Superwall paywall with placement: \(placement) (language: \(language))")
+                Superwall.shared.register(placement: placement)
             }
         }
     }
@@ -173,10 +140,44 @@ struct OnboardingCompletionView: View {
     }
 }
 
+// MARK: - Superwall Delegate Handler
+
+class SuperwallDelegateHandler: SuperwallDelegate, ObservableObject {
+    var onComplete: (() -> Void)?
+
+    func handleSuperwallEvent(withInfo eventInfo: SuperwallEventInfo) {
+        switch eventInfo.event {
+        case .paywallClose:
+            print("⚠️ Superwall paywall closed")
+            DispatchQueue.main.async {
+                self.onComplete?()
+            }
+        case .paywallDecline:
+            print("⚠️ Superwall paywall declined")
+            DispatchQueue.main.async {
+                self.onComplete?()
+            }
+        case .transactionComplete:
+            print("✅ Superwall transaction complete")
+            DispatchQueue.main.async {
+                self.onComplete?()
+            }
+        case .transactionRestore:
+            print("✅ Superwall transaction restored")
+            DispatchQueue.main.async {
+                self.onComplete?()
+            }
+        default:
+            break
+        }
+    }
+}
+
 #Preview {
     OnboardingCompletionView(
         habitsQuizResult: HabitsQuizResult(answers: Array(repeating: 2, count: 12)),
         onboardingStartTime: Date().addingTimeInterval(-300),
+        language: "en",
         onViewPlan: {}
     )
 }

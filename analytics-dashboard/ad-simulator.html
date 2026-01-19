@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Performance Simulator - CortiFree</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #F5F1E8;
+            --card: #FFFFFF;
+            --text: #1A1A1A;
+            --text-light: #666666;
+            --orange: #FF6B3D;
+            --orange-light: #FFF0EC;
+            --green: #34C759;
+            --red: #FF3B30;
+            --border: #E5E5E5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 32px;
+        }
+
+        /* Left Panel - Parameters */
+        .params-panel {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .params-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+
+        .param-group {
+            margin-bottom: 24px;
+        }
+
+        .param-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .param-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .param-input:focus {
+            outline: none;
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px var(--orange-light);
+        }
+
+        .input-suffix {
+            position: relative;
+        }
+
+        .input-suffix::after {
+            content: attr(data-suffix);
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+        .input-suffix input {
+            padding-right: 40px;
+        }
+
+        /* Right Panel - Results */
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .result-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .result-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .result-value.positive {
+            color: var(--green);
+        }
+
+        .result-value.negative {
+            color: var(--red);
+        }
+
+        .result-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        /* Breakdown Section */
+        .breakdown-section {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .breakdown-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .breakdown-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 11px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+            background: var(--bg);
+        }
+
+        .breakdown-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+        }
+
+        .breakdown-table tr:hover {
+            background: var(--orange-light);
+        }
+
+        .metric-name {
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Comparison Section */
+        .comparison-section {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .save-scenario-btn {
+            background: var(--orange);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .save-scenario-btn:hover {
+            background: #FF5525;
+            transform: translateY(-1px);
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .scenario-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scenario-card:hover {
+            border-color: var(--orange);
+            box-shadow: 0 4px 12px rgba(255, 107, 61, 0.1);
+        }
+
+        .scenario-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .scenario-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .scenario-metric strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .scenario-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .scenario-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scenario-btn:hover {
+            background: var(--orange-light);
+            border-color: var(--orange);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .params-panel {
+                position: relative;
+                top: 0;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .scenarios-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Simulateur Ad Performance</h1>
+            <p class="subtitle">Testez vos budgets publicitaires et optimisez votre ROI</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left Panel: Parameters -->
+            <div class="params-panel">
+                <h2 class="params-title">Paramètres</h2>
+
+                <div class="param-group">
+                    <label class="param-label">Budget Mensuel</label>
+                    <div class="input-suffix" data-suffix="€">
+                        <input type="number" id="budget" class="param-input" value="10000" step="1000" min="0">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">CPI (Coût par Install)</label>
+                    <div class="input-suffix" data-suffix="€">
+                        <input type="number" id="cpi" class="param-input" value="6.5" step="0.1" min="0">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">Install → Trial</label>
+                    <div class="input-suffix" data-suffix="%">
+                        <input type="number" id="installToTrial" class="param-input" value="70" step="1" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">Trial → Paid</label>
+                    <div class="input-suffix" data-suffix="%">
+                        <input type="number" id="trialToPaid" class="param-input" value="18" step="1" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">Prix Mensuel</label>
+                    <div class="input-suffix" data-suffix="€">
+                        <input type="number" id="priceMonthly" class="param-input" value="9.99" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">Prix Annuel</label>
+                    <div class="input-suffix" data-suffix="€">
+                        <input type="number" id="priceYearly" class="param-input" value="49.99" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">% Abonnements Annuels</label>
+                    <div class="input-suffix" data-suffix="%">
+                        <input type="number" id="yearlyRatio" class="param-input" value="70" step="1" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">Churn Mensuel</label>
+                    <div class="input-suffix" data-suffix="%">
+                        <input type="number" id="churn" class="param-input" value="12" step="1" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="param-group">
+                    <label class="param-label">Projection</label>
+                    <div class="input-suffix" data-suffix="mois">
+                        <input type="number" id="projectionMonths" class="param-input" value="12" step="1" min="1" max="36">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="results-panel">
+                <!-- KPI Cards -->
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="result-icon">📱</div>
+                        <div class="result-label">Installations</div>
+                        <div class="result-value" id="resultInstalls">0</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-icon">👤</div>
+                        <div class="result-label">Paid Subs</div>
+                        <div class="result-value" id="resultPaidSubs">0</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-icon">💰</div>
+                        <div class="result-label">Revenus M1</div>
+                        <div class="result-value" id="resultRevenue">0€</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-icon">🎯</div>
+                        <div class="result-label">CPA</div>
+                        <div class="result-value" id="resultCPA">0€</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-icon">📈</div>
+                        <div class="result-label">ROI 12 Mois</div>
+                        <div class="result-value" id="resultROI">0%</div>
+                        <div class="result-subtitle" id="resultROIStatus"></div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-icon">⚡</div>
+                        <div class="result-label">Break-Even</div>
+                        <div class="result-value" id="resultBreakEven">-</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-icon">💎</div>
+                        <div class="result-label">LTV Projeté</div>
+                        <div class="result-value" id="resultLTV">0€</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-icon">💸</div>
+                        <div class="result-label">Profit M1</div>
+                        <div class="result-value" id="resultProfit">0€</div>
+                    </div>
+                </div>
+
+                <!-- Breakdown Table -->
+                <div class="breakdown-section">
+                    <h2 class="breakdown-title">Détails de Projection (12 mois)</h2>
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>Métrique</th>
+                                <th style="text-align: right;">Valeur</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdownTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Saved Scenarios -->
+                <div class="comparison-section">
+                    <div class="comparison-header">
+                        <h2 class="breakdown-title">Scénarios Sauvegardés</h2>
+                        <button class="save-scenario-btn" onclick="saveScenario()">💾 Sauvegarder ce scénario</button>
+                    </div>
+                    <div class="scenarios-grid" id="scenariosGrid">
+                        <div class="empty-state">
+                            <div class="empty-icon">📊</div>
+                            <p>Aucun scénario sauvegardé</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get all input elements
+        const inputs = {
+            budget: document.getElementById('budget'),
+            cpi: document.getElementById('cpi'),
+            installToTrial: document.getElementById('installToTrial'),
+            trialToPaid: document.getElementById('trialToPaid'),
+            priceMonthly: document.getElementById('priceMonthly'),
+            priceYearly: document.getElementById('priceYearly'),
+            yearlyRatio: document.getElementById('yearlyRatio'),
+            churn: document.getElementById('churn'),
+            projectionMonths: document.getElementById('projectionMonths')
+        };
+
+        // Load saved scenarios from localStorage
+        let savedScenarios = JSON.parse(localStorage.getItem('adScenarios') || '[]');
+
+        // Calculate and update results
+        function calculate() {
+            const params = {
+                budget: parseFloat(inputs.budget.value),
+                cpi: parseFloat(inputs.cpi.value),
+                installToTrial: parseFloat(inputs.installToTrial.value) / 100,
+                trialToPaid: parseFloat(inputs.trialToPaid.value) / 100,
+                priceMonthly: parseFloat(inputs.priceMonthly.value),
+                priceYearly: parseFloat(inputs.priceYearly.value),
+                yearlyRatio: parseFloat(inputs.yearlyRatio.value) / 100,
+                churn: parseFloat(inputs.churn.value) / 100,
+                projectionMonths: parseInt(inputs.projectionMonths.value)
+            };
+
+            // Acquisition
+            const installs = params.budget / params.cpi;
+            const trials = installs * params.installToTrial;
+            const paidSubs = trials * params.trialToPaid;
+
+            // Revenue Month 1
+            const yearlySubs = paidSubs * params.yearlyRatio;
+            const monthlySubs = paidSubs * (1 - params.yearlyRatio);
+            const revenueM1 = (monthlySubs * params.priceMonthly) + (yearlySubs * params.priceYearly / 12);
+
+            // Costs & Profitability
+            const cpa = params.budget / paidSubs;
+            const profitM1 = revenueM1 - params.budget;
+            const roi1M = (profitM1 / params.budget) * 100;
+
+            // LTV Calculation (over projection period with churn)
+            let ltv = 0;
+            let activeUsers = paidSubs;
+            for (let month = 1; month <= params.projectionMonths; month++) {
+                const monthRevenue = (activeUsers * params.yearlyRatio * params.priceYearly / 12) +
+                                    (activeUsers * (1 - params.yearlyRatio) * params.priceMonthly);
+                ltv += monthRevenue;
+                activeUsers = activeUsers * (1 - params.churn);
+            }
+            const ltvPerUser = ltv / paidSubs;
+
+            // Long-term ROI
+            const totalInvestment = params.budget;
+            const totalRevenue = ltv;
+            const roiCumulative = ((totalRevenue - totalInvestment) / totalInvestment) * 100;
+
+            // Break-even calculation
+            let breakEven = '-';
+            if (profitM1 < 0) {
+                let cumProfit = profitM1;
+                let month = 1;
+                let users = paidSubs;
+                while (cumProfit < 0 && month <= 36) {
+                    month++;
+                    users = users * (1 - params.churn);
+                    const monthRev = (users * params.yearlyRatio * params.priceYearly / 12) +
+                                    (users * (1 - params.yearlyRatio) * params.priceMonthly);
+                    cumProfit += monthRev;
+                }
+                if (cumProfit >= 0) {
+                    breakEven = `${month} mois`;
+                }
+            } else {
+                breakEven = '< 1 mois';
+            }
+
+            // Update UI
+            document.getElementById('resultInstalls').textContent = Math.floor(installs).toLocaleString();
+            document.getElementById('resultPaidSubs').textContent = Math.floor(paidSubs).toLocaleString();
+            document.getElementById('resultRevenue').textContent = revenueM1.toFixed(0) + '€';
+            document.getElementById('resultCPA').textContent = cpa.toFixed(2) + '€';
+
+            const roiElement = document.getElementById('resultROI');
+            roiElement.textContent = roiCumulative.toFixed(1) + '%';
+            roiElement.className = 'result-value ' + (roiCumulative > 0 ? 'positive' : 'negative');
+
+            document.getElementById('resultROIStatus').textContent = roiCumulative > 0 ? 'Rentable' : 'Non rentable';
+            document.getElementById('resultBreakEven').textContent = breakEven;
+            document.getElementById('resultLTV').textContent = ltvPerUser.toFixed(2) + '€';
+
+            const profitElement = document.getElementById('resultProfit');
+            profitElement.textContent = profitM1.toFixed(0) + '€';
+            profitElement.className = 'result-value ' + (profitM1 > 0 ? 'positive' : 'negative');
+
+            // Update breakdown table
+            updateBreakdownTable({
+                installs,
+                trials,
+                paidSubs,
+                revenueM1,
+                totalRevenue,
+                totalInvestment,
+                profitM1,
+                roi1M,
+                roiCumulative,
+                cpa,
+                ltvPerUser,
+                breakEven
+            });
+
+            return { params, results: {
+                installs, paidSubs, revenueM1, cpa, roiCumulative, ltvPerUser, breakEven, profitM1
+            }};
+        }
+
+        function updateBreakdownTable(results) {
+            const tbody = document.getElementById('breakdownTableBody');
+            const rows = [
+                { label: 'Installations totales', value: Math.floor(results.installs).toLocaleString() },
+                { label: 'Users en trial', value: Math.floor(results.trials).toLocaleString() },
+                { label: 'Abonnements payants', value: Math.floor(results.paidSubs).toLocaleString() },
+                { label: 'CPA (Coût par acquisition)', value: results.cpa.toFixed(2) + '€' },
+                { label: 'Revenus Mois 1', value: results.revenueM1.toFixed(0) + '€' },
+                { label: 'Profit Mois 1', value: results.profitM1.toFixed(0) + '€' },
+                { label: 'ROI Mois 1', value: results.roi1M.toFixed(1) + '%' },
+                { label: 'Revenus cumulés (projection)', value: results.totalRevenue.toFixed(0) + '€' },
+                { label: 'ROI cumulé (projection)', value: results.roiCumulative.toFixed(1) + '%' },
+                { label: 'LTV par user', value: results.ltvPerUser.toFixed(2) + '€' },
+                { label: 'Break-even point', value: results.breakEven }
+            ];
+
+            tbody.innerHTML = rows.map(row => `
+                <tr>
+                    <td class="metric-name">${row.label}</td>
+                    <td class="metric-value">${row.value}</td>
+                </tr>
+            `).join('');
+        }
+
+        function saveScenario() {
+            const name = prompt('Nom du scénario:', `Scénario ${savedScenarios.length + 1}`);
+            if (!name) return;
+
+            const calculation = calculate();
+            const scenario = {
+                id: Date.now(),
+                name,
+                ...calculation.params,
+                ...calculation.results,
+                createdAt: new Date().toISOString()
+            };
+
+            savedScenarios.push(scenario);
+            localStorage.setItem('adScenarios', JSON.stringify(savedScenarios));
+            renderScenarios();
+        }
+
+        function loadScenario(id) {
+            const scenario = savedScenarios.find(s => s.id === id);
+            if (!scenario) return;
+
+            inputs.budget.value = scenario.budget;
+            inputs.cpi.value = scenario.cpi;
+            inputs.installToTrial.value = (scenario.installToTrial * 100).toFixed(0);
+            inputs.trialToPaid.value = (scenario.trialToPaid * 100).toFixed(0);
+            inputs.priceMonthly.value = scenario.priceMonthly;
+            inputs.priceYearly.value = scenario.priceYearly;
+            inputs.yearlyRatio.value = (scenario.yearlyRatio * 100).toFixed(0);
+            inputs.churn.value = (scenario.churn * 100).toFixed(0);
+            inputs.projectionMonths.value = scenario.projectionMonths;
+
+            calculate();
+        }
+
+        function deleteScenario(id) {
+            if (!confirm('Supprimer ce scénario?')) return;
+            savedScenarios = savedScenarios.filter(s => s.id !== id);
+            localStorage.setItem('adScenarios', JSON.stringify(savedScenarios));
+            renderScenarios();
+        }
+
+        function renderScenarios() {
+            const grid = document.getElementById('scenariosGrid');
+
+            if (savedScenarios.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <p>Aucun scénario sauvegardé</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = savedScenarios.map(s => `
+                <div class="scenario-card">
+                    <div class="scenario-name">${s.name}</div>
+                    <div class="scenario-metrics">
+                        <div class="scenario-metric">Budget: <strong>${s.budget.toLocaleString()}€</strong></div>
+                        <div class="scenario-metric">CPI: <strong>${s.cpi}€</strong></div>
+                        <div class="scenario-metric">Paid Subs: <strong>${Math.floor(s.paidSubs)}</strong></div>
+                        <div class="scenario-metric">ROI: <strong class="${s.roiCumulative > 0 ? 'positive' : 'negative'}">${s.roiCumulative.toFixed(1)}%</strong></div>
+                    </div>
+                    <div class="scenario-actions">
+                        <button class="scenario-btn" onclick="loadScenario(${s.id})">📂 Charger</button>
+                        <button class="scenario-btn" onclick="deleteScenario(${s.id})">🗑️ Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Auto-calculate on any input change
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Initial calculation
+        calculate();
+        renderScenarios();
+    </script>
+</body>
+</html>

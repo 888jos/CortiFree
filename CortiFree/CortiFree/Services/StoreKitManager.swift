@@ -313,6 +313,48 @@ class StoreKitManager: ObservableObject {
                     currency: product.priceFormatStyle.currencyCode ?? "EUR"
                 )
 
+                // SKAN Conversion Value Update (iOS 14.5+)
+                if #available(iOS 16.1, *) {
+                    // For paid subscriptions (high value = 63)
+                    SKAdNetwork.updatePostbackConversionValue(
+                        63, // Max value for paid subscription
+                        coarseValue: .high,
+                        lockWindow: false
+                    ) { error in
+                        if let error = error {
+                            print("❌ SKAN update error: \(error.localizedDescription)")
+                        } else {
+                            print("✅ SKAN conversion value updated: 63 (high)")
+                            MixpanelManager.shared.track(
+                                event: "skan_conversion_value_updated",
+                                properties: [
+                                    "value": 63,
+                                    "coarse": "high",
+                                    "product_id": product.id
+                                ]
+                            )
+                        }
+                    }
+                } else if #available(iOS 14.0, *) {
+                    // iOS 14-16: Legacy SKAN
+                    SKAdNetwork.updateConversionValue(63)
+                    print("✅ SKAN (legacy) conversion value updated: 63")
+                }
+
+                // Update subscription status in Mixpanel
+                let subscriptionType: MixpanelManager.SubscriptionType = product.id.contains("yearly") ? .yearly : .monthly
+                MixpanelManager.shared.updateSubscriptionStatus(
+                    status: .trial, // Initially trial (3 days)
+                    type: subscriptionType,
+                    expiryDate: transaction.expirationDate
+                )
+
+                // Save first subscription date if first time
+                if UserDefaults.standard.object(forKey: "first_subscription_date") == nil {
+                    UserDefaults.standard.set(Date(), forKey: "first_subscription_date")
+                    print("✅ First subscription date saved")
+                }
+
                 // Notifier le changement d'état premium
                 NotificationCenter.default.post(name: .subscriptionStatusChanged, object: nil)
 
@@ -389,6 +431,7 @@ class StoreKitManager: ObservableObject {
     /// Met à jour la liste des produits achetés actifs
     func updatePurchasedProducts() async {
         var purchased: Set<String> = []
+        var latestTransaction: Transaction?
 
         // Parcourir toutes les transactions actives
         for await result in Transaction.currentEntitlements {
@@ -398,6 +441,7 @@ class StoreKitManager: ObservableObject {
                 // Vérifier que la transaction n'est pas révoquée
                 if transaction.revocationDate == nil {
                     purchased.insert(transaction.productID)
+                    latestTransaction = transaction
                 }
             } catch {
                 #if DEBUG
@@ -415,9 +459,42 @@ class StoreKitManager: ObservableObject {
             UserDefaults.standard.set(firstProductID, forKey: "subscriptionProductID")
         }
 
+        // Update subscription status in Mixpanel
+        if isPremium, let transaction = latestTransaction {
+            // Determine if trial or active
+            let isTrial = isInTrialPeriod(transaction: transaction)
+            let status: MixpanelManager.SubscriptionStatus = isTrial ? .trial : .active
+
+            // Determine subscription type
+            let subscriptionType: MixpanelManager.SubscriptionType = transaction.productID.contains("yearly") ? .yearly : .monthly
+
+            MixpanelManager.shared.updateSubscriptionStatus(
+                status: status,
+                type: subscriptionType,
+                expiryDate: transaction.expirationDate
+            )
+        } else {
+            // No active subscription
+            MixpanelManager.shared.updateSubscriptionStatus(
+                status: .expired,
+                type: nil,
+                expiryDate: nil
+            )
+        }
+
         #if DEBUG
         print("📋 StoreKit: État mis à jour - Premium: \(isPremium), Abonnements: \(purchased)")
         #endif
+    }
+
+    /// Check if transaction is still in trial period (3 days)
+    private func isInTrialPeriod(transaction: Transaction) -> Bool {
+        let purchaseDate = transaction.purchaseDate // purchaseDate is not optional in Transaction
+
+        let trialDurationDays = 3
+        let daysSincePurchase = Calendar.current.dateComponents([.day], from: purchaseDate, to: Date()).day ?? 0
+
+        return daysSincePurchase <= trialDurationDays
     }
 
     // MARK: - Transaction Listener

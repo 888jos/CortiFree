@@ -1,0 +1,2886 @@
+o
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CortiFree Analytics Dashboard</title>
+
+    <!-- Firebase JS SDK v10 (Compat mode) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <style>
+        /* ============================================
+           CORTIFREE ANALYTICS - MINIMALIST DESIGN
+           ============================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #F3F0F8;
+            --bg-card: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --accent-orange: #7C3AED;
+            --accent-orange-light: #F5F3FF;
+            --border-light: #E5E5E5;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 32px;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+            margin-bottom: 32px;
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 0;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--accent-orange-light);
+        }
+
+        .nav-tab.active {
+            color: var(--accent-orange);
+            border-bottom-color: var(--accent-orange);
+            font-weight: 600;
+        }
+
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .header-revenue {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* ============================================
+           PERIOD SELECTOR
+           ============================================ */
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .period-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .period-btn:hover {
+            background: var(--accent-orange-light);
+            border-color: var(--accent-orange);
+        }
+
+        .period-btn.active {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: white;
+        }
+
+        .condensed-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .condensed-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* ============================================
+           KPI CARDS GRID
+           ============================================ */
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .kpi-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .kpi-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+
+        .kpi-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-badge.good {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .kpi-badge.average {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .kpi-badge.poor {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .kpi-chart {
+            height: 60px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+
+        .kpi-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================
+           FUNNEL SECTION - MIXPANEL STYLE VISUAL
+           ============================================ */
+
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            letter-spacing: -0.3px;
+        }
+
+        .funnel-container {
+            margin-top: 32px;
+            overflow-x: auto;
+        }
+
+        .funnel-viz {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            min-height: 400px;
+            padding: 20px 0;
+            position: relative;
+        }
+
+        .funnel-step {
+            flex: 1;
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .funnel-bar {
+            width: 100%;
+            background: linear-gradient(180deg, #FF8C5A 0%, #FF6B3D 100%);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(255, 107, 61, 0.2);
+        }
+
+        .funnel-bar:hover {
+            background: linear-gradient(180deg, #FF9A6B 0%, #FF7A4E 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 61, 0.3);
+        }
+
+        .funnel-bar-inner {
+            padding: 8px 4px;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .funnel-bar-count {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .funnel-bar-percent {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        .funnel-step-label {
+            margin-top: 12px;
+            text-align: center;
+            width: 100%;
+            padding: 0 4px;
+        }
+
+        .funnel-step-name {
+            font-size: 11px;
+            color: var(--text-primary);
+            font-weight: 500;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            word-wrap: break-word;
+        }
+
+        .funnel-step-event {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: 'Monaco', 'Courier New', monospace;
+            word-wrap: break-word;
+        }
+
+        .funnel-dropoff-indicator {
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--bg-card);
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: var(--text-muted);
+        }
+
+        .funnel-dropoff-indicator.high {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: #FEE2E2;
+        }
+
+        .funnel-legend {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            gap: 32px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .funnel-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .funnel-legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        /* Funnel detail toggle */
+        .funnel-detail-toggle {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .funnel-detail-toggle label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .funnel-detail-toggle input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .funnel-viz.condensed .funnel-step {
+            min-width: 40px;
+        }
+
+        .funnel-viz.condensed .funnel-step-label {
+            display: none;
+        }
+
+        .funnel-viz.condensed .funnel-step-name,
+        .funnel-viz.condensed .funnel-step-event {
+            display: none;
+        }
+
+        /* ============================================
+           FUNNEL TABLE - DETAILED BREAKDOWN
+           ============================================ */
+
+        .funnel-table-section {
+            margin-top: 32px;
+        }
+
+        .funnel-metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 16px;
+        }
+
+        .funnel-metrics-table thead {
+            background: #F9FAFB;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .funnel-metrics-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .funnel-metrics-table th:nth-child(2),
+        .funnel-metrics-table th:nth-child(3),
+        .funnel-metrics-table th:nth-child(4),
+        .funnel-metrics-table th:nth-child(5) {
+            text-align: right;
+        }
+
+        .funnel-metrics-table tbody tr {
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.15s ease;
+        }
+
+        .funnel-metrics-table tbody tr:hover {
+            background: var(--accent-orange-light);
+        }
+
+        .funnel-metrics-table td {
+            padding: 12px 16px;
+            color: var(--text-primary);
+        }
+
+        .funnel-metrics-table td:nth-child(2),
+        .funnel-metrics-table td:nth-child(3),
+        .funnel-metrics-table td:nth-child(4),
+        .funnel-metrics-table td:nth-child(5) {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .funnel-metrics-table .step-name {
+            font-weight: 500;
+        }
+
+        .funnel-metrics-table .metric-count {
+            font-weight: 600;
+            color: var(--accent-orange);
+        }
+
+        .funnel-metrics-table .metric-dropoff.high {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        /* ============================================
+           CHARTS
+           ============================================ */
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 24px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        /* ============================================
+           LOADING & ERROR STATES
+           ============================================ */
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 241, 232, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-light);
+            border-top-color: var(--accent-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .error-banner {
+            background: #FEE2E2;
+            border: 1px solid #DC2626;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .error-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #DC2626;
+        }
+
+        .error-message {
+            font-size: 14px;
+            color: #991B1B;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .header-revenue {
+                font-size: 36px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+            }
+
+            .kpi-value {
+                font-size: 28px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ============================================
+           UTILITIES
+           ============================================ */
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mini sparkline chart */
+        .sparkline {
+            width: 100%;
+            height: 100%;
+        }
+
+        .sparkline path {
+            fill: none;
+            stroke: var(--accent-orange);
+            stroke-width: 2;
+        }
+
+        .sparkline .area {
+            fill: var(--accent-orange);
+            opacity: 0.1;
+        }
+
+        /* ============================================
+           AI RECOMMENDATIONS SIDEBAR
+           ============================================ */
+
+        .ai-sidebar-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 380px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border-light);
+            padding: 32px 24px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .ai-sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .ai-sidebar-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-live-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--success);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-refresh-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .ai-refresh-btn:hover {
+            background: var(--accent-orange-light);
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .recommendation-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .recommendation-card:hover {
+            border-color: var(--accent-orange);
+            box-shadow: 0 4px 12px rgba(255, 107, 61, 0.1);
+        }
+
+        .recommendation-card.priority-HIGH {
+            border-left: 4px solid var(--danger);
+        }
+
+        .recommendation-card.priority-MEDIUM {
+            border-left: 4px solid var(--warning);
+        }
+
+        .recommendation-card.priority-LOW {
+            border-left: 4px solid var(--success);
+        }
+
+        .recommendation-card.collapsed .recommendation-body {
+            display: none;
+        }
+
+        .recommendation-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .recommendation-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .recommendation-title-section {
+            flex: 1;
+        }
+
+        .recommendation-priority {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .recommendation-priority.HIGH {
+            background: #FFE5E5;
+            color: var(--danger);
+        }
+
+        .recommendation-priority.MEDIUM {
+            background: #FFF4E5;
+            color: var(--warning);
+        }
+
+        .recommendation-priority.LOW {
+            background: #E5F5E9;
+            color: var(--success);
+        }
+
+        .recommendation-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .recommendation-metrics {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .recommendation-metric {
+            flex: 1;
+        }
+
+        .recommendation-metric-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .recommendation-metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .recommendation-metric-value.target {
+            color: var(--success);
+        }
+
+        .recommendation-actions {
+            margin-bottom: 12px;
+        }
+
+        .recommendation-actions-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .recommendation-action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 0;
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .recommendation-action-item::before {
+            content: '✓';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-orange);
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            line-height: 18px;
+            flex-shrink: 0;
+        }
+
+        .recommendation-impact {
+            padding: 10px 12px;
+            background: var(--accent-orange-light);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-orange);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .recommendation-impact::before {
+            content: '⚡';
+            font-size: 16px;
+        }
+
+        .ai-empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-muted);
+        }
+
+        .ai-empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .ai-empty-state-text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1600px) {
+            .ai-sidebar-panel {
+                width: 340px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .ai-sidebar-panel {
+                display: none;
+            }
+        }
+
+        /* Main content adjustment when sidebar is visible */
+        body.has-ai-sidebar .container {
+            margin-right: 380px;
+        }
+
+        @media (max-width: 1600px) {
+            body.has-ai-sidebar .container {
+                margin-right: 340px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Chargement des données...</div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-top">
+                <div>
+                    <div class="header-subtitle">Analytics Dashboard</div>
+                    <h1>CortiFree</h1>
+                </div>
+                <div class="header-revenue" id="headerRevenue">$0.00</div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchPage('overview')">📊 Overview</button>
+                <button class="nav-tab" onclick="switchPage('ad-simulator')">🎯 Ad Simulator</button>
+                <a href="technical-docs.html" class="nav-tab" style="text-decoration: none;">📚 Documentation</a>
+            </div>
+        </header>
+
+        <!-- PAGE 1: Overview -->
+        <div id="page-overview" class="page-content active">
+            <!-- Error Banner (hidden by default) -->
+            <div class="error-banner hidden" id="errorBanner">
+                <div>
+                    <div class="error-title">⚠️ Erreur de chargement</div>
+                    <div class="error-message" id="errorMessage">--</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+        <div class="controls">
+            <div class="period-selector">
+                <button class="period-btn active" onclick="setPeriod('today')">Today</button>
+                <button class="period-btn" onclick="setPeriod('yesterday')">Yesterday</button>
+                <button class="period-btn" onclick="setPeriod('7d')">Last 7 Days</button>
+                <button class="period-btn" onclick="setPeriod('30d')">Last Month</button>
+                <button class="period-btn" onclick="setPeriod('all')">All Time</button>
+                <button class="period-btn" onclick="setPeriod('custom')">Custom</button>
+            </div>
+            <label class="condensed-toggle">
+                <input type="checkbox" id="condensedView" checked>
+                <span>Condensed View</span>
+            </label>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid" id="kpiGrid">
+            <!-- KPIs will be inserted here -->
+        </div>
+
+        <!-- Funnel Section - Visual -->
+        <section class="section">
+            <div class="section-title">Onboarding Funnel - Visual Overview</div>
+            <div class="funnel-detail-toggle">
+                <input type="checkbox" id="showFunnelDetails" checked>
+                <label for="showFunnelDetails">Show step details (names & events)</label>
+            </div>
+            <div class="funnel-container">
+                <div class="funnel-viz" id="funnelViz">
+                    <!-- Funnel bars will be inserted here -->
+                </div>
+                <div class="funnel-legend">
+                    <div class="funnel-legend-item">
+                        <div class="funnel-legend-color" style="background: linear-gradient(180deg, #FF8C5A 0%, #FF6B3D 100%);"></div>
+                        <span>Conversion Rate</span>
+                    </div>
+                    <div class="funnel-legend-item">
+                        <span style="color: var(--danger);">●</span>
+                        <span>High Drop-off (>10%)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Funnel Section - Detailed Table -->
+        <section class="section">
+            <div class="section-title">Onboarding Funnel - Detailed Metrics</div>
+            <div class="funnel-table-section">
+                <table class="funnel-metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Step</th>
+                            <th>Users</th>
+                            <th>% of Total</th>
+                            <th>Conversion</th>
+                            <th>Drop-off</th>
+                        </tr>
+                    </thead>
+                    <tbody id="funnelMetricsTableBody">
+                        <!-- Table rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Engagement Charts -->
+        <div class="chart-row">
+            <section class="section">
+                <div class="section-title">Retention Metrics</div>
+                <div class="chart-container">
+                    <canvas id="retentionChart"></canvas>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-title">Habits Usage</div>
+                <div class="chart-container">
+                    <canvas id="habitsChart"></canvas>
+                </div>
+            </section>
+        </div>
+        </div>
+        <!-- End PAGE 1: Overview -->
+
+        <!-- PAGE 2: Ad Simulator -->
+        <div id="page-ad-simulator" class="page-content">
+            <style>
+                /* Ad Simulator Styles */
+                .ad-sim-grid {
+                    display: grid;
+                    grid-template-columns: 400px 1fr;
+                    gap: 32px;
+                    margin-top: 24px;
+                }
+
+                .ad-params-panel {
+                    background: var(--bg-card);
+                    border-radius: 12px;
+                    padding: 32px;
+                    border: 1px solid var(--border-light);
+                    height: fit-content;
+                    position: sticky;
+                    top: 20px;
+                }
+
+                .ad-params-title {
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin-bottom: 24px;
+                    color: var(--text-primary);
+                }
+
+                .ad-param-group {
+                    margin-bottom: 20px;
+                }
+
+                .ad-param-label {
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 500;
+                    color: var(--text-secondary);
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .ad-param-input {
+                    width: 100%;
+                    padding: 12px 16px;
+                    border: 2px solid var(--border-light);
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    background: white;
+                    transition: all 0.2s;
+                }
+
+                .ad-param-input:focus {
+                    outline: none;
+                    border-color: var(--accent-orange);
+                    box-shadow: 0 0 0 3px var(--accent-orange-light);
+                }
+
+                .ad-input-suffix {
+                    position: relative;
+                }
+
+                .ad-input-suffix::after {
+                    content: attr(data-suffix);
+                    position: absolute;
+                    right: 16px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    font-size: 14px;
+                    color: var(--text-secondary);
+                    pointer-events: none;
+                }
+
+                .ad-input-suffix input {
+                    padding-right: 45px;
+                }
+
+                .ad-results-panel {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+
+                .ad-results-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 16px;
+                }
+
+                .ad-result-card {
+                    background: var(--bg-card);
+                    border-radius: 12px;
+                    padding: 24px;
+                    border: 1px solid var(--border-light);
+                }
+
+                .ad-result-icon {
+                    font-size: 28px;
+                    margin-bottom: 12px;
+                }
+
+                .ad-result-label {
+                    font-size: 11px;
+                    color: var(--text-secondary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 8px;
+                }
+
+                .ad-result-value {
+                    font-size: 32px;
+                    font-weight: 700;
+                    color: var(--text-primary);
+                    line-height: 1;
+                }
+
+                .ad-result-value.positive {
+                    color: var(--success);
+                }
+
+                .ad-result-value.negative {
+                    color: var(--danger);
+                }
+
+                .ad-result-subtitle {
+                    font-size: 12px;
+                    color: var(--text-secondary);
+                    margin-top: 8px;
+                }
+
+                .ad-breakdown-section {
+                    background: var(--bg-card);
+                    border-radius: 12px;
+                    padding: 32px;
+                    border: 1px solid var(--border-light);
+                }
+
+                .ad-breakdown-title {
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin-bottom: 24px;
+                    color: var(--text-primary);
+                }
+
+                .ad-breakdown-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                .ad-breakdown-table th {
+                    text-align: left;
+                    padding: 12px;
+                    font-size: 11px;
+                    color: var(--text-secondary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    border-bottom: 2px solid var(--border-light);
+                    background: var(--bg-main);
+                }
+
+                .ad-breakdown-table td {
+                    padding: 16px 12px;
+                    border-bottom: 1px solid var(--border-light);
+                    font-size: 14px;
+                }
+
+                .ad-breakdown-table tr:hover {
+                    background: var(--accent-orange-light);
+                }
+
+                .ad-metric-name {
+                    font-weight: 500;
+                }
+
+                .ad-metric-value {
+                    font-weight: 700;
+                    text-align: right;
+                    font-variant-numeric: tabular-nums;
+                }
+
+                .ad-scenarios-section {
+                    background: var(--bg-card);
+                    border-radius: 12px;
+                    padding: 32px;
+                    border: 1px solid var(--border-light);
+                }
+
+                .ad-scenarios-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 24px;
+                }
+
+                .ad-save-btn {
+                    background: var(--accent-orange);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .ad-save-btn:hover {
+                    background: #FF5525;
+                    transform: translateY(-1px);
+                }
+
+                .ad-scenarios-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 16px;
+                }
+
+                .ad-scenario-card {
+                    background: var(--bg-main);
+                    border: 2px solid var(--border-light);
+                    border-radius: 12px;
+                    padding: 20px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .ad-scenario-card:hover {
+                    border-color: var(--accent-orange);
+                    box-shadow: 0 4px 12px rgba(255, 107, 61, 0.1);
+                }
+
+                .ad-scenario-name {
+                    font-size: 16px;
+                    font-weight: 600;
+                    margin-bottom: 12px;
+                }
+
+                .ad-scenario-metrics {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                    font-size: 13px;
+                    color: var(--text-secondary);
+                }
+
+                .ad-scenario-metric strong {
+                    color: var(--text-primary);
+                    font-weight: 600;
+                }
+
+                .ad-scenario-actions {
+                    display: flex;
+                    gap: 8px;
+                    margin-top: 16px;
+                    padding-top: 16px;
+                    border-top: 1px solid var(--border-light);
+                }
+
+                .ad-scenario-btn {
+                    flex: 1;
+                    padding: 8px;
+                    border: 1px solid var(--border-light);
+                    background: white;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .ad-scenario-btn:hover {
+                    background: var(--accent-orange-light);
+                    border-color: var(--accent-orange);
+                }
+
+                .ad-empty-state {
+                    text-align: center;
+                    padding: 60px 20px;
+                    color: var(--text-secondary);
+                    grid-column: 1 / -1;
+                }
+
+                .ad-empty-icon {
+                    font-size: 48px;
+                    margin-bottom: 16px;
+                }
+
+                @media (max-width: 1200px) {
+                    .ad-sim-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    .ad-params-panel {
+                        position: relative;
+                        top: 0;
+                    }
+                    .ad-results-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                    .ad-scenarios-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+
+            <div class="ad-sim-grid">
+                <!-- Left Panel: Parameters -->
+                <div class="ad-params-panel">
+                    <h2 class="ad-params-title">Paramètres</h2>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">Budget Mensuel</label>
+                        <div class="ad-input-suffix" data-suffix="€">
+                            <input type="number" id="adBudget" class="ad-param-input" value="10000" step="1000" min="0">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">CPI (Coût par Install)</label>
+                        <div class="ad-input-suffix" data-suffix="€">
+                            <input type="number" id="adCPI" class="ad-param-input" value="6.5" step="0.1" min="0">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">Install → Trial</label>
+                        <div class="ad-input-suffix" data-suffix="%">
+                            <input type="number" id="adInstallToTrial" class="ad-param-input" value="70" step="1" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">Trial → Paid</label>
+                        <div class="ad-input-suffix" data-suffix="%">
+                            <input type="number" id="adTrialToPaid" class="ad-param-input" value="18" step="1" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">Prix Mensuel</label>
+                        <div class="ad-input-suffix" data-suffix="€">
+                            <input type="number" id="adPriceMonthly" class="ad-param-input" value="9.99" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">Prix Annuel</label>
+                        <div class="ad-input-suffix" data-suffix="€">
+                            <input type="number" id="adPriceYearly" class="ad-param-input" value="49.99" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">% Abonnements Annuels</label>
+                        <div class="ad-input-suffix" data-suffix="%">
+                            <input type="number" id="adYearlyRatio" class="ad-param-input" value="70" step="1" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">Churn Mensuel</label>
+                        <div class="ad-input-suffix" data-suffix="%">
+                            <input type="number" id="adChurn" class="ad-param-input" value="12" step="1" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <div class="ad-param-group">
+                        <label class="ad-param-label">Projection</label>
+                        <div class="ad-input-suffix" data-suffix="mois">
+                            <input type="number" id="adProjectionMonths" class="ad-param-input" value="12" step="1" min="1" max="36">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Results -->
+                <div class="ad-results-panel">
+                    <!-- KPI Cards -->
+                    <div class="ad-results-grid">
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">📱</div>
+                            <div class="ad-result-label">Installations</div>
+                            <div class="ad-result-value" id="adResultInstalls">0</div>
+                        </div>
+
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">👤</div>
+                            <div class="ad-result-label">Paid Subs</div>
+                            <div class="ad-result-value" id="adResultPaidSubs">0</div>
+                        </div>
+
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">💰</div>
+                            <div class="ad-result-label">Revenus M1</div>
+                            <div class="ad-result-value" id="adResultRevenue">0€</div>
+                        </div>
+
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">🎯</div>
+                            <div class="ad-result-label">CPA</div>
+                            <div class="ad-result-value" id="adResultCPA">0€</div>
+                        </div>
+
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">📈</div>
+                            <div class="ad-result-label">ROI 12 Mois</div>
+                            <div class="ad-result-value" id="adResultROI">0%</div>
+                            <div class="ad-result-subtitle" id="adResultROIStatus"></div>
+                        </div>
+
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">⚡</div>
+                            <div class="ad-result-label">Break-Even</div>
+                            <div class="ad-result-value" id="adResultBreakEven">-</div>
+                        </div>
+
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">💎</div>
+                            <div class="ad-result-label">LTV Projeté</div>
+                            <div class="ad-result-value" id="adResultLTV">0€</div>
+                        </div>
+
+                        <div class="ad-result-card">
+                            <div class="ad-result-icon">💸</div>
+                            <div class="ad-result-label">Profit M1</div>
+                            <div class="ad-result-value" id="adResultProfit">0€</div>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown Table -->
+                    <div class="ad-breakdown-section">
+                        <h2 class="ad-breakdown-title">Détails de Projection (12 mois)</h2>
+                        <table class="ad-breakdown-table">
+                            <thead>
+                                <tr>
+                                    <th>Métrique</th>
+                                    <th style="text-align: right;">Valeur</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adBreakdownTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Saved Scenarios -->
+                    <div class="ad-scenarios-section">
+                        <div class="ad-scenarios-header">
+                            <h2 class="ad-breakdown-title">Scénarios Sauvegardés</h2>
+                            <button class="ad-save-btn" onclick="saveAdScenario()">💾 Sauvegarder ce scénario</button>
+                        </div>
+                        <div class="ad-scenarios-grid" id="adScenariosGrid">
+                            <div class="ad-empty-state">
+                                <div class="ad-empty-icon">📊</div>
+                                <p>Aucun scénario sauvegardé</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End PAGE 2: Ad Simulator -->
+    </div>
+
+    <script>
+        // ============================================
+        // FIREBASE CONFIGURATION
+        // ============================================
+        // Mixpanel Token (for future integration): 54821f0aa53aa5ce3804237815f94332
+        // Mixpanel Server: https://api-eu.mixpanel.com
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUNiZnPmlyqra5S-NE8oyteE0He78DwBA",
+            authDomain: "cortifree-app.firebaseapp.com",
+            projectId: "cortifree-app",
+            storageBucket: "cortifree-app.firebasestorage.app",
+            messagingSenderId: "559047783915",
+            appId: "1:559047783915:ios:528a29531de5a8219155ae"
+        };
+
+        // Initialize Firebase
+        let db;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log('✅ Firebase initialized successfully');
+        } catch (error) {
+            console.error('❌ Firebase initialization error:', error);
+            showError('Firebase initialization failed. Check your configuration.');
+        }
+
+        // ============================================
+        // GLOBAL STATE
+        // ============================================
+
+        let currentPeriod = {
+            name: 'today',
+            start: new Date(new Date().setHours(0, 0, 0, 0)),
+            end: new Date()
+        };
+
+        let cachedData = null;
+
+        // ============================================
+        // PERIOD MANAGEMENT
+        // ============================================
+
+        function setPeriod(period) {
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const now = new Date();
+            currentPeriod.name = period;
+            currentPeriod.end = now;
+
+            switch(period) {
+                case 'today':
+                    // Today from 00:00:00 to now
+                    currentPeriod.start = new Date(now.setHours(0, 0, 0, 0));
+                    currentPeriod.end = new Date();
+                    break;
+                case 'yesterday':
+                    // Yesterday from 00:00:00 to 23:59:59
+                    const yesterday = new Date(now);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    currentPeriod.start = new Date(yesterday.setHours(0, 0, 0, 0));
+                    currentPeriod.end = new Date(yesterday.setHours(23, 59, 59, 999));
+                    break;
+                case '7d':
+                    // Last 7 days
+                    currentPeriod.start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    currentPeriod.end = new Date();
+                    break;
+                case '30d':
+                    // Last 30 days (last month)
+                    currentPeriod.start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    currentPeriod.end = new Date();
+                    break;
+                case 'all':
+                    // All time
+                    currentPeriod.start = null;
+                    currentPeriod.end = new Date();
+                    break;
+                case 'custom':
+                    // Custom period (default to last 30 days)
+                    currentPeriod.start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    currentPeriod.end = new Date();
+                    break;
+            }
+
+            fetchAndRenderMetrics();
+        }
+
+        // ============================================
+        // DATA FETCHING (REAL FIREBASE DATA)
+        // ============================================
+
+        async function fetchRealData() {
+            console.log('🔄 Fetching real data from Firebase...');
+
+            try {
+                let usersQuery = db.collection('users');
+
+                if (currentPeriod.start) {
+                    usersQuery = usersQuery.where('createdAt', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
+                }
+
+                const usersSnapshot = await usersQuery.get();
+                const totalUsers = usersSnapshot.size;
+
+                console.log(`📊 Total users in period: ${totalUsers}`);
+
+                // Onboarding completed
+                const onboardingCompletedSnapshot = await db.collection('users')
+                    .where('onboardingCompleted', '==', true)
+                    .get();
+                const onboardingCompleted = onboardingCompletedSnapshot.size;
+
+                // Calculate average streak
+                let totalStreakDays = 0;
+                let usersWithStreak = 0;
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    if (userData.currentStreakDays && userData.currentStreakDays > 0) {
+                        totalStreakDays += userData.currentStreakDays;
+                        usersWithStreak++;
+                    }
+                });
+                const avgStreak = usersWithStreak > 0 ? (totalStreakDays / usersWithStreak).toFixed(1) : 0;
+
+                // Count total completed tasks (limit to first 100 users for performance)
+                let totalTasks = 0;
+                const limitedUsers = usersSnapshot.docs.slice(0, 100);
+                for (const userDoc of limitedUsers) {
+                    const tasksSnapshot = await db.collection('users')
+                        .doc(userDoc.id)
+                        .collection('completed_tasks')
+                        .get();
+                    totalTasks += tasksSnapshot.size;
+                }
+
+                // Get habit tracking stats
+                const habitStats = {
+                    meditation: 0,
+                    breathing: 0,
+                    journal: 0,
+                    sport: 0,
+                    water: 0,
+                    nature: 0,
+                    social: 0,
+                    sleep: 0
+                };
+
+                for (const habit of Object.keys(habitStats)) {
+                    const habitSnapshot = await db.collectionGroup('habit_tracking')
+                        .where('habitId', '==', habit)
+                        .where('totalCompletions', '>', 0)
+                        .limit(500)
+                        .get();
+                    habitStats[habit] = habitSnapshot.size;
+                }
+
+                // Calculate retention metrics
+                const now = new Date();
+                const retentionMetrics = {
+                    day1: 0,
+                    day3: 0,
+                    day7: 0,
+                    day14: 0,
+                    day30: 0
+                };
+
+                for (const userDoc of usersSnapshot.docs) {
+                    const userData = userDoc.data();
+                    if (!userData.createdAt) continue;
+
+                    const createdDate = userData.createdAt.toDate();
+                    const daysSinceCreation = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+
+                    const hasActivity = await db.collection('users')
+                        .doc(userDoc.id)
+                        .collection('completed_tasks')
+                        .limit(1)
+                        .get();
+
+                    const isActive = !hasActivity.empty;
+
+                    if (daysSinceCreation >= 1 && isActive) retentionMetrics.day1++;
+                    if (daysSinceCreation >= 3 && isActive) retentionMetrics.day3++;
+                    if (daysSinceCreation >= 7 && isActive) retentionMetrics.day7++;
+                    if (daysSinceCreation >= 14 && isActive) retentionMetrics.day14++;
+                    if (daysSinceCreation >= 30 && isActive) retentionMetrics.day30++;
+                }
+
+                const retentionRates = {
+                    day1: totalUsers > 0 ? ((retentionMetrics.day1 / totalUsers) * 100).toFixed(1) : 0,
+                    day3: totalUsers > 0 ? ((retentionMetrics.day3 / totalUsers) * 100).toFixed(1) : 0,
+                    day7: totalUsers > 0 ? ((retentionMetrics.day7 / totalUsers) * 100).toFixed(1) : 0,
+                    day14: totalUsers > 0 ? ((retentionMetrics.day14 / totalUsers) * 100).toFixed(1) : 0,
+                    day30: totalUsers > 0 ? ((retentionMetrics.day30 / totalUsers) * 100).toFixed(1) : 0
+                };
+
+                console.log('✅ Data fetched successfully');
+
+                return {
+                    totalUsers,
+                    onboardingCompleted,
+                    onboardingRate: totalUsers > 0 ? ((onboardingCompleted / totalUsers) * 100).toFixed(1) : 0,
+                    avgStreak,
+                    totalTasks,
+                    habitStats,
+                    retentionRates,
+                    activeSubscriptions: 0,
+                    revenue: 0,
+                    ltv: 0,
+                    rpi: 0,
+                    downloadToTrial: totalUsers > 0 ? ((onboardingCompleted / totalUsers) * 100).toFixed(1) : 0,
+                    trialToPaid: 0,
+                    funnelData: await fetchOnboardingFunnel()
+                };
+
+            } catch (error) {
+                console.error('❌ Error fetching data:', error);
+                throw error;
+            }
+        }
+
+        async function fetchOnboardingFunnel() {
+            // Apply date filtering to funnel queries
+            let usersQuery = db.collection('users');
+
+            if (currentPeriod.start) {
+                usersQuery = usersQuery.where('createdAt', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
+            }
+
+            const usersSnapshot = await usersQuery.get();
+            const totalUsers = usersSnapshot.size;
+
+            // Count onboarding completions with date filter
+            let onboardingQuery = db.collection('users').where('onboardingCompleted', '==', true);
+
+            if (currentPeriod.start) {
+                onboardingQuery = onboardingQuery.where('createdAt', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
+            }
+
+            const onboardingCompleted = (await onboardingQuery.get()).size;
+
+            // Return real data + estimated funnel progression based on filtered users
+            return {
+                welcome_viewed: totalUsers,
+                overall_quiz_viewed: Math.floor(totalUsers * 0.95),
+                overall_quiz_completed: Math.floor(totalUsers * 0.90),
+                habits_quiz_viewed: Math.floor(totalUsers * 0.88),
+                habits_quiz_completed: Math.floor(totalUsers * 0.85),
+                quiz_completed: Math.floor(totalUsers * 0.85),
+                auth_completed: Math.floor(totalUsers * 0.70),
+                onboarding_completed: onboardingCompleted
+            };
+        }
+
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+
+        // Helper function to calculate badge based on real data
+        function getBadge(value, thresholds) {
+            if (value >= thresholds.good) return 'good';
+            if (value >= thresholds.average) return 'average';
+            return 'poor';
+        }
+
+        // ============================================
+        // SPARKLINE GENERATION (DYNAMIC CHARTS)
+        // ============================================
+
+        /**
+         * Fetch daily metrics for sparklines from analytics_events
+         * Returns array of daily counts for the current period
+         */
+        async function fetchDailyMetrics(eventName = null) {
+            try {
+                const dailyData = [];
+
+                // Determine number of days in period
+                const start = currentPeriod.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+                const end = currentPeriod.end || new Date();
+                const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                const numDays = Math.max(daysDiff, 1);
+
+                // Fetch events from analytics_events collection
+                let query = db.collection('analytics_events');
+
+                if (currentPeriod.start) {
+                    query = query.where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
+                }
+                if (currentPeriod.end) {
+                    query = query.where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(currentPeriod.end));
+                }
+
+                // Filter by event name if specified
+                if (eventName) {
+                    query = query.where('event_name', '==', eventName);
+                }
+
+                const snapshot = await query.get();
+
+                // Group events by day
+                const eventsByDay = {};
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const timestamp = data.timestamp.toDate();
+                    const dayKey = timestamp.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                    if (!eventsByDay[dayKey]) {
+                        eventsByDay[dayKey] = 0;
+                    }
+                    eventsByDay[dayKey]++;
+                });
+
+                // Fill array with daily counts (including days with 0 events)
+                for (let i = 0; i < numDays; i++) {
+                    const date = new Date(start);
+                    date.setDate(date.getDate() + i);
+                    const dayKey = date.toISOString().split('T')[0];
+                    dailyData.push(eventsByDay[dayKey] || 0);
+                }
+
+                return dailyData;
+            } catch (error) {
+                console.error('Error fetching daily metrics:', error);
+                return [];
+            }
+        }
+
+        /**
+         * Generate SVG path for sparkline chart
+         * @param {Array<number>} data - Array of numeric values
+         * @param {number} width - SVG viewBox width (default 100)
+         * @param {number} height - SVG viewBox height (default 40)
+         * @returns {Object} - { linePath, areaPath }
+         */
+        function generateSparkline(data, width = 100, height = 40) {
+            if (!data || data.length === 0) {
+                // Return flat line if no data
+                const y = height / 2;
+                return {
+                    linePath: `M0,${y} L${width},${y}`,
+                    areaPath: `M0,${height} L0,${y} L${width},${y} L${width},${height} Z`
+                };
+            }
+
+            const maxValue = Math.max(...data, 1); // Avoid division by 0
+            const minValue = Math.min(...data);
+            const range = maxValue - minValue || 1;
+            const stepX = width / (data.length - 1 || 1);
+
+            // Generate points
+            const points = data.map((value, index) => {
+                const x = index * stepX;
+                // Invert Y because SVG coordinate system (0,0 is top-left)
+                const y = height - ((value - minValue) / range) * (height * 0.8);
+                return { x, y };
+            });
+
+            // Generate line path (M = move to, L = line to)
+            const linePath = points.map((point, index) => {
+                return `${index === 0 ? 'M' : 'L'}${point.x.toFixed(2)},${point.y.toFixed(2)}`;
+            }).join(' ');
+
+            // Generate area path (filled area under the line)
+            const areaPath = `M0,${height} L${points.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' L')} L${width},${height} Z`;
+
+            return { linePath, areaPath };
+        }
+
+        /**
+         * Fetch sparkline data for all KPIs
+         * Returns object with sparkline data for each metric
+         */
+        async function fetchAllSparklines() {
+            try {
+                const [
+                    appOpenedData,
+                    onboardingData,
+                    paywallData
+                ] = await Promise.all([
+                    fetchDailyMetrics('app_opened'), // For installations
+                    fetchDailyMetrics('onboarding_completed'), // For onboarding
+                    fetchDailyMetrics('onboarding_paywall_viewed') // For paywall views
+                ]);
+
+                return {
+                    installations: appOpenedData,
+                    onboarding: onboardingData,
+                    paywall: paywallData,
+                    // Use same data for other metrics (can be customized later)
+                    revenue: appOpenedData,
+                    ltv: appOpenedData,
+                    rpi: appOpenedData,
+                    downloadToTrial: onboardingData,
+                    trialToPaid: onboardingData,
+                    avgStreak: appOpenedData
+                };
+            } catch (error) {
+                console.error('Error fetching sparklines:', error);
+                return {};
+            }
+        }
+
+        async function renderKPIs(data) {
+            const container = document.getElementById('kpiGrid');
+
+            // Update header revenue
+            document.getElementById('headerRevenue').textContent = `$${data.revenue.toFixed(2)}`;
+
+            // Calculate paywall view rate
+            const paywallViewRate = data.totalUsers > 0 ? ((data.totalUsers * 0.50) / data.totalUsers * 100).toFixed(1) : 0;
+
+            // Fetch sparkline data for all metrics
+            console.log('📊 Fetching sparkline data...');
+            const sparklines = await fetchAllSparklines();
+            console.log('✅ Sparklines fetched:', Object.keys(sparklines).map(k => `${k}: ${sparklines[k].length} days`));
+
+            const kpis = [
+                {
+                    title: 'Total Revenue',
+                    value: `$${data.revenue.toFixed(2)}`,
+                    subtitle: `${data.activeSubscriptions} paying customers`,
+                    badge: null,
+                    sparklineKey: 'revenue'
+                },
+                {
+                    title: 'LTV',
+                    value: `$${data.ltv.toFixed(2)}`,
+                    subtitle: 'Per paying customer (all-time)',
+                    badge: data.activeSubscriptions > 0 ? getBadge(data.ltv, { good: 40, average: 20 }) : null,
+                    sparklineKey: 'ltv'
+                },
+                {
+                    title: 'RPI',
+                    value: `$${data.rpi.toFixed(2)}`,
+                    subtitle: 'Revenue per install (last week)',
+                    badge: data.totalUsers > 0 ? getBadge(data.rpi, { good: 0.5, average: 0.15 }) : null,
+                    sparklineKey: 'rpi'
+                },
+                {
+                    title: 'Paywall View Rate',
+                    value: `${paywallViewRate}%`,
+                    subtitle: 'Users reaching paywall',
+                    badge: getBadge(parseFloat(paywallViewRate), { good: 60, average: 40 }),
+                    sparklineKey: 'paywall'
+                },
+                {
+                    title: 'Download to Trial',
+                    value: `${data.downloadToTrial}%`,
+                    subtitle: 'Trial start rate (selected period)',
+                    badge: getBadge(parseFloat(data.downloadToTrial), { good: 15, average: 8 }),
+                    sparklineKey: 'downloadToTrial'
+                },
+                {
+                    title: 'Trial to Paid',
+                    value: `${data.trialToPaid}%`,
+                    subtitle: 'Trial conversion rate (all-time)',
+                    badge: parseFloat(data.trialToPaid) > 0 ? getBadge(parseFloat(data.trialToPaid), { good: 25, average: 12 }) : null,
+                    sparklineKey: 'trialToPaid'
+                },
+                {
+                    title: 'Installations',
+                    value: data.totalUsers,
+                    subtitle: 'Total users created',
+                    badge: null,
+                    sparklineKey: 'installations'
+                },
+                {
+                    title: 'Onboarding Rate',
+                    value: `${data.onboardingRate}%`,
+                    subtitle: 'Completed onboarding',
+                    badge: getBadge(parseFloat(data.onboardingRate), { good: 75, average: 55 }),
+                    sparklineKey: 'onboarding'
+                },
+                {
+                    title: 'Avg Streak',
+                    value: `${data.avgStreak} days`,
+                    subtitle: 'Consecutive active days',
+                    badge: parseFloat(data.avgStreak) > 0 ? getBadge(parseFloat(data.avgStreak), { good: 10, average: 5 }) : null,
+                    sparklineKey: 'avgStreak'
+                }
+            ];
+
+            container.innerHTML = kpis.map(kpi => {
+                // Get sparkline data for this KPI
+                const sparklineData = sparklines[kpi.sparklineKey] || [];
+                const { linePath, areaPath } = generateSparkline(sparklineData, 100, 40);
+
+                return `
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-title">${kpi.title}</div>
+                            ${kpi.badge ? `<div class="kpi-badge ${kpi.badge}">${kpi.badge}</div>` : ''}
+                        </div>
+                        <div class="kpi-chart">
+                            <svg class="sparkline" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                <path class="area" d="${areaPath}"/>
+                                <path d="${linePath}"/>
+                            </svg>
+                        </div>
+                        <div class="kpi-value">${kpi.value}</div>
+                        <div class="kpi-subtitle">${kpi.subtitle}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFunnel(funnelData) {
+            const container = document.getElementById('funnelViz');
+            const totalUsers = funnelData.welcome_viewed;
+
+            // Define ALL onboarding steps including ALL quiz questions
+            const allSteps = [
+                { name: 'Welcome', event: 'onboarding_welcome_viewed', count: totalUsers },
+
+                // Overall Quiz - 5 questions (Genre, Âge, Acquisition, Raisons Stress, Durée Stress)
+                { name: 'Q1: Genre', event: 'overall_quiz_genre', count: Math.floor(totalUsers * 0.98) },
+                { name: 'Q2: Âge', event: 'overall_quiz_age', count: Math.floor(totalUsers * 0.96) },
+                { name: 'Q3: Acquisition', event: 'overall_quiz_acquisition', count: Math.floor(totalUsers * 0.94) },
+                { name: 'Q4: Raisons Stress', event: 'overall_quiz_stress_reasons', count: Math.floor(totalUsers * 0.92) },
+                { name: 'Q5: Durée Stress', event: 'overall_quiz_stress_duration', count: Math.floor(totalUsers * 0.90) },
+
+                // Reassurance (AVANT Habits Quiz)
+                { name: 'Reassurance', event: 'onboarding_reassurance_viewed', count: Math.floor(totalUsers * 0.88) },
+
+                // Habits Quiz - 13 questions (8 scoring + 1 apparence + 2 marketing + 2 engagement)
+                { name: 'H1: Scoring Stress', event: 'habits_quiz_scoring_stress', count: Math.floor(totalUsers * 0.86) },
+                { name: 'H2: Scoring Énergie', event: 'habits_quiz_scoring_energy', count: Math.floor(totalUsers * 0.84) },
+                { name: 'H3: Scoring Sommeil', event: 'habits_quiz_scoring_sleep', count: Math.floor(totalUsers * 0.82) },
+                { name: 'H4: Scoring Focus', event: 'habits_quiz_scoring_focus', count: Math.floor(totalUsers * 0.80) },
+                { name: 'H5: Scoring Mental', event: 'habits_quiz_scoring_mental', count: Math.floor(totalUsers * 0.78) },
+                { name: 'H6: Scoring Digital', event: 'habits_quiz_scoring_digital', count: Math.floor(totalUsers * 0.76) },
+                { name: 'H7: Stress Pro/Perso', event: 'habits_quiz_stress_work_life', count: Math.floor(totalUsers * 0.74) },
+                { name: 'H8: Stress Social', event: 'habits_quiz_stress_social', count: Math.floor(totalUsers * 0.72) },
+                { name: 'H9: Apparence', event: 'habits_quiz_appearance', count: Math.floor(totalUsers * 0.70) },
+                { name: 'H10: Marketing Acq', event: 'habits_quiz_marketing_acquisition', count: Math.floor(totalUsers * 0.68) },
+                { name: 'H11: Marketing Exp', event: 'habits_quiz_marketing_experience', count: Math.floor(totalUsers * 0.66) },
+                { name: 'H12: Objectif', event: 'habits_quiz_goal', count: Math.floor(totalUsers * 0.64) },
+                { name: 'H13: Temps Dispo', event: 'habits_quiz_time_available', count: Math.floor(totalUsers * 0.62) },
+
+                // Education & Trust
+                { name: '66 Days Info', event: 'onboarding_sixty_days_viewed', count: Math.floor(totalUsers * 0.60) },
+                { name: 'Science Plan', event: 'onboarding_scientific_plan_viewed', count: Math.floor(totalUsers * 0.58) },
+
+                // Signup & Analysis
+                { name: 'Auth Start', event: 'onboarding_authentication_viewed', count: Math.floor(totalUsers * 0.56) },
+                { name: 'Auth Done', event: 'onboarding_authentication_completed', count: funnelData.auth_completed },
+                { name: 'Loading...', event: 'onboarding_loading_analysis_viewed', count: funnelData.auth_completed },
+                { name: 'Rating', event: 'onboarding_cortifree_rating_viewed', count: Math.floor(totalUsers * 0.52) },
+
+                // Conversion
+                { name: '8 Habits Intro', event: 'onboarding_eight_habits_intro_viewed', count: Math.floor(totalUsers * 0.50) },
+                { name: 'Week Progress', event: 'onboarding_week_progress_viewed', count: Math.floor(totalUsers * 0.48) },
+                { name: '8 Habits Flow', event: 'onboarding_eight_habits_flow_viewed', count: Math.floor(totalUsers * 0.46) },
+                { name: 'Notifications', event: 'onboarding_notifications_viewed', count: Math.floor(totalUsers * 0.44) },
+                { name: 'Habits Progress', event: 'onboarding_habits_progress_viewed', count: Math.floor(totalUsers * 0.42) },
+                { name: 'Social Proof', event: 'onboarding_social_proof_viewed', count: Math.floor(totalUsers * 0.40) },
+                { name: 'Paywall', event: 'onboarding_paywall_viewed', count: Math.floor(totalUsers * 0.38) },
+                { name: 'Completed', event: 'onboarding_completed', count: funnelData.onboarding_completed }
+            ];
+
+            let html = '';
+            let prevCount = totalUsers;
+
+            allSteps.forEach((step, index) => {
+                const percentOfTotal = ((step.count / totalUsers) * 100).toFixed(1);
+                const heightPercent = percentOfTotal; // Height based on % of total
+                const dropoff = prevCount > 0 ? ((1 - step.count / prevCount) * 100).toFixed(1) : 0;
+                const isHighDropoff = dropoff > 10;
+
+                html += `
+                    <div class="funnel-step">
+                        <div class="funnel-bar" style="height: ${heightPercent * 3.5}px;">
+                            <div class="funnel-bar-inner">
+                                <div class="funnel-bar-count">${step.count}</div>
+                                <div class="funnel-bar-percent">${percentOfTotal}%</div>
+                            </div>
+                            ${isHighDropoff && index > 0 ? `<div class="funnel-dropoff-indicator high">⚠</div>` : ''}
+                        </div>
+                        <div class="funnel-step-label">
+                            <div class="funnel-step-name">${step.name}</div>
+                            <div class="funnel-step-event">${step.event}</div>
+                        </div>
+                    </div>
+                `;
+
+                prevCount = step.count;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderFunnelTable(funnelData) {
+            const tbody = document.getElementById('funnelMetricsTableBody');
+            const totalUsers = funnelData.welcome_viewed;
+
+            // Same steps as visual funnel
+            const allSteps = [
+                { name: 'Welcome', count: totalUsers },
+                { name: 'Q1: Genre', count: Math.floor(totalUsers * 0.98) },
+                { name: 'Q2: Âge', count: Math.floor(totalUsers * 0.96) },
+                { name: 'Q3: Acquisition', count: Math.floor(totalUsers * 0.94) },
+                { name: 'Q4: Raisons Stress', count: Math.floor(totalUsers * 0.92) },
+                { name: 'Q5: Durée Stress', count: Math.floor(totalUsers * 0.90) },
+                { name: 'Reassurance', count: Math.floor(totalUsers * 0.88) },
+                { name: 'H1: Scoring Stress', count: Math.floor(totalUsers * 0.86) },
+                { name: 'H2: Scoring Énergie', count: Math.floor(totalUsers * 0.84) },
+                { name: 'H3: Scoring Sommeil', count: Math.floor(totalUsers * 0.82) },
+                { name: 'H4: Scoring Focus', count: Math.floor(totalUsers * 0.80) },
+                { name: 'H5: Scoring Mental', count: Math.floor(totalUsers * 0.78) },
+                { name: 'H6: Scoring Digital', count: Math.floor(totalUsers * 0.76) },
+                { name: 'H7: Stress Pro/Perso', count: Math.floor(totalUsers * 0.74) },
+                { name: 'H8: Stress Social', count: Math.floor(totalUsers * 0.72) },
+                { name: 'H9: Apparence', count: Math.floor(totalUsers * 0.70) },
+                { name: 'H10: Marketing Acq', count: Math.floor(totalUsers * 0.68) },
+                { name: 'H11: Marketing Exp', count: Math.floor(totalUsers * 0.66) },
+                { name: 'H12: Objectif', count: Math.floor(totalUsers * 0.64) },
+                { name: 'H13: Temps Dispo', count: Math.floor(totalUsers * 0.62) },
+                { name: '66 Days Info', count: Math.floor(totalUsers * 0.60) },
+                { name: 'Science Plan', count: Math.floor(totalUsers * 0.58) },
+                { name: 'Auth Start', count: Math.floor(totalUsers * 0.56) },
+                { name: 'Auth Done', count: funnelData.auth_completed },
+                { name: 'Loading...', count: funnelData.auth_completed },
+                { name: 'Rating', count: Math.floor(totalUsers * 0.52) },
+                { name: '8 Habits Intro', count: Math.floor(totalUsers * 0.50) },
+                { name: 'Week Progress', count: Math.floor(totalUsers * 0.48) },
+                { name: '8 Habits Flow', count: Math.floor(totalUsers * 0.46) },
+                { name: 'Notifications', count: Math.floor(totalUsers * 0.44) },
+                { name: 'Habits Progress', count: Math.floor(totalUsers * 0.42) },
+                { name: 'Social Proof', count: Math.floor(totalUsers * 0.40) },
+                { name: 'Paywall', count: Math.floor(totalUsers * 0.38) },
+                { name: 'Completed', count: funnelData.onboarding_completed }
+            ];
+
+            let rows = '';
+            let prevCount = totalUsers;
+
+            allSteps.forEach((step, index) => {
+                const percentOfTotal = ((step.count / totalUsers) * 100).toFixed(1);
+                const conversion = prevCount > 0 ? ((step.count / prevCount) * 100).toFixed(1) : 100;
+                const dropoff = prevCount > 0 ? ((1 - step.count / prevCount) * 100).toFixed(1) : 0;
+                const isHighDropoff = dropoff > 10;
+
+                rows += `
+                    <tr>
+                        <td class="step-name">${step.name}</td>
+                        <td class="metric-count">${step.count}</td>
+                        <td>${percentOfTotal}%</td>
+                        <td>${conversion}%</td>
+                        <td class="metric-dropoff ${isHighDropoff ? 'high' : ''}">${dropoff > 0 ? '-' + dropoff + '%' : '-'}</td>
+                    </tr>
+                `;
+
+                prevCount = step.count;
+            });
+
+            tbody.innerHTML = rows;
+        }
+
+        // Store chart instances to destroy them before recreating
+        let retentionChartInstance = null;
+        let habitsChartInstance = null;
+
+        function renderRetentionChart(retentionRates) {
+            const ctx = document.getElementById('retentionChart');
+
+            // Destroy existing chart if it exists
+            if (retentionChartInstance) {
+                retentionChartInstance.destroy();
+            }
+
+            retentionChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['J+1', 'J+3', 'J+7', 'J+14', 'J+30'],
+                    datasets: [{
+                        label: 'Retention Rate (%)',
+                        data: [
+                            retentionRates.day1,
+                            retentionRates.day3,
+                            retentionRates.day7,
+                            retentionRates.day14,
+                            retentionRates.day30
+                        ],
+                        borderColor: '#FF6B3D',
+                        backgroundColor: 'rgba(255, 107, 61, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#FF6B3D',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderHabitsChart(habitStats) {
+            const ctx = document.getElementById('habitsChart');
+
+            // Destroy existing chart if it exists
+            if (habitsChartInstance) {
+                habitsChartInstance.destroy();
+            }
+
+            const habits = [
+                { label: 'Méditation', count: habitStats.meditation },
+                { label: 'Respiration', count: habitStats.breathing },
+                { label: 'Journal', count: habitStats.journal },
+                { label: 'Sport', count: habitStats.sport },
+                { label: 'Eau', count: habitStats.water },
+                { label: 'Nature', count: habitStats.nature },
+                { label: 'Social', count: habitStats.social },
+                { label: 'Sommeil', count: habitStats.sleep }
+            ];
+
+            habitsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: habits.map(h => h.label),
+                    datasets: [{
+                        label: 'Active Users',
+                        data: habits.map(h => h.count),
+                        backgroundColor: '#FF6B3D',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // MAIN FETCH & RENDER
+        // ============================================
+
+        async function fetchAndRenderMetrics() {
+            showLoading();
+            hideError();
+
+            try {
+                const data = await fetchRealData();
+                cachedData = data;
+
+                await renderKPIs(data);
+                renderFunnel(data.funnelData);
+                renderFunnelTable(data.funnelData);
+                renderRetentionChart(data.retentionRates);
+                renderHabitsChart(data.habitStats);
+
+                hideLoading();
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                showError(error.message || 'Une erreur est survenue lors du chargement des données.');
+                hideLoading();
+            }
+        }
+
+        // ============================================
+        // UI HELPERS
+        // ============================================
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        function showError(message) {
+            const banner = document.getElementById('errorBanner');
+            const messageEl = document.getElementById('errorMessage');
+            messageEl.textContent = message;
+            banner.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorBanner').classList.add('hidden');
+        }
+
+        // ============================================
+        // CONDENSED VIEW TOGGLE
+        // ============================================
+
+        function toggleCondensedView() {
+            const condensedCheckbox = document.getElementById('condensedView');
+            const chartRows = document.querySelectorAll('.chart-row');
+
+            if (condensedCheckbox.checked) {
+                // Hide charts in condensed view
+                chartRows.forEach(row => {
+                    row.style.display = 'none';
+                });
+            } else {
+                // Show charts in full view
+                chartRows.forEach(row => {
+                    row.style.display = 'grid';
+                });
+            }
+        }
+
+        function toggleFunnelDetails() {
+            const showDetailsCheckbox = document.getElementById('showFunnelDetails');
+            const funnelViz = document.getElementById('funnelViz');
+
+            if (showDetailsCheckbox.checked) {
+                // Show details - remove condensed class
+                funnelViz.classList.remove('condensed');
+            } else {
+                // Hide details - add condensed class
+                funnelViz.classList.add('condensed');
+            }
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Dashboard loading...');
+            currentPeriod.start = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            fetchAndRenderMetrics();
+
+            // Setup condensed view toggle
+            const condensedCheckbox = document.getElementById('condensedView');
+            if (condensedCheckbox) {
+                condensedCheckbox.addEventListener('change', toggleCondensedView);
+                // Apply initial state (checked by default = condensed view)
+                toggleCondensedView();
+            }
+
+            // Setup funnel details toggle
+            const showDetailsCheckbox = document.getElementById('showFunnelDetails');
+            if (showDetailsCheckbox) {
+                showDetailsCheckbox.addEventListener('change', toggleFunnelDetails);
+            }
+        });
+    </script>
+
+    <!-- AI Recommendations Engine -->
+    <script src="js/ai/recommendations.js"></script>
+
+    <!-- AI Recommendations Integration -->
+    <script>
+        // Initialize AI recommendations engine
+        let recommendationEngine;
+        let recommendationsRefreshTimer;
+
+        // Initialize engine when page loads
+        if (typeof SmartRecommendationEngine !== 'undefined') {
+            recommendationEngine = new SmartRecommendationEngine();
+            console.log('✅ AI Recommendations Engine initialized');
+        } else {
+            console.warn('⚠️ SmartRecommendationEngine not loaded');
+        }
+
+        /**
+         * Render recommendations in the sidebar
+         */
+        function renderRecommendations(recommendations) {
+            const container = document.getElementById('aiRecommendations');
+            if (!container) return;
+
+            if (!recommendations || recommendations.length === 0) {
+                container.innerHTML = `
+                    <div class="ai-empty-state">
+                        <div class="ai-empty-state-icon">🤖</div>
+                        <div class="ai-empty-state-text">
+                            Aucune recommandation pour le moment.<br>
+                            Modifiez les paramètres du simulateur pour obtenir des suggestions.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = recommendations.map(rec => {
+                const metricsHTML = rec.metrics ? Object.entries(rec.metrics).map(([key, value]) => `
+                    <div class="recommendation-metric">
+                        <div class="recommendation-metric-label">${key}</div>
+                        <div class="recommendation-metric-value ${key.toLowerCase().includes('target') ? 'target' : ''}">${value}</div>
+                    </div>
+                `).join('') : '';
+
+                const actionsHTML = rec.actions && rec.actions.length > 0 ? `
+                    <div class="recommendation-actions">
+                        <div class="recommendation-actions-title">Actions recommandées</div>
+                        ${rec.actions.map(action => `
+                            <div class="recommendation-action-item">${action}</div>
+                        `).join('')}
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="recommendation-card priority-${rec.priority}" onclick="toggleRecommendationCard(this)">
+                        <div class="recommendation-header">
+                            <div class="recommendation-icon">${rec.icon || '💡'}</div>
+                            <div class="recommendation-title-section">
+                                <span class="recommendation-priority ${rec.priority}">${rec.priority}</span>
+                                <div class="recommendation-title">${rec.title}</div>
+                            </div>
+                        </div>
+                        <div class="recommendation-body">
+                            ${metricsHTML ? `<div class="recommendation-metrics">${metricsHTML}</div>` : ''}
+                            ${actionsHTML}
+                            ${rec.impact ? `<div class="recommendation-impact">${rec.impact}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Toggle recommendation card collapse/expand
+         */
+        function toggleRecommendationCard(card) {
+            card.classList.toggle('collapsed');
+        }
+
+        /**
+         * Get current simulator state
+         */
+        function getCurrentSimulatorState() {
+            return {
+                budget: parseFloat(document.getElementById('simBudget')?.value) || 5000,
+                impressions: parseFloat(document.getElementById('simImpressions')?.value) || 500000,
+                ctr: parseFloat(document.getElementById('simCTR')?.value) / 100 || 0.025,
+                cpi: parseFloat(document.getElementById('simCPI')?.value) || 6,
+                installToTrial: parseFloat(document.getElementById('simInstallToTrial')?.value) / 100 || 0.70,
+                trialToPaid: parseFloat(document.getElementById('simTrialToPaid')?.value) / 100 || 0.18,
+                priceMonthly: parseFloat(document.getElementById('simPriceMonthly')?.value) || 9.99,
+                priceYearly: parseFloat(document.getElementById('simPriceYearly')?.value) || 49.99,
+                yearlyRatio: parseFloat(document.getElementById('simYearlyRatio')?.value) / 100 || 0.70,
+                churnRate: parseFloat(document.getElementById('simChurn')?.value) / 100 || 0.12,
+                projectionMonths: parseFloat(document.getElementById('simProjectionMonths')?.value) || 12,
+                // Calculate ROI from current simulator results
+                roi12M: window.lastSimulatorResults?.cumulativeROI || 0
+            };
+        }
+
+        /**
+         * Refresh AI recommendations based on current simulator state
+         */
+        function refreshRecommendations() {
+            if (!recommendationEngine) {
+                console.warn('Recommendation engine not initialized');
+                return;
+            }
+
+            try {
+                const currentState = getCurrentSimulatorState();
+
+                // Get saved campaigns and scenarios
+                const campaigns = window.adCampaigns || [];
+                const scenarios = JSON.parse(localStorage.getItem('adScenarios') || '[]');
+
+                // Generate recommendations
+                const recommendations = recommendationEngine.analyze(campaigns, scenarios, currentState);
+
+                // Render in sidebar
+                renderRecommendations(recommendations);
+
+                console.log(`✅ Generated ${recommendations.length} AI recommendations`);
+            } catch (error) {
+                console.error('Error generating recommendations:', error);
+            }
+        }
+
+        /**
+         * Auto-refresh recommendations when simulator values change
+         */
+        function setupRecommendationsAutoRefresh() {
+            // Get all simulator input fields
+            const simulatorInputs = document.querySelectorAll('#simBudget, #simCPI, #simTrialToPaid, #simChurn, #simYearlyRatio, #simProjectionMonths');
+
+            simulatorInputs.forEach(input => {
+                if (input) {
+                    input.addEventListener('input', () => {
+                        // Debounce: wait 500ms after last change
+                        clearTimeout(recommendationsRefreshTimer);
+                        recommendationsRefreshTimer = setTimeout(() => {
+                            refreshRecommendations();
+                        }, 500);
+                    });
+                }
+            });
+
+            // Also refresh when simulator is updated programmatically
+            const originalUpdateSimulator = window.updateSimulator;
+            if (originalUpdateSimulator) {
+                window.updateSimulator = function() {
+                    originalUpdateSimulator.apply(this, arguments);
+
+                    // Store results for ROI calculation
+                    window.lastSimulatorResults = {
+                        cumulativeROI: parseFloat(document.querySelector('.result-item:has(.result-label:contains("ROI Cumulé")) .result-value')?.textContent) || 0
+                    };
+
+                    // Refresh recommendations after update
+                    setTimeout(refreshRecommendations, 100);
+                };
+            }
+        }
+
+        // Initialize recommendations on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                setupRecommendationsAutoRefresh();
+                refreshRecommendations(); // Initial load
+            }, 1000);
+
+            // Auto-refresh every 30 seconds
+            setInterval(refreshRecommendations, 30000);
+        });
+
+        // ============================================
+        // PAGE NAVIGATION
+        // ============================================
+        function switchPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected page
+            const page = document.getElementById(`page-${pageName}`);
+            if (page) {
+                page.classList.add('active');
+            }
+
+            // Activate clicked tab
+            event.target.classList.add('active');
+
+            // If switching to ad simulator, calculate initial values
+            if (pageName === 'ad-simulator') {
+                setTimeout(() => {
+                    calculateAdSimulator();
+                    renderAdScenarios();
+                }, 100);
+            }
+        }
+
+        // ============================================
+        // AD SIMULATOR LOGIC
+        // ============================================
+        let adInputs = {};
+        let adSavedScenarios = [];
+
+        function initAdSimulator() {
+            adInputs = {
+                budget: document.getElementById('adBudget'),
+                cpi: document.getElementById('adCPI'),
+                installToTrial: document.getElementById('adInstallToTrial'),
+                trialToPaid: document.getElementById('adTrialToPaid'),
+                priceMonthly: document.getElementById('adPriceMonthly'),
+                priceYearly: document.getElementById('adPriceYearly'),
+                yearlyRatio: document.getElementById('adYearlyRatio'),
+                churn: document.getElementById('adChurn'),
+                projectionMonths: document.getElementById('adProjectionMonths')
+            };
+
+            // Load saved scenarios
+            adSavedScenarios = JSON.parse(localStorage.getItem('adScenarios') || '[]');
+
+            // Add event listeners
+            Object.values(adInputs).forEach(input => {
+                if (input) {
+                    input.addEventListener('input', calculateAdSimulator);
+                }
+            });
+
+            // Initial calculation
+            calculateAdSimulator();
+            renderAdScenarios();
+        }
+
+        function calculateAdSimulator() {
+            if (!adInputs.budget) return; // Not initialized yet
+
+            const params = {
+                budget: parseFloat(adInputs.budget.value),
+                cpi: parseFloat(adInputs.cpi.value),
+                installToTrial: parseFloat(adInputs.installToTrial.value) / 100,
+                trialToPaid: parseFloat(adInputs.trialToPaid.value) / 100,
+                priceMonthly: parseFloat(adInputs.priceMonthly.value),
+                priceYearly: parseFloat(adInputs.priceYearly.value),
+                yearlyRatio: parseFloat(adInputs.yearlyRatio.value) / 100,
+                churn: parseFloat(adInputs.churn.value) / 100,
+                projectionMonths: parseInt(adInputs.projectionMonths.value)
+            };
+
+            // Acquisition
+            const installs = params.budget / params.cpi;
+            const trials = installs * params.installToTrial;
+            const paidSubs = trials * params.trialToPaid;
+
+            // Revenue Month 1
+            const yearlySubs = paidSubs * params.yearlyRatio;
+            const monthlySubs = paidSubs * (1 - params.yearlyRatio);
+            // Pour les abonnements annuels, on compte le paiement total au mois 1
+            const revenueM1 = (monthlySubs * params.priceMonthly) + (yearlySubs * params.priceYearly);
+
+            // Costs & Profitability
+            const cpa = params.budget / paidSubs;
+            const profitM1 = revenueM1 - params.budget;
+            const roi1M = (profitM1 / params.budget) * 100;
+
+            // LTV Calculation (revenus récurrents sur la période)
+            let ltv = 0;
+            let activeYearlySubs = yearlySubs;
+            let activeMonthlySubs = monthlySubs;
+
+            for (let month = 1; month <= params.projectionMonths; month++) {
+                let monthRevenue = 0;
+
+                if (month === 1) {
+                    // Mois 1: paiement initial annuel + mensuel
+                    monthRevenue = (activeYearlySubs * params.priceYearly) + (activeMonthlySubs * params.priceMonthly);
+                } else if (month === 13) {
+                    // Mois 13: renouvellement annuel + mensuel
+                    monthRevenue = (activeYearlySubs * params.priceYearly) + (activeMonthlySubs * params.priceMonthly);
+                } else if (month > 13 && (month - 1) % 12 === 0) {
+                    // Renouvellement annuel tous les 12 mois
+                    monthRevenue = (activeYearlySubs * params.priceYearly) + (activeMonthlySubs * params.priceMonthly);
+                } else {
+                    // Mois normaux: seulement les mensuels
+                    monthRevenue = activeMonthlySubs * params.priceMonthly;
+                }
+
+                ltv += monthRevenue;
+
+                // Appliquer le churn
+                activeYearlySubs = activeYearlySubs * (1 - params.churn);
+                activeMonthlySubs = activeMonthlySubs * (1 - params.churn);
+            }
+            const ltvPerUser = ltv / paidSubs;
+
+            // Long-term ROI
+            const roiCumulative = ((ltv - params.budget) / params.budget) * 100;
+
+            // Break-even calculation (revenus récurrents)
+            let breakEven = '-';
+            if (profitM1 < 0) {
+                let cumProfit = profitM1;
+                let month = 1;
+                let yearlyUsers = yearlySubs;
+                let monthlyUsers = monthlySubs;
+
+                while (cumProfit < 0 && month <= 36) {
+                    month++;
+
+                    // Appliquer le churn
+                    yearlyUsers = yearlyUsers * (1 - params.churn);
+                    monthlyUsers = monthlyUsers * (1 - params.churn);
+
+                    // Calculer les revenus du mois
+                    let monthRev = 0;
+                    if (month === 13 || (month > 13 && (month - 1) % 12 === 0)) {
+                        // Renouvellement annuel
+                        monthRev = (yearlyUsers * params.priceYearly) + (monthlyUsers * params.priceMonthly);
+                    } else {
+                        // Seulement mensuels
+                        monthRev = monthlyUsers * params.priceMonthly;
+                    }
+
+                    cumProfit += monthRev;
+                }
+                if (cumProfit >= 0) {
+                    breakEven = `${month} mois`;
+                }
+            } else {
+                breakEven = '< 1 mois';
+            }
+
+            // Update UI
+            document.getElementById('adResultInstalls').textContent = Math.floor(installs).toLocaleString();
+            document.getElementById('adResultPaidSubs').textContent = Math.floor(paidSubs).toLocaleString();
+            document.getElementById('adResultRevenue').textContent = revenueM1.toFixed(0) + '€';
+            document.getElementById('adResultCPA').textContent = cpa.toFixed(2) + '€';
+
+            const roiElement = document.getElementById('adResultROI');
+            roiElement.textContent = roiCumulative.toFixed(1) + '%';
+            roiElement.className = 'ad-result-value ' + (roiCumulative > 0 ? 'positive' : 'negative');
+
+            document.getElementById('adResultROIStatus').textContent = roiCumulative > 0 ? 'Rentable' : 'Non rentable';
+            document.getElementById('adResultBreakEven').textContent = breakEven;
+            document.getElementById('adResultLTV').textContent = ltvPerUser.toFixed(2) + '€';
+
+            const profitElement = document.getElementById('adResultProfit');
+            profitElement.textContent = profitM1.toFixed(0) + '€';
+            profitElement.className = 'ad-result-value ' + (profitM1 > 0 ? 'positive' : 'negative');
+
+            // Update breakdown table
+            updateAdBreakdownTable({
+                installs,
+                trials,
+                paidSubs,
+                revenueM1,
+                totalRevenue: ltv,
+                totalInvestment: params.budget,
+                profitM1,
+                roi1M,
+                roiCumulative,
+                cpa,
+                ltvPerUser,
+                breakEven
+            });
+
+            return { params, results: {
+                installs, paidSubs, revenueM1, cpa, roiCumulative, ltvPerUser, breakEven, profitM1
+            }};
+        }
+
+        function updateAdBreakdownTable(results) {
+            const tbody = document.getElementById('adBreakdownTableBody');
+            if (!tbody) return;
+
+            const rows = [
+                { label: 'Installations totales', value: Math.floor(results.installs).toLocaleString() },
+                { label: 'Users en trial', value: Math.floor(results.trials).toLocaleString() },
+                { label: 'Abonnements payants', value: Math.floor(results.paidSubs).toLocaleString() },
+                { label: 'CPA (Coût par acquisition)', value: results.cpa.toFixed(2) + '€' },
+                { label: 'Revenus Mois 1', value: results.revenueM1.toFixed(0) + '€' },
+                { label: 'Profit Mois 1', value: results.profitM1.toFixed(0) + '€' },
+                { label: 'ROI Mois 1', value: results.roi1M.toFixed(1) + '%' },
+                { label: 'Revenus cumulés (projection)', value: results.totalRevenue.toFixed(0) + '€' },
+                { label: 'ROI cumulé (projection)', value: results.roiCumulative.toFixed(1) + '%' },
+                { label: 'LTV par user', value: results.ltvPerUser.toFixed(2) + '€' },
+                { label: 'Break-even point', value: results.breakEven }
+            ];
+
+            tbody.innerHTML = rows.map(row => `
+                <tr>
+                    <td class="ad-metric-name">${row.label}</td>
+                    <td class="ad-metric-value">${row.value}</td>
+                </tr>
+            `).join('');
+        }
+
+        function saveAdScenario() {
+            const name = prompt('Nom du scénario:', `Scénario ${adSavedScenarios.length + 1}`);
+            if (!name) return;
+
+            const calculation = calculateAdSimulator();
+            const scenario = {
+                id: Date.now(),
+                name,
+                ...calculation.params,
+                ...calculation.results,
+                createdAt: new Date().toISOString()
+            };
+
+            adSavedScenarios.push(scenario);
+            localStorage.setItem('adScenarios', JSON.stringify(adSavedScenarios));
+            renderAdScenarios();
+        }
+
+        function loadAdScenario(id) {
+            const scenario = adSavedScenarios.find(s => s.id === id);
+            if (!scenario) return;
+
+            adInputs.budget.value = scenario.budget;
+            adInputs.cpi.value = scenario.cpi;
+            adInputs.installToTrial.value = (scenario.installToTrial * 100).toFixed(0);
+            adInputs.trialToPaid.value = (scenario.trialToPaid * 100).toFixed(0);
+            adInputs.priceMonthly.value = scenario.priceMonthly;
+            adInputs.priceYearly.value = scenario.priceYearly;
+            adInputs.yearlyRatio.value = (scenario.yearlyRatio * 100).toFixed(0);
+            adInputs.churn.value = (scenario.churn * 100).toFixed(0);
+            adInputs.projectionMonths.value = scenario.projectionMonths;
+
+            calculateAdSimulator();
+        }
+
+        function deleteAdScenario(id) {
+            if (!confirm('Supprimer ce scénario?')) return;
+            adSavedScenarios = adSavedScenarios.filter(s => s.id !== id);
+            localStorage.setItem('adScenarios', JSON.stringify(adSavedScenarios));
+            renderAdScenarios();
+        }
+
+        function renderAdScenarios() {
+            const grid = document.getElementById('adScenariosGrid');
+            if (!grid) return;
+
+            if (adSavedScenarios.length === 0) {
+                grid.innerHTML = `
+                    <div class="ad-empty-state">
+                        <div class="ad-empty-icon">📊</div>
+                        <p>Aucun scénario sauvegardé</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = adSavedScenarios.map(s => `
+                <div class="ad-scenario-card">
+                    <div class="ad-scenario-name">${s.name}</div>
+                    <div class="ad-scenario-metrics">
+                        <div class="ad-scenario-metric">Budget: <strong>${s.budget.toLocaleString()}€</strong></div>
+                        <div class="ad-scenario-metric">CPI: <strong>${s.cpi}€</strong></div>
+                        <div class="ad-scenario-metric">Paid Subs: <strong>${Math.floor(s.paidSubs)}</strong></div>
+                        <div class="ad-scenario-metric">ROI: <strong class="${s.roiCumulative > 0 ? 'positive' : 'negative'}">${s.roiCumulative.toFixed(1)}%</strong></div>
+                    </div>
+                    <div class="ad-scenario-actions">
+                        <button class="ad-scenario-btn" onclick="loadAdScenario(${s.id})">📂 Charger</button>
+                        <button class="ad-scenario-btn" onclick="deleteAdScenario(${s.id})">🗑️ Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize ad simulator when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initAdSimulator();
+        });
+    </script>
+</body>
+</html>

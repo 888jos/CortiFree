@@ -23,6 +23,7 @@ struct LibraryView: View {
     @State private var showJournal = false
     @State private var showLearning = false
     @State private var showTips = false
+    @State private var showRoutines = false
 
     var body: some View {
         ZStack {
@@ -98,6 +99,9 @@ struct LibraryView: View {
         }
         .fullScreenCover(isPresented: $showTips) {
             TipsSectionView()
+        }
+        .fullScreenCover(isPresented: $showRoutines) {
+            RoutinesView()
         }
     }
 
@@ -183,13 +187,11 @@ struct LibraryView: View {
                 }
 
                 CategoryButton(
-                    title: NSLocalizedString("library.category.blog", comment: ""),
+                    title: NSLocalizedString("library.category.routines", comment: ""),
                     backgroundImage: "button_blog",
-                    strokeColor: Color(hex: "27154D")
+                    strokeColor: Color(hex: "7E57C2")
                 ) {
-                    if let url = URL(string: "https://cortifree.framer.website/blog") {
-                        UIApplication.shared.open(url)
-                    }
+                    showRoutines = true
                 }
             }
 

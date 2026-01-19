@@ -1,19 +1,22 @@
 //
-//  MixpanelManager.swift
+//  MixpanelManager.swift (now using Firebase Analytics)
 //  CortiFree
 //
-//  Mixpanel analytics manager - Complete implementation
-//  Token: 54821f0aa53aa5ce3804237815f94332 (EU server)
+//  Analytics manager - Migrated from Mixpanel to Firebase Analytics
+//  Sends to both Firebase Analytics AND Firestore for dashboard
 //
 
 import Foundation
 import UIKit
-import Mixpanel
+import FirebaseAnalytics
+import FirebaseFirestore
+import FirebaseAuth
 
 class MixpanelManager {
     static let shared = MixpanelManager()
 
     private var isInitialized = false
+    private let db = Firestore.firestore()
 
     private init() {
         // Initialize will be called explicitly from AppDelegate/App
@@ -24,31 +27,17 @@ class MixpanelManager {
     func initialize() {
         guard !isInitialized else { return }
 
-        Mixpanel.initialize(
-            token: "54821f0aa53aa5ce3804237815f94332",
-            trackAutomaticEvents: true,
-            serverURL: "https://api-eu.mixpanel.com"
-        )
-
-        #if DEBUG
-        // Set flush interval to 5 seconds in DEBUG mode
-        Mixpanel.mainInstance().flushInterval = 5
-        print("[Mixpanel] 🔧 DEBUG mode: Flush interval set to 5 seconds")
-        #endif
-
-        // Set super properties (sent with every event)
+        // Firebase Analytics is auto-initialized with Firebase SDK
+        // Just set user properties
         registerSuperProperties()
 
         isInitialized = true
         #if DEBUG
-        print("[Mixpanel] ✅ Initialized successfully with EU server")
+        print("[Analytics] ✅ Initialized successfully with Firebase")
         #endif
 
         // Send a test event to verify connection
         track(event: "app_opened")
-
-        // Force flush immediately for testing
-        Mixpanel.mainInstance().flush()
     }
 
     private func registerSuperProperties() {
@@ -57,19 +46,19 @@ class MixpanelManager {
         let deviceType = UIDevice.current.model
         let language = Locale.current.language.languageCode?.identifier ?? "unknown"
 
-        Mixpanel.mainInstance().registerSuperProperties([
-            "app_version": appVersion,
-            "os_version": osVersion,
-            "device_type": deviceType,
-            "language": language,
-            "platform": "iOS"
-        ])
+        // Set Firebase user properties (sent with every event)
+        Analytics.setUserProperty(appVersion, forName: "app_version")
+        Analytics.setUserProperty(osVersion, forName: "os_version")
+        Analytics.setUserProperty(deviceType, forName: "device_type")
+        Analytics.setUserProperty(language, forName: "language")
+        Analytics.setUserProperty("iOS", forName: "platform")
     }
 
     // MARK: - User Identification & Properties
 
     func identify(userId: String) {
-        Mixpanel.mainInstance().identify(distinctId: userId)
+        // Set Firebase user ID
+        Analytics.setUserID(userId)
     }
 
     func setUserProfile(
@@ -80,31 +69,22 @@ class MixpanelManager {
         globalScore: Int?,
         primaryGoal: String?
     ) {
-        var properties: [String: MixpanelType] = [:]
-
+        // Set Firebase user properties
         if let firstName = firstName {
-            properties["$name"] = firstName
-            properties["first_name"] = firstName
-        }
-        if let email = email {
-            properties["$email"] = email
+            Analytics.setUserProperty(firstName, forName: "first_name")
         }
         if let age = age {
-            properties["age"] = age
+            Analytics.setUserProperty(String(age), forName: "age")
         }
         if let gender = gender {
-            properties["gender"] = gender
+            Analytics.setUserProperty(gender, forName: "gender")
         }
         if let globalScore = globalScore {
-            properties["global_score"] = globalScore
+            Analytics.setUserProperty(String(globalScore), forName: "global_score")
         }
         if let primaryGoal = primaryGoal {
-            properties["primary_goal"] = primaryGoal
+            Analytics.setUserProperty(primaryGoal, forName: "primary_goal")
         }
-
-        properties["onboarding_completion_date"] = Date()
-
-        Mixpanel.mainInstance().people.set(properties: properties)
     }
 
     func updateUserProgress(
@@ -114,29 +94,80 @@ class MixpanelManager {
         globalScore: Int?,
         totalAchievements: Int?
     ) {
-        var properties: [String: MixpanelType] = [:]
-
+        // Set Firebase user properties
         if let currentDay = currentDay {
-            properties["current_program_day"] = currentDay
+            Analytics.setUserProperty(String(currentDay), forName: "current_program_day")
         }
         if let currentStreak = currentStreak {
-            properties["current_streak"] = currentStreak
+            Analytics.setUserProperty(String(currentStreak), forName: "current_streak")
         }
         if let totalTasksCompleted = totalTasksCompleted {
-            properties["total_tasks_completed"] = totalTasksCompleted
+            Analytics.setUserProperty(String(totalTasksCompleted), forName: "total_tasks_completed")
         }
         if let globalScore = globalScore {
-            properties["global_score"] = globalScore
+            Analytics.setUserProperty(String(globalScore), forName: "global_score")
         }
         if let totalAchievements = totalAchievements {
-            properties["total_achievements"] = totalAchievements
+            Analytics.setUserProperty(String(totalAchievements), forName: "total_achievements")
         }
-
-        Mixpanel.mainInstance().people.set(properties: properties)
     }
 
     func incrementProperty(property: String, by amount: Double = 1) {
-        Mixpanel.mainInstance().people.increment(property: property, by: amount)
+        // Firebase doesn't have direct increment - track as event instead
+        track(event: "property_incremented", properties: [
+            "property": property,
+            "amount": amount
+        ])
+    }
+
+    // MARK: - 💳 SUBSCRIPTION STATUS TRACKING
+
+    enum SubscriptionStatus: String {
+        case trial = "trial"
+        case active = "active"
+        case expired = "expired"
+        case cancelled = "cancelled"
+        case none = "none"
+    }
+
+    enum SubscriptionType: String {
+        case monthly = "monthly"
+        case yearly = "yearly"
+    }
+
+    func updateSubscriptionStatus(status: SubscriptionStatus, type: SubscriptionType?, expiryDate: Date?) {
+        var properties: [String: any Any] = [
+            "subscription_status": status.rawValue,
+            "subscription_type": type?.rawValue ?? "none",
+            "is_trial": status == .trial,
+            "is_paying": status == .active
+        ]
+
+        if let expiryDate = expiryDate {
+            properties["subscription_expiry_date"] = ISO8601DateFormatter().string(from: expiryDate)
+        } else {
+            properties["subscription_expiry_date"] = ""
+        }
+
+        // Calculate days subscribed
+        if let firstSubDate = UserDefaults.standard.object(forKey: "first_subscription_date") as? Date {
+            let daysSubscribed = Calendar.current.dateComponents([.day], from: firstSubDate, to: Date()).day ?? 0
+            properties["days_subscribed"] = daysSubscribed
+        } else {
+            properties["days_subscribed"] = 0
+        }
+
+        // Set Firebase user properties (persists across sessions)
+        Analytics.setUserProperty(status.rawValue, forName: "subscription_status")
+        Analytics.setUserProperty(type?.rawValue ?? "none", forName: "subscription_type")
+
+        // Also track as event for timeline analysis
+        track(event: "subscription_status_changed", properties: properties)
+
+        // Save to UserDefaults for quick access
+        UserDefaults.standard.set(status.rawValue, forKey: "current_subscription_status")
+
+        print("✅ Subscription status updated: \(status.rawValue)")
     }
 
     // MARK: - 🎯 ONBOARDING - SIMPLIFIÉ (viewed + clicked pour chaque écran)
@@ -786,7 +817,7 @@ class MixpanelManager {
         default: return
         }
 
-        var properties: [String: MixpanelType] = [
+        var properties: [String: Any] = [
             "tasks_completed": tasksCompleted
         ]
 
@@ -825,34 +856,78 @@ class MixpanelManager {
 
     // MARK: - Helper Methods
 
-    private func track(event: String, properties: [String: any MixpanelType]? = nil) {
-        Mixpanel.mainInstance().track(event: event, properties: properties)
+    func track(event: String, properties: [String: any Any]? = nil) {
+        // 1. Send to Firebase Analytics (standard events)
+        if let props = properties {
+            // Convert properties to [String: Any] for Firebase
+            var firebaseParams: [String: Any] = [:]
+            for (key, value) in props {
+                firebaseParams[key] = value
+            }
+            Analytics.logEvent(event, parameters: firebaseParams)
+        } else {
+            Analytics.logEvent(event, parameters: nil)
+        }
+
+        // 2. ALSO send to Firestore for dashboard (with full data)
+        Task {
+            await sendToFirestore(event: event, properties: properties)
+        }
 
         #if DEBUG
         if let props = properties, !props.isEmpty {
-            print("[Mixpanel] 📊 Event: \(event) | Properties: \(props)")
+            print("[Analytics] 📊 Event: \(event) | Properties: \(props)")
         } else {
-            print("[Mixpanel] 📊 Event: \(event)")
+            print("[Analytics] 📊 Event: \(event)")
         }
-
-        // Force immediate flush in DEBUG mode for testing
-        Mixpanel.mainInstance().flush()
-        print("[Mixpanel] 💾 Flush executed for event: \(event)")
         #endif
     }
 
+    private func sendToFirestore(event: String, properties: [String: any Any]?) async {
+        // Send event to Firestore analytics_events collection for dashboard
+        var eventData: [String: Any] = [
+            "event_name": event,
+            "timestamp": Timestamp(date: Date()),
+            "user_id": Auth.auth().currentUser?.uid ?? "anonymous"
+        ]
+
+        // Add properties if available
+        if let props = properties {
+            var propsDict: [String: Any] = [:]
+            for (key, value) in props {
+                propsDict[key] = value
+            }
+            eventData["properties"] = propsDict
+        }
+
+        do {
+            try await db.collection("analytics_events").addDocument(data: eventData)
+            #if DEBUG
+            print("[Analytics] 💾 Sent to Firestore: \(event)")
+            #endif
+        } catch {
+            #if DEBUG
+            print("[Analytics] ❌ Firestore error: \(error.localizedDescription)")
+            #endif
+        }
+    }
+
     func flush() {
-        Mixpanel.mainInstance().flush()
+        // Firebase Analytics automatically flushes, no manual flush needed
+        #if DEBUG
+        print("[Analytics] ℹ️ Firebase Analytics auto-flushes, no manual flush needed")
+        #endif
     }
 
     func reset() {
-        Mixpanel.mainInstance().reset()
+        // Reset Firebase Analytics user ID
+        Analytics.setUserID(nil)
     }
 
     // MARK: - Purchase Tracking
 
     func trackPurchase(productId: String, price: Decimal, currency: String) {
-        let properties: [String: any MixpanelType] = [
+        let properties: [String: any Any] = [
             "product_id": productId,
             "price": NSDecimalNumber(decimal: price).doubleValue,
             "currency": currency,
@@ -863,7 +938,7 @@ class MixpanelManager {
     }
 
     func trackRestorePurchases(success: Bool, productIds: [String]?) {
-        var properties: [String: any MixpanelType] = [
+        var properties: [String: any Any] = [
             "success": success
         ]
 

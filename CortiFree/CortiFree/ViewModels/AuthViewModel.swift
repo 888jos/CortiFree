@@ -36,10 +36,12 @@ class AuthViewModel: ObservableObject {
         // Vérifier le statut d'onboarding local
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "onboardingV2Completed")
 
-        // Si authentifié, synchroniser avec Firestore
+        // Si authentifié, synchroniser avec Firestore et RevenueCat
         if isAuthenticated, let user = currentUser {
             Task {
                 await syncOnboardingStatus(userId: user.uid)
+                // Identify user with RevenueCat
+                await RevenueCatManager.shared.identifyUser(userId: user.uid)
             }
         }
     }
@@ -82,6 +84,9 @@ class AuthViewModel: ObservableObject {
             currentUser = user
             isAuthenticated = true
             successMessage = NSLocalizedString("auth.success.account_created", comment: "")
+
+            // Identify user with RevenueCat
+            await RevenueCatManager.shared.identifyUser(userId: user.uid)
         } catch let error as CoreError {
             errorMessage = error.errorDescription
             ErrorHandler.shared.handle(error, context: "AuthViewModel.signUp", showToUser: false)
@@ -110,6 +115,9 @@ class AuthViewModel: ObservableObject {
             // Vérifier si l'utilisateur a déjà complété l'onboarding
             await syncOnboardingStatus(userId: user.uid)
 
+            // Identify user with RevenueCat
+            await RevenueCatManager.shared.identifyUser(userId: user.uid)
+
             isAuthenticated = true
             successMessage = NSLocalizedString("auth.success.login", comment: "")
         } catch let error as CoreError {
@@ -128,6 +136,10 @@ class AuthViewModel: ObservableObject {
         Task {
             do {
                 try await firebase.auth.signOut()
+
+                // Logout from RevenueCat
+                await RevenueCatManager.shared.logout()
+
                 currentUser = nil
                 isAuthenticated = false
                 successMessage = NSLocalizedString("auth.success.logout", comment: "")

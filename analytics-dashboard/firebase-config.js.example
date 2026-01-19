@@ -1,0 +1,49 @@
+// ============================================
+// FIREBASE CONFIGURATION TEMPLATE
+// ============================================
+//
+// INSTRUCTIONS:
+// 1. Dupliquer ce fichier et le renommer en "firebase-config.js"
+// 2. Remplacer les valeurs "YOUR_XXX" avec vos vraies credentials Firebase
+// 3. Ne PAS commit firebase-config.js dans git (déjà dans .gitignore)
+//
+// Où trouver ces valeurs:
+// - Firebase Console: https://console.firebase.google.com/
+// - Project Settings > General > Your apps > Web app
+// - Si pas d'app web, créer une avec le bouton "Add app" (</>)
+//
+// ============================================
+
+const firebaseConfig = {
+    // Votre clé API publique Firebase
+    // Exemple: "AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    apiKey: "YOUR_API_KEY",
+
+    // Domaine d'authentification
+    // Format: "votre-projet.firebaseapp.com"
+    authDomain: "cortifree.firebaseapp.com",
+
+    // ID du projet (nom unique)
+    // Exemple: "cortifree" ou "cortifree-prod"
+    projectId: "cortifree",
+
+    // Bucket de stockage (optionnel pour analytics)
+    // Format: "votre-projet.appspot.com"
+    storageBucket: "cortifree.appspot.com",
+
+    // ID de l'expéditeur de messages (optionnel)
+    // Exemple: "123456789012"
+    messagingSenderId: "YOUR_SENDER_ID",
+
+    // ID de l'application
+    // Exemple: "1:123456789012:web:abcdef1234567890"
+    appId: "YOUR_APP_ID",
+
+    // Measurement ID (optionnel, pour Google Analytics)
+    // Exemple: "G-XXXXXXXXXX"
+    measurementId: "YOUR_MEASUREMENT_ID"
+};
+
+// Export de la config (si vous utilisez ce fichier comme module JS)
+// Pour utiliser dans cortifree-analytics.html, copiez simplement l'objet firebaseConfig
+// et remplacez celui dans le fichier HTML (ligne ~800)

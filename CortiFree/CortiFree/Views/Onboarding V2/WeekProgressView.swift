@@ -67,6 +67,23 @@ struct WeekProgressView: View {
         }
     }
 
+    // Responsive label offsets that scale with iPad
+    private var labelOffsets: (vertical: CGFloat, horizontal: CGFloat) {
+        let multiplier = ResponsiveLayout.sizeMultiplier
+        return (
+            vertical: 168 * multiplier,     // ±168 becomes ±201.6 on iPad (1.2x)
+            horizontal: 148 * multiplier    // ±148 becomes ±177.6 on iPad (1.2x)
+        )
+    }
+
+    private var labelOffsetsSmall: (vertical: CGFloat, horizontal: CGFloat) {
+        let multiplier = ResponsiveLayout.sizeMultiplier
+        return (
+            vertical: 82 * multiplier,      // ±82 becomes ±98.4 on iPad (1.2x)
+            horizontal: 148 * multiplier    // ±148 becomes ±177.6 on iPad (1.2x)
+        )
+    }
+
     var body: some View {
         ZStack {
             // Background with current week color gradient
@@ -80,12 +97,13 @@ struct WeekProgressView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Week title - Force display of week number based on screen index
-                Text(getWeekTitle())
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Week title - Force display of week number based on screen index
+                    Text(getWeekTitle())
                     .font(Font.Poppins.custom(.bold, size: 40))
                     .foregroundColor(.white)
-                    .padding(.top, 100)
+                    .responsivePadding(.top, 100)
                     .padding(.bottom, 16)
 
                 // Date range
@@ -106,17 +124,17 @@ struct WeekProgressView: View {
                                 .stroke(Color.white.opacity(0.6), lineWidth: 1.5)
                         )
                 )
-                .padding(.bottom, 32)
+                .responsivePadding(.bottom, 32)
 
-                // Motivational message - Fixed height
+                // Motivational message - Flexible height for iPad
                 Text(currentWeekData.message)
                     .font(.custom("Poppins-Regular", size: 16))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(nil)
-                    .frame(height: 60, alignment: .center)
+                    .frame(minHeight: 60, maxHeight: 80, alignment: .center)
                     .padding(.horizontal, 32)
-                    .padding(.bottom, 32)
+                    .responsivePadding(.bottom, 32)
 
                 // Bottom card with radar chart
                 VStack(spacing: 24) {
@@ -149,7 +167,7 @@ struct WeekProgressView: View {
                             )
                             .responsiveFrame(width: 280, height: 280)
 
-                        // Labels at hexagon vertices
+                        // Labels at hexagon vertices (scaled for iPad)
                         ZStack {
                             // Global - Top
                             HStack(spacing: 4) {
@@ -159,7 +177,7 @@ struct WeekProgressView: View {
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
-                            .offset(x: 0, y: -168)
+                            .offset(x: 0, y: -labelOffsets.vertical)
 
                             // Sérénité - Top right
                             HStack(spacing: 4) {
@@ -169,7 +187,7 @@ struct WeekProgressView: View {
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
-                            .offset(x: 148, y: -82)
+                            .offset(x: labelOffsets.horizontal, y: -labelOffsetsSmall.vertical)
 
                             // Sommeil - Bottom right
                             HStack(spacing: 4) {
@@ -179,7 +197,7 @@ struct WeekProgressView: View {
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
-                            .offset(x: 148, y: 82)
+                            .offset(x: labelOffsets.horizontal, y: labelOffsetsSmall.vertical)
 
                             // Énergie - Bottom
                             HStack(spacing: 4) {
@@ -189,7 +207,7 @@ struct WeekProgressView: View {
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
-                            .offset(x: 0, y: 168)
+                            .offset(x: 0, y: labelOffsets.vertical)
 
                             // Focus - Bottom left
                             HStack(spacing: 4) {
@@ -199,7 +217,7 @@ struct WeekProgressView: View {
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
-                            .offset(x: -148, y: 82)
+                            .offset(x: -labelOffsets.horizontal, y: labelOffsetsSmall.vertical)
 
                             // Équilibre - Top left
                             HStack(spacing: 4) {
@@ -209,10 +227,10 @@ struct WeekProgressView: View {
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                             .foregroundColor(.white)
-                            .offset(x: -148, y: -82)
+                            .offset(x: -labelOffsets.horizontal, y: -labelOffsetsSmall.vertical)
                         }
                     }
-                    .padding(.vertical, 48)
+                    .responsivePadding(.vertical, 48)
 
                     // Button
                     Button(action: {
@@ -246,14 +264,14 @@ struct WeekProgressView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 28))
                     }
                     .padding(.horizontal, 32)
-                    .padding(.bottom, 40)
+                    .responsivePadding(.bottom, 40)
 
                     Spacer(minLength: 0)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
                 .background(Color.black)
                 .clipShape(RoundedCorner(radius: 40, corners: [.topLeft, .topRight]))
-                .ignoresSafeArea(edges: .bottom)
+                }
             }
         }
         .onAppear {

@@ -1,0 +1,153 @@
+<!-- Add these pages before the closing </div> of container and before closing </body> -->
+
+<!-- PAGE 2: ADVANCED METRICS -->
+<div class="page-content" id="advancedPage">
+    <div class="section">
+        <div class="section-title">Advanced Analytics - Deep Dive</div>
+
+        <!-- Secondary KPIs Grid -->
+        <div class="kpi-grid" style="margin-top: 24px;">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Session Duration</div>
+                </div>
+                <div class="kpi-value" id="advSessionDuration">-</div>
+                <div class="kpi-subtitle">Average time per session</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">DAU/MAU Ratio</div>
+                </div>
+                <div class="kpi-value" id="advStickiness">-</div>
+                <div class="kpi-subtitle">Stickiness metric</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Churn Rate</div>
+                </div>
+                <div class="kpi-value" id="advChurn">-</div>
+                <div class="kpi-subtitle">Monthly churn</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Time to Value</div>
+                </div>
+                <div class="kpi-value" id="advTTV">-</div>
+                <div class="kpi-subtitle">First task completion</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Feature Adoption</div>
+                </div>
+                <div class="kpi-value" id="advFeatureAdoption">-</div>
+                <div class="kpi-subtitle">Users trying 3+ habits</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Power Users</div>
+                </div>
+                <div class="kpi-value" id="advPowerUsers">-</div>
+                <div class="kpi-subtitle">Daily active users</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Avg Revenue Per Session</div>
+                </div>
+                <div class="kpi-value" id="advARPS">$-</div>
+                <div class="kpi-subtitle">Revenue efficiency</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">CAC Payback Period</div>
+                </div>
+                <div class="kpi-value" id="advCACPayback">-</div>
+                <div class="kpi-subtitle">Months to recover CAC</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Viral Coefficient</div>
+                </div>
+                <div class="kpi-value" id="advViralK">-</div>
+                <div class="kpi-subtitle">Referrals per user</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cohort Analysis -->
+    <div class="section" style="margin-top: 32px;">
+        <div class="section-title">User Cohorts - Behavioral Segments</div>
+
+        <table class="funnel-metrics-table">
+            <thead>
+                <tr>
+                    <th>Cohort</th>
+                    <th>Users</th>
+                    <th>Avg Streak</th>
+                    <th>Completion Rate</th>
+                    <th>LTV</th>
+                </tr>
+            </thead>
+            <tbody id="cohortTableBody">
+                <tr>
+                    <td class="step-name">Highly Engaged</td>
+                    <td class="metric-count">-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td class="step-name">Moderately Active</td>
+                    <td class="metric-count">-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td class="step-name">At Risk</td>
+                    <td class="metric-count">-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td class="step-name">Churned</td>
+                    <td class="metric-count">-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- PAGE 3: RECOMMENDATIONS -->
+<div class="page-content" id="recommendationsPage">
+    <div class="section">
+        <div class="section-title">🎯 AI-Powered Recommendations</div>
+        <div class="recommendation-description" style="margin-bottom: 32px;">
+            Real-time insights and actionable recommendations based on your current metrics.
+            Prioritized by impact and urgency.
+        </div>
+    </div>
+
+    <div id="recommendationsContainer">
+        <!-- Recommendations will be dynamically inserted here -->
+        <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+            <div style="font-size: 48px; margin-bottom: 16px;">🤖</div>
+            <div style="font-size: 16px;">Loading recommendations...</div>
+            <div style="font-size: 14px; margin-top: 8px;">Analyzing your metrics to generate personalized insights</div>
+        </div>
+    </div>
+</div>
+
+<!-- Add script reference before closing body tag -->
+<script src="cortifree-analytics-pages.js"></script>

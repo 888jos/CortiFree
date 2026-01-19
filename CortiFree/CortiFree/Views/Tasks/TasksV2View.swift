@@ -23,6 +23,7 @@ struct TasksV2View: View {
     @State private var globalStreak: Int = 0 // Global streak (consecutive days with at least 1 task validated)
     @State private var showConfetti: Bool = false // Confetti animation trigger
     @State private var showSuccessCheckmark: Bool = false // Success checkmark animation trigger
+    @State private var showFlameAnimation: Bool = false // Flame streak animation trigger (first task of day)
     @State private var isRefreshing: Bool = false // Pull to refresh state
     @State private var showFutureWeekAlert: Bool = false // Show blocking screen for future weeks
 
@@ -683,6 +684,12 @@ struct TasksV2View: View {
                     .transition(.scale.combined(with: .opacity))
                 }
 
+                // Flame streak animation (first task of day)
+                if showFlameAnimation {
+                    FlameStreakAnimation(isShowing: $showFlameAnimation)
+                        .transition(.scale.combined(with: .opacity))
+                }
+
                 // Habit badge unlock popup
                 if habitBadgeService.showBadgePopup, let badge = habitBadgeService.newlyUnlockedBadge {
                     BadgeEvolutionView(badge: badge, isPresented: $habitBadgeService.showBadgePopup)
@@ -959,12 +966,21 @@ struct TasksV2View: View {
             taskStatuses[dayKey(currentDay)] = [:]
         }
 
+        // Check if this is the first task of the day BEFORE updating status
+        let tasksCompletedBeforeThis = taskStatuses[dayKey(currentDay)]?.values.filter { $0 == .done }.count ?? 0
+        let isFirstTaskToday = tasksCompletedBeforeThis == 0
+
         taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .done
 
         // Toujours recalculer les streaks normalement
         // Skip = "pas encore fait", donc valider après un skip continue le streak normalement
         updateTaskStreak(task)
         updateGlobalStreak()
+
+        // Trigger flame animation if this is the first task of the day
+        if isFirstTaskToday {
+            showFlameAnimation = true
+        }
 
         // Save to Firebase and apply impact scoring
         Task {

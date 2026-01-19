@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CortiFree - Technical Documentation</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #F3F0F8;
+            --bg-card: #FFFFFF;
+            --bg-code: #F8F8FB;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --accent-purple: #7C3AED;
+            --accent-purple-light: #F5F3FF;
+            --accent-purple-dark: #5B21B6;
+            --border-light: #E5E5E5;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--border-light);
+            padding: 24px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .header-badge {
+            background: var(--accent-purple-light);
+            color: var(--accent-purple-dark);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .header-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover {
+            color: var(--accent-purple);
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 32px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-light);
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav > li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: var(--accent-purple-light);
+            color: var(--accent-purple);
+        }
+
+        .sidebar-nav a.active {
+            background: var(--accent-purple);
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-nav .sub-items {
+            margin-left: 16px;
+            margin-top: 4px;
+            list-style: none;
+        }
+
+        .sidebar-nav .sub-items li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-nav .sub-items a {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        /* MAIN CONTENT */
+        .content {
+            min-height: 100vh;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border-light);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .section-icon {
+            font-size: 28px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-main);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-top: 8px;
+        }
+
+        .stat-description {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* CODE BLOCKS */
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 16px 0;
+        }
+
+        code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--accent-purple-dark);
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-purple {
+            background: var(--accent-purple-light);
+            color: var(--accent-purple-dark);
+        }
+
+        /* TABLES */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        th {
+            background: var(--bg-main);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: var(--bg-main);
+        }
+
+        /* LISTS */
+        .list {
+            list-style: none;
+            margin: 16px 0;
+        }
+
+        .list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+
+        .list li::before {
+            content: "→";
+            color: var(--accent-purple);
+            font-weight: bold;
+        }
+
+        /* COLLAPSIBLE SECTIONS */
+        .collapsible {
+            margin: 16px 0;
+        }
+
+        .collapsible-header {
+            background: var(--bg-main);
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border: 1px solid var(--border-light);
+        }
+
+        .collapsible-header:hover {
+            background: var(--accent-purple-light);
+        }
+
+        .collapsible-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .collapsible-icon {
+            transition: transform 0.2s;
+        }
+
+        .collapsible.open .collapsible-icon {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible.open .collapsible-content {
+            max-height: 5000px;
+            padding: 16px 0;
+        }
+
+        /* DIAGRAM */
+        .diagram {
+            background: var(--bg-code);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 16px 0;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        /* PRIORITY BADGES */
+        .priority-high {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        .priority-medium {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .priority-low {
+            color: var(--info);
+            font-weight: 500;
+        }
+
+        /* SEARCH BAR */
+        .search-bar {
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px var(--accent-purple-light);
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab:hover {
+            color: var(--accent-purple);
+        }
+
+        .tab.active {
+            color: var(--accent-purple);
+            border-bottom-color: var(--accent-purple);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>📚 CortiFree Technical Documentation</h1>
+                <span class="header-badge">v1.0 - iOS App</span>
+            </div>
+            <div class="header-nav">
+                <a href="cortifree-analytics.html">← Back to Dashboard</a>
+                <a href="#overview">Overview</a>
+                <a href="#recommendations">Recommendations</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Table of Contents</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview" class="active">📊 Overview</a></li>
+                <li><a href="#architecture">🏗️ Architecture</a></li>
+                <li><a href="#services">🔧 Services</a>
+                    <ul class="sub-items">
+                        <li><a href="#auth">Auth Service</a></li>
+                        <li><a href="#analytics">Analytics</a></li>
+                        <li><a href="#monetization">Monetization</a></li>
+                        <li><a href="#notifications">Notifications</a></li>
+                    </ul>
+                </li>
+                <li><a href="#flows">🎯 User Flows</a>
+                    <ul class="sub-items">
+                        <li><a href="#onboarding">Onboarding</a></li>
+                        <li><a href="#core-loop">Core Loop</a></li>
+                    </ul>
+                </li>
+                <li><a href="#data">💾 Data Layer</a></li>
+                <li><a href="#events">📈 Analytics Events</a></li>
+                <li><a href="#recommendations">🎯 Recommendations</a></li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="content">
+            <!-- OVERVIEW SECTION -->
+            <section id="overview" class="section">
+                <div class="section-header">
+                    <span class="section-icon">📊</span>
+                    <div>
+                        <h2 class="section-title">Project Overview</h2>
+                        <p class="section-subtitle">High-level statistics and architecture summary</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Files</div>
+                        <div class="stat-value">179</div>
+                        <div class="stat-description">Swift files</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Lines of Code</div>
+                        <div class="stat-value">~60k</div>
+                        <div class="stat-description">Total codebase</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Views</div>
+                        <div class="stat-value">115</div>
+                        <div class="stat-description">SwiftUI components</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Services</div>
+                        <div class="stat-value">22</div>
+                        <div class="stat-description">Business logic layers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">ViewModels</div>
+                        <div class="stat-value">10</div>
+                        <div class="stat-description">MVVM pattern</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Analytics Events</div>
+                        <div class="stat-value">81</div>
+                        <div class="stat-description">Tracked events</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 32px; margin-bottom: 16px;">Tech Stack</h3>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span class="badge badge-purple">SwiftUI</span>
+                    <span class="badge badge-purple">Firebase</span>
+                    <span class="badge badge-purple">RevenueCat</span>
+                    <span class="badge badge-purple">StoreKit 2</span>
+                    <span class="badge badge-purple">Superwall</span>
+                    <span class="badge badge-info">Lottie</span>
+                    <span class="badge badge-info">Combine</span>
+                    <span class="badge badge-info">UserNotifications</span>
+                </div>
+
+                <h3 style="margin-top: 32px; margin-bottom: 16px;">Key Features</h3>
+                <ul class="list">
+                    <li><strong>66-Day Habit Program</strong> - Science-based behavior change program</li>
+                    <li><strong>8 Core Habits</strong> - Sleep, Breathing, Meditation, Water, Sport, Nature, Social, Journal</li>
+                    <li><strong>Gamification</strong> - XP, Levels, Streaks, Badges, Achievements</li>
+                    <li><strong>Impact Scoring</strong> - 6 life domains tracked (Serenity, Sleep, Energy, Focus, Balance, Global)</li>
+                    <li><strong>Smart Notifications</strong> - 5 types including re-engagement strategies</li>
+                    <li><strong>Comprehensive Analytics</strong> - 81 events tracked to Firebase + Firestore</li>
+                </ul>
+            </section>
+
+            <!-- ARCHITECTURE SECTION -->
+            <section id="architecture" class="section">
+                <div class="section-header">
+                    <span class="section-icon">🏗️</span>
+                    <div>
+                        <h2 class="section-title">Architecture</h2>
+                        <p class="section-subtitle">MVVM pattern with Firebase backend</p>
+                    </div>
+                </div>
+
+                <h3>Pattern: MVVM (Model-View-ViewModel)</h3>
+                <div class="diagram">┌─────────────────────────────────────────┐
+│           CortiFreeApp.swift           │
+│   (Entry Point + AppDelegate)          │
+└──────────────┬──────────────────────────┘
+               │
+    ┌──────────┴──────────┐
+    │                     │
+┌───▼────┐         ┌──────▼─────┐
+│ Views  │         │ ViewModels │
+│        │◄────────┤            │
+└───┬────┘         └──────┬─────┘
+    │                     │
+    │              ┌──────▼─────┐
+    │              │  Services  │
+    │              └──────┬─────┘
+    │                     │
+┌───▼─────────────────────▼─────┐
+│         Models                 │
+└────────────┬───────────────────┘
+             │
+    ┌────────┴────────┐
+    │                 │
+┌───▼────┐     ┌──────▼─────┐
+│Firebase│     │External SDK│
+│Backend │     │RevenueCat  │
+└────────┘     │Superwall   │
+               └────────────┘</div>
+
+                <h3 style="margin-top: 24px;">Folder Structure</h3>
+                <pre><code>CortiFree/
+├── CortiFreeApp.swift          # Entry point
+├── ContentView.swift            # TabBar (4 tabs)
+├── Models/                      # 28 data models
+├── Views/                       # 115+ SwiftUI views
+│   ├── HomeView.swift
+│   ├── TasksV2View.swift
+│   ├── LibraryView.swift
+│   ├── ProfileView.swift
+│   └── Onboarding V2/          # 17 onboarding screens
+├── ViewModels/                  # 10 ViewModels
+├── Services/                    # 22 services
+│   ├── AuthService.swift
+│   ├── MixpanelManager.swift   # Analytics
+│   ├── RevenueCatManager.swift
+│   ├── StoreKitManager.swift
+│   └── NotificationService.swift
+└── Resources/
+    └── TASKS_DATABASE.json      # 200+ tasks</code></pre>
+            </section>
+
+            <!-- SERVICES SECTION -->
+            <section id="services" class="section">
+                <div class="section-header">
+                    <span class="section-icon">🔧</span>
+                    <div>
+                        <h2 class="section-title">Critical Services</h2>
+                        <p class="section-subtitle">Core business logic components</p>
+                    </div>
+                </div>
+
+                <!-- Auth Service -->
+                <div id="auth" class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>🔐 AuthService.swift</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Role:</strong> Firebase Authentication (Email/Password + Google)</p>
+
+                        <h4 style="margin-top: 16px;">Key Methods:</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>signUp(email:password:username:)</code></td>
+                                    <td>Create account + Firestore user document</td>
+                                </tr>
+                                <tr>
+                                    <td><code>signIn(email:password:)</code></td>
+                                    <td>Login with email</td>
+                                </tr>
+                                <tr>
+                                    <td><code>signOut()</code></td>
+                                    <td>Logout + cleanup</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deleteAccount()</code></td>
+                                    <td>Permanent account deletion</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 style="margin-top: 16px;">Firestore Document Created:</h4>
+                        <pre><code>{
+  "uid": "string",
+  "email": "string",
+  "username": "string",
+  "createdAt": Timestamp,
+  "xp": 0,
+  "level": 1,
+  "currentStreak": 0,
+  "onboardingCompleted": false
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Analytics Service -->
+                <div id="analytics" class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>📊 MixpanelManager.swift (Firebase Analytics)</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Role:</strong> Event tracking to Firebase Analytics + Firestore</p>
+
+                        <h4 style="margin-top: 16px;">Architecture:</h4>
+                        <div class="diagram">track(event: String, properties: [String: Any]?)
+  ├─> Firebase Analytics (Google Analytics)
+  └─> Firestore "analytics_events" collection</div>
+
+                        <p><strong>81 Events Tracked</strong> - See <a href="#events">Analytics Events section</a></p>
+
+                        <h4 style="margin-top: 16px;">Firestore Document Structure:</h4>
+                        <pre><code>{
+  "event_name": "task_validated",
+  "timestamp": Timestamp,
+  "user_id": "uid",
+  "properties": {
+    "task_title": "Méditer 5 minutes",
+    "habit_id": "meditation",
+    "day": 18,
+    "current_streak": 12
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Monetization -->
+                <div id="monetization" class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>💰 RevenueCatManager.swift + StoreKitManager.swift</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Dual System:</strong> RevenueCat (primary) + StoreKit 2 (fallback)</p>
+
+                        <h4 style="margin-top: 16px;">RevenueCat Configuration:</h4>
+                        <ul class="list">
+                            <li>API Key: <code>test_VJPakDolvKFgQacRtOHITvapOtT</code></li>
+                            <li>Entitlement: <code>CortiFree Premium</code></li>
+                            <li>Product IDs: <code>monthly</code>, <code>yearly</code></li>
+                        </ul>
+
+                        <h4 style="margin-top: 16px;">StoreKit 2 Product IDs:</h4>
+                        <ul class="list">
+                            <li><code>cortifree.yearly.sub</code> - Annual subscription</li>
+                            <li><code>cortifree.monthly.sub</code> - Monthly subscription</li>
+                        </ul>
+
+                        <h4 style="margin-top: 16px;">SKAN Tracking:</h4>
+                        <pre><code>// iOS 16.1+ - Conversion value for paid subscription
+SKAdNetwork.updatePostbackConversionValue(
+    63,  // Max value
+    coarseValue: .high
+)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div id="notifications" class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>🔔 NotificationService.swift</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>5 Notification Types:</strong></p>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Trigger</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Daily</strong></td>
+                                    <td>9h (morning), 19h (evening)</td>
+                                    <td>Meditation reminder, Journal prompt</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Trial</strong></td>
+                                    <td>Day 2 & Day 3 of trial</td>
+                                    <td>Keep engagement during trial</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Streak Danger</strong></td>
+                                    <td>20h if no tasks completed</td>
+                                    <td>Prevent streak loss</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Milestones</strong></td>
+                                    <td>3, 7, 14, 30, 66 days</td>
+                                    <td>Celebrate achievements</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Re-engagement</strong></td>
+                                    <td>Onboarding incomplete</td>
+                                    <td>Recover dropped users (3 strategies)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 style="margin-top: 16px;">Re-engagement Strategies:</h4>
+                        <ul class="list">
+                            <li><strong>Strategy 1 - Checkpoint-based:</strong> 2h, 24h, 48h after quit</li>
+                            <li><strong>Strategy 2 - Paywall-focused:</strong> 1h, 6h, 24h after viewing paywall</li>
+                            <li><strong>Strategy 3 - Auth-based:</strong> 12h, 48h, 7 days after authentication</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- USER FLOWS SECTION -->
+            <section id="flows" class="section">
+                <div class="section-header">
+                    <span class="section-icon">🎯</span>
+                    <div>
+                        <h2 class="section-title">User Flows</h2>
+                        <p class="section-subtitle">Complete onboarding and core loop</p>
+                    </div>
+                </div>
+
+                <!-- Onboarding -->
+                <div id="onboarding" class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>🚀 Onboarding Flow (16 Steps)</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="diagram">1. Welcome Screen
+   ↓
+2. Overall Quiz (5 questions)
+   Gender, Age, Discovery, Stress Reasons, Duration
+   ↓
+3. Reassurance
+   ↓
+4. Habits Quiz (11 questions) ⭐ CRITICAL
+   → Calculates 6 domain scores (0-100)
+   → Saved to Firestore
+   ↓
+5. 60-Day Explanation
+   ↓
+6. Scientific Plan
+   ↓
+7. Authentication ⚠️ HIGH DROP-OFF
+   Email/Password or Google Sign-In
+   ↓
+8. Loading Analysis (fake 3s)
+   ↓
+9. CortiFree Rating
+   Display calculated scores with animation
+   ↓
+10. 8 Habits Intro
+   ↓
+11. Week Progress
+   ↓
+12. 8 Habits Flow (Carousel)
+   ↓
+13. Notification Permissions
+   ↓
+14. Habits Progress (Charts)
+   ↓
+15. Social Proof (Testimonials)
+   ↓
+16. Paywall ⚠️ HIGH DROP-OFF
+   3-day free trial
+   RevenueCat or Custom paywall
+   ↓
+✅ COMPLETED (onboardingCompleted = true)</div>
+
+                        <h4 style="margin-top: 16px;">Conversion Metrics:</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Step</th>
+                                    <th>Avg Completion</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Welcome → Overall Quiz</td>
+                                    <td>~85%</td>
+                                    <td class="badge badge-success">Good</td>
+                                </tr>
+                                <tr>
+                                    <td>Overall Quiz → Habits Quiz</td>
+                                    <td>~65%</td>
+                                    <td class="badge badge-info">Normal</td>
+                                </tr>
+                                <tr>
+                                    <td>Habits Quiz → Authentication</td>
+                                    <td>~45%</td>
+                                    <td class="badge badge-warning">⚠️ Drop-off</td>
+                                </tr>
+                                <tr>
+                                    <td>Authentication → Paywall</td>
+                                    <td>~25%</td>
+                                    <td class="badge badge-danger">Critical</td>
+                                </tr>
+                                <tr>
+                                    <td>Paywall → Completed</td>
+                                    <td>~20%</td>
+                                    <td class="badge badge-danger">Critical</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Core Loop -->
+                <div id="core-loop" class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>🔄 Core Loop (Daily Task Completion)</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="diagram">User completes task
+   ↓
+ImpactScoringService.applyTaskImpact(habitId)
+   → Updates Firestore currentDomainScores
+   → Serenity +2.0, Sleep +1.0, etc.
+   ↓
+FirebaseService.completeTask()
+   → +5 XP
+   → Update dailyPrograms collection
+   ↓
+Check Milestones
+   → 3, 7, 14, 30, 66 days?
+   → Unlock achievement badge
+   → Send notification
+   ↓
+MixpanelManager.trackTaskValidated()
+   → Firebase Analytics
+   → Firestore analytics_events
+   ↓
+Update UI
+   → Global score increases
+   → Streak counter updates
+   → XP bar fills
+   → Confetti animation (100%)</div>
+
+                        <h4 style="margin-top: 16px;">Impact Scoring Example (Meditation):</h4>
+                        <pre><code>HabitImpactWeights.impactForHabit("meditation")
+// Returns:
+{
+  "serenity": +2.0,
+  "sleep": +1.0,
+  "energy": +0.5,
+  "focus": +1.5,
+  "balance": +1.0
+}
+
+// After 10 meditation tasks:
+currentScores.serenity += 20.0
+currentScores.sleep += 10.0
+// etc...</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DATA LAYER SECTION -->
+            <section id="data" class="section">
+                <div class="section-header">
+                    <span class="section-icon">💾</span>
+                    <div>
+                        <h2 class="section-title">Data Layer</h2>
+                        <p class="section-subtitle">Firestore collections and local storage</p>
+                    </div>
+                </div>
+
+                <h3>Firestore Collections</h3>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>users/{uid}</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <pre><code>{
+  // Auth & Profile
+  "uid": "string",
+  "email": "string",
+  "username": "string",
+  "firstName": "string",
+  "age": 28,
+  "gender": "homme",
+
+  // Onboarding
+  "onboardingCompleted": true,
+  "stressReasons": ["work", "sleep"],
+
+  // Baseline Scores (from quiz)
+  "domainScores": {
+    "global": 42,
+    "serenity": 38,
+    "sleep": 45,
+    "energy": 40,
+    "focus": 35,
+    "balance": 50
+  },
+
+  // Current Scores (evolving)
+  "currentDomainScores": {
+    "global": 55.5,
+    "serenity": 52.0,
+    "sleep": 58.0,
+    // ...
+  },
+
+  // Progression
+  "xp": 450,
+  "level": 5,
+  "currentStreak": 12,
+  "longestStreak": 18,
+
+  // Subscription
+  "subscriptionStatus": "active",
+  "subscriptionType": "yearly",
+
+  // Program
+  "currentProgramDay": 18
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>users/{uid}/dailyPrograms (subcollection)</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <pre><code>{
+  "id": "program_day_18",
+  "dayNumber": 18,
+  "taskIds": [
+    "breathing_coherence",
+    "meditation_mindfulness",
+    "water_morning",
+    "nature_walk",
+    "journal_evening"
+  ],
+  "completedTaskIds": [
+    "breathing_coherence",
+    "water_morning"
+  ],
+  "completionRate": 0.4, // 40%
+  "createdAt": Timestamp
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3>analytics_events (root collection)</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <pre><code>{
+  "event_name": "task_validated",
+  "timestamp": Timestamp,
+  "user_id": "uid",
+  "properties": {
+    "task_title": "Méditer 5 minutes",
+    "habit_id": "meditation",
+    "day": 18,
+    "current_streak": 12,
+    "global_score_before": 42,
+    "global_score_after": 44
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ANALYTICS EVENTS SECTION -->
+            <section id="events" class="section">
+                <div class="section-header">
+                    <span class="section-icon">📈</span>
+                    <div>
+                        <h2 class="section-title">Analytics Events (81 Total)</h2>
+                        <p class="section-subtitle">All tracked events sent to Firebase + Firestore</p>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab(event, 'onboarding-events')">Onboarding (32)</button>
+                    <button class="tab" onclick="switchTab(event, 'tasks-events')">Tasks (10)</button>
+                    <button class="tab" onclick="switchTab(event, 'conversion-events')">Conversion (6)</button>
+                    <button class="tab" onclick="switchTab(event, 'subscription-events')">Subscription (5)</button>
+                </div>
+
+                <div id="onboarding-events" class="tab-content active">
+                    <h3>Onboarding Events (32)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Trigger</th>
+                                <th>Properties</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>onboarding_welcome_viewed</code></td>
+                                <td>Welcome screen displayed</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td><code>onboarding_habits_quiz_clicked</code></td>
+                                <td>Habits quiz completed</td>
+                                <td>serenity_score, sleep_score, energy_score, focus_score, balance_score, global_score</td>
+                            </tr>
+                            <tr>
+                                <td><code>onboarding_authentication_clicked</code></td>
+                                <td>User authenticated</td>
+                                <td>auth_method (email|google), user_id</td>
+                            </tr>
+                            <tr>
+                                <td><code>onboarding_paywall_viewed</code></td>
+                                <td>Paywall displayed</td>
+                                <td>quiz_answers_count, has_quiz_data</td>
+                            </tr>
+                            <tr>
+                                <td><code>onboarding_completed</code></td>
+                                <td>Full onboarding done</td>
+                                <td>total_time, subscription_status</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 16px; color: var(--text-secondary); font-size: 14px;">+ 27 more onboarding events (viewed/clicked for each step)</p>
+                </div>
+
+                <div id="tasks-events" class="tab-content">
+                    <h3>Tasks Events (10) - CRITICAL</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Trigger</th>
+                                <th>Properties</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #FEF3C7;">
+                                <td><code>task_validated</code> ⭐</td>
+                                <td>Task completed (swipe right)</td>
+                                <td>task_title, habit_id, day, current_streak, global_score_before, global_score_after</td>
+                            </tr>
+                            <tr>
+                                <td><code>task_skipped</code></td>
+                                <td>Task skipped (swipe left)</td>
+                                <td>task_title, habit_id, day</td>
+                            </tr>
+                            <tr>
+                                <td><code>tasks_viewed</code></td>
+                                <td>Tasks screen opened</td>
+                                <td>current_day, todo_count, done_count, global_score</td>
+                            </tr>
+                            <tr>
+                                <td><code>achievement_unlocked</code></td>
+                                <td>Milestone reached</td>
+                                <td>achievement_id, achievement_title, achievement_milestone</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="conversion-events" class="tab-content">
+                    <h3>Conversion & Retention Events (6)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Trigger</th>
+                                <th>Properties</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>first_app_launch</code></td>
+                                <td>App opened for first time</td>
+                                <td>install_source, device_type</td>
+                            </tr>
+                            <tr>
+                                <td><code>first_task_completed</code></td>
+                                <td>First task ever completed</td>
+                                <td>task_title, time_since_onboarding</td>
+                            </tr>
+                            <tr>
+                                <td><code>day_1_active</code></td>
+                                <td>User active on Day 1</td>
+                                <td>tasks_completed, global_score_change</td>
+                            </tr>
+                            <tr>
+                                <td><code>day_7_active</code></td>
+                                <td>User active on Day 7</td>
+                                <td>tasks_completed, current_streak</td>
+                            </tr>
+                            <tr>
+                                <td><code>day_30_active</code></td>
+                                <td>User active on Day 30</td>
+                                <td>tasks_completed, current_streak</td>
+                            </tr>
+                            <tr>
+                                <td><code>day_66_completed</code></td>
+                                <td>Program completed! 🎉</td>
+                                <td>tasks_completed, global_score_change</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="subscription-events" class="tab-content">
+                    <h3>Subscription Events (5) - CRITICAL</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Trigger</th>
+                                <th>Properties</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #FEF3C7;">
+                                <td><code>subscription_purchased</code> ⭐</td>
+                                <td>User subscribes</td>
+                                <td>product_id, price, currency, timestamp</td>
+                            </tr>
+                            <tr style="background: #FEF3C7;">
+                                <td><code>subscription_status_changed</code> ⭐</td>
+                                <td>Status updated</td>
+                                <td>subscription_status (trial|active|expired|cancelled), subscription_type, is_trial, days_subscribed</td>
+                            </tr>
+                            <tr>
+                                <td><code>purchases_restored</code></td>
+                                <td>Restore purchases clicked</td>
+                                <td>success, restored_products</td>
+                            </tr>
+                            <tr>
+                                <td><code>skan_conversion_value_updated</code></td>
+                                <td>SKAN postback sent</td>
+                                <td>value, coarse, product_id</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- RECOMMENDATIONS SECTION -->
+            <section id="recommendations" class="section">
+                <div class="section-header">
+                    <span class="section-icon">🎯</span>
+                    <div>
+                        <h2 class="section-title">Priority Recommendations</h2>
+                        <p class="section-subtitle">Ranked action items for new developers</p>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3><span class="priority-high">🔴 P0 - Critical</span> Understand Core Loop First</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Why:</strong> This is the heart of the app. Everything revolves around task completion.</p>
+
+                        <h4>Flow to understand:</h4>
+                        <pre><code>User swipes right on task
+   → TasksViewModel.validateTask()
+   → ImpactScoringService.applyTaskImpact(habitId)
+   → FirebaseService.completeTask() (+5 XP)
+   → Check milestones
+   → MixpanelManager.trackTaskValidated()</code></pre>
+
+                        <h4>Files to read:</h4>
+                        <ul class="list">
+                            <li><code>TasksViewModel.swift</code> (lines 257-305)</li>
+                            <li><code>ImpactScoringService.swift</code></li>
+                            <li><code>FirebaseService.swift</code> (lines 117-135)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3><span class="priority-high">🔴 P0 - Critical</span> Respect MVVM Architecture</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Rule:</strong> Views never talk to Firestore directly. Always use Services via ViewModels.</p>
+
+                        <h4>❌ WRONG:</h4>
+                        <pre><code>// In SwiftUI View
+let db = Firestore.firestore()
+db.collection("users").document(userId).setData(...)</code></pre>
+
+                        <h4>✅ CORRECT:</h4>
+                        <pre><code>// In View
+@StateObject private var viewModel = TasksViewModel()
+
+// In ViewModel
+await firebaseService.saveTask(task)
+
+// In Service
+FirebaseService.shared.saveTask(_:)</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3><span class="priority-medium">🟡 P1 - High</span> Analytics are Mandatory</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Every screen MUST track:</strong></p>
+                        <pre><code>.onAppear {
+    MixpanelManager.shared.track(event: "screen_name_viewed")
+}</code></pre>
+
+                        <p><strong>Every CTA button MUST track:</strong></p>
+                        <pre><code>Button("Action") {
+    MixpanelManager.shared.track(
+        event: "action_clicked",
+        properties: ["key": "value"]
+    )
+    // Action logic
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3><span class="priority-medium">🟡 P1 - High</span> Refactor: Unify Firebase Services</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Problem:</strong> 3 overlapping Firebase services exist:</p>
+                        <ul class="list">
+                            <li><code>FirebaseService.swift</code></li>
+                            <li><code>FirebaseManager.swift</code></li>
+                            <li><code>OptimizedFirebaseService.swift</code></li>
+                        </ul>
+
+                        <p><strong>Solution:</strong> Consolidate into <code>UnifiedFirebaseService</code></p>
+                        <pre><code>UnifiedFirebaseService
+  ├─ AuthModule (replaces AuthService + AuthManager)
+  ├─ FirestoreModule (replaces FirebaseService + Manager)
+  └─ AnalyticsModule (wraps MixpanelManager)</code></pre>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3><span class="priority-low">🔵 P2 - Medium</span> Add Sign in with Apple</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Why:</strong> Apple requires it if you have Google Sign-In</p>
+                        <p><strong>Status:</strong> TODO comment at line 202 in <code>AuthModule.swift</code></p>
+                        <p><strong>Action:</strong> Implement before App Store submission</p>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h3><span class="priority-low">🔵 P2 - Medium</span> Centralized Logging</h3>
+                        <span class="collapsible-icon">▶</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Problem:</strong> 50+ <code>#if DEBUG print()</code> scattered everywhere</p>
+                        <p><strong>Solution:</strong> Use <code>OSLog</code> or custom logger</p>
+                        <pre><code>import OSLog
+
+let logger = Logger(subsystem: "com.cortifree.app", category: "general")
+
+logger.debug("Task validated: \(taskId)")
+logger.error("Failed to save: \(error)")</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <div style="text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 14px;">
+                <p>📚 CortiFree Technical Documentation v1.0</p>
+                <p style="margin-top: 8px;">Generated on 2026-01-16 | <a href="cortifree-analytics.html" style="color: var(--accent-purple);">← Back to Analytics Dashboard</a></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Collapsible toggle
+        function toggleCollapsible(header) {
+            const collapsible = header.parentElement;
+            collapsible.classList.toggle('open');
+        }
+
+        // Tab switching
+        function switchTab(event, tabId) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Smooth scroll for sidebar links
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                        // Update active link
+                        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                            link.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // Scroll spy for sidebar
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    const link = document.querySelector(`.sidebar-nav a[href="#${id}"]`);
+                    if (link) {
+                        document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                }
+            });
+        }, { rootMargin: '-100px 0px -66% 0px' });
+
+        // Observe all sections
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

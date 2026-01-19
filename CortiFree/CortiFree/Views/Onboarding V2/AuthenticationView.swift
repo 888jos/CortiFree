@@ -13,6 +13,53 @@ import FirebaseFirestore
 import Lottie
 import GoogleSignIn
 import GoogleSignInSwift
+import CryptoKit
+
+// MARK: - Nonce Generation for Sign in with Apple
+
+// Adapted from Firebase documentation
+// https://firebase.google.com/docs/auth/ios/apple
+
+private func randomNonceString(length: Int = 32) -> String {
+    precondition(length > 0)
+    let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+    var result = ""
+    var remainingLength = length
+
+    while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+            var random: UInt8 = 0
+            let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+            if errorCode != errSecSuccess {
+                fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+            }
+            return random
+        }
+
+        randoms.forEach { random in
+            if remainingLength == 0 {
+                return
+            }
+
+            if random < charset.count {
+                result.append(charset[Int(random)])
+                remainingLength -= 1
+            }
+        }
+    }
+
+    return result
+}
+
+private func sha256(_ input: String) -> String {
+    let inputData = Data(input.utf8)
+    let hashedData = SHA256.hash(data: inputData)
+    let hashString = hashedData.compactMap {
+        String(format: "%02x", $0)
+    }.joined()
+
+    return hashString
+}
 
 // Pre-computed star positions to avoid random in Canvas (fixes iPad freeze) - shared across all auth views
 private let authStarPositions: [(CGFloat, CGFloat, CGFloat)] = [
@@ -938,25 +985,37 @@ struct GoogleAuthView: View {
                 do {
                     let authResult = try await Auth.auth().signIn(with: credential)
 
+                    // Check if user document exists to determine if new user
+                    let db = Firestore.firestore()
+                    let userDoc = try await db.collection("users").document(authResult.user.uid).getDocument()
+                    let isNewUser = !userDoc.exists
+
                     // Create/update user profile in Firestore
-                    let userData: [String: Any] = [
+                    var userData: [String: Any] = [
                         "uid": authResult.user.uid,
                         "email": authResult.user.email ?? "",
                         "firstName": user.profile?.givenName ?? "Utilisateur",
                         "displayName": user.profile?.name ?? "Utilisateur",
                         "photoURL": user.profile?.imageURL(withDimension: 200)?.absoluteString ?? "",
-                        "createdAt": Timestamp(date: Date()),
                         "authProvider": "google",
                         "lastLoginAt": Timestamp(date: Date())
                     ]
 
-                    try await Firestore.firestore()
-                        .collection("users")
+                    // For new users, set onboardingCompleted and createdAt
+                    if isNewUser {
+                        userData["onboardingCompleted"] = false
+                        userData["createdAt"] = Timestamp(date: Date())
+                    }
+
+                    try await db.collection("users")
                         .document(authResult.user.uid)
                         .setData(userData, merge: true)
 
                     // Save firstName to UserDefaults for offline access
                     UserDefaults.standard.set(user.profile?.givenName ?? "Utilisateur", forKey: "userFirstName")
+
+                    // Identify user with RevenueCat
+                    await RevenueCatManager.shared.identifyUser(userId: authResult.user.uid)
 
                     await MainActor.run {
                         isLoading = false
@@ -983,6 +1042,7 @@ struct AppleAuthView: View {
     @State private var errorMessage: String?
     @State private var showEmailAuth = false
     @State private var showGoogleAuth = false
+    @State private var currentNonce: String?
 
     var onComplete: () -> Void
 
@@ -1069,7 +1129,10 @@ struct AppleAuthView: View {
 
                 // Sign in with Apple button
                 SignInWithAppleButton(.signIn) { request in
+                    let nonce = randomNonceString()
+                    currentNonce = nonce
                     request.requestedScopes = [.fullName, .email]
+                    request.nonce = sha256(nonce)
                 } onCompletion: { result in
                     handleAppleSignIn(result)
                 }
@@ -1184,17 +1247,30 @@ struct AppleAuthView: View {
                 return
             }
 
+            guard let nonce = currentNonce else {
+                errorMessage = "onboarding_v2.auth.token_error".localized
+                return
+            }
+
             isLoading = true
 
             Task {
                 do {
+                    // Create credential with nonce
                     let credential = OAuthProvider.appleCredential(
                         withIDToken: idTokenString,
-                        rawNonce: nil,
+                        rawNonce: nonce,
                         fullName: appleIDCredential.fullName
                     )
 
                     let authResult = try await Auth.auth().signIn(with: credential)
+                    let userId = authResult.user.uid
+
+                    // Check if user document already exists
+                    let db = Firestore.firestore()
+                    let userDoc = try await db.collection("users").document(userId).getDocument()
+
+                    let isNewUser = !userDoc.exists
 
                     // Get name from Apple credential (only provided on first sign-in)
                     let firstName = appleIDCredential.fullName?.givenName
@@ -1204,26 +1280,38 @@ struct AppleAuthView: View {
 
                     // Create/update user profile in Firestore
                     var userData: [String: Any] = [
-                        "uid": authResult.user.uid,
+                        "uid": userId,
                         "email": authResult.user.email ?? appleIDCredential.email ?? "",
-                        "createdAt": Timestamp(date: Date()),
                         "authProvider": "apple",
                         "lastLoginAt": Timestamp(date: Date())
                     ]
+
+                    // For new users, set onboardingCompleted to false and createdAt
+                    if isNewUser {
+                        userData["onboardingCompleted"] = false
+                        userData["createdAt"] = Timestamp(date: Date())
+                    }
 
                     // Only add name fields if we got them (first sign-in only)
                     if let firstName = firstName, !firstName.isEmpty {
                         userData["firstName"] = firstName
                         UserDefaults.standard.set(firstName, forKey: "userFirstName")
+                    } else if isNewUser {
+                        // New user but no name provided - use fallback
+                        userData["firstName"] = "User"
+                        UserDefaults.standard.set("User", forKey: "userFirstName")
                     }
+
                     if !displayName.isEmpty {
                         userData["displayName"] = displayName
                     }
 
-                    try await Firestore.firestore()
-                        .collection("users")
-                        .document(authResult.user.uid)
+                    try await db.collection("users")
+                        .document(userId)
                         .setData(userData, merge: true)
+
+                    // Identify user with RevenueCat
+                    await RevenueCatManager.shared.identifyUser(userId: userId)
 
                     await MainActor.run {
                         isLoading = false

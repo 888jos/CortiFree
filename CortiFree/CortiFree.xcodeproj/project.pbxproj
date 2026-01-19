@@ -10,6 +10,9 @@
 		8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AEC92ED91A0100541E54 /* GoogleSignIn */; };
 		8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AECB2ED91A0100541E54 /* GoogleSignInSwift */; };
 		802C49B12EBBB2340084B356 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 802C49B02EBBB2340084B356 /* Lottie */; };
+		80622A4A2F1701B9000C459F /* ReceiptParser in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A492F1701B9000C459F /* ReceiptParser */; };
+		80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4B2F1701B9000C459F /* RevenueCat */; };
+		80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4D2F1701B9000C459F /* RevenueCatUI */; };
 		8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8077CC292ECF8AF400742806 /* Mixpanel */; };
 		8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9902EA8CBCA007C9606 /* FirebaseAuth */; };
 		8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9922EA8CBCA007C9606 /* FirebaseFirestore */; };
@@ -68,12 +71,15 @@
 			files = (
 				80F600D22E85D5BF008F58FB /* FirebaseAnalyticsIdentitySupport in Frameworks */,
 				8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */,
+				80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */,
 				80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */,
 				80F600D02E85D5BF008F58FB /* FirebaseAnalyticsCore in Frameworks */,
 				80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */,
 				8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */,
+				80622A4A2F1701B9000C459F /* ReceiptParser in Frameworks */,
 				80F600CC2E85D5BF008F58FB /* FirebaseAI in Frameworks */,
 				8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */,
+				80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */,
 				8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */,
 				802C49B12EBBB2340084B356 /* Lottie in Frameworks */,
 				8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */,
@@ -148,6 +154,9 @@
 				8077CC292ECF8AF400742806 /* Mixpanel */,
 				8021AEC92ED91A0100541E54 /* GoogleSignIn */,
 				8021AECB2ED91A0100541E54 /* GoogleSignInSwift */,
+				80622A492F1701B9000C459F /* ReceiptParser */,
+				80622A4B2F1701B9000C459F /* RevenueCat */,
+				80622A4D2F1701B9000C459F /* RevenueCatUI */,
 			);
 			productName = CortiFree;
 			productReference = 80F600A02E85D4A0008F58FB /* CortiFree.app */;
@@ -234,6 +243,7 @@
 				802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				8077CC282ECF8AF400742806 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 				8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80F600A12E85D4A0008F58FB /* Products */;
@@ -436,7 +446,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9XGVT5L2P3;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -468,7 +478,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9XGVT5L2P3;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -626,6 +636,14 @@
 				minimumVersion = 4.5.2;
 			};
 		};
+		80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.54.0;
+			};
+		};
 		8077CC282ECF8AF400742806 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mixpanel/mixpanel-swift";
@@ -667,6 +685,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		80622A492F1701B9000C459F /* ReceiptParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = ReceiptParser;
+		};
+		80622A4B2F1701B9000C459F /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		80622A4D2F1701B9000C459F /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
 		};
 		8077CC292ECF8AF400742806 /* Mixpanel */ = {
 			isa = XCSwiftPackageProductDependency;

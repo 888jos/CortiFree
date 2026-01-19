@@ -41,7 +41,8 @@ class AuthService {
             "xp": 0,
             "level": 1,
             "currentStreak": 0,
-            "longestStreak": 0
+            "longestStreak": 0,
+            "onboardingCompleted": false
         ]
 
         try await db.collection("users").document(authResult.user.uid).setData(userData)

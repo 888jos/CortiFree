@@ -1687,6 +1687,91 @@
 "library.meditation.focus" = "Méditation focus";
 "library.meditation.sleep" = "Méditation sommeil";
 
+// MARK: - Routines
+"library.category.routines" = "Routines";
+"routines.title" = "Routines";
+"routines.subtitle" = "Des programmes guidés qui combinent respiration, méditation et sons pour des objectifs spécifiques.";
+"routines.badge" = "ROUTINE";
+"routines.steps" = "étapes";
+"routines.impact" = "Domaines d'impact";
+"routines.program" = "Programme";
+"routines.start" = "Commencer la routine";
+"routines.step" = "Étape";
+"routines.next" = "Suivant";
+"routines.complete" = "Terminer";
+"routines.type.breathing" = "Exercice de respiration";
+"routines.type.meditation" = "Exercice de méditation";
+"routines.type.sound" = "Son d'ambiance";
+"routines.type.journal" = "Journaling";
+"routines.type.pause" = "Moment de pause";
+"routines.completed.title" = "Routine terminée !";
+"routines.completed.duration" = "Durée";
+"routines.completed.steps" = "Étapes";
+"routines.completed.continue" = "Continuer";
+
+// Routine names
+"routine.morning.name" = "Routine Matinale";
+"routine.morning.description" = "Commencez la journée avec énergie et clarté mentale.";
+"routine.morning.step1" = "Respiration abdominale pour réveiller le corps";
+"routine.morning.step2" = "Méditation de respiration consciente";
+"routine.morning.step3" = "Journal de gratitude matinal";
+"routine.morning.step4" = "Fixez votre intention pour la journée";
+
+"routine.sleep.name" = "Routine Sommeil";
+"routine.sleep.description" = "Préparez-vous à un sommeil profond et réparateur.";
+"routine.sleep.step1" = "Sons de pluie pour créer l'ambiance";
+"routine.sleep.step2" = "Respiration 4-7-8 pour calmer le système nerveux";
+"routine.sleep.step3" = "Méditation Yoga Nidra guidée";
+"routine.sleep.step4" = "Laissez-vous glisser vers le sommeil";
+
+"routine.focus.name" = "Concentration";
+"routine.focus.description" = "Améliorez votre focus et votre clarté mentale.";
+"routine.focus.step1" = "Cohérence cardiaque pour équilibrer";
+"routine.focus.step2" = "Méditation focus pour la concentration";
+"routine.focus.step3" = "Moment de réflexion";
+"routine.focus.step4" = "Notez vos priorités du moment";
+
+"routine.energy.name" = "Boost d'Énergie";
+"routine.energy.description" = "Retrouvez vitalité et motivation en quelques minutes.";
+"routine.energy.step1" = "Kapalabhati pour énergiser";
+"routine.energy.step2" = "Bhastrika pour intensifier";
+"routine.energy.step3" = "Étirez-vous et bougez";
+"routine.energy.step4" = "Visualisation énergisante";
+
+"routine.stress.name" = "Anti-stress";
+"routine.stress.description" = "Libérez les tensions et retrouvez la sérénité.";
+"routine.stress.step1" = "Respiration carrée pour calmer";
+"routine.stress.step2" = "Ancrage 5-4-3-2-1";
+"routine.stress.step3" = "Auto-compassion";
+"routine.stress.step4" = "Affirmation positive";
+
+"routine.relaxation.name" = "Détente";
+"routine.relaxation.description" = "Un moment de relaxation profonde pour se ressourcer.";
+"routine.relaxation.step1" = "Sons de l'océan pour l'ambiance";
+"routine.relaxation.step2" = "Respiration lente 6-6";
+"routine.relaxation.step3" = "Body scan pour relâcher les tensions";
+"routine.relaxation.step4" = "Savourez ce moment de calme";
+
+"routine.quick.name" = "Pause Rapide";
+"routine.quick.description" = "Une micro-pause efficace en 3 minutes.";
+"routine.quick.step1" = "Respiration triangle pour recentrer";
+"routine.quick.step2" = "Vous êtes prêt à continuer";
+
+"routine.deepwork.name" = "Concentration Profonde";
+"routine.deepwork.description" = "Préparez-vous pour une session de travail intense.";
+"routine.deepwork.step1" = "Cohérence cardiaque de préparation";
+"routine.deepwork.step2" = "Définissez votre objectif de session";
+"routine.deepwork.step3" = "Méditation focus approfondie";
+"routine.deepwork.step4" = "Bruit blanc pour la concentration";
+"routine.deepwork.step5" = "Vous êtes en mode deep work";
+
+// Impact domains
+"domain.serenity" = "Sérénité";
+"domain.sleep" = "Sommeil";
+"domain.energy" = "Énergie";
+"domain.focus" = "Focus";
+"domain.balance" = "Équilibre";
+
 // MARK: - Breathing Detail View
 "breathing_detail.category_badge" = "RESPIRATION";
 "breathing_detail.how_it_works" = "Comment ça marche ?";
@@ -2744,10 +2829,10 @@
 "onboarding_v2.habits.q8_opt3" = "Correct";
 "onboarding_v2.habits.q8_opt4" = "Plein(e) d'énergie";
 "onboarding_v2.habits.q9" = "Comment te sens-tu par rapport à ton apparence physique ces derniers temps ?";
-"onboarding_v2.habits.q9_opt1" = "Je me sens bien dans ma peau, confiant(e) et énergique";
-"onboarding_v2.habits.q9_opt2" = "Quelques imperfections me dérangent mais ça va globalement";
-"onboarding_v2.habits.q9_opt3" = "J'ai du mal avec mon reflet, fatigue visible et peau terne";
-"onboarding_v2.habits.q9_opt4" = "Je ne me reconnais plus : cernes, teint gris, prise/perte de poids";
+"onboarding_v2.habits.q9_opt1" = "Bien dans ma peau, énergique";
+"onboarding_v2.habits.q9_opt2" = "Quelques imperfections visibles";
+"onboarding_v2.habits.q9_opt3" = "Fatigue visible, peau terne";
+"onboarding_v2.habits.q9_opt4" = "Cernes, teint gris, poids fluctue";
 "onboarding_v2.habits.q10" = "Comment as-tu entendu parler de CortiFree ?";
 "onboarding_v2.habits.q10_opt1" = "App Store";
 "onboarding_v2.habits.q10_opt2" = "Instagram";
@@ -3220,6 +3305,11 @@
 "settings.privacy.delete_account" = "Supprimer mon compte";
 "settings.privacy.delete_account_subtitle" = "Action irréversible";
 "settings.privacy.icloud_subtitle" = "Synchroniser vos données entre appareils";
+
+// MARK: - Settings Subscription Section
+"settings.subscription.status" = "Statut";
+"settings.subscription.manage" = "Gérer l'abonnement";
+"settings.subscription.manage_subtitle" = "Voir les options dans l'App Store";
 
 // MARK: - Settings Bug Report
 "settings.bug_report.title" = "Signaler un bug";

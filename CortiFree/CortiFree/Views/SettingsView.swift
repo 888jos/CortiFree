@@ -3,6 +3,8 @@ import SafariServices
 import FirebaseAuth
 import FirebaseFirestore
 import StoreKit
+import RevenueCat
+import RevenueCatUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -36,6 +38,7 @@ struct SettingsView: View {
     @State private var bugReportText: String = ""
     @State private var bugReportScreenshot: UIImage? = nil
     @State private var showBugReportSuccess: Bool = false
+    @State private var showCustomerCenter: Bool = false
 
     var body: some View {
         ZStack {
@@ -126,6 +129,9 @@ struct SettingsView: View {
         } message: {
             Text("Merci pour votre retour ! Nous examinerons votre rapport rapidement.")
         }
+        .sheet(isPresented: $showCustomerCenter) {
+            CustomerCenterView()
+        }
     }
 
     // MARK: - Header View
@@ -209,12 +215,21 @@ struct SettingsView: View {
     private var subscriptionSection: some View {
         settingsSection(title: "Abonnement", icon: "crown.fill") {
             VStack(spacing: 0) {
-                settingsRow(icon: "checkmark.circle.fill", title: NSLocalizedString("settings.subscription.status", comment: ""), subtitle: viewModel.subscriptionStatus, showChevron: false) {}
+                // RevenueCat subscription status
+                settingsRow(
+                    icon: RevenueCatManager.shared.hasPremiumEntitlement ? "checkmark.circle.fill" : "circle",
+                    title: NSLocalizedString("settings.subscription.status", comment: ""),
+                    subtitle: RevenueCatManager.shared.hasPremiumEntitlement ?
+                        (LanguageManager.shared.currentLanguage == .french ? "Premium actif" : "Premium active") :
+                        (LanguageManager.shared.currentLanguage == .french ? "Non abonné" : "Not subscribed"),
+                    showChevron: false
+                ) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
+                // RevenueCat Customer Center
                 settingsRow(icon: "gearshape.fill", title: NSLocalizedString("settings.subscription.manage", comment: ""), subtitle: NSLocalizedString("settings.subscription.manage_subtitle", comment: ""), showChevron: true) {
                     HapticManager.light()
-                    manageSubscription()
+                    showCustomerCenter = true
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
