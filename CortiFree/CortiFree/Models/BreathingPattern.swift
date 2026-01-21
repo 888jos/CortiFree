@@ -10,7 +10,11 @@ import Foundation
 
 // MARK: - Breathing Pattern
 
-struct BreathingPattern: Identifiable {
+struct BreathingPattern: Identifiable, Equatable {
+    static func == (lhs: BreathingPattern, rhs: BreathingPattern) -> Bool {
+        lhs.name == rhs.name
+    }
+
     let id = UUID()
     let name: String
     let displayName: String

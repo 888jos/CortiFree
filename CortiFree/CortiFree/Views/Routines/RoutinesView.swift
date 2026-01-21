@@ -9,36 +9,54 @@ import SwiftUI
 
 struct RoutinesView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var selectedRoutine: Routine?
+
+    private var isFrench: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+    }
 
     var body: some View {
-        ZStack {
-            // Galaxy background
-            GalaxyBackgroundView(intensity: 1.0)
-                .ignoresSafeArea()
+        NavigationStack {
+            ZStack {
+                // Galaxy background
+                GalaxyBackgroundView(intensity: 1.0)
+                    .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Header
-                header
+                VStack(spacing: 0) {
+                    // Header
+                    header
 
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 16) {
-                        // Introduction text
-                        introSection
+                    // Routines grid - one big card per category
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 20) {
+                            // Subtitle section
+                            HStack(spacing: 10) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color(hex: "7E57C2"))
 
-                        // Routines grid
-                        routinesGrid
+                                Text(isFrench ? "Programmes guidés pour chaque moment" : "Guided programs for every moment")
+                                    .font(.custom("Poppins-Regular", size: 14))
+                                    .foregroundColor(.white.opacity(0.7))
 
-                        Spacer(minLength: 100)
+                                Spacer()
+                            }
+                            .padding(.bottom, 4)
+
+                            ForEach(RoutineCategory.allCases, id: \.self) { category in
+                                NavigationLink(destination: RoutineLevelSelectionView(category: category)) {
+                                    RoutineCategoryCardContent(category: category)
+                                }
+                                .buttonStyle(RoutineCategoryButtonStyle())
+                            }
+
+                            Spacer(minLength: 100)
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 16)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 16)
                 }
             }
-        }
-        .sheet(item: $selectedRoutine) { routine in
-            RoutineDetailView(routine: routine)
-                .presentationBackground(.clear)
+            .navigationBarHidden(true)
         }
     }
 
@@ -84,110 +102,125 @@ struct RoutinesView: View {
             .padding(.top, 60)
         }
     }
+}
 
-    // MARK: - Intro Section
-    private var introSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(NSLocalizedString("routines.subtitle", comment: ""))
-                .font(.custom("Poppins-Regular", size: 15))
-                .foregroundColor(Color(hex: "B0B8D4"))
-                .lineSpacing(4)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    // MARK: - Routines Grid
-    private var routinesGrid: some View {
-        LazyVStack(spacing: 16) {
-            ForEach(Routine.allRoutines) { routine in
-                RoutineCard(routine: routine) {
+// MARK: - Button Style for Category Cards
+struct RoutineCategoryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+            .onChange(of: configuration.isPressed) { _, isPressed in
+                if isPressed {
                     HapticManager.light()
-                    selectedRoutine = routine
                 }
             }
-        }
     }
 }
 
-// MARK: - Routine Card
-struct RoutineCard: View {
-    let routine: Routine
-    let action: () -> Void
+// MARK: - Routine Category Card Content (for NavigationLink)
+struct RoutineCategoryCardContent: View {
+    let category: RoutineCategory
+
+    private var isFrench: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+    }
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 16) {
-                // Icon circle
-                ZStack {
-                    Circle()
-                        .fill(Color(hex: routine.color).opacity(0.2))
-                        .frame(width: 56, height: 56)
+        ZStack(alignment: .topLeading) {
+            // Background image
+            Image(category.imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 180)
+                .clipped()
 
-                    Image(systemName: routine.icon)
-                        .font(.system(size: 24))
-                        .foregroundColor(Color(hex: routine.color))
-                }
+            // Dark gradient overlay for readability
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.1),
+                    Color.black.opacity(0.4),
+                    Color.black.opacity(0.75)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
 
-                // Content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(routine.localizedName)
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .foregroundColor(.white)
-
-                    Text(routine.localizedDescription)
-                        .font(.custom("Poppins-Regular", size: 13))
-                        .foregroundColor(Color(hex: "B0B8D4"))
-                        .lineLimit(2)
-
-                    // Duration + Difficulty
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock")
-                                .font(.system(size: 12))
-                            Text(routine.formattedDuration)
-                                .font(.custom("Poppins-Medium", size: 12))
-                        }
-                        .foregroundColor(Color(hex: routine.color))
-
-                        // Difficulty dots
-                        HStack(spacing: 3) {
-                            ForEach(0..<3, id: \.self) { i in
-                                Circle()
-                                    .fill(i < routine.difficulty ? Color(hex: routine.color) : Color.white.opacity(0.2))
-                                    .frame(width: 6, height: 6)
-                            }
-                        }
+            // Content overlay
+            VStack(alignment: .leading, spacing: 0) {
+                // Top: Category badge only
+                HStack {
+                    // Category type badge
+                    HStack(spacing: 6) {
+                        Text(NSLocalizedString("routines.badge", comment: ""))
+                            .font(.custom("Poppins-Bold", size: 10))
+                            .tracking(1)
                     }
+                    .foregroundColor(.white.opacity(0.9))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule()
+                            .fill(Color.black.opacity(0.35))
+                    )
+
+                    Spacer()
                 }
+                .padding(.top, 16)
+                .padding(.horizontal, 16)
 
                 Spacer()
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color.white.opacity(0.5))
+                // Bottom: Title + Info
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(category.localizedName)
+                        .font(.custom("Poppins-Bold", size: 22))
+                        .foregroundColor(.white)
+
+                    Text(category.localizedDescription)
+                        .font(.custom("Poppins-Regular", size: 13))
+                        .foregroundColor(.white.opacity(0.8))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+
+                    HStack(spacing: 16) {
+                        // Duration range only
+                        HStack(spacing: 4) {
+                            Image(systemName: "clock")
+                                .font(.system(size: 12))
+                            Text(category.durationRange)
+                                .font(.custom("Poppins-Medium", size: 13))
+                        }
+                        .foregroundColor(.white.opacity(0.9))
+
+                        Spacer()
+
+                        // Arrow indicator - white filled with dark violet chevron
+                        ZStack {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 36, height: 36)
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(Color(hex: "5E35B1"))
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "1A1B3A").opacity(0.8),
-                                Color(hex: "2A2B5A").opacity(0.6)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color(hex: routine.color).opacity(0.3), lineWidth: 1)
-                    )
-            )
         }
-        .buttonStyle(PlainButtonStyle())
+        .frame(height: 180)
+        .contentShape(Rectangle())
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+        )
     }
 }
+
 
 // MARK: - Routine Identifiable Extension
 extension Routine: Hashable {

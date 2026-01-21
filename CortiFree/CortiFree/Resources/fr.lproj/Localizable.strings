@@ -1709,61 +1709,148 @@
 "routines.completed.steps" = "Étapes";
 "routines.completed.continue" = "Continuer";
 
-// Routine names
-"routine.morning.name" = "Routine Matinale";
-"routine.morning.description" = "Commencez la journée avec énergie et clarté mentale.";
-"routine.morning.step1" = "Respiration abdominale pour réveiller le corps";
-"routine.morning.step2" = "Méditation de respiration consciente";
-"routine.morning.step3" = "Journal de gratitude matinal";
-"routine.morning.step4" = "Fixez votre intention pour la journée";
+// Routine launch buttons
+"routines.launch.start" = "Lancer l'exercice";
+"routines.launch.breathing" = "Lancer l'exercice";
+"routines.launch.meditation" = "Lancer la méditation";
+"routines.launch.journal" = "Ouvrir le journal";
+"routines.launch.sound" = "Jouer le son";
+"routines.launch.sound.stop" = "Arrêter le son";
 
-"routine.sleep.name" = "Routine Sommeil";
-"routine.sleep.description" = "Préparez-vous à un sommeil profond et réparateur.";
-"routine.sleep.step1" = "Sons de pluie pour créer l'ambiance";
-"routine.sleep.step2" = "Respiration 4-7-8 pour calmer le système nerveux";
-"routine.sleep.step3" = "Méditation Yoga Nidra guidée";
-"routine.sleep.step4" = "Laissez-vous glisser vers le sommeil";
+// Routine categories
+"routine.category.morning" = "Matin";
+"routine.category.morning.description" = "Commencez la journée avec énergie et clarté mentale.";
+"routine.category.sleep" = "Sommeil";
+"routine.category.sleep.description" = "Préparez-vous à un sommeil profond et réparateur.";
+"routine.category.focus" = "Focus";
+"routine.category.focus.description" = "Améliorez votre concentration et votre productivité.";
+"routine.category.energy" = "Énergie";
+"routine.category.energy.description" = "Retrouvez vitalité et motivation en quelques minutes.";
+"routine.category.stress" = "Anti-stress";
+"routine.category.stress.description" = "Libérez les tensions et retrouvez la sérénité.";
+"routine.category.relaxation" = "Détente";
+"routine.category.relaxation.description" = "Un moment de relaxation profonde pour se ressourcer.";
 
-"routine.focus.name" = "Concentration";
-"routine.focus.description" = "Améliorez votre focus et votre clarté mentale.";
-"routine.focus.step1" = "Cohérence cardiaque pour équilibrer";
-"routine.focus.step2" = "Méditation focus pour la concentration";
-"routine.focus.step3" = "Moment de réflexion";
-"routine.focus.step4" = "Notez vos priorités du moment";
+// Level selector
+"routines.choose.level" = "Choisissez votre niveau";
 
-"routine.energy.name" = "Boost d'Énergie";
-"routine.energy.description" = "Retrouvez vitalité et motivation en quelques minutes.";
-"routine.energy.step1" = "Kapalabhati pour énergiser";
-"routine.energy.step2" = "Bhastrika pour intensifier";
-"routine.energy.step3" = "Étirez-vous et bougez";
-"routine.energy.step4" = "Visualisation énergisante";
+// Routine difficulty levels
+"routine.difficulty.beginner" = "Débutant";
+"routine.difficulty.intermediate" = "Intermédiaire";
+"routine.difficulty.advanced" = "Avancé";
 
-"routine.stress.name" = "Anti-stress";
-"routine.stress.description" = "Libérez les tensions et retrouvez la sérénité.";
-"routine.stress.step1" = "Respiration carrée pour calmer";
-"routine.stress.step2" = "Ancrage 5-4-3-2-1";
-"routine.stress.step3" = "Auto-compassion";
-"routine.stress.step4" = "Affirmation positive";
+// =====================================================
+// MORNING ROUTINES (3 levels)
+// =====================================================
+"routine.morning.1.name" = "Réveil en douceur";
+"routine.morning.1.description" = "Une routine rapide pour bien commencer la journée.";
+"routine.morning.2.name" = "Éveil conscient";
+"routine.morning.2.description" = "Réveillez corps et esprit avec méditation et respiration.";
+"routine.morning.3.name" = "Rituel matinal complet";
+"routine.morning.3.description" = "Préparez-vous pour une journée exceptionnelle.";
 
-"routine.relaxation.name" = "Détente";
-"routine.relaxation.description" = "Un moment de relaxation profonde pour se ressourcer.";
-"routine.relaxation.step1" = "Sons de l'océan pour l'ambiance";
-"routine.relaxation.step2" = "Respiration lente 6-6";
-"routine.relaxation.step3" = "Body scan pour relâcher les tensions";
-"routine.relaxation.step4" = "Savourez ce moment de calme";
+// Morning routine steps
+"routine.morning.step.breathing" = "Respiration abdominale pour réveiller le corps";
+"routine.morning.step.meditation" = "Méditation de respiration consciente";
+"routine.morning.step.intention" = "Définissez votre intention pour la journée";
+"routine.morning.step.coherence" = "Cohérence cardiaque pour l'équilibre";
+"routine.morning.step.visualization" = "Visualisez votre journée idéale";
+"routine.morning.step.journal" = "Notez 3 gratitudes dans votre journal";
 
-"routine.quick.name" = "Pause Rapide";
-"routine.quick.description" = "Une micro-pause efficace en 3 minutes.";
-"routine.quick.step1" = "Respiration triangle pour recentrer";
-"routine.quick.step2" = "Vous êtes prêt à continuer";
+// =====================================================
+// SLEEP ROUTINES (3 levels)
+// =====================================================
+"routine.sleep.1.name" = "Pré-sommeil express";
+"routine.sleep.1.description" = "Calmez votre esprit rapidement avant de dormir.";
+"routine.sleep.2.name" = "Préparation au sommeil";
+"routine.sleep.2.description" = "Détendez corps et esprit pour un sommeil réparateur.";
+"routine.sleep.3.name" = "Rituel sommeil profond";
+"routine.sleep.3.description" = "La routine complète pour un sommeil de qualité.";
 
-"routine.deepwork.name" = "Concentration Profonde";
-"routine.deepwork.description" = "Préparez-vous pour une session de travail intense.";
-"routine.deepwork.step1" = "Cohérence cardiaque de préparation";
-"routine.deepwork.step2" = "Définissez votre objectif de session";
-"routine.deepwork.step3" = "Méditation focus approfondie";
-"routine.deepwork.step4" = "Bruit blanc pour la concentration";
-"routine.deepwork.step5" = "Vous êtes en mode deep work";
+// Sleep routine steps
+"routine.sleep.step.478" = "Respiration 4-7-8 pour calmer le système nerveux";
+"routine.sleep.step.relax" = "Laissez votre corps se détendre";
+"routine.sleep.step.sound" = "Sons apaisants pour l'ambiance";
+"routine.sleep.step.bodyscan" = "Scan corporel pour relâcher les tensions";
+"routine.sleep.step.slow" = "Respiration lente pour ralentir le rythme cardiaque";
+"routine.sleep.step.nidra" = "Yoga Nidra pour un sommeil profond";
+"routine.sleep.step.journal" = "Videz votre esprit dans le journal";
+
+// =====================================================
+// FOCUS ROUTINES (3 levels)
+// =====================================================
+"routine.focus.1.name" = "Focus rapide";
+"routine.focus.1.description" = "Retrouvez votre concentration en 5 minutes.";
+"routine.focus.2.name" = "Concentration guidée";
+"routine.focus.2.description" = "Préparez-vous pour une session de travail efficace.";
+"routine.focus.3.name" = "Deep focus";
+"routine.focus.3.description" = "La routine complète pour une concentration intense.";
+
+// Focus routine steps
+"routine.focus.step.coherence" = "Cohérence cardiaque pour l'équilibre mental";
+"routine.focus.step.meditation" = "Méditation focus pour la concentration";
+"routine.focus.step.ready" = "Vous êtes prêt à vous concentrer";
+"routine.focus.step.goals" = "Définissez vos objectifs de session";
+"routine.focus.step.deepfocus" = "Méditation focus approfondie";
+"routine.focus.step.whitenoise" = "Bruit blanc pour la concentration";
+"routine.focus.step.deepwork" = "Lancez-vous en mode deep work";
+
+// =====================================================
+// ENERGY ROUTINES (3 levels)
+// =====================================================
+"routine.energy.1.name" = "Boost minute";
+"routine.energy.1.description" = "Un coup de boost rapide en 3 minutes.";
+"routine.energy.2.name" = "Réveil énergétique";
+"routine.energy.2.description" = "Rechargez vos batteries en quelques minutes.";
+"routine.energy.3.name" = "Power routine";
+"routine.energy.3.description" = "La routine complète pour une énergie explosive.";
+
+// Energy routine steps
+"routine.energy.step.triangle" = "Respiration triangle pour dynamiser";
+"routine.energy.step.ready" = "Vous êtes chargé à bloc !";
+"routine.energy.step.kapalabhati" = "Kapalabhati pour stimuler l'énergie";
+"routine.energy.step.bhastrika" = "Bhastrika pour intensifier la vitalité";
+"routine.energy.step.move" = "Étirez-vous et bougez votre corps";
+"routine.energy.step.visualization" = "Visualisation énergisante";
+"routine.energy.step.power" = "Vous êtes en pleine puissance !";
+
+// =====================================================
+// STRESS ROUTINES (3 levels)
+// =====================================================
+"routine.stress.1.name" = "SOS calme";
+"routine.stress.1.description" = "Technique d'urgence pour calmer le stress.";
+"routine.stress.2.name" = "Libération du stress";
+"routine.stress.2.description" = "Relâchez les tensions en profondeur.";
+"routine.stress.3.name" = "Anti-stress complet";
+"routine.stress.3.description" = "La routine complète pour retrouver la sérénité.";
+
+// Stress routine steps
+"routine.stress.step.box" = "Respiration carrée pour calmer l'esprit";
+"routine.stress.step.calm" = "Observez le calme qui s'installe";
+"routine.stress.step.grounding" = "Ancrage 5-4-3-2-1 pour revenir au présent";
+"routine.stress.step.sound" = "Sons apaisants pour l'ambiance";
+"routine.stress.step.coherence" = "Cohérence cardiaque pour l'équilibre";
+"routine.stress.step.compassion" = "Auto-compassion pour vous apaiser";
+"routine.stress.step.affirmation" = "Terminez par une affirmation positive";
+
+// =====================================================
+// RELAXATION ROUTINES (3 levels)
+// =====================================================
+"routine.relaxation.1.name" = "Mini détente";
+"routine.relaxation.1.description" = "Une pause relaxante rapide.";
+"routine.relaxation.2.name" = "Relaxation profonde";
+"routine.relaxation.2.description" = "Accordez-vous un moment de détente complète.";
+"routine.relaxation.3.name" = "Spa mental";
+"routine.relaxation.3.description" = "La routine ultime pour se ressourcer.";
+
+// Relaxation routine steps
+"routine.relaxation.step.slow" = "Respiration lente pour ralentir";
+"routine.relaxation.step.savor" = "Savourez ce moment de calme";
+"routine.relaxation.step.ocean" = "Sons de l'océan pour l'ambiance";
+"routine.relaxation.step.bodyscan" = "Body scan pour relâcher toutes les tensions";
+"routine.relaxation.step.478" = "Respiration 4-7-8 pour approfondir la détente";
+"routine.relaxation.step.compassion" = "Auto-compassion et bienveillance";
+"routine.relaxation.step.gratitude" = "Terminez par un moment de gratitude";
 
 // Impact domains
 "domain.serenity" = "Sérénité";

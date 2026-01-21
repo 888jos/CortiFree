@@ -256,6 +256,7 @@ struct HomeView: View {
                     .font(.system(size: 24))
                     .foregroundColor(.white)
             }
+            .accessibleButton(label: AccessibilityLabels.settings, hint: NSLocalizedString("accessibility.hint.open_settings", comment: ""))
         }
     }
 
@@ -394,6 +395,7 @@ struct HomeView: View {
 
     private var antiStressButton: some View {
         Button(action: {
+            HapticManager.medium()
             viewModel.triggerAntiStress()
         }) {
             HStack(spacing: 12) {

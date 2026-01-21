@@ -189,7 +189,7 @@ struct LibraryView: View {
                 CategoryButton(
                     title: NSLocalizedString("library.category.routines", comment: ""),
                     backgroundImage: "button_blog",
-                    strokeColor: Color(hex: "7E57C2")
+                    strokeColor: Color(hex: "250431")
                 ) {
                     showRoutines = true
                 }

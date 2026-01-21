@@ -377,14 +377,14 @@ class SettingsViewModel: ObservableObject {
     }
 
     private func loadSubscriptionStatus() {
-        Task {
-            // Check StoreKit for active subscription
-            let isSubscribed = StoreKitManager.shared.isSubscribed
+        Task { @MainActor in
+            // Check RevenueCat for active subscription
+            let isSubscribed = RevenueCatManager.shared.hasPremiumEntitlement
             self.isPremium = isSubscribed
             self.subscriptionStatus = isSubscribed ? StringKeys.Settings.subscriptionPremium : StringKeys.Settings.subscriptionFree
 
             // Get renewal/expiration date
-            if let expirationDate = await StoreKitManager.shared.getSubscriptionExpirationDate() {
+            if let expirationDate = RevenueCatManager.shared.getSubscriptionExpirationDate() {
                 let formatter = DateFormatter()
                 formatter.dateStyle = .medium
                 formatter.timeStyle = .none

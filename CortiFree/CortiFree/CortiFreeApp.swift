@@ -41,8 +41,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
 
         // Configurer Superwall (toujours actif)
-        Superwall.configure(apiKey: "pk_JPmmC0H5be4yqTnw24VTm")
-        print("✅ Superwall configured with API key")
+        Superwall.configure(apiKey: APIConfig.shared.superwallAPIKey)
+        Logger.success("Superwall configured", category: .subscription)
 
         // Register custom fonts
         FontManager.registerFonts()

@@ -12,11 +12,19 @@ struct RoutinePlayerView: View {
     @Environment(\.dismiss) var dismiss
 
     @State private var currentStepIndex = 0
-    @State private var stepTimeRemaining: Int = 0
-    @State private var isPlaying = true
-    @State private var timer: Timer?
     @State private var showCompletion = false
     @State private var pulseAnimation = false
+
+    // Exercise presentation states
+    @State private var showBreathingExercise = false
+    @State private var showMeditationExercise = false
+    @State private var showJournalView = false
+    @State private var currentBreathingPattern: BreathingPattern?
+    @State private var currentMeditationSupport: MeditationSupport?
+    @State private var currentStepDuration: TimeInterval = 180
+
+    // Sound playback for ambient sounds
+    @ObservedObject private var soundPlayer = SoundPlayer.shared
 
     private var currentStep: RoutineStep {
         routine.steps[currentStepIndex]
@@ -55,13 +63,45 @@ struct RoutinePlayerView: View {
             }
         }
         .onAppear {
-            startStep()
             withAnimation(Animation.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
                 pulseAnimation = true
             }
         }
         .onDisappear {
-            timer?.invalidate()
+            // Stop any playing sound when leaving
+            if soundPlayer.isPlaying {
+                soundPlayer.stop()
+            }
+        }
+        .onChange(of: currentBreathingPattern) { _, newValue in
+            if newValue != nil {
+                showBreathingExercise = true
+            }
+        }
+        .onChange(of: currentMeditationSupport) { _, newValue in
+            if newValue != nil {
+                showMeditationExercise = true
+            }
+        }
+        .fullScreenCover(isPresented: $showBreathingExercise) {
+            if let pattern = currentBreathingPattern {
+                BreathingDetailFlowView(
+                    pattern: pattern,
+                    duration: currentStepDuration,
+                    onComplete: {
+                        // Exercise completed - auto advance
+                        advanceToNextStep()
+                    }
+                )
+            }
+        }
+        .fullScreenCover(isPresented: $showMeditationExercise) {
+            if let support = currentMeditationSupport {
+                MeditationSessionSlideView(support: support)
+            }
+        }
+        .fullScreenCover(isPresented: $showJournalView) {
+            JournalHomeView()
         }
     }
 
@@ -71,6 +111,9 @@ struct RoutinePlayerView: View {
             HStack {
                 Button(action: {
                     HapticManager.light()
+                    if soundPlayer.isPlaying {
+                        soundPlayer.stop()
+                    }
                     dismiss()
                 }) {
                     ZStack {
@@ -171,8 +214,8 @@ struct RoutinePlayerView: View {
                     .shadow(color: Color(hex: routine.color).opacity(0.5), radius: 20)
             }
 
-            VStack(spacing: 20) {
-                // Step label with timer
+            VStack(spacing: 16) {
+                // Step label
                 HStack(spacing: 12) {
                     Text("\(NSLocalizedString("routines.step", comment: "")) \(currentStepIndex + 1)")
                         .font(.custom("Poppins-Bold", size: 14))
@@ -180,21 +223,8 @@ struct RoutinePlayerView: View {
                         .foregroundColor(Color(hex: routine.color))
                         .textCase(.uppercase)
 
-                    if stepTimeRemaining > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock.fill")
-                                .font(.system(size: 10))
-                            Text(formatTime(stepTimeRemaining))
-                                .font(.custom("Poppins-Bold", size: 11))
-                        }
-                        .foregroundColor(.white.opacity(0.9))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(
-                            Capsule()
-                                .fill(Color(hex: routine.color).opacity(0.25))
-                        )
-                    }
+                    // Step type badge
+                    stepTypeBadge
                 }
 
                 // Instruction
@@ -205,8 +235,16 @@ struct RoutinePlayerView: View {
                     .lineSpacing(8)
                     .padding(.horizontal, 32)
 
-                // Step type indicator
-                stepTypeIndicator
+                // Duration info
+                if currentStep.duration > 0 {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock.fill")
+                            .font(.system(size: 14))
+                        Text(formatDuration(currentStep.duration))
+                            .font(.custom("Poppins-Medium", size: 14))
+                    }
+                    .foregroundColor(.white.opacity(0.7))
+                }
             }
             .id(currentStepIndex)
             .transition(.asymmetric(
@@ -216,45 +254,59 @@ struct RoutinePlayerView: View {
         }
     }
 
-    private var stepTypeIndicator: some View {
-        Group {
-            switch currentStep.type {
-            case .breathing:
-                Text(NSLocalizedString("routines.type.breathing", comment: ""))
-                    .font(.custom("Poppins-Regular", size: 14))
-                    .foregroundColor(.white.opacity(0.6))
+    private var stepTypeBadge: some View {
+        HStack(spacing: 4) {
+            Image(systemName: stepTypeIcon)
+                .font(.system(size: 10))
+            Text(stepTypeText)
+                .font(.custom("Poppins-Medium", size: 11))
+        }
+        .foregroundColor(.white.opacity(0.9))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(
+            Capsule()
+                .fill(Color(hex: routine.color).opacity(0.25))
+        )
+    }
 
-            case .meditation:
-                Text(NSLocalizedString("routines.type.meditation", comment: ""))
-                    .font(.custom("Poppins-Regular", size: 14))
-                    .foregroundColor(.white.opacity(0.6))
+    private var stepTypeIcon: String {
+        switch currentStep.type {
+        case .breathing: return "wind"
+        case .meditation: return "brain.head.profile"
+        case .sound: return "speaker.wave.2.fill"
+        case .journaling: return "book.fill"
+        case .pause: return "pause.circle.fill"
+        }
+    }
 
-            case .sound:
-                Text(NSLocalizedString("routines.type.sound", comment: ""))
-                    .font(.custom("Poppins-Regular", size: 14))
-                    .foregroundColor(.white.opacity(0.6))
+    private var stepTypeText: String {
+        switch currentStep.type {
+        case .breathing: return NSLocalizedString("routines.type.breathing", comment: "")
+        case .meditation: return NSLocalizedString("routines.type.meditation", comment: "")
+        case .sound: return NSLocalizedString("routines.type.sound", comment: "")
+        case .journaling: return NSLocalizedString("routines.type.journal", comment: "")
+        case .pause: return NSLocalizedString("routines.type.pause", comment: "")
+        }
+    }
 
-            case .journaling:
-                Text(NSLocalizedString("routines.type.journal", comment: ""))
-                    .font(.custom("Poppins-Regular", size: 14))
-                    .foregroundColor(.white.opacity(0.6))
-
-            case .pause:
-                Text(NSLocalizedString("routines.type.pause", comment: ""))
-                    .font(.custom("Poppins-Regular", size: 14))
-                    .foregroundColor(.white.opacity(0.6))
-            }
+    private var hasLaunchableExercise: Bool {
+        switch currentStep.type {
+        case .breathing, .meditation, .journaling:
+            return true
+        case .sound, .pause:
+            return false
         }
     }
 
     // MARK: - Player Controls
     private var playerControls: some View {
-        HStack(spacing: 16) {
-            // Previous button
+        HStack(spacing: 12) {
+            // Previous button (only if not first step)
             if currentStepIndex > 0 {
                 Button(action: previousStep) {
                     Image(systemName: "chevron.left")
-                        .font(.custom("Poppins-SemiBold", size: 18))
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white.opacity(0.8))
                         .frame(width: 56, height: 56)
                         .background(
@@ -265,7 +317,34 @@ struct RoutinePlayerView: View {
                 .buttonStyle(ScaleButtonStyle())
             }
 
-            // Next/Complete button
+            // Start Exercise button (long, takes remaining space) - only for breathing/meditation/journal
+            if hasLaunchableExercise {
+                Button(action: launchCurrentExercise) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 16, weight: .semibold))
+
+                        Text(NSLocalizedString("routines.launch.start", comment: ""))
+                            .font(.custom("Poppins-Bold", size: 16))
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(
+                        RoundedRectangle(cornerRadius: 28)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color(hex: routine.color), Color(hex: routine.color).opacity(0.7)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    )
+                }
+                .buttonStyle(ScaleButtonStyle())
+            }
+
+            // Next/Complete button (circle with chevron or checkmark)
             Button(action: {
                 if currentStepIndex < routine.steps.count - 1 {
                     advanceToNextStep()
@@ -273,27 +352,27 @@ struct RoutinePlayerView: View {
                     completeRoutine()
                 }
             }) {
-                HStack(spacing: 12) {
-                    Text(currentStepIndex < routine.steps.count - 1 ?
-                         NSLocalizedString("routines.next", comment: "") :
-                         NSLocalizedString("routines.complete", comment: ""))
-                        .font(.custom("Poppins-Bold", size: 18))
-                    Image(systemName: currentStepIndex < routine.steps.count - 1 ? "chevron.right" : "checkmark.circle.fill")
-                        .font(.system(size: 18))
+                ZStack {
+                    if currentStepIndex < routine.steps.count - 1 {
+                        // Next step - circle with chevron
+                        Circle()
+                            .fill(hasLaunchableExercise ? Color.white.opacity(0.15) : Color(hex: routine.color))
+                            .frame(width: 56, height: 56)
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                    } else {
+                        // Complete - circle with checkmark
+                        Circle()
+                            .fill(Color(hex: routine.color))
+                            .frame(width: 56, height: 56)
+
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.white)
+                    }
                 }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 64)
-                .background(
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: routine.color), Color(hex: routine.color).opacity(0.7)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                )
             }
             .buttonStyle(ScaleButtonStyle())
         }
@@ -301,50 +380,102 @@ struct RoutinePlayerView: View {
         .padding(.bottom, 32)
     }
 
-    // MARK: - Helper Methods
-    private func startStep() {
-        stepTimeRemaining = currentStep.duration
-        timer?.invalidate()
+    // MARK: - Actions
+    private func launchCurrentExercise() {
+        HapticManager.light()
 
-        // Start countdown timer
-        if stepTimeRemaining > 0 {
-            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-                if stepTimeRemaining > 0 {
-                    stepTimeRemaining -= 1
-                }
-                // Don't auto-advance - let user control the flow
-            }
+        switch currentStep.type {
+        case .breathing:
+            launchBreathingExercise()
+
+        case .meditation:
+            launchMeditationExercise()
+
+        case .journaling:
+            showJournalView = true
+
+        case .sound, .pause:
+            break
+        }
+    }
+
+    private func launchBreathingExercise() {
+        // Map referenceId to BreathingPattern
+        guard let refId = currentStep.referenceId else { return }
+
+        let pattern: BreathingPattern?
+        switch refId {
+        case "deepAbdominal":
+            pattern = .deepAbdominal
+        case "fourSevenEight":
+            pattern = .fourSevenEight
+        case "coherence":
+            pattern = .coherence
+        case "slow66":
+            pattern = .slow66
+        case "triangle":
+            pattern = .triangle
+        case "boxBreathing":
+            pattern = .boxBreathing
+        case "kapalabhati":
+            pattern = .kapalabhati
+        case "bhastrika":
+            pattern = .bhastrika
+        default:
+            pattern = .coherence // Fallback
+        }
+
+        if let p = pattern {
+            currentStepDuration = TimeInterval(currentStep.duration)
+            currentBreathingPattern = p
+        }
+    }
+
+    private func launchMeditationExercise() {
+        // Map referenceId to MeditationSupport
+        guard let refId = currentStep.referenceId else { return }
+
+        if let support = MeditationSupport.support(for: refId) {
+            currentMeditationSupport = support
         }
     }
 
     private func advanceToNextStep() {
-        timer?.invalidate()
+        // Stop sound if playing
+        if soundPlayer.isPlaying {
+            soundPlayer.stop()
+        }
 
         if currentStepIndex < routine.steps.count - 1 {
             HapticManager.light()
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                 currentStepIndex += 1
             }
-            startStep()
         } else {
             completeRoutine()
         }
     }
 
     private func previousStep() {
-        timer?.invalidate()
+        // Stop sound if playing
+        if soundPlayer.isPlaying {
+            soundPlayer.stop()
+        }
 
         if currentStepIndex > 0 {
             HapticManager.light()
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                 currentStepIndex -= 1
             }
-            startStep()
         }
     }
 
     private func completeRoutine() {
-        timer?.invalidate()
+        // Stop sound if playing
+        if soundPlayer.isPlaying {
+            soundPlayer.stop()
+        }
+
         HapticManager.success()
 
         withAnimation {
@@ -352,13 +483,15 @@ struct RoutinePlayerView: View {
         }
     }
 
-    private func formatTime(_ seconds: Int) -> String {
-        if seconds >= 60 {
-            let mins = seconds / 60
-            let secs = seconds % 60
-            return secs == 0 ? "\(mins)'" : "\(mins)'\(String(format: "%02d", secs))''"
+    private func formatDuration(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let secs = seconds % 60
+        if minutes > 0 && secs > 0 {
+            return "\(minutes) min \(secs) sec"
+        } else if minutes > 0 {
+            return "\(minutes) min"
         } else {
-            return "\(seconds)''"
+            return "\(secs) sec"
         }
     }
 }
@@ -466,5 +599,5 @@ struct RoutineCompletionOverlay: View {
 }
 
 #Preview {
-    RoutinePlayerView(routine: Routine.morningRoutine)
+    RoutinePlayerView(routine: Routine.morningBeginner)
 }

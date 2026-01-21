@@ -336,5 +336,5 @@ struct StepPreviewRow: View {
 }
 
 #Preview {
-    RoutineDetailView(routine: Routine.morningRoutine)
+    RoutineDetailView(routine: Routine.morningBeginner)
 }

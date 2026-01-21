@@ -16,7 +16,6 @@ struct OnboardingCompletionView: View {
     let language: String // Language detected during onboarding ("en" or "fr")
     let onViewPlan: () -> Void
 
-    @StateObject private var storeKit = StoreKitManager.shared
     @StateObject private var superwallDelegate = SuperwallDelegateHandler()
     @State private var hasTrackedCompletion = false
     @State private var isPurchasing = false

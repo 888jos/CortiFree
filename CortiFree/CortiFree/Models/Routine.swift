@@ -17,6 +17,69 @@ enum RoutineStepType: String, Codable {
     case pause         // Simple timed pause with instruction
 }
 
+// MARK: - Routine Category
+enum RoutineCategory: String, CaseIterable {
+    case morning = "morning"
+    case sleep = "sleep"
+    case focus = "focus"
+    case energy = "energy"
+    case stress = "stress"
+    case relaxation = "relaxation"
+
+    var nameKey: String {
+        "routine.category.\(rawValue)"
+    }
+
+    var localizedName: String {
+        NSLocalizedString(nameKey, comment: "")
+    }
+
+    var icon: String {
+        switch self {
+        case .morning: return "sunrise.fill"
+        case .sleep: return "moon.zzz.fill"
+        case .focus: return "brain.head.profile"
+        case .energy: return "bolt.fill"
+        case .stress: return "heart.fill"
+        case .relaxation: return "sparkles"
+        }
+    }
+
+    var color: String {
+        switch self {
+        case .morning: return "FFB74D"
+        case .sleep: return "5C6BC0"
+        case .focus: return "26A69A"
+        case .energy: return "FF7043"
+        case .stress: return "EC407A"
+        case .relaxation: return "7E57C2"
+        }
+    }
+
+    var imageName: String {
+        "routine_\(rawValue)"
+    }
+
+    var descriptionKey: String {
+        "routine.category.\(rawValue).description"
+    }
+
+    var localizedDescription: String {
+        NSLocalizedString(descriptionKey, comment: "")
+    }
+
+    var durationRange: String {
+        switch self {
+        case .morning: return "5-15 min"
+        case .sleep: return "5-20 min"
+        case .focus: return "5-20 min"
+        case .energy: return "3-15 min"
+        case .stress: return "5-15 min"
+        case .relaxation: return "5-20 min"
+        }
+    }
+}
+
 // MARK: - Routine Step
 struct RoutineStep: Identifiable, Codable {
     let id: String
@@ -34,14 +97,17 @@ struct RoutineStep: Identifiable, Codable {
 // MARK: - Routine
 struct Routine: Identifiable {
     let id: String
+    let category: RoutineCategory
+    let difficulty: Int           // 1-3 scale (Débutant, Intermédiaire, Avancé)
     let nameKey: String           // Localization key
     let descriptionKey: String    // Localization key for benefit
-    let icon: String              // SF Symbol
-    let color: String             // Hex color
     let totalDuration: Int        // Total duration in seconds
     let steps: [RoutineStep]
     let impactDomains: [String]   // e.g., ["Energy", "Focus"]
-    let difficulty: Int           // 1-3 scale
+
+    var icon: String { category.icon }
+    var color: String { category.color }
+    var imageName: String { category.imageName }
 
     var localizedName: String {
         NSLocalizedString(nameKey, comment: "")
@@ -61,380 +127,335 @@ struct Routine: Identifiable {
             return remainingMins > 0 ? "\(hours)h \(remainingMins)min" : "\(hours)h"
         }
     }
+
+    var difficultyText: String {
+        switch difficulty {
+        case 1: return NSLocalizedString("routine.difficulty.beginner", comment: "")
+        case 2: return NSLocalizedString("routine.difficulty.intermediate", comment: "")
+        case 3: return NSLocalizedString("routine.difficulty.advanced", comment: "")
+        default: return ""
+        }
+    }
 }
 
 // MARK: - Predefined Routines
 extension Routine {
 
+    // All routines grouped by category
     static let allRoutines: [Routine] = [
-        morningRoutine,
-        sleepRoutine,
-        focusRoutine,
-        energyRoutine,
-        stressRoutine,
-        relaxationRoutine,
-        quickRoutine,
-        deepWorkRoutine
+        // Morning - 3 levels
+        morningBeginner, morningIntermediate, morningAdvanced,
+        // Sleep - 3 levels
+        sleepBeginner, sleepIntermediate, sleepAdvanced,
+        // Focus - 3 levels
+        focusBeginner, focusIntermediate, focusAdvanced,
+        // Energy - 3 levels
+        energyBeginner, energyIntermediate, energyAdvanced,
+        // Stress - 3 levels
+        stressBeginner, stressIntermediate, stressAdvanced,
+        // Relaxation - 3 levels
+        relaxationBeginner, relaxationIntermediate, relaxationAdvanced
     ]
 
-    // MARK: 1. Morning Routine (Routine Matinale) - 10 min
-    static let morningRoutine = Routine(
-        id: "morning",
-        nameKey: "routine.morning.name",
-        descriptionKey: "routine.morning.description",
-        icon: "sunrise.fill",
-        color: "FFB74D",  // Orange/gold
-        totalDuration: 600, // 10 min
+    static func routines(for category: RoutineCategory) -> [Routine] {
+        allRoutines.filter { $0.category == category }
+    }
+
+    // =====================================================
+    // MARK: - MORNING ROUTINES
+    // =====================================================
+
+    static let morningBeginner = Routine(
+        id: "morning_1",
+        category: .morning,
+        difficulty: 1,
+        nameKey: "routine.morning.1.name",
+        descriptionKey: "routine.morning.1.description",
+        totalDuration: 300, // 5 min
         steps: [
-            RoutineStep(
-                id: "m1",
-                type: .breathing,
-                referenceId: "deepAbdominal",
-                duration: 180,
-                instructionKey: "routine.morning.step1",
-                icon: "wind"
-            ),
-            RoutineStep(
-                id: "m2",
-                type: .meditation,
-                referenceId: "conscious-breathing",
-                duration: 180,
-                instructionKey: "routine.morning.step2",
-                icon: "brain.head.profile"
-            ),
-            RoutineStep(
-                id: "m3",
-                type: .journaling,
-                referenceId: nil,
-                duration: 180,
-                instructionKey: "routine.morning.step3",
-                icon: "pencil.and.list.clipboard"
-            ),
-            RoutineStep(
-                id: "m4",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.morning.step4",
-                icon: "sparkles"
-            )
+            RoutineStep(id: "m1_1", type: .breathing, referenceId: "deepAbdominal", duration: 180, instructionKey: "routine.morning.step.breathing", icon: "wind"),
+            RoutineStep(id: "m1_2", type: .pause, referenceId: nil, duration: 120, instructionKey: "routine.morning.step.intention", icon: "sparkles")
         ],
-        impactDomains: ["Energy", "Focus", "Balance"],
-        difficulty: 1
+        impactDomains: ["Energy", "Focus"]
     )
 
-    // MARK: 2. Sleep Routine (Routine Sommeil) - 15 min
-    static let sleepRoutine = Routine(
-        id: "sleep",
-        nameKey: "routine.sleep.name",
-        descriptionKey: "routine.sleep.description",
-        icon: "moon.zzz.fill",
-        color: "5C6BC0",  // Indigo
+    static let morningIntermediate = Routine(
+        id: "morning_2",
+        category: .morning,
+        difficulty: 2,
+        nameKey: "routine.morning.2.name",
+        descriptionKey: "routine.morning.2.description",
+        totalDuration: 600, // 10 min
+        steps: [
+            RoutineStep(id: "m2_1", type: .breathing, referenceId: "deepAbdominal", duration: 180, instructionKey: "routine.morning.step.breathing", icon: "wind"),
+            RoutineStep(id: "m2_2", type: .meditation, referenceId: "conscious-breathing", duration: 300, instructionKey: "routine.morning.step.meditation", icon: "brain.head.profile"),
+            RoutineStep(id: "m2_3", type: .pause, referenceId: nil, duration: 120, instructionKey: "routine.morning.step.intention", icon: "sparkles")
+        ],
+        impactDomains: ["Energy", "Focus", "Serenity"]
+    )
+
+    static let morningAdvanced = Routine(
+        id: "morning_3",
+        category: .morning,
+        difficulty: 3,
+        nameKey: "routine.morning.3.name",
+        descriptionKey: "routine.morning.3.description",
         totalDuration: 900, // 15 min
         steps: [
-            RoutineStep(
-                id: "s1",
-                type: .sound,
-                referenceId: "rain",
-                duration: 60,
-                instructionKey: "routine.sleep.step1",
-                icon: "cloud.rain.fill"
-            ),
-            RoutineStep(
-                id: "s2",
-                type: .breathing,
-                referenceId: "fourSevenEight",
-                duration: 300,
-                instructionKey: "routine.sleep.step2",
-                icon: "moon.stars.fill"
-            ),
-            RoutineStep(
-                id: "s3",
-                type: .meditation,
-                referenceId: "yoga-nidra",
-                duration: 480,
-                instructionKey: "routine.sleep.step3",
-                icon: "bed.double.fill"
-            ),
-            RoutineStep(
-                id: "s4",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.sleep.step4",
-                icon: "zzz"
-            )
+            RoutineStep(id: "m3_1", type: .breathing, referenceId: "coherence", duration: 300, instructionKey: "routine.morning.step.coherence", icon: "heart.fill"),
+            RoutineStep(id: "m3_2", type: .meditation, referenceId: "visualization", duration: 300, instructionKey: "routine.morning.step.visualization", icon: "eye.fill"),
+            RoutineStep(id: "m3_3", type: .journaling, referenceId: nil, duration: 180, instructionKey: "routine.morning.step.journal", icon: "pencil.and.list.clipboard"),
+            RoutineStep(id: "m3_4", type: .pause, referenceId: nil, duration: 120, instructionKey: "routine.morning.step.intention", icon: "sparkles")
         ],
-        impactDomains: ["Sleep", "Serenity"],
-        difficulty: 1
+        impactDomains: ["Energy", "Focus", "Balance"]
     )
 
-    // MARK: 3. Focus Routine (Concentration) - 12 min
-    static let focusRoutine = Routine(
-        id: "focus",
-        nameKey: "routine.focus.name",
-        descriptionKey: "routine.focus.description",
-        icon: "brain.head.profile",
-        color: "26A69A",  // Teal
-        totalDuration: 720, // 12 min
+    // =====================================================
+    // MARK: - SLEEP ROUTINES
+    // =====================================================
+
+    static let sleepBeginner = Routine(
+        id: "sleep_1",
+        category: .sleep,
+        difficulty: 1,
+        nameKey: "routine.sleep.1.name",
+        descriptionKey: "routine.sleep.1.description",
+        totalDuration: 300, // 5 min
         steps: [
-            RoutineStep(
-                id: "f1",
-                type: .breathing,
-                referenceId: "coherence",
-                duration: 300,
-                instructionKey: "routine.focus.step1",
-                icon: "heart.fill"
-            ),
-            RoutineStep(
-                id: "f2",
-                type: .meditation,
-                referenceId: "focus-clarity",
-                duration: 300,
-                instructionKey: "routine.focus.step2",
-                icon: "target"
-            ),
-            RoutineStep(
-                id: "f3",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.focus.step3",
-                icon: "lightbulb.fill"
-            ),
-            RoutineStep(
-                id: "f4",
-                type: .journaling,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.focus.step4",
-                icon: "list.bullet.clipboard"
-            )
+            RoutineStep(id: "s1_1", type: .breathing, referenceId: "fourSevenEight", duration: 240, instructionKey: "routine.sleep.step.478", icon: "moon.stars.fill"),
+            RoutineStep(id: "s1_2", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.sleep.step.relax", icon: "zzz")
         ],
-        impactDomains: ["Focus", "Energy"],
-        difficulty: 2
+        impactDomains: ["Sleep", "Serenity"]
     )
 
-    // MARK: 4. Energy Boost (Boost d'Énergie) - 8 min
-    static let energyRoutine = Routine(
-        id: "energy",
-        nameKey: "routine.energy.name",
-        descriptionKey: "routine.energy.description",
-        icon: "bolt.fill",
-        color: "FF7043",  // Deep orange
-        totalDuration: 480, // 8 min
-        steps: [
-            RoutineStep(
-                id: "e1",
-                type: .breathing,
-                referenceId: "kapalabhati",
-                duration: 120,
-                instructionKey: "routine.energy.step1",
-                icon: "bolt.fill"
-            ),
-            RoutineStep(
-                id: "e2",
-                type: .breathing,
-                referenceId: "bhastrika",
-                duration: 120,
-                instructionKey: "routine.energy.step2",
-                icon: "flame.fill"
-            ),
-            RoutineStep(
-                id: "e3",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.energy.step3",
-                icon: "figure.stand"
-            ),
-            RoutineStep(
-                id: "e4",
-                type: .meditation,
-                referenceId: "visualization",
-                duration: 180,
-                instructionKey: "routine.energy.step4",
-                icon: "sparkles"
-            )
-        ],
-        impactDomains: ["Energy", "Focus"],
-        difficulty: 3
-    )
-
-    // MARK: 5. Stress Relief (Anti-stress) - 10 min
-    static let stressRoutine = Routine(
-        id: "stress",
-        nameKey: "routine.stress.name",
-        descriptionKey: "routine.stress.description",
-        icon: "heart.fill",
-        color: "EC407A",  // Pink
+    static let sleepIntermediate = Routine(
+        id: "sleep_2",
+        category: .sleep,
+        difficulty: 2,
+        nameKey: "routine.sleep.2.name",
+        descriptionKey: "routine.sleep.2.description",
         totalDuration: 600, // 10 min
         steps: [
-            RoutineStep(
-                id: "st1",
-                type: .breathing,
-                referenceId: "boxBreathing",
-                duration: 240,
-                instructionKey: "routine.stress.step1",
-                icon: "square"
-            ),
-            RoutineStep(
-                id: "st2",
-                type: .meditation,
-                referenceId: "grounding",
-                duration: 180,
-                instructionKey: "routine.stress.step2",
-                icon: "leaf.fill"
-            ),
-            RoutineStep(
-                id: "st3",
-                type: .meditation,
-                referenceId: "compassion",
-                duration: 120,
-                instructionKey: "routine.stress.step3",
-                icon: "heart.fill"
-            ),
-            RoutineStep(
-                id: "st4",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.stress.step4",
-                icon: "hand.raised.fill"
-            )
+            RoutineStep(id: "s2_1", type: .sound, referenceId: "rain", duration: 60, instructionKey: "routine.sleep.step.sound", icon: "cloud.rain.fill"),
+            RoutineStep(id: "s2_2", type: .breathing, referenceId: "fourSevenEight", duration: 300, instructionKey: "routine.sleep.step.478", icon: "moon.stars.fill"),
+            RoutineStep(id: "s2_3", type: .meditation, referenceId: "body-scan", duration: 240, instructionKey: "routine.sleep.step.bodyscan", icon: "figure.stand")
         ],
-        impactDomains: ["Serenity", "Balance"],
-        difficulty: 2
+        impactDomains: ["Sleep", "Serenity"]
     )
 
-    // MARK: 6. Relaxation (Détente) - 12 min
-    static let relaxationRoutine = Routine(
-        id: "relaxation",
-        nameKey: "routine.relaxation.name",
-        descriptionKey: "routine.relaxation.description",
-        icon: "sparkles",
-        color: "7E57C2",  // Deep purple
-        totalDuration: 720, // 12 min
-        steps: [
-            RoutineStep(
-                id: "r1",
-                type: .sound,
-                referenceId: "ocean",
-                duration: 120,
-                instructionKey: "routine.relaxation.step1",
-                icon: "water.waves"
-            ),
-            RoutineStep(
-                id: "r2",
-                type: .breathing,
-                referenceId: "slow66",
-                duration: 300,
-                instructionKey: "routine.relaxation.step2",
-                icon: "wind"
-            ),
-            RoutineStep(
-                id: "r3",
-                type: .meditation,
-                referenceId: "body-scan",
-                duration: 240,
-                instructionKey: "routine.relaxation.step3",
-                icon: "figure.stand"
-            ),
-            RoutineStep(
-                id: "r4",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.relaxation.step4",
-                icon: "face.smiling"
-            )
-        ],
-        impactDomains: ["Serenity", "Sleep"],
-        difficulty: 1
-    )
-
-    // MARK: 7. Quick Break (Pause Rapide) - 3 min
-    static let quickRoutine = Routine(
-        id: "quick",
-        nameKey: "routine.quick.name",
-        descriptionKey: "routine.quick.description",
-        icon: "timer",
-        color: "42A5F5",  // Blue
-        totalDuration: 180, // 3 min
-        steps: [
-            RoutineStep(
-                id: "q1",
-                type: .breathing,
-                referenceId: "triangle",
-                duration: 120,
-                instructionKey: "routine.quick.step1",
-                icon: "triangle"
-            ),
-            RoutineStep(
-                id: "q2",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.quick.step2",
-                icon: "checkmark.circle.fill"
-            )
-        ],
-        impactDomains: ["Serenity", "Focus"],
-        difficulty: 1
-    )
-
-    // MARK: 8. Deep Work (Concentration Profonde) - 20 min
-    static let deepWorkRoutine = Routine(
-        id: "deepwork",
-        nameKey: "routine.deepwork.name",
-        descriptionKey: "routine.deepwork.description",
-        icon: "target",
-        color: "66BB6A",  // Green
+    static let sleepAdvanced = Routine(
+        id: "sleep_3",
+        category: .sleep,
+        difficulty: 3,
+        nameKey: "routine.sleep.3.name",
+        descriptionKey: "routine.sleep.3.description",
         totalDuration: 1200, // 20 min
         steps: [
-            RoutineStep(
-                id: "d1",
-                type: .breathing,
-                referenceId: "coherence",
-                duration: 300,
-                instructionKey: "routine.deepwork.step1",
-                icon: "heart.fill"
-            ),
-            RoutineStep(
-                id: "d2",
-                type: .journaling,
-                referenceId: nil,
-                duration: 180,
-                instructionKey: "routine.deepwork.step2",
-                icon: "pencil.and.list.clipboard"
-            ),
-            RoutineStep(
-                id: "d3",
-                type: .meditation,
-                referenceId: "focus-clarity",
-                duration: 420,
-                instructionKey: "routine.deepwork.step3",
-                icon: "brain.head.profile"
-            ),
-            RoutineStep(
-                id: "d4",
-                type: .sound,
-                referenceId: "whitenoise",
-                duration: 240,
-                instructionKey: "routine.deepwork.step4",
-                icon: "waveform"
-            ),
-            RoutineStep(
-                id: "d5",
-                type: .pause,
-                referenceId: nil,
-                duration: 60,
-                instructionKey: "routine.deepwork.step5",
-                icon: "checkmark.seal.fill"
-            )
+            RoutineStep(id: "s3_1", type: .sound, referenceId: "rain", duration: 120, instructionKey: "routine.sleep.step.sound", icon: "cloud.rain.fill"),
+            RoutineStep(id: "s3_2", type: .breathing, referenceId: "slow66", duration: 300, instructionKey: "routine.sleep.step.slow", icon: "wind"),
+            RoutineStep(id: "s3_3", type: .meditation, referenceId: "yoga-nidra", duration: 600, instructionKey: "routine.sleep.step.nidra", icon: "bed.double.fill"),
+            RoutineStep(id: "s3_4", type: .journaling, referenceId: nil, duration: 180, instructionKey: "routine.sleep.step.journal", icon: "book.fill")
         ],
-        impactDomains: ["Focus", "Energy", "Balance"],
-        difficulty: 3
+        impactDomains: ["Sleep", "Serenity", "Balance"]
+    )
+
+    // =====================================================
+    // MARK: - FOCUS ROUTINES
+    // =====================================================
+
+    static let focusBeginner = Routine(
+        id: "focus_1",
+        category: .focus,
+        difficulty: 1,
+        nameKey: "routine.focus.1.name",
+        descriptionKey: "routine.focus.1.description",
+        totalDuration: 300, // 5 min
+        steps: [
+            RoutineStep(id: "f1_1", type: .breathing, referenceId: "coherence", duration: 300, instructionKey: "routine.focus.step.coherence", icon: "heart.fill")
+        ],
+        impactDomains: ["Focus", "Serenity"]
+    )
+
+    static let focusIntermediate = Routine(
+        id: "focus_2",
+        category: .focus,
+        difficulty: 2,
+        nameKey: "routine.focus.2.name",
+        descriptionKey: "routine.focus.2.description",
+        totalDuration: 720, // 12 min
+        steps: [
+            RoutineStep(id: "f2_1", type: .breathing, referenceId: "coherence", duration: 300, instructionKey: "routine.focus.step.coherence", icon: "heart.fill"),
+            RoutineStep(id: "f2_2", type: .meditation, referenceId: "focus-clarity", duration: 360, instructionKey: "routine.focus.step.meditation", icon: "target"),
+            RoutineStep(id: "f2_3", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.focus.step.ready", icon: "checkmark.circle.fill")
+        ],
+        impactDomains: ["Focus", "Energy"]
+    )
+
+    static let focusAdvanced = Routine(
+        id: "focus_3",
+        category: .focus,
+        difficulty: 3,
+        nameKey: "routine.focus.3.name",
+        descriptionKey: "routine.focus.3.description",
+        totalDuration: 1200, // 20 min
+        steps: [
+            RoutineStep(id: "f3_1", type: .breathing, referenceId: "coherence", duration: 300, instructionKey: "routine.focus.step.coherence", icon: "heart.fill"),
+            RoutineStep(id: "f3_2", type: .journaling, referenceId: nil, duration: 180, instructionKey: "routine.focus.step.goals", icon: "list.bullet.clipboard"),
+            RoutineStep(id: "f3_3", type: .meditation, referenceId: "focus-clarity", duration: 480, instructionKey: "routine.focus.step.deepfocus", icon: "brain.head.profile"),
+            RoutineStep(id: "f3_4", type: .sound, referenceId: "whitenoise", duration: 180, instructionKey: "routine.focus.step.whitenoise", icon: "waveform"),
+            RoutineStep(id: "f3_5", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.focus.step.deepwork", icon: "target")
+        ],
+        impactDomains: ["Focus", "Energy", "Balance"]
+    )
+
+    // =====================================================
+    // MARK: - ENERGY ROUTINES
+    // =====================================================
+
+    static let energyBeginner = Routine(
+        id: "energy_1",
+        category: .energy,
+        difficulty: 1,
+        nameKey: "routine.energy.1.name",
+        descriptionKey: "routine.energy.1.description",
+        totalDuration: 180, // 3 min
+        steps: [
+            RoutineStep(id: "e1_1", type: .breathing, referenceId: "triangle", duration: 120, instructionKey: "routine.energy.step.triangle", icon: "triangle"),
+            RoutineStep(id: "e1_2", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.energy.step.ready", icon: "bolt.fill")
+        ],
+        impactDomains: ["Energy"]
+    )
+
+    static let energyIntermediate = Routine(
+        id: "energy_2",
+        category: .energy,
+        difficulty: 2,
+        nameKey: "routine.energy.2.name",
+        descriptionKey: "routine.energy.2.description",
+        totalDuration: 480, // 8 min
+        steps: [
+            RoutineStep(id: "e2_1", type: .breathing, referenceId: "kapalabhati", duration: 180, instructionKey: "routine.energy.step.kapalabhati", icon: "bolt.fill"),
+            RoutineStep(id: "e2_2", type: .breathing, referenceId: "bhastrika", duration: 180, instructionKey: "routine.energy.step.bhastrika", icon: "flame.fill"),
+            RoutineStep(id: "e2_3", type: .pause, referenceId: nil, duration: 120, instructionKey: "routine.energy.step.move", icon: "figure.walk")
+        ],
+        impactDomains: ["Energy", "Focus"]
+    )
+
+    static let energyAdvanced = Routine(
+        id: "energy_3",
+        category: .energy,
+        difficulty: 3,
+        nameKey: "routine.energy.3.name",
+        descriptionKey: "routine.energy.3.description",
+        totalDuration: 900, // 15 min
+        steps: [
+            RoutineStep(id: "e3_1", type: .breathing, referenceId: "kapalabhati", duration: 240, instructionKey: "routine.energy.step.kapalabhati", icon: "bolt.fill"),
+            RoutineStep(id: "e3_2", type: .breathing, referenceId: "bhastrika", duration: 240, instructionKey: "routine.energy.step.bhastrika", icon: "flame.fill"),
+            RoutineStep(id: "e3_3", type: .pause, referenceId: nil, duration: 120, instructionKey: "routine.energy.step.move", icon: "figure.walk"),
+            RoutineStep(id: "e3_4", type: .meditation, referenceId: "visualization", duration: 240, instructionKey: "routine.energy.step.visualization", icon: "sparkles"),
+            RoutineStep(id: "e3_5", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.energy.step.power", icon: "star.fill")
+        ],
+        impactDomains: ["Energy", "Focus", "Balance"]
+    )
+
+    // =====================================================
+    // MARK: - STRESS ROUTINES
+    // =====================================================
+
+    static let stressBeginner = Routine(
+        id: "stress_1",
+        category: .stress,
+        difficulty: 1,
+        nameKey: "routine.stress.1.name",
+        descriptionKey: "routine.stress.1.description",
+        totalDuration: 300, // 5 min
+        steps: [
+            RoutineStep(id: "st1_1", type: .breathing, referenceId: "boxBreathing", duration: 240, instructionKey: "routine.stress.step.box", icon: "square"),
+            RoutineStep(id: "st1_2", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.stress.step.calm", icon: "hand.raised.fill")
+        ],
+        impactDomains: ["Serenity"]
+    )
+
+    static let stressIntermediate = Routine(
+        id: "stress_2",
+        category: .stress,
+        difficulty: 2,
+        nameKey: "routine.stress.2.name",
+        descriptionKey: "routine.stress.2.description",
+        totalDuration: 600, // 10 min
+        steps: [
+            RoutineStep(id: "st2_1", type: .breathing, referenceId: "boxBreathing", duration: 240, instructionKey: "routine.stress.step.box", icon: "square"),
+            RoutineStep(id: "st2_2", type: .meditation, referenceId: "grounding", duration: 300, instructionKey: "routine.stress.step.grounding", icon: "leaf.fill"),
+            RoutineStep(id: "st2_3", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.stress.step.calm", icon: "hand.raised.fill")
+        ],
+        impactDomains: ["Serenity", "Balance"]
+    )
+
+    static let stressAdvanced = Routine(
+        id: "stress_3",
+        category: .stress,
+        difficulty: 3,
+        nameKey: "routine.stress.3.name",
+        descriptionKey: "routine.stress.3.description",
+        totalDuration: 900, // 15 min
+        steps: [
+            RoutineStep(id: "st3_1", type: .sound, referenceId: "rain", duration: 60, instructionKey: "routine.stress.step.sound", icon: "cloud.rain.fill"),
+            RoutineStep(id: "st3_2", type: .breathing, referenceId: "coherence", duration: 300, instructionKey: "routine.stress.step.coherence", icon: "heart.fill"),
+            RoutineStep(id: "st3_3", type: .meditation, referenceId: "grounding", duration: 240, instructionKey: "routine.stress.step.grounding", icon: "leaf.fill"),
+            RoutineStep(id: "st3_4", type: .meditation, referenceId: "compassion", duration: 240, instructionKey: "routine.stress.step.compassion", icon: "heart.fill"),
+            RoutineStep(id: "st3_5", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.stress.step.affirmation", icon: "sparkles")
+        ],
+        impactDomains: ["Serenity", "Balance", "Sleep"]
+    )
+
+    // =====================================================
+    // MARK: - RELAXATION ROUTINES
+    // =====================================================
+
+    static let relaxationBeginner = Routine(
+        id: "relaxation_1",
+        category: .relaxation,
+        difficulty: 1,
+        nameKey: "routine.relaxation.1.name",
+        descriptionKey: "routine.relaxation.1.description",
+        totalDuration: 300, // 5 min
+        steps: [
+            RoutineStep(id: "r1_1", type: .breathing, referenceId: "slow66", duration: 240, instructionKey: "routine.relaxation.step.slow", icon: "wind"),
+            RoutineStep(id: "r1_2", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.relaxation.step.savor", icon: "face.smiling")
+        ],
+        impactDomains: ["Serenity"]
+    )
+
+    static let relaxationIntermediate = Routine(
+        id: "relaxation_2",
+        category: .relaxation,
+        difficulty: 2,
+        nameKey: "routine.relaxation.2.name",
+        descriptionKey: "routine.relaxation.2.description",
+        totalDuration: 720, // 12 min
+        steps: [
+            RoutineStep(id: "r2_1", type: .sound, referenceId: "ocean", duration: 120, instructionKey: "routine.relaxation.step.ocean", icon: "water.waves"),
+            RoutineStep(id: "r2_2", type: .breathing, referenceId: "slow66", duration: 300, instructionKey: "routine.relaxation.step.slow", icon: "wind"),
+            RoutineStep(id: "r2_3", type: .meditation, referenceId: "body-scan", duration: 300, instructionKey: "routine.relaxation.step.bodyscan", icon: "figure.stand")
+        ],
+        impactDomains: ["Serenity", "Sleep"]
+    )
+
+    static let relaxationAdvanced = Routine(
+        id: "relaxation_3",
+        category: .relaxation,
+        difficulty: 3,
+        nameKey: "routine.relaxation.3.name",
+        descriptionKey: "routine.relaxation.3.description",
+        totalDuration: 1200, // 20 min
+        steps: [
+            RoutineStep(id: "r3_1", type: .sound, referenceId: "ocean", duration: 180, instructionKey: "routine.relaxation.step.ocean", icon: "water.waves"),
+            RoutineStep(id: "r3_2", type: .breathing, referenceId: "fourSevenEight", duration: 300, instructionKey: "routine.relaxation.step.478", icon: "moon.fill"),
+            RoutineStep(id: "r3_3", type: .meditation, referenceId: "body-scan", duration: 360, instructionKey: "routine.relaxation.step.bodyscan", icon: "figure.stand"),
+            RoutineStep(id: "r3_4", type: .meditation, referenceId: "compassion", duration: 300, instructionKey: "routine.relaxation.step.compassion", icon: "heart.fill"),
+            RoutineStep(id: "r3_5", type: .pause, referenceId: nil, duration: 60, instructionKey: "routine.relaxation.step.gratitude", icon: "sparkles")
+        ],
+        impactDomains: ["Serenity", "Sleep", "Balance"]
     )
 
     // MARK: - Helper Methods

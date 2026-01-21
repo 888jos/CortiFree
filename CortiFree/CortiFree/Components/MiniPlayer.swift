@@ -66,6 +66,7 @@ struct MiniPlayer: View {
 
                 // Play/Pause button
                 Button(action: {
+                    HapticManager.light()
                     if soundPlayer.isPlaying {
                         soundPlayer.pause()
                     } else {
@@ -80,6 +81,7 @@ struct MiniPlayer: View {
 
                 // Close button
                 Button(action: {
+                    HapticManager.light()
                     soundPlayer.stop()
                 }) {
                     Image(systemName: "xmark")

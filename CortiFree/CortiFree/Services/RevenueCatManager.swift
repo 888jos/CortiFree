@@ -25,7 +25,6 @@ class RevenueCatManager: ObservableObject {
     @Published var currentOffering: Offering?
 
     // MARK: - Constants
-    private let apiKey = "test_VJPakDolvKFgQacRtOHITvapOtT"
     private let entitlementID = "CortiFree Premium"
 
     // Monthly and Yearly product identifiers
@@ -51,7 +50,7 @@ class RevenueCatManager: ObservableObject {
         print("🔧 Configuring RevenueCat SDK with API key")
         #endif
 
-        Purchases.configure(withAPIKey: apiKey)
+        Purchases.configure(withAPIKey: APIConfig.shared.revenueCatAPIKey)
 
         // Start observing customer info changes
         startObservingCustomerInfo()
@@ -170,6 +169,87 @@ class RevenueCatManager: ObservableObject {
             print("   - Premium Expiration: \(customerInfo.entitlements[entitlementID]?.expirationDate?.description ?? "N/A")")
         }
         #endif
+    }
+
+    // MARK: - Price Display Properties (for UI)
+
+    /// Monthly package from current offering
+    var monthlyPackage: Package? {
+        currentOffering?.package(identifier: "$rc_monthly") ?? currentOffering?.monthly
+    }
+
+    /// Yearly package from current offering
+    var yearlyPackage: Package? {
+        currentOffering?.package(identifier: "$rc_annual") ?? currentOffering?.annual
+    }
+
+    /// Monthly display price (e.g., "9,99 €")
+    var monthlyDisplayPrice: String {
+        monthlyPackage?.storeProduct.localizedPriceString ?? "—"
+    }
+
+    /// Yearly display price (e.g., "39,99 €")
+    var yearlyDisplayPrice: String {
+        yearlyPackage?.storeProduct.localizedPriceString ?? "—"
+    }
+
+    /// Monthly equivalent for yearly subscription
+    var yearlyMonthlyEquivalent: String {
+        guard let yearly = yearlyPackage else { return "—" }
+        let monthlyEquivalent = yearly.storeProduct.price / 12
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = yearly.storeProduct.priceFormatter?.locale ?? Locale.current
+        return formatter.string(from: monthlyEquivalent as NSNumber) ?? "—"
+    }
+
+    /// Daily equivalent for yearly subscription
+    var yearlyDailyEquivalent: String {
+        guard let yearly = yearlyPackage else { return "—" }
+        let dailyEquivalent = yearly.storeProduct.price / 365
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = yearly.storeProduct.priceFormatter?.locale ?? Locale.current
+        return formatter.string(from: dailyEquivalent as NSNumber) ?? "—"
+    }
+
+    /// Savings percentage of yearly vs monthly
+    var yearlySavingsPercentage: Int {
+        guard let monthly = monthlyPackage, let yearly = yearlyPackage else { return 0 }
+        let monthlyTotal = monthly.storeProduct.price * 12
+        guard monthlyTotal > 0 else { return 0 }
+        let savings = (monthlyTotal - yearly.storeProduct.price) / monthlyTotal * 100
+        return Int(NSDecimalNumber(decimal: savings).doubleValue.rounded())
+    }
+
+    /// Free trial period for yearly (if available)
+    var yearlyTrialPeriod: String? {
+        guard let yearly = yearlyPackage,
+              let intro = yearly.storeProduct.introductoryDiscount,
+              intro.paymentMode == .freeTrial else {
+            return nil
+        }
+
+        let value = intro.subscriptionPeriod.value
+        let isFr = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+
+        switch intro.subscriptionPeriod.unit {
+        case .day:
+            return "\(value) " + (isFr ? (value == 1 ? "jour" : "jours") : (value == 1 ? "day" : "days"))
+        case .week:
+            return "\(value) " + (isFr ? (value == 1 ? "semaine" : "semaines") : (value == 1 ? "week" : "weeks"))
+        case .month:
+            return "\(value) " + (isFr ? "mois" : (value == 1 ? "month" : "months"))
+        case .year:
+            return "\(value) " + (isFr ? (value == 1 ? "an" : "ans") : (value == 1 ? "year" : "years"))
+        @unknown default:
+            return nil
+        }
+    }
+
+    /// Whether products are loaded and ready
+    var productsLoaded: Bool {
+        currentOffering != nil && !(currentOffering?.availablePackages.isEmpty ?? true)
     }
 
     // MARK: - Offerings

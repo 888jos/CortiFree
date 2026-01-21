@@ -17,7 +17,11 @@ enum MeditationSupportType {
     case affirmations    // Affirmations positives
 }
 
-struct MeditationSupport: Identifiable {
+struct MeditationSupport: Identifiable, Equatable {
+    static func == (lhs: MeditationSupport, rhs: MeditationSupport) -> Bool {
+        lhs.meditationId == rhs.meditationId
+    }
+
     var id: String { meditationId }
     let meditationId: String
     let supportType: MeditationSupportType

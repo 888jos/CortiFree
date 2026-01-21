@@ -2,12 +2,12 @@
 //  CustomPaywallView.swift
 //  CortiFree
 //
-//  Custom paywall design - uses real App Store Connect prices via StoreKit 2
+//  Custom paywall design - uses RevenueCat for pricing
 //  Conforme aux guidelines Apple: aucun prix hardcodé, utilise displayPrice
 //
 
 import SwiftUI
-import StoreKit
+import RevenueCat
 import FirebaseAuth
 import FirebaseFirestore
 import SuperwallKit
@@ -17,8 +17,8 @@ struct CustomPaywallView: View {
     let onPurchase: (String) -> Void // "monthly" or "yearly"
     let onRestore: () -> Void
 
-    // StoreKit Manager pour les vrais prix App Store
-    @ObservedObject private var storeKit = StoreKitManager.shared
+    // RevenueCat Manager pour les vrais prix App Store
+    @ObservedObject private var revenueCat = RevenueCatManager.shared
 
     // User data from onboarding
     var baselineScores: [Double] = [0.4, 0.35, 0.45, 0.5, 0.4] // Sérénité, Sommeil, Énergie, Focus, Équilibre
@@ -39,42 +39,42 @@ struct CustomPaywallView: View {
         LanguageManager.shared.currentLanguage == .french
     }
 
-    // MARK: - Dynamic Prices from StoreKit (Real App Store Connect prices)
+    // MARK: - Dynamic Prices from RevenueCat (Real App Store Connect prices)
     // Conforme aux guidelines Apple: utilise displayPrice pour les vrais prix localisés
 
     /// Prix mensuel depuis App Store Connect
     private var monthlyPrice: String {
-        storeKit.monthlyDisplayPrice
+        revenueCat.monthlyDisplayPrice
     }
 
     /// Prix annuel depuis App Store Connect
     private var yearlyPrice: String {
-        storeKit.yearlyDisplayPrice
+        revenueCat.yearlyDisplayPrice
     }
 
     /// Équivalent mensuel de l'abonnement annuel
     private var yearlyMonthlyEquivalent: String {
-        storeKit.yearlyMonthlyEquivalent
+        revenueCat.yearlyMonthlyEquivalent
     }
 
     /// Pourcentage d'économie calculé dynamiquement
     private var discountPercentage: Int {
-        storeKit.yearlySavingsPercentage
+        revenueCat.yearlySavingsPercentage
     }
 
     /// Prix journalier de l'abonnement annuel
     private var dailyPrice: String {
-        storeKit.yearlyDailyEquivalent
+        revenueCat.yearlyDailyEquivalent
     }
 
     /// Période d'essai gratuit (si disponible)
     private var trialPeriod: String? {
-        storeKit.yearlyTrialPeriod
+        revenueCat.yearlyTrialPeriod
     }
 
     /// Indique si les produits sont chargés
     private var productsReady: Bool {
-        storeKit.productsLoaded
+        revenueCat.productsLoaded
     }
 
     // Les habitudes avec leurs statistiques de progression (same as HabitsProgressFlowView)
@@ -1032,8 +1032,8 @@ struct PaywallStartProgramScreen: View {
     let onPurchase: (String) -> Void
     let onRestore: () -> Void
 
-    // Observe StoreKit directly for real-time price updates
-    @ObservedObject private var storeKit = StoreKitManager.shared
+    // Observe RevenueCat directly for real-time price updates
+    @ObservedObject private var revenueCat = RevenueCatManager.shared
 
     @State private var selectedPlan: String = "yearly"
 
@@ -1041,12 +1041,12 @@ struct PaywallStartProgramScreen: View {
         LanguageManager.shared.currentLanguage == .french
     }
 
-    // Dynamic prices from StoreKit
-    private var monthlyPrice: String { storeKit.monthlyDisplayPrice }
-    private var yearlyPrice: String { storeKit.yearlyDisplayPrice }
-    private var yearlyMonthlyEquivalent: String { storeKit.yearlyMonthlyEquivalent }
-    private var discountPercentage: Int { storeKit.yearlySavingsPercentage }
-    private var dailyPrice: String { storeKit.yearlyDailyEquivalent }
+    // Dynamic prices from RevenueCat
+    private var monthlyPrice: String { revenueCat.monthlyDisplayPrice }
+    private var yearlyPrice: String { revenueCat.yearlyDisplayPrice }
+    private var yearlyMonthlyEquivalent: String { revenueCat.yearlyMonthlyEquivalent }
+    private var discountPercentage: Int { revenueCat.yearlySavingsPercentage }
+    private var dailyPrice: String { revenueCat.yearlyDailyEquivalent }
 
     var body: some View {
         ZStack {

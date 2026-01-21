@@ -723,9 +723,9 @@ struct EmailAuthView: View {
         Task {
             do {
                 if isSignUp {
-                    _ = try await AuthService.shared.signUp(email: email, password: password, username: username)
+                    _ = try await UnifiedFirebaseService.shared.auth.signUp(email: email, password: password, displayName: username)
                 } else {
-                    _ = try await AuthService.shared.signIn(email: email, password: password)
+                    _ = try await UnifiedFirebaseService.shared.auth.signIn(email: email, password: password)
                 }
 
                 await MainActor.run {
