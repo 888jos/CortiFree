@@ -10,19 +10,22 @@ import SwiftUI
 
 struct MeditationListView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showMeditationSupport = false
     @State private var selectedMeditationSupport: MeditationSupport?
 
-    let meditations: [(id: String, icon: String, title: String)] = [
-        ("conscious-breathing", "wind", NSLocalizedString("library.meditation.conscious_breathing", comment: "")),
-        ("body-scan", "figure.stand", NSLocalizedString("library.meditation.body_scan", comment: "")),
-        ("mindfulness", "eye.fill", NSLocalizedString("library.meditation.mindfulness", comment: "")),
-        ("grounding", "leaf.fill", NSLocalizedString("library.meditation.grounding", comment: "")),
-        ("visualization", "sparkles", NSLocalizedString("library.meditation.visualization", comment: "")),
-        ("compassion", "heart.fill", NSLocalizedString("library.meditation.compassion", comment: "")),
-        ("focus-clarity", "brain.head.profile", NSLocalizedString("library.meditation.focus", comment: "")),
-        ("yoga-nidra", "moon.stars.fill", NSLocalizedString("library.meditation.sleep", comment: ""))
-    ]
+    private var meditations: [(id: String, icon: String, titleKey: String)] {
+        [
+            ("conscious-breathing", "wind", "library.meditation.conscious_breathing"),
+            ("body-scan", "figure.stand", "library.meditation.body_scan"),
+            ("mindfulness", "eye.fill", "library.meditation.mindfulness"),
+            ("grounding", "leaf.fill", "library.meditation.grounding"),
+            ("visualization", "sparkles", "library.meditation.visualization"),
+            ("compassion", "heart.fill", "library.meditation.compassion"),
+            ("focus-clarity", "brain.head.profile", "library.meditation.focus"),
+            ("yoga-nidra", "moon.stars.fill", "library.meditation.sleep")
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -42,7 +45,7 @@ struct MeditationListView: View {
                         ForEach(meditations, id: \.id) { meditation in
                             MeditationCard(
                                 icon: meditation.icon,
-                                title: meditation.title
+                                title: languageManager.localized(meditation.titleKey)
                             ) {
                                 if let support = MeditationSupport.support(for: meditation.id) {
                                     selectedMeditationSupport = support
@@ -51,6 +54,7 @@ struct MeditationListView: View {
                             }
                         }
                     }
+                    .id(languageManager.refreshID)
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                     .padding(.bottom, 24)
@@ -78,7 +82,7 @@ struct MeditationListView: View {
 
             Spacer()
 
-            Text(NSLocalizedString("library.meditation.title", comment: ""))
+            Text(languageManager.localized("library.meditation.title"))
                 .font(.custom("Poppins-SemiBold", size: 20))
                 .foregroundColor(.white)
 

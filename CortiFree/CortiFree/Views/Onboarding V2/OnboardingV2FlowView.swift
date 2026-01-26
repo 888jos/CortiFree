@@ -152,6 +152,8 @@ struct OnboardingV2FlowView: View {
         case .reassurance:
             ReassuranceView(
                 onStartQuiz: {
+                    // Request App Store rating after reassurance
+                    AppRatingService.shared.requestRating()
                     currentStep = .habitsQuiz
                 }
             )

@@ -229,11 +229,11 @@
 "tasks.empty.done_message" = "Complete tasks to see them here";
 "tasks.empty.skipped_title" = "No skipped tasks";
 "tasks.empty.skipped_message" = "Skipped tasks will appear here";
-"tasks.week_locked_title" = "Week %d locked";
-"tasks.week_locked_current" = "You are currently on week %d of your program.";
-"tasks.week_locked_unlock" = "Week %d tasks will automatically unlock when you reach this week.";
-"tasks.week_locked_encouragement" = "Keep up the great work! 💪";
-"tasks.understood" = "Got it";
+"tasks.week_locked_title" = "Not quite there yet";
+"tasks.week_locked_current" = "You're on week %d, and you're doing great!";
+"tasks.week_locked_unlock" = "Week %d awaits you a bit further in your journey. Every day brings you closer!";
+"tasks.week_locked_encouragement" = "Keep going, you're making progress!";
+"tasks.understood" = "Got it!";
 
 // MARK: - Habits
 "habit.wake_before_7" = "Wake up before 7am";
@@ -2850,10 +2850,10 @@
 "voiceover.breathing.hold_out" = "Hold";
 
 // MARK: - Motivational Messages
-"motivational.title.morning" = "Wake up well\n%@";
-"motivational.title.afternoon" = "Have a great day\n%@";
-"motivational.title.evening" = "Enjoy this evening\n%@";
-"motivational.title.night" = "Sleep well\n%@";
+"motivational.title.morning" = "Wake up well,\n%@";
+"motivational.title.afternoon" = "Have a great day,\n%@";
+"motivational.title.evening" = "Enjoy this evening,\n%@";
+"motivational.title.night" = "Sleep well,\n%@";
 
 "motivational.greeting.morning" = "Good morning\n%@";
 "motivational.greeting.afternoon" = "Good afternoon\n%@";

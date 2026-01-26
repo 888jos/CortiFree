@@ -329,6 +329,11 @@ class FirebaseManager: ObservableObject {
                 "longestStreakDays": longestStreak
             ])
 
+            // Request rating on 7-day streak
+            if newStreak == 7 {
+                AppRatingService.shared.trackSevenDayStreak()
+            }
+
             // Streak milestone tracking handled in TasksV2View
         }
     }

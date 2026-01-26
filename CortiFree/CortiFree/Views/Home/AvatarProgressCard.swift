@@ -149,8 +149,8 @@ struct AvatarProgressCard: View {
 
             Spacer()
 
-            // Stat principale - Jours complétés avec gradient blanc-violet (aligné à gauche)
-            VStack(spacing: 4) {
+            // Stat principale - Jours complétés avec gradient blanc-violet (aligné à gauche avec l'étoile)
+            VStack(alignment: .leading, spacing: 4) {
                 Text("\(currentProgramDay)/\(totalDays)")
                     .font(Font.Poppins.custom(.bold, size: 56))
                     .foregroundStyle(
@@ -169,7 +169,7 @@ struct AvatarProgressCard: View {
                     .foregroundColor(.white.opacity(0.6))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 20)
 
             Spacer()
 

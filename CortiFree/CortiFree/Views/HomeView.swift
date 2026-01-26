@@ -121,32 +121,6 @@ struct HomeView: View {
                                     .padding(.top, 20)
                                     .offset(y: scrollOffset * 0.6)
 
-                                // DEBUG: Quick access buttons for testing
-                                #if DEBUG
-                                VStack(spacing: 12) {
-                                    Button("🔄 Quick Access: Onboarding") {
-                                        showOnboarding = true
-                                    }
-                                    .font(.custom("Poppins-Medium", size: 14))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 44)
-                                    .background(Color.orange.opacity(0.3))
-                                    .cornerRadius(12)
-
-                                    Button("💳 Quick Access: Paywall") {
-                                        showPaywall = true
-                                    }
-                                    .font(.custom("Poppins-Medium", size: 14))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 44)
-                                    .background(Color.purple.opacity(0.3))
-                                    .cornerRadius(12)
-                                }
-                                .padding(.horizontal, 24)
-                                .padding(.top, 16)
-                                #endif
 
                                 // Anti-Stress Button - rapprocher
                                 antiStressButton
@@ -199,6 +173,13 @@ struct HomeView: View {
 
             // Initialize program start date if this is the first time HomeView is opened (after paywall)
             initializeProgramStartDateIfNeeded()
+
+            // Track app session for rating and check day 7
+            AppRatingService.shared.trackAppSession()
+            let currentDay = AppConstants.Routine.totalDays - daysRemaining + 1
+            if currentDay == 7 {
+                AppRatingService.shared.trackProgramDay7()
+            }
         }
     }
 
@@ -285,7 +266,7 @@ struct HomeView: View {
     // MARK: - Quick Actions
 
     private var quickActionsRow: some View {
-        HStack(spacing: 24) {
+        HStack(spacing: 22) {
             QuickActionButtonNew(
                 icon: "wind",
                 title: NSLocalizedString("quickaction.breathing", comment: ""),

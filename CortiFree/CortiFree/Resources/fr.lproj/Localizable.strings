@@ -56,11 +56,11 @@
 "tasks.empty.done_message" = "Complétez des tâches pour les voir ici";
 "tasks.empty.skipped_title" = "Aucune tâche ignorée";
 "tasks.empty.skipped_message" = "Les tâches ignorées apparaîtront ici";
-"tasks.week_locked_title" = "Semaine %d verrouillée";
-"tasks.week_locked_current" = "Tu es actuellement à la semaine %d de ton programme.";
-"tasks.week_locked_unlock" = "Les tâches de la semaine %d se déverrouilleront automatiquement quand tu atteindras cette semaine.";
-"tasks.week_locked_encouragement" = "Continue ton excellent travail ! 💪";
-"tasks.understood" = "Compris";
+"tasks.week_locked_title" = "Patience, jeune padawan";
+"tasks.week_locked_current" = "Tu es à la semaine %d, et c'est super !";
+"tasks.week_locked_unlock" = "La semaine %d t'attend un peu plus loin dans ton voyage. Chaque jour te rapproche !";
+"tasks.week_locked_encouragement" = "Continue comme ça, tu progresses !";
+"tasks.understood" = "J'ai compris !";
 
 // MARK: - Habits
 "habit.breathe" = "Exercices de respiration";
@@ -2572,10 +2572,10 @@
 "voiceover.breathing.hold_out" = "Retiens";
 
 // MARK: - Motivational Messages
-"motivational.title.morning" = "Réveille toi bien\n%@";
-"motivational.title.afternoon" = "Passe une bonne journée\n%@";
-"motivational.title.evening" = "Profite de cette soirée\n%@";
-"motivational.title.night" = "Endors toi bien\n%@";
+"motivational.title.morning" = "Réveille-toi bien,\n%@";
+"motivational.title.afternoon" = "Passe une bonne journée,\n%@";
+"motivational.title.evening" = "Profite de cette soirée,\n%@";
+"motivational.title.night" = "Endors-toi bien,\n%@";
 
 "motivational.greeting.morning" = "Bonjour\n%@";
 "motivational.greeting.afternoon" = "Bon après-midi\n%@";

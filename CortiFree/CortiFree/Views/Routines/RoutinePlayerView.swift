@@ -478,6 +478,9 @@ struct RoutinePlayerView: View {
 
         HapticManager.success()
 
+        // Track routine completion for rating request
+        AppRatingService.shared.trackRoutineCompletion()
+
         withAnimation {
             showCompletion = true
         }

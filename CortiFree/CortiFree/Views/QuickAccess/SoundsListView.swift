@@ -10,19 +10,20 @@ import SwiftUI
 
 struct SoundsListView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var languageManager = LanguageManager.shared
     @StateObject private var viewModel = LibraryViewModel()
     @ObservedObject private var soundPlayer = SoundPlayer.shared
 
-    var sounds: [(id: String, icon: String, title: String, imageName: String)] {
+    private var sounds: [(id: String, icon: String, titleKey: String, imageName: String)] {
         [
-            ("rain", "cloud.rain.fill", NSLocalizedString("sounds.rain", comment: ""), "sound_rain"),
-            ("ocean", "water.waves", NSLocalizedString("sounds.ocean", comment: ""), "sound_ocean"),
-            ("fire", "flame.fill", NSLocalizedString("sounds.fire", comment: ""), "sound_fire"),
-            ("whitenoise", "waveform", NSLocalizedString("sounds.whitenoise", comment: ""), "sound_whitenoise"),
-            ("wind", "sunrise.fill", NSLocalizedString("sounds.morning", comment: ""), "sound_morning"),
-            ("forest", "leaf.fill", NSLocalizedString("sounds.forest", comment: ""), "sound_forest"),
-            ("stream", "drop.fill", NSLocalizedString("sounds.stream", comment: ""), "sound_stream"),
-            ("night", "moon.stars.fill", NSLocalizedString("sounds.night", comment: ""), "sound_night")
+            ("rain", "cloud.rain.fill", "sounds.rain", "sound_rain"),
+            ("ocean", "water.waves", "sounds.ocean", "sound_ocean"),
+            ("fire", "flame.fill", "sounds.fire", "sound_fire"),
+            ("whitenoise", "waveform", "sounds.whitenoise", "sound_whitenoise"),
+            ("wind", "sunrise.fill", "sounds.morning", "sound_morning"),
+            ("forest", "leaf.fill", "sounds.forest", "sound_forest"),
+            ("stream", "drop.fill", "sounds.stream", "sound_stream"),
+            ("night", "moon.stars.fill", "sounds.night", "sound_night")
         ]
     }
 
@@ -44,14 +45,15 @@ struct SoundsListView: View {
                         ForEach(sounds, id: \.id) { sound in
                             SoundCard(
                                 icon: sound.icon,
-                                title: sound.title,
+                                title: languageManager.localized(sound.titleKey),
                                 imageName: sound.imageName,
                                 isPlaying: soundPlayer.currentExercise?.id == sound.id && soundPlayer.isPlaying
                             ) {
-                                playSound(id: sound.id, title: sound.title)
+                                playSound(id: sound.id, title: languageManager.localized(sound.titleKey))
                             }
                         }
                     }
+                    .id(languageManager.refreshID)
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                     .padding(.bottom, 24)
@@ -74,7 +76,7 @@ struct SoundsListView: View {
 
             Spacer()
 
-            Text(NSLocalizedString("sounds.title", comment: ""))
+            Text(languageManager.localized("sounds.title"))
                 .font(.custom("Poppins-SemiBold", size: 20))
                 .foregroundColor(.white)
 

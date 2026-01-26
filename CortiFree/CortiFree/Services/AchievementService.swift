@@ -160,6 +160,9 @@ class AchievementService: ObservableObject {
             newlyUnlockedAchievement = first
             showAchievementPopup = true
             HapticManager.success()
+
+            // Request rating on achievement unlock
+            AppRatingService.shared.trackAchievementUnlock()
         }
     }
 
@@ -174,6 +177,9 @@ class AchievementService: ObservableObject {
             newlyUnlockedAchievement = achievements[index]
             showAchievementPopup = true
             HapticManager.success()
+
+            // Request rating on achievement unlock
+            AppRatingService.shared.trackAchievementUnlock()
         }
     }
 
@@ -189,6 +195,9 @@ class AchievementService: ObservableObject {
                 newlyUnlockedAchievement = achievements[index]
                 showAchievementPopup = true
                 HapticManager.success()
+
+                // Request rating on achievement unlock
+                AppRatingService.shared.trackAchievementUnlock()
             }
         }
     }

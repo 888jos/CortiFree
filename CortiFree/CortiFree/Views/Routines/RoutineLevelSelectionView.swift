@@ -12,6 +12,7 @@ struct RoutineLevelSelectionView: View {
     @Environment(\.dismiss) var dismiss
     @State private var selectedRoutine: Routine?
     @State private var showPlayer = false
+    @State private var appearAnimation = false
 
     private var routines: [Routine] {
         Routine.routines(for: category)
@@ -31,27 +32,39 @@ struct RoutineLevelSelectionView: View {
                 // Header with category info
                 headerSection
 
-                // Level cards
+                // Level cards - stacked visual design
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 12) {
-                        ForEach(routines) { routine in
-                            RoutineLevelDetailCard(routine: routine, category: category) {
+                    VStack(spacing: 16) {
+                        ForEach(Array(routines.enumerated()), id: \.element.id) { index, routine in
+                            RoutineLevelCard(
+                                routine: routine,
+                                category: category,
+                                index: index
+                            ) {
                                 selectedRoutine = routine
                             }
+                            .opacity(appearAnimation ? 1 : 0)
+                            .offset(y: appearAnimation ? 0 : 30)
+                            .animation(
+                                .spring(response: 0.5, dampingFraction: 0.8)
+                                .delay(Double(index) * 0.1),
+                                value: appearAnimation
+                            )
                         }
 
-                        // Info section
-                        infoSection
-                            .padding(.top, 16)
-
-                        Spacer(minLength: 100)
+                        Spacer(minLength: 120)
                     }
                     .padding(.horizontal, 24)
-                    .padding(.top, 12)
+                    .padding(.top, 20)
                 }
             }
         }
         .navigationBarHidden(true)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                appearAnimation = true
+            }
+        }
         .onChange(of: selectedRoutine) { _, newValue in
             if newValue != nil {
                 showPlayer = true
@@ -76,7 +89,7 @@ struct RoutineLevelSelectionView: View {
                     ZStack {
                         Circle()
                             .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
+                            .frame(width: 44, height: 44)
 
                         Image(systemName: "chevron.left")
                             .font(.system(size: 16, weight: .semibold))
@@ -87,77 +100,76 @@ struct RoutineLevelSelectionView: View {
                 Spacer()
 
                 // Category title centered
-                Text(category.localizedName)
-                    .font(.custom("Poppins-Bold", size: 20))
-                    .foregroundColor(.white)
+                VStack(spacing: 2) {
+                    Text(category.localizedName)
+                        .font(.custom("Poppins-Bold", size: 22))
+                        .foregroundColor(.white)
+
+                    Text(isFrench ? "Choisissez votre intensité" : "Choose your intensity")
+                        .font(.custom("Poppins-Regular", size: 13))
+                        .foregroundColor(.white.opacity(0.6))
+                }
 
                 Spacer()
 
-                // Category icon
-                ZStack {
-                    Circle()
-                        .fill(Color(hex: category.color).opacity(0.2))
-                        .frame(width: 40, height: 40)
-
-                    Image(systemName: category.icon)
-                        .font(.system(size: 18))
-                        .foregroundColor(Color(hex: category.color))
-                }
+                // Placeholder for symmetry
+                Color.clear.frame(width: 44, height: 44)
             }
             .padding(.horizontal, 24)
             .padding(.top, 60)
-
-            // Subtitle - choose your level
-            Text(isFrench ? "Choisissez votre niveau" : "Choose your level")
-                .font(.custom("Poppins-Regular", size: 14))
-                .foregroundColor(.white.opacity(0.6))
-                .padding(.top, 16)
-                .padding(.bottom, 8)
+            .padding(.bottom, 16)
         }
-    }
-
-    // MARK: - Info Section
-    private var infoSection: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "info.circle.fill")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: category.color))
-
-                Text(isFrench ? "Conseil" : "Tip")
-                    .font(.custom("Poppins-SemiBold", size: 14))
-                    .foregroundColor(.white)
-
-                Spacer()
-            }
-
-            Text(isFrench ?
-                 "Commencez par le niveau Débutant pour vous familiariser avec les exercices, puis progressez vers les niveaux supérieurs." :
-                 "Start with the Beginner level to familiarize yourself with the exercises, then progress to higher levels.")
-                .font(.custom("Poppins-Regular", size: 13))
-                .foregroundColor(.white.opacity(0.7))
-                .lineSpacing(4)
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color(hex: category.color).opacity(0.2), lineWidth: 1)
-                )
-        )
     }
 }
 
-// MARK: - Routine Level Detail Card (Compact design)
-struct RoutineLevelDetailCard: View {
+// MARK: - Routine Level Card (Premium Design)
+struct RoutineLevelCard: View {
     let routine: Routine
     let category: RoutineCategory
+    let index: Int
     let action: () -> Void
+
+    @State private var isPressed = false
 
     private var isFrench: Bool {
         Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+    }
+
+    // Level-specific styling
+    private var levelEmoji: String {
+        switch routine.difficulty {
+        case 1: return "🌱"
+        case 2: return "🌿"
+        case 3: return "🌳"
+        default: return "🌱"
+        }
+    }
+
+    private var levelLabel: String {
+        switch routine.difficulty {
+        case 1: return isFrench ? "Doux" : "Gentle"
+        case 2: return isFrench ? "Modéré" : "Moderate"
+        case 3: return isFrench ? "Intense" : "Intense"
+        default: return ""
+        }
+    }
+
+    private var levelGradient: [Color] {
+        switch routine.difficulty {
+        case 1: return [Color(hex: category.color).opacity(0.15), Color(hex: category.color).opacity(0.05)]
+        case 2: return [Color(hex: category.color).opacity(0.25), Color(hex: category.color).opacity(0.1)]
+        case 3: return [Color(hex: category.color).opacity(0.35), Color(hex: category.color).opacity(0.15)]
+        default: return [Color.white.opacity(0.1), Color.white.opacity(0.05)]
+        }
+    }
+
+    private var borderOpacity: Double {
+        switch routine.difficulty {
+        case 1: return 0.2
+        case 2: return 0.35
+        case 3: return 0.5
+        default: return 0.2
+        }
     }
 
     var body: some View {
@@ -165,82 +177,103 @@ struct RoutineLevelDetailCard: View {
             HapticManager.light()
             action()
         }) {
-            HStack(spacing: 14) {
-                // Difficulty indicator (compact)
-                VStack(spacing: 6) {
-                    // Difficulty bars
-                    HStack(alignment: .bottom, spacing: 3) {
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(routine.difficulty >= 1 ? Color(hex: category.color) : Color.white.opacity(0.2))
-                            .frame(width: 6, height: 10)
+            HStack(spacing: 16) {
+                // Left: Emoji + Level indicator
+                VStack(spacing: 8) {
+                    Text(levelEmoji)
+                        .font(.system(size: 36))
 
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(routine.difficulty >= 2 ? Color(hex: category.color) : Color.white.opacity(0.2))
-                            .frame(width: 6, height: 16)
-
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(routine.difficulty >= 3 ? Color(hex: category.color) : Color.white.opacity(0.2))
-                            .frame(width: 6, height: 22)
+                    // Level dots
+                    HStack(spacing: 4) {
+                        ForEach(1...3, id: \.self) { dot in
+                            Circle()
+                                .fill(dot <= routine.difficulty
+                                      ? Color(hex: category.color)
+                                      : Color.white.opacity(0.2))
+                                .frame(width: 8, height: 8)
+                        }
                     }
-
-                    Text(routine.difficultyText)
-                        .font(.custom("Poppins-Medium", size: 9))
-                        .foregroundColor(Color(hex: category.color))
                 }
-                .frame(width: 50)
+                .frame(width: 70)
 
-                // Content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(routine.localizedName)
-                        .font(.custom("Poppins-SemiBold", size: 15))
+                // Center: Content
+                VStack(alignment: .leading, spacing: 8) {
+                    // Level label
+                    Text(levelLabel)
+                        .font(.custom("Poppins-Bold", size: 18))
                         .foregroundColor(.white)
-                        .lineLimit(1)
+
+                    // Routine name
+                    Text(routine.localizedName)
+                        .font(.custom("Poppins-Regular", size: 13))
+                        .foregroundColor(.white.opacity(0.7))
+                        .lineLimit(2)
 
                     // Stats row
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
+                    HStack(spacing: 16) {
+                        // Duration
+                        HStack(spacing: 5) {
                             Image(systemName: "clock")
-                                .font(.system(size: 11))
+                                .font(.system(size: 12))
                             Text(routine.formattedDuration)
-                                .font(.custom("Poppins-Regular", size: 12))
+                                .font(.custom("Poppins-Medium", size: 13))
                         }
-                        .foregroundColor(.white.opacity(0.6))
+                        .foregroundColor(Color(hex: category.color))
 
-                        HStack(spacing: 4) {
-                            Image(systemName: "list.number")
-                                .font(.system(size: 11))
-                            Text("\(routine.steps.count) \(isFrench ? "étapes" : "steps")")
-                                .font(.custom("Poppins-Regular", size: 12))
+                        // Steps count
+                        HStack(spacing: 5) {
+                            Image(systemName: "list.bullet")
+                                .font(.system(size: 12))
+                            Text("\(routine.steps.count)")
+                                .font(.custom("Poppins-Medium", size: 13))
                         }
-                        .foregroundColor(.white.opacity(0.6))
+                        .foregroundColor(.white.opacity(0.5))
                     }
                 }
 
                 Spacer()
 
-                // Play button (circle) - white with dark violet chevron
+                // Right: Play button
                 ZStack {
                     Circle()
-                        .fill(Color.white)
-                        .frame(width: 44, height: 44)
+                        .fill(Color(hex: category.color))
+                        .frame(width: 50, height: 50)
+                        .shadow(color: Color(hex: category.color).opacity(0.4), radius: 8, x: 0, y: 4)
 
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(Color(hex: "5E35B1"))
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 18))
+                        .foregroundColor(.white)
+                        .offset(x: 2)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(0.05))
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(
+                        LinearGradient(
+                            colors: levelGradient,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(
+                                Color(hex: category.color).opacity(borderOpacity),
+                                lineWidth: 1.5
+                            )
                     )
             )
+            .scaleEffect(isPressed ? 0.97 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
         }
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(PlainButtonStyle())
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in isPressed = true }
+                .onEnded { _ in isPressed = false }
+        )
     }
 }
 

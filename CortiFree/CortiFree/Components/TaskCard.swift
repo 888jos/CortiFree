@@ -23,7 +23,7 @@ struct HabitTaskCard: View {
     @State private var showExerciseView = false
 
     private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+        LanguageManager.shared.currentLanguage == .french
     }
 
     // Translate frequency text based on locale

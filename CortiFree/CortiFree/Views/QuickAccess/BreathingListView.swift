@@ -10,19 +10,22 @@ import SwiftUI
 
 struct BreathingListView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showBreathingDetail = false
     @State private var selectedBreathingPattern: BreathingPattern?
 
-    let breathingExercises: [(pattern: BreathingPattern, icon: String, title: String)] = [
-        (.deepAbdominal, "wind", NSLocalizedString("library.breathing.deep_abdominal", comment: "")),
-        (.fourSevenEight, "moon.stars.fill", NSLocalizedString("library.breathing.4_7_8", comment: "")),
-        (.coherence, "heart.fill", NSLocalizedString("library.breathing.cardiac_coherence", comment: "")),
-        (.slow66, "bed.double.fill", NSLocalizedString("library.breathing.slow", comment: "")),
-        (.triangle, "triangle", NSLocalizedString("library.breathing.triangle", comment: "")),
-        (.boxBreathing, "square", NSLocalizedString("library.breathing.box", comment: "")),
-        (.kapalabhati, "bolt.fill", NSLocalizedString("library.breathing.kapalabhati", comment: "")),
-        (.bhastrika, "flame.fill", NSLocalizedString("library.breathing.bhastrika", comment: ""))
-    ]
+    private var breathingExercises: [(pattern: BreathingPattern, icon: String, titleKey: String)] {
+        [
+            (.deepAbdominal, "wind", "library.breathing.deep_abdominal"),
+            (.fourSevenEight, "moon.stars.fill", "library.breathing.4_7_8"),
+            (.coherence, "heart.fill", "library.breathing.cardiac_coherence"),
+            (.slow66, "bed.double.fill", "library.breathing.slow"),
+            (.triangle, "triangle", "library.breathing.triangle"),
+            (.boxBreathing, "square", "library.breathing.box"),
+            (.kapalabhati, "bolt.fill", "library.breathing.kapalabhati"),
+            (.bhastrika, "flame.fill", "library.breathing.bhastrika")
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -39,16 +42,17 @@ struct BreathingListView: View {
                         GridItem(.flexible(), spacing: 24),
                         GridItem(.flexible(), spacing: 24)
                     ], spacing: 24) {
-                        ForEach(breathingExercises, id: \.title) { exercise in
+                        ForEach(breathingExercises, id: \.titleKey) { exercise in
                             BreathingCard(
                                 icon: exercise.icon,
-                                title: exercise.title
+                                title: languageManager.localized(exercise.titleKey)
                             ) {
                                 selectedBreathingPattern = exercise.pattern
                                 showBreathingDetail = true
                             }
                         }
                     }
+                    .id(languageManager.refreshID)
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                     .padding(.bottom, 24)
@@ -76,7 +80,7 @@ struct BreathingListView: View {
 
             Spacer()
 
-            Text(NSLocalizedString("library.breathing.title", comment: ""))
+            Text(languageManager.localized("library.breathing.title"))
                 .font(.custom("Poppins-SemiBold", size: 20))
                 .foregroundColor(.white)
 

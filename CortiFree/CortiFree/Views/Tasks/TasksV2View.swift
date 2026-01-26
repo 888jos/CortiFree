@@ -1225,9 +1225,9 @@ struct FutureWeekBlockingView: View {
 
             // Card with explanation
             VStack(spacing: 24) {
-                // Icon
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 60))
+                // Icon - friendly hourglass instead of lock
+                Image(systemName: "hourglass.bottomhalf.filled")
+                    .font(.system(size: 56))
                     .foregroundColor(Color(hex: "B794F6"))
 
                 // Title
