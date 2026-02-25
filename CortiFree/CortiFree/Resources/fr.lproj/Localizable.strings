@@ -7,6 +7,9 @@
 "onboarding.welcome.title" = "Bienvenue sur CortiFree";
 "onboarding.welcome.subtitle" = "Ton parcours de 66 jours vers le bien-être mental";
 "onboarding.continue" = "Continuer";
+"onboarding.completion.title" = "Tout est prêt !";
+"onboarding.completion.subtitle" = "Commençons ton parcours de transformation";
+"onboarding.completion.continue" = "Démarrer mon programme";
 "onboarding.8habits.title" = "Les 8 habitudes clés";
 "onboarding.8habits.description1" = "Des études montrent que pour réinitialiser votre";
 "onboarding.8habits.description2" = "vie, vous avez besoin des";
@@ -85,7 +88,7 @@
 
 // Single variants
 "habit.breathing_title" = "Exercice de respiration";
-"habit.meditation_title" = "Méditer 10 minutes";
+"habit.meditation_title" = "Méditer";
 "habit.journal_title" = "Écrire dans son journal";
 "habit.water_title" = "Boire au moins %@ d'eau";
 "habit.water_title_legacy" = "Boire au moins 2,5L d'eau";
@@ -132,6 +135,36 @@
 // MARK: - Breathing
 "breathing.title" = "RESPIRATION";
 "breathing.start_exercise" = "Démarrer l'exercice";
+
+// MARK: - Paywall
+"paywall.title" = "Reprends le contrôle de ton stress";
+"paywall.subtitle" = "Des outils validés scientifiquement pour réduire le cortisol et retrouver le calme";
+"paywall.review_1" = "Je dors enfin bien. Mon stress a diminué après seulement 2 semaines.";
+"paywall.review_1_name" = "Sarah M.";
+"paywall.review_2" = "Cette app a changé ma vie. Je me sens tellement plus calme et concentré.";
+"paywall.review_2_name" = "Thomas L.";
+"paywall.review_3" = "Mieux que la thérapie pour gérer le stress quotidien. Je l'utilise chaque matin.";
+"paywall.review_3_name" = "Emma R.";
+"paywall.review_4" = "Mon anxiété a vraiment diminué. Les exercices de respiration sont incroyables.";
+"paywall.review_4_name" = "Lucas D.";
+"paywall.monthly" = "Mensuel";
+"paywall.yearly" = "Annuel";
+"paywall.per_month" = "par mois";
+"paywall.per_year" = "par an";
+"paywall.per_month_equivalent" = "%@ / mois";
+"paywall.save_70" = "Économise 70%";
+"paywall.3_day_trial" = "3 jours d'essai gratuit";
+"paywall.trial_notifications" = "Me rappeler avant la fin de l'essai";
+"paywall.start_trial" = "Commencer l'essai gratuit de 3 jours";
+"paywall.subscribe_for" = "S'abonner pour %@";
+"paywall.continue" = "Continuer";
+"paywall.restore_purchases" = "Restaurer mes achats";
+"paywall.privacy_policy" = "Politique de confidentialité";
+"paywall.terms_of_use" = "Conditions d'utilisation";
+"paywall.error_title" = "Erreur d'achat";
+"paywall.no_purchases_found" = "Aucun achat précédent trouvé";
+"paywall.products_unavailable" = "Les abonnements sont temporairement indisponibles. Veuillez réessayer plus tard.";
+"paywall.purchase_pending" = "Votre achat est en cours de traitement. Votre abonnement sera activé sous peu.";
 
 // MARK: - Common
 "common.validate" = "Valider";
@@ -343,6 +376,47 @@
 "sounds.forest" = "Forêt";
 "sounds.stream" = "Ruisseau";
 "sounds.night" = "Nuit d'été";
+"sounds.rain.description" = "Son apaisant de pluie";
+"sounds.ocean.description" = "Vagues relaxantes";
+"sounds.fire.description" = "Crépitement du feu";
+"sounds.whitenoise.description" = "Bruit blanc apaisant";
+"sounds.morning.description" = "Ambiance matinale apaisante";
+"sounds.forest.description" = "Ambiance forestière relaxante";
+"sounds.stream.description" = "Écoulement d'eau douce";
+"sounds.night.description" = "Ambiance nocturne estivale paisible";
+
+// MARK: - Exercise Types
+"exercise_type.breathing" = "Respiration";
+"exercise_type.meditation" = "Méditation";
+"exercise_type.sound" = "Sons Relaxants";
+
+// MARK: - Breathing Exercise Titles & Descriptions
+"breathing.deep_abdominal.title" = "Respiration abdominale";
+"breathing.deep_abdominal.description" = "Débutant - Base pour tous les exercices";
+"breathing.478.title" = "4-7-8";
+"breathing.478.description" = "Débutant - Anxiété, sommeil";
+"breathing.coherence.title" = "Cohérence cardiaque";
+"breathing.coherence.description" = "Débutant - Stress quotidien";
+"breathing.slow.title" = "Respiration lente";
+"breathing.slow.description" = "Débutant - Sommeil profond";
+"breathing.triangle.title" = "Triangle Breathing 4-4-4";
+"breathing.triangle.description" = "Débutant - Relaxation";
+"breathing.box.title" = "Box Breathing 4-4-4-4";
+"breathing.box.description" = "Intermédiaire - Stress aigu";
+"breathing.kapalabhati.title" = "Kapalabhati";
+"breathing.kapalabhati.description" = "Avancé - Énergie explosive";
+"breathing.bhastrika.title" = "Bhastrika";
+"breathing.bhastrika.description" = "Avancé - Énergie intense";
+
+// MARK: - Meditation Exercise Titles & Descriptions
+"meditation.conscious_breathing.short_description" = "Débutant - Premier pas";
+"meditation.body_scan.short_description" = "Débutant - Tensions rapides";
+"meditation.mindfulness.short_description" = "Débutant - Observer pensées";
+"meditation.grounding.short_description" = "Débutant - Anxiété, crises";
+"meditation.visualization.short_description" = "Intermédiaire - Calme mental";
+"meditation.compassion.short_description" = "Intermédiaire - Bienveillance";
+"meditation.focus_clarity.short_description" = "Intermédiaire - Concentration";
+"meditation.yoga_nidra.short_description" = "Avancé - Sommeil profond";
 
 // MARK: - Duration Selector
 "duration.infinite" = "Infini";
@@ -2831,20 +2905,20 @@
 
 // Welcome Screen
 "onboarding_v2.welcome.title" = "Bienvenue dans\nCortiFree";
-"onboarding_v2.welcome.subtitle" = "Ton compagnon personnel pour une vie sans stress";
-"onboarding_v2.welcome.benefit_1" = "Plan personnalisé à ton stress";
-"onboarding_v2.welcome.benefit_2" = "Suivi quotidien de tes progrès";
-"onboarding_v2.welcome.benefit_3" = "Techniques scientifiquement prouvées";
+"onboarding_v2.welcome.subtitle" = "Retrouve le calme. Dors mieux. Pense plus clairement.";
+"onboarding_v2.welcome.benefit_1" = "Ton plan personnalisé de reset du cortisol";
+"onboarding_v2.welcome.benefit_2" = "Basé sur la recherche en sciences comportementales";
+"onboarding_v2.welcome.benefit_3" = "Régulation du système nerveux en 66 jours";
 "onboarding_v2.welcome.start_button" = "Commencer";
-"onboarding_v2.welcome.time_estimate" = "Prends 15 minutes";
+"onboarding_v2.welcome.time_estimate" = "Prends 5 minutes";
 
 // Overall Quiz
 "onboarding_v2.overall.name_question" = "Comment puis-je t'appeler ?";
 "onboarding_v2.overall.name_placeholder" = "Ton prénom";
-"onboarding_v2.overall.gender_question" = "Tu es...";
+"onboarding_v2.overall.gender_question" = "Quel est ton genre ?";
 "onboarding_v2.overall.gender_male" = "Homme";
 "onboarding_v2.overall.gender_female" = "Femme";
-"onboarding_v2.overall.gender_other" = "Préfère ne pas dire";
+"onboarding_v2.overall.gender_other" = "Autre / Préfère ne pas dire";
 "onboarding_v2.overall.age_question" = "Quel âge as-tu ?";
 "onboarding_v2.overall.age_under_18" = "-18 ans";
 "onboarding_v2.overall.age_18_24" = "18-24 ans";
@@ -2870,8 +2944,9 @@
 // Reassurance View
 "onboarding_v2.reassurance.greeting" = "Merci";
 "onboarding_v2.reassurance.message_part1" = "Tu n'es pas seul(e) dans cette situation.";
-"onboarding_v2.reassurance.message_part2" = "Des milliers de personnes comme toi ont déjà trouvé leur sérénité avec CortiFree.";
+"onboarding_v2.reassurance.message_part2" = "CortiFree est construit sur la psychologie comportementale et la science de la régulation du système nerveux.";
 "onboarding_v2.reassurance.message_part3" = "Maintenant, nous allons faire un petit quiz pour mieux comprendre ta situation et personnaliser ton parcours.";
+"onboarding_v2.reassurance.message_part4" = "Tes réponses sont totalement confidentielles. Personne n'y a accès et elles ne seront jamais revendues ou partagées.";
 "onboarding_v2.reassurance.start_quiz" = "Commencer le quiz";
 
 // Habits Quiz - Questions
@@ -2960,8 +3035,8 @@
 "onboarding_v2.scientific.point_3" = "Suivi personnalisé de tes progrès";
 
 // Authentication
-"onboarding_v2.auth.title" = "Crée ton compte";
-"onboarding_v2.auth.subtitle" = "pour accéder à ton diagnostic et ton plan personnalisé";
+"onboarding_v2.auth.title" = "Tu es à 66 jours du calme";
+"onboarding_v2.auth.subtitle" = "Crée ton compte pour commencer ton reset du système nerveux";
 "onboarding_v2.auth.email_placeholder" = "Email";
 "onboarding_v2.auth.password_placeholder" = "Mot de passe";
 "onboarding_v2.auth.signup_button" = "S'inscrire";
@@ -2973,7 +3048,7 @@
 "onboarding_v2.auth.no_account" = "Pas encore de compte ?";
 "onboarding_v2.auth.forgot_password" = "Mot de passe oublié ?";
 "onboarding_v2.auth.privacy_notice" = "En continuant, tu acceptes nos Conditions d'utilisation et notre Politique de confidentialité";
-"onboarding_v2.auth.create_account_message" = "crée ton compte pour accéder à ton diagnostic personnalisé";
+"onboarding_v2.auth.create_account_message" = "Ton plan anti-cortisol\nt'attend.";
 "onboarding_v2.auth.email_button" = "Continuer avec Email";
 "onboarding_v2.auth.apple_coming_soon" = "Apple Sign In sera disponible prochainement";
 "onboarding_v2.auth.create_account" = "Créer un compte";
@@ -3239,12 +3314,12 @@
 "onboarding_v2.notifications.enable" = "Activer les notifications";
 "onboarding_v2.notifications.later" = "Plus tard";
 "onboarding_v2.notifications.activate_subtitle" = "Active les notifications pour ne jamais perdre ta routine et suivre tes progrès";
-"onboarding_v2.notifications.daily_routine" = "Rappel de routine quotidienne";
-"onboarding_v2.notifications.daily_routine_desc" = "Rappel personnalisable pour tes sessions quotidiennes et maintenir ta constance";
-"onboarding_v2.notifications.streak_danger" = "Série en danger";
-"onboarding_v2.notifications.streak_danger_desc" = "Préserve ta motivation : on te rappelle si tu risques de perdre ta série du jour";
-"onboarding_v2.notifications.reflection_moment" = "Moment de réflexion";
-"onboarding_v2.notifications.reflection_moment_desc" = "Rappel en soirée pour prendre quelques minutes et noter tes pensées du jour";
+"onboarding_v2.notifications.daily_routine" = "Rappel matinal (9h)";
+"onboarding_v2.notifications.daily_routine_desc" = "Commence ta journée avec une session de méditation pour réduire ton stress";
+"onboarding_v2.notifications.streak_danger" = "Série en danger (20h)";
+"onboarding_v2.notifications.streak_danger_desc" = "On te rappelle si tu n'as encore rien complété aujourd'hui pour garder ta série active";
+"onboarding_v2.notifications.reflection_moment" = "Journal du soir (19h)";
+"onboarding_v2.notifications.reflection_moment_desc" = "Rappel pour écrire dans ton journal et réfléchir sur ta journée";
 "onboarding_v2.notifications.next" = "Suivant";
 
 // MARK: - Common Onboarding
@@ -3445,3 +3520,237 @@
 "onboarding_v2.paywall.best_value" = "Meilleur rapport";
 "onboarding_v2.paywall.most_popular" = "Le plus populaire";
 "onboarding_v2.paywall.legal" = "L'abonnement se renouvelle automatiquement sauf annulation 24h avant la fin de la période.";
+
+// MARK: - Stress Pattern Validation Screen
+"onboarding_v2.pattern.title" = "D'après tes réponses,\nton profil de stress montre :";
+"onboarding_v2.pattern.mental_load" = "Charge mentale élevée";
+"onboarding_v2.pattern.sleep_dysregulation" = "Dérèglement du sommeil";
+"onboarding_v2.pattern.energy_fluctuations" = "Fluctuations d'énergie";
+"onboarding_v2.pattern.focus_difficulty" = "Difficulté à maintenir la concentration";
+"onboarding_v2.pattern.stress_accumulation" = "Accumulation chronique de stress";
+"onboarding_v2.pattern.good_news" = "La bonne nouvelle ?\nC'est réversible.";
+"onboarding_v2.pattern.continue" = "Voir comment";
+
+// MARK: - Cortisol Science Hook Screen
+"onboarding_v2.science_hook.line1" = "Le stress chronique maintient le cortisol élevé.";
+"onboarding_v2.science_hook.line2" = "Quand le cortisol reste haut,\nle sommeil et la concentration chutent.";
+"onboarding_v2.science_hook.line3" = "On va t'aider à le réinitialiser.";
+"onboarding_v2.science_hook.continue" = "Continuer";
+
+// MARK: - Paywall Quiz-Based Insight
+"onboarding_v2.paywall.based_on_answers" = "D'après tes réponses :";
+"onboarding_v2.paywall.deserve_calm" = "Tu mérites de te sentir calme, reposé(e) et concentré(e) à nouveau.";
+
+// MARK: - Commitment Pledge Screen
+"onboarding_v2.commitment.title" = "Pendant combien de temps\nes-tu prêt(e) à t'engager ?";
+"onboarding_v2.commitment.1_week" = "1 semaine";
+"onboarding_v2.commitment.1_week_sub" = "Essayer";
+"onboarding_v2.commitment.2_weeks" = "2 semaines";
+"onboarding_v2.commitment.2_weeks_sub" = "Prendre de l'élan";
+"onboarding_v2.commitment.4_weeks" = "4 semaines";
+"onboarding_v2.commitment.4_weeks_sub" = "Un vrai changement";
+"onboarding_v2.commitment.66_days" = "66 jours";
+"onboarding_v2.commitment.66_days_sub" = "Transformation complète";
+"onboarding_v2.commitment.subtitle" = "Choisis ta durée d'engagement";
+"onboarding_v2.commitment.recommended" = "Recommandé";
+"onboarding_v2.commitment.chose" = "ont choisi";
+"onboarding_v2.commitment.1_week_sub" = "Découvrir";
+"onboarding_v2.commitment.66_days_sub" = "Résultats prouvés";
+"onboarding_v2.commitment.hold_instruction" = "Maintiens pour t'engager";
+"onboarding_v2.commitment.committed" = "Tu t'es engagé(e).";
+
+// MARK: - StressPatternValidationView
+"stress_pattern.analysis_complete" = "Analyse complète";
+"stress_pattern.news_to_break" = "On a des nouvelles à t'annoncer...";
+"stress_pattern.cortisol_above" = "Ton cortisol est estimé **%d points au-dessus** de la normale";
+"stress_pattern.disclaimer" = "Cette estimation ne constitue pas un diagnostic médical.";
+"stress_pattern.cta" = "Vérifier tes symptômes";
+"stress_pattern.bar_you" = "Toi";
+"stress_pattern.bar_normal" = "Normal";
+
+// MARK: - SymptomCheckerView
+"symptom_checker.title" = "Tes symptômes";
+"symptom_checker.alert" = "Un cortisol chroniquement élevé peut causer des dommages durables sur ton cerveau, ton métabolisme et ton système immunitaire.";
+"symptom_checker.select_all" = "Sélectionne tout ce que tu ressens";
+"symptom_checker.count_singular" = "%d symptôme sélectionné";
+"symptom_checker.count_plural" = "%d symptômes sélectionnés";
+"symptom_checker.cta" = "Continuer";
+"symptom_checker.category.mental" = "Mental";
+"symptom_checker.category.physical" = "Physique";
+"symptom_checker.category.social" = "Social";
+"symptom_checker.mental.1" = "Anxiété fréquente";
+"symptom_checker.mental.1.bold" = "Anxiété";
+"symptom_checker.mental.2" = "Difficulté à se concentrer";
+"symptom_checker.mental.2.bold" = "se concentrer";
+"symptom_checker.mental.3" = "Pensées négatives en boucle";
+"symptom_checker.mental.3.bold" = "Pensées négatives";
+"symptom_checker.mental.4" = "Irritabilité";
+"symptom_checker.mental.4.bold" = "Irritabilité";
+"symptom_checker.mental.5" = "Brouillard mental";
+"symptom_checker.mental.5.bold" = "Brouillard mental";
+"symptom_checker.mental.6" = "Perte de motivation";
+"symptom_checker.mental.6.bold" = "motivation";
+"symptom_checker.physical.1" = "Sommeil perturbé ou non réparateur";
+"symptom_checker.physical.1.bold" = "Sommeil perturbé";
+"symptom_checker.physical.2" = "Fatigue chronique";
+"symptom_checker.physical.2.bold" = "Fatigue chronique";
+"symptom_checker.physical.3" = "Maux de tête fréquents";
+"symptom_checker.physical.3.bold" = "Maux de tête";
+"symptom_checker.physical.4" = "Tensions dans le cou ou les épaules";
+"symptom_checker.physical.4.bold" = "Tensions";
+"symptom_checker.physical.5" = "Prise de poids inexpliquée";
+"symptom_checker.physical.5.bold" = "Prise de poids";
+"symptom_checker.physical.6" = "Palpitations ou souffle court";
+"symptom_checker.physical.6.bold" = "Palpitations";
+"symptom_checker.social.1" = "Envie de s'isoler";
+"symptom_checker.social.1.bold" = "s'isoler";
+"symptom_checker.social.2" = "Conflits relationnels plus fréquents";
+"symptom_checker.social.2.bold" = "Conflits relationnels";
+"symptom_checker.social.3" = "Perte d'intérêt pour les activités";
+"symptom_checker.social.3.bold" = "Perte d'intérêt";
+"symptom_checker.social.4" = "Difficulté à communiquer";
+"symptom_checker.social.4.bold" = "communiquer";
+"symptom_checker.social.5" = "Impatience ou irritabilité avec les proches";
+"symptom_checker.social.5.bold" = "Impatience";
+
+// MARK: - SocialProofFlowView
+"social_proof.title" = "Ce que disent\nnos utilisateurs";
+"social_proof.user_count" = "12 400+ utilisateurs nous font confiance";
+"social_proof.based_on_research" = "Basé sur des recherches de";
+"social_proof.cta" = "Continuer";
+"social_proof.testimonial.sophie.time" = "il y a 3 semaines";
+"social_proof.testimonial.james.name" = "Julien K.";
+"social_proof.testimonial.james.text" = "La structure de 66 jours me garde motivé. J'en suis au jour 40 et mon stress a clairement diminué.";
+"social_proof.testimonial.james.time" = "il y a 1 mois";
+"social_proof.testimonial.claire.time" = "il y a 2 semaines";
+"social_proof.testimonial.marc.time" = "il y a 5 jours";
+"social_proof.testimonial.emma.time" = "il y a 1 mois";
+"social_proof.testimonial.sophie.text" = "J'ai essayé d'autres applis de méditation mais CortiFree cible vraiment la cause. Mon sommeil s'est amélioré dès la première semaine.";
+"social_proof.testimonial.claire.text" = "Entre le boulot et les enfants je craquais. Les routines quotidiennes sont assez courtes pour les faire, et les résultats sont réels.";
+"social_proof.testimonial.marc.name" = "Marc L.";
+"social_proof.testimonial.marc.text" = "Mon médecin m'a conseillé de gérer mon cortisol. Cette appli rend ça simple et j'arrive à m'y tenir.";
+"social_proof.testimonial.emma.text" = "J'étais sceptique mais les exercices de respiration seuls ont changé ma gestion du stress au travail.";
+
+// MARK: - CortisolScienceHookView
+"cortisol_hook.title" = "Voici ce qui se passe\ndans ton corps en ce moment";
+"cortisol_hook.subtitle" = "Niveau de cortisol sur 24h";
+"cortisol_hook.legend_now" = "Toi maintenant";
+"cortisol_hook.legend_66" = "Dans 66 jours";
+"cortisol_hook.level_high" = "Élevé";
+"cortisol_hook.level_normal" = "Normal";
+"cortisol_hook.level_low" = "Bas";
+"cortisol_hook.insight_1" = "La nuit, ton cortisol reste trop haut — ton cerveau ne décroche jamais.";
+"cortisol_hook.insight_2" = "Le matin, ton pic arrive trop tôt et trop fort. Épuisement garanti à 15h.";
+"cortisol_hook.insight_3" = "66 jours de pratique suffisent pour inverser ce cycle. Pas des années.";
+"cortisol_hook.cta" = "Continuer";
+
+// MARK: - FirstLaunchWelcomeView
+"first_launch.q1" = "Tu te réveilles fatigué(e)\nmalgré 7-8h de sommeil ?";
+"first_launch.q2" = "Tu te sens submergé(e)\npar le moindre imprévu ?";
+"first_launch.q3" = "Tu n'arrives plus à déconnecter,\nmême le soir ou le week-end ?";
+"first_launch.cortisol_intro" = "Ce n'est pas dans ta tête.";
+"first_launch.cortisol_prefix" = "C'est ton ";
+"first_launch.cortisol_word" = "cortisol.";
+"first_launch.cortisol_desc" = "L'hormone du stress chronique qui empêche\nton corps de se régénérer — même quand tu te reposes.";
+"first_launch.solution_pill" = "En 66 jours, on peut le rééquilibrer.";
+"first_launch.cta_button" = "Analyser mon cortisol";
+
+// MARK: - CustomPaywallView
+
+// Header - Personalized title (no primary goal)
+"paywall_custom.title_default" = "Dans 66 jours, tu auras\ntransformé ta vie.";
+
+// Header - Personalized titles by goal
+"paywall_custom.title_sleep" = "Dans 66 jours,\ntu dormiras enfin comme avant.";
+"paywall_custom.title_stress" = "Dans 66 jours,\nton cortisol sera sous contrôle.";
+"paywall_custom.title_energy" = "Dans 66 jours,\ntu retrouveras ton énergie d'avant.";
+"paywall_custom.title_focus" = "Dans 66 jours,\ntu te concentreras sans effort.";
+"paywall_custom.title_balance" = "Dans 66 jours,\ntu trouveras ton équilibre.";
+
+// Promise section
+"paywall_custom.promise_subtitle" = "Ton destin t'attend. Tu libéreras ton\nvéritable potentiel le :";
+
+// Plan toggle
+"paywall_custom.plan_without" = "Sans CortiFree";
+
+// Date transformation section
+"paywall_custom.if_start_today" = "Si tu commences aujourd'hui";
+"paywall_custom.transform_subtitle" = "Tu transformeras ta vie et deviendras\nla meilleure version de toi-même d'ici le :";
+
+// Features section
+"paywall_custom.feature_program_title" = "Programme personnalisé";
+"paywall_custom.feature_program_desc" = "Un plan adapté à ton niveau, mis à jour chaque semaine.";
+"paywall_custom.feature_tasks_title" = "Planification des tâches";
+"paywall_custom.feature_tasks_desc" = "Des habitudes fondées sur la science pour t'aider au quotidien.";
+"paywall_custom.feature_tracking_title" = "Suivi des améliorations";
+"paywall_custom.feature_tracking_desc" = "Suis tes progrès avec des statistiques détaillées.";
+"paywall_custom.feature_journal_title" = "Journal quotidien";
+"paywall_custom.feature_journal_desc" = "Note tes pensées et émotions pour mieux te connaître.";
+
+// Radar chart section
+"paywall_custom.radar_title" = "Amélioration de %@ en 66 jours";
+
+// Radar labels
+"paywall_custom.radar_label_global" = "Global";
+"paywall_custom.radar_label_serenity" = "Sérénité";
+"paywall_custom.radar_label_sleep" = "Sommeil";
+"paywall_custom.radar_label_energy" = "Énergie";
+"paywall_custom.radar_label_balance" = "Équilibre";
+
+// Floating CTA
+"paywall_custom.cta_start" = "Démarrer mon programme";
+
+// Footer links
+"paywall_custom.footer_privacy" = "Confidentialité";
+"paywall_custom.footer_restore" = "Restaurer";
+"paywall_custom.footer_terms" = "CGU";
+
+// Habit progress chart titles
+"paywall_custom.habit_breathe_title" = "Respirer consciemment / sem.";
+"paywall_custom.habit_meditate_title" = "Méditer / sem.";
+"paywall_custom.habit_journal_title" = "Tenir un journal / sem.";
+"paywall_custom.habit_sport_title" = "Faire du sport / sem.";
+"paywall_custom.habit_water_title" = "Boire de l'eau / jour";
+"paywall_custom.habit_nature_title" = "Temps en nature / sem.";
+"paywall_custom.habit_sleep_title" = "Routine sommeil / jour";
+"paywall_custom.habit_social_title" = "Connexion sociale / sem.";
+
+// Habit progress stat messages
+"paywall_custom.habit_breathe_stat" = "pratiqueras la respiration consciente 1h par semaine.";
+"paywall_custom.habit_meditate_stat" = "méditeras 1h30 par semaine.";
+"paywall_custom.habit_journal_stat" = "tiendras un journal 7 fois par semaine.";
+"paywall_custom.habit_sport_stat" = "feras du sport 3h30 par semaine.";
+"paywall_custom.habit_water_stat" = "boiras 2,5L d'eau par jour.";
+"paywall_custom.habit_nature_stat" = "passeras 3h30 en nature par semaine.";
+"paywall_custom.habit_sleep_stat" = "dormiras 8 heures par nuit.";
+"paywall_custom.habit_social_stat" = "te connecteras socialement 4 fois par semaine.";
+
+// Symptom fix strings - Mental
+"paywall_custom.fix_anxiety" = "Tu retrouves une tête apaisée, sans l'anxiété qui tourne en boucle";
+"paywall_custom.fix_focus" = "Ta concentration revient, tu entres dans le flow sans forcer";
+"paywall_custom.fix_negative_thoughts" = "Tu coupes le circuit des pensées négatives qui t'épuisent";
+"paywall_custom.fix_irritability" = "Tu réagis moins vite, ton système nerveux se calme vraiment";
+"paywall_custom.fix_brain_fog" = "Le brouillard mental se lève et tu penses à nouveau clairement";
+"paywall_custom.fix_motivation" = "Ta motivation se rallume, tu veux à nouveau avancer";
+
+// Symptom fix strings - Physical
+"paywall_custom.fix_sleep" = "Tu dors profondément et tu te réveilles enfin reposé(e)";
+"paywall_custom.fix_fatigue" = "La fatigue chronique recule, ton énergie tient toute la journée";
+"paywall_custom.fix_headaches" = "Les maux de tête s'estompent quand ton cortisol redescend";
+"paywall_custom.fix_tension" = "Tes tensions physiques relâchent, ton corps n'est plus en alerte";
+"paywall_custom.fix_weight" = "Ton métabolisme se régule quand le cortisol n'est plus en excès";
+"paywall_custom.fix_heart" = "Ton cœur se calme, la respiration redevient ton outil le plus puissant";
+
+// Symptom fix strings - Social
+"paywall_custom.fix_isolation" = "Tu reprends goût aux connexions humaines sans te forcer";
+"paywall_custom.fix_conflicts" = "Tes relations se détendent quand tu n'es plus à fleur de peau";
+"paywall_custom.fix_interest" = "Tes passions reviennent quand le cortisol ne te vole plus ton énergie";
+"paywall_custom.fix_communication" = "Tu t'exprimes mieux quand ton système nerveux est régulé";
+"paywall_custom.fix_impatience" = "Tu retrouves de la douceur avec ceux qui comptent pour toi";
+
+// Fallback fix strings
+"paywall_custom.fallback_stress" = "Tu arrêtes de subir ton stress, tu le traverses";
+"paywall_custom.fallback_sleep" = "Tu dors et tu te réveilles enfin reposé(e)";
+"paywall_custom.fallback_energy" = "Ton énergie tient toute la journée sans crash";
+"paywall_custom.fallback_focus" = "Ta concentration revient, le flow sans effort";
+"first_launch.cta_sub" = "Quiz gratuit · 5 minutes";

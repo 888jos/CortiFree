@@ -133,7 +133,7 @@ struct HabitTaskCard: View {
                     // Middle info - centered vertically
                     VStack(alignment: .leading, spacing: 8) {
                         Text(title)
-                            .font(Font.Poppins.custom(.bold, size: 20))
+                            .font(.faroBold(20))
                             .foregroundColor(.white)
                             .lineLimit(2)
                             .fixedSize(horizontal: false, vertical: true)

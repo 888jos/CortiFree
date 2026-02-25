@@ -1,0 +1,29 @@
+/*
+  Localizable.strings - English
+  CortiFreeWidget
+*/
+
+// MARK: - Widget header
+"widget.program" = "CORTIFREE PROGRAM";
+"widget.tasks" = "tasks";
+"widget.day" = "Day";
+"widget.day_of" = "/66";
+
+// MARK: - Widget footer messages
+"widget.footer.zero"    = "0%% done, get started!";
+"widget.footer.low"     = "%d%% done, it's a start!";
+"widget.footer.mid"     = "%d%% done, you're on the right track";
+"widget.footer.high"    = "%d%% done, you're halfway there!";
+"widget.footer.almost"  = "%d%% done, the finish line is near";
+"widget.footer.perfect" = "100%% done, perfect day ✦";
+
+// MARK: - Widget empty state
+"widget.empty" = "No tasks for today";
+
+// MARK: - Widget metadata
+"widget.display_name"   = "CortiFree";
+"widget.description"    = "Your daily tasks";
+
+// MARK: - Lock screen widget
+"widget.lockscreen.display_name" = "CortiFree";
+"widget.lockscreen.description"  = "Open CortiFree from the lock screen";

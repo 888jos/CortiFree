@@ -16,7 +16,6 @@ struct ReassuranceView: View {
     @State private var displayedText: String = ""
     @State private var currentCharacterIndex: Int = 0
     @State private var player: AVPlayer?
-    @State private var showBadges: Bool = false
     @State private var showButton: Bool = false
     @State private var screenViewTime: Date?
 
@@ -24,7 +23,8 @@ struct ReassuranceView: View {
         let message1 = "onboarding_v2.reassurance.message_part1".localized
         let message2 = "onboarding_v2.reassurance.message_part2".localized
         let message3 = "onboarding_v2.reassurance.message_part3".localized
-        return "\(message1)\n\n\(message2)\n\n\(message3)"
+        let message4 = "onboarding_v2.reassurance.message_part4".localized
+        return "\(message1)\n\n\(message2)\n\n\(message3)\n\n\(message4)"
     }
 
     init(onStartQuiz: @escaping () -> Void) {
@@ -59,24 +59,6 @@ struct ReassuranceView: View {
                         .frame(minHeight: 200, alignment: .top)
                         .padding(.horizontal, 40)
 
-                    // Social proof badges (appear after text completes)
-                    if showBadges {
-                        HStack(spacing: 16) {
-                            Image("welcome_5_stars")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 120, height: 50)
-                                .clipped()
-                                .transition(.move(edge: .leading).combined(with: .opacity))
-
-                            Image("welcome_cortifree_app")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 120, height: 50)
-                                .clipped()
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
-                        }
-                    }
                 }
                 .padding(.top, 80)
 
@@ -172,17 +154,10 @@ struct ReassuranceView: View {
 
     private func animateNextCharacter() {
         guard currentCharacterIndex < fullText.count else {
-            // Text animation complete, show badges after delay (reduced by 50%)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            // Text animation complete, show button after short delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    showBadges = true
-                }
-
-                // Show button after badges appear (reduced by 50%)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        showButton = true
-                    }
+                    showButton = true
                 }
             }
             return

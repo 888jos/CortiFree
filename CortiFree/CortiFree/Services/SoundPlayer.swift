@@ -7,6 +7,7 @@
 
 import Foundation
 import AVFoundation
+import MediaPlayer
 import UIKit
 
 class SoundPlayer: ObservableObject {
@@ -26,21 +27,136 @@ class SoundPlayer: ObservableObject {
 
     private init() {
         setupAudioSession()
+        setupRemoteTransportControls()
+        setupNotifications()
     }
+
+    // MARK: - Audio Session
 
     private func setupAudioSession() {
         do {
-            // Configure pour la lecture en arrière-plan
             try AVAudioSession.sharedInstance().setCategory(
                 .playback,
                 mode: .default,
-                options: [.mixWithOthers]
+                options: []  // Pas de mixWithOthers — on veut prendre le focus comme Spotify
             )
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             print("Failed to setup audio session: \(error.localizedDescription)")
         }
     }
+
+    // MARK: - Remote Controls (Control Center)
+
+    private func setupRemoteTransportControls() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            self?.resume()
+            return .success
+        }
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            self?.pause()
+            return .success
+        }
+        commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+            guard let self else { return .commandFailed }
+            if self.isPlaying { self.pause() } else { self.resume() }
+            return .success
+        }
+        commandCenter.stopCommand.addTarget { [weak self] _ in
+            self?.stop()
+            return .success
+        }
+    }
+
+    private func updateNowPlayingInfo() {
+        guard let exercise = currentExercise else {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+            return
+        }
+
+        var info: [String: Any] = [
+            MPMediaItemPropertyTitle: exercise.title,
+            MPMediaItemPropertyArtist: "CortiFree",
+            MPNowPlayingInfoPropertyIsLiveStream: true,  // loop infini = live stream
+            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: totalPlayTime
+        ]
+
+        // Artwork — utilise l'icône de l'app comme artwork
+        if let image = UIImage(named: "AppIcon") ?? UIImage(named: "AppIcon60x60") {
+            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+        }
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+
+    // MARK: - Notifications
+
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAudioInterruption),
+            name: AVAudioSession.interruptionNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleRouteChange),
+            name: AVAudioSession.routeChangeNotification,
+            object: nil
+        )
+    }
+
+    @objc private func handleAudioInterruption(_ notification: Notification) {
+        guard let info = notification.userInfo,
+              let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
+
+        switch type {
+        case .began:
+            // Interruption (appel, Siri…) — mettre en pause proprement
+            if isPlaying {
+                audioPlayer?.pause()
+                isPlaying = false
+                if let startTime = playStartTime {
+                    accumulatedPlayTime += Date().timeIntervalSince(startTime)
+                    totalPlayTime = accumulatedPlayTime
+                }
+                playStartTime = nil
+                stopTimer()
+                updateNowPlayingInfo()
+            }
+
+        case .ended:
+            // Reprendre si iOS le suggère
+            let optionsValue = info[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+            if options.contains(.shouldResume) {
+                try? AVAudioSession.sharedInstance().setActive(true)
+                resume()
+            }
+
+        @unknown default:
+            break
+        }
+    }
+
+    @objc private func handleRouteChange(_ notification: Notification) {
+        guard let info = notification.userInfo,
+              let reasonValue = info[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }
+
+        // Pause si les écouteurs sont débranchés (comportement standard iOS)
+        if reason == .oldDeviceUnavailable {
+            DispatchQueue.main.async { [weak self] in
+                self?.pause()
+            }
+        }
+    }
+
+    // MARK: - Playback
 
     func play(exercise: Exercise) {
         // If same exercise is playing, just toggle pause
@@ -63,23 +179,32 @@ class SoundPlayer: ObservableObject {
             return
         }
 
-        // Load audio file
-        guard let url = Bundle.main.url(forResource: audioFileName.replacingOccurrences(of: ".mp3", with: ""), withExtension: "mp3") else {
+        // Load audio file (try m4a first, then mp3 as fallback)
+        let baseName = audioFileName
+            .replacingOccurrences(of: ".mp3", with: "")
+            .replacingOccurrences(of: ".m4a", with: "")
+        guard let url = Bundle.main.url(forResource: baseName, withExtension: "m4a")
+                ?? Bundle.main.url(forResource: baseName, withExtension: "mp3") else {
             print("Audio file not found: \(audioFileName)")
             return
         }
 
         do {
+            // Réactiver la session au cas où elle aurait été désactivée
+            try AVAudioSession.sharedInstance().setActive(true)
+
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.numberOfLoops = -1 // Loop indefinitely
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
 
             isPlaying = true
-            playStartTime = Date()  // Commencer à tracker le temps
-            accumulatedPlayTime = 0  // Réinitialiser le temps accumulé
+            UIApplication.shared.isIdleTimerDisabled = true
+            playStartTime = Date()
+            accumulatedPlayTime = 0
             totalPlayTime = 0
             startTimer()
+            updateNowPlayingInfo()
             triggerHaptic(.light)
         } catch {
             print("Failed to play audio: \(error.localizedDescription)")
@@ -89,6 +214,7 @@ class SoundPlayer: ObservableObject {
     func pause() {
         audioPlayer?.pause()
         isPlaying = false
+        UIApplication.shared.isIdleTimerDisabled = false
 
         // Accumuler le temps écoulé
         if let startTime = playStartTime {
@@ -98,14 +224,20 @@ class SoundPlayer: ObservableObject {
         playStartTime = nil
 
         stopTimer()
+        updateNowPlayingInfo()
         triggerHaptic(.light)
     }
 
     func resume() {
+        // Réactiver la session si nécessaire
+        try? AVAudioSession.sharedInstance().setActive(true)
+
         audioPlayer?.play()
         isPlaying = true
-        playStartTime = Date()  // Redémarrer le compteur
+        UIApplication.shared.isIdleTimerDisabled = true
+        playStartTime = Date()
         startTimer()
+        updateNowPlayingInfo()
         triggerHaptic(.light)
     }
 
@@ -113,6 +245,7 @@ class SoundPlayer: ObservableObject {
         audioPlayer?.stop()
         audioPlayer = nil
         isPlaying = false
+        UIApplication.shared.isIdleTimerDisabled = false
         currentExercise = nil
         progress = 0.0
         currentTime = 0
@@ -121,10 +254,14 @@ class SoundPlayer: ObservableObject {
         playStartTime = nil
         selectedDuration = nil
         stopTimer()
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
+    // MARK: - Timer
+
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        // RunLoop.common = fonctionne aussi en background et quand l'UI scroll
+        timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self, let player = self.audioPlayer else { return }
 
             self.currentTime = player.currentTime
@@ -133,7 +270,6 @@ class SoundPlayer: ObservableObject {
                 self.progress = player.currentTime / player.duration
             }
 
-            // Calculer le temps total de lecture
             if let startTime = self.playStartTime {
                 self.totalPlayTime = self.accumulatedPlayTime + Date().timeIntervalSince(startTime)
             }
@@ -143,6 +279,7 @@ class SoundPlayer: ObservableObject {
                 self.stop()
             }
         }
+        RunLoop.main.add(timer!, forMode: .common)
     }
 
     private func stopTimer() {

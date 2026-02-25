@@ -163,7 +163,7 @@ struct GroundingExerciseView: View {
                     // Step info
                     VStack(spacing: 16) {
                         Text(currentGroundingStep.sense)
-                            .font(.custom("Poppins-SemiBold", size: 24))
+                            .font(.faroSemiBold(24))
                             .foregroundColor(.white)
 
                         Text(currentGroundingStep.instruction)

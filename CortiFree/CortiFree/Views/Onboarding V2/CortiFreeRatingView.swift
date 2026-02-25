@@ -39,10 +39,13 @@ struct CortiFreeRatingView: View {
     }
 
     private var potentialScores: [Int] {
-        currentScores.map { score in
-            // Potentiel = score actuel + 65, plafonné à 98
-            min(score + 65, 98)
+        // Improvements per domain: serenity, sleep, energy, focus, balance
+        let domainImprovements = [60, 58, 56, 60, 58]
+        let domainScores = zip(currentScores.dropFirst(), domainImprovements).map { score, improvement in
+            min(score + improvement, 96)
         }
+        let globalPotential = domainScores.reduce(0, +) / domainScores.count
+        return [globalPotential] + domainScores
     }
 
     private var increases: [Int] {
@@ -70,7 +73,7 @@ struct CortiFreeRatingView: View {
                     VStack(spacing: 4) {
                         if selectedTab == .current {
                             Text("onboarding_v2.rating.current_title".localized)
-                                .font(Font.Poppins.custom(.bold, size: ResponsiveLayout.fontSize(base: 28)))
+                                .font(Font.faroBold(ResponsiveLayout.fontSize(base: 28)))
                                 .foregroundStyle(
                                     LinearGradient(
                                         colors: [.white, Color(hex: "B794F6")],
@@ -84,7 +87,7 @@ struct CortiFreeRatingView: View {
                                 (Text("onboarding_v2.rating.potential_title".localized)
                                     + Text(" ")
                                     + Text("onboarding_v2.rating.after_66_days".localized))
-                                    .font(Font.Poppins.custom(.bold, size: ResponsiveLayout.fontSize(base: 28)))
+                                    .font(Font.faroBold(ResponsiveLayout.fontSize(base: 28)))
                                     .foregroundStyle(
                                         LinearGradient(
                                             colors: [.white, Color(hex: "B794F6")],
@@ -255,44 +258,46 @@ struct CortiFreeRatingView: View {
             isSavingScore = true
             defer { isSavingScore = false }
 
-            // Save score to Firebase
             if let userId = Auth.auth().currentUser?.uid {
                 do {
-                    let globalScore = currentScores[0] // Global score from quiz
+                    let db = Firestore.firestore()
+                    let userRef = db.collection("users").document(userId)
 
-                    // Save detailed scores to Firebase
-                    let scoresData: [String: Any] = [
-                        "onboardingScore": globalScore,
-                        "onboardingScoreSavedAt": Timestamp(),
-                        "domainScores": [
-                            "global": currentScores[0],
-                            "serenity": currentScores[1],
-                            "sleep": currentScores[2],
-                            "energy": currentScores[3],
-                            "focus": currentScores[4],
-                            "balance": currentScores[5]
-                        ],
-                        "potentialScores": [
-                            "global": potentialScores[0],
-                            "serenity": potentialScores[1],
-                            "sleep": potentialScores[2],
-                            "energy": potentialScores[3],
-                            "focus": potentialScores[4],
-                            "balance": potentialScores[5]
+                    // Vérifie si les scores existent déjà — ne jamais écraser un compte existant
+                    let existing = try await userRef.getDocument()
+                    let alreadyHasScores = (existing.data()?["potentialScores"] != nil)
+
+                    if alreadyHasScores {
+                        #if DEBUG
+                        print("ℹ️ Onboarding scores already exist — skipping overwrite")
+                        #endif
+                    } else {
+                        let globalScore = currentScores[0]
+                        let scoresData: [String: Any] = [
+                            "onboardingScore": globalScore,
+                            "onboardingScoreSavedAt": Timestamp(),
+                            "domainScores": [
+                                "global": currentScores[0],
+                                "serenity": currentScores[1],
+                                "sleep": currentScores[2],
+                                "energy": currentScores[3],
+                                "focus": currentScores[4],
+                                "balance": currentScores[5]
+                            ],
+                            "potentialScores": [
+                                "global": potentialScores[0],
+                                "serenity": potentialScores[1],
+                                "sleep": potentialScores[2],
+                                "energy": potentialScores[3],
+                                "focus": potentialScores[4],
+                                "balance": potentialScores[5]
+                            ]
                         ]
-                    ]
-
-                    try await Firestore.firestore()
-                        .collection("users")
-                        .document(userId)
-                        .setData(scoresData, merge: true)
-
-                    // Note: UserSettings and program start date will be initialized
-                    // in HomeView.onAppear after user passes paywall
-
-                    #if DEBUG
-                    print("✅ Successfully saved detailed onboarding scores")
-                    #endif
+                        try await userRef.setData(scoresData, merge: true)
+                        #if DEBUG
+                        print("✅ Successfully saved onboarding scores")
+                        #endif
+                    }
                 } catch {
                     #if DEBUG
                     print("❌ Error saving onboarding scores: \(error)")
@@ -300,7 +305,6 @@ struct CortiFreeRatingView: View {
                 }
             }
 
-            // Continue regardless of save success
             await MainActor.run {
                 onContinue()
             }
@@ -340,12 +344,12 @@ struct CortiFreeStatCard: View {
             // Value with increase - Centered vertically
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("\(value)")
-                    .font(Font.Poppins.custom(.bold, size: 52))
+                    .font(.faroBold(52))
                     .foregroundColor(.white)
 
                 if let increase = increase {
                     Text("(+\(increase))")
-                        .font(Font.Poppins.custom(.bold, size: 20))
+                        .font(.faroBold(20))
                         .foregroundColor(.green)
                 }
             }

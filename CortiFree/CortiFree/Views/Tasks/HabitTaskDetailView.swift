@@ -63,7 +63,7 @@ struct HabitTaskDetailView: View {
                     VStack(spacing: 24) {
                         // Title only
                         Text(task.title)
-                            .font(Font.Poppins.custom(.bold, size: 28))
+                            .font(.faroBold(28))
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [.white, Color(hex: "B794F6")],

@@ -10,12 +10,18 @@
 		8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AEC92ED91A0100541E54 /* GoogleSignIn */; };
 		8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AECB2ED91A0100541E54 /* GoogleSignInSwift */; };
 		802C49B12EBBB2340084B356 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 802C49B02EBBB2340084B356 /* Lottie */; };
+		803AC4DE2F40CED0007B3B5A /* TikTokBusinessSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */; };
+		804F1D882F4CF13600374D9D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804F1D872F4CF13600374D9D /* WidgetKit.framework */; };
+		804F1D8A2F4CF13600374D9D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804F1D892F4CF13600374D9D /* SwiftUI.framework */; };
+		804F1D9B2F4CF13700374D9D /* CortiFreeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		805099B72F4BC34E002841B9 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 805099B62F4BC34E002841B9 /* PostHog */; };
 		80622A4A2F1701B9000C459F /* ReceiptParser in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A492F1701B9000C459F /* ReceiptParser */; };
 		80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4B2F1701B9000C459F /* RevenueCat */; };
 		80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4D2F1701B9000C459F /* RevenueCatUI */; };
 		8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8077CC292ECF8AF400742806 /* Mixpanel */; };
 		8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9902EA8CBCA007C9606 /* FirebaseAuth */; };
 		8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9922EA8CBCA007C9606 /* FirebaseFirestore */; };
+		80E85E8D2F3762E300E18C4B /* CortiFree.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 80E85E8C2F3762E300E18C4B /* CortiFree.storekit */; };
 		80F600CC2E85D5BF008F58FB /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600CB2E85D5BF008F58FB /* FirebaseAI */; };
 		80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600CD2E85D5BF008F58FB /* FirebaseAnalytics */; };
 		80F600D02E85D5BF008F58FB /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600CF2E85D5BF008F58FB /* FirebaseAnalyticsCore */; };
@@ -24,6 +30,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		804F1D992F4CF13700374D9D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 80F600982E85D4A0008F58FB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 804F1D842F4CF13600374D9D;
+			remoteInfo = CortiFreeWidgetExtension;
+		};
 		80F600AE2E85D4A0008F58FB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 80F600982E85D4A0008F58FB /* Project object */;
@@ -40,15 +53,61 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		804F1D9C2F4CF13700374D9D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				804F1D9B2F4CF13700374D9D /* CortiFreeWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CortiFreeWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		804F1D872F4CF13600374D9D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		804F1D892F4CF13600374D9D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		80E85E8C2F3762E300E18C4B /* CortiFree.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = CortiFree.storekit; sourceTree = "<group>"; };
 		80F600A02E85D4A0008F58FB /* CortiFree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CortiFree.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		80F600AD2E85D4A0008F58FB /* CortiFreeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CortiFreeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		80F600B72E85D4A0008F58FB /* CortiFreeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CortiFreeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		804F1D9F2F4CF13700374D9D /* Exceptions for "CortiFreeWidget" folder in "CortiFreeWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 804F1D842F4CF13600374D9D /* CortiFreeWidgetExtension */;
+		};
+		804F1DA62F4CF3A600374D9D /* Exceptions for "CortiFree" folder in "CortiFreeWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Services/WidgetDataStore.swift,
+			);
+			target = 804F1D842F4CF13600374D9D /* CortiFreeWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		804F1D8B2F4CF13600374D9D /* CortiFreeWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				804F1D9F2F4CF13700374D9D /* Exceptions for "CortiFreeWidget" folder in "CortiFreeWidgetExtension" target */,
+			);
+			path = CortiFreeWidget;
+			sourceTree = "<group>";
+		};
 		80F600A22E85D4A0008F58FB /* CortiFree */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				804F1DA62F4CF3A600374D9D /* Exceptions for "CortiFree" folder in "CortiFreeWidgetExtension" target */,
+			);
 			path = CortiFree;
 			sourceTree = "<group>";
 		};
@@ -65,11 +124,21 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		804F1D822F4CF13600374D9D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				804F1D8A2F4CF13600374D9D /* SwiftUI.framework in Frameworks */,
+				804F1D882F4CF13600374D9D /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		80F6009D2E85D4A0008F58FB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				80F600D22E85D5BF008F58FB /* FirebaseAnalyticsIdentitySupport in Frameworks */,
+				803AC4DE2F40CED0007B3B5A /* TikTokBusinessSDK in Frameworks */,
 				8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */,
 				80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */,
 				80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */,
@@ -79,6 +148,7 @@
 				80622A4A2F1701B9000C459F /* ReceiptParser in Frameworks */,
 				80F600CC2E85D5BF008F58FB /* FirebaseAI in Frameworks */,
 				8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */,
+				805099B72F4BC34E002841B9 /* PostHog in Frameworks */,
 				80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */,
 				8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */,
 				802C49B12EBBB2340084B356 /* Lottie in Frameworks */,
@@ -103,12 +173,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		804F1D862F4CF13600374D9D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				804F1D872F4CF13600374D9D /* WidgetKit.framework */,
+				804F1D892F4CF13600374D9D /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		80F600972E85D4A0008F58FB = {
 			isa = PBXGroup;
 			children = (
+				80E85E8C2F3762E300E18C4B /* CortiFree.storekit */,
 				80F600A22E85D4A0008F58FB /* CortiFree */,
 				80F600B02E85D4A0008F58FB /* CortiFreeTests */,
 				80F600BA2E85D4A0008F58FB /* CortiFreeUITests */,
+				804F1D8B2F4CF13600374D9D /* CortiFreeWidget */,
+				804F1D862F4CF13600374D9D /* Frameworks */,
 				80F600A12E85D4A0008F58FB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -119,6 +201,7 @@
 				80F600A02E85D4A0008F58FB /* CortiFree.app */,
 				80F600AD2E85D4A0008F58FB /* CortiFreeTests.xctest */,
 				80F600B72E85D4A0008F58FB /* CortiFreeUITests.xctest */,
+				804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,6 +209,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		804F1D842F4CF13600374D9D /* CortiFreeWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 804F1DA02F4CF13700374D9D /* Build configuration list for PBXNativeTarget "CortiFreeWidgetExtension" */;
+			buildPhases = (
+				804F1D812F4CF13600374D9D /* Sources */,
+				804F1D822F4CF13600374D9D /* Frameworks */,
+				804F1D832F4CF13600374D9D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				804F1D8B2F4CF13600374D9D /* CortiFreeWidget */,
+			);
+			name = CortiFreeWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = CortiFreeWidgetExtension;
+			productReference = 804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		80F6009F2E85D4A0008F58FB /* CortiFree */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 80F600C12E85D4A0008F58FB /* Build configuration list for PBXNativeTarget "CortiFree" */;
@@ -133,10 +238,12 @@
 				80F6009C2E85D4A0008F58FB /* Sources */,
 				80F6009D2E85D4A0008F58FB /* Frameworks */,
 				80F6009E2E85D4A0008F58FB /* Resources */,
+				804F1D9C2F4CF13700374D9D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				804F1D9A2F4CF13700374D9D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				80F600A22E85D4A0008F58FB /* CortiFree */,
@@ -157,6 +264,8 @@
 				80622A492F1701B9000C459F /* ReceiptParser */,
 				80622A4B2F1701B9000C459F /* RevenueCat */,
 				80622A4D2F1701B9000C459F /* RevenueCatUI */,
+				803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */,
+				805099B62F4BC34E002841B9 /* PostHog */,
 			);
 			productName = CortiFree;
 			productReference = 80F600A02E85D4A0008F58FB /* CortiFree.app */;
@@ -214,6 +323,9 @@
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					804F1D842F4CF13600374D9D = {
+						CreatedOnToolsVersion = 16.4;
+					};
 					80F6009F2E85D4A0008F58FB = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -244,6 +356,8 @@
 				8077CC282ECF8AF400742806 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 				8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				803AC4DC2F40CED0007B3B5A /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */,
+				805099B52F4BC34E002841B9 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80F600A12E85D4A0008F58FB /* Products */;
@@ -253,15 +367,24 @@
 				80F6009F2E85D4A0008F58FB /* CortiFree */,
 				80F600AC2E85D4A0008F58FB /* CortiFreeTests */,
 				80F600B62E85D4A0008F58FB /* CortiFreeUITests */,
+				804F1D842F4CF13600374D9D /* CortiFreeWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		804F1D832F4CF13600374D9D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		80F6009E2E85D4A0008F58FB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80E85E8D2F3762E300E18C4B /* CortiFree.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +405,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		804F1D812F4CF13600374D9D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		80F6009C2E85D4A0008F58FB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -306,6 +436,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		804F1D9A2F4CF13700374D9D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 804F1D842F4CF13600374D9D /* CortiFreeWidgetExtension */;
+			targetProxy = 804F1D992F4CF13700374D9D /* PBXContainerItemProxy */;
+		};
 		80F600AF2E85D4A0008F58FB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 80F6009F2E85D4A0008F58FB /* CortiFree */;
@@ -319,6 +454,72 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		804F1D9D2F4CF13700374D9D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RSC662VDU8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortiFreeWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree.CortiFreeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		804F1D9E2F4CF13700374D9D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RSC662VDU8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortiFreeWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree.CortiFreeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		80F600BF2E85D4A0008F58FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -444,21 +645,25 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 15;
+				DEVELOPMENT_TEAM = RSC662VDU8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortiFree;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 2.2.9;
 				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
-				PRODUCT_BUNDLE_IDENTIFIER = Josbiot.App.CortiFree;
+				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -476,21 +681,25 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 15;
+				DEVELOPMENT_TEAM = RSC662VDU8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CortiFree;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 2.2.9;
 				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
-				PRODUCT_BUNDLE_IDENTIFIER = Josbiot.App.CortiFree;
+				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -581,6 +790,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		804F1DA02F4CF13700374D9D /* Build configuration list for PBXNativeTarget "CortiFreeWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				804F1D9D2F4CF13700374D9D /* Debug */,
+				804F1D9E2F4CF13700374D9D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		80F6009B2E85D4A0008F58FB /* Build configuration list for PBXProject "CortiFree" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -636,6 +854,22 @@
 				minimumVersion = 4.5.2;
 			};
 		};
+		803AC4DC2F40CED0007B3B5A /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tiktok/tiktok-business-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.0;
+			};
+		};
+		805099B52F4BC34E002841B9 /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.41.2;
+			};
+		};
 		80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
@@ -685,6 +919,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 803AC4DC2F40CED0007B3B5A /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */;
+			productName = TikTokBusinessSDK;
+		};
+		805099B62F4BC34E002841B9 /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 805099B52F4BC34E002841B9 /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
 		};
 		80622A492F1701B9000C459F /* ReceiptParser */ = {
 			isa = XCSwiftPackageProductDependency;

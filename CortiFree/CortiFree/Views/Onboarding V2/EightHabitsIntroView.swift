@@ -34,7 +34,7 @@ struct EightHabitsIntroView: View {
                 VStack(spacing: 0) {
                     // Title
                     Text("onboarding_v2.eight_habits.intro_title".localized)
-                        .font(.custom("Poppins-Bold", size: ResponsiveLayout.fontSize(base: 32)))
+                        .font(.faroBold(ResponsiveLayout.fontSize(base: 32)))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [.white, Color(hex: "B794F6")],

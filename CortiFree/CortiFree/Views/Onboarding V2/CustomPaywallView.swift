@@ -2,23 +2,23 @@
 //  CustomPaywallView.swift
 //  CortiFree
 //
-//  Custom paywall design - uses RevenueCat for pricing
-//  Conforme aux guidelines Apple: aucun prix hardcodé, utilise displayPrice
+//  Custom paywall design - triggers Superwall
+//  NOTE: This view is now just a placeholder that triggers Superwall's paywall
 //
 
 import SwiftUI
-import RevenueCat
 import FirebaseAuth
 import FirebaseFirestore
 import SuperwallKit
 
 struct CustomPaywallView: View {
     let onComplete: () -> Void
-    let onPurchase: (String) -> Void // "monthly" or "yearly"
+    let onPurchase: (String) -> Void // "monthly" or "yearly" (not used, Superwall handles)
     let onRestore: () -> Void
+    var habitsQuizResult: HabitsQuizResult?
+    var selectedSymptoms: Set<String> = []
 
-    // RevenueCat Manager pour les vrais prix App Store
-    @ObservedObject private var revenueCat = RevenueCatManager.shared
+    // REMOVED: RevenueCat is no longer used, Superwall handles everything
 
     // User data from onboarding
     var baselineScores: [Double] = [0.4, 0.35, 0.45, 0.5, 0.4] // Sérénité, Sommeil, Énergie, Focus, Équilibre
@@ -33,48 +33,43 @@ struct CustomPaywallView: View {
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
     @State private var purchaseErrorMessage: String = ""
-    @StateObject private var superwallDelegate = SuperwallDelegateHandler()
 
-    private var isFrench: Bool {
-        LanguageManager.shared.currentLanguage == .french
-    }
+    // MARK: - Prices (not used anymore, Superwall handles pricing)
+    // NOTE: These are placeholder values, Superwall displays the real prices
 
-    // MARK: - Dynamic Prices from RevenueCat (Real App Store Connect prices)
-    // Conforme aux guidelines Apple: utilise displayPrice pour les vrais prix localisés
-
-    /// Prix mensuel depuis App Store Connect
+    /// Prix mensuel (placeholder)
     private var monthlyPrice: String {
-        revenueCat.monthlyDisplayPrice
+        "Loading..."
     }
 
-    /// Prix annuel depuis App Store Connect
+    /// Prix annuel (placeholder)
     private var yearlyPrice: String {
-        revenueCat.yearlyDisplayPrice
+        "Loading..."
     }
 
-    /// Équivalent mensuel de l'abonnement annuel
+    /// Équivalent mensuel (placeholder)
     private var yearlyMonthlyEquivalent: String {
-        revenueCat.yearlyMonthlyEquivalent
+        "Loading..."
     }
 
-    /// Pourcentage d'économie calculé dynamiquement
+    /// Pourcentage d'économie (placeholder)
     private var discountPercentage: Int {
-        revenueCat.yearlySavingsPercentage
+        70
     }
 
-    /// Prix journalier de l'abonnement annuel
+    /// Prix journalier (placeholder)
     private var dailyPrice: String {
-        revenueCat.yearlyDailyEquivalent
+        "Loading..."
     }
 
-    /// Période d'essai gratuit (si disponible)
+    /// Période d'essai gratuit (placeholder)
     private var trialPeriod: String? {
-        revenueCat.yearlyTrialPeriod
+        nil
     }
 
-    /// Indique si les produits sont chargés
+    /// Indique si les produits sont chargés (always false now)
     private var productsReady: Bool {
-        revenueCat.productsLoaded
+        false
     }
 
     // Les habitudes avec leurs statistiques de progression (same as HabitsProgressFlowView)
@@ -82,66 +77,66 @@ struct CustomPaywallView: View {
         [
             PaywallHabitProgress(
                 icon: "wind",
-                title: isFrench ? "Respirer consciemment / sem." : "Breathe Consciously / week",
+                title: "paywall_custom.habit_breathe_title".localized,
                 yAxisValues: ["15 min", "30 min", "45 min", "1h"],
                 currentValue: "1h",
-                statMessage: isFrench ? "pratiqueras la respiration consciente 1h par semaine." : "will practice conscious breathing 1h per week.",
+                statMessage: "paywall_custom.habit_breathe_stat".localized,
                 curveStyle: 0
             ),
             PaywallHabitProgress(
                 icon: "figure.mind.and.body",
-                title: isFrench ? "Méditer / sem." : "Meditate / week",
+                title: "paywall_custom.habit_meditate_title".localized,
                 yAxisValues: ["20 min", "40 min", "1h", "1h20", "1h40"],
                 currentValue: "1h30",
-                statMessage: isFrench ? "méditeras 1h30 par semaine." : "will meditate 1h30 per week.",
+                statMessage: "paywall_custom.habit_meditate_stat".localized,
                 curveStyle: 1
             ),
             PaywallHabitProgress(
                 icon: "book.pages",
-                title: isFrench ? "Tenir un journal / sem." : "Keep a Journal / week",
+                title: "paywall_custom.habit_journal_title".localized,
                 yAxisValues: ["2x", "3x", "5x", "7x"],
                 currentValue: "7x",
-                statMessage: isFrench ? "tiendras un journal 7 fois par semaine." : "will journal 7 times per week.",
+                statMessage: "paywall_custom.habit_journal_stat".localized,
                 curveStyle: 2
             ),
             PaywallHabitProgress(
                 icon: "figure.walk",
-                title: isFrench ? "Faire du sport / sem." : "Exercise / week",
+                title: "paywall_custom.habit_sport_title".localized,
                 yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
                 currentValue: "3h30",
-                statMessage: isFrench ? "feras du sport 3h30 par semaine." : "will exercise 3h30 per week.",
+                statMessage: "paywall_custom.habit_sport_stat".localized,
                 curveStyle: 3
             ),
             PaywallHabitProgress(
                 icon: "drop.fill",
-                title: isFrench ? "Boire de l'eau / jour" : "Drink Water / day",
+                title: "paywall_custom.habit_water_title".localized,
                 yAxisValues: ["1.5L", "2L", "2.5L", "3L"],
                 currentValue: "2,5L",
-                statMessage: isFrench ? "boiras 2,5L d'eau par jour." : "will drink 2.5L of water per day.",
+                statMessage: "paywall_custom.habit_water_stat".localized,
                 curveStyle: 4
             ),
             PaywallHabitProgress(
                 icon: "tree.fill",
-                title: isFrench ? "Temps en nature / sem." : "Time in Nature / week",
+                title: "paywall_custom.habit_nature_title".localized,
                 yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
                 currentValue: "3h30",
-                statMessage: isFrench ? "passeras 3h30 en nature par semaine." : "will spend 3h30 in nature per week.",
+                statMessage: "paywall_custom.habit_nature_stat".localized,
                 curveStyle: 5
             ),
             PaywallHabitProgress(
                 icon: "moon.zzz.fill",
-                title: isFrench ? "Routine sommeil / jour" : "Sleep Routine / day",
+                title: "paywall_custom.habit_sleep_title".localized,
                 yAxisValues: ["6h", "6.5h", "7h", "7.5h", "8h"],
                 currentValue: "8h",
-                statMessage: isFrench ? "dormiras 8 heures par nuit." : "will sleep 8 hours per night.",
+                statMessage: "paywall_custom.habit_sleep_stat".localized,
                 curveStyle: 6
             ),
             PaywallHabitProgress(
                 icon: "person.2.fill",
-                title: isFrench ? "Connexion sociale / sem." : "Social Connection / week",
+                title: "paywall_custom.habit_social_title".localized,
                 yAxisValues: ["1x", "2x", "3x", "4x"],
                 currentValue: "4x",
-                statMessage: isFrench ? "te connecteras socialement 4 fois par semaine." : "will connect socially 4 times per week.",
+                statMessage: "paywall_custom.habit_social_stat".localized,
                 curveStyle: 7
             )
         ]
@@ -158,26 +153,26 @@ struct CustomPaywallView: View {
 
     private var formattedEndDate: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: isFrench ? "fr_FR" : "en_US")
+        formatter.locale = Locale.current
         formatter.dateFormat = "d MMM yyyy"
         return formatter.string(from: endDate)
     }
 
     private var formattedTodayDate: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: isFrench ? "fr_FR" : "en_US")
+        formatter.locale = Locale.current
         formatter.dateFormat = "d MMM yyyy"
         return formatter.string(from: Date())
     }
 
     var body: some View {
         ZStack {
-            // Background gradient
+            // PERFORMANCE: Static gradient background (no animations)
             LinearGradient(
                 colors: [
-                    Color(hex: "1a0a2e"),
-                    Color(hex: "0A0515"),
-                    Color(hex: "1a0a2e")
+                    Color(hex: "1F0140"), // Top - Purple deep
+                    Color(hex: "0B011B"), // Middle - Very dark purple
+                    Color(hex: "01000C")  // Bottom - Almost black
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -185,27 +180,22 @@ struct CustomPaywallView: View {
             .ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 32) {
-                    // Close button
-                    closeButton
-
+                LazyVStack(spacing: 32) { // PERFORMANCE: Use LazyVStack instead of VStack
                     // Header with checkmark
                     headerSection
+                        .padding(.top, 60)
 
                     // Promise section with date
                     promiseSection
 
-                    // Benefits list
-                    benefitsSection
+                    // Personalized insight (replaces both benefits + quiz insight)
+                    personalizedInsightSection
 
                     // Progress chart preview
                     progressChartSection
 
                     // Plan toggle
                     planToggle
-
-                    // Stats section
-                    statsSection
 
                     // Date transformation
                     dateTransformationSection
@@ -231,26 +221,13 @@ struct CustomPaywallView: View {
         .onAppear {
             loadUserName()
             startRadarAnimation()
-
-            // Setup Superwall delegate
-            superwallDelegate.onComplete = {
-                // When user completes purchase or closes paywall
-                onComplete()
-            }
-            Superwall.shared.delegate = superwallDelegate
         }
-        .onChange(of: showStartProgramScreen) { shouldShow in
-            if shouldShow {
-                // Trigger Superwall paywall instead of custom screen
-                // IMPORTANT: Replace "trigger" with the exact placement name from your Superwall dashboard
-                let placement = "trigger"
-
-                print("🌍 [CustomPaywall] Triggering Superwall with placement: \(placement)")
-                Superwall.shared.register(placement: placement)
-
-                // Reset the flag after triggering
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    showStartProgramScreen = false
+        .onChange(of: showStartProgramScreen) { _, show in
+            if show {
+                showStartProgramScreen = false
+                Superwall.shared.register(placement: "campaign_trigger") {
+                    // Called when paywall is dismissed after successful purchase
+                    onComplete()
                 }
             }
         }
@@ -323,13 +300,25 @@ struct CustomPaywallView: View {
 
     // MARK: - Header Section
 
+    private var personalizedTitle: String {
+        guard let goal = habitsQuizResult?.primaryGoal else {
+            return "paywall_custom.title_default".localized
+        }
+        switch goal {
+        case "sleep":   return "paywall_custom.title_sleep".localized
+        case "stress":  return "paywall_custom.title_stress".localized
+        case "energy":  return "paywall_custom.title_energy".localized
+        case "focus":   return "paywall_custom.title_focus".localized
+        case "balance": return "paywall_custom.title_balance".localized
+        default:        return "paywall_custom.title_default".localized
+        }
+    }
+
     private var headerSection: some View {
         VStack(spacing: 16) {
             // Title
-            Text(isFrench
-                 ? "Dans 66 jours, tu auras\ntransformé ta vie."
-                 : "In 66 days, you will have\ntransformed your life.")
-                .font(.custom("Poppins-Bold", size: 26))
+            Text(personalizedTitle)
+                .font(.faroBold(28))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -341,9 +330,7 @@ struct CustomPaywallView: View {
 
     private var promiseSection: some View {
         VStack(spacing: 16) {
-            Text(isFrench
-                 ? "Ton destin t'attend. Tu libéreras ton\nvéritable potentiel le :"
-                 : "Your destiny awaits. You will unlock\nyour true potential on:")
+            Text("paywall_custom.promise_subtitle".localized)
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
@@ -362,31 +349,116 @@ struct CustomPaywallView: View {
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
-    // MARK: - Benefits Section
+    // MARK: - Personalized Insight Section (fused benefits + quiz patterns)
 
-    private var benefitsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            PaywallBenefitRow(
-                text: isFrench
-                    ? "Ton **niveau de stress** va diminuer drastiquement"
-                    : "Your **stress level** will decrease drastically"
-            )
-            PaywallBenefitRow(
-                text: isFrench
-                    ? "Ton **sommeil et ton énergie** seront 3 fois meilleurs"
-                    : "Your **sleep and energy** will be 3 times better"
-            )
-            PaywallBenefitRow(
-                text: isFrench
-                    ? "Tu te sentiras **plus serein et concentré** que jamais"
-                    : "You will feel **more serene and focused** than ever"
-            )
-            PaywallBenefitRow(
-                text: isFrench
-                    ? "Ton **équilibre de vie** sera complètement régénéré"
-                    : "Your **life balance** will be completely regenerated"
-            )
+    private struct DetectedIssue {
+        let icon: String
+        let fix: String
+        let theme: String // used to avoid redundancy when mixing with fallbacks
+    }
+
+    // Map: symptom key (from SymptomCheckerView) → DetectedIssue
+    // Keys match exactly the `key` strings from both FR and EN symptom lists
+    private var symptomToIssue: [String: DetectedIssue] {
+        [
+            // ── Mental FR ──
+            "Anxiété fréquente": DetectedIssue(icon: "waveform.path.ecg", fix: "paywall_custom.fix_anxiety".localized, theme: "anxiety"),
+            "Difficulté à se concentrer": DetectedIssue(icon: "scope", fix: "paywall_custom.fix_focus".localized, theme: "focus"),
+            "Pensées négatives en boucle": DetectedIssue(icon: "arrow.trianglehead.2.clockwise", fix: "paywall_custom.fix_negative_thoughts".localized, theme: "anxiety"),
+            "Irritabilité": DetectedIssue(icon: "flame.fill", fix: "paywall_custom.fix_irritability".localized, theme: "irritability"),
+            "Brouillard mental": DetectedIssue(icon: "cloud.fill", fix: "paywall_custom.fix_brain_fog".localized, theme: "anxiety"),
+            "Perte de motivation": DetectedIssue(icon: "battery.25percent", fix: "paywall_custom.fix_motivation".localized, theme: "motivation"),
+            // ── Mental EN ──
+            "Frequent anxiety": DetectedIssue(icon: "waveform.path.ecg", fix: "paywall_custom.fix_anxiety".localized, theme: "anxiety"),
+            "Difficulty focusing": DetectedIssue(icon: "scope", fix: "paywall_custom.fix_focus".localized, theme: "focus"),
+            "Negative thought loops": DetectedIssue(icon: "arrow.trianglehead.2.clockwise", fix: "paywall_custom.fix_negative_thoughts".localized, theme: "anxiety"),
+            "Irritability": DetectedIssue(icon: "flame.fill", fix: "paywall_custom.fix_irritability".localized, theme: "irritability"),
+            "Brain fog": DetectedIssue(icon: "cloud.fill", fix: "paywall_custom.fix_brain_fog".localized, theme: "anxiety"),
+            "Loss of motivation": DetectedIssue(icon: "battery.25percent", fix: "paywall_custom.fix_motivation".localized, theme: "motivation"),
+
+            // ── Physique FR ──
+            "Sommeil perturbé ou non réparateur": DetectedIssue(icon: "moon.zzz.fill", fix: "paywall_custom.fix_sleep".localized, theme: "sleep"),
+            "Fatigue chronique": DetectedIssue(icon: "bolt.slash.fill", fix: "paywall_custom.fix_fatigue".localized, theme: "energy"),
+            "Maux de tête fréquents": DetectedIssue(icon: "brain.head.profile", fix: "paywall_custom.fix_headaches".localized, theme: "physical"),
+            "Tensions dans le cou ou les épaules": DetectedIssue(icon: "figure.arms.open", fix: "paywall_custom.fix_tension".localized, theme: "physical"),
+            "Prise de poids inexpliquée": DetectedIssue(icon: "scalemass.fill", fix: "paywall_custom.fix_weight".localized, theme: "physical"),
+            "Palpitations ou souffle court": DetectedIssue(icon: "heart.fill", fix: "paywall_custom.fix_heart".localized, theme: "physical"),
+            // ── Physique EN ──
+            "Disrupted or unrestful sleep": DetectedIssue(icon: "moon.zzz.fill", fix: "paywall_custom.fix_sleep".localized, theme: "sleep"),
+            "Chronic fatigue": DetectedIssue(icon: "bolt.slash.fill", fix: "paywall_custom.fix_fatigue".localized, theme: "energy"),
+            "Frequent headaches": DetectedIssue(icon: "brain.head.profile", fix: "paywall_custom.fix_headaches".localized, theme: "physical"),
+            "Neck or shoulder tension": DetectedIssue(icon: "figure.arms.open", fix: "paywall_custom.fix_tension".localized, theme: "physical"),
+            "Unexplained weight gain": DetectedIssue(icon: "scalemass.fill", fix: "paywall_custom.fix_weight".localized, theme: "physical"),
+            "Heart palpitations or shortness of breath": DetectedIssue(icon: "heart.fill", fix: "paywall_custom.fix_heart".localized, theme: "physical"),
+
+            // ── Social FR ──
+            "Envie de s'isoler": DetectedIssue(icon: "person.crop.circle.badge.minus", fix: "paywall_custom.fix_isolation".localized, theme: "social"),
+            "Conflits relationnels plus fréquents": DetectedIssue(icon: "bubble.left.and.bubble.right.fill", fix: "paywall_custom.fix_conflicts".localized, theme: "social"),
+            "Perte d'intérêt pour les activités": DetectedIssue(icon: "star.slash.fill", fix: "paywall_custom.fix_interest".localized, theme: "social"),
+            "Difficulté à communiquer": DetectedIssue(icon: "mic.slash.fill", fix: "paywall_custom.fix_communication".localized, theme: "social"),
+            "Impatience ou irritabilité avec les proches": DetectedIssue(icon: "figure.2.arms.open", fix: "paywall_custom.fix_impatience".localized, theme: "social"),
+            // ── Social EN ──
+            "Desire to isolate": DetectedIssue(icon: "person.crop.circle.badge.minus", fix: "paywall_custom.fix_isolation".localized, theme: "social"),
+            "More frequent relationship conflicts": DetectedIssue(icon: "bubble.left.and.bubble.right.fill", fix: "paywall_custom.fix_conflicts".localized, theme: "social"),
+            "Loss of interest in activities": DetectedIssue(icon: "star.slash.fill", fix: "paywall_custom.fix_interest".localized, theme: "social"),
+            "Difficulty communicating": DetectedIssue(icon: "mic.slash.fill", fix: "paywall_custom.fix_communication".localized, theme: "social"),
+            "Impatience or irritability with loved ones": DetectedIssue(icon: "figure.2.arms.open", fix: "paywall_custom.fix_impatience".localized, theme: "social"),
+        ]
+    }
+
+    // Ordered fallbacks — listed from most to least generic so we can pick non-redundant ones
+    private var allFallbacks: [DetectedIssue] {
+        [
+            DetectedIssue(icon: "brain.head.profile", fix: "paywall_custom.fallback_stress".localized, theme: "stress"),
+            DetectedIssue(icon: "moon.zzz.fill",      fix: "paywall_custom.fallback_sleep".localized,  theme: "sleep"),
+            DetectedIssue(icon: "bolt.fill",           fix: "paywall_custom.fallback_energy".localized, theme: "energy"),
+            DetectedIssue(icon: "scope",               fix: "paywall_custom.fallback_focus".localized,  theme: "focus"),
+        ]
+    }
+
+    private var detectedIssues: [DetectedIssue] {
+        let map = symptomToIssue
+
+        // Deduplicate by theme (keep first occurrence per theme), max 3 symptom fixes
+        var seenThemes: Set<String> = []
+        var symptomFixes: [DetectedIssue] = []
+        for symptom in selectedSymptoms {
+            guard let issue = map[symptom], !seenThemes.contains(issue.theme) else { continue }
+            seenThemes.insert(issue.theme)
+            symptomFixes.append(issue)
+            if symptomFixes.count == 3 { break }
         }
+
+        // Fill remaining slots with fallbacks whose theme isn't already shown
+        let needed = 4 - symptomFixes.count
+        let fillers = allFallbacks
+            .filter { !seenThemes.contains($0.theme) }
+            .prefix(needed)
+
+        return symptomFixes + Array(fillers)
+    }
+
+    private func issueBarColor(score: Int) -> Color {
+        if score > 70 { return Color(hex: "FF8A80") }
+        if score > 40 { return Color(hex: "FFB74D") }
+        return Color(hex: "FFF176")
+    }
+
+    private var personalizedInsightSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            ForEach(Array(detectedIssues.enumerated()), id: \.offset) { _, issue in
+                HStack(spacing: 10) {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(Color(hex: "B794F6"))
+
+                    Text(issue.fix)
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
@@ -422,7 +494,7 @@ struct CustomPaywallView: View {
             VStack(spacing: 10) {
                 // Title with gradient
                 Text(currentHabitProgress.title)
-                    .font(.custom("Poppins-Bold", size: 16))
+                    .font(.faroSemiBold(16))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [.white, Color(hex: "B794F6")],
@@ -492,7 +564,7 @@ struct CustomPaywallView: View {
                             Circle()
                                 .stroke(Color.white.opacity(0.5), lineWidth: 1)
                         )
-                    Text(isFrench ? "Sans CortiFree" : "Without CortiFree")
+                    Text("paywall_custom.plan_without".localized)
                         .font(.custom("Poppins-Medium", size: 14))
                         .foregroundColor(selectedPlan == .monthly ? .white : .white.opacity(0.5))
                 }
@@ -507,36 +579,15 @@ struct CustomPaywallView: View {
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
-    // MARK: - Stats Section
-
-    private var statsSection: some View {
-        HStack(spacing: 16) {
-            Image("welcome_5_stars")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 120, height: 50)
-                .clipped()
-
-            Image("welcome_cortifree_app")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 120, height: 50)
-                .clipped()
-        }
-        .padding(.horizontal, AppConstants.Layout.paddingLarge)
-    }
-
     // MARK: - Date Transformation Section
 
     private var dateTransformationSection: some View {
         VStack(spacing: 16) {
-            Text(isFrench ? "Si tu commences aujourd'hui" : "If you start today")
-                .font(.custom("Poppins-SemiBold", size: 18))
+            Text("paywall_custom.if_start_today".localized)
+                .font(.faroBold(22))
                 .foregroundColor(.white)
 
-            Text(isFrench
-                 ? "Tu transformeras ta vie et deviendras\nla meilleure version de toi-même d'ici le :"
-                 : "You will transform your life and become\nthe best version of yourself by:")
+            Text("paywall_custom.transform_subtitle".localized)
                 .font(.custom("Poppins-Regular", size: 14))
                 .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
@@ -584,10 +635,8 @@ struct CustomPaywallView: View {
         VStack(spacing: 0) {
             PaywallFeatureListRow(
                 icon: "chart.bar.fill",
-                title: isFrench ? "Programme personnalisé" : "Personalized program",
-                description: isFrench
-                    ? "Un plan adapté à ton niveau, mis à jour chaque semaine."
-                    : "A plan adapted to your level, updated weekly.",
+                title: "paywall_custom.feature_program_title".localized,
+                description: "paywall_custom.feature_program_desc".localized,
                 isNew: false
             )
 
@@ -595,10 +644,8 @@ struct CustomPaywallView: View {
 
             PaywallFeatureListRow(
                 icon: "checkmark.square.fill",
-                title: isFrench ? "Planification des tâches" : "Task planning",
-                description: isFrench
-                    ? "Des habitudes fondées sur la science pour t'aider au quotidien."
-                    : "Science-based habits to help you daily.",
+                title: "paywall_custom.feature_tasks_title".localized,
+                description: "paywall_custom.feature_tasks_desc".localized,
                 isNew: false
             )
 
@@ -606,10 +653,8 @@ struct CustomPaywallView: View {
 
             PaywallFeatureListRow(
                 icon: "chart.line.uptrend.xyaxis",
-                title: isFrench ? "Suivi des améliorations" : "Progress tracking",
-                description: isFrench
-                    ? "Suis tes progrès avec des statistiques détaillées."
-                    : "Track your progress with detailed statistics.",
+                title: "paywall_custom.feature_tracking_title".localized,
+                description: "paywall_custom.feature_tracking_desc".localized,
                 isNew: false
             )
 
@@ -617,10 +662,8 @@ struct CustomPaywallView: View {
 
             PaywallFeatureListRow(
                 icon: "pencil.and.outline",
-                title: isFrench ? "Journal quotidien" : "Daily journal",
-                description: isFrench
-                    ? "Note tes pensées et émotions pour mieux te connaître."
-                    : "Record your thoughts and emotions to know yourself better.",
+                title: "paywall_custom.feature_journal_title".localized,
+                description: "paywall_custom.feature_journal_desc".localized,
                 isNew: true
             )
 
@@ -651,10 +694,8 @@ struct CustomPaywallView: View {
 
     private var radarChartSection: some View {
         VStack(spacing: 16) {
-            Text(isFrench
-                 ? "Amélioration de \(userName) en 66 jours"
-                 : "\(userName)'s improvement in 66 days")
-                .font(.custom("Poppins-Bold", size: 20))
+            Text(String(format: "paywall_custom.radar_title".localized, userName))
+                .font(.faroBold(22))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
 
@@ -685,10 +726,11 @@ struct CustomPaywallView: View {
                     .responsiveFrame(width: 165, height: 165)
 
                 // Labels (using larger frame for positioning)
-                PaywallRadarLabels(size: ResponsiveLayout.cardWidth(base: 165), isFrench: isFrench)
+                PaywallRadarLabels(size: ResponsiveLayout.cardWidth(base: 165))
             }
             .responsiveFrame(width: 280, height: 280)
             .padding(.vertical, 8)
+            .drawingGroup() // PERFORMANCE: Render radar chart as bitmap
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
@@ -697,7 +739,7 @@ struct CustomPaywallView: View {
 
     private var floatingCTASection: some View {
         VStack(spacing: 8) {
-            // Main CTA button (same style as CortiFreeRatingView)
+            // Main CTA button - Opens NativePaywallView
             Button(action: {
                 HapticManager.medium()
                 showStartProgramScreen = true
@@ -705,7 +747,7 @@ struct CustomPaywallView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 18, weight: .semibold))
-                    Text(isFrench ? "Démarrer mon programme" : "Start my program")
+                    Text("paywall_custom.cta_start".localized)
                         .font(.custom("Poppins-SemiBold", size: 18))
                 }
                 .foregroundColor(.white)
@@ -742,7 +784,7 @@ struct CustomPaywallView: View {
                 HapticManager.light()
                 LegalDocumentsHelper.openPrivacyPolicy()
             }) {
-                Text(isFrench ? "Confidentialité" : "Privacy")
+                Text("paywall_custom.footer_privacy".localized)
                     .font(.custom("Poppins-Regular", size: 11))
                     .foregroundColor(.white.opacity(0.4))
             }
@@ -751,7 +793,7 @@ struct CustomPaywallView: View {
                 HapticManager.light()
                 onRestore()
             }) {
-                Text(isFrench ? "Restaurer" : "Restore")
+                Text("paywall_custom.footer_restore".localized)
                     .font(.custom("Poppins-Regular", size: 11))
                     .foregroundColor(.white.opacity(0.4))
             }
@@ -760,7 +802,7 @@ struct CustomPaywallView: View {
                 HapticManager.light()
                 LegalDocumentsHelper.openTerms()
             }) {
-                Text(isFrench ? "CGU" : "Terms")
+                Text("paywall_custom.footer_terms".localized)
                     .font(.custom("Poppins-Regular", size: 11))
                     .foregroundColor(.white.opacity(0.4))
             }
@@ -770,9 +812,12 @@ struct CustomPaywallView: View {
     // MARK: - Helper Methods
 
     private func startRadarAnimation() {
-        // Toggle between small (0) and large (1) every 1.5 seconds - no animation
-        Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { _ in
-            radarAnimationProgress = radarAnimationProgress < 0.5 ? 1.0 : 0.0
+        // PERFORMANCE: Use DispatchQueue instead of Timer for better performance
+        Task { @MainActor in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+                radarAnimationProgress = radarAnimationProgress < 0.5 ? 1.0 : 0.0
+            }
         }
     }
 
@@ -851,7 +896,7 @@ struct PaywallFeatureListRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Text(title)
-                        .font(.custom("Poppins-SemiBold", size: 15))
+                        .font(.faroSemiBold(15))
                         .foregroundColor(.white)
 
                     if isNew {
@@ -883,7 +928,6 @@ struct PaywallFeatureListRow: View {
 
 struct PaywallRadarLabels: View {
     let size: CGFloat
-    let isFrench: Bool
 
     private var labelOffset: CGFloat { size * 0.72 }
     private var sideOffset: CGFloat { size * 0.62 }
@@ -897,7 +941,7 @@ struct PaywallRadarLabels: View {
             HStack(spacing: 3) {
                 Image(systemName: "star.fill")
                     .font(.system(size: iconSize))
-                Text(isFrench ? "Global" : "Overall")
+                Text("paywall_custom.radar_label_global".localized)
                     .font(.custom("Poppins-SemiBold", size: fontSize))
             }
             .foregroundColor(.white)
@@ -907,7 +951,7 @@ struct PaywallRadarLabels: View {
             HStack(spacing: 3) {
                 Image(systemName: "leaf.fill")
                     .font(.system(size: iconSize))
-                Text(isFrench ? "Sérénité" : "Serenity")
+                Text("paywall_custom.radar_label_serenity".localized)
                     .font(.custom("Poppins-SemiBold", size: fontSize))
             }
             .foregroundColor(.white)
@@ -917,7 +961,7 @@ struct PaywallRadarLabels: View {
             HStack(spacing: 3) {
                 Image(systemName: "moon.fill")
                     .font(.system(size: iconSize))
-                Text(isFrench ? "Sommeil" : "Sleep")
+                Text("paywall_custom.radar_label_sleep".localized)
                     .font(.custom("Poppins-SemiBold", size: fontSize))
             }
             .foregroundColor(.white)
@@ -927,7 +971,7 @@ struct PaywallRadarLabels: View {
             HStack(spacing: 3) {
                 Image(systemName: "bolt.fill")
                     .font(.system(size: iconSize))
-                Text(isFrench ? "Énergie" : "Energy")
+                Text("paywall_custom.radar_label_energy".localized)
                     .font(.custom("Poppins-SemiBold", size: fontSize))
             }
             .foregroundColor(.white)
@@ -947,7 +991,7 @@ struct PaywallRadarLabels: View {
             HStack(spacing: 3) {
                 Image(systemName: "heart.fill")
                     .font(.system(size: iconSize))
-                Text(isFrench ? "Équilibre" : "Balance")
+                Text("paywall_custom.radar_label_balance".localized)
                     .font(.custom("Poppins-SemiBold", size: fontSize))
             }
             .foregroundColor(.white)
@@ -1024,537 +1068,5 @@ struct PaywallFeatureBullet: View {
     }
 }
 
-// MARK: - Start Program Screen
-
-struct PaywallStartProgramScreen: View {
-    @Binding var isPresented: Bool
-    let userName: String
-    let onPurchase: (String) -> Void
-    let onRestore: () -> Void
-
-    // Observe RevenueCat directly for real-time price updates
-    @ObservedObject private var revenueCat = RevenueCatManager.shared
-
-    @State private var selectedPlan: String = "yearly"
-
-    private var isFrench: Bool {
-        LanguageManager.shared.currentLanguage == .french
-    }
-
-    // Dynamic prices from RevenueCat
-    private var monthlyPrice: String { revenueCat.monthlyDisplayPrice }
-    private var yearlyPrice: String { revenueCat.yearlyDisplayPrice }
-    private var yearlyMonthlyEquivalent: String { revenueCat.yearlyMonthlyEquivalent }
-    private var discountPercentage: Int { revenueCat.yearlySavingsPercentage }
-    private var dailyPrice: String { revenueCat.yearlyDailyEquivalent }
-
-    var body: some View {
-        ZStack {
-            // Galaxy background (same as app)
-            GalaxyBackgroundView()
-                .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                // Header with Restore and Close
-                HStack {
-                    Button(action: {
-                        HapticManager.light()
-                        onRestore()
-                    }) {
-                        Text(isFrench ? "Restaurer" : "Restore")
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-
-                    Spacer()
-
-                    Button(action: {
-                        HapticManager.light()
-                        isPresented = false
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
-
-                // Scrollable content
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        // Main title - more impactful
-                        VStack(spacing: 8) {
-                            Text(isFrench ? "Reprends le contrôle" : "Take back control")
-                                .font(.custom("Poppins-Bold", size: 28))
-                                .foregroundColor(.white)
-
-                            Text(isFrench ? "de ton bien-être" : "of your well-being")
-                                .font(.custom("Poppins-Bold", size: 28))
-                                .foregroundColor(Color(hex: "B794F6"))
-                        }
-                        .padding(.top, 20)
-
-                        // Subtitle
-                        Text(isFrench
-                             ? "66 jours pour transformer tes habitudes"
-                             : "66 days to transform your habits")
-                            .font(.custom("Poppins-Regular", size: 16))
-                            .foregroundColor(.white.opacity(0.7))
-                            .padding(.bottom, 8)
-
-                        // Features list - aligned left with better styling
-                        VStack(alignment: .leading, spacing: 16) {
-                            PaywallFeatureRow(
-                                icon: "calendar.badge.clock",
-                                text: isFrench ? "Programme personnalisé de 66 jours" : "Personalized 66-day program"
-                            )
-                            PaywallFeatureRow(
-                                icon: "wind",
-                                text: isFrench ? "Exercices de respiration guidés" : "Guided breathing exercises"
-                            )
-                            PaywallFeatureRow(
-                                icon: "chart.line.uptrend.xyaxis",
-                                text: isFrench ? "Suivi quotidien de tes progrès" : "Daily progress tracking"
-                            )
-                            PaywallFeatureRow(
-                                icon: "brain.head.profile",
-                                text: isFrench ? "Méditations anti-stress" : "Anti-stress meditations"
-                            )
-                            PaywallFeatureRow(
-                                icon: "bell.badge",
-                                text: isFrench ? "Rappels intelligents" : "Smart reminders"
-                            )
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 16)
-
-                        // Pricing options side by side - equal height
-                        HStack(spacing: 12) {
-                            // Monthly option
-                            ProgramPlanCard(
-                                title: isFrench ? "MENSUEL" : "MONTHLY",
-                                price: monthlyPrice,
-                                period: isFrench ? "/mois" : "/mo",
-                                badgeText: nil,
-                                trialText: nil,
-                                isSelected: selectedPlan == "monthly",
-                                isRecommended: false,
-                                onTap: {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        HapticManager.light()
-                                        selectedPlan = "monthly"
-                                    }
-                                }
-                            )
-
-                            // Yearly option (with badge + free trial)
-                            ProgramPlanCard(
-                                title: isFrench ? "ANNUEL" : "YEARLY",
-                                price: yearlyPrice,
-                                period: isFrench ? "/an" : "/yr",
-                                badgeText: isFrench ? "-\(discountPercentage)%" : "-\(discountPercentage)%",
-                                trialText: isFrench ? "3 jours gratuits" : "3 days free",
-                                isSelected: selectedPlan == "yearly",
-                                isRecommended: true,
-                                onTap: {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        HapticManager.light()
-                                        selectedPlan = "yearly"
-                                    }
-                                }
-                            )
-                        }
-                        .padding(.horizontal, 24)
-
-                        // Price breakdown - More visible for Apple Review compliance
-                        if selectedPlan == "yearly" {
-                            VStack(spacing: 6) {
-                                // Monthly equivalent - More prominent
-                                HStack(spacing: 4) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(Color(hex: "8B5CF6"))
-                                    Text(isFrench
-                                         ? "Soit seulement \(yearlyMonthlyEquivalent)/mois"
-                                         : "That's only \(yearlyMonthlyEquivalent)/month")
-                                        .font(.custom("Poppins-SemiBold", size: 15))
-                                        .foregroundColor(Color(hex: "8B5CF6"))
-                                }
-                            }
-                            .padding(.top, 8)
-                            .padding(.bottom, 4)
-                        }
-
-                        // APPLE REQUIREMENT 3.1.2: Explicit subscription pricing information
-                        // Must be displayed BEFORE the purchase button
-                        VStack(spacing: 6) {
-                            // Subscription name and full price
-                            VStack(spacing: 2) {
-                                Text(selectedPlan == "yearly"
-                                     ? (isFrench ? "Abonnement annuel CortiFree" : "CortiFree Annual Subscription")
-                                     : (isFrench ? "Abonnement mensuel CortiFree" : "CortiFree Monthly Subscription"))
-                                    .font(.custom("Poppins-SemiBold", size: 15))
-                                    .foregroundColor(.white.opacity(0.9))
-
-                                // Full price with period
-                                if selectedPlan == "yearly" {
-                                    Text(isFrench
-                                         ? "\(yearlyPrice) / an (\(yearlyMonthlyEquivalent) / mois)"
-                                         : "\(yearlyPrice) per year (\(yearlyMonthlyEquivalent) per month)")
-                                        .font(.custom("Poppins-Medium", size: 14))
-                                        .foregroundColor(Color(hex: "8B5CF6"))
-                                } else {
-                                    Text(isFrench
-                                         ? "\(monthlyPrice) / mois"
-                                         : "\(monthlyPrice) per month")
-                                        .font(.custom("Poppins-Medium", size: 14))
-                                        .foregroundColor(Color(hex: "8B5CF6"))
-                                }
-                            }
-
-                            // Auto-renewal and cancellation notice (MUST be before button per Apple 3.1.2)
-                            Text(isFrench
-                                 ? "Renouvellement automatique • Résiliable à tout moment"
-                                 : "Auto-renewing • Cancel anytime")
-                                .font(.custom("Poppins-Regular", size: 11))
-                                .foregroundColor(.white.opacity(0.5))
-                                .multilineTextAlignment(.center)
-                                .padding(.top, 2)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 12)
-
-                        // Spacer to push content up and leave room for fixed button
-                        Spacer()
-                            .frame(height: 220)
-                    }
-                }
-            }
-
-            // Fixed bottom section - OVERLAY (outside ScrollView for proper hit testing)
-            VStack {
-                Spacer()
-
-                VStack(spacing: 12) {
-                    // CTA Button - Increased height for iPad accessibility
-                    Button(action: {
-                        print("🔥 Purchase button tapped - Plan: \(selectedPlan)")
-                        HapticManager.medium()
-                        onPurchase(selectedPlan)
-                    }) {
-                        HStack(spacing: 8) {
-                            Text(selectedPlan == "yearly"
-                                 ? (isFrench ? "Commencer mon essai gratuit" : "Start my free trial")
-                                 : (isFrench ? "S'abonner maintenant" : "Subscribe now"))
-                                .font(.custom("Poppins-Bold", size: ResponsiveLayout.fontSize(base: 17)))
-                                .lineLimit(2)
-                                .minimumScaleFactor(0.8)
-                                .multilineTextAlignment(.center)
-
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: ResponsiveLayout.fontSize(base: 16), weight: .semibold))
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: ResponsiveLayout.isIPad ? 64 : 56)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "7C3AED"), Color(hex: "5B21B6")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: Color(hex: "7C3AED").opacity(0.4), radius: 12, x: 0, y: 6)
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, 24)
-
-                    // Free trial info text when yearly is selected
-                    if selectedPlan == "yearly" {
-                        HStack(spacing: 6) {
-                            Image(systemName: "checkmark.shield.fill")
-                                .font(.system(size: 12))
-                                .foregroundColor(Color(hex: "8B5CF6"))
-                            Text(isFrench
-                                 ? "3 jours gratuits, puis \(yearlyPrice)/an"
-                                 : "3 days free, then \(yearlyPrice)/year")
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.6))
-                        }
-                    }
-
-                    // Legal disclaimer - Detailed cancellation instructions (additional info, not replacement)
-                    Text(isFrench
-                         ? "Annulation dans Réglages > App Store > Abonnements."
-                         : "Cancel in Settings > App Store > Subscriptions.")
-                        .font(.custom("Poppins-Regular", size: 10))
-                        .foregroundColor(.white.opacity(0.4))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 4)
-
-                    // Footer links
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            HapticManager.light()
-                            LegalDocumentsHelper.openTerms()
-                        }) {
-                            Text(isFrench ? "Conditions" : "Terms")
-                                .font(.custom("Poppins-Regular", size: 11))
-                                .foregroundColor(.white.opacity(0.4))
-                        }
-
-                        Text("•")
-                            .font(.custom("Poppins-Regular", size: 11))
-                            .foregroundColor(.white.opacity(0.3))
-
-                        Button(action: {
-                            HapticManager.light()
-                            LegalDocumentsHelper.openPrivacyPolicy()
-                        }) {
-                            Text(isFrench ? "Confidentialité" : "Privacy")
-                                .font(.custom("Poppins-Regular", size: 11))
-                                .foregroundColor(.white.opacity(0.4))
-                        }
-
-                        Text("•")
-                            .font(.custom("Poppins-Regular", size: 11))
-                            .foregroundColor(.white.opacity(0.3))
-
-                        Button(action: {
-                            HapticManager.light()
-                            onRestore()
-                        }) {
-                            Text(isFrench ? "Restaurer" : "Restore")
-                                .font(.custom("Poppins-Regular", size: 11))
-                                .foregroundColor(.white.opacity(0.4))
-                        }
-                    }
-                    .padding(.top, 4)
-                }
-                .padding(.bottom, 24)
-                .background(
-                    LinearGradient(
-                        colors: [Color.clear, Color(hex: "0D0D1A").opacity(0.95), Color(hex: "0D0D1A")],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 180)
-                    .offset(y: -40)
-                    .allowsHitTesting(false)
-                )
-            }
-            .ignoresSafeArea(edges: .bottom)
-        }
-    }
-}
-
-// MARK: - Feature Row with icon
-
-struct PaywallFeatureRow: View {
-    let icon: String
-    let text: String
-
-    var body: some View {
-        HStack(spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 18))
-                .foregroundColor(Color(hex: "B794F6"))
-                .frame(width: 24)
-
-            Text(text)
-                .font(.custom("Poppins-Regular", size: 15))
-                .foregroundColor(.white.opacity(0.9))
-        }
-    }
-}
-
-// MARK: - App Screenshots Carousel
-
-struct AppScreenshotsCarousel: View {
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: -30) {
-                // Show placeholder screens (in real app, use actual screenshots)
-                ForEach(0..<5, id: \.self) { index in
-                    AppScreenshotMock(index: index)
-                        .frame(width: 140, height: 260)
-                        .scaleEffect(index == 2 ? 1.1 : 0.9)
-                        .zIndex(index == 2 ? 1 : 0)
-                }
-            }
-            .padding(.horizontal, 40)
-        }
-    }
-}
-
-struct AppScreenshotMock: View {
-    let index: Int
-
-    private var screenContent: (icon: String, title: String, color: Color) {
-        let contents = [
-            ("house.fill", "Home", Color(hex: "FF6B6B")),
-            ("chart.bar.fill", "Progress", Color(hex: "4ECDC4")),
-            ("calendar", "Day 12/66", Color(hex: "45B7D1")),
-            ("checkmark.circle.fill", "Tasks", Color(hex: "96CEB4")),
-            ("trophy.fill", "Achievement", Color(hex: "FFD700"))
-        ]
-        return contents[index % contents.count]
-    }
-
-    var body: some View {
-        VStack(spacing: 8) {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: "1a0a2e"),
-                            screenContent.color.opacity(0.3)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .overlay(
-                    VStack(spacing: 12) {
-                        Image(systemName: screenContent.icon)
-                            .font(.system(size: 32))
-                            .foregroundColor(screenContent.color)
-
-                        Text(screenContent.title)
-                            .font(.custom("Poppins-SemiBold", size: 14))
-                            .foregroundColor(.white)
-                    }
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                )
-        }
-        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-    }
-}
-
-// MARK: - Program Plan Card
-
-struct ProgramPlanCard: View {
-    let title: String
-    let price: String
-    let period: String
-    let badgeText: String?
-    let trialText: String?
-    let isSelected: Bool
-    let isRecommended: Bool
-    let onTap: () -> Void
-
-    private let cardHeight: CGFloat = 140
-
-    private var isFrench: Bool {
-        LanguageManager.shared.currentLanguage == .french
-    }
-
-    var body: some View {
-        Button(action: onTap) {
-            VStack(spacing: 0) {
-                // Content area - same height for both cards
-                VStack(spacing: 6) {
-                    // Badge or spacer for alignment
-                    if let badge = badgeText {
-                        Text(badge)
-                            .font(.custom("Poppins-Bold", size: 11))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(Color(hex: "8B5CF6"))
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                    } else {
-                        // Invisible spacer to maintain alignment
-                        Text(" ")
-                            .font(.custom("Poppins-Bold", size: 11))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .opacity(0)
-                    }
-
-                    Text(title)
-                        .font(.custom("Poppins-SemiBold", size: 12))
-                        .foregroundColor(.white.opacity(0.6))
-                        .tracking(1)
-
-                    HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(price)
-                            .font(.custom("Poppins-Bold", size: 26))
-                            .foregroundColor(.white)
-                        Text(period)
-                            .font(.custom("Poppins-Regular", size: 13))
-                            .foregroundColor(.white.opacity(0.5))
-                    }
-
-                    // Trial text or spacer
-                    if let trial = trialText {
-                        HStack(spacing: 4) {
-                            Image(systemName: "gift.fill")
-                                .font(.system(size: 10))
-                            Text(trial)
-                                .font(.custom("Poppins-Medium", size: 11))
-                        }
-                        .foregroundColor(Color(hex: "8B5CF6"))
-                        .padding(.top, 2)
-                    } else {
-                        // Spacer for alignment
-                        Text(" ")
-                            .font(.custom("Poppins-Medium", size: 11))
-                            .padding(.top, 2)
-                            .opacity(0)
-                    }
-                }
-                .padding(.vertical, 16)
-                .frame(maxWidth: .infinity)
-                .frame(height: cardHeight)
-            }
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected
-                          ? (isRecommended ? Color(hex: "7C3AED").opacity(0.2) : Color.white.opacity(0.12))
-                          : Color.white.opacity(0.05))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(
-                        isSelected
-                            ? (isRecommended ? Color(hex: "B794F6") : Color.white.opacity(0.6))
-                            : Color.white.opacity(0.15),
-                        lineWidth: isSelected ? 2 : 1
-                    )
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            // Recommended label
-            .overlay(
-                Group {
-                    if isRecommended && isSelected {
-                        Text(isFrench ? "RECOMMANDÉ" : "RECOMMENDED")
-                            .font(.custom("Poppins-Bold", size: 9))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Color(hex: "7C3AED"))
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .offset(y: -cardHeight / 2 - 8)
-                            .transition(.scale.combined(with: .opacity))
-                    }
-                }
-            )
-            // Selection animation
-            .scaleEffect(isSelected ? 1.02 : 0.98)
-            .opacity(isSelected ? 1 : 0.7)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-// Previews moved to PaywallSubviews.swift to fix compilation timeout
+// All legacy Superwall paywall code has been removed.
+// The app now uses NativePaywallView (StoreKit 2) for all paywall functionality.

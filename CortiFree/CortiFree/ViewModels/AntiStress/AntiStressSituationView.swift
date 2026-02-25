@@ -14,11 +14,6 @@ struct AntiStressSituationView: View {
     @State private var selectedSituation: StressSituation?
     @State private var showRecommendations = false
 
-    let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-
     var body: some View {
         NavigationStack {
             ZStack {
@@ -30,7 +25,7 @@ struct AntiStressSituationView: View {
                         // Header
                         VStack(spacing: 12) {
                             Text(NSLocalizedString("antistress.situation.title", comment: ""))
-                                .font(.custom("Poppins-SemiBold", size: 24))
+                                .font(.faroSemiBold(24))
                                 .foregroundStyle(
                                     LinearGradient(
                                         colors: [.white, Color(hex: "B794F6")],
@@ -50,24 +45,32 @@ struct AntiStressSituationView: View {
                         .padding(.horizontal, 32)
 
                         // Situation Grid (2x3)
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(StressSituation.allCases, id: \.self) { situation in
-                                SituationCard(
-                                    situation: situation,
-                                    isSelected: selectedSituation == situation,
-                                    onTap: {
-                                        HapticManager.light()
-                                        withAnimation(.spring(response: 0.3)) {
-                                            selectedSituation = situation
-                                        }
-
-                                        // Auto-advance after selection
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            viewModel.selectSituation(situation)
-                                            showRecommendations = true
+                        let situations = StressSituation.allCases
+                        VStack(spacing: 16) {
+                            ForEach(0..<(situations.count + 1) / 2, id: \.self) { row in
+                                HStack(spacing: 16) {
+                                    ForEach(0..<2) { col in
+                                        let index = row * 2 + col
+                                        if index < situations.count {
+                                            let situation = situations[index]
+                                            SituationCard(
+                                                situation: situation,
+                                                isSelected: selectedSituation == situation,
+                                                onTap: {
+                                                    HapticManager.light()
+                                                    selectedSituation = situation
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                        viewModel.selectSituation(situation)
+                                                        showRecommendations = true
+                                                    }
+                                                }
+                                            )
+                                        } else {
+                                            Color.clear
+                                                .aspectRatio(1.0, contentMode: .fit)
                                         }
                                     }
-                                )
+                                }
                             }
                         }
                         .padding(.horizontal, 24)
@@ -166,8 +169,6 @@ struct SituationCard: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
-        .scaleEffect(isSelected ? 1.05 : 1.0)
-        .animation(.spring(response: 0.3), value: isSelected)
     }
 }
 

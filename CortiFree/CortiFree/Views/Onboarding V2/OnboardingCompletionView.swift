@@ -3,23 +3,21 @@
 //  CortiFree
 //
 //  Created by Claude on 18/11/2025.
-//  Final onboarding screen with paywall
+//  Final onboarding screen with paywall (Native StoreKit 2)
 //
 
 import SwiftUI
 import FirebaseAuth
-import SuperwallKit
 
 struct OnboardingCompletionView: View {
     let habitsQuizResult: HabitsQuizResult?
+    var selectedSymptoms: Set<String> = []
     let onboardingStartTime: Date?
     let language: String // Language detected during onboarding ("en" or "fr")
     let onViewPlan: () -> Void
 
-    @StateObject private var superwallDelegate = SuperwallDelegateHandler()
     @State private var hasTrackedCompletion = false
-    @State private var isPurchasing = false
-    @State private var purchaseError: String?
+    @State private var hasCompletedOnboarding = false // Prevent double completion
 
     // DEBUG: Set to true to bypass paywall during development
     // Change to false before shipping to App Store!
@@ -29,43 +27,37 @@ struct OnboardingCompletionView: View {
     private let bypassPaywallForTesting = false
     #endif
 
-
     var body: some View {
-        ZStack {
-            // Background gradient
-            LinearGradient(
-                colors: [
-                    Color(hex: "0A0515"),
-                    Color(hex: "1a0a2e")
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-        }
-        .onAppear {
-            if bypassPaywallForTesting {
-                // DEBUG: Skip paywall and go directly to app
+        // PRODUCTION: Show CustomPaywallView BUT bypass actual paywall
+        // When "Start my program" is clicked, go directly to app
+        CustomPaywallView(
+            onComplete: {
+                // Guard against double completion
+                guard !hasCompletedOnboarding else {
+                    print("⚠️ OnboardingCompletionView: Already completed, ignoring duplicate call")
+                    return
+                }
+                hasCompletedOnboarding = true
+
+                // Track completion and go to app
                 trackOnboardingCompletion()
                 onViewPlan()
-            } else {
-                // Track paywall/completion screen viewed
-                MixpanelManager.shared.trackOnboardingCompletionViewed(
-                    quizAnswersCount: habitsQuizResult?.answers.count ?? 0,
-                    hasQuizData: habitsQuizResult != nil
-                )
-                // Track onboarding completion (once)
-                trackOnboardingCompletion()
-
-                // Setup Superwall delegate callback
-                superwallDelegate.onComplete = onViewPlan
-                Superwall.shared.delegate = superwallDelegate
-
-                // Show Superwall paywall with language-specific placement
-                let placement = language == "fr" ? "trigger_fr" : "trigger"
-                print("🌍 Showing Superwall paywall with placement: \(placement) (language: \(language))")
-                Superwall.shared.register(placement: placement)
-            }
+            },
+            onPurchase: { _ in
+                // Not used - no purchase functionality
+            },
+            onRestore: {
+                // Not used - no restore functionality
+            },
+            habitsQuizResult: habitsQuizResult,
+            selectedSymptoms: selectedSymptoms
+        )
+        .onAppear {
+            // Track completion screen viewed
+            MixpanelManager.shared.trackOnboardingCompletionViewed(
+                quizAnswersCount: habitsQuizResult?.answers.count ?? 0,
+                hasQuizData: habitsQuizResult != nil
+            )
         }
     }
 
@@ -139,38 +131,7 @@ struct OnboardingCompletionView: View {
     }
 }
 
-// MARK: - Superwall Delegate Handler
-
-class SuperwallDelegateHandler: SuperwallDelegate, ObservableObject {
-    var onComplete: (() -> Void)?
-
-    func handleSuperwallEvent(withInfo eventInfo: SuperwallEventInfo) {
-        switch eventInfo.event {
-        case .paywallClose:
-            print("⚠️ Superwall paywall closed")
-            DispatchQueue.main.async {
-                self.onComplete?()
-            }
-        case .paywallDecline:
-            print("⚠️ Superwall paywall declined")
-            DispatchQueue.main.async {
-                self.onComplete?()
-            }
-        case .transactionComplete:
-            print("✅ Superwall transaction complete")
-            DispatchQueue.main.async {
-                self.onComplete?()
-            }
-        case .transactionRestore:
-            print("✅ Superwall transaction restored")
-            DispatchQueue.main.async {
-                self.onComplete?()
-            }
-        default:
-            break
-        }
-    }
-}
+// Superwall delegate handler removed - using native StoreKit 2 paywall now
 
 #Preview {
     OnboardingCompletionView(

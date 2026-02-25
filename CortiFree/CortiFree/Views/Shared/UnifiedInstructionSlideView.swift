@@ -228,28 +228,7 @@ struct UnifiedInstructionSlideView: View {
 
                 Spacer()
 
-                // VoiceOver toggle button
-                Button(action: {
-                    HapticManager.light()
-                    voiceOverManager.toggle()
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.2) : Color.white.opacity(0.1))
-                            .frame(width: 44, height: 44)
-                            .blur(radius: 8)
-
-                        Circle()
-                            .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.3) : Color(hex: "1A1B3A").opacity(0.9))
-                            .frame(width: 44, height: 44)
-
-                        Image(systemName: voiceOverManager.isEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(voiceOverManager.isEnabled ? Color(hex: "B388FF") : .white.opacity(0.7))
-                            .scaleEffect(voiceOverManager.isSpeaking ? 1.1 : 1.0)
-                            .animation(.easeInOut(duration: 0.3).repeatForever(autoreverses: true), value: voiceOverManager.isSpeaking)
-                    }
-                }
+                Color.clear.frame(width: 44, height: 44)
             }
             .padding(.horizontal, 24)
             .padding(.top, 20)

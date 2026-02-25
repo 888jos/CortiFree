@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>559047783915-e7oca1vj0ssv0rqlb7m2o3vla5ii8ks8.apps.googleusercontent.com</string>
+	<string>559047783915-cmbhjkc2ceuitt2p1o3pia84d56l2jvb.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.559047783915-e7oca1vj0ssv0rqlb7m2o3vla5ii8ks8</string>
+	<string>com.googleusercontent.apps.559047783915-cmbhjkc2ceuitt2p1o3pia84d56l2jvb</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDUNiZnPmlyqra5S-NE8oyteE0He78DwBA</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>Josbiot.App.CortiFree</string>
+	<string>com.solstys.cortifree</string>
 	<key>PROJECT_ID</key>
 	<string>cortifree-app</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:559047783915:ios:528a29531de5a8219155ae</string>
+	<string>1:559047783915:ios:2516c03d3d8586139155ae</string>
 </dict>
 </plist>

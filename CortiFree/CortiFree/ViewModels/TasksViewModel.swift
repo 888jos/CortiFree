@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import WidgetKit
 
 @MainActor
 class TasksViewModel: ObservableObject {
@@ -123,6 +124,7 @@ class TasksViewModel: ObservableObject {
                 await resetDailyTasksIfNeeded()
             }
 
+            syncWidgetCache()
             isLoading = false
         } catch {
             #if DEBUG
@@ -294,6 +296,8 @@ class TasksViewModel: ObservableObject {
                 }
             }
 
+            syncWidgetCache()
+
             // Update daily progress in stats
             try await firebaseService.updateDailyProgress(completionRate: completionPercentage)
 
@@ -357,6 +361,59 @@ class TasksViewModel: ObservableObject {
                 print("Error adding custom task: \(error.localizedDescription)")
                 #endif
             }
+        }
+    }
+
+    // MARK: - Widget Cache
+
+    /// Mappe les tâches vers le format widget et sauvegarde via AppGroup
+    func syncWidgetCache() {
+        let widgetTasks = tasks.map { task -> WidgetTask in
+            let emoji = emojiForTask(task)
+            let symbol = sfSymbolForTask(task)
+            return WidgetTask(
+                id: task.id ?? UUID().uuidString,
+                title: task.title,
+                emoji: emoji,
+                sfSymbol: symbol,
+                completed: task.completed,
+                cancelled: false,
+                recommendedTime: task.recommendedTime,
+                habitId: task.habitId
+            )
+        }
+        WidgetDataStore.saveTasks(widgetTasks)
+    }
+
+    private func emojiForTask(_ task: TaskItem) -> String {
+        if let icon = task.icon, !icon.isEmpty { return icon }
+        switch task.habitId ?? "" {
+        case "breathing":  return "💨"
+        case "meditation": return "🧘"
+        case "water":      return "💧"
+        case "sport":      return "🏃"
+        case "sleep":      return "🌙"
+        case "nature":     return "🌿"
+        case "journal":    return "📓"
+        case "social":     return "🤝"
+        default:           return "✅"
+        }
+    }
+
+    private func sfSymbolForTask(_ task: TaskItem) -> String {
+        // Utilise le sfSymbol stocké dans la tâche en priorité
+        if let symbol = task.sfSymbol, !symbol.isEmpty { return symbol }
+        // Fallback selon habitId — mêmes icônes que EightHabitsIntroView
+        switch task.habitId ?? "" {
+        case "breathing":  return "wind"
+        case "meditation": return "figure.mind.and.body"
+        case "water":      return "drop.fill"
+        case "sport":      return "figure.run"
+        case "sleep":      return "moon.zzz.fill"
+        case "nature":     return "leaf.fill"
+        case "journal":    return "book.fill"
+        case "social":     return "person.2.fill"
+        default:           return "checkmark.circle.fill"
         }
     }
 

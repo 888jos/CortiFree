@@ -20,6 +20,7 @@ struct OnboardingV2FlowView: View {
     @AppStorage("onboardingLanguage") private var onboardingLanguage: String = "en" // Track language used
     @State private var overallQuizData: OverallQuizData?
     @State private var habitsQuizResult: HabitsQuizResult?
+    @State private var selectedSymptoms: Set<String> = []
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var onboardingStartTime: Date?
@@ -33,6 +34,9 @@ struct OnboardingV2FlowView: View {
         case overall
         case reassurance
         case habitsQuiz
+        case stressPatternValidation
+        case symptomChecker
+        case cortisolScienceHook
         case sixtyDayExplanation
         case scientificPlan
         case authentication
@@ -43,6 +47,7 @@ struct OnboardingV2FlowView: View {
         case eightHabits
         case habitsProgress
         case notificationPermissions
+        case commitmentPledge
         case socialProof
         case complete
 
@@ -52,15 +57,15 @@ struct OnboardingV2FlowView: View {
             switch self {
             case .welcome, .overall:
                 return .welcome
-            case .reassurance, .habitsQuiz:
+            case .reassurance, .habitsQuiz, .stressPatternValidation, .symptomChecker:
                 return .reassurance
-            case .sixtyDayExplanation, .scientificPlan:
+            case .cortisolScienceHook, .sixtyDayExplanation, .scientificPlan:
                 return .sixtyDayExplanation
             case .authentication, .loading:
                 return .authentication
             case .cortiFreeRating, .eightHabitsIntro, .weekProgress:
                 return .cortiFreeRating
-            case .eightHabits, .notificationPermissions, .habitsProgress:
+            case .eightHabits, .notificationPermissions, .habitsProgress, .commitmentPledge:
                 return .eightHabits
             case .socialProof, .complete:
                 return .socialProof
@@ -161,13 +166,41 @@ struct OnboardingV2FlowView: View {
         case .habitsQuiz:
             HabitsQuizView(onComplete: { result in
                 habitsQuizResult = result
-                currentStep = .sixtyDayExplanation
+                currentStep = .stressPatternValidation
 
                 // Save in background without blocking UI
                 OptimizedFirebaseService.shared.saveQuizDataInBackground(
                     result,
                     overallData: overallQuizData
                 )
+            })
+
+        case .stressPatternValidation:
+            if let result = habitsQuizResult {
+                StressPatternValidationView(
+                    habitsQuizResult: result,
+                    onContinue: {
+                        currentStep = .symptomChecker
+                    }
+                )
+            } else {
+                StressPatternValidationView(
+                    habitsQuizResult: HabitsQuizResult(answers: Array(repeating: 0, count: 12)),
+                    onContinue: {
+                        currentStep = .symptomChecker
+                    }
+                )
+            }
+
+        case .symptomChecker:
+            SymptomCheckerView(onContinue: { symptoms in
+                selectedSymptoms = symptoms
+                currentStep = .cortisolScienceHook
+            })
+
+        case .cortisolScienceHook:
+            CortisolScienceHookView(onContinue: {
+                currentStep = .sixtyDayExplanation
             })
 
         case .sixtyDayExplanation:
@@ -230,24 +263,30 @@ struct OnboardingV2FlowView: View {
 
         case .habitsProgress:
             HabitsProgressFlowView(onComplete: {
-                currentStep = .socialProof
-            })
-
-        case .socialProof:
-            SocialProofFlowView(onComplete: {
                 #if DEBUG
-                print("✅ OnboardingV2FlowView: Transition .socialProof → .complete")
+                print("✅ OnboardingV2FlowView: Transition .habitsProgress → .commitmentPledge")
                 #endif
                 // Generate personalized plan based on quiz results
                 if let habitsResult = habitsQuizResult {
                     saveDataAndGeneratePlan(result: habitsResult)
                 }
+                currentStep = .commitmentPledge
+            })
+
+        case .commitmentPledge:
+            CommitmentPledgeView(onContinue: {
+                currentStep = .socialProof
+            })
+
+        case .socialProof:
+            SocialProofFlowView(onComplete: {
                 currentStep = .complete
             })
 
         case .complete:
             OnboardingCompletionView(
                 habitsQuizResult: habitsQuizResult,
+                selectedSymptoms: selectedSymptoms,
                 onboardingStartTime: onboardingStartTime,
                 language: onboardingLanguage, // Pass detected language
                 onViewPlan: {

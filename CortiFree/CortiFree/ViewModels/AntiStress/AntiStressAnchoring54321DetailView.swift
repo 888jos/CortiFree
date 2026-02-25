@@ -141,7 +141,7 @@ struct AntiStressAnchoring54321DetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Title
             Text(NSLocalizedString("antistress.anchoring_54321.title", comment: ""))
-                .font(.custom("Poppins-Bold", size: 28))
+                .font(.faroBold(28))
                 .foregroundColor(.white)
 
             // Description courte

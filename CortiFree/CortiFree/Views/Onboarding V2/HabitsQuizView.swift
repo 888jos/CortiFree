@@ -3,11 +3,11 @@
 //  CortiFree
 //
 //  Created by Claude on 11/11/2025.
-//  Quiz de prise de conscience du stress - 13 questions situationnelles
+//  Quiz de prise de conscience du stress - 12 questions situationnelles
 //  Q1-Q8: Questions pour calculer les scores (stress, sommeil, énergie, focus)
 //  Q9: Question apparence physique (profil uniquement, pas de scoring)
-//  Q10-Q11: Questions marketing (acquisition, expérience apps)
-//  Q12-Q13: Objectif et temps disponible
+//  Q10: Question marketing (expérience apps) - acquisition removed (duplicate with Overall quiz)
+//  Q11-Q12: Objectif et temps disponible
 //
 
 import SwiftUI
@@ -18,12 +18,12 @@ struct HabitsQuizView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentQuestionIndex: Int = 0
     @State private var selectedAnswer: Int? = nil
-    @State private var answers: [Int] = Array(repeating: 0, count: 13)
+    @State private var answers: [Int] = Array(repeating: 0, count: 12)
     @State private var isGoingBack: Bool = false
     @State private var questionStartTime: Date?
     @State private var quizStartTime: Date?
 
-    private let totalQuestions = 13
+    private let totalQuestions = 12
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -49,7 +49,7 @@ struct HabitsQuizView: View {
                     VStack(spacing: 0) {
                     // Fixed Question Number Title
                     Text("Question #\(currentQuestionNumber)")
-                        .font(.custom("Poppins-Bold", size: 24))
+                        .font(.faroBold(24))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 30)
@@ -166,7 +166,7 @@ struct HabitsQuizView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
             Text(question.text)
-                .font(.custom("Poppins-Medium", size: 18))
+                .font(.faroRegular(18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
                 .padding(.horizontal, 32)
@@ -264,7 +264,7 @@ struct HabitsQuizView: View {
 
         // Track additional marketing data
         MixpanelManager.shared.trackOnboardingMarketingData(
-            acquisitionChannel: result.acquisitionChannel,
+            acquisitionChannel: "Unknown", // Acquisition now tracked in Overall quiz
             previousAppExperience: result.previousAppExperience
         )
 
@@ -406,23 +406,10 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
         ),
 
         // ============ PHASE 3: MARKETING (Q10) ============
-        // Questions pour analytics (pas de scoring)
+        // Question pour analytics (pas de scoring)
+        // NOTE: Acquisition question (Q10) removed - already asked in Overall quiz
 
-        // Q10 - ACQUISITION: Découverte de l'app (ex-Q9)
-        HabitsQuestion(
-            text: "onboarding_v2.habits.q10".localized,
-            options: [
-                "onboarding_v2.habits.q10_opt1".localized,
-                "onboarding_v2.habits.q10_opt2".localized,
-                "onboarding_v2.habits.q10_opt3".localized,
-                "onboarding_v2.habits.q10_opt4".localized,
-                "onboarding_v2.habits.q10_opt5".localized,
-                "onboarding_v2.habits.q10_opt6".localized
-            ],
-            scoring: [0, 0, 0, 0, 0, 0] // Pas de scoring, juste tracking
-        ),
-
-        // Q11 - EXPÉRIENCE: Apps similaires (ex-Q10)
+        // Q10 - EXPÉRIENCE: Apps similaires (ex-Q11)
         HabitsQuestion(
             text: "onboarding_v2.habits.q11".localized,
             options: [
@@ -434,9 +421,9 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [0, 0, 0, 0] // Pas de scoring, juste tracking
         ),
 
-        // ============ PHASE 4: ENGAGEMENT (Q12-Q13) ============
+        // ============ PHASE 4: ENGAGEMENT (Q11-Q12) ============
 
-        // Q12 - OBJECTIF: Ce qu'ils veulent améliorer (ex-Q11)
+        // Q11 - OBJECTIF: Ce qu'ils veulent améliorer (ex-Q12)
         HabitsQuestion(
             text: "onboarding_v2.habits.q12".localized,
             options: [
@@ -449,7 +436,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
             scoring: [0, 0, 0, 0, 0] // Utilisé pour primaryGoal
         ),
 
-        // Q13 - TEMPS: Disponibilité quotidienne (ex-Q12)
+        // Q12 - TEMPS: Disponibilité quotidienne (ex-Q13)
         HabitsQuestion(
             text: "onboarding_v2.habits.q13".localized,
             options: [
@@ -569,32 +556,27 @@ struct HabitsQuizResult {
         return concerns[safe: answers[8]] ?? "Bien dans ma peau"
     }
 
-    // MARK: - Marketing Data (Q10-Q11)
+    // MARK: - Marketing Data (Q10)
+    // NOTE: Acquisition channel (old Q10) removed - duplicate with Overall quiz
 
-    /// Canal d'acquisition (Q10)
-    var acquisitionChannel: String {
-        let channels = ["App Store", "Instagram", "TikTok", "Bouche à oreille", "Publicité", "Autre"]
-        return channels[safe: answers[9]] ?? "App Store"
-    }
-
-    /// Expérience avec apps similaires (Q11)
+    /// Expérience avec apps similaires (Q10, ex-Q11)
     var previousAppExperience: String {
         let experiences = ["Première app", "A arrêté", "En utilise une autre", "Plusieurs essayées"]
-        return experiences[safe: answers[10]] ?? "Première app"
+        return experiences[safe: answers[9]] ?? "Première app"
     }
 
-    // MARK: - Objectif et disponibilité (Q12-Q13)
+    // MARK: - Objectif et disponibilité (Q11-Q12)
 
-    /// Objectif principal choisi par l'user (Q12)
+    /// Objectif principal choisi par l'user (Q11, ex-Q12)
     var primaryGoal: String {
         let goals = ["sleep", "stress", "energy", "focus", "balance"]
-        return goals[safe: answers[11]] ?? "balance"
+        return goals[safe: answers[10]] ?? "balance"
     }
 
-    /// Temps disponible par jour en minutes (Q13)
+    /// Temps disponible par jour en minutes (Q12, ex-Q13)
     var availableTime: Int {
         let times = [10, 22, 37, 52, 75]
-        return times[safe: answers[12]] ?? 22
+        return times[safe: answers[11]] ?? 22
     }
 
     // MARK: - Compatibilité baselineData (simplifié)
@@ -662,7 +644,6 @@ extension Array {
         print("- Focus: \(result.focusScore)")
         print("- Global: \(result.globalScore)")
         print("- Apparence: \(result.appearanceConcern)")
-        print("- Acquisition: \(result.acquisitionChannel)")
         print("- Expérience apps: \(result.previousAppExperience)")
         print("- Objectif: \(result.primaryGoal)")
         print("- Temps disponible: \(result.availableTime) min")

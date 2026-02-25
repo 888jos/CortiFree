@@ -140,7 +140,7 @@ struct AntiStressGroundingDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Title
             Text(NSLocalizedString("antistress.grounding_5_senses.title", comment: ""))
-                .font(.custom("Poppins-Bold", size: 28))
+                .font(.faroBold(28))
                 .foregroundColor(.white)
 
             // Description courte

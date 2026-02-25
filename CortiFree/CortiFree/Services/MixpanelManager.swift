@@ -346,6 +346,10 @@ class MixpanelManager {
         track(event: "onboarding_authentication_clicked", properties: [
             "auth_method": authMethod
         ])
+        // TikTok: CompleteRegistration
+        TikTokManager.shared.trackCompleteRegistration(method: authMethod)
+        // PostHog
+        PostHogManager.shared.trackRegistration(method: authMethod)
     }
 
     func trackOnboardingAuthenticationFailed(error: String, authMethod: String) {
@@ -494,6 +498,10 @@ class MixpanelManager {
     // 17. Onboarding Completion (Paywall)
     func trackOnboardingCompletionViewed(quizAnswersCount: Int = 0, hasQuizData: Bool = false) {
         track(event: "onboarding_paywall_viewed")
+        // TikTok: ViewContent (paywall seen)
+        TikTokManager.shared.trackViewContent()
+        // PostHog
+        PostHogManager.shared.trackPaywallViewed(source: "onboarding")
     }
 
     func trackOnboardingViewPlanClicked() {
@@ -926,15 +934,29 @@ class MixpanelManager {
 
     // MARK: - Purchase Tracking
 
-    func trackPurchase(productId: String, price: Decimal, currency: String) {
+    /// isTrial = l'entitlement actif est en période d'essai (RevenueCat: periodType == .trial)
+    func trackPurchase(productId: String, price: Decimal, currency: String, isTrial: Bool = false) {
+        let priceDouble = NSDecimalNumber(decimal: price).doubleValue
+
         let properties: [String: any Any] = [
             "product_id": productId,
-            "price": NSDecimalNumber(decimal: price).doubleValue,
+            "price": priceDouble,
             "currency": currency,
+            "is_trial": isTrial,
             "timestamp": Date().timeIntervalSince1970
         ]
 
         track(event: "subscription_purchased", properties: properties)
+
+        if isTrial {
+            // Trial gratuit commencé → StartTrial (valeur 0, pas de paiement réel)
+            TikTokManager.shared.trackStartTrial(productId: productId)
+            PostHogManager.shared.trackTrialStarted(productId: productId)
+        } else {
+            // Vrai paiement → Subscribe
+            TikTokManager.shared.trackSubscribe(productId: productId, price: priceDouble, currency: currency)
+            PostHogManager.shared.trackPurchase(productId: productId, price: priceDouble, currency: currency)
+        }
     }
 
     func trackRestorePurchases(success: Bool, productIds: [String]?) {

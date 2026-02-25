@@ -2,8 +2,8 @@
 //  FirstLaunchWelcomeView.swift
 //  CortiFree
 //
-//  Created by Claude on 18/11/2025.
-//  First-launch welcome screen shown before onboarding quiz
+//  First-launch welcome screen
+//  Logo centré + 3 questions rhétoriques + hook cortisol + CTA
 //
 
 import SwiftUI
@@ -11,186 +11,214 @@ import SwiftUI
 struct FirstLaunchWelcomeView: View {
     let onContinue: () -> Void
 
-    @ObservedObject var languageManager = LanguageManager.shared
-    @State private var showContent = false
-    @State private var showBenefits = false
-    @State private var showButton = false
     @State private var screenViewTime: Date?
+
+    @State private var showLogo = false
+    @State private var showQ1 = false
+    @State private var showQ2 = false
+    @State private var showQ3 = false
+    @State private var showDivider = false
+    @State private var showStat = false
+    @State private var showSolution = false
+    @State private var showButton = false
 
     var body: some View {
         ZStack {
-            // Animated galaxy background
-            GalaxyBackgroundView()
+            GalaxyBackgroundView(intensity: 1.0)
                 .ignoresSafeArea()
 
-            // Dark overlay for text readability
-            Color.black.opacity(0.4)
+            Color.black.opacity(0.45)
                 .ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Top section: Title + Description + Benefits
-                    VStack(alignment: .leading, spacing: 24) {
-                    // Main title
-                    if showContent {
-                        Text("onboarding_v2.welcome.title".localized)
-                            .font(.custom("Poppins-Bold", size: 36))
-                            .foregroundColor(.white)
-                            .lineSpacing(4)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.7)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .transition(.opacity.combined(with: .move(edge: .top)))
-                    }
+            VStack(spacing: 0) {
 
-                    // Subtitle
-                    if showContent {
-                        Text("onboarding_v2.welcome.subtitle".localized)
-                            .font(.custom("Poppins-Regular", size: 18))
-                            .foregroundColor(.white.opacity(0.85))
-                            .lineSpacing(6)
-                            .padding(.top, 8)
-                            .transition(.opacity.combined(with: .move(edge: .top)))
-                    }
+                // ── Logo centré ──
+                if showLogo {
+                    VStack(spacing: 10) {
+                        Image("AppLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 96, height: 96)
 
-                    // Key benefits
-                    if showBenefits {
-                        VStack(alignment: .leading, spacing: 16) {
-                            BenefitRow(icon: "sparkles", text: "onboarding_v2.welcome.benefit_1".localized)
-                            BenefitRow(icon: "chart.line.uptrend.xyaxis", text: "onboarding_v2.welcome.benefit_2".localized)
-                            BenefitRow(icon: "heart.fill", text: "onboarding_v2.welcome.benefit_3".localized)
-                        }
-                        .padding(.top, 16)
-                        .transition(.opacity.combined(with: .move(edge: .leading)))
+                        Text("CortiFree")
+                            .font(.faroBold(20))
+                            .foregroundColor(.white.opacity(0.9))
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 68)
+                    .transition(.opacity.combined(with: .scale(scale: 0.92)))
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 40)
-                .padding(.top, 100)
 
                 Spacer()
 
-                // Bottom section: CTA Button
-                if showButton {
-                    VStack(spacing: 12) {
-                        Button(action: {
-                            HapticManager.medium()
+                // ── 3 questions rhétoriques ──
+                VStack(alignment: .leading, spacing: 0) {
 
-                            // Track continue button click with time spent
-                            if let startTime = screenViewTime {
-                                let timeSpent = Date().timeIntervalSince(startTime)
-                                MixpanelManager.shared.trackOnboardingWelcomeContinue(timeSpent: timeSpent)
-                            }
+                    if showQ1 {
+                        painLine(text: "first_launch.q1".localized)
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
 
-                            onContinue()
-                        }) {
-                            HStack(spacing: 12) {
-                                Text("onboarding_v2.welcome.start_button".localized)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
-                                    .foregroundColor(Color(hex: "1A1A4E"))
+                    if showQ2 {
+                        painLine(text: "first_launch.q2".localized)
+                        .padding(.top, 20)
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
 
-                                // Dark circle with white arrow
-                                ZStack {
-                                    Circle()
-                                        .fill(Color(hex: "1A1A4E"))
-                                        .frame(width: 32, height: 32)
+                    if showQ3 {
+                        painLine(text: "first_launch.q3".localized)
+                        .padding(.top, 20)
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
+                }
+                .padding(.horizontal, 36)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.white)
-                                }
-                            }
-                            .padding(.vertical, 12)
-                            .padding(.leading, 24)
-                            .padding(.trailing, 12)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 40))
+                // ── Séparateur ──
+                if showDivider {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(height: 1)
+                        .padding(.horizontal, 36)
+                        .padding(.top, 30)
+                        .transition(.opacity)
+                }
+
+                // ── Explication cortisol ──
+                if showStat {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("first_launch.cortisol_intro".localized)
+                            .font(.custom("Poppins-SemiBold", size: 16))
+                            .foregroundColor(.white.opacity(0.55))
+
+                        HStack(alignment: .firstTextBaseline, spacing: 0) {
+                            Text("first_launch.cortisol_prefix".localized)
+                                .font(.custom("Poppins-Regular", size: 22))
+                                .foregroundColor(.white)
+
+                            Text("first_launch.cortisol_word".localized)
+                                .font(.faroBold(24))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color(hex: "B794F6"), Color(hex: "E0C4FF")],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
                         }
 
-                        // Time estimate
-                        Text("onboarding_v2.welcome.time_estimate".localized)
+                        Text("first_launch.cortisol_desc".localized)
                             .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(.white.opacity(0.5))
+                            .lineSpacing(5)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.horizontal, 40)
-                    .padding(.bottom, 50)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .padding(.horizontal, 36)
+                    .padding(.top, 26)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
+
+                // ── Pill solution ──
+                if showSolution {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Color(hex: "4FC3A1"))
+
+                        Text("first_launch.solution_pill".localized)
+                            .font(.custom("Poppins-SemiBold", size: 13))
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 9)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(Color(hex: "4FC3A1").opacity(0.1))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .stroke(Color(hex: "4FC3A1").opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                    .padding(.horizontal, 36)
+                    .padding(.top, 18)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                }
+
+                Spacer()
+
+                // ── CTA ──
+                if showButton {
+                    VStack(spacing: 10) {
+                        Button(action: {
+                            HapticManager.medium()
+                            if let startTime = screenViewTime {
+                                MixpanelManager.shared.trackOnboardingWelcomeContinue(
+                                    timeSpent: Date().timeIntervalSince(startTime)
+                                )
+                            }
+                            onContinue()
+                        }) {
+                            Text("first_launch.cta_button".localized)
+                                .font(.custom("Poppins-SemiBold", size: 16))
+                                .foregroundColor(Color(hex: "1A1A4E"))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 40))
+                        }
+                        .padding(.horizontal, 34)
+
+                        Text("first_launch.cta_sub".localized)
+                            .font(.custom("Poppins-Regular", size: 12))
+                            .foregroundColor(.white.opacity(0.35))
+                    }
+                    .padding(.bottom, 52)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
         }
         .onAppear {
-            // Track screen view
             screenViewTime = Date()
             MixpanelManager.shared.trackOnboardingWelcomeViewed()
-
             startAnimations()
         }
     }
 
-    // MARK: - Animation sequence
+    // MARK: - Pain line
 
-    private func startAnimations() {
-        // Show title and subtitle
-        withAnimation(.easeOut(duration: 0.8)) {
-            showContent = true
-        }
-
-        // Show benefits after a delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            withAnimation(.easeOut(duration: 0.6)) {
-                showBenefits = true
-            }
-        }
-
-        // Show button after benefits
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            withAnimation(.easeOut(duration: 0.6)) {
-                showButton = true
-            }
-        }
-    }
-}
-
-// MARK: - Benefit Row Component
-
-private struct BenefitRow: View {
-    let icon: String
-    let text: String
-
-    var body: some View {
+    private func painLine(text: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            // Icon with purple gradient background
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(hex: "B794F6").opacity(0.3), Color(hex: "B794F6").opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 40, height: 40)
-
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Color(hex: "B794F6"))
-            }
+            RoundedRectangle(cornerRadius: 2)
+                .fill(Color(hex: "B794F6").opacity(0.7))
+                .frame(width: 3, height: 40)
+                .padding(.top, 3)
 
             Text(text)
-                .font(.custom("Poppins-Regular", size: 16))
-                .foregroundColor(.white)
-                .lineSpacing(4)
+                .font(.faroRegular(20))
+                .foregroundColor(.white.opacity(0.88))
+                .lineSpacing(5)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
+
+    // MARK: - Animations
+
+    private func startAnimations() {
+        withAnimation(.easeOut(duration: 0.5).delay(0.2)) { showLogo = true }
+        withAnimation(.easeOut(duration: 0.5).delay(0.7)) { showQ1 = true }
+        withAnimation(.easeOut(duration: 0.5).delay(1.4)) { showQ2 = true }
+        withAnimation(.easeOut(duration: 0.5).delay(2.1)) { showQ3 = true }
+        withAnimation(.easeOut(duration: 0.4).delay(2.8)) { showDivider = true }
+        withAnimation(.easeOut(duration: 0.6).delay(3.1)) { showStat = true }
+        withAnimation(.easeOut(duration: 0.5).delay(3.9)) {
+            showSolution = true
+            HapticManager.light()
+        }
+        withAnimation(.easeOut(duration: 0.5).delay(4.5)) { showButton = true }
+    }
 }
 
-// MARK: - Preview
-
 #Preview {
-    FirstLaunchWelcomeView(onContinue: {
-        print("Welcome screen completed")
-    })
+    FirstLaunchWelcomeView(onContinue: {})
 }

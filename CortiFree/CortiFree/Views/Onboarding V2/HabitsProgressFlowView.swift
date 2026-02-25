@@ -208,7 +208,7 @@ struct HabitsProgressFlowView: View {
                 VStack(spacing: 16) {
                     // Title with gradient
                     Text(currentHabitProgress.title)
-                        .font(Font.Poppins.custom(.bold, size: 20))
+                        .font(.faroBold(20))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [.white, Color(hex: "B794F6")],

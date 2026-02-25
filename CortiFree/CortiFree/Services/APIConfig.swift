@@ -32,6 +32,7 @@ final class APIConfig {
         case superwallAPIKey = "SUPERWALL_API_KEY"
         case mixpanelToken = "MIXPANEL_TOKEN"
         case googleClientID = "GIDClientID" // Standard Google Sign-In key
+        case tiktokAccessToken = "TIKTOK_ACCESS_TOKEN"
     }
 
     // MARK: - Private Methods
@@ -47,13 +48,9 @@ final class APIConfig {
         if let key = value(for: .revenueCatAPIKey), !key.isEmpty, !key.hasPrefix("$(") {
             return key
         }
-        // Fallback for development - REMOVE IN PRODUCTION
-        #if DEBUG
+        // Fallback to avoid crash - uses test key
         Logger.warning("RevenueCat API key not found in Info.plist, using fallback", category: .subscription)
-        return "test_VJPakDolvKFgQacRtOHITvapOtT"
-        #else
-        fatalError("RevenueCat API key must be set in Info.plist for production builds")
-        #endif
+        return "test_lHXDZOSssHKRdtZSSgpdZyhvGwY"
     }
 
     /// Superwall API Key
@@ -62,13 +59,9 @@ final class APIConfig {
         if let key = value(for: .superwallAPIKey), !key.isEmpty, !key.hasPrefix("$(") {
             return key
         }
-        // Fallback for development - REMOVE IN PRODUCTION
-        #if DEBUG
+        // Fallback to avoid crash
         Logger.warning("Superwall API key not found in Info.plist, using fallback", category: .subscription)
         return "pk_JPmmC0H5be4yqTnw24VTm"
-        #else
-        fatalError("Superwall API key must be set in Info.plist for production builds")
-        #endif
     }
 
     /// Mixpanel Token
@@ -89,6 +82,22 @@ final class APIConfig {
         value(for: .googleClientID)
     }
 
+    /// TikTok App ID (from TikTok Ads Manager - the numeric app ID)
+    let tiktokEventAppId: String = "6758314805"
+
+    /// TikTok App ID (the longer TikTok-specific ID)
+    let tiktokAppId: String = "7606716625122770951"
+
+    /// TikTok Access Token
+    /// Add TIKTOK_ACCESS_TOKEN to Info.plist
+    var tiktokAccessToken: String {
+        if let token = value(for: .tiktokAccessToken), !token.isEmpty, !token.hasPrefix("$(") {
+            return token
+        }
+        Logger.warning("TikTok access token not found in Info.plist", category: .analytics)
+        return ""
+    }
+
     // MARK: - Validation
 
     /// Check if all required API keys are configured
@@ -105,5 +114,6 @@ final class APIConfig {
         Logger.info("  - Superwall: \(value(for: .superwallAPIKey) != nil ? "✅" : "⚠️ Using fallback")", category: .subscription)
         Logger.info("  - Mixpanel: \(value(for: .mixpanelToken) != nil ? "✅" : "❌ Not configured")", category: .analytics)
         Logger.info("  - Google: \(value(for: .googleClientID) != nil ? "✅" : "❌ Not configured")", category: .auth)
+        Logger.info("  - TikTok: \(value(for: .tiktokAccessToken) != nil ? "✅" : "⚠️ Not configured")", category: .analytics)
     }
 }

@@ -285,7 +285,7 @@ struct ProfileView: View {
                         .frame(width: 80, height: 80)
 
                     Text(String((firstName.isEmpty ? getUserFirstName() : firstName).prefix(1)).uppercased())
-                        .font(Font.Poppins.custom(.bold, size: 32))
+                        .font(.faroBold(32))
                         .foregroundColor(.white)
                 }
                 .overlay(
@@ -319,7 +319,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 6) {
                 // Name
                 Text(firstName.isEmpty ? getUserFirstName() : firstName)
-                    .font(Font.Poppins.custom(.bold, size: 20))
+                    .font(.faroBold(20))
                     .foregroundColor(.white)
 
                 // Removed level display - no longer using XP/Levels system
@@ -414,7 +414,7 @@ struct ProfileView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) { // Reduced from 4 to 2
                     Text(NSLocalizedString("profile.score.title", comment: ""))
-                        .font(Font.Poppins.custom(.bold, size: 18)) // Reduced from 20 to 18
+                        .font(.faroBold(18))
                         .foregroundColor(.white)
 
                     Text(showPotentialScores ? NSLocalizedString("profile.score.potential", comment: "") : NSLocalizedString("profile.score.current", comment: ""))
@@ -587,7 +587,7 @@ struct ProfileView: View {
                     // Section header
                     HStack(spacing: 12) {
                         Text(NSLocalizedString("profile.achievements.streaks", comment: ""))
-                            .font(.custom("Poppins-Bold", size: 16))
+                            .font(.faroSemiBold(16))
                             .foregroundColor(.white)
 
                         Spacer()
@@ -626,7 +626,7 @@ struct ProfileView: View {
                     // Section header
                     HStack(spacing: 12) {
                         Text(NSLocalizedString("profile.achievements.habits", comment: ""))
-                            .font(.custom("Poppins-Bold", size: 16))
+                            .font(.faroSemiBold(16))
                             .foregroundColor(.white)
 
                         Spacer()
@@ -680,7 +680,7 @@ struct ProfileView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(NSLocalizedString("profile.achievements.badges_title", comment: ""))
-                        .font(Font.Poppins.custom(.bold, size: 24))
+                        .font(.faroBold(24))
                         .foregroundColor(.white)
 
                     Text("\(totalUnlockedBadges)/\(totalBadges) \(NSLocalizedString("profile.achievements.unlocked", comment: ""))")

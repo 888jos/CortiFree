@@ -30,8 +30,9 @@ private func randomNonceString(length: Int = 32) -> String {
         let randoms: [UInt8] = (0 ..< 16).map { _ in
             var random: UInt8 = 0
             let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-            if errorCode != errSecSuccess {
-                fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+            guard errorCode == errSecSuccess else {
+                // SecRandomCopyBytes ne peut pas échouer sur un device Apple — erreur OS fatale non récupérable
+                return 0
             }
             return random
         }
@@ -126,9 +127,10 @@ struct AuthenticationView: View {
             VStack(spacing: 0) {
                 // Message at top
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("onboarding_v2.auth.create_account_message".localized.prefix(1).uppercased() + "onboarding_v2.auth.create_account_message".localized.dropFirst())
-                        .font(.custom("Poppins-Regular", size: 18))
+                    Text("onboarding_v2.auth.create_account_message".localized)
+                        .font(.faroBold(32))
                         .foregroundColor(.white)
+                        .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -425,7 +427,7 @@ struct EmailAuthView: View {
                         // Title
                         VStack(alignment: .leading, spacing: 8) {
                             Text(isSignUp ? "onboarding_v2.auth.create_account".localized : "onboarding_v2.auth.login".localized)
-                                .font(.custom("Poppins-Bold", size: 28))
+                                .font(.faroBold(28))
                                 .foregroundColor(.white)
 
                             Text(isSignUp ? "onboarding_v2.auth.enter_info".localized : "onboarding_v2.auth.enter_credentials".localized)
@@ -723,9 +725,12 @@ struct EmailAuthView: View {
         Task {
             do {
                 if isSignUp {
-                    _ = try await UnifiedFirebaseService.shared.auth.signUp(email: email, password: password, displayName: username)
+                    let user = try await UnifiedFirebaseService.shared.auth.signUp(email: email, password: password, displayName: username)
+                    // Identify user with RevenueCat so purchases are tied to this account
+                    await RevenueCatManager.shared.identifyUser(userId: user.uid)
                 } else {
-                    _ = try await UnifiedFirebaseService.shared.auth.signIn(email: email, password: password)
+                    let user = try await UnifiedFirebaseService.shared.auth.signIn(email: email, password: password)
+                    await RevenueCatManager.shared.identifyUser(userId: user.uid)
                 }
 
                 await MainActor.run {
@@ -814,7 +819,7 @@ struct GoogleAuthView: View {
                         .frame(width: 80, height: 80)
 
                     Text("onboarding_v2.auth.google_title".localized)
-                        .font(.custom("Poppins-Bold", size: 28))
+                        .font(.faroBold(28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
@@ -1014,7 +1019,7 @@ struct GoogleAuthView: View {
                     // Save firstName to UserDefaults for offline access
                     UserDefaults.standard.set(user.profile?.givenName ?? "Utilisateur", forKey: "userFirstName")
 
-                    // Identify user with RevenueCat
+                    // Identify user with RevenueCat so purchases are tied to this account
                     await RevenueCatManager.shared.identifyUser(userId: authResult.user.uid)
 
                     await MainActor.run {
@@ -1106,7 +1111,7 @@ struct AppleAuthView: View {
                         .foregroundColor(.white)
 
                     Text("onboarding_v2.auth.apple_title".localized)
-                        .font(.custom("Poppins-Bold", size: 28))
+                        .font(.faroBold(28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
@@ -1310,7 +1315,7 @@ struct AppleAuthView: View {
                         .document(userId)
                         .setData(userData, merge: true)
 
-                    // Identify user with RevenueCat
+                    // Identify user with RevenueCat so purchases are tied to this account
                     await RevenueCatManager.shared.identifyUser(userId: userId)
 
                     await MainActor.run {

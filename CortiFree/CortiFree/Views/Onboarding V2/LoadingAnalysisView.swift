@@ -62,7 +62,7 @@ struct LoadingAnalysisView: View {
 
                     // Percentage text
                     Text("\(displayedProgress)%")
-                        .font(.custom("Poppins-Bold", size: 48))
+                        .font(.faroBold(48))
                         .foregroundColor(.white)
                 }
 
@@ -70,7 +70,7 @@ struct LoadingAnalysisView: View {
                 VStack(spacing: 12) {
                     // Title
                     Text("onboarding_v2.loading.calculating".localized)
-                        .font(.custom("Poppins-Bold", size: 32))
+                        .font(.faroBold(32))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 

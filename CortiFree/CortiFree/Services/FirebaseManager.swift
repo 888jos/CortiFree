@@ -501,25 +501,29 @@ class FirebaseManager: ObservableObject {
     func fetchHabitCompletionHistory(uid: String, habitId: String, days: Int = 7) async throws -> [Bool] {
         let calendar = Calendar.current
         let today = Date()
-        var completionHistory: [Bool] = []
 
+        // Build date strings for the period
+        var dateStrings: [String] = []
         for dayOffset in (0..<days).reversed() {
-            guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) else {
-                completionHistory.append(false)
-                continue
+            if let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) {
+                dateStrings.append(getCurrentDateString(from: date))
             }
-
-            let dateString = getCurrentDateString(from: date)
-            let document = try await db.collection("users").document(uid)
-                .collection("habit_tracking").document(habitId)
-                .collection("daily_completion").document(dateString)
-                .getDocument()
-
-            let isCompleted = document.data()?["completed"] as? Bool ?? false
-            completionHistory.append(isCompleted)
         }
 
-        return completionHistory
+        // Single query: fetch all daily_completion docs at once (1 read instead of 7)
+        let snapshot = try await db.collection("users").document(uid)
+            .collection("habit_tracking").document(habitId)
+            .collection("daily_completion")
+            .getDocuments()
+
+        // Build a lookup map from the fetched docs
+        var completionMap: [String: Bool] = [:]
+        for doc in snapshot.documents {
+            completionMap[doc.documentID] = doc.data()["completed"] as? Bool ?? false
+        }
+
+        // Map date strings to completion status
+        return dateStrings.map { completionMap[$0] ?? false }
     }
 
     func saveOnboardingScore(uid: String, score: Int) async throws {

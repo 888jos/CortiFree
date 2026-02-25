@@ -110,7 +110,7 @@ struct LibraryView: View {
     private var headerNavigation: some View {
         HStack {
             Text(NSLocalizedString("library.title", comment: ""))
-                .font(.custom("Poppins-Bold", size: 24))
+                .font(.faroBold(24))
                 .foregroundColor(.white)
 
             Spacer()
@@ -223,7 +223,7 @@ struct LibraryView: View {
             // Section Header
             VStack(alignment: .leading, spacing: 8) {
                 Text(NSLocalizedString("library.sounds.title", comment: ""))
-                    .font(.custom("Poppins-SemiBold", size: 18))
+                    .font(.faroSemiBold(18))
                     .foregroundColor(.white)
 
                 Text(NSLocalizedString("library.sounds.subtitle", comment: ""))
@@ -318,7 +318,7 @@ struct LibraryView: View {
                 }) {
                     HStack(spacing: 6) {
                         Text(showAllSounds ? NSLocalizedString("library.sounds.see_less", comment: "") : NSLocalizedString("library.sounds.see_more", comment: ""))
-                            .font(.custom("Poppins-Medium", size: 13))
+                            .font(.faroSemiBold(13))
                             .foregroundColor(Color.appTheme)
 
                         Image(systemName: showAllSounds ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
@@ -344,7 +344,7 @@ struct LibraryView: View {
             // Section Header
             VStack(alignment: .leading, spacing: 8) {
                 Text(NSLocalizedString("library.breathing.title", comment: ""))
-                    .font(.custom("Poppins-SemiBold", size: 18))
+                    .font(.faroSemiBold(18))
                     .foregroundColor(.white)
 
                 Text(NSLocalizedString("library.breathing.subtitle", comment: ""))
@@ -439,7 +439,7 @@ struct LibraryView: View {
                 }) {
                     HStack(spacing: 6) {
                         Text(showAllBreathing ? NSLocalizedString("library.sounds.see_less", comment: "") : NSLocalizedString("library.sounds.see_more", comment: ""))
-                            .font(.custom("Poppins-Medium", size: 13))
+                            .font(.faroSemiBold(13))
                             .foregroundColor(Color.appTheme)
 
                         Image(systemName: showAllBreathing ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
@@ -465,7 +465,7 @@ struct LibraryView: View {
             // Section Header
             VStack(alignment: .leading, spacing: 8) {
                 Text(NSLocalizedString("library.meditation.title", comment: ""))
-                    .font(.custom("Poppins-SemiBold", size: 18))
+                    .font(.faroSemiBold(18))
                     .foregroundColor(.white)
 
                 Text(NSLocalizedString("library.meditation.subtitle", comment: ""))
@@ -560,7 +560,7 @@ struct LibraryView: View {
                 }) {
                     HStack(spacing: 6) {
                         Text(showAllMeditation ? NSLocalizedString("library.sounds.see_less", comment: "") : NSLocalizedString("library.sounds.see_more", comment: ""))
-                            .font(.custom("Poppins-Medium", size: 13))
+                            .font(.faroSemiBold(13))
                             .foregroundColor(Color.appTheme)
 
                         Image(systemName: showAllMeditation ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
@@ -658,7 +658,7 @@ struct QuickNavIcon: View {
                     .foregroundColor(color)
 
                 Text(title)
-                    .font(.custom("Poppins-Regular", size: 12))
+                    .font(.faroRegular(12))
                     .foregroundColor(Color(hex: "E1AFF8"))
             }
             .frame(maxWidth: .infinity)
@@ -693,7 +693,7 @@ struct CategoryButton: View {
 
                 // Title
                 Text(title)
-                    .font(.custom("Poppins-Medium", size: 16))
+                    .font(.faroSemiBold(16))
                     .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
@@ -734,7 +734,7 @@ struct SoundItem: View {
 
                 // Title (right)
                 Text(title)
-                    .font(.custom("Poppins-Medium", size: 14))
+                    .font(.faroSemiBold(14))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -793,7 +793,7 @@ struct BreathingExerciseItem: View {
                 }
 
                 Text(title)
-                    .font(.custom("Poppins-Medium", size: 13))
+                    .font(.faroSemiBold(13))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
             }

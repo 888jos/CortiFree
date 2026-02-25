@@ -54,7 +54,7 @@ struct TaskDetailView: View {
                     VStack(spacing: 24) {
                         // Title
                         Text(task.title)
-                            .font(.custom("Poppins-SemiBold", size: 26))
+                            .font(.faroSemiBold(26))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 24)

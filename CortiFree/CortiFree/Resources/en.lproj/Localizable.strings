@@ -8,6 +8,9 @@
 "onboarding.welcome.subtitle" = "Your 66-day journey to mental wellness";
 "onboarding.continue" = "Continue";
 "onboarding.next" = "Next";
+"onboarding.completion.title" = "You're all set!";
+"onboarding.completion.subtitle" = "Let's start your transformation journey";
+"onboarding.completion.continue" = "Start my program";
 "onboarding.8habits.title" = "The 8 Key Habits";
 "onboarding.8habits.description1" = "Studies show that to reset your";
 "onboarding.8habits.description2" = "life, you need the";
@@ -82,6 +85,36 @@
 "quiz.15_30_then_lose" = "15-30 min then I lose focus";
 "quiz.30_60_before_dropping" = "30-60 min before dropping off";
 "quiz.more_hour_no_problem" = "Over an hour without issue";
+
+// MARK: - Paywall
+"paywall.title" = "Take Back Control of Your Stress";
+"paywall.subtitle" = "Science-backed tools to reduce cortisol and feel calm again";
+"paywall.review_1" = "I finally sleep well. My stress levels dropped after just 2 weeks.";
+"paywall.review_1_name" = "Sarah M.";
+"paywall.review_2" = "This app changed my life. I feel so much calmer and more focused every day.";
+"paywall.review_2_name" = "Thomas L.";
+"paywall.review_3" = "Better than therapy for daily stress management. I use it every morning.";
+"paywall.review_3_name" = "Emma R.";
+"paywall.review_4" = "My anxiety has dropped significantly. The breathing exercises are amazing.";
+"paywall.review_4_name" = "Lucas D.";
+"paywall.monthly" = "Monthly";
+"paywall.yearly" = "Yearly";
+"paywall.per_month" = "per month";
+"paywall.per_year" = "per year";
+"paywall.per_month_equivalent" = "%@ / month";
+"paywall.save_70" = "Save 70%";
+"paywall.3_day_trial" = "3-day free trial";
+"paywall.trial_notifications" = "Remind me before trial ends";
+"paywall.start_trial" = "Start 3-Day Free Trial";
+"paywall.subscribe_for" = "Subscribe for %@";
+"paywall.continue" = "Continue";
+"paywall.restore_purchases" = "Restore Purchases";
+"paywall.privacy_policy" = "Privacy Policy";
+"paywall.terms_of_use" = "Terms of Use";
+"paywall.error_title" = "Purchase Error";
+"paywall.no_purchases_found" = "No previous purchases found";
+"paywall.products_unavailable" = "Subscriptions are temporarily unavailable. Please try again later.";
+"paywall.purchase_pending" = "Your purchase is being processed. Your subscription will activate shortly.";
 
 // MARK: - Habit Frequency Questions
 "quiz.breathing_frequency" = "How often do you practice conscious breathing per week?";
@@ -282,7 +315,7 @@
 
 // Single variants
 "habit.breathing_title" = "Breathing exercise";
-"habit.meditation_title" = "Meditate 10 minutes";
+"habit.meditation_title" = "Meditate";
 "habit.journal_title" = "Write in your journal";
 "habit.water_title" = "Drink at least %@ of water";
 "habit.water_title_legacy" = "Drink at least 2.5L of water";
@@ -774,6 +807,47 @@
 "sounds.forest" = "Forest";
 "sounds.stream" = "Stream";
 "sounds.night" = "Summer Night";
+"sounds.rain.description" = "Soothing rain sound";
+"sounds.ocean.description" = "Relaxing waves";
+"sounds.fire.description" = "Crackling fire";
+"sounds.whitenoise.description" = "Soothing white noise";
+"sounds.morning.description" = "Peaceful morning ambiance";
+"sounds.forest.description" = "Relaxing forest ambiance";
+"sounds.stream.description" = "Gentle flowing water";
+"sounds.night.description" = "Peaceful summer night ambiance";
+
+// MARK: - Exercise Types
+"exercise_type.breathing" = "Breathing";
+"exercise_type.meditation" = "Meditation";
+"exercise_type.sound" = "Relaxing Sounds";
+
+// MARK: - Breathing Exercise Titles & Descriptions
+"breathing.deep_abdominal.title" = "Abdominal Breathing";
+"breathing.deep_abdominal.description" = "Beginner - Foundation for all exercises";
+"breathing.478.title" = "4-7-8";
+"breathing.478.description" = "Beginner - Anxiety, sleep";
+"breathing.coherence.title" = "Cardiac Coherence";
+"breathing.coherence.description" = "Beginner - Daily stress";
+"breathing.slow.title" = "Slow Breathing";
+"breathing.slow.description" = "Beginner - Deep sleep";
+"breathing.triangle.title" = "Triangle Breathing 4-4-4";
+"breathing.triangle.description" = "Beginner - Relaxation";
+"breathing.box.title" = "Box Breathing 4-4-4-4";
+"breathing.box.description" = "Intermediate - Acute stress";
+"breathing.kapalabhati.title" = "Kapalabhati";
+"breathing.kapalabhati.description" = "Advanced - Explosive energy";
+"breathing.bhastrika.title" = "Bhastrika";
+"breathing.bhastrika.description" = "Advanced - Intense energy";
+
+// MARK: - Meditation Exercise Titles & Descriptions
+"meditation.conscious_breathing.short_description" = "Beginner - First step";
+"meditation.body_scan.short_description" = "Beginner - Quick tension release";
+"meditation.mindfulness.short_description" = "Beginner - Observe thoughts";
+"meditation.grounding.short_description" = "Beginner - Anxiety, crises";
+"meditation.visualization.short_description" = "Intermediate - Mental calm";
+"meditation.compassion.short_description" = "Intermediate - Self-kindness";
+"meditation.focus_clarity.short_description" = "Intermediate - Concentration";
+"meditation.yoga_nidra.short_description" = "Advanced - Deep sleep";
 
 // MARK: - Duration Selector
 "duration.infinite" = "Infinite";
@@ -2983,20 +3057,20 @@
 
 // MARK: - Onboarding V2 - Welcome Screen
 "onboarding_v2.welcome.title" = "Welcome to\nCortiFree";
-"onboarding_v2.welcome.subtitle" = "Your personal companion for a stress-free life";
-"onboarding_v2.welcome.benefit_1" = "Personalized plan for your stress";
-"onboarding_v2.welcome.benefit_2" = "Daily progress tracking";
-"onboarding_v2.welcome.benefit_3" = "Scientifically proven techniques";
+"onboarding_v2.welcome.subtitle" = "Feel calm again. Sleep deeper. Think clearer.";
+"onboarding_v2.welcome.benefit_1" = "Your personalized cortisol reset plan";
+"onboarding_v2.welcome.benefit_2" = "Based on behavioral science research";
+"onboarding_v2.welcome.benefit_3" = "Nervous system regulation in 66 days";
 "onboarding_v2.welcome.start_button" = "Get Started";
-"onboarding_v2.welcome.time_estimate" = "Takes 15 minutes";
+"onboarding_v2.welcome.time_estimate" = "Takes 5 minutes";
 
 // MARK: - Onboarding V2 - Overall Quiz
 "onboarding_v2.overall.name_question" = "What can I call you?";
 "onboarding_v2.overall.name_placeholder" = "Your first name";
-"onboarding_v2.overall.gender_question" = "You are...";
+"onboarding_v2.overall.gender_question" = "What is your gender?";
 "onboarding_v2.overall.gender_male" = "Male";
 "onboarding_v2.overall.gender_female" = "Female";
-"onboarding_v2.overall.gender_other" = "Prefer not to say";
+"onboarding_v2.overall.gender_other" = "Other / Prefer not to say";
 "onboarding_v2.overall.age_question" = "How old are you?";
 "onboarding_v2.overall.age_under_18" = "Under 18";
 "onboarding_v2.overall.age_18_24" = "18-24 years";
@@ -3022,8 +3096,9 @@
 // MARK: - Onboarding V2 - Reassurance View
 "onboarding_v2.reassurance.greeting" = "Thank you";
 "onboarding_v2.reassurance.message_part1" = "You're not alone in this situation.";
-"onboarding_v2.reassurance.message_part2" = "Thousands of people like you have already found their serenity with CortiFree.";
+"onboarding_v2.reassurance.message_part2" = "CortiFree is built on behavioral psychology and nervous system regulation science.";
 "onboarding_v2.reassurance.message_part3" = "Now, we'll do a quick quiz to better understand your situation and personalize your journey.";
+"onboarding_v2.reassurance.message_part4" = "Your responses are completely confidential. No one has access to them and they will never be sold or shared.";
 "onboarding_v2.reassurance.start_quiz" = "Start the quiz";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
@@ -3122,8 +3197,8 @@
 "onboarding_v2.scientific.point_3" = "Personalized progress tracking";
 
 // MARK: - Onboarding V2 - Authentication
-"onboarding_v2.auth.title" = "Create your account";
-"onboarding_v2.auth.subtitle" = "to access your diagnosis and personalized plan";
+"onboarding_v2.auth.title" = "You're 66 days away from calm";
+"onboarding_v2.auth.subtitle" = "Create your account to start your nervous system reset";
 "onboarding_v2.auth.email_placeholder" = "Email";
 "onboarding_v2.auth.password_placeholder" = "Password";
 "onboarding_v2.auth.signup_button" = "Sign up";
@@ -3135,7 +3210,7 @@
 "onboarding_v2.auth.no_account" = "Don't have an account yet?";
 "onboarding_v2.auth.forgot_password" = "Forgot password?";
 "onboarding_v2.auth.privacy_notice" = "By continuing, you agree to our Terms of Service and Privacy Policy";
-"onboarding_v2.auth.create_account_message" = "create your account to access your personalized diagnosis";
+"onboarding_v2.auth.create_account_message" = "Your cortisol reset plan\nis waiting.";
 "onboarding_v2.auth.email_button" = "Continue with Email";
 "onboarding_v2.auth.apple_coming_soon" = "Apple Sign In coming soon";
 "onboarding_v2.auth.create_account" = "Create account";
@@ -3391,12 +3466,12 @@
 "onboarding_v2.notifications.enable" = "Enable notifications";
 "onboarding_v2.notifications.later" = "Later";
 "onboarding_v2.notifications.activate_subtitle" = "Enable notifications to never lose your routine and track your progress";
-"onboarding_v2.notifications.daily_routine" = "Daily routine reminder";
-"onboarding_v2.notifications.daily_routine_desc" = "Customizable reminder for your daily sessions to maintain consistency";
-"onboarding_v2.notifications.streak_danger" = "Streak at risk";
-"onboarding_v2.notifications.streak_danger_desc" = "Preserve your motivation: we'll remind you if you're at risk of losing your daily streak";
-"onboarding_v2.notifications.reflection_moment" = "Moment of reflection";
-"onboarding_v2.notifications.reflection_moment_desc" = "Evening reminder to take a few minutes and note your thoughts of the day";
+"onboarding_v2.notifications.daily_routine" = "Morning reminder (9am)";
+"onboarding_v2.notifications.daily_routine_desc" = "Start your day with a meditation session to reduce your stress";
+"onboarding_v2.notifications.streak_danger" = "Streak at risk (8pm)";
+"onboarding_v2.notifications.streak_danger_desc" = "We'll remind you if you haven't completed anything today to keep your streak alive";
+"onboarding_v2.notifications.reflection_moment" = "Evening journal (7pm)";
+"onboarding_v2.notifications.reflection_moment_desc" = "Reminder to write in your journal and reflect on your day";
 "onboarding_v2.notifications.next" = "Next";
 
 // MARK: - Common Onboarding
@@ -3645,3 +3720,237 @@
 "onboarding_v2.paywall.best_value" = "Best value";
 "onboarding_v2.paywall.most_popular" = "Most popular";
 "onboarding_v2.paywall.legal" = "Subscription auto-renews unless canceled 24 hours before the end of the current period.";
+
+// MARK: - Stress Pattern Validation Screen
+"onboarding_v2.pattern.title" = "Based on your answers,\nyour stress pattern shows:";
+"onboarding_v2.pattern.mental_load" = "Elevated mental load";
+"onboarding_v2.pattern.sleep_dysregulation" = "Sleep dysregulation";
+"onboarding_v2.pattern.energy_fluctuations" = "Energy fluctuations";
+"onboarding_v2.pattern.focus_difficulty" = "Difficulty maintaining focus";
+"onboarding_v2.pattern.stress_accumulation" = "Chronic stress accumulation";
+"onboarding_v2.pattern.good_news" = "The good news?\nThis is reversible.";
+"onboarding_v2.pattern.continue" = "See how";
+
+// MARK: - Cortisol Science Hook Screen
+"onboarding_v2.science_hook.line1" = "Chronic stress keeps cortisol elevated.";
+"onboarding_v2.science_hook.line2" = "When cortisol stays high,\nsleep and focus drop.";
+"onboarding_v2.science_hook.line3" = "We'll help you reset it.";
+"onboarding_v2.science_hook.continue" = "Continue";
+
+// MARK: - Paywall Quiz-Based Insight
+"onboarding_v2.paywall.based_on_answers" = "Based on your answers:";
+"onboarding_v2.paywall.deserve_calm" = "You deserve to feel calm, rested, and focused again.";
+
+// MARK: - Commitment Pledge Screen
+"onboarding_v2.commitment.title" = "How long are you ready\nto commit to yourself?";
+"onboarding_v2.commitment.1_week" = "1 week";
+"onboarding_v2.commitment.1_week_sub" = "Try it out";
+"onboarding_v2.commitment.2_weeks" = "2 weeks";
+"onboarding_v2.commitment.2_weeks_sub" = "Build momentum";
+"onboarding_v2.commitment.4_weeks" = "4 weeks";
+"onboarding_v2.commitment.4_weeks_sub" = "Real change";
+"onboarding_v2.commitment.66_days" = "66 days";
+"onboarding_v2.commitment.66_days_sub" = "Full transformation";
+"onboarding_v2.commitment.subtitle" = "Choose your commitment length";
+"onboarding_v2.commitment.recommended" = "Recommended";
+"onboarding_v2.commitment.chose" = "chose";
+"onboarding_v2.commitment.1_week_sub" = "Try it out";
+"onboarding_v2.commitment.66_days_sub" = "Proven results";
+"onboarding_v2.commitment.hold_instruction" = "Press and hold to commit";
+"onboarding_v2.commitment.committed" = "You're committed.";
+
+// MARK: - StressPatternValidationView
+"stress_pattern.analysis_complete" = "Analysis complete";
+"stress_pattern.news_to_break" = "We've got some news to break to you...";
+"stress_pattern.cortisol_above" = "Your cortisol is estimated **%d points above** normal";
+"stress_pattern.disclaimer" = "This estimate does not constitute a medical diagnosis.";
+"stress_pattern.cta" = "Check your symptoms";
+"stress_pattern.bar_you" = "You";
+"stress_pattern.bar_normal" = "Normal";
+
+// MARK: - SymptomCheckerView
+"symptom_checker.title" = "Your symptoms";
+"symptom_checker.alert" = "Chronically elevated cortisol can cause lasting damage to your brain, metabolism, and immune system.";
+"symptom_checker.select_all" = "Select everything you experience";
+"symptom_checker.count_singular" = "%d symptom selected";
+"symptom_checker.count_plural" = "%d symptoms selected";
+"symptom_checker.cta" = "Continue";
+"symptom_checker.category.mental" = "Mental";
+"symptom_checker.category.physical" = "Physical";
+"symptom_checker.category.social" = "Social";
+"symptom_checker.mental.1" = "Frequent anxiety";
+"symptom_checker.mental.1.bold" = "anxiety";
+"symptom_checker.mental.2" = "Difficulty focusing";
+"symptom_checker.mental.2.bold" = "focusing";
+"symptom_checker.mental.3" = "Negative thought loops";
+"symptom_checker.mental.3.bold" = "Negative thought";
+"symptom_checker.mental.4" = "Irritability";
+"symptom_checker.mental.4.bold" = "Irritability";
+"symptom_checker.mental.5" = "Brain fog";
+"symptom_checker.mental.5.bold" = "Brain fog";
+"symptom_checker.mental.6" = "Loss of motivation";
+"symptom_checker.mental.6.bold" = "motivation";
+"symptom_checker.physical.1" = "Disrupted or unrestful sleep";
+"symptom_checker.physical.1.bold" = "Disrupted sleep";
+"symptom_checker.physical.2" = "Chronic fatigue";
+"symptom_checker.physical.2.bold" = "Chronic fatigue";
+"symptom_checker.physical.3" = "Frequent headaches";
+"symptom_checker.physical.3.bold" = "headaches";
+"symptom_checker.physical.4" = "Neck or shoulder tension";
+"symptom_checker.physical.4.bold" = "tension";
+"symptom_checker.physical.5" = "Unexplained weight gain";
+"symptom_checker.physical.5.bold" = "weight gain";
+"symptom_checker.physical.6" = "Heart palpitations or shortness of breath";
+"symptom_checker.physical.6.bold" = "palpitations";
+"symptom_checker.social.1" = "Desire to isolate";
+"symptom_checker.social.1.bold" = "isolate";
+"symptom_checker.social.2" = "More frequent relationship conflicts";
+"symptom_checker.social.2.bold" = "conflicts";
+"symptom_checker.social.3" = "Loss of interest in activities";
+"symptom_checker.social.3.bold" = "Loss of interest";
+"symptom_checker.social.4" = "Difficulty communicating";
+"symptom_checker.social.4.bold" = "communicating";
+"symptom_checker.social.5" = "Impatience or irritability with loved ones";
+"symptom_checker.social.5.bold" = "Impatience";
+
+// MARK: - SocialProofFlowView
+"social_proof.title" = "What our\nusers say";
+"social_proof.user_count" = "Trusted by 12,400+ users";
+"social_proof.based_on_research" = "Based on research from";
+"social_proof.cta" = "Continue";
+"social_proof.testimonial.sophie.time" = "3 weeks ago";
+"social_proof.testimonial.james.name" = "James K.";
+"social_proof.testimonial.james.text" = "The 66-day structure keeps me accountable. I'm on day 40 and my stress levels are noticeably lower.";
+"social_proof.testimonial.james.time" = "1 month ago";
+"social_proof.testimonial.claire.time" = "2 weeks ago";
+"social_proof.testimonial.marc.time" = "5 days ago";
+"social_proof.testimonial.emma.time" = "1 month ago";
+"social_proof.testimonial.sophie.text" = "I've tried meditation apps before but CortiFree actually targets the root cause. My sleep improved within the first week.";
+"social_proof.testimonial.claire.text" = "Between work and kids I was burning out. The daily routines are short enough to actually do, and the results are real.";
+"social_proof.testimonial.marc.name" = "Marc L.";
+"social_proof.testimonial.marc.text" = "My doctor recommended managing cortisol levels. This app made it simple and I actually stick with it.";
+"social_proof.testimonial.emma.text" = "I was skeptical but the breathing exercises alone changed how I handle work stress. Worth every minute.";
+
+// MARK: - CortisolScienceHookView
+"cortisol_hook.title" = "Here's what's happening\nin your body right now";
+"cortisol_hook.subtitle" = "Cortisol level over 24 hours";
+"cortisol_hook.legend_now" = "You now";
+"cortisol_hook.legend_66" = "In 66 days";
+"cortisol_hook.level_high" = "High";
+"cortisol_hook.level_normal" = "Normal";
+"cortisol_hook.level_low" = "Low";
+"cortisol_hook.insight_1" = "At night, your cortisol stays too high — your brain never fully shuts down.";
+"cortisol_hook.insight_2" = "Your morning spike comes too early, too hard. Guaranteed crash by 3pm.";
+"cortisol_hook.insight_3" = "66 days of practice is all it takes to reverse this. Not years.";
+"cortisol_hook.cta" = "Continue";
+
+// MARK: - FirstLaunchWelcomeView
+"first_launch.q1" = "You wake up exhausted\nafter 7-8 hours of sleep?";
+"first_launch.q2" = "You feel overwhelmed\nby the smallest things?";
+"first_launch.q3" = "You can't switch off anymore,\neven on weekends?";
+"first_launch.cortisol_intro" = "It's not in your head.";
+"first_launch.cortisol_prefix" = "It's your ";
+"first_launch.cortisol_word" = "cortisol.";
+"first_launch.cortisol_desc" = "The chronic stress hormone that stops\nyour body from recovering — even when you rest.";
+"first_launch.solution_pill" = "In 66 days, we can rebalance it.";
+"first_launch.cta_button" = "Analyze my cortisol";
+
+// MARK: - CustomPaywallView
+
+// Header - Personalized title (no primary goal)
+"paywall_custom.title_default" = "In 66 days, you will have\ntransformed your life.";
+
+// Header - Personalized titles by goal
+"paywall_custom.title_sleep" = "In 66 days,\nyou'll sleep soundly again.";
+"paywall_custom.title_stress" = "In 66 days,\nyour cortisol will be under control.";
+"paywall_custom.title_energy" = "In 66 days,\nyou'll have your energy back.";
+"paywall_custom.title_focus" = "In 66 days,\nyou'll focus effortlessly.";
+"paywall_custom.title_balance" = "In 66 days,\nyou'll find your balance.";
+
+// Promise section
+"paywall_custom.promise_subtitle" = "Your destiny awaits. You will unlock\nyour true potential on:";
+
+// Plan toggle
+"paywall_custom.plan_without" = "Without CortiFree";
+
+// Date transformation section
+"paywall_custom.if_start_today" = "If you start today";
+"paywall_custom.transform_subtitle" = "You will transform your life and become\nthe best version of yourself by:";
+
+// Features section
+"paywall_custom.feature_program_title" = "Personalized program";
+"paywall_custom.feature_program_desc" = "A plan adapted to your level, updated weekly.";
+"paywall_custom.feature_tasks_title" = "Task planning";
+"paywall_custom.feature_tasks_desc" = "Science-based habits to help you daily.";
+"paywall_custom.feature_tracking_title" = "Progress tracking";
+"paywall_custom.feature_tracking_desc" = "Track your progress with detailed statistics.";
+"paywall_custom.feature_journal_title" = "Daily journal";
+"paywall_custom.feature_journal_desc" = "Record your thoughts and emotions to know yourself better.";
+
+// Radar chart section
+"paywall_custom.radar_title" = "%@'s improvement in 66 days";
+
+// Radar labels
+"paywall_custom.radar_label_global" = "Overall";
+"paywall_custom.radar_label_serenity" = "Serenity";
+"paywall_custom.radar_label_sleep" = "Sleep";
+"paywall_custom.radar_label_energy" = "Energy";
+"paywall_custom.radar_label_balance" = "Balance";
+
+// Floating CTA
+"paywall_custom.cta_start" = "Start my program";
+
+// Footer links
+"paywall_custom.footer_privacy" = "Privacy";
+"paywall_custom.footer_restore" = "Restore";
+"paywall_custom.footer_terms" = "Terms";
+
+// Habit progress chart titles
+"paywall_custom.habit_breathe_title" = "Breathe Consciously / week";
+"paywall_custom.habit_meditate_title" = "Meditate / week";
+"paywall_custom.habit_journal_title" = "Keep a Journal / week";
+"paywall_custom.habit_sport_title" = "Exercise / week";
+"paywall_custom.habit_water_title" = "Drink Water / day";
+"paywall_custom.habit_nature_title" = "Time in Nature / week";
+"paywall_custom.habit_sleep_title" = "Sleep Routine / day";
+"paywall_custom.habit_social_title" = "Social Connection / week";
+
+// Habit progress stat messages
+"paywall_custom.habit_breathe_stat" = "will practice conscious breathing 1h per week.";
+"paywall_custom.habit_meditate_stat" = "will meditate 1h30 per week.";
+"paywall_custom.habit_journal_stat" = "will journal 7 times per week.";
+"paywall_custom.habit_sport_stat" = "will exercise 3h30 per week.";
+"paywall_custom.habit_water_stat" = "will drink 2.5L of water per day.";
+"paywall_custom.habit_nature_stat" = "will spend 3h30 in nature per week.";
+"paywall_custom.habit_sleep_stat" = "will sleep 8 hours per night.";
+"paywall_custom.habit_social_stat" = "will connect socially 4 times per week.";
+
+// Symptom fix strings - Mental
+"paywall_custom.fix_anxiety" = "You regain a calm mind, without anxiety spiraling";
+"paywall_custom.fix_focus" = "Your focus returns, you enter flow without forcing it";
+"paywall_custom.fix_negative_thoughts" = "You break the loop of draining negative thoughts";
+"paywall_custom.fix_irritability" = "You react less, your nervous system genuinely settles down";
+"paywall_custom.fix_brain_fog" = "The brain fog lifts and you think clearly again";
+"paywall_custom.fix_motivation" = "Your motivation reignites, you want to move forward again";
+
+// Symptom fix strings - Physical
+"paywall_custom.fix_sleep" = "You sleep deeply and wake up actually rested";
+"paywall_custom.fix_fatigue" = "Chronic fatigue fades, your energy holds all day long";
+"paywall_custom.fix_headaches" = "Headaches ease as your cortisol comes back down";
+"paywall_custom.fix_tension" = "Physical tension releases, your body stops being on high alert";
+"paywall_custom.fix_weight" = "Your metabolism rebalances when cortisol stops overloading it";
+"paywall_custom.fix_heart" = "Your heart rate steadies, breathing becomes your most powerful tool";
+
+// Symptom fix strings - Social
+"paywall_custom.fix_isolation" = "You rediscover the desire for connection without forcing it";
+"paywall_custom.fix_conflicts" = "Your relationships ease when you stop running on edge";
+"paywall_custom.fix_interest" = "Your passions return when cortisol stops stealing your energy";
+"paywall_custom.fix_communication" = "You communicate better when your nervous system is regulated";
+"paywall_custom.fix_impatience" = "You find gentleness again with the people who matter most";
+
+// Fallback fix strings
+"paywall_custom.fallback_stress" = "You stop surviving stress, you move through it";
+"paywall_custom.fallback_sleep" = "You sleep and wake up actually rested";
+"paywall_custom.fallback_energy" = "Your energy holds all day without crashing";
+"paywall_custom.fallback_focus" = "Your focus returns, effortless flow state";
+"first_launch.cta_sub" = "Free quiz · 5 minutes";

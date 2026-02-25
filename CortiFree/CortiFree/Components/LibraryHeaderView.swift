@@ -57,7 +57,7 @@ struct LibraryHeaderView: View {
                 // Title "Librairie" - positioned in upper portion of image
                 HStack {
                     Text(NSLocalizedString("library.title", comment: ""))
-                        .font(.custom("Poppins-Bold", size: 24))
+                        .font(.faroBold(24))
                         .foregroundColor(Color(hex: "FFFFFF"))
                         .shadow(
                             color: Color.black.opacity(0.4),
@@ -199,7 +199,7 @@ struct LibraryIconButton: View {
 
                 // Label text
                 Text(title)
-                    .font(.custom("Poppins-Regular", size: 12))
+                    .font(.faroRegular(12))
                     .foregroundColor(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

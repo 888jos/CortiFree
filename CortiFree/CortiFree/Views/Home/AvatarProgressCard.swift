@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseAuth
 import Combine
+import WidgetKit
 
 struct AvatarProgressCard: View {
     @State private var currentProgramDay: Int = 1 // Jour actuel du programme (1-66), synced with TasksV2
@@ -18,6 +19,7 @@ struct AvatarProgressCard: View {
     @State private var bestStreak: Int = 0
     @State private var showBadgesScreen: Bool = false
     @State private var firstName: String = ""
+    @State private var didLoadProgress: Bool = false
 
     private let totalDays = 66
     private let columns = 8   // 8 colonnes pour cellules plus grandes
@@ -51,6 +53,8 @@ struct AvatarProgressCard: View {
             }
         }
         .onAppear {
+            guard !didLoadProgress else { return }
+            didLoadProgress = true
             loadProgress()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
@@ -280,6 +284,10 @@ struct AvatarProgressCard: View {
                     await MainActor.run {
                         currentProgramDay = min(settings.currentProgramDay, 66)
                         startDate = settings.programStartDate
+                        // Sync program day to AppGroup so widget shows correct day
+                        // even if user has never opened the Tasks tab
+                        WidgetDataStore.sharedDefaults?.set(currentProgramDay, forKey: WidgetDataStore.programDayKey)
+                        WidgetCenter.shared.reloadAllTimelines()
                     }
                 } else {
                     loadFromUserDefaults()
@@ -404,6 +412,7 @@ struct BadgesListView: View {
     @ObservedObject private var habitBadgeService = HabitBadgeService.shared
     @StateObject private var profileViewModel = ProfileViewModel()
     @Environment(\.dismiss) var dismiss
+    @State private var didLoadBackCard: Bool = false
 
     private var streakAchievements: [Achievement] {
         achievementService.achievements.filter { $0.category == .streak }
@@ -595,6 +604,8 @@ struct BadgesListView: View {
             }
         }
         .onAppear {
+            guard !didLoadBackCard else { return }
+            didLoadBackCard = true
             Task {
                 await profileViewModel.refreshProfile()
                 await habitBadgeService.loadHabitBadges()

@@ -3,7 +3,7 @@
 //  CortiFree
 //
 //  Created by Claude on 22/10/2025.
-//  Animated galaxy background with twinkling stars and shooting stars
+//  Optimized galaxy background with static stars and lightweight twinkle animations
 //
 
 import SwiftUI
@@ -13,7 +13,8 @@ import SwiftUI
 struct GalaxyBackgroundView: View {
     let intensity: Double
 
-    @State private var stars: [Star] = []
+    @State private var staticStars: [StaticStar] = []
+    @State private var twinklingStars: [TwinklingStar] = []
     @State private var shootingStars: [ShootingStar] = []
 
     init(intensity: Double = 1.0) {
@@ -25,53 +26,42 @@ struct GalaxyBackgroundView: View {
             // Deep space gradient background
             LinearGradient(
                 colors: [
-                    Color(hex: "1F0140"), // Top - Purple deep
-                    Color(hex: "0B011B"), // Middle - Very dark purple
-                    Color(hex: "01000C")  // Bottom - Almost black
+                    Color(hex: "1F0140"),
+                    Color(hex: "0B011B"),
+                    Color(hex: "01000C")
                 ],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
 
-            // Stars layer
-            TimelineView(.animation) { timeline in
-                Canvas { context, size in
-                    let currentTime = timeline.date.timeIntervalSinceReferenceDate
-
-                    // Draw static and twinkling stars
-                    for star in stars {
-                        let opacity = star.calculateOpacity(at: currentTime)
-                        let position = star.calculatePosition(at: currentTime, in: size)
-
-                        let rect = CGRect(
-                            x: position.x - star.size / 2,
-                            y: position.y - star.size / 2,
-                            width: star.size,
-                            height: star.size
-                        )
-
-                        context.fill(
-                            Path(ellipseIn: rect),
-                            with: .color(.white.opacity(opacity))
-                        )
-                    }
-
-                    // Draw shooting stars
-                    for shootingStar in shootingStars {
-                        if let path = shootingStar.calculatePath(at: currentTime, in: size) {
-                            let opacity = shootingStar.calculateOpacity(at: currentTime)
-
-                            context.stroke(
-                                path,
-                                with: .color(.white.opacity(opacity)),
-                                lineWidth: shootingStar.thickness
-                            )
-                        }
-                    }
+            // Static stars - drawn once, never re-rendered
+            Canvas { context, size in
+                for star in staticStars {
+                    let rect = CGRect(
+                        x: star.x * size.width - star.size / 2,
+                        y: star.y * size.height - star.size / 2,
+                        width: star.size,
+                        height: star.size
+                    )
+                    context.fill(
+                        Path(ellipseIn: rect),
+                        with: .color(.white.opacity(star.opacity))
+                    )
                 }
             }
             .ignoresSafeArea()
+            .drawingGroup()
+
+            // Twinkling stars - lightweight SwiftUI opacity animations
+            ForEach(twinklingStars) { star in
+                TwinklingStarView(star: star)
+            }
+            .ignoresSafeArea()
+
+            // Shooting stars - rare, minimal cost
+            ShootingStarsLayer(shootingStars: $shootingStars)
+                .ignoresSafeArea()
         }
         .onAppear {
             generateStars()
@@ -82,20 +72,26 @@ struct GalaxyBackgroundView: View {
     // MARK: - Star Generation
 
     private func generateStars() {
-        let baseCount = 150
-        let starCount = Int(Double(baseCount) * intensity)
+        let staticCount = Int(30.0 * intensity)
+        let twinkleCount = Int(10.0 * intensity)
 
-        stars = (0..<starCount).map { index in
-            Star(
-                id: index,
+        staticStars = (0..<staticCount).map { _ in
+            StaticStar(
                 x: Double.random(in: 0...1),
                 y: Double.random(in: 0...1),
-                size: Double.random(in: 0.5...2.5),
-                twinkleDuration: Double.random(in: 2...4),
-                twinkling: Bool.random(),
-                driftSpeed: Double.random(in: 0.0001...0.0003),
-                driftAngle: Double.random(in: 0...(2 * .pi)),
-                phaseOffset: Double.random(in: 0...(2 * .pi))
+                size: Double.random(in: 0.5...2.0),
+                opacity: Double.random(in: 0.4...0.8)
+            )
+        }
+
+        twinklingStars = (0..<twinkleCount).map { _ in
+            TwinklingStar(
+                x: Double.random(in: 0...1),
+                y: Double.random(in: 0...1),
+                size: Double.random(in: 1.0...2.5),
+                minOpacity: Double.random(in: 0.2...0.4),
+                maxOpacity: Double.random(in: 0.7...1.0),
+                duration: Double.random(in: 2...4)
             )
         }
     }
@@ -107,7 +103,6 @@ struct GalaxyBackgroundView: View {
             addShootingStar()
         }
 
-        // Add first shooting star after a delay
         DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 3...8)) {
             addShootingStar()
         }
@@ -116,64 +111,94 @@ struct GalaxyBackgroundView: View {
     private func addShootingStar() {
         let shootingStar = ShootingStar(
             startTime: Date().timeIntervalSinceReferenceDate,
-            duration: Double.random(in: 0.3...0.6), // Beaucoup plus rapide !
+            duration: Double.random(in: 0.3...0.6),
             startX: Double.random(in: 0.3...0.7),
             startY: Double.random(in: 0.1...0.3),
-            angle: Double.random(in: .pi/4...(.pi/2.5)), // 45° to 72° (plus naturel)
-            length: Double.random(in: 25...45), // Plus court !
-            thickness: Double.random(in: 0.8...1.2) // Plus fin
+            angle: Double.random(in: .pi/4...(.pi/2.5)),
+            length: Double.random(in: 25...45),
+            thickness: Double.random(in: 0.8...1.2)
         )
 
         shootingStars.append(shootingStar)
 
-        // Remove after animation completes
         DispatchQueue.main.asyncAfter(deadline: .now() + shootingStar.duration + 0.5) {
             shootingStars.removeAll { $0.id == shootingStar.id }
         }
     }
 }
 
-// MARK: - Star Model
+// MARK: - Static Star Model
 
-private struct Star {
-    let id: Int
-    let x: Double // Normalized 0-1
-    let y: Double // Normalized 0-1
+private struct StaticStar {
+    let x: Double
+    let y: Double
     let size: Double
-    let twinkleDuration: Double
-    let twinkling: Bool
-    let driftSpeed: Double
-    let driftAngle: Double
-    let phaseOffset: Double
+    let opacity: Double
+}
 
-    func calculateOpacity(at time: TimeInterval) -> Double {
-        guard twinkling else { return 0.8 }
+// MARK: - Twinkling Star Model
 
-        let cycle = (time + phaseOffset) / twinkleDuration
-        let phase = cycle.truncatingRemainder(dividingBy: 1.0)
+private struct TwinklingStar: Identifiable {
+    let id = UUID()
+    let x: Double
+    let y: Double
+    let size: Double
+    let minOpacity: Double
+    let maxOpacity: Double
+    let duration: Double
+}
 
-        // Smooth sine wave for twinkling
-        let opacity = 0.3 + 0.5 * (1 + sin(phase * 2 * .pi)) / 2
-        return opacity
+// MARK: - Twinkling Star View (GPU-accelerated opacity animation)
+
+private struct TwinklingStarView: View {
+    let star: TwinklingStar
+    @State private var isGlowing = false
+
+    var body: some View {
+        GeometryReader { geo in
+            Circle()
+                .fill(.white)
+                .frame(width: star.size, height: star.size)
+                .opacity(isGlowing ? star.maxOpacity : star.minOpacity)
+                .position(
+                    x: star.x * geo.size.width,
+                    y: star.y * geo.size.height
+                )
+        }
+        .onAppear {
+            withAnimation(
+                .easeInOut(duration: star.duration)
+                .repeatForever(autoreverses: true)
+            ) {
+                isGlowing = true
+            }
+        }
     }
+}
 
-    func calculatePosition(at time: TimeInterval, in size: CGSize) -> CGPoint {
-        // Very subtle parallax drift
-        let driftX = cos(driftAngle) * driftSpeed * time
-        let driftY = sin(driftAngle) * driftSpeed * time
+// MARK: - Shooting Stars Layer
 
-        // Ensure values stay in 0-1 range (wrapping)
-        var finalX = (x + driftX).truncatingRemainder(dividingBy: 1.0)
-        var finalY = (y + driftY).truncatingRemainder(dividingBy: 1.0)
+private struct ShootingStarsLayer: View {
+    @Binding var shootingStars: [ShootingStar]
 
-        // Handle negative remainders
-        if finalX < 0 { finalX += 1.0 }
-        if finalY < 0 { finalY += 1.0 }
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.05)) { timeline in
+            Canvas { context, size in
+                let currentTime = timeline.date.timeIntervalSinceReferenceDate
 
-        return CGPoint(
-            x: finalX * size.width,
-            y: finalY * size.height
-        )
+                for shootingStar in shootingStars {
+                    if let path = shootingStar.calculatePath(at: currentTime, in: size) {
+                        let opacity = shootingStar.calculateOpacity(at: currentTime)
+                        context.stroke(
+                            path,
+                            with: .color(.white.opacity(opacity)),
+                            lineWidth: shootingStar.thickness
+                        )
+                    }
+                }
+            }
+        }
+        .allowsHitTesting(false)
     }
 }
 
@@ -189,36 +214,20 @@ private struct ShootingStar: Identifiable {
     let length: Double
     let thickness: Double
 
-    var startPoint: CGPoint {
-        CGPoint(x: startX, y: startY)
-    }
-
-    var endPoint: CGPoint {
-        CGPoint(
-            x: startX + cos(angle) * (length / 1000),
-            y: startY + sin(angle) * (length / 1000)
-        )
-    }
-
     func calculatePath(at time: TimeInterval, in size: CGSize) -> Path? {
         let elapsed = time - startTime
-
         guard elapsed >= 0 && elapsed <= duration else { return nil }
 
         let progress = elapsed / duration
-
-        // Mouvement rapide et fluide - beaucoup plus de distance parcourue !
-        let travelDistance = 0.8 // 80% de l'écran parcouru
+        let travelDistance = 0.8
         let currentX = startX + cos(angle) * progress * travelDistance
         let currentY = startY + sin(angle) * progress * travelDistance
 
-        // Tête de l'étoile filante
         let headPoint = CGPoint(
             x: currentX * size.width,
             y: currentY * size.height
         )
 
-        // Queue de l'étoile filante (beaucoup plus courte maintenant)
         let tailLength = length / size.width
         let tailPoint = CGPoint(
             x: (currentX - cos(angle) * tailLength) * size.width,
@@ -228,26 +237,19 @@ private struct ShootingStar: Identifiable {
         var path = Path()
         path.move(to: headPoint)
         path.addLine(to: tailPoint)
-
         return path
     }
 
     func calculateOpacity(at time: TimeInterval) -> Double {
         let elapsed = time - startTime
-
         guard elapsed >= 0 && elapsed <= duration else { return 0 }
 
         let progress = elapsed / duration
-
-        // Fade naturel: apparition rapide, disparition rapide
         if progress < 0.15 {
-            // Fade in très rapide (15% du temps)
             return progress / 0.15
         } else if progress > 0.75 {
-            // Fade out rapide (25% du temps)
             return 1.0 - ((progress - 0.75) / 0.25)
         } else {
-            // Pleine intensité au milieu
             return 1.0
         }
     }

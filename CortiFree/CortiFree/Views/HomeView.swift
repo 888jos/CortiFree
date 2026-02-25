@@ -9,6 +9,7 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import SuperwallKit
 
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
@@ -21,9 +22,10 @@ struct HomeView: View {
     @State private var showSoundsList = false
     @State private var showJournal = false
     @State private var showSettings = false
-    @State private var showPaywall = false
     @State private var showOnboarding = false
+    @State private var showCustomPaywall = false
     @State private var currentTime = Date() // For countdown updates
+    @State private var didInitProgram = false
 
     // Smart scroll detection
     @State private var lastScrollOffset: CGFloat = 0
@@ -122,9 +124,32 @@ struct HomeView: View {
                                     .offset(y: scrollOffset * 0.6)
 
 
-                                // Anti-Stress Button - rapprocher
+                                // Anti-Stress Button
                                 antiStressButton
                                     .padding(.top, 16)
+
+                                #if DEBUG
+                                VStack(spacing: 12) {
+                                    Button(action: { showOnboarding = true }) {
+                                        Text("🛠 Preview Onboarding")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    Button(action: { showCustomPaywall = true }) {
+                                        Text("💳 Custom Paywall")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    Button(action: {
+                                        Superwall.shared.register(placement: "campaign_trigger")
+                                    }) {
+                                        Text("🚀 Superwall Paywall")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                }
+                                .padding(.top, 24)
+                                #endif
 
                                 Spacer(minLength: 150)
                             }
@@ -155,24 +180,28 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
         }
-        .fullScreenCover(isPresented: $showPaywall) {
+        .fullScreenCover(isPresented: $showCustomPaywall) {
             CustomPaywallView(
-                onComplete: {
-                    showPaywall = false
-                },
+                onComplete: { showCustomPaywall = false },
                 onPurchase: { _ in },
-                onRestore: {}
+                onRestore: { showCustomPaywall = false }
             )
         }
+        #if DEBUG
+        // Debug-only: Onboarding preview (excluded from production builds)
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingV2FlowView()
         }
+        #endif
         .onAppear {
             // Refresh motivational message to pick up any name changes from profile edit
             motivationalVM.refreshMessage()
 
-            // Initialize program start date if this is the first time HomeView is opened (after paywall)
-            initializeProgramStartDateIfNeeded()
+            // Initialize program start date ONCE (avoid repeated Firestore reads on tab switches)
+            if !didInitProgram {
+                didInitProgram = true
+                initializeProgramStartDateIfNeeded()
+            }
 
             // Track app session for rating and check day 7
             AppRatingService.shared.trackAppSession()
@@ -223,7 +252,7 @@ struct HomeView: View {
     private var headerNavigation: some View {
         HStack {
             Text("CortiFree")
-                .font(Font.Poppins.custom(.semiBold, size: AppConstants.FontSize.largeTitle))
+                .font(.faroSemiBold(AppConstants.FontSize.largeTitle))
                 .foregroundColor(.white)
 
             Spacer()
@@ -375,29 +404,56 @@ struct HomeView: View {
     // MARK: - Anti-Stress Button
 
     private var antiStressButton: some View {
-        Button(action: {
-            HapticManager.medium()
-            viewModel.triggerAntiStress()
-        }) {
-            HStack(spacing: 12) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(.white)
+        ZStack {
+            // Background violet glow
+            Ellipse()
+                .fill(Color(hex: "9333EA").opacity(0.25))
+                .frame(maxWidth: 300, maxHeight: 40)
+                .blur(radius: 28)
+                .offset(y: 16)
 
-                Text(NSLocalizedString(StringKeys.Home.antiStressButton, comment: ""))
-                    .font(.custom("Poppins-Medium", size: 16))
-                    .foregroundColor(.white)
-            }
-            .frame(maxWidth: 320, minHeight: 54)
-            .background(
-                RoundedRectangle(cornerRadius: 60)
-                    .fill(Color(hex: "4A0000").opacity(0.66))
+            Button(action: {
+                HapticManager.medium()
+                viewModel.triggerAntiStress()
+            }) {
+                HStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.white)
+
+                    Text(NSLocalizedString(StringKeys.Home.antiStressButton, comment: ""))
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: 320, minHeight: 54)
+                .background(
+                    ZStack {
+                        LinearGradient(
+                            colors: [
+                                Color(hex: "6B21E8"),
+                                Color(hex: "9333EA"),
+                                Color(hex: "C084FC")
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.15),
+                                Color.clear
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 60))
                     .overlay(
                         RoundedRectangle(cornerRadius: 60)
-                            .stroke(Color(hex: "9B0003"), lineWidth: 2)
+                            .stroke(Color(hex: "E9D5FF").opacity(0.4), lineWidth: 1)
                     )
-            )
-            .modifier(AntiStressPulseModifier())
+                )
+                .shadow(color: Color(hex: "9333EA").opacity(0.55), radius: 18, x: 0, y: 6)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -444,24 +500,6 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Anti-Stress Pulse Modifier
-
-struct AntiStressPulseModifier: ViewModifier {
-    @State private var isPulsing = false
-
-    func body(content: Content) -> some View {
-        content
-            .shadow(
-                color: Color(red: 255/255, green: 68/255, blue: 68/255, opacity: isPulsing ? 0.7 : 0.4),
-                radius: isPulsing ? 20 : 16,
-                y: 4
-            )
-            .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isPulsing)
-            .onAppear {
-                isPulsing = true
-            }
-    }
-}
 
 // MARK: - Quick Action Button (New Design)
 
@@ -526,7 +564,7 @@ struct AntiStressView: View {
             VStack(spacing: 60) {
                 VStack(spacing: 12) {
                     Text(NSLocalizedString(StringKeys.Home.breatheDeeply, comment: ""))
-                        .font(.custom("Poppins-SemiBold", size: 28))
+                        .font(.faroSemiBold(28))
                         .foregroundColor(.white)
 
                     Text(breatheIn ? NSLocalizedString(StringKeys.Home.breatheIn, comment: "") : NSLocalizedString(StringKeys.Home.breatheOut, comment: ""))
@@ -621,7 +659,7 @@ struct RoutineDetailsView: View {
                     // Header
                     VStack(spacing: 12) {
                         Text(NSLocalizedString(StringKeys.Home.why66Days, comment: ""))
-                            .font(.custom("Poppins-Bold", size: 28))
+                            .font(.faroBold(28))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
 
@@ -638,7 +676,7 @@ struct RoutineDetailsView: View {
                             .foregroundColor(.white.opacity(0.7))
 
                         Text(routineTitle)
-                            .font(.custom("Poppins-SemiBold", size: 20))
+                            .font(.faroSemiBold(20))
                             .foregroundColor(.white)
 
                         Text("dans")
@@ -647,7 +685,7 @@ struct RoutineDetailsView: View {
 
                         HStack(spacing: 6) {
                             Text("\(daysRemaining)")
-                                .font(.custom("Poppins-Bold", size: 36))
+                                .font(.faroBold(36))
                                 .foregroundColor(.white)
 
                             Text(daysRemaining > 1 ? NSLocalizedString(StringKeys.Common.days, comment: "") : NSLocalizedString(StringKeys.Common.day, comment: ""))
@@ -717,7 +755,7 @@ struct EvidenceCard: View {
         HStack(alignment: .top, spacing: 16) {
             // Number badge
             Text("\(number)")
-                .font(.custom("Poppins-Bold", size: 20))
+                .font(.faroBold(20))
                 .foregroundColor(.white)
                 .frame(width: 40, height: 40)
                 .background(
@@ -737,7 +775,7 @@ struct EvidenceCard: View {
             // Content
             VStack(alignment: .leading, spacing: 8) {
                 Text(title)
-                    .font(.custom("Poppins-SemiBold", size: 16))
+                    .font(.faroSemiBold(16))
                     .foregroundColor(.white)
 
                 Text(description)
@@ -763,7 +801,7 @@ struct TimeUnitView: View {
     var body: some View {
         VStack(spacing: 2) {
             Text("\(value)")
-                .font(.custom("Poppins-Bold", size: 24))
+                .font(.faroBold(24))
                 .foregroundColor(.white)
 
             Text(unit)
@@ -783,7 +821,7 @@ struct TimeUnitRowView: View {
     var body: some View {
         HStack(spacing: 8) {
             Text("\(value)")
-                .font(Font.Poppins.custom(.bold, size: 36))
+                .font(.faroBold(36))
                 .foregroundStyle(
                     LinearGradient(
                         colors: [.white, Color(hex: "B794F6")],
@@ -794,7 +832,7 @@ struct TimeUnitRowView: View {
                 .frame(width: 70, alignment: .trailing)
 
             Text(unit)
-                .font(Font.Poppins.custom(.bold, size: 14))
+                .font(.faroSemiBold(14))
                 .foregroundColor(.white.opacity(0.8))
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

@@ -8,9 +8,8 @@
 import SwiftUI
 import UIKit
 import FirebaseCore
+import FirebaseAuth
 import FirebaseFirestore
-import SuperwallKit
-import RevenueCat
 import UserNotifications
 #if canImport(GoogleSignIn)
 import GoogleSignIn
@@ -18,6 +17,8 @@ import GoogleSignIn
 #if canImport(Mixpanel)
 import Mixpanel
 #endif
+import SuperwallKit
+import AppTrackingTransparency
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication,
@@ -32,23 +33,57 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Set notification delegate
         UNUserNotificationCenter.current().delegate = self
 
-        // Configure RevenueCat SDK
-        #if DEBUG
-        print("🔧 Configuring RevenueCat SDK")
-        #endif
-        Task { @MainActor in
-            RevenueCatManager.shared.configure()
-        }
-
-        // Configurer Superwall (toujours actif)
-        Superwall.configure(apiKey: APIConfig.shared.superwallAPIKey)
-        Logger.success("Superwall configured", category: .subscription)
-
         // Register custom fonts
         FontManager.registerFonts()
 
         // Initialize Mixpanel Analytics
         MixpanelManager.shared.initialize()
+
+        // Initialize PostHog Analytics
+        PostHogManager.shared.initialize()
+
+        // Initialize TikTok App Events SDK
+        TikTokManager.shared.initialize()
+
+        // Request App Tracking Transparency (ATT) permission for TikTok attribution
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                #if DEBUG
+                print("📊 ATT status: \(status.rawValue)")
+                #endif
+            }
+        }
+
+        // Configure RevenueCat SDK
+        RevenueCatManager.shared.configure()
+
+        // Configure Superwall with RevenueCat as PurchaseController
+        let purchaseController = RCPurchaseController()
+        let superwallOptions = SuperwallOptions()
+        let savedLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "fr"
+        superwallOptions.localeIdentifier = savedLanguage == "fr" ? "fr_FR" : "en_US"
+        Superwall.configure(
+            apiKey: APIConfig.shared.superwallAPIKey,
+            purchaseController: purchaseController,
+            options: superwallOptions
+        )
+        purchaseController.syncSubscriptionStatus()
+
+        // Sync RevenueCat with Firebase user on app launch
+        // IMPORTANT: premium is NOT active until identifyUser/getCustomerInfo returns
+        if let firebaseUser = Auth.auth().currentUser {
+            Task {
+                await RevenueCatManager.shared.identifyUser(userId: firebaseUser.uid)
+                // Belt-and-suspenders: force server fetch to guarantee isPremiumStatusReady = true
+                await RevenueCatManager.shared.refreshCustomerInfo(forceServerFetch: true)
+            }
+        } else {
+            // No Firebase user - force server fetch + load offerings for anonymous user
+            Task {
+                await RevenueCatManager.shared.refreshCustomerInfo(forceServerFetch: true)
+                await RevenueCatManager.shared.loadCurrentOffering()
+            }
+        }
 
         // Initialize TaskManager with optimization
         #if DEBUG
@@ -126,27 +161,30 @@ struct CortiFreeApp: App {
     @StateObject private var authViewModel = AuthViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
+    // IMPORTANT: Use @AppStorage to make onboarding completion reactive
+    @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
+
     // DEBUG: Set to true to skip onboarding and go directly to HomeView
     #if DEBUG
-    private let skipOnboardingForTesting = true
+    private let skipOnboardingForTesting = false
     #else
     private let skipOnboardingForTesting = false
     #endif
 
     var body: some Scene {
         WindowGroup {
-            if authViewModel.isAuthenticated {
-                // User is authenticated - check if onboarding is completed (local or synced from Firestore)
-                if skipOnboardingForTesting || authViewModel.hasCompletedOnboarding || UserDefaults.standard.bool(forKey: "onboardingV2Completed") {
-                    // Onboarding completed - show main app
-                    ContentView()
-                        .environmentObject(authViewModel)
-                } else {
-                    // Onboarding not completed - show onboarding flow (includes welcome screen)
-                    OnboardingV2FlowView()
-                }
+            // First launch: check if onboarding is completed
+            // IMPORTANT: Use @AppStorage variable for reactive updates
+            if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
+                // First time user - show onboarding
+                OnboardingV2FlowView()
+                    .environmentObject(authViewModel)
+            } else if authViewModel.isAuthenticated {
+                // User is authenticated and onboarding completed - show main app
+                ContentView()
+                    .environmentObject(authViewModel)
             } else {
-                // Not authenticated - show auth screens
+                // Onboarding completed but not authenticated - show auth screens
                 AuthView()
                     .environmentObject(authViewModel)
             }
@@ -165,6 +203,8 @@ struct CortiFreeApp: App {
             scheduleReengagementIfNeeded()
 
         case .active:
+            // Efface la pastille rouge dès que l'app est ouverte
+            UNUserNotificationCenter.current().setBadgeCount(0)
             #if DEBUG
             print("📱 App became active")
             #endif

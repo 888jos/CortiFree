@@ -29,7 +29,7 @@ struct ExerciseRecommendationView: View {
                     // Header
                     VStack(spacing: 12) {
                         Text(NSLocalizedString("antistress.recommendation.title", comment: ""))
-                            .font(.custom("Poppins-SemiBold", size: 26))
+                            .font(.faroSemiBold(26))
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [.white, Color(hex: "B794F6")],

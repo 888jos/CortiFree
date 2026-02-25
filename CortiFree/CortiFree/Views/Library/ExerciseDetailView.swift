@@ -176,7 +176,7 @@ struct ExerciseDetailView: View {
 
             // Title
             Text(exercise.title)
-                .font(.custom("Poppins-Bold", size: 32))
+                .font(.faroBold(32))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .shadow(color: Color.black.opacity(0.3), radius: 10, y: 5)
@@ -196,7 +196,7 @@ struct ExerciseDetailView: View {
                     .foregroundColor(Color.appTheme)
 
                 Text(formatDuration(exercise.duration))
-                    .font(.custom("Poppins-SemiBold", size: 18))
+                    .font(.faroSemiBold(18))
                     .foregroundColor(.white)
             }
             .padding(.horizontal, 20)
@@ -222,7 +222,7 @@ struct ExerciseDetailView: View {
                     .foregroundColor(Color.appTheme)
 
                 Text(NSLocalizedString("exercise.about", comment: ""))
-                    .font(.custom("Poppins-SemiBold", size: 18))
+                    .font(.faroSemiBold(18))
                     .foregroundColor(.white)
             }
 
@@ -276,7 +276,7 @@ struct ExerciseDetailView: View {
                         .font(.system(size: 24))
 
                     Text(NSLocalizedString("exercise.start_exercise", comment: ""))
-                        .font(.custom("Poppins-Bold", size: 18))
+                        .font(.faroBold(18))
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -369,6 +369,12 @@ struct ExerciseTimerView: View {
                 timerView
             }
         }
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
         .onReceive(timer) { _ in
             if isRunning && timeRemaining > 0 {
                 timeRemaining -= 1
@@ -382,7 +388,7 @@ struct ExerciseTimerView: View {
         VStack(spacing: 60) {
             VStack(spacing: 8) {
                 Text(exercise.title)
-                    .font(.custom("Poppins-SemiBold", size: 24))
+                    .font(.faroSemiBold(24))
                     .foregroundColor(.white)
 
                 Text(exercise.description)
@@ -418,7 +424,7 @@ struct ExerciseTimerView: View {
 
             // Timer
             Text(formatTime(timeRemaining))
-                .font(.custom("Poppins-Medium", size: 56))
+                .font(.faroBold(56))
                 .foregroundColor(.white)
                 .monospacedDigit()
 
@@ -450,7 +456,7 @@ struct ExerciseTimerView: View {
                 .foregroundColor(Color.appTheme)
 
             Text(NSLocalizedString("exercise.congrats", comment: ""))
-                .font(.custom("Poppins-SemiBold", size: 32))
+                .font(.faroSemiBold(32))
                 .foregroundColor(.white)
 
             Text(NSLocalizedString("exercise.completed_message", comment: ""))
@@ -462,7 +468,7 @@ struct ExerciseTimerView: View {
                 onComplete()
             }) {
                 Text(NSLocalizedString("exercise.finish", comment: ""))
-                    .font(.custom("Poppins-SemiBold", size: 18))
+                    .font(.faroSemiBold(18))
                     .foregroundColor(.white)
                     .frame(maxWidth: 200)
                     .padding(.vertical, 16)

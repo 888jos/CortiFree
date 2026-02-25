@@ -22,7 +22,7 @@ struct ScientificPlanView: View {
                 VStack(spacing: 0) {
                     // Title
                     Text("onboarding_v2.scientific.approach_title".localized)
-                        .font(Font.Poppins.custom(.bold, size: 28))
+                        .font(.faroBold(28))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [.white, Color(hex: "B794F6")],

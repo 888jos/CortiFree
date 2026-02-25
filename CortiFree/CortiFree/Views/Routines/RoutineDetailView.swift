@@ -112,7 +112,7 @@ struct RoutineDetailView: View {
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(routine.localizedName)
-                .font(.custom("Poppins-Bold", size: 28))
+                .font(.faroBold(28))
                 .foregroundColor(.white)
 
             Text(routine.localizedDescription)

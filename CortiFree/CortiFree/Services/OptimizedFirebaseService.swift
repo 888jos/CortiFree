@@ -100,6 +100,7 @@ class OptimizedFirebaseService {
             "gender": data.gender,
             "stressReasons": data.reasons,
             "stressDuration": data.duration,
+            "acquisitionChannel": data.acquisitionChannel,
             "onboardingCompletedAt": Date(),
             "hasBaseline": true
         ]

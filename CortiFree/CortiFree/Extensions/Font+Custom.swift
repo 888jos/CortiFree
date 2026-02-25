@@ -41,6 +41,19 @@ extension Font {
     static func poppinsBold(_ size: CGFloat) -> Font {
         return Font.system(size: size, weight: .bold)
     }
+
+    // Faro — used for titles and numbers
+    static func faroRegular(_ size: CGFloat) -> Font {
+        return Font.custom("Faro-RegularLucky", size: size)
+    }
+
+    static func faroSemiBold(_ size: CGFloat) -> Font {
+        return Font.custom("Faro-SemiBoldLucky", size: size)
+    }
+
+    static func faroBold(_ size: CGFloat) -> Font {
+        return Font.custom("Faro-BoldLucky", size: size)
+    }
 }
 
 // View modifier for custom fonts

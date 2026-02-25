@@ -214,6 +214,9 @@ class FirebaseService: ObservableObject {
     // MARK: - Real-time Listeners
 
     func listenToUser(completion: @escaping (Result<User, Error>) -> Void) {
+        // Remove any existing listeners before adding a new one
+        removeAllListeners()
+
         guard let userId = currentUserId else {
             completion(.failure(FirebaseError.noUserLoggedIn))
             return

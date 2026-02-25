@@ -15,7 +15,7 @@ struct MotivationalMessageCard: View {
         VStack(alignment: .leading, spacing: 16) {
             // Time-based title with gradient text
             Text(viewModel.timeBasedTitle)
-                .font(.custom("Poppins-Bold", size: 28))
+                .font(.faroBold(28))
                 .foregroundStyle(
                     LinearGradient(
                         colors: [

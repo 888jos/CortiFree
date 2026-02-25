@@ -138,7 +138,7 @@ struct AntiStressGenericDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Title
             Text(exerciseType.displayName)
-                .font(.custom("Poppins-Bold", size: 28))
+                .font(.faroBold(28))
                 .foregroundColor(.white)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)

@@ -90,7 +90,7 @@ struct RoutinesView: View {
                 Spacer()
 
                 Text(NSLocalizedString("routines.title", comment: ""))
-                    .font(.custom("Poppins-Bold", size: 20))
+                    .font(.faroBold(20))
                     .foregroundColor(.white)
 
                 Spacer()
@@ -174,7 +174,7 @@ struct RoutineCategoryCardContent: View {
                 // Bottom: Title + Info
                 VStack(alignment: .leading, spacing: 10) {
                     Text(category.localizedName)
-                        .font(.custom("Poppins-Bold", size: 22))
+                        .font(.faroBold(22))
                         .foregroundColor(.white)
 
                     Text(category.localizedDescription)

@@ -102,7 +102,7 @@ struct RoutineLevelSelectionView: View {
                 // Category title centered
                 VStack(spacing: 2) {
                     Text(category.localizedName)
-                        .font(.custom("Poppins-Bold", size: 22))
+                        .font(.faroBold(22))
                         .foregroundColor(.white)
 
                     Text(isFrench ? "Choisissez votre intensité" : "Choose your intensity")
@@ -156,9 +156,9 @@ struct RoutineLevelCard: View {
 
     private var levelGradient: [Color] {
         switch routine.difficulty {
-        case 1: return [Color(hex: category.color).opacity(0.15), Color(hex: category.color).opacity(0.05)]
-        case 2: return [Color(hex: category.color).opacity(0.25), Color(hex: category.color).opacity(0.1)]
-        case 3: return [Color(hex: category.color).opacity(0.35), Color(hex: category.color).opacity(0.15)]
+        case 1: return [Color(hex: "5C6BC0").opacity(0.15), Color(hex: "5C6BC0").opacity(0.05)]
+        case 2: return [Color(hex: "5C6BC0").opacity(0.25), Color(hex: "5C6BC0").opacity(0.1)]
+        case 3: return [Color(hex: "5C6BC0").opacity(0.35), Color(hex: "5C6BC0").opacity(0.15)]
         default: return [Color.white.opacity(0.1), Color.white.opacity(0.05)]
         }
     }
@@ -188,7 +188,7 @@ struct RoutineLevelCard: View {
                         ForEach(1...3, id: \.self) { dot in
                             Circle()
                                 .fill(dot <= routine.difficulty
-                                      ? Color(hex: category.color)
+                                      ? Color(hex: "5C6BC0")
                                       : Color.white.opacity(0.2))
                                 .frame(width: 8, height: 8)
                         }
@@ -218,7 +218,7 @@ struct RoutineLevelCard: View {
                             Text(routine.formattedDuration)
                                 .font(.custom("Poppins-Medium", size: 13))
                         }
-                        .foregroundColor(Color(hex: category.color))
+                        .foregroundColor(Color(hex: "5C6BC0"))
 
                         // Steps count
                         HStack(spacing: 5) {
@@ -236,9 +236,9 @@ struct RoutineLevelCard: View {
                 // Right: Play button
                 ZStack {
                     Circle()
-                        .fill(Color(hex: category.color))
+                        .fill(Color(hex: "5C6BC0"))
                         .frame(width: 50, height: 50)
-                        .shadow(color: Color(hex: category.color).opacity(0.4), radius: 8, x: 0, y: 4)
+                        .shadow(color: Color(hex: "5C6BC0").opacity(0.4), radius: 8, x: 0, y: 4)
 
                     Image(systemName: "play.fill")
                         .font(.system(size: 18))
@@ -260,7 +260,7 @@ struct RoutineLevelCard: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
                             .stroke(
-                                Color(hex: category.color).opacity(borderOpacity),
+                                Color(hex: "5C6BC0").opacity(borderOpacity),
                                 lineWidth: 1.5
                             )
                     )

@@ -8,6 +8,8 @@
 import Foundation
 import RevenueCat
 import Combine
+import FirebaseFirestore
+import FirebaseAuth
 
 /// Centralized manager for RevenueCat SDK operations
 /// Handles subscription management, entitlement checking, and customer info
@@ -23,13 +25,16 @@ class RevenueCatManager: ObservableObject {
     @Published var hasPremiumEntitlement: Bool = false
     @Published var isLoading: Bool = false
     @Published var currentOffering: Offering?
+    /// True once we've received at least one customerInfo response from RevenueCat
+    @Published var isPremiumStatusReady: Bool = false
 
     // MARK: - Constants
-    private let entitlementID = "CortiFree Premium"
+    // Entitlement ID - must match Superwall and App Store Connect
+    private let entitlementID = "pro"
 
-    // Monthly and Yearly product identifiers
-    private let monthlyProductID = "monthly"
-    private let yearlyProductID = "yearly"
+    // Product IDs - must match App Store Connect exactly
+    private let monthlyProductID = "cortifree_monthly"
+    private let yearlyProductID = "cortifree_year"
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -55,11 +60,8 @@ class RevenueCatManager: ObservableObject {
         // Start observing customer info changes
         startObservingCustomerInfo()
 
-        // Fetch initial customer info
-        Task {
-            await refreshCustomerInfo()
-            await loadCurrentOffering()
-        }
+        // Premium is NOT considered active until identifyUser() or getCustomerInfo() returns
+        // isPremiumStatusReady stays false until then
     }
 
     // MARK: - User Identification
@@ -78,8 +80,12 @@ class RevenueCatManager: ObservableObject {
                 self.updateSubscriptionStatus()
             }
             #if DEBUG
-            print("✅ User identified successfully")
+            print("✅ User identified successfully with UID: \(userId)")
+            logDiagnostics(context: "After identifyUser")
             #endif
+
+            // Load offerings AFTER login so they're tied to the correct user
+            await loadCurrentOffering()
         } catch {
             #if DEBUG
             print("⚠️ Failed to identify user: \(error.localizedDescription)")
@@ -88,10 +94,20 @@ class RevenueCatManager: ObservableObject {
     }
 
     /// Logout current user from RevenueCat
+    /// Resets ALL premium state — no local cache survives logout
     func logout() async {
         #if DEBUG
         print("🔧 Logging out user from RevenueCat")
         #endif
+
+        // Reset all local state IMMEDIATELY before async call
+        await MainActor.run {
+            self.customerInfo = nil
+            self.hasActiveSubscription = false
+            self.hasPremiumEntitlement = false
+            self.isPremiumStatusReady = false
+            self.currentOffering = nil
+        }
 
         do {
             let customerInfo = try await Purchases.shared.logOut()
@@ -100,31 +116,46 @@ class RevenueCatManager: ObservableObject {
                 self.updateSubscriptionStatus()
             }
             #if DEBUG
-            print("✅ User logged out successfully")
+            print("✅ User logged out successfully — AppUserID: \(Purchases.shared.appUserID)")
             #endif
         } catch {
             #if DEBUG
             print("⚠️ Failed to logout user: \(error.localizedDescription)")
             #endif
+            // Even on failure, ensure premium is false
+            await MainActor.run {
+                self.hasPremiumEntitlement = false
+                self.hasActiveSubscription = false
+                self.isPremiumStatusReady = true
+            }
         }
     }
 
     // MARK: - Customer Info
 
     /// Refresh customer info from RevenueCat
-    func refreshCustomerInfo() async {
+    /// - Parameter forceServerFetch: When true, bypasses cache and fetches from server
+    func refreshCustomerInfo(forceServerFetch: Bool = false) async {
         isLoading = true
         defer { isLoading = false }
 
         do {
-            let customerInfo = try await Purchases.shared.customerInfo()
+            let customerInfo: CustomerInfo
+            if forceServerFetch {
+                customerInfo = try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
+                #if DEBUG
+                print("🔄 Customer info fetched from SERVER (forced)")
+                #endif
+            } else {
+                customerInfo = try await Purchases.shared.customerInfo()
+                #if DEBUG
+                print("✅ Customer info refreshed (may be cached)")
+                #endif
+            }
             await MainActor.run {
                 self.customerInfo = customerInfo
                 self.updateSubscriptionStatus()
             }
-            #if DEBUG
-            print("✅ Customer info refreshed")
-            #endif
         } catch {
             #if DEBUG
             print("⚠️ Failed to refresh customer info: \(error.localizedDescription)")
@@ -148,25 +179,40 @@ class RevenueCatManager: ObservableObject {
     }
 
     /// Update subscription status based on current customer info
+    /// This is the SINGLE SOURCE OF TRUTH for premium access
     private func updateSubscriptionStatus() {
         guard let customerInfo = customerInfo else {
             hasActiveSubscription = false
             hasPremiumEntitlement = false
+            isPremiumStatusReady = true // We know: no info = no premium
             return
         }
 
         // Check if user has any active entitlements
         hasActiveSubscription = !customerInfo.entitlements.active.isEmpty
 
-        // Check specifically for premium entitlement
+        // STRICT CHECK: only entitlements["pro"]?.isActive == true grants premium
         hasPremiumEntitlement = customerInfo.entitlements[entitlementID]?.isActive == true
+
+        // Mark that we've received a definitive answer from RevenueCat
+        isPremiumStatusReady = true
+
+        // Sync isPaid status to Firestore
+        if let userId = Auth.auth().currentUser?.uid {
+            let db = Firestore.firestore()
+            db.collection("users").document(userId)
+                .setData(["isPaid": hasPremiumEntitlement], merge: true)
+        }
 
         #if DEBUG
         print("📊 Subscription Status:")
+        print("   - AppUserID: \(Purchases.shared.appUserID)")
         print("   - Has Active Subscription: \(hasActiveSubscription)")
-        print("   - Has Premium Entitlement: \(hasPremiumEntitlement)")
+        print("   - Has Premium Entitlement (\(entitlementID)): \(hasPremiumEntitlement)")
+        print("   - Active Entitlements: \(Array(customerInfo.entitlements.active.keys))")
         if hasPremiumEntitlement {
             print("   - Premium Expiration: \(customerInfo.entitlements[entitlementID]?.expirationDate?.description ?? "N/A")")
+            print("   - Product ID: \(customerInfo.entitlements[entitlementID]?.productIdentifier ?? "N/A")")
         }
         #endif
     }
@@ -178,9 +224,24 @@ class RevenueCatManager: ObservableObject {
         currentOffering?.package(identifier: "$rc_monthly") ?? currentOffering?.monthly
     }
 
-    /// Yearly package from current offering
+    /// Yearly package — 3d trial (original)
     var yearlyPackage: Package? {
         currentOffering?.package(identifier: "$rc_annual") ?? currentOffering?.annual
+    }
+
+    /// Yearly package — 7d trial (A/B test variant)
+    var yearlyV2Package: Package? {
+        currentOffering?.package(identifier: "cortifree_yearly_v2")
+    }
+
+    /// Exit intent offer — 30€ 3d trial
+    var exitIntentV1Package: Package? {
+        currentOffering?.package(identifier: "cortifree_offer_v1")
+    }
+
+    /// Exit intent offer — 30€ 7d trial
+    var exitIntentV2Package: Package? {
+        currentOffering?.package(identifier: "cortifree_offer_v2")
     }
 
     /// Monthly display price (e.g., "9,99 €")
@@ -292,10 +353,13 @@ class RevenueCatManager: ObservableObject {
         defer { isLoading = false }
 
         do {
-            let (_, customerInfo, _) = try await Purchases.shared.purchase(package: package)
+            let (_, _, _) = try await Purchases.shared.purchase(package: package)
+
+            // FORCE SERVER REFRESH — never trust the customerInfo returned by purchase()
+            let refreshedInfo = try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
 
             await MainActor.run {
-                self.customerInfo = customerInfo
+                self.customerInfo = refreshedInfo
                 self.updateSubscriptionStatus()
             }
 
@@ -303,14 +367,10 @@ class RevenueCatManager: ObservableObject {
             print("✅ Purchase successful!")
             #endif
 
-            // Track purchase with Mixpanel
-            MixpanelManager.shared.trackPurchase(
-                productId: package.storeProduct.productIdentifier,
-                price: package.storeProduct.price as Decimal,
-                currency: package.storeProduct.priceFormatter?.currencyCode ?? "USD"
-            )
+            // NE PAS tracker ici — le tracking est fait au niveau du call site (vue)
+            // pour éviter le double-fire (RevenueCatManager + NativePaywallView)
 
-            return customerInfo
+            return refreshedInfo
         } catch {
             #if DEBUG
             print("⚠️ Purchase failed: \(error.localizedDescription)")
@@ -329,10 +389,13 @@ class RevenueCatManager: ObservableObject {
         defer { isLoading = false }
 
         do {
-            let customerInfo = try await Purchases.shared.restorePurchases()
+            let _ = try await Purchases.shared.restorePurchases()
+
+            // FORCE SERVER REFRESH — never trust restore's returned customerInfo
+            let refreshedInfo = try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
 
             await MainActor.run {
-                self.customerInfo = customerInfo
+                self.customerInfo = refreshedInfo
                 self.updateSubscriptionStatus()
             }
 
@@ -340,7 +403,7 @@ class RevenueCatManager: ObservableObject {
             print("✅ Purchases restored successfully")
             #endif
 
-            return customerInfo
+            return refreshedInfo
         } catch {
             #if DEBUG
             print("⚠️ Restore failed: \(error.localizedDescription)")
@@ -388,6 +451,28 @@ class RevenueCatManager: ObservableObject {
             return false
         }
         return entitlement.willRenew
+    }
+
+    // MARK: - Diagnostics
+
+    /// Log full subscription diagnostic info — call when paywall opens
+    func logDiagnostics(context: String = "Paywall") {
+        #if DEBUG
+        print("🔍 [\(context)] RevenueCat Diagnostics:")
+        print("   - AppUserID: \(Purchases.shared.appUserID)")
+        print("   - Is Anonymous: \(Purchases.shared.isAnonymous)")
+        print("   - Premium Status Ready: \(isPremiumStatusReady)")
+        print("   - Has Premium Entitlement (\(entitlementID)): \(hasPremiumEntitlement)")
+        print("   - Has Active Subscription: \(hasActiveSubscription)")
+        if let info = customerInfo {
+            print("   - Active Entitlements: \(Array(info.entitlements.active.keys))")
+            for (key, entitlement) in info.entitlements.active {
+                print("     → \(key): productID=\(entitlement.productIdentifier), expires=\(entitlement.expirationDate?.description ?? "never")")
+            }
+        } else {
+            print("   - CustomerInfo: nil (not yet loaded)")
+        }
+        #endif
     }
 
     // MARK: - Promotional Offers

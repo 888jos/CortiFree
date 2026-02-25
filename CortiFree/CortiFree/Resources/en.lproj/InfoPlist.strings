@@ -16,5 +16,3 @@
 "NSMicrophoneUsageDescription" = "CortiFree needs microphone access for guided meditation and breathing exercises.";
 "NSLocationWhenInUseUsageDescription" = "CortiFree uses your location to provide personalized nature activity suggestions based on your area.";
 "NSMotionUsageDescription" = "CortiFree uses motion tracking to monitor your physical activity and provide better exercise recommendations.";
-"NSHealthShareUsageDescription" = "CortiFree reads health data to provide personalized wellness insights and track your progress.";
-"NSHealthUpdateUsageDescription" = "CortiFree saves your meditation and exercise data to Apple Health to give you a complete view of your wellness.";

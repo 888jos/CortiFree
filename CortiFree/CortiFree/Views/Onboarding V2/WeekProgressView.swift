@@ -54,17 +54,7 @@ struct WeekProgressView: View {
 
     // Force week titles to display correctly (Week 1, Week 5, Week 10)
     private func getWeekTitle() -> String {
-        let isFrench = languageManager.currentLanguage == .french
-        switch currentWeek {
-        case 1:
-            return isFrench ? "Semaine 1" : "Week 1"
-        case 5:
-            return isFrench ? "Semaine 5" : "Week 5"
-        case 10:
-            return isFrench ? "Semaine 10" : "Week 10"
-        default:
-            return isFrench ? "Semaine \(currentWeek)" : "Week \(currentWeek)"
-        }
+        String(format: StringKeys.Onboarding.WeekProgress.weekNumber, currentWeek)
     }
 
     // Responsive label offsets that scale with iPad
@@ -101,7 +91,7 @@ struct WeekProgressView: View {
                 VStack(spacing: 0) {
                     // Week title - Force display of week number based on screen index
                     Text(getWeekTitle())
-                    .font(Font.Poppins.custom(.bold, size: 40))
+                    .font(.faroBold(40))
                     .foregroundColor(.white)
                     .responsivePadding(.top, 100)
                     .padding(.bottom, 16)
@@ -174,7 +164,7 @@ struct WeekProgressView: View {
                                 Image(systemName: "star.fill")
                                     .font(.system(size: 14))
                                 Text(StringKeys.Common.global)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
+                                    .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
                             .offset(x: 0, y: -labelOffsets.vertical)
@@ -184,7 +174,7 @@ struct WeekProgressView: View {
                                 Image(systemName: "leaf.fill")
                                     .font(.system(size: 14))
                                 Text(StringKeys.Common.serenity)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
+                                    .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
                             .offset(x: labelOffsets.horizontal, y: -labelOffsetsSmall.vertical)
@@ -194,7 +184,7 @@ struct WeekProgressView: View {
                                 Image(systemName: "moon.fill")
                                     .font(.system(size: 14))
                                 Text(StringKeys.Common.sleep)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
+                                    .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
                             .offset(x: labelOffsets.horizontal, y: labelOffsetsSmall.vertical)
@@ -204,7 +194,7 @@ struct WeekProgressView: View {
                                 Image(systemName: "bolt.fill")
                                     .font(.system(size: 14))
                                 Text(StringKeys.Common.energy)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
+                                    .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
                             .offset(x: 0, y: labelOffsets.vertical)
@@ -214,7 +204,7 @@ struct WeekProgressView: View {
                                 Image(systemName: "target")
                                     .font(.system(size: 14))
                                 Text(StringKeys.Common.focus)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
+                                    .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
                             .offset(x: -labelOffsets.horizontal, y: labelOffsetsSmall.vertical)
@@ -224,7 +214,7 @@ struct WeekProgressView: View {
                                 Image(systemName: "heart.fill")
                                     .font(.system(size: 14))
                                 Text(StringKeys.Common.balance)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
+                                    .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
                             .offset(x: -labelOffsets.horizontal, y: -labelOffsetsSmall.vertical)

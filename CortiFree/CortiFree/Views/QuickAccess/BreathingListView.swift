@@ -81,7 +81,7 @@ struct BreathingListView: View {
             Spacer()
 
             Text(languageManager.localized("library.breathing.title"))
-                .font(.custom("Poppins-SemiBold", size: 20))
+                .font(.faroSemiBold(20))
                 .foregroundColor(.white)
 
             Spacer()
@@ -128,7 +128,7 @@ struct BreathingCard: View {
                             .foregroundColor(.white)
 
                         Text(title)
-                            .font(.custom("Poppins-SemiBold", size: 12))
+                            .font(.faroSemiBold(12))
                             .foregroundColor(.white)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)

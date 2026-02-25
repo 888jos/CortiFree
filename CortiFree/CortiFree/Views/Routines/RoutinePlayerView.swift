@@ -63,11 +63,13 @@ struct RoutinePlayerView: View {
             }
         }
         .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
             withAnimation(Animation.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
                 pulseAnimation = true
             }
         }
         .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
             // Stop any playing sound when leaving
             if soundPlayer.isPlaying {
                 soundPlayer.stop()
@@ -229,7 +231,7 @@ struct RoutinePlayerView: View {
 
                 // Instruction
                 Text(currentStep.localizedInstruction)
-                    .font(.custom("Poppins-SemiBold", size: 24))
+                    .font(.faroSemiBold(24))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .lineSpacing(8)
@@ -526,7 +528,7 @@ struct RoutineCompletionOverlay: View {
 
                 VStack(spacing: 8) {
                     Text(NSLocalizedString("routines.completed.title", comment: ""))
-                        .font(.custom("Poppins-Bold", size: 28))
+                        .font(.faroBold(28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
@@ -540,7 +542,7 @@ struct RoutineCompletionOverlay: View {
                 HStack(spacing: 24) {
                     VStack(spacing: 4) {
                         Text(routine.formattedDuration)
-                            .font(.custom("Poppins-Bold", size: 20))
+                            .font(.faroBold(20))
                             .foregroundColor(.white)
                         Text(NSLocalizedString("routines.completed.duration", comment: ""))
                             .font(.custom("Poppins-Regular", size: 12))
@@ -553,7 +555,7 @@ struct RoutineCompletionOverlay: View {
 
                     VStack(spacing: 4) {
                         Text("\(routine.steps.count)")
-                            .font(.custom("Poppins-Bold", size: 20))
+                            .font(.faroBold(20))
                             .foregroundColor(.white)
                         Text(NSLocalizedString("routines.completed.steps", comment: ""))
                             .font(.custom("Poppins-Regular", size: 12))

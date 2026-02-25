@@ -9,6 +9,7 @@ import RevenueCatUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authViewModel: AuthViewModel
+    @ObservedObject private var revenueCatManager = RevenueCatManager.shared
     @AppStorage("appLanguage") private var appLanguage: String = {
         // Détection de la région pour la langue par défaut
         let regionCode = Locale.current.region?.identifier ?? ""
@@ -39,6 +40,11 @@ struct SettingsView: View {
     @State private var bugReportScreenshot: UIImage? = nil
     @State private var showBugReportSuccess: Bool = false
     @State private var showCustomerCenter: Bool = false
+    @State private var showReauthAlert: Bool = false
+    @State private var reauthEmail: String = ""
+    @State private var reauthPassword: String = ""
+    @State private var deleteError: String?
+    @State private var showDeleteError: Bool = false
 
     var body: some View {
         ZStack {
@@ -109,6 +115,36 @@ struct SettingsView: View {
         } message: {
             Text(NSLocalizedString("settings.alert.clear_data.message", comment: ""))
         }
+        .alert(
+            LanguageManager.shared.currentLanguage == .french ?
+                "Confirmer votre identité" : "Confirm your identity",
+            isPresented: $showReauthAlert
+        ) {
+            SecureField(
+                LanguageManager.shared.currentLanguage == .french ?
+                    "Mot de passe" : "Password",
+                text: $reauthPassword
+            )
+            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) {
+                reauthPassword = ""
+            }
+            Button(NSLocalizedString("settings.alert.delete.button", comment: ""), role: .destructive) {
+                reauthenticateAndDelete()
+                reauthPassword = ""
+            }
+        } message: {
+            Text(LanguageManager.shared.currentLanguage == .french ?
+                 "Entrez votre mot de passe pour supprimer votre compte." :
+                 "Enter your password to delete your account.")
+        }
+        .alert(
+            LanguageManager.shared.currentLanguage == .french ? "Erreur" : "Error",
+            isPresented: $showDeleteError
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteError ?? "")
+        }
         .onAppear {
             viewModel.calculateLocalDataSize()
         }
@@ -149,7 +185,7 @@ struct SettingsView: View {
             Spacer()
 
             Text(NSLocalizedString("settings.title", comment: ""))
-                .font(.custom("Poppins-Bold", size: 24))
+                .font(.faroBold(24))
                 .foregroundColor(.white)
 
             Spacer()
@@ -217,9 +253,9 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 // RevenueCat subscription status
                 settingsRow(
-                    icon: RevenueCatManager.shared.hasPremiumEntitlement ? "checkmark.circle.fill" : "circle",
+                    icon: revenueCatManager.hasPremiumEntitlement ? "checkmark.circle.fill" : "circle",
                     title: NSLocalizedString("settings.subscription.status", comment: ""),
-                    subtitle: RevenueCatManager.shared.hasPremiumEntitlement ?
+                    subtitle: revenueCatManager.hasPremiumEntitlement ?
                         (LanguageManager.shared.currentLanguage == .french ? "Premium actif" : "Premium active") :
                         (LanguageManager.shared.currentLanguage == .french ? "Non abonné" : "Not subscribed"),
                     showChevron: false
@@ -365,7 +401,7 @@ struct SettingsView: View {
                     .foregroundColor(.white.opacity(0.7))
 
                 Text(title)
-                    .font(.custom("Poppins-Medium", size: 14))
+                    .font(.faroSemiBold(13))
                     .foregroundColor(.white.opacity(0.7))
                     .textCase(.uppercase)
             }
@@ -615,22 +651,63 @@ struct SettingsView: View {
                 let db = Firestore.firestore()
                 try await db.collection("users").document(userId).delete()
 
+                // Delete sub-collections if any
+                let settingsRef = db.collection("users").document(userId).collection("settings")
+                let settingsDocs = try await settingsRef.getDocuments()
+                for doc in settingsDocs.documents {
+                    try await doc.reference.delete()
+                }
+
                 // Delete Firebase auth account
                 try await user.delete()
+
+                // Logout RevenueCat
+                await RevenueCatManager.shared.logout()
 
                 // Clear all local data
                 let domain = Bundle.main.bundleIdentifier!
                 UserDefaults.standard.removePersistentDomain(forName: domain)
                 UserDefaults.standard.synchronize()
 
-                // Sign out
-                authViewModel.signOut()
+                // Update auth state
+                await MainActor.run {
+                    authViewModel.signOut()
+                    dismiss()
+                }
+            } catch let error as NSError {
+                if error.code == AuthErrorCode.requiresRecentLogin.rawValue {
+                    // Need re-authentication — show re-auth prompt
+                    await MainActor.run {
+                        reauthEmail = Auth.auth().currentUser?.email ?? ""
+                        showReauthAlert = true
+                    }
+                } else {
+                    await MainActor.run {
+                        deleteError = error.localizedDescription
+                        showDeleteError = true
+                    }
+                    #if DEBUG
+                    print("❌ Error deleting account: \(error)")
+                    #endif
+                }
+            }
+        }
+    }
 
-                dismiss()
+    private func reauthenticateAndDelete() {
+        Task {
+            do {
+                guard let user = Auth.auth().currentUser else { return }
+                let credential = EmailAuthProvider.credential(withEmail: reauthEmail, password: reauthPassword)
+                try await user.reauthenticate(with: credential)
+
+                // Now retry delete
+                deleteAccount()
             } catch {
-                #if DEBUG
-                print("❌ Error deleting account: \(error)")
-                #endif
+                await MainActor.run {
+                    deleteError = error.localizedDescription
+                    showDeleteError = true
+                }
             }
         }
     }

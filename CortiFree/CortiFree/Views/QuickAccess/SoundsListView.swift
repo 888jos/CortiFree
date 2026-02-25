@@ -77,7 +77,7 @@ struct SoundsListView: View {
             Spacer()
 
             Text(languageManager.localized("sounds.title"))
-                .font(.custom("Poppins-SemiBold", size: 20))
+                .font(.faroSemiBold(20))
                 .foregroundColor(.white)
 
             Spacer()
@@ -140,7 +140,7 @@ struct SoundCard: View {
                             .foregroundColor(.white)
 
                         Text(title)
-                            .font(.custom("Poppins-SemiBold", size: 13))
+                            .font(.faroSemiBold(13))
                             .foregroundColor(.white)
                             .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
 

@@ -140,7 +140,7 @@ struct BreathingExerciseDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Title
             Text(pattern.displayName)
-                .font(.custom("Poppins-Bold", size: 28))
+                .font(.faroBold(28))
                 .foregroundColor(.white)
 
             // Description courte
@@ -169,7 +169,7 @@ struct BreathingExerciseDetailView: View {
                         .foregroundColor(Color.appTheme)
 
                     Text(NSLocalizedString("breathing_detail.how_it_works", comment: ""))
-                        .font(.custom("Poppins-SemiBold", size: 18))
+                        .font(.faroSemiBold(18))
                         .foregroundColor(.white)
 
                     Spacer()
@@ -239,7 +239,7 @@ struct BreathingExerciseDetailView: View {
                         .foregroundColor(Color.appTheme)
 
                     Text(NSLocalizedString("breathing_detail.scientific_evidence", comment: ""))
-                        .font(.custom("Poppins-SemiBold", size: 18))
+                        .font(.faroSemiBold(18))
                         .foregroundColor(.white)
 
                     Spacer()
@@ -385,14 +385,14 @@ struct BreathingExerciseDetailView: View {
                     .foregroundColor(Color.appTheme)
 
                 Text(NSLocalizedString("breathing_detail.exercise_duration", comment: ""))
-                    .font(.custom("Poppins-SemiBold", size: 16))
+                    .font(.faroSemiBold(16))
                     .foregroundColor(.white)
 
                 Spacer()
 
                 // Display selected duration with REDUCED font size
                 Text(formatDuration(selectedDuration))
-                    .font(.custom("Poppins-Bold", size: 18)) // Reduced from 24
+                    .font(.faroBold(18)) // Reduced from 24
                     .foregroundColor(Color.appTheme)
                     .monospacedDigit()
             }
@@ -462,7 +462,7 @@ struct BreathingExerciseDetailView: View {
                     .font(.system(size: 24))
 
                 Text(NSLocalizedString("breathing_detail.start_exercise", comment: ""))
-                    .font(.custom("Poppins-Bold", size: 18))
+                    .font(.faroBold(18))
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -523,12 +523,12 @@ struct BenefitBadge: View {
                     .frame(width: 24, height: 24)
 
                 Image(systemName: "checkmark")
-                    .font(.custom("Poppins-Bold", size: 12))
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.white)
             }
 
             Text(benefit)
-                .font(.custom("Poppins-Medium", size: 14))
+                .font(.faroSemiBold(14))
                 .foregroundColor(.white)
                 .fixedSize(horizontal: false, vertical: true)
         }

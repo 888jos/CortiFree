@@ -338,7 +338,7 @@ struct TasksV2View: View {
                     // Day counter
                     HStack {
                         Text(currentDay <= 66 ? String(format: NSLocalizedString("tasks.day_counter", comment: ""), currentDay) : String(format: NSLocalizedString("tasks.day_counter_extended", comment: ""), currentDay))
-                            .font(Font.Poppins.custom(.bold, size: 48))
+                            .font(.faroBold(48))
                             .foregroundColor(.white)
 
                         Spacer()
@@ -488,7 +488,7 @@ struct TasksV2View: View {
                                 // Error message
                                 VStack(spacing: 8) {
                                     Text(NSLocalizedString("tasks.error_loading", comment: ""))
-                                        .font(Font.Poppins.custom(.semiBold, size: 20))
+                                        .font(.faroSemiBold(20))
                                         .foregroundColor(.white)
 
                                     Text(error)
@@ -539,7 +539,7 @@ struct TasksV2View: View {
                                 // Empty state message
                                 VStack(spacing: 8) {
                                     Text(emptyStateTitle)
-                                        .font(Font.Poppins.custom(.semiBold, size: 18))
+                                        .font(.faroSemiBold(18))
                                         .foregroundColor(.white)
 
                                     Text(emptyStateMessage)
@@ -774,6 +774,7 @@ struct TasksV2View: View {
                 // Calculate global streak from all habits
                 await MainActor.run {
                     updateGlobalStreak()
+                    syncWidgetCache()
                 }
             } catch {
                 #if DEBUG
@@ -971,6 +972,7 @@ struct TasksV2View: View {
         let isFirstTaskToday = tasksCompletedBeforeThis == 0
 
         taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .done
+        syncWidgetCache()
 
         // Toujours recalculer les streaks normalement
         // Skip = "pas encore fait", donc valider après un skip continue le streak normalement
@@ -1090,6 +1092,7 @@ struct TasksV2View: View {
         }
 
         taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .skipped
+        syncWidgetCache()
 
         // NE PAS toucher aux streaks - skip = "pas encore fait"
         // Les streaks seront recalculés correctement quand on valide
@@ -1178,6 +1181,7 @@ struct TasksV2View: View {
 
             // Set task back to todo status
             taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .todo
+            syncWidgetCache()
 
             // Recalculate streaks
             updateTaskStreak(task)
@@ -1206,6 +1210,49 @@ struct TasksV2View: View {
 
         skippedTask = nil
     }
+
+    // MARK: - Widget Sync
+
+    /// Synchronise le widget avec exactement les tâches affichées aujourd'hui.
+    /// Appelé après chaque changement de statut (validate, skip, restore).
+    private func syncWidgetCache() {
+        let dayTasks = tasks  // computed property — tâches exactes du jour actuel
+        let dayStatuses = taskStatuses[dayKey(currentDay)] ?? [:]
+
+        let widgetTasks = dayTasks.map { task -> WidgetTask in
+            let status = dayStatuses[taskKey(task)] ?? .todo
+            let habitId = getHabitId(for: task)
+            let sfSymbol = sfSymbolForHabit(habitId, imageName: task.imageName)
+            return WidgetTask(
+                id: task.title, // titre = clé stable pour le jour
+                title: task.title,
+                emoji: "",
+                sfSymbol: sfSymbol,
+                completed: status == .done,
+                cancelled: status == .skipped,
+                recommendedTime: nil,
+                habitId: habitId
+            )
+        }
+
+        WidgetDataStore.saveTasks(widgetTasks, programDay: actualDay)
+    }
+
+    private func sfSymbolForHabit(_ habitId: String, imageName: String = "") -> String {
+        switch habitId {
+        case "breathing":  return "wind"
+        case "meditation": return "figure.mind.and.body"
+        case "water":      return "drop.fill"
+        case "sport":      return "figure.run"
+        case "sleep":
+            // Distingue lever (morning) et coucher (night)
+            return imageName.contains("morning") ? "sunrise.fill" : "moon.zzz.fill"
+        case "nature":     return "leaf.fill"
+        case "journal":    return "book.fill"
+        case "social":     return "person.2.fill"
+        default:           return "checkmark.circle.fill"
+        }
+    }
 }
 
 // MARK: - Future Week Blocking View
@@ -1232,7 +1279,7 @@ struct FutureWeekBlockingView: View {
 
                 // Title
                 Text(String(format: NSLocalizedString("tasks.week_locked_title", comment: ""), currentWeek + 1))
-                    .font(Font.Poppins.custom(.bold, size: 24))
+                    .font(.faroBold(24))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
 

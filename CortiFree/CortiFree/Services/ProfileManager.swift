@@ -187,18 +187,30 @@ class ProfileManager: ObservableObject {
         return performance
     }
 
-    /// Récupère toutes les performances
+    /// Récupère toutes les performances (parallel fetch — 1 roundtrip batch instead of 8 sequential)
     func fetchAllPerformances(uid: String) async throws -> [String: HabitPerformance] {
         let habitIds = ["meditation", "breathing", "journal", "sport", "water", "nature", "social", "sleep"]
-        var performances: [String: HabitPerformance] = [:]
 
-        for habitId in habitIds {
-            if let performance = try? await fetchCurrentPerformance(uid: uid, habitId: habitId) {
-                performances[habitId] = performance
+        let performances = try await withThrowingTaskGroup(of: (String, HabitPerformance)?.self) { group in
+            for habitId in habitIds {
+                group.addTask {
+                    guard let performance = try? await self.fetchCurrentPerformance(uid: uid, habitId: habitId) else {
+                        return nil
+                    }
+                    return (habitId, performance)
+                }
             }
+
+            var results: [String: HabitPerformance] = [:]
+            for try await result in group {
+                if let (habitId, performance) = result {
+                    results[habitId] = performance
+                }
+            }
+            return results
         }
 
-        DispatchQueue.main.async {
+        await MainActor.run {
             self.currentPerformance = performances
         }
 

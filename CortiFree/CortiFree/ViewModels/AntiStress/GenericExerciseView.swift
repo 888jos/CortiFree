@@ -67,7 +67,7 @@ struct GenericExerciseView: View {
 
                     VStack(spacing: 12) {
                         Text(exerciseType.displayName)
-                            .font(.custom("Poppins-SemiBold", size: 28))
+                            .font(.faroSemiBold(28))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
@@ -86,7 +86,7 @@ struct GenericExerciseView: View {
                 // Timer
                 VStack(spacing: 16) {
                     Text(formatTime(timeRemaining))
-                        .font(.custom("Poppins-Medium", size: 60))
+                        .font(.faroBold(60))
                         .foregroundColor(.white)
                         .monospacedDigit()
 
@@ -127,7 +127,11 @@ struct GenericExerciseView: View {
             }
         }
         .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
             viewModel.startExercise(exerciseType)
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
         }
         .onReceive(timer) { _ in
             if timeRemaining > 0 {

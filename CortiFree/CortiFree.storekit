@@ -1,0 +1,264 @@
+{
+  "identifier" : "C0E3B9A5",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6758316268",
+    "_developerTeamID" : "Y9U65KVXHK",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 760125690.75587201,
+    "_locale" : "fr_FR",
+    "_storefront" : "FRA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21557588",
+      "localizations" : [
+
+      ],
+      "name" : "CortiFree Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6758315419",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Subscription providing full access to the features",
+              "displayName" : "CortiFree Monthly Subscription",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Accès complet à toutes les fonctionnalités CortiFree",
+              "displayName" : "Abonnement mensuel CortiFree",
+              "locale" : "fr_FR"
+            }
+          ],
+          "productID" : "cortifree_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "CortiFree Premium Monthly",
+          "subscriptionGroupID" : "21557588",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6758316268",
+          "introductoryOffer" : {
+            "internalID" : "E8A84C1A",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "Full annual access to all meditation exercises, daily programs, and premium content. Save 67% with the annual plan!",
+              "displayName" : "CortiFree Annual Subscription",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Accès complet annuel à tous les exercices de méditation, programmes quotidiens et contenus premium. Économise 67% avec l'abonnement annuel !",
+              "displayName" : "Abonnement annuel CortiFree",
+              "locale" : "fr_FR"
+            }
+          ],
+          "productID" : "cortifree_year",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "CortiFree Premium Yearly",
+          "subscriptionGroupID" : "21557588",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "cortifree_yearly_v2_internal",
+          "introductoryOffer" : {
+            "internalID" : "cortifree_yearly_v2_trial",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P7D"
+          },
+          "localizations" : [
+            {
+              "description" : "Full annual access with 7-day free trial. Save 67% with the annual plan!",
+              "displayName" : "CortiFree Yearly 7d Trial",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Accès annuel complet avec 7 jours d'essai gratuit. Économise 67% !",
+              "displayName" : "CortiFree Annuel 7j Essai",
+              "locale" : "fr_FR"
+            }
+          ],
+          "productID" : "cortifree_yearly_v2",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "CortiFree Yearly 7d Trial",
+          "subscriptionGroupID" : "21557588",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "familyShareable" : false,
+          "groupNumber" : 4,
+          "internalID" : "cortifree_offer_v1_internal",
+          "introductoryOffer" : {
+            "internalID" : "cortifree_offer_v1_trial",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "Special offer: annual access at reduced price with 3-day free trial.",
+              "displayName" : "CortiFree Offer 3d Trial",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Offre spéciale : accès annuel à prix réduit avec 3 jours d'essai gratuit.",
+              "displayName" : "CortiFree Offre 3j Essai",
+              "locale" : "fr_FR"
+            }
+          ],
+          "productID" : "cortifree_offer_v1",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "CortiFree Offer 3d Trial",
+          "subscriptionGroupID" : "21557588",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "familyShareable" : false,
+          "groupNumber" : 5,
+          "internalID" : "cortifree_offer_v2_internal",
+          "introductoryOffer" : {
+            "internalID" : "cortifree_offer_v2_trial",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P7D"
+          },
+          "localizations" : [
+            {
+              "description" : "Special offer: annual access at reduced price with 7-day free trial.",
+              "displayName" : "CortiFree Offer 7d Trial",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Offre spéciale : accès annuel à prix réduit avec 7 jours d'essai gratuit.",
+              "displayName" : "CortiFree Offre 7j Essai",
+              "locale" : "fr_FR"
+            }
+          ],
+          "productID" : "cortifree_offer_v2",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "CortiFree Offer 7d Trial",
+          "subscriptionGroupID" : "21557588",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

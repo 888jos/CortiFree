@@ -36,10 +36,14 @@ class SettingsViewModel: ObservableObject {
     @Published var syncEnabled: Bool = true
     @Published var localDataSize: String = "0 MB"
 
-    // Subscription (read-only from Firebase/Superwall)
+    // Subscription (read-only from RevenueCat — no local cache)
     @Published var subscriptionStatus: String = ""
     @Published var renewalDate: String = ""
-    @Published var isPremium: Bool = false
+
+    /// Premium status derived from RevenueCat — never set manually
+    var isPremium: Bool {
+        RevenueCatManager.shared.hasPremiumEntitlement
+    }
 
     // Sync Status
     @Published var isSyncing: Bool = false
@@ -378,10 +382,8 @@ class SettingsViewModel: ObservableObject {
 
     private func loadSubscriptionStatus() {
         Task { @MainActor in
-            // Check RevenueCat for active subscription
-            let isSubscribed = RevenueCatManager.shared.hasPremiumEntitlement
-            self.isPremium = isSubscribed
-            self.subscriptionStatus = isSubscribed ? StringKeys.Settings.subscriptionPremium : StringKeys.Settings.subscriptionFree
+            // isPremium is now a computed property from RevenueCat — no local assignment
+            self.subscriptionStatus = isPremium ? StringKeys.Settings.subscriptionPremium : StringKeys.Settings.subscriptionFree
 
             // Get renewal/expiration date
             if let expirationDate = RevenueCatManager.shared.getSubscriptionExpirationDate() {

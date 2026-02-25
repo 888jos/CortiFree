@@ -48,7 +48,7 @@ struct OverallQuizView: View {
                     VStack(spacing: 0) {
                     // Fixed Question Number Title
                     Text("Question #\(currentQuestionNumber)")
-                        .font(.custom("Poppins-Bold", size: 24))
+                        .font(.faroBold(24))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 30)
@@ -56,35 +56,35 @@ struct OverallQuizView: View {
 
                     // Sliding content
                     if currentQuestionIndex == 0 {
-                        genderQuestion
+                        reasonQuestion
                             .id(0)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 1 {
-                        ageQuestion
+                        durationQuestion
                             .id(1)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 2 {
-                        acquisitionQuestion
+                        genderQuestion
                             .id(2)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 3 {
-                        reasonQuestion
+                        ageQuestion
                             .id(3)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
                     } else if currentQuestionIndex == 4 {
-                        durationQuestion
+                        acquisitionQuestion
                             .id(4)
                             .transition(.asymmetric(
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
@@ -115,11 +115,11 @@ struct OverallQuizView: View {
 
     private func trackQuestionViewed(_ index: Int) {
         let questionTexts = [
+            "Raisons du stress",
+            "Durée du stress",
             "Genre",
             "Âge",
-            "Comment as-tu découvert CortiFree ?",
-            "Raisons du stress",
-            "Durée du stress"
+            "Comment as-tu découvert CortiFree ?"
         ]
         MixpanelManager.shared.trackOnboardingQuizQuestionViewed(
             questionNumber: index + 1,
@@ -130,11 +130,11 @@ struct OverallQuizView: View {
 
     private func trackQuestionAnswered(_ index: Int, answerIndex: Int, answerText: String) {
         let questionTexts = [
+            "Raisons du stress",
+            "Durée du stress",
             "Genre",
             "Âge",
-            "Comment as-tu découvert CortiFree ?",
-            "Raisons du stress",
-            "Durée du stress"
+            "Comment as-tu découvert CortiFree ?"
         ]
         let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
         MixpanelManager.shared.trackOnboardingQuizQuestionAnswered(
@@ -212,7 +212,7 @@ struct OverallQuizView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
             Text("onboarding_v2.overall.gender_question".localized)
-                .font(.custom("Poppins-Medium", size: 18))
+                .font(.faroRegular(18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
                 .padding(.horizontal, 32)
@@ -227,7 +227,7 @@ struct OverallQuizView: View {
                     isSelected: selectedGender == 0,
                     onTap: {
                         HapticManager.light()
-                        trackQuestionAnswered(0, answerIndex: 0, answerText: "onboarding_v2.overall.gender_male".localized)
+                        trackQuestionAnswered(2, answerIndex: 0, answerText: "onboarding_v2.overall.gender_male".localized)
                         withAnimation(.easeInOut(duration: 0.5)) {
                             selectedGender = 0
                         }
@@ -243,7 +243,7 @@ struct OverallQuizView: View {
                     isSelected: selectedGender == 1,
                     onTap: {
                         HapticManager.light()
-                        trackQuestionAnswered(0, answerIndex: 1, answerText: "onboarding_v2.overall.gender_female".localized)
+                        trackQuestionAnswered(2, answerIndex: 1, answerText: "onboarding_v2.overall.gender_female".localized)
                         withAnimation(.easeInOut(duration: 0.5)) {
                             selectedGender = 1
                         }
@@ -259,7 +259,7 @@ struct OverallQuizView: View {
                     isSelected: selectedGender == 2,
                     onTap: {
                         HapticManager.light()
-                        trackQuestionAnswered(0, answerIndex: 2, answerText: "onboarding_v2.overall.gender_other".localized)
+                        trackQuestionAnswered(2, answerIndex: 2, answerText: "onboarding_v2.overall.gender_other".localized)
                         withAnimation(.easeInOut(duration: 0.5)) {
                             selectedGender = 2
                         }
@@ -280,7 +280,7 @@ struct OverallQuizView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
             Text("onboarding_v2.overall.age_question".localized)
-                .font(.custom("Poppins-Medium", size: 18))
+                .font(.faroRegular(18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
                 .padding(.horizontal, 32)
@@ -304,7 +304,7 @@ struct OverallQuizView: View {
                         isSelected: selectedAge == index,
                         onTap: {
                             HapticManager.light()
-                            trackQuestionAnswered(1, answerIndex: index, answerText: ageTexts[index])
+                            trackQuestionAnswered(3, answerIndex: index, answerText: ageTexts[index])
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 selectedAge = index
                             }
@@ -325,8 +325,8 @@ struct OverallQuizView: View {
     private var acquisitionQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
-            Text("onboarding_v2.habits.q9".localized)
-                .font(.custom("Poppins-Medium", size: 18))
+            Text("onboarding_v2.habits.q10".localized)
+                .font(.faroRegular(18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
                 .padding(.horizontal, 32)
@@ -338,12 +338,12 @@ struct OverallQuizView: View {
                 VStack(spacing: 22) {
                     ForEach(0..<6, id: \.self) { index in
                         let acquisitionTexts = [
-                            "onboarding_v2.habits.q9_opt1".localized,
-                            "onboarding_v2.habits.q9_opt2".localized,
-                            "onboarding_v2.habits.q9_opt3".localized,
-                            "onboarding_v2.habits.q9_opt4".localized,
-                            "onboarding_v2.habits.q9_opt5".localized,
-                            "onboarding_v2.habits.q9_opt6".localized
+                            "onboarding_v2.habits.q10_opt1".localized,
+                            "onboarding_v2.habits.q10_opt2".localized,
+                            "onboarding_v2.habits.q10_opt3".localized,
+                            "onboarding_v2.habits.q10_opt4".localized,
+                            "onboarding_v2.habits.q10_opt5".localized,
+                            "onboarding_v2.habits.q10_opt6".localized
                         ]
                         OverallAnswerButton(
                             number: index + 1,
@@ -351,12 +351,12 @@ struct OverallQuizView: View {
                             isSelected: selectedAcquisition == index,
                             onTap: {
                                 HapticManager.light()
-                                trackQuestionAnswered(2, answerIndex: index, answerText: acquisitionTexts[index])
+                                trackQuestionAnswered(4, answerIndex: index, answerText: acquisitionTexts[index])
                                 withAnimation(.easeInOut(duration: 0.5)) {
                                     selectedAcquisition = index
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                    currentQuestionIndex += 1
+                                    completeQuiz()
                                 }
                             }
                         )
@@ -374,7 +374,7 @@ struct OverallQuizView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
             Text("onboarding_v2.overall.reason_question".localized)
-                .font(.custom("Poppins-Medium", size: 18))
+                .font(.faroRegular(18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
                 .padding(.horizontal, 32)
@@ -493,7 +493,7 @@ struct OverallQuizView: View {
                                 "onboarding_v2.overall.reason_habits".localized
                             ]
                             let selectedTexts = selectedReasons.sorted().compactMap { reasonTexts[safe: $0] }.joined(separator: ", ")
-                            trackQuestionAnswered(3, answerIndex: selectedReasons.count, answerText: selectedTexts)
+                            trackQuestionAnswered(0, answerIndex: selectedReasons.count, answerText: selectedTexts)
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 currentQuestionIndex += 1
                             }
@@ -522,7 +522,7 @@ struct OverallQuizView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Question text
             Text("onboarding_v2.overall.duration_question".localized)
-                .font(.custom("Poppins-Medium", size: 18))
+                .font(.faroRegular(18))
                 .foregroundColor(.white)
                 .lineSpacing(4)
                 .padding(.horizontal, 32)
@@ -545,12 +545,12 @@ struct OverallQuizView: View {
                         isSelected: selectedDuration == index,
                         onTap: {
                             HapticManager.light()
-                            trackQuestionAnswered(4, answerIndex: index, answerText: durationTexts[index])
+                            trackQuestionAnswered(1, answerIndex: index, answerText: durationTexts[index])
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 selectedDuration = index
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                completeQuiz()
+                                currentQuestionIndex += 1
                             }
                         }
                     )

@@ -30,7 +30,6 @@ struct RevenueCatPaywallView: View {
     var body: some View {
         ZStack {
             // RevenueCat's built-in paywall view
-            // This will display the paywall configured in RevenueCat dashboard
             if revenueCatManager.hasPremiumEntitlement {
                 // User already has premium - show success message
                 successView
@@ -83,7 +82,7 @@ struct RevenueCatPaywallView: View {
                 Text(languageManager.currentLanguage == .french ?
                      "Vous êtes Premium !" :
                      "You're Premium!")
-                    .font(.custom("Poppins-Bold", size: 28))
+                    .font(.faroBold(28))
                     .foregroundColor(.white)
 
                 Text(languageManager.currentLanguage == .french ?
@@ -122,12 +121,14 @@ struct RevenueCatPaywallView: View {
         print("✅ Purchase completed successfully")
         #endif
 
-        // Track purchase with Mixpanel
-        if let entitlement = customerInfo.entitlements["CortiFree Premium"] {
+        // Track purchase avec détection trial vs paid
+        if let entitlement = customerInfo.entitlements["pro"] {
+            let isTrial = entitlement.periodType == .trial
             MixpanelManager.shared.trackPurchase(
                 productId: entitlement.productIdentifier,
-                price: 0, // Price is already tracked in RevenueCatManager
-                currency: "USD"
+                price: 0, // Prix non disponible ici (paywall natif RevenueCat)
+                currency: "EUR",
+                isTrial: isTrial
             )
         }
 
@@ -153,7 +154,7 @@ struct RevenueCatPaywallView: View {
         onRestoreCompleted?()
 
         // Dismiss if user has active entitlement
-        if customerInfo.entitlements["CortiFree Premium"]?.isActive == true {
+        if customerInfo.entitlements["pro"]?.isActive == true {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 dismiss()
             }
@@ -213,7 +214,7 @@ extension View {
 
     /// Automatically presents paywall if premium entitlement is not active
     func presentRevenueCatPaywallIfNeeded(
-        requiredEntitlementIdentifier: String = "CortiFree Premium",
+        requiredEntitlementIdentifier: String = "pro",
         onPurchaseCompleted: ((CustomerInfo) -> Void)? = nil,
         onRestoreCompleted: ((CustomerInfo) -> Void)? = nil
     ) -> some View {

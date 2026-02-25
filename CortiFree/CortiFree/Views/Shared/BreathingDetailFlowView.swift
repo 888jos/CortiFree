@@ -90,11 +90,15 @@ struct BreathingDetailFlowView: View {
             }
         }
         .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
             startBreathingAnimation()
             // Animation du halo
             withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
                 haloOpacity = 0.5
             }
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
         }
         .onReceive(timer) { _ in
             if isExerciseActive && timeRemaining > 0 {
@@ -132,23 +136,7 @@ struct BreathingDetailFlowView: View {
 
             Spacer()
 
-            // VoiceOver toggle - même niveau que le bouton retour
-            Button(action: {
-                HapticManager.light()
-                voiceOverManager.toggle()
-            }) {
-                ZStack {
-                    Circle()
-                        .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.2) : Color.white.opacity(0.1))
-                        .frame(width: 44, height: 44)
-
-                    Image(systemName: voiceOverManager.isEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(voiceOverManager.isEnabled ? Color(hex: "B388FF") : .white.opacity(0.7))
-                        .scaleEffect(voiceOverManager.isSpeaking ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 0.3).repeatForever(autoreverses: true), value: voiceOverManager.isSpeaking)
-                }
-            }
+            Color.clear.frame(width: 44, height: 44)
         }
         .padding(.horizontal, 24)
         .padding(.top, 60)
@@ -180,7 +168,7 @@ struct BreathingDetailFlowView: View {
 
     private var phaseTextSection: some View {
         Text(currentPhase.displayText)
-            .font(.custom("Poppins-Bold", size: 28))
+            .font(.faroBold(28))
             .foregroundColor(.white)
             .frame(height: 40) // Hauteur fixe pour éviter les sauts
     }
@@ -190,7 +178,7 @@ struct BreathingDetailFlowView: View {
     private var timerSection: some View {
         VStack(spacing: 12) {
             Text(formatTime(timeRemaining))
-                .font(.custom("Poppins-Medium", size: 48))
+                .font(.faroBold(48))
                 .foregroundColor(.white)
                 .monospacedDigit()
 
@@ -302,7 +290,7 @@ struct BreathingCompletionOverlay: View {
 
                 // Message
                 Text(NSLocalizedString("breathing.completion.title", comment: "Tu as repris le contrôle"))
-                    .font(.custom("Poppins-SemiBold", size: 28))
+                    .font(.faroSemiBold(28))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
 

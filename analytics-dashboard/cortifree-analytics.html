@@ -953,7 +953,16 @@ o
                     <div class="header-subtitle">Analytics Dashboard</div>
                     <h1>CortiFree</h1>
                 </div>
-                <div class="header-revenue" id="headerRevenue">$0.00</div>
+                <div style="display:flex; gap:32px; align-items:flex-end;">
+                    <div style="text-align:right;">
+                        <div style="font-size:12px; color:var(--text-muted); font-weight:500; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;">Total Revenue <span style="font-size:10px;">(all-time)</span></div>
+                        <div class="header-revenue" id="headerRevenue">$0</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:12px; color:var(--text-muted); font-weight:500; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;">RPI <span style="font-size:10px;">(all-time)</span></div>
+                        <div class="header-revenue" id="headerRPI">$0.00</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Navigation Tabs -->
@@ -1530,12 +1539,13 @@ o
         // Mixpanel Server: https://api-eu.mixpanel.com
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDUNiZnPmlyqra5S-NE8oyteE0He78DwBA",
+            apiKey: "AIzaSyBlqQE1WtTLMRqEAOSbTg6w0jIMmUMuPZ8",
             authDomain: "cortifree-app.firebaseapp.com",
             projectId: "cortifree-app",
             storageBucket: "cortifree-app.firebasestorage.app",
             messagingSenderId: "559047783915",
-            appId: "1:559047783915:ios:528a29531de5a8219155ae"
+            appId: "1:559047783915:web:fcacee272bb7ba2b9155ae",
+            measurementId: "G-G83XWCNNMK"
         };
 
         // Initialize Firebase
@@ -1621,22 +1631,43 @@ o
             console.log('🔄 Fetching real data from Firebase...');
 
             try {
+                // Build queries
+                let installQuery = db.collection('analytics_events')
+                    .where('event_name', '==', 'onboarding_welcome_viewed');
                 let usersQuery = db.collection('users');
+                let onboardingQuery = db.collection('users').where('onboardingCompleted', '==', true);
+                let trialQuery = db.collection('analytics_events')
+                    .where('event_name', '==', 'subscription_purchased');
 
-                if (currentPeriod.start) {
-                    usersQuery = usersQuery.where('createdAt', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
+                if (currentPeriod.start && currentPeriod.end) {
+                    const startTs = firebase.firestore.Timestamp.fromDate(currentPeriod.start);
+                    const endTs = firebase.firestore.Timestamp.fromDate(currentPeriod.end);
+                    installQuery = installQuery.where('timestamp', '>=', startTs).where('timestamp', '<=', endTs);
+                    usersQuery = usersQuery.where('createdAt', '>=', startTs).where('createdAt', '<=', endTs);
+                    onboardingQuery = onboardingQuery.where('createdAt', '>=', startTs).where('createdAt', '<=', endTs);
+                    trialQuery = trialQuery.where('timestamp', '>=', startTs).where('timestamp', '<=', endTs);
                 }
+                // All time → aucun filtre de date
 
-                const usersSnapshot = await usersQuery.get();
-                const totalUsers = usersSnapshot.size;
+                // All-time installs (pour RPI cohérent avec revenue all-time)
+                const allTimeInstallQuery = db.collection('analytics_events')
+                    .where('event_name', '==', 'onboarding_welcome_viewed');
 
-                console.log(`📊 Total users in period: ${totalUsers}`);
+                // Fetch all 5 in parallel
+                const [installSnapshot, usersSnapshot, onboardingCompletedSnapshot, allTimeInstallSnapshot, trialSnapshot] = await Promise.all([
+                    installQuery.get(),
+                    usersQuery.get(),
+                    onboardingQuery.get(),
+                    allTimeInstallQuery.get(),
+                    trialQuery.get()
+                ]);
 
-                // Onboarding completed
-                const onboardingCompletedSnapshot = await db.collection('users')
-                    .where('onboardingCompleted', '==', true)
-                    .get();
+                const totalUsers = installSnapshot.size;
+                const totalUsersAllTime = allTimeInstallSnapshot.size;
                 const onboardingCompleted = onboardingCompletedSnapshot.size;
+                // Trials démarrés dans la période (subscription_purchased inclut is_trial=true et is_trial=false)
+                const trialsStarted = trialSnapshot.size;
+                console.log(`📊 Installs: ${totalUsers}, Onboarding completed: ${onboardingCompleted}`);
 
                 // Calculate average streak
                 let totalStreakDays = 0;
@@ -1650,94 +1681,85 @@ o
                 });
                 const avgStreak = usersWithStreak > 0 ? (totalStreakDays / usersWithStreak).toFixed(1) : 0;
 
-                // Count total completed tasks (limit to first 100 users for performance)
-                let totalTasks = 0;
-                const limitedUsers = usersSnapshot.docs.slice(0, 100);
-                for (const userDoc of limitedUsers) {
-                    const tasksSnapshot = await db.collection('users')
-                        .doc(userDoc.id)
-                        .collection('completed_tasks')
-                        .get();
-                    totalTasks += tasksSnapshot.size;
+                const totalTasks = 0; // skipped — too slow (N queries per user)
+
+                // Get habit tracking stats — parallel queries
+                const habitKeys = ['meditation', 'breathing', 'journal', 'sport', 'water', 'nature', 'social', 'sleep'];
+                const habitStats = { meditation: 0, breathing: 0, journal: 0, sport: 0, water: 0, nature: 0, social: 0, sleep: 0 };
+                try {
+                    const habitResults = await Promise.all(habitKeys.map(habit =>
+                        db.collectionGroup('habit_tracking')
+                            .where('habitId', '==', habit)
+                            .where('totalCompletions', '>', 0)
+                            .limit(500)
+                            .get()
+                    ));
+                    habitKeys.forEach((habit, i) => { habitStats[habit] = habitResults[i].size; });
+                } catch (e) {
+                    console.warn('⚠️ habit_tracking not accessible, skipping:', e.message);
                 }
 
-                // Get habit tracking stats
-                const habitStats = {
-                    meditation: 0,
-                    breathing: 0,
-                    journal: 0,
-                    sport: 0,
-                    water: 0,
-                    nature: 0,
-                    social: 0,
-                    sleep: 0
-                };
+                // Retention — skipped (requires 1 query per user, too slow)
+                const retentionRates = { day1: 0, day3: 0, day7: 0, day14: 0, day30: 0 };
 
-                for (const habit of Object.keys(habitStats)) {
-                    const habitSnapshot = await db.collectionGroup('habit_tracking')
-                        .where('habitId', '==', habit)
-                        .where('totalCompletions', '>', 0)
-                        .limit(500)
-                        .get();
-                    habitStats[habit] = habitSnapshot.size;
+                // Fetch active subs/trials/revenue from RevenueCat overview (all-time, no date filter available)
+                var activeSubscriptions = 0;
+                var activeTrials = 0;
+                var revenue = 0;
+                try {
+                    const rcResponse = await fetch('https://api.revenuecat.com/v2/projects/proj3f3f17f6/metrics/overview', {
+                        headers: {
+                            'Authorization': 'Bearer sk_mAogCdRrShVTorhJdHeBoaYTEauti',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (rcResponse.ok) {
+                        const rcData = await rcResponse.json();
+                        const rcMetrics = {};
+                        rcData.metrics.forEach(m => { rcMetrics[m.id] = m.value; });
+                        activeSubscriptions = rcMetrics.active_subscriptions || 0;
+                        activeTrials = rcMetrics.active_trials || 0;
+                        revenue = rcMetrics.revenue || 0;
+                        console.log(`💰 Active subs: ${activeSubscriptions}, Trials: ${activeTrials}, Revenue: $${revenue}`);
+                    } else {
+                        console.warn('⚠️ RevenueCat overview error:', rcResponse.status);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Could not fetch RevenueCat overview:', e.message);
                 }
 
-                // Calculate retention metrics
-                const now = new Date();
-                const retentionMetrics = {
-                    day1: 0,
-                    day3: 0,
-                    day7: 0,
-                    day14: 0,
-                    day30: 0
-                };
-
-                for (const userDoc of usersSnapshot.docs) {
-                    const userData = userDoc.data();
-                    if (!userData.createdAt) continue;
-
-                    const createdDate = userData.createdAt.toDate();
-                    const daysSinceCreation = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
-
-                    const hasActivity = await db.collection('users')
-                        .doc(userDoc.id)
-                        .collection('completed_tasks')
-                        .limit(1)
-                        .get();
-
-                    const isActive = !hasActivity.empty;
-
-                    if (daysSinceCreation >= 1 && isActive) retentionMetrics.day1++;
-                    if (daysSinceCreation >= 3 && isActive) retentionMetrics.day3++;
-                    if (daysSinceCreation >= 7 && isActive) retentionMetrics.day7++;
-                    if (daysSinceCreation >= 14 && isActive) retentionMetrics.day14++;
-                    if (daysSinceCreation >= 30 && isActive) retentionMetrics.day30++;
-                }
-
-                const retentionRates = {
-                    day1: totalUsers > 0 ? ((retentionMetrics.day1 / totalUsers) * 100).toFixed(1) : 0,
-                    day3: totalUsers > 0 ? ((retentionMetrics.day3 / totalUsers) * 100).toFixed(1) : 0,
-                    day7: totalUsers > 0 ? ((retentionMetrics.day7 / totalUsers) * 100).toFixed(1) : 0,
-                    day14: totalUsers > 0 ? ((retentionMetrics.day14 / totalUsers) * 100).toFixed(1) : 0,
-                    day30: totalUsers > 0 ? ((retentionMetrics.day30 / totalUsers) * 100).toFixed(1) : 0
-                };
+                const ltv = activeSubscriptions > 0 ? revenue / activeSubscriptions : 0;
+                const rpi = totalUsersAllTime > 0 ? revenue / totalUsersAllTime : 0;
+                // Trial to Paid = paid subs / (paid subs + active trials) — source: RevenueCat only
+                const totalTrialPool = activeSubscriptions + activeTrials;
+                const trialToPaid = totalTrialPool > 0 ? ((activeSubscriptions / totalTrialPool) * 100).toFixed(1) : 0;
 
                 console.log('✅ Data fetched successfully');
+
+                // Download to Trial = subscription_purchased events / installs — Firestore (période)
+                const downloadToTrial = totalUsers > 0 ? ((trialsStarted / totalUsers) * 100).toFixed(1) : 0;
+
+                const accountsCreated = usersSnapshot.size;
+                const authRate = totalUsers > 0 ? ((accountsCreated / totalUsers) * 100).toFixed(1) : 0;
 
                 return {
                     totalUsers,
                     onboardingCompleted,
                     onboardingRate: totalUsers > 0 ? ((onboardingCompleted / totalUsers) * 100).toFixed(1) : 0,
+                    authRate,
+                    accountsCreated,
                     avgStreak,
                     totalTasks,
                     habitStats,
                     retentionRates,
-                    activeSubscriptions: 0,
-                    revenue: 0,
-                    ltv: 0,
-                    rpi: 0,
-                    downloadToTrial: totalUsers > 0 ? ((onboardingCompleted / totalUsers) * 100).toFixed(1) : 0,
-                    trialToPaid: 0,
+                    activeSubscriptions,
+                    activeTrials,
+                    trialsStarted,
+                    revenue,
+                    ltv,
+                    rpi,
+                    downloadToTrial,
+                    trialToPaid,
                     funnelData: await fetchOnboardingFunnel()
                 };
 
@@ -1748,36 +1770,89 @@ o
         }
 
         async function fetchOnboardingFunnel() {
-            // Apply date filtering to funnel queries
-            let usersQuery = db.collection('users');
+            // ALL onboarding events in order
+            const funnelSteps = [
+                'onboarding_welcome_viewed',
+                'onboarding_welcome_clicked',
+                'onboarding_overall_quiz_viewed',
+                'onboarding_overall_quiz_clicked',
+                'onboarding_reassurance_viewed',
+                'onboarding_reassurance_clicked',
+                'onboarding_habits_quiz_viewed',
+                'onboarding_habits_quiz_clicked',
+                'onboarding_stress_pattern_viewed',
+                'onboarding_stress_pattern_continue',
+                'onboarding_symptom_checker_viewed',
+                'onboarding_symptom_checker_continue',
+                'onboarding_science_hook_viewed',
+                'onboarding_science_hook_continue',
+                'onboarding_sixty_days_viewed',
+                'onboarding_sixty_days_clicked',
+                'onboarding_scientific_plan_viewed',
+                'onboarding_scientific_plan_clicked',
+                'onboarding_authentication_viewed',
+                'onboarding_authentication_clicked',
+                'onboarding_loading_analysis_viewed',
+                'onboarding_loading_analysis_clicked',
+                'onboarding_cortifree_rating_viewed',
+                'onboarding_cortifree_rating_clicked',
+                'onboarding_eight_habits_intro_viewed',
+                'onboarding_eight_habits_intro_clicked',
+                'onboarding_week_progress_viewed',
+                'onboarding_week_progress_clicked',
+                'onboarding_eight_habits_flow_viewed',
+                'onboarding_eight_habits_flow_clicked',
+                'onboarding_notifications_viewed',
+                'onboarding_notifications_clicked',
+                'onboarding_habits_progress_viewed',
+                'onboarding_habits_progress_clicked',
+                'onboarding_commitment_viewed',
+                'onboarding_commitment_completed',
+                'onboarding_testimonials_viewed',
+                'onboarding_testimonials_clicked',
+                'onboarding_paywall_viewed',
+                'onboarding_paywall_clicked',
+                'subscription_purchased',
+                'onboarding_completed'
+            ];
 
-            if (currentPeriod.start) {
-                usersQuery = usersQuery.where('createdAt', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
+            const funnelData = {};
+            funnelSteps.forEach(step => { funnelData[step] = new Set(); });
+
+            try {
+                // Single query: get all analytics events, filter client-side
+                let query = db.collection('analytics_events');
+                if (currentPeriod.start && currentPeriod.end) {
+                    query = query
+                        .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start))
+                        .where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(currentPeriod.end));
+                }
+                // All time → aucun filtre de date
+                const snapshot = await query.get();
+                console.log(`📊 Fetched ${snapshot.size} analytics events`);
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const eventName = data.event_name;
+                    if (funnelData.hasOwnProperty(eventName)) {
+                        // Use real user_id, but treat "anonymous" as unique per-event doc
+                        const userId = (data.user_id && data.user_id !== 'anonymous') ? data.user_id : doc.id;
+                        funnelData[eventName].add(userId);
+                    }
+                });
+
+                // Convert Sets to counts
+                funnelSteps.forEach(step => {
+                    funnelData[step] = funnelData[step].size;
+                });
+                console.log('📊 Funnel data:', funnelData);
+            } catch (e) {
+                console.warn('⚠️ Could not fetch funnel data:', e.message);
+                funnelSteps.forEach(step => { funnelData[step] = 0; });
             }
 
-            const usersSnapshot = await usersQuery.get();
-            const totalUsers = usersSnapshot.size;
-
-            // Count onboarding completions with date filter
-            let onboardingQuery = db.collection('users').where('onboardingCompleted', '==', true);
-
-            if (currentPeriod.start) {
-                onboardingQuery = onboardingQuery.where('createdAt', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
-            }
-
-            const onboardingCompleted = (await onboardingQuery.get()).size;
-
-            // Return real data + estimated funnel progression based on filtered users
-            return {
-                welcome_viewed: totalUsers,
-                overall_quiz_viewed: Math.floor(totalUsers * 0.95),
-                overall_quiz_completed: Math.floor(totalUsers * 0.90),
-                habits_quiz_viewed: Math.floor(totalUsers * 0.88),
-                habits_quiz_completed: Math.floor(totalUsers * 0.85),
-                quiz_completed: Math.floor(totalUsers * 0.85),
-                auth_completed: Math.floor(totalUsers * 0.70),
-                onboarding_completed: onboardingCompleted
-            };
+            // Return with all steps accessible by key
+            return funnelData;
         }
 
         // ============================================
@@ -1812,17 +1887,16 @@ o
                 // Fetch events from analytics_events collection
                 let query = db.collection('analytics_events');
 
-                if (currentPeriod.start) {
-                    query = query.where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start));
-                }
-                if (currentPeriod.end) {
-                    query = query.where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(currentPeriod.end));
-                }
-
-                // Filter by event name if specified
+                // Always filter by event_name first, then date range if not all-time
                 if (eventName) {
                     query = query.where('event_name', '==', eventName);
                 }
+                if (currentPeriod.start && currentPeriod.end) {
+                    query = query
+                        .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(currentPeriod.start))
+                        .where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(currentPeriod.end));
+                }
+                // All time → aucun filtre de date
 
                 const snapshot = await query.get();
 
@@ -1906,7 +1980,7 @@ o
                     onboardingData,
                     paywallData
                 ] = await Promise.all([
-                    fetchDailyMetrics('app_opened'), // For installations
+                    fetchDailyMetrics('onboarding_welcome_viewed'), // For installations
                     fetchDailyMetrics('onboarding_completed'), // For onboarding
                     fetchDailyMetrics('onboarding_paywall_viewed') // For paywall views
                 ]);
@@ -1932,11 +2006,13 @@ o
         async function renderKPIs(data) {
             const container = document.getElementById('kpiGrid');
 
-            // Update header revenue
-            document.getElementById('headerRevenue').textContent = `$${data.revenue.toFixed(2)}`;
+            // Update header revenue + RPI (all-time, above period filter)
+            document.getElementById('headerRevenue').textContent = `$${data.revenue.toFixed(0)}`;
+            document.getElementById('headerRPI').textContent = `$${data.rpi.toFixed(2)}`;
 
-            // Calculate paywall view rate
-            const paywallViewRate = data.totalUsers > 0 ? ((data.totalUsers * 0.50) / data.totalUsers * 100).toFixed(1) : 0;
+            // Calculate paywall view rate from real funnel data
+            const paywallViews = data.funnelData['onboarding_paywall_viewed'] || 0;
+            const paywallViewRate = data.totalUsers > 0 ? ((paywallViews / data.totalUsers) * 100).toFixed(1) : 0;
 
             // Fetch sparkline data for all metrics
             console.log('📊 Fetching sparkline data...');
@@ -1945,68 +2021,40 @@ o
 
             const kpis = [
                 {
-                    title: 'Total Revenue',
-                    value: `$${data.revenue.toFixed(2)}`,
-                    subtitle: `${data.activeSubscriptions} paying customers`,
-                    badge: null,
-                    sparklineKey: 'revenue'
-                },
-                {
-                    title: 'LTV',
-                    value: `$${data.ltv.toFixed(2)}`,
-                    subtitle: 'Per paying customer (all-time)',
-                    badge: data.activeSubscriptions > 0 ? getBadge(data.ltv, { good: 40, average: 20 }) : null,
-                    sparklineKey: 'ltv'
-                },
-                {
-                    title: 'RPI',
-                    value: `$${data.rpi.toFixed(2)}`,
-                    subtitle: 'Revenue per install (last week)',
-                    badge: data.totalUsers > 0 ? getBadge(data.rpi, { good: 0.5, average: 0.15 }) : null,
-                    sparklineKey: 'rpi'
-                },
-                {
                     title: 'Paywall View Rate',
                     value: `${paywallViewRate}%`,
-                    subtitle: 'Users reaching paywall',
+                    subtitle: 'paywall_viewed / installs — Firestore (période)',
                     badge: getBadge(parseFloat(paywallViewRate), { good: 60, average: 40 }),
                     sparklineKey: 'paywall'
                 },
                 {
                     title: 'Download to Trial',
                     value: `${data.downloadToTrial}%`,
-                    subtitle: 'Trial start rate (selected period)',
+                    subtitle: `${data.trialsStarted} subscription_purchased / installs — période`,
                     badge: getBadge(parseFloat(data.downloadToTrial), { good: 15, average: 8 }),
                     sparklineKey: 'downloadToTrial'
                 },
                 {
                     title: 'Trial to Paid',
                     value: `${data.trialToPaid}%`,
-                    subtitle: 'Trial conversion rate (all-time)',
+                    subtitle: 'Paid / (Paid + Active trials) — RevenueCat',
                     badge: parseFloat(data.trialToPaid) > 0 ? getBadge(parseFloat(data.trialToPaid), { good: 25, average: 12 }) : null,
                     sparklineKey: 'trialToPaid'
                 },
                 {
                     title: 'Installations',
                     value: data.totalUsers,
-                    subtitle: 'Total users created',
+                    subtitle: 'New installs (welcome screen)',
                     badge: null,
                     sparklineKey: 'installations'
                 },
                 {
-                    title: 'Onboarding Rate',
-                    value: `${data.onboardingRate}%`,
-                    subtitle: 'Completed onboarding',
-                    badge: getBadge(parseFloat(data.onboardingRate), { good: 75, average: 55 }),
+                    title: 'Auth Rate',
+                    value: `${data.authRate}%`,
+                    subtitle: `${data.accountsCreated} comptes créés / installs — période`,
+                    badge: getBadge(parseFloat(data.authRate), { good: 70, average: 45 }),
                     sparklineKey: 'onboarding'
                 },
-                {
-                    title: 'Avg Streak',
-                    value: `${data.avgStreak} days`,
-                    subtitle: 'Consecutive active days',
-                    badge: parseFloat(data.avgStreak) > 0 ? getBadge(parseFloat(data.avgStreak), { good: 10, average: 5 }) : null,
-                    sparklineKey: 'avgStreak'
-                }
             ];
 
             container.innerHTML = kpis.map(kpi => {
@@ -2035,57 +2083,53 @@ o
 
         function renderFunnel(funnelData) {
             const container = document.getElementById('funnelViz');
-            const totalUsers = funnelData.welcome_viewed;
+            const totalUsers = funnelData['onboarding_welcome_viewed'] || 0;
 
-            // Define ALL onboarding steps including ALL quiz questions
+            // All funnel steps with display names
             const allSteps = [
-                { name: 'Welcome', event: 'onboarding_welcome_viewed', count: totalUsers },
-
-                // Overall Quiz - 5 questions (Genre, Âge, Acquisition, Raisons Stress, Durée Stress)
-                { name: 'Q1: Genre', event: 'overall_quiz_genre', count: Math.floor(totalUsers * 0.98) },
-                { name: 'Q2: Âge', event: 'overall_quiz_age', count: Math.floor(totalUsers * 0.96) },
-                { name: 'Q3: Acquisition', event: 'overall_quiz_acquisition', count: Math.floor(totalUsers * 0.94) },
-                { name: 'Q4: Raisons Stress', event: 'overall_quiz_stress_reasons', count: Math.floor(totalUsers * 0.92) },
-                { name: 'Q5: Durée Stress', event: 'overall_quiz_stress_duration', count: Math.floor(totalUsers * 0.90) },
-
-                // Reassurance (AVANT Habits Quiz)
-                { name: 'Reassurance', event: 'onboarding_reassurance_viewed', count: Math.floor(totalUsers * 0.88) },
-
-                // Habits Quiz - 13 questions (8 scoring + 1 apparence + 2 marketing + 2 engagement)
-                { name: 'H1: Scoring Stress', event: 'habits_quiz_scoring_stress', count: Math.floor(totalUsers * 0.86) },
-                { name: 'H2: Scoring Énergie', event: 'habits_quiz_scoring_energy', count: Math.floor(totalUsers * 0.84) },
-                { name: 'H3: Scoring Sommeil', event: 'habits_quiz_scoring_sleep', count: Math.floor(totalUsers * 0.82) },
-                { name: 'H4: Scoring Focus', event: 'habits_quiz_scoring_focus', count: Math.floor(totalUsers * 0.80) },
-                { name: 'H5: Scoring Mental', event: 'habits_quiz_scoring_mental', count: Math.floor(totalUsers * 0.78) },
-                { name: 'H6: Scoring Digital', event: 'habits_quiz_scoring_digital', count: Math.floor(totalUsers * 0.76) },
-                { name: 'H7: Stress Pro/Perso', event: 'habits_quiz_stress_work_life', count: Math.floor(totalUsers * 0.74) },
-                { name: 'H8: Stress Social', event: 'habits_quiz_stress_social', count: Math.floor(totalUsers * 0.72) },
-                { name: 'H9: Apparence', event: 'habits_quiz_appearance', count: Math.floor(totalUsers * 0.70) },
-                { name: 'H10: Marketing Acq', event: 'habits_quiz_marketing_acquisition', count: Math.floor(totalUsers * 0.68) },
-                { name: 'H11: Marketing Exp', event: 'habits_quiz_marketing_experience', count: Math.floor(totalUsers * 0.66) },
-                { name: 'H12: Objectif', event: 'habits_quiz_goal', count: Math.floor(totalUsers * 0.64) },
-                { name: 'H13: Temps Dispo', event: 'habits_quiz_time_available', count: Math.floor(totalUsers * 0.62) },
-
-                // Education & Trust
-                { name: '66 Days Info', event: 'onboarding_sixty_days_viewed', count: Math.floor(totalUsers * 0.60) },
-                { name: 'Science Plan', event: 'onboarding_scientific_plan_viewed', count: Math.floor(totalUsers * 0.58) },
-
-                // Signup & Analysis
-                { name: 'Auth Start', event: 'onboarding_authentication_viewed', count: Math.floor(totalUsers * 0.56) },
-                { name: 'Auth Done', event: 'onboarding_authentication_completed', count: funnelData.auth_completed },
-                { name: 'Loading...', event: 'onboarding_loading_analysis_viewed', count: funnelData.auth_completed },
-                { name: 'Rating', event: 'onboarding_cortifree_rating_viewed', count: Math.floor(totalUsers * 0.52) },
-
-                // Conversion
-                { name: '8 Habits Intro', event: 'onboarding_eight_habits_intro_viewed', count: Math.floor(totalUsers * 0.50) },
-                { name: 'Week Progress', event: 'onboarding_week_progress_viewed', count: Math.floor(totalUsers * 0.48) },
-                { name: '8 Habits Flow', event: 'onboarding_eight_habits_flow_viewed', count: Math.floor(totalUsers * 0.46) },
-                { name: 'Notifications', event: 'onboarding_notifications_viewed', count: Math.floor(totalUsers * 0.44) },
-                { name: 'Habits Progress', event: 'onboarding_habits_progress_viewed', count: Math.floor(totalUsers * 0.42) },
-                { name: 'Social Proof', event: 'onboarding_social_proof_viewed', count: Math.floor(totalUsers * 0.40) },
-                { name: 'Paywall', event: 'onboarding_paywall_viewed', count: Math.floor(totalUsers * 0.38) },
-                { name: 'Completed', event: 'onboarding_completed', count: funnelData.onboarding_completed }
-            ];
+                { name: 'Welcome', event: 'onboarding_welcome_viewed' },
+                { name: 'Welcome Click', event: 'onboarding_welcome_clicked' },
+                { name: 'Overall Quiz', event: 'onboarding_overall_quiz_viewed' },
+                { name: 'Overall Quiz Done', event: 'onboarding_overall_quiz_clicked' },
+                { name: 'Reassurance', event: 'onboarding_reassurance_viewed' },
+                { name: 'Reassurance Click', event: 'onboarding_reassurance_clicked' },
+                { name: 'Habits Quiz', event: 'onboarding_habits_quiz_viewed' },
+                { name: 'Habits Quiz Done', event: 'onboarding_habits_quiz_clicked' },
+                { name: 'Stress Pattern', event: 'onboarding_stress_pattern_viewed' },
+                { name: 'Stress Continue', event: 'onboarding_stress_pattern_continue' },
+                { name: 'Symptom Checker', event: 'onboarding_symptom_checker_viewed' },
+                { name: 'Symptom Done', event: 'onboarding_symptom_checker_continue' },
+                { name: 'Cortisol Hook', event: 'onboarding_science_hook_viewed' },
+                { name: 'Cortisol Continue', event: 'onboarding_science_hook_continue' },
+                { name: '66 Days Info', event: 'onboarding_sixty_days_viewed' },
+                { name: '66 Days Click', event: 'onboarding_sixty_days_clicked' },
+                { name: 'Science Plan', event: 'onboarding_scientific_plan_viewed' },
+                { name: 'Science Click', event: 'onboarding_scientific_plan_clicked' },
+                { name: 'Auth Start', event: 'onboarding_authentication_viewed' },
+                { name: 'Auth Done', event: 'onboarding_authentication_clicked' },
+                { name: 'Loading', event: 'onboarding_loading_analysis_viewed' },
+                { name: 'Loading Click', event: 'onboarding_loading_analysis_clicked' },
+                { name: 'Rating', event: 'onboarding_cortifree_rating_viewed' },
+                { name: 'Rating Click', event: 'onboarding_cortifree_rating_clicked' },
+                { name: '8 Habits Intro', event: 'onboarding_eight_habits_intro_viewed' },
+                { name: '8 Habits Click', event: 'onboarding_eight_habits_intro_clicked' },
+                { name: 'Week Progress', event: 'onboarding_week_progress_viewed' },
+                { name: 'Week Click', event: 'onboarding_week_progress_clicked' },
+                { name: '8 Habits Flow', event: 'onboarding_eight_habits_flow_viewed' },
+                { name: '8 Habits Done', event: 'onboarding_eight_habits_flow_clicked' },
+                { name: 'Notifications', event: 'onboarding_notifications_viewed' },
+                { name: 'Notif Click', event: 'onboarding_notifications_clicked' },
+                { name: 'Habits Progress', event: 'onboarding_habits_progress_viewed' },
+                { name: 'Habits Click', event: 'onboarding_habits_progress_clicked' },
+                { name: 'Commitment', event: 'onboarding_commitment_viewed' },
+                { name: 'Committed', event: 'onboarding_commitment_completed' },
+                { name: 'Social Proof', event: 'onboarding_testimonials_viewed' },
+                { name: 'Social Click', event: 'onboarding_testimonials_clicked' },
+                { name: 'Paywall', event: 'onboarding_paywall_viewed' },
+                { name: 'Paywall Click', event: 'onboarding_paywall_clicked' },
+                { name: 'Purchased', event: 'subscription_purchased' },
+                { name: 'Completed', event: 'onboarding_completed' }
+            ].map(s => ({ ...s, count: funnelData[s.event] || 0 }));
 
             let html = '';
             let prevCount = totalUsers;
@@ -2120,45 +2164,53 @@ o
 
         function renderFunnelTable(funnelData) {
             const tbody = document.getElementById('funnelMetricsTableBody');
-            const totalUsers = funnelData.welcome_viewed;
+            const totalUsers = funnelData['onboarding_welcome_viewed'] || 0;
 
-            // Same steps as visual funnel
+            // Same steps as visual funnel - all events
             const allSteps = [
-                { name: 'Welcome', count: totalUsers },
-                { name: 'Q1: Genre', count: Math.floor(totalUsers * 0.98) },
-                { name: 'Q2: Âge', count: Math.floor(totalUsers * 0.96) },
-                { name: 'Q3: Acquisition', count: Math.floor(totalUsers * 0.94) },
-                { name: 'Q4: Raisons Stress', count: Math.floor(totalUsers * 0.92) },
-                { name: 'Q5: Durée Stress', count: Math.floor(totalUsers * 0.90) },
-                { name: 'Reassurance', count: Math.floor(totalUsers * 0.88) },
-                { name: 'H1: Scoring Stress', count: Math.floor(totalUsers * 0.86) },
-                { name: 'H2: Scoring Énergie', count: Math.floor(totalUsers * 0.84) },
-                { name: 'H3: Scoring Sommeil', count: Math.floor(totalUsers * 0.82) },
-                { name: 'H4: Scoring Focus', count: Math.floor(totalUsers * 0.80) },
-                { name: 'H5: Scoring Mental', count: Math.floor(totalUsers * 0.78) },
-                { name: 'H6: Scoring Digital', count: Math.floor(totalUsers * 0.76) },
-                { name: 'H7: Stress Pro/Perso', count: Math.floor(totalUsers * 0.74) },
-                { name: 'H8: Stress Social', count: Math.floor(totalUsers * 0.72) },
-                { name: 'H9: Apparence', count: Math.floor(totalUsers * 0.70) },
-                { name: 'H10: Marketing Acq', count: Math.floor(totalUsers * 0.68) },
-                { name: 'H11: Marketing Exp', count: Math.floor(totalUsers * 0.66) },
-                { name: 'H12: Objectif', count: Math.floor(totalUsers * 0.64) },
-                { name: 'H13: Temps Dispo', count: Math.floor(totalUsers * 0.62) },
-                { name: '66 Days Info', count: Math.floor(totalUsers * 0.60) },
-                { name: 'Science Plan', count: Math.floor(totalUsers * 0.58) },
-                { name: 'Auth Start', count: Math.floor(totalUsers * 0.56) },
-                { name: 'Auth Done', count: funnelData.auth_completed },
-                { name: 'Loading...', count: funnelData.auth_completed },
-                { name: 'Rating', count: Math.floor(totalUsers * 0.52) },
-                { name: '8 Habits Intro', count: Math.floor(totalUsers * 0.50) },
-                { name: 'Week Progress', count: Math.floor(totalUsers * 0.48) },
-                { name: '8 Habits Flow', count: Math.floor(totalUsers * 0.46) },
-                { name: 'Notifications', count: Math.floor(totalUsers * 0.44) },
-                { name: 'Habits Progress', count: Math.floor(totalUsers * 0.42) },
-                { name: 'Social Proof', count: Math.floor(totalUsers * 0.40) },
-                { name: 'Paywall', count: Math.floor(totalUsers * 0.38) },
-                { name: 'Completed', count: funnelData.onboarding_completed }
-            ];
+                { name: 'Welcome', event: 'onboarding_welcome_viewed' },
+                { name: 'Welcome Click', event: 'onboarding_welcome_clicked' },
+                { name: 'Overall Quiz', event: 'onboarding_overall_quiz_viewed' },
+                { name: 'Overall Quiz Done', event: 'onboarding_overall_quiz_clicked' },
+                { name: 'Reassurance', event: 'onboarding_reassurance_viewed' },
+                { name: 'Reassurance Click', event: 'onboarding_reassurance_clicked' },
+                { name: 'Habits Quiz', event: 'onboarding_habits_quiz_viewed' },
+                { name: 'Habits Quiz Done', event: 'onboarding_habits_quiz_clicked' },
+                { name: 'Stress Pattern', event: 'onboarding_stress_pattern_viewed' },
+                { name: 'Stress Continue', event: 'onboarding_stress_pattern_continue' },
+                { name: 'Symptom Checker', event: 'onboarding_symptom_checker_viewed' },
+                { name: 'Symptom Done', event: 'onboarding_symptom_checker_continue' },
+                { name: 'Cortisol Hook', event: 'onboarding_science_hook_viewed' },
+                { name: 'Cortisol Continue', event: 'onboarding_science_hook_continue' },
+                { name: '66 Days Info', event: 'onboarding_sixty_days_viewed' },
+                { name: '66 Days Click', event: 'onboarding_sixty_days_clicked' },
+                { name: 'Science Plan', event: 'onboarding_scientific_plan_viewed' },
+                { name: 'Science Click', event: 'onboarding_scientific_plan_clicked' },
+                { name: 'Auth Start', event: 'onboarding_authentication_viewed' },
+                { name: 'Auth Done', event: 'onboarding_authentication_clicked' },
+                { name: 'Loading', event: 'onboarding_loading_analysis_viewed' },
+                { name: 'Loading Click', event: 'onboarding_loading_analysis_clicked' },
+                { name: 'Rating', event: 'onboarding_cortifree_rating_viewed' },
+                { name: 'Rating Click', event: 'onboarding_cortifree_rating_clicked' },
+                { name: '8 Habits Intro', event: 'onboarding_eight_habits_intro_viewed' },
+                { name: '8 Habits Click', event: 'onboarding_eight_habits_intro_clicked' },
+                { name: 'Week Progress', event: 'onboarding_week_progress_viewed' },
+                { name: 'Week Click', event: 'onboarding_week_progress_clicked' },
+                { name: '8 Habits Flow', event: 'onboarding_eight_habits_flow_viewed' },
+                { name: '8 Habits Done', event: 'onboarding_eight_habits_flow_clicked' },
+                { name: 'Notifications', event: 'onboarding_notifications_viewed' },
+                { name: 'Notif Click', event: 'onboarding_notifications_clicked' },
+                { name: 'Habits Progress', event: 'onboarding_habits_progress_viewed' },
+                { name: 'Habits Click', event: 'onboarding_habits_progress_clicked' },
+                { name: 'Commitment', event: 'onboarding_commitment_viewed' },
+                { name: 'Committed', event: 'onboarding_commitment_completed' },
+                { name: 'Social Proof', event: 'onboarding_testimonials_viewed' },
+                { name: 'Social Click', event: 'onboarding_testimonials_clicked' },
+                { name: 'Paywall', event: 'onboarding_paywall_viewed' },
+                { name: 'Paywall Click', event: 'onboarding_paywall_clicked' },
+                { name: 'Purchased', event: 'subscription_purchased' },
+                { name: 'Completed', event: 'onboarding_completed' }
+            ].map(s => ({ ...s, count: funnelData[s.event] || 0 }));
 
             let rows = '';
             let prevCount = totalUsers;

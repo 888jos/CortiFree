@@ -24,21 +24,19 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Content - Optimized with lazy loading
+            // Content
+            // IMPORTANT: Do NOT use .id() on tabs — it forces full view recreation
+            // and re-triggers all .onAppear Firestore reads on every tab switch
             Group {
                 switch selectedTab {
                 case .home:
                     HomeView(isScrolling: $isScrolling, scrollTimer: $scrollTimer)
-                        .id(Tab.home) // Force view refresh on tab change
                 case .tasks:
                     TasksV2View()
-                        .id(Tab.tasks)
                 case .library:
                     LibraryView()
-                        .id(Tab.library)
                 case .profile:
                     ProfileView()
-                        .id(Tab.profile)
                 }
             }
 
@@ -59,6 +57,11 @@ struct ContentView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
+        .onOpenURL { url in
+            if url.scheme == "cortifree" && url.host == "tasks" {
+                selectedTab = .tasks
+            }
+        }
     }
 }
 

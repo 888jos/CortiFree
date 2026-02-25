@@ -36,11 +36,12 @@ final class UserPersistence {
         case routineStartDate = "routineStartDate"
         case programStartDate = "programStartDate"
 
-        // Subscription
-        case isSubscribed = "isSubscribed"
-        case subscriptionProductID = "subscriptionProductID"
-        case firstSubscriptionDate = "first_subscription_date"
-        case currentSubscriptionStatus = "current_subscription_status"
+        // Subscription (legacy keys — premium status is 100% from RevenueCat)
+        // These keys are kept only for clearAll() cleanup of old installs
+        case isSubscribed_legacy = "isSubscribed"
+        case subscriptionProductID_legacy = "subscriptionProductID"
+        case firstSubscriptionDate_legacy = "first_subscription_date"
+        case currentSubscriptionStatus_legacy = "current_subscription_status"
 
         // Language
         case appleLanguages = "AppleLanguages"
@@ -189,22 +190,7 @@ final class UserPersistence {
         }
     }
 
-    // Subscription
-    static var isSubscribed: Bool {
-        get { bool(for: .isSubscribed) }
-        set { set(.isSubscribed, bool: newValue) }
-    }
-
-    static var firstSubscriptionDate: Date? {
-        get { date(for: .firstSubscriptionDate) }
-        set {
-            if let date = newValue {
-                set(.firstSubscriptionDate, date: date)
-            } else {
-                remove(.firstSubscriptionDate)
-            }
-        }
-    }
+    // Subscription — premium status is 100% from RevenueCat, no local cache
 
     // MARK: - Reset Methods
 

@@ -101,7 +101,7 @@ struct SixtyDaysExplanationView: View {
                     // Scientific Research Section
                     VStack(alignment: .leading, spacing: 0) {
                         Text("onboarding_v2.sixty_days.scientific_research".localized)
-                            .font(.custom("Poppins-SemiBold", size: 20))
+                            .font(.faroSemiBold(20))
                             .foregroundColor(.white)
 
                         Spacer()
@@ -221,7 +221,7 @@ struct BenefitStatCard: View {
 
             HStack(spacing: 4) {
                 Text(percentage)
-                    .font(Font.Poppins.custom(.bold, size: 28))
+                    .font(.faroBold(28))
                     .foregroundColor(.white)
 
                 Image(systemName: "arrow.up")
