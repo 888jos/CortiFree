@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SuperwallKit
 
 class LanguageManager: ObservableObject {
     static let shared = LanguageManager()
@@ -23,6 +24,9 @@ class LanguageManager: ObservableObject {
             UserDefaults.standard.set(currentLanguage.rawValue, forKey: "selectedLanguage")
             UserDefaults.standard.set([currentLanguage.rawValue], forKey: "AppleLanguages")
             UserDefaults.standard.synchronize()
+
+            // Sync Superwall paywall language immediately
+            Superwall.shared.localeIdentifier = currentLanguage == .french ? "fr_FR" : "en_US"
 
             // Post notification
             NotificationCenter.default.post(name: Self.languageDidChangeNotification, object: nil)

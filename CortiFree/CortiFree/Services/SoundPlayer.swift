@@ -242,6 +242,9 @@ class SoundPlayer: ObservableObject {
     }
 
     func stop() {
+        let finishedExercise = currentExercise
+        let finishedDuration = Int(totalPlayTime.rounded())
+
         audioPlayer?.stop()
         audioPlayer = nil
         isPlaying = false
@@ -255,6 +258,23 @@ class SoundPlayer: ObservableObject {
         selectedDuration = nil
         stopTimer()
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+
+        if let finishedExercise {
+            ExerciseSessionRecorder.shared.record(
+                exerciseID: finishedExercise.id,
+                category: progressCategory(for: finishedExercise.type),
+                durationSeconds: finishedDuration,
+                source: "sound_player"
+            )
+        }
+    }
+
+    private func progressCategory(for type: ExerciseType) -> ProgressActivityCategory {
+        switch type {
+        case .breathing: return .breathing
+        case .meditation: return .meditation
+        case .sound: return .sounds
+        }
     }
 
     // MARK: - Timer

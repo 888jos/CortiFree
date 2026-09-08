@@ -40,6 +40,7 @@ struct SettingsView: View {
     @State private var bugReportScreenshot: UIImage? = nil
     @State private var showBugReportSuccess: Bool = false
     @State private var showCustomerCenter: Bool = false
+    @State private var showLogin: Bool = false
     @State private var showReauthAlert: Bool = false
     @State private var reauthEmail: String = ""
     @State private var reauthPassword: String = ""
@@ -168,6 +169,16 @@ struct SettingsView: View {
         .sheet(isPresented: $showCustomerCenter) {
             CustomerCenterView()
         }
+        .fullScreenCover(isPresented: $showLogin) {
+            AuthenticationView(
+                onComplete: {
+                    showLogin = false
+                },
+                onSkip: {
+                    showLogin = false
+                }
+            )
+        }
     }
 
     // MARK: - Header View
@@ -223,6 +234,22 @@ struct SettingsView: View {
     private var profileObjectiveSection: some View {
         settingsSection(title: NSLocalizedString("settings.section.profile", comment: ""), icon: "person.circle.fill") {
             VStack(spacing: 0) {
+                if !authViewModel.isAuthenticated {
+                    settingsRow(
+                        icon: "person.crop.circle.badge.plus",
+                        title: NSLocalizedString("onboarding_v2.auth.login_button", comment: ""),
+                        subtitle: NSLocalizedString("progress.error.signed_out", comment: ""),
+                        showChevron: true
+                    ) {
+                        HapticManager.light()
+                        showLogin = true
+                    }
+
+                    Divider()
+                        .background(Color.white.opacity(0.1))
+                        .padding(.leading, 48)
+                }
+
                 settingsRow(
                     icon: "globe",
                     title: NSLocalizedString("settings.language", comment: ""),
@@ -336,9 +363,9 @@ struct SettingsView: View {
 
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "envelope.fill", title: NSLocalizedString("settings.about.contact", comment: ""), subtitle: "contact.cortifree@gmail.com", showChevron: true) {
+                settingsRow(icon: "envelope.fill", title: NSLocalizedString("settings.about.contact", comment: ""), subtitle: "cortifree@driftstudio.app", showChevron: true) {
                     HapticManager.light()
-                    openURL("mailto:contact.cortifree@gmail.com")
+                    openURL("mailto:cortifree@driftstudio.app")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 

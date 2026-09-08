@@ -22,50 +22,85 @@ class ImpactScoringService {
     /// Récupère les scores actuels de l'utilisateur
     func fetchCurrentScores() async throws -> UserDomainScores {
         guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "ImpactScoringService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+            return LocalScoreStore.current() ?? LocalScoreStore.baseline() ?? UserDomainScores()
         }
 
-        let document = try await db.collection("users")
-            .document(userId)
-            .getDocument()
+        do {
+            let document = try await db.collection("users")
+                .document(userId)
+                .getDocument()
 
-        if let data = document.data(),
-           let currentScoresData = data["currentDomainScores"] as? [String: Any] {
-            return UserDomainScores.from(currentScoresData)
-        } else {
-            // Si pas de scores actuels, récupérer les scores d'onboarding comme point de départ
-            if let data = document.data(),
-               let domainScoresData = data["domainScores"] as? [String: Any] {
-                var scores = UserDomainScores()
-                scores.global = domainScoresData["global"] as? Double ?? 0.0
-                scores.serenity = domainScoresData["serenity"] as? Double ?? 0.0
-                scores.sleep = domainScoresData["sleep"] as? Double ?? 0.0
-                scores.energy = domainScoresData["energy"] as? Double ?? 0.0
-                scores.focus = domainScoresData["focus"] as? Double ?? 0.0
-                scores.balance = domainScoresData["balance"] as? Double ?? 0.0
+            let data = document.data() ?? [:]
 
-                // Sauvegarder comme scores actuels
+            if let currentScoresData = data["currentDomainScores"] as? [String: Any] {
+                let scores = UserDomainScores.from(currentScoresData)
+                if scores.global == 0,
+                   let baseline = LocalScoreStore.baseline(),
+                   baseline.global > 0 {
+                    return LocalScoreStore.current() ?? baseline
+                }
+                if scores.global == 0,
+                   let remoteBaseline = await fetchRemoteBaselineScores(userID: userId, userData: data),
+                   remoteBaseline.global > 0 {
+                    LocalScoreStore.saveCurrent(remoteBaseline)
+                    return remoteBaseline
+                }
+                LocalScoreStore.saveCurrent(scores)
+                return scores
+            } else if let scores = await fetchRemoteBaselineScores(userID: userId, userData: data) {
+                // If no current snapshot exists, initialize it from the onboarding baseline.
                 try await saveCurrentScores(scores)
                 return scores
             }
 
-            // Aucun score trouvé, créer nouveau
-            return UserDomainScores()
+            return LocalScoreStore.current() ?? LocalScoreStore.baseline() ?? UserDomainScores()
+        } catch {
+            return LocalScoreStore.current() ?? LocalScoreStore.baseline() ?? UserDomainScores()
         }
+    }
+
+    private func fetchRemoteBaselineScores(userID: String, userData: [String: Any]) async -> UserDomainScores? {
+        if let domainScoresData = userData["domainScores"] as? [String: Any] {
+            return UserDomainScores.from(domainScoresData)
+        }
+
+        guard let snapshot = try? await db.collection("users")
+            .document(userID)
+            .collection("baseline")
+            .document("initial")
+            .getDocument(),
+              let baselineData = snapshot.data(),
+              let domainScoresData = baselineData["domainScores"] as? [String: Any] else {
+            return nil
+        }
+
+        return UserDomainScores.from(domainScoresData)
     }
 
     /// Sauvegarde les scores actuels
     func saveCurrentScores(_ scores: UserDomainScores) async throws {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "ImpactScoringService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
+        LocalScoreStore.saveCurrent(scores)
+        guard let userId = Auth.auth().currentUser?.uid else { return }
 
-        try await db.collection("users")
-            .document(userId)
-            .setData([
+        let userReference = db.collection("users").document(userId)
+        try await userReference.setData([
                 "currentDomainScores": scores.toFirestore(),
                 "lastScoreUpdate": Timestamp()
             ], merge: true)
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dayKey = formatter.string(from: Date())
+        do {
+            try await userReference.updateData([
+                "domainScoreHistory.\(dayKey)": scores.toFirestore()
+            ])
+        } catch {
+            #if DEBUG
+            print("Domain score history snapshot failed: \(error.localizedDescription)")
+            #endif
+        }
     }
 
     /// Applique les points d'impact lorsqu'une tâche est complétée

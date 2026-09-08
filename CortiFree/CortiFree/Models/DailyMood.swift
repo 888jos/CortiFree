@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 struct DailyMood: Codable, Identifiable {
     var id: String // Format: "YYYY-MM-DD"
@@ -34,10 +35,13 @@ struct DailyMood: Codable, Identifiable {
 
     // Initialize from Firestore
     init?(from dictionary: [String: Any]) {
-        guard let date = dictionary["date"] as? Date,
+        let date = (dictionary["date"] as? Timestamp)?.dateValue() ?? dictionary["date"] as? Date
+        let timestamp = (dictionary["timestamp"] as? Timestamp)?.dateValue() ?? dictionary["timestamp"] as? Date
+
+        guard let date,
               let moodString = dictionary["mood"] as? String,
               let mood = Mood(rawValue: moodString),
-              let timestamp = dictionary["timestamp"] as? Date else {
+              let timestamp else {
             return nil
         }
 

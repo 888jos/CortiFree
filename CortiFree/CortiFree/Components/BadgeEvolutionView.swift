@@ -43,30 +43,14 @@ struct BadgeEvolutionView: View {
                             value: showBadge
                         )
 
-                    // Badge circle
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: badge.level.color),
-                                    Color(hex: badge.level.color).opacity(0.7)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 140, height: 140)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white.opacity(0.3), lineWidth: 4)
-                        )
-                        .shadow(color: Color(hex: badge.level.color).opacity(0.6), radius: 20, x: 0, y: 10)
-                        .scaleEffect(showBadge ? 1 : 0.5)
-                        .opacity(showBadge ? 1 : 0)
-
-                    // Badge emoji
-                    Text(badge.level.emoji)
-                        .font(.system(size: 70))
+                    BadgeOctagonMark(
+                        icon: HabitBadge.habitIcon(badge.habitId),
+                        number: nil,
+                        isUnlocked: true,
+                        accent: Color(hex: badge.level.color),
+                        size: 140,
+                        assetName: badge.badgeAssetName
+                    )
                         .scaleEffect(showBadge ? 1 : 0.5)
                         .opacity(showBadge ? 1 : 0)
 
@@ -89,13 +73,13 @@ struct BadgeEvolutionView: View {
 
                 // Title
                 VStack(spacing: 8) {
-                    Text("Badge Débloqué !")
+                    Text("Badge Unlocked!")
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
                         .opacity(showTitle ? 1 : 0)
                         .offset(y: showTitle ? 0 : 20)
 
-                    Text("\(HabitBadge.habitDisplayName(badge.habitId)) - \(badge.level.displayName)")
+                    Text("\(HabitBadge.englishHabitDisplayName(badge.habitId)) - \(badge.level.englishDisplayName)")
                         .font(.custom("Poppins-SemiBold", size: 20))
                         .foregroundColor(Color(hex: badge.level.color))
                         .opacity(showTitle ? 1 : 0)
@@ -103,7 +87,7 @@ struct BadgeEvolutionView: View {
                 }
 
                 // Description
-                Text("Tu as complété \(badge.requirement) tâches de \(HabitBadge.habitDisplayName(badge.habitId))")
+                Text("You completed \(badge.requirement) \(HabitBadge.englishHabitDisplayName(badge.habitId)) tasks")
                     .font(.custom("Poppins-Regular", size: 16))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
@@ -129,7 +113,7 @@ struct BadgeEvolutionView: View {
                         isPresented = false
                     }
                 }) {
-                    Text("Continuer")
+                    Text("Continue")
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

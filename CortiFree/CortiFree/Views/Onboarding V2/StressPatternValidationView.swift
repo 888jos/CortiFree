@@ -89,9 +89,11 @@ struct StressPatternValidationView: View {
                     .frame(height: 48)
 
                 // Cortisol stat
-                Text(try! AttributedString(
-                    markdown: String(format: "stress_pattern.cortisol_above".localized, cortisolPercentAbove)
-                ))
+                Text(
+                    (try? AttributedString(
+                        markdown: String(format: "stress_pattern.cortisol_above".localized, cortisolPercentAbove)
+                    )) ?? AttributedString(String(format: "stress_pattern.cortisol_above".localized, cortisolPercentAbove))
+                )
                     .font(.custom("Poppins-Medium", size: 15))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)

@@ -398,9 +398,9 @@ struct SettingsView: View {
 
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "envelope.fill", title: "Contact support", subtitle: "support@cortifree.com", showChevron: true) {
+                settingsRow(icon: "envelope.fill", title: "Contact support", subtitle: "cortifree@driftstudio.app", showChevron: true) {
                     HapticManager.light()
-                    openURL("mailto:support@cortifree.com")
+                    openURL("mailto:cortifree@driftstudio.app")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 

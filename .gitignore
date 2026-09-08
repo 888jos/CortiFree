@@ -18,6 +18,7 @@ xcuserdata/
 ## Build generated
 build/
 DerivedData/
+Archives/
 
 ## Various settings
 *.pbxuser

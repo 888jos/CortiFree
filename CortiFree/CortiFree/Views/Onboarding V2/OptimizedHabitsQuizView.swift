@@ -15,6 +15,7 @@ struct OptimizedHabitsQuizView: View {
     @State private var selectedAnswer: Int? = nil
     @State private var answers: [Int] = Array(repeating: 0, count: 15)
     @State private var isGoingBack: Bool = false
+    @State private var isTransitioning: Bool = false
 
     // Questions essentielles seulement (15 au lieu de 25)
     private let totalQuestions = 15
@@ -87,60 +88,70 @@ struct OptimizedHabitsQuizView: View {
 
     @ViewBuilder
     private var questionContent: some View {
-        let question = getEssentialQuestion(at: currentQuestionIndex)
+        if currentQuestionIndex < totalQuestions {
+            let question = getEssentialQuestion(at: currentQuestionIndex)
+            VStack(alignment: .leading, spacing: 20) {
+                // Question text
+                Text(question.text)
+                    .font(.custom("Poppins-Medium", size: 18))
+                    .foregroundColor(.white)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 30)
 
-        VStack(alignment: .leading, spacing: 20) {
-            // Question text
-            Text(question.text)
-                .font(.custom("Poppins-Medium", size: 18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 24)
-                .padding(.top, 30)
-
-            // Answer options
-            VStack(spacing: 12) {
-                ForEach(0..<question.options.count, id: \.self) { index in
-                    SimpleAnswerButton(
-                        text: question.options[index],
-                        isSelected: selectedAnswer == index,
-                        onTap: {
-                            selectAnswer(index)
-                        }
-                    )
+                // Answer options
+                VStack(spacing: 12) {
+                    ForEach(0..<question.options.count, id: \.self) { index in
+                        SimpleAnswerButton(
+                            text: question.options[index],
+                            isSelected: selectedAnswer == index,
+                            onTap: {
+                                selectAnswer(index)
+                            }
+                        )
+                    }
                 }
+                .disabled(isTransitioning)
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
+        } else {
+            EmptyView()
         }
     }
 
     // MARK: - Actions
 
     private func goBack() {
+        guard !isTransitioning else { return }
+        guard currentQuestionIndex > 0 else { return }
         HapticManager.light()
-        if currentQuestionIndex > 0 {
-            isGoingBack = true
-            currentQuestionIndex -= 1
-            selectedAnswer = nil
-        }
+        isGoingBack = true
+        currentQuestionIndex -= 1
+        selectedAnswer = nil
     }
 
     private func selectAnswer(_ index: Int) {
+        guard !isTransitioning else { return }
         HapticManager.light()
+        isTransitioning = true
         selectedAnswer = index
         answers[currentQuestionIndex] = index
 
-        // Auto-advance after short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             advanceToNext()
         }
     }
 
     private func advanceToNext() {
+        guard currentQuestionIndex < totalQuestions else {
+            isTransitioning = false
+            return
+        }
         if currentQuestionIndex < totalQuestions - 1 {
             isGoingBack = false
             currentQuestionIndex += 1
             selectedAnswer = nil
+            isTransitioning = false
         } else {
             completeQuiz()
         }

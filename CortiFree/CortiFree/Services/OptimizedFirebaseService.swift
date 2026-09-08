@@ -95,15 +95,19 @@ class OptimizedFirebaseService {
     }
 
     private func prepareProfileData(_ data: OverallQuizData) -> [String: Any] {
-        return [
+        var profileData: [String: Any] = [
             "age": data.age,
             "gender": data.gender,
+            "genderCode": data.genderCode,
             "stressReasons": data.reasons,
             "stressDuration": data.duration,
-            "acquisitionChannel": data.acquisitionChannel,
             "onboardingCompletedAt": Date(),
             "hasBaseline": true
         ]
+        if let acquisitionChannel = data.acquisitionChannel, !acquisitionChannel.isEmpty {
+            profileData["acquisitionChannel"] = acquisitionChannel
+        }
+        return profileData
     }
 
 }

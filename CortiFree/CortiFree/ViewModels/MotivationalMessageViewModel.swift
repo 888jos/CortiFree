@@ -35,7 +35,7 @@ class MotivationalMessageViewModel: ObservableObject {
 
     private func loadUserFirstName() async {
         guard let user = Auth.auth().currentUser else {
-            firstName = NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+            firstName = ""
             return
         }
 
@@ -46,18 +46,7 @@ class MotivationalMessageViewModel: ObservableObject {
             print("✅ MotivationalMessageViewModel: Loaded firstName = '\(firstName)' from Firebase Auth")
             #endif
         } else {
-            // Fallback to email username if displayName not available
-            if let email = user.email {
-                firstName = email.components(separatedBy: "@").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
-                #if DEBUG
-                print("✅ MotivationalMessageViewModel: Loaded firstName = '\(firstName)' from email")
-                #endif
-            } else {
-                firstName = NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
-                #if DEBUG
-                print("⚠️ MotivationalMessageViewModel: No displayName or email, using default")
-                #endif
-            }
+            firstName = ""
         }
     }
 
@@ -78,7 +67,6 @@ class MotivationalMessageViewModel: ObservableObject {
     }
 
     private func generateTimeBasedTitle() -> String {
-        let name = firstName.isEmpty ? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "") : firstName
         let hour = Calendar.current.component(.hour, from: Date())
 
         let timeKey: String
@@ -92,7 +80,13 @@ class MotivationalMessageViewModel: ObservableObject {
             timeKey = "motivational.title.night"
         }
 
-        return String(format: NSLocalizedString(timeKey, comment: ""), name)
+        let localizedTitle = NSLocalizedString(timeKey, comment: "")
+        if firstName.isEmpty {
+            return localizedTitle
+                .replacingOccurrences(of: "\n%@", with: "")
+                .replacingOccurrences(of: "%@", with: "")
+        }
+        return String(format: localizedTitle, firstName)
     }
 
     private func generateGreeting() -> String {

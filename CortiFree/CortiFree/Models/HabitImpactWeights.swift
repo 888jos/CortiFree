@@ -157,12 +157,25 @@ struct UserDomainScores: Codable {
     /// Crée depuis dictionnaire Firestore
     static func from(_ data: [String: Any]) -> UserDomainScores {
         var scores = UserDomainScores()
-        scores.global = data["global"] as? Double ?? 0.0
-        scores.serenity = data["serenity"] as? Double ?? 0.0
-        scores.sleep = data["sleep"] as? Double ?? 0.0
-        scores.energy = data["energy"] as? Double ?? 0.0
-        scores.focus = data["focus"] as? Double ?? 0.0
-        scores.balance = data["balance"] as? Double ?? 0.0
+        scores.global = numericValue(data["global"])
+        scores.serenity = numericValue(data["serenity"])
+        scores.sleep = numericValue(data["sleep"])
+        scores.energy = numericValue(data["energy"])
+        scores.focus = numericValue(data["focus"])
+        // Older onboarding documents used "habits" for the balance domain.
+        scores.balance = numericValue(data["balance"] ?? data["habits"])
+        if scores.global == 0 {
+            scores.updateGlobalScore()
+        }
         return scores
+    }
+
+    private static func numericValue(_ value: Any?) -> Double {
+        if let value = value as? Double { return value }
+        if let value = value as? Int { return Double(value) }
+        if let value = value as? Int64 { return Double(value) }
+        if let value = value as? Float { return Double(value) }
+        if let value = value as? NSNumber { return value.doubleValue }
+        return 0
     }
 }

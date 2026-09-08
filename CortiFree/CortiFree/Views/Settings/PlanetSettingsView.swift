@@ -97,6 +97,21 @@ struct PlanetCard: View {
         Button(action: onSelect) {
             VStack(spacing: 12) {
                 ZStack {
+                    // Opaque ocean base so the globe never looks transparent
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    planet.gradientSecondaryColor.opacity(0.95),
+                                    planet.haloColor.opacity(0.98)
+                                ],
+                                center: .init(x: 0.38, y: 0.32),
+                                startRadius: 8,
+                                endRadius: 82
+                            )
+                        )
+                        .frame(width: 148, height: 148)
+
                     // Halo coloré personnalisé pour chaque planète avec animation d'opacité
                     Circle()
                         .fill(
@@ -122,6 +137,9 @@ struct PlanetCard: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 160, height: 160)
+                        .contrast(1.12)
+                        .saturation(1.08)
+                        .brightness(-0.01)
                         .shadow(color: planet.haloColor.opacity(0.6), radius: 20)
 
                     // Selection checkmark

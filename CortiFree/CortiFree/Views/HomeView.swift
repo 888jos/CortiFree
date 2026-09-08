@@ -24,8 +24,11 @@ struct HomeView: View {
     @State private var showSettings = false
     @State private var showOnboarding = false
     @State private var showCustomPaywall = false
+    @State private var showRatingSocialProofDebug = false
+    @State private var showGlowScanDebug = false
     @State private var currentTime = Date() // For countdown updates
     @State private var didInitProgram = false
+    @State private var didCheckCancelledTrialWinback = false
 
     // Smart scroll detection
     @State private var lastScrollOffset: CGFloat = 0
@@ -135,15 +138,39 @@ struct HomeView: View {
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
+                                    Button(action: {
+                                        launchOnboardingFromAuthDebug()
+                                    }) {
+                                        Text("🛠 Onboarding From Auth")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
                                     Button(action: { showCustomPaywall = true }) {
                                         Text("💳 Custom Paywall")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
+                                    Button(action: { showRatingSocialProofDebug = true }) {
+                                        Text("⭐ Rating Social Proof")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    Button(action: { showGlowScanDebug = true }) {
+                                        Text("DEBUG: Glow Scan")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
                                     Button(action: {
-                                        Superwall.shared.register(placement: "campaign_trigger")
+                                        triggerSuperwallDebugPlacement("campaign_trigger")
                                     }) {
-                                        Text("🚀 Superwall Paywall")
+                                        Text("🚀 Superwall campaign_trigger")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    Button(action: {
+                                        triggerSuperwallDebugPlacement("winback_cancelled_trial")
+                                    }) {
+                                        Text("↩️ Superwall winback_cancelled_trial")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
@@ -190,7 +217,18 @@ struct HomeView: View {
         #if DEBUG
         // Debug-only: Onboarding preview (excluded from production builds)
         .fullScreenCover(isPresented: $showOnboarding) {
-            OnboardingV2FlowView()
+            OnboardingV2FlowView(enablesLiveActivityWhenAlreadyCompleted: true)
+        }
+        .fullScreenCover(isPresented: $showRatingSocialProofDebug) {
+            RatingSocialProofView {
+                showRatingSocialProofDebug = false
+            }
+        }
+        .fullScreenCover(isPresented: $showGlowScanDebug) {
+            GlowScanFlowView(
+                onComplete: { showGlowScanDebug = false },
+                onExit: { showGlowScanDebug = false }
+            )
         }
         #endif
         .onAppear {
@@ -209,6 +247,8 @@ struct HomeView: View {
             if currentDay == 7 {
                 AppRatingService.shared.trackProgramDay7()
             }
+
+            triggerCancelledTrialWinbackIfNeeded()
         }
     }
 
@@ -246,6 +286,37 @@ struct HomeView: View {
             }
         }
     }
+
+    private func triggerCancelledTrialWinbackIfNeeded() {
+        guard !didCheckCancelledTrialWinback else { return }
+        didCheckCancelledTrialWinback = true
+
+        Task {
+            await RevenueCatManager.shared.refreshCustomerInfo(forceServerFetch: true)
+
+            guard RevenueCatManager.shared.hasInactivePreviousProEntitlement else { return }
+
+            #if DEBUG
+            print("↩️ Triggering previous Pro winback placement")
+            #endif
+            Superwall.shared.register(placement: "winback_cancelled_trial")
+        }
+    }
+
+    #if DEBUG
+    private func triggerSuperwallDebugPlacement(_ placement: String) {
+        print("🧪 Triggering Superwall debug placement: \(placement)")
+        Superwall.shared.register(placement: placement)
+    }
+
+    private func launchOnboardingFromAuthDebug() {
+        UserDefaults.standard.set(OnboardingV2FlowView.OnboardingStep.authentication.rawValue, forKey: "onboardingCheckpoint")
+        UserDefaults.standard.set(OnboardingV2FlowView.OnboardingStep.authentication.rawValue, forKey: "last_onboarding_checkpoint")
+        UserDefaults.standard.set(false, forKey: "hasSeenPaywall")
+        UserDefaults.standard.set(false, forKey: "saw_paywall_without_accepting")
+        showOnboarding = true
+    }
+    #endif
 
     // MARK: - Header Navigation
 

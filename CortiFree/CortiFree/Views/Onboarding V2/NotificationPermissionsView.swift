@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import UserNotifications
+import UIKit
 
 struct NotificationPermissionsView: View {
     let onContinue: () -> Void
@@ -94,8 +96,7 @@ struct NotificationPermissionsView: View {
                         weeklyReportEnabled: enableWeeklyReport
                     )
 
-                    requestNotificationPermissions()
-                    onContinue()
+                    handleContinue()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.right")
@@ -130,13 +131,33 @@ struct NotificationPermissionsView: View {
         }
     }
 
-    private func requestNotificationPermissions() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
-            #if DEBUG
-            if granted {
-                print("✅ Notification permissions granted")
+    private func handleContinue() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                NotificationService.shared.requestNotificationPermission { granted in
+                    UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
+                    DispatchQueue.main.async {
+                        onContinue()
+                    }
+                }
+            case .denied:
+                DispatchQueue.main.async {
+                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(settingsURL)
+                    }
+                    onContinue()
+                }
+            case .authorized, .provisional, .ephemeral:
+                UserDefaults.standard.set(true, forKey: "notificationsEnabled")
+                DispatchQueue.main.async {
+                    onContinue()
+                }
+            @unknown default:
+                DispatchQueue.main.async {
+                    onContinue()
+                }
             }
-            #endif
         }
     }
 }

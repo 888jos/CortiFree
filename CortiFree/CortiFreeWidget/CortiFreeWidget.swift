@@ -320,25 +320,27 @@ private struct DayLabel: View {
     let size: CGFloat
     var isTinted: Bool = false
 
+    private var labelColor: Color { isTinted ? .primary : .white }
+
     var body: some View {
         HStack(alignment: .lastTextBaseline, spacing: 3) {
             Text(NSLocalizedString("widget.day", comment: ""))
                 .font(.fSB(size))
-                .foregroundColor(.primary.opacity(0.55))
+                .foregroundColor(labelColor.opacity(0.55))
             if day <= 66 {
                 HStack(alignment: .lastTextBaseline, spacing: 1) {
                     Text("\(day)")
                         .font(.fB(size))
-                        .foregroundColor(.primary)
+                        .foregroundColor(labelColor)
                         .widgetAccentable()
                     Text(NSLocalizedString("widget.day_of", comment: ""))
                         .font(.fR(size * 0.55))
-                        .foregroundColor(.primary.opacity(0.35))
+                        .foregroundColor(labelColor.opacity(0.35))
                 }
             } else {
                 Text("\(day)")
                     .font(.fB(size))
-                    .foregroundColor(.primary)
+                    .foregroundColor(labelColor)
                     .widgetAccentable()
             }
         }

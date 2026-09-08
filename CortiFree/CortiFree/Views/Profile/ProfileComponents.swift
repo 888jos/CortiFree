@@ -147,7 +147,7 @@ struct SingleEvolvingHabitBadge: View {
             return highestUnlocked
         }
         // Otherwise return the first locked badge (bronze)
-        if let firstBadge = badges.sorted { $0.level.percentage < $1.level.percentage }.first {
+        if let firstBadge = badges.sorted(by: { $0.level.percentage < $1.level.percentage }).first {
             return firstBadge
         }
         // Fallback: create default bronze badge if badges array is empty
@@ -156,41 +156,17 @@ struct SingleEvolvingHabitBadge: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            // Badge circle (NO GLOW)
-            ZStack {
-                // Badge
-                Circle()
-                    .fill(
-                        displayBadge.isUnlocked
-                        ? LinearGradient(
-                            colors: [
-                                Color(hex: displayBadge.level.color),
-                                Color(hex: displayBadge.level.color).opacity(0.7)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        : LinearGradient(
-                            colors: [Color.white.opacity(0.15), Color.white.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 60, height: 60)
-
-                // Icon or Lock
-                if displayBadge.isUnlocked {
-                    Text(displayBadge.level.emoji)
-                        .font(.system(size: 28))
-                } else {
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.3))
-                }
-            }
+            BadgeOctagonMark(
+                icon: HabitBadge.habitIcon(habitId),
+                number: nil,
+                isUnlocked: displayBadge.isUnlocked,
+                accent: Color(hex: displayBadge.level.color),
+                size: 60,
+                assetName: displayBadge.badgeAssetName
+            )
 
             // Habit name
-            Text(HabitBadge.habitDisplayName(habitId))
+            Text(HabitBadge.englishHabitDisplayName(habitId))
                 .font(.custom("Poppins-Medium", size: 11))
                 .foregroundColor(.white)
                 .lineLimit(1)
@@ -232,7 +208,7 @@ struct HabitBadgeDetailSheet: View {
         if let highestUnlocked = unlockedBadges.first {
             return highestUnlocked
         }
-        if let firstBadge = badges.sorted { $0.level.percentage < $1.level.percentage }.first {
+        if let firstBadge = badges.sorted(by: { $0.level.percentage < $1.level.percentage }).first {
             return firstBadge
         }
         // Fallback: create default bronze badge if badges array is empty
@@ -256,50 +232,24 @@ struct HabitBadgeDetailSheet: View {
                 VStack(spacing: 24) {
                     // Large current badge
                     ZStack {
-                        if currentBadge.isUnlocked {
-                            Circle()
-                                .fill(Color(hex: currentBadge.level.color).opacity(0.3))
-                                .frame(width: 160, height: 160)
-                                .blur(radius: 30)
-                        }
-
-                        Circle()
-                            .fill(
-                                currentBadge.isUnlocked
-                                ? LinearGradient(
-                                    colors: [
-                                        Color(hex: currentBadge.level.color),
-                                        Color(hex: currentBadge.level.color).opacity(0.7)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                                : LinearGradient(
-                                    colors: [Color.white.opacity(0.15), Color.white.opacity(0.05)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 140, height: 140)
-
-                        if currentBadge.isUnlocked {
-                            Text(currentBadge.level.emoji)
-                                .font(.system(size: 70))
-                        } else {
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: 50, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.3))
-                        }
+                        BadgeOctagonMark(
+                            icon: HabitBadge.habitIcon(habitId),
+                            number: nil,
+                            isUnlocked: currentBadge.isUnlocked,
+                            accent: Color(hex: currentBadge.level.color),
+                            size: 140,
+                            assetName: currentBadge.badgeAssetName
+                        )
                     }
                     .padding(.top, 40)
 
                     // Title
                     VStack(spacing: 8) {
-                        Text(HabitBadge.habitDisplayName(habitId))
+                        Text(HabitBadge.englishHabitDisplayName(habitId))
                             .font(.custom("Poppins-Bold", size: 28))
                             .foregroundColor(.white)
 
-                        Text(currentBadge.level.displayName)
+                        Text(currentBadge.level.englishDisplayName)
                             .font(.custom("Poppins-SemiBold", size: 18))
                             .foregroundColor(Color(hex: currentBadge.level.color))
                     }
@@ -308,12 +258,17 @@ struct HabitBadgeDetailSheet: View {
                     VStack(spacing: 16) {
                         ForEach(badges.sorted(by: { $0.level.percentage < $1.level.percentage })) { badge in
                             HStack(spacing: 12) {
-                                // Level emoji
-                                Text(badge.level.emoji)
-                                    .font(.system(size: 24))
+                                BadgeOctagonMark(
+                                    icon: HabitBadge.habitIcon(habitId),
+                                    number: nil,
+                                    isUnlocked: badge.isUnlocked,
+                                    accent: Color(hex: badge.level.color),
+                                    size: 30,
+                                    assetName: badge.badgeAssetName
+                                )
 
                                 // Level name
-                                Text(badge.level.displayName)
+                                Text(badge.level.englishDisplayName)
                                     .font(.custom("Poppins-Medium", size: 14))
                                     .foregroundColor(.white)
                                     .frame(width: 80, alignment: .leading)
@@ -362,7 +317,7 @@ struct HabitBadgeDetailSheet: View {
                         HapticManager.light()
                         dismiss()
                     }) {
-                        Text(NSLocalizedString("profile.achievements.close", comment: ""))
+                        Text("Close")
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)

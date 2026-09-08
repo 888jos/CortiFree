@@ -82,6 +82,10 @@ struct CortiFreeRatingView: View {
                                     )
                                 )
                                 .multilineTextAlignment(.center)
+                            Text("onboarding_v2.rating.current_subtitle".localized)
+                                .font(.custom("Poppins-Regular", size: 13))
+                                .foregroundColor(.white.opacity(0.5))
+                                .multilineTextAlignment(.center)
                         } else {
                             VStack(spacing: 0) {
                                 (Text("onboarding_v2.rating.potential_title".localized)
@@ -253,6 +257,11 @@ struct CortiFreeRatingView: View {
 
     private func saveScoreAndContinue() {
         guard !isSavingScore else { return }
+
+        LocalScoreStore.saveOnboarding(
+            currentScores: currentScores,
+            potentialScores: potentialScores
+        )
 
         Task {
             isSavingScore = true

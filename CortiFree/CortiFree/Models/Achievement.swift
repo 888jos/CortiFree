@@ -37,6 +37,40 @@ struct Achievement: Identifiable, Codable, Equatable {
         NSLocalizedString(descriptionKey, comment: "")
     }
 
+    var englishTitle: String {
+        switch id {
+        case "streak_3": return "Beginner"
+        case "streak_7": return "Motivated"
+        case "streak_14": return "Determined"
+        case "streak_21": return "Engaged"
+        case "streak_30": return "Dedicated"
+        case "streak_40": return "Champion"
+        case "streak_50": return "Invincible"
+        case "streak_60": return "Legend"
+        case "streak_66": return "Master"
+        default: return title
+        }
+    }
+
+    var englishDescription: String {
+        switch id {
+        case "streak_3": return "Maintain a 3-day streak"
+        case "streak_7": return "Maintain a 7-day streak"
+        case "streak_14": return "Maintain a 14-day streak"
+        case "streak_21": return "Maintain a 21-day streak"
+        case "streak_30": return "Maintain a 30-day streak"
+        case "streak_40": return "Maintain a 40-day streak"
+        case "streak_50": return "Maintain a 50-day streak"
+        case "streak_60": return "Maintain a 60-day streak"
+        case "streak_66": return "Maintain a 66-day streak - Full program!"
+        default: return description
+        }
+    }
+
+    var badgeAssetName: String? {
+        id.hasPrefix("streak_") ? "achievement_\(id)" : nil
+    }
+
     enum AchievementCategory: String, Codable {
         case streak
         case completion

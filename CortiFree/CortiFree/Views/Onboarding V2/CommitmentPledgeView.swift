@@ -172,13 +172,15 @@ struct CommitmentPledgeView: View {
                         Text(duration.localizedTitle)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.white)
-                            .fixedSize()
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
 
                         if isRecommended {
                             Text("onboarding_v2.commitment.recommended".localized)
                                 .font(.custom("Poppins-Bold", size: 10))
                                 .foregroundColor(Color(hex: "B794F6"))
-                                .fixedSize()
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
                                 .background(
@@ -191,10 +193,11 @@ struct CommitmentPledgeView: View {
                     Text(duration.localizedSubtitle)
                         .font(.custom("Poppins-Regular", size: 12))
                         .foregroundColor(.white.opacity(0.5))
-                        .lineLimit(1)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-
-                Spacer()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .layoutPriority(1)
 
                 // Percentage badge
                 VStack(spacing: 1) {
@@ -295,7 +298,7 @@ struct CommitmentPledgeView: View {
         HapticManager.light()
 
         holdTimer = Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { timer in
-            let increment: CGFloat = 0.03 / 3.0 // 3 seconds total
+            let increment: CGFloat = 0.03 / 2.0 // 2 seconds total (1.5x faster)
             holdProgress = min(holdProgress + increment, 1.0)
 
             // Continuous haptic — interval shrinks from ~20 ticks to ~4 ticks as progress rises

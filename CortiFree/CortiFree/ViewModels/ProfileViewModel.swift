@@ -22,6 +22,8 @@ class ProfileViewModel: ObservableObject {
     @Published var habitProgress: [String: (completed: Int, total: Int)] = [:] // Progress par habitude
 
     private let firebaseService = FirebaseService.shared
+    private var lastLoadedAt: Date? = nil
+    private let cacheInterval: TimeInterval = 60 // 60 seconds
 
     enum StatsPeriod: String, CaseIterable {
         case week = "7j"
@@ -55,7 +57,18 @@ class ProfileViewModel: ObservableObject {
     }
 
     func loadProfile() async {
+        if let last = lastLoadedAt, Date().timeIntervalSince(last) < cacheInterval {
+            return
+        }
         isLoading = true
+
+        if let baseline = LocalScoreStore.baseline() {
+            onboardingGlobalScore = Int(baseline.global.rounded())
+            onboardingDomainScores = [baseline.serenity, baseline.sleep, baseline.energy, baseline.focus, baseline.balance]
+        }
+        if let potential = LocalScoreStore.potential() {
+            potentialScores = [potential.serenity, potential.sleep, potential.energy, potential.focus, potential.balance]
+        }
 
         // Try to fetch user, but don't fail if it doesn't exist
         user = try? await firebaseService.fetchUser()
@@ -91,33 +104,29 @@ class ProfileViewModel: ObservableObject {
                     .getDocument()
 
                 if let data = userDoc.data() {
-                    // Load potential scores
-                    if let scores = data["potentialScores"] as? [String: Int] {
-                        potentialScores = [
-                            Double(scores["serenity"] ?? 0),
-                            Double(scores["sleep"] ?? 0),
-                            Double(scores["energy"] ?? 0),
-                            Double(scores["focus"] ?? 0),
-                            Double(scores["balance"] ?? 0)
-                        ]
+                    // Firestore may decode numeric fields as Int, Int64, Double, or NSNumber.
+                    if let scores = data["potentialScores"] as? [String: Any] {
+                        let parsed = UserDomainScores.from(scores)
+                        potentialScores = [parsed.serenity, parsed.sleep, parsed.energy, parsed.focus, parsed.balance]
                     }
 
                     // Load onboarding global score
-                    if let onboardingScore = data["onboardingScore"] as? Int {
-                        onboardingGlobalScore = onboardingScore
+                    if let onboardingScore = Self.numericValue(data["onboardingScore"]) {
+                        onboardingGlobalScore = Int(onboardingScore.rounded())
                         #if DEBUG
-                        print("📊 Onboarding score loaded: \(onboardingScore)")
+                        print("📊 Onboarding score loaded: \(onboardingGlobalScore)")
                         #endif
                     }
 
                     // Load onboarding domain scores
-                    if let domainScoresData = data["domainScores"] as? [String: Int] {
+                    if let domainScoresData = data["domainScores"] as? [String: Any] {
+                        let parsed = UserDomainScores.from(domainScoresData)
                         onboardingDomainScores = [
-                            Double(domainScoresData["serenity"] ?? 0),
-                            Double(domainScoresData["sleep"] ?? 0),
-                            Double(domainScoresData["energy"] ?? 0),
-                            Double(domainScoresData["focus"] ?? 0),
-                            Double(domainScoresData["balance"] ?? 0)
+                            parsed.serenity,
+                            parsed.sleep,
+                            parsed.energy,
+                            parsed.focus,
+                            parsed.balance
                         ]
                         #if DEBUG
                         print("📊 Onboarding domain scores loaded")
@@ -146,6 +155,16 @@ class ProfileViewModel: ObservableObject {
         }
 
         isLoading = false
+        lastLoadedAt = Date()
+    }
+
+    private static func numericValue(_ value: Any?) -> Double? {
+        if let value = value as? Double { return value }
+        if let value = value as? Int { return Double(value) }
+        if let value = value as? Int64 { return Double(value) }
+        if let value = value as? Float { return Double(value) }
+        if let value = value as? NSNumber { return value.doubleValue }
+        return nil
     }
 
     func selectPeriod(_ period: StatsPeriod) {
@@ -154,6 +173,7 @@ class ProfileViewModel: ObservableObject {
 
     /// Refresh profile data (called when returning to profile view)
     func refreshProfile() async {
+        lastLoadedAt = nil
         await loadProfile()
     }
 }

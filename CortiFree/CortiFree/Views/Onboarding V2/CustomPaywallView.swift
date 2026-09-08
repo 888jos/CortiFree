@@ -8,7 +8,6 @@
 
 import SwiftUI
 import FirebaseAuth
-import FirebaseFirestore
 import SuperwallKit
 
 struct CustomPaywallView: View {
@@ -30,6 +29,7 @@ struct CustomPaywallView: View {
     @State private var currentHabitIndex: Int = 0
     @State private var currentWeek: Int = 1
     @State private var showStartProgramScreen: Bool = false
+    @State private var showBenefitsFlow: Bool = false
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
     @State private var purchaseErrorMessage: String = ""
@@ -225,56 +225,69 @@ struct CustomPaywallView: View {
         .onChange(of: showStartProgramScreen) { _, show in
             if show {
                 showStartProgramScreen = false
-                Superwall.shared.register(placement: "campaign_trigger") {
-                    // Called when paywall is dismissed after successful purchase
-                    onComplete()
+                showBenefitsFlow = true
+            }
+        }
+        .fullScreenCover(isPresented: $showBenefitsFlow) {
+            OnboardingBenefitsFlowView {
+                showBenefitsFlow = false
+                DispatchQueue.main.async {
+                    presentSuperwallPaywall()
                 }
             }
         }
     }
 
+    private func presentSuperwallPaywall() {
+                let handler = PaywallPresentationHandler()
+                handler.onPresent { _ in
+                    UserDefaults.standard.set(true, forKey: "hasSeenPaywall")
+                    UserDefaults.standard.set(true, forKey: "saw_paywall_without_accepting")
+                    OnboardingLiveActivityManager.shared.prepareLiveGiftOffer()
+                }
+                handler.onDismiss { _, result in
+                    switch result {
+                    case .declined:
+                        guard !RevenueCatManager.shared.hasPremiumEntitlement else {
+                            OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+                            return
+                        }
+                        OnboardingLiveActivityManager.shared.showLiveGiftOffer()
+                    case .purchased, .restored:
+                        OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+                    }
+                }
+                Superwall.shared.register(
+                    placement: SuperwallPlacement.onboarding,
+                    handler: handler
+                ) {
+                    // Called when Superwall gates are passed — verify subscription before proceeding
+                    guard RevenueCatManager.shared.hasPremiumEntitlement else { return }
+                    onComplete()
+                }
+    }
+
     // MARK: - Load User Name
 
     private func loadUserName() {
-        if let user = Auth.auth().currentUser {
-            // Priority 1: displayName from Firebase Auth (Google/Apple Sign In)
-            if let displayName = user.displayName, !displayName.isEmpty {
-                // Extract first name from display name
-                userName = displayName.components(separatedBy: " ").first ?? displayName
-            }
-            // Priority 2: Check Firestore for firstName field (Email Sign In)
-            else {
-                Task {
-                    do {
-                        let db = Firestore.firestore()
-                        let document = try await db.collection("users").document(user.uid).getDocument()
-
-                        if let firstName = document.data()?["firstName"] as? String, !firstName.isEmpty {
-                            await MainActor.run {
-                                userName = firstName
-                            }
-                        } else {
-                            // Fallback: use email prefix
-                            if let email = user.email {
-                                let emailPrefix = email.components(separatedBy: "@").first ?? ""
-                                await MainActor.run {
-                                    userName = emailPrefix.isEmpty ? "vous" : emailPrefix
-                                }
-                            } else {
-                                await MainActor.run {
-                                    userName = "vous"
-                                }
-                            }
-                        }
-                    } catch {
-                        // Fallback if Firestore fails
-                        print("Error loading user firstName: \(error)")
-                        await MainActor.run {
-                            userName = "vous"
-                        }
-                    }
-                }
-            }
+        guard let user = Auth.auth().currentUser else {
+            userName = "vous"
+            return
+        }
+        // Priority 1: displayName from Firebase Auth (Google/Apple Sign In)
+        if let displayName = user.displayName, !displayName.isEmpty {
+            userName = displayName.components(separatedBy: " ").first ?? displayName
+            return
+        }
+        // Priority 2: UserDefaults cache (set at signup for all providers)
+        if let cached = UserDefaults.standard.string(forKey: "userFirstName"), !cached.isEmpty {
+            userName = cached
+            return
+        }
+        // Priority 3: email prefix (no Firestore read needed)
+        if let email = user.email {
+            let prefix = email.components(separatedBy: "@").first ?? ""
+            userName = prefix.isEmpty ? "vous" : prefix
         } else {
             userName = "vous"
         }

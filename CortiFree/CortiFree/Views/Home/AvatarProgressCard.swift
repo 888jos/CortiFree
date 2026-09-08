@@ -104,9 +104,11 @@ struct AvatarProgressCard: View {
 
                     Spacer()
 
-                    Text(firstName.isEmpty ? getUserFirstName() : firstName)
-                        .font(.custom("Poppins-SemiBold", size: 10))
-                        .foregroundColor(.white.opacity(0.9))
+                    if !(firstName.isEmpty ? getUserFirstName() : firstName).isEmpty {
+                        Text(firstName.isEmpty ? getUserFirstName() : firstName)
+                            .font(.custom("Poppins-SemiBold", size: 10))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
@@ -329,14 +331,15 @@ struct AvatarProgressCard: View {
     }
 
     private func getUserFirstName() -> String {
+        if let storedName = UserPersistence.userFirstName?.trimmingCharacters(in: .whitespacesAndNewlines), !storedName.isEmpty {
+            return storedName
+        }
         if let user = Auth.auth().currentUser {
-            if let displayName = user.displayName {
-                return displayName.components(separatedBy: " ").first ?? "Champion"
-            } else if let email = user.email {
-                return email.components(separatedBy: "@").first ?? "Champion"
+            if let displayName = user.displayName, !displayName.isEmpty {
+                return displayName.components(separatedBy: " ").first ?? ""
             }
         }
-        return "Champion"
+        return ""
     }
 
     private func formatStartDate(_ date: Date) -> String {
@@ -433,12 +436,14 @@ struct BadgesListView: View {
 
     private func getHabitProgress(_ habitId: String) -> Int {
         let stats = profileViewModel.habitProgress[habitId]
-        return stats?.completed ?? 0
+        if let completed = stats?.completed { return completed }
+        guard let userId = Auth.auth().currentUser?.uid else { return 0 }
+        return LocalProgressStore.completedCount(for: habitId, userID: userId)
     }
 
     private func getHabitTotal(_ habitId: String) -> Int {
         let stats = profileViewModel.habitProgress[habitId]
-        return stats?.total ?? 0
+        return stats?.total ?? TaskStatusService.habitTotals[habitId, default: 0]
     }
 
     var body: some View {

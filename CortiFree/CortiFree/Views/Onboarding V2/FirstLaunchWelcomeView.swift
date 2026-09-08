@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct FirstLaunchWelcomeView: View {
     let onContinue: () -> Void
@@ -21,6 +22,7 @@ struct FirstLaunchWelcomeView: View {
     @State private var showStat = false
     @State private var showSolution = false
     @State private var showButton = false
+    @State private var hasContinued = false
 
     var body: some View {
         ZStack {
@@ -150,15 +152,7 @@ struct FirstLaunchWelcomeView: View {
                 // ── CTA ──
                 if showButton {
                     VStack(spacing: 10) {
-                        Button(action: {
-                            HapticManager.medium()
-                            if let startTime = screenViewTime {
-                                MixpanelManager.shared.trackOnboardingWelcomeContinue(
-                                    timeSpent: Date().timeIntervalSince(startTime)
-                                )
-                            }
-                            onContinue()
-                        }) {
+                        Button(action: continueToQuiz) {
                             Text("first_launch.cta_button".localized)
                                 .font(.custom("Poppins-SemiBold", size: 16))
                                 .foregroundColor(Color(hex: "1A1A4E"))
@@ -167,6 +161,7 @@ struct FirstLaunchWelcomeView: View {
                                 .background(Color.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 40))
                         }
+                        .buttonStyle(.plain)
                         .padding(.horizontal, 34)
 
                         Text("first_launch.cta_sub".localized)
@@ -174,7 +169,7 @@ struct FirstLaunchWelcomeView: View {
                             .foregroundColor(.white.opacity(0.35))
                     }
                     .padding(.bottom, 52)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(.move(edge: .bottom))
                 }
             }
         }
@@ -204,18 +199,58 @@ struct FirstLaunchWelcomeView: View {
 
     // MARK: - Animations
 
+    private func continueToQuiz() {
+        guard !hasContinued else { return }
+        hasContinued = true
+
+        let timeSpent = screenViewTime.map { Date().timeIntervalSince($0) } ?? 0
+        HapticManager.medium()
+
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            if settings.authorizationStatus == .notDetermined {
+                NotificationService.shared.requestNotificationPermission { granted in
+                    UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
+                    DispatchQueue.main.async {
+                        finishWelcome(timeSpent: timeSpent)
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    finishWelcome(timeSpent: timeSpent)
+                }
+            }
+        }
+    }
+
+    private func finishWelcome(timeSpent: TimeInterval) {
+        onContinue()
+        Task { @MainActor in
+            await Task.yield()
+            MixpanelManager.shared.trackOnboardingWelcomeContinue(timeSpent: timeSpent)
+        }
+    }
+
     private func startAnimations() {
-        withAnimation(.easeOut(duration: 0.5).delay(0.2)) { showLogo = true }
-        withAnimation(.easeOut(duration: 0.5).delay(0.7)) { showQ1 = true }
-        withAnimation(.easeOut(duration: 0.5).delay(1.4)) { showQ2 = true }
-        withAnimation(.easeOut(duration: 0.5).delay(2.1)) { showQ3 = true }
-        withAnimation(.easeOut(duration: 0.4).delay(2.8)) { showDivider = true }
-        withAnimation(.easeOut(duration: 0.6).delay(3.1)) { showStat = true }
-        withAnimation(.easeOut(duration: 0.5).delay(3.9)) {
+        reveal(after: 0.2, duration: 0.5) { showLogo = true }
+        reveal(after: 0.7, duration: 0.5) { showQ1 = true }
+        reveal(after: 1.4, duration: 0.5) { showQ2 = true }
+        reveal(after: 2.1, duration: 0.5) { showQ3 = true }
+        reveal(after: 2.8, duration: 0.4) { showDivider = true }
+        reveal(after: 3.1, duration: 0.6) { showStat = true }
+        reveal(after: 3.9, duration: 0.5) {
             showSolution = true
             HapticManager.light()
         }
-        withAnimation(.easeOut(duration: 0.5).delay(4.5)) { showButton = true }
+        reveal(after: 4.5, duration: 0.5) { showButton = true }
+    }
+
+    private func reveal(after delay: TimeInterval, duration: TimeInterval, action: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard !hasContinued else { return }
+            withAnimation(.easeOut(duration: duration)) {
+                action()
+            }
+        }
     }
 }
 

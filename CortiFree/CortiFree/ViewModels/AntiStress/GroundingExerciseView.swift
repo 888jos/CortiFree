@@ -242,7 +242,7 @@ struct GroundingExerciseView: View {
             viewModel.startExercise(.grounding5Senses)
             speakCurrentStep()
         }
-        .onChange(of: currentStep) { _ in
+        .onChange(of: currentStep) {
             speakCurrentStep()
         }
     }

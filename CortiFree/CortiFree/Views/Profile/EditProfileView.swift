@@ -28,6 +28,12 @@ struct EditProfileView: View {
 
     // Loading states
     @State private var isSaving = false
+    @State private var saveErrorMessage: String?
+    @FocusState private var focusedField: PersonalInfoField?
+
+    private enum PersonalInfoField {
+        case firstName
+    }
 
     var body: some View {
         ZStack {
@@ -98,6 +104,16 @@ struct EditProfileView: View {
             }
         } message: {
             Text(NSLocalizedString("editprofile.alert.logout.message", comment: ""))
+        }
+        .alert("Profile", isPresented: Binding(
+            get: { saveErrorMessage != nil },
+            set: { if !$0 { saveErrorMessage = nil } }
+        )) {
+            Button(NSLocalizedString("common.ok", comment: ""), role: .cancel) {
+                saveErrorMessage = nil
+            }
+        } message: {
+            Text(saveErrorMessage ?? NSLocalizedString("error.generic", comment: ""))
         }
     }
 
@@ -228,14 +244,33 @@ struct EditProfileView: View {
                     .font(.custom(AppConstants.Fonts.medium, size: 13))
                     .foregroundColor(.white.opacity(0.6))
 
-                TextField("", text: $firstName)
+                TextField(
+                    NSLocalizedString("editprofile.first_name", comment: ""),
+                    text: $firstName
+                )
                     .font(.custom(AppConstants.Fonts.regular, size: 16))
                     .foregroundColor(.white)
+                    .tint(AppConstants.Colors.violet)
+                    .textContentType(.givenName)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                    .submitLabel(.done)
+                    .focused($focusedField, equals: .firstName)
+                    .textFieldStyle(.plain)
                     .padding(AppConstants.Layout.paddingMedium)
                     .background(
                         RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
                             .fill(Color.white.opacity(0.1))
                     )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
+                            .stroke(
+                                focusedField == .firstName ? AppConstants.Colors.violet : .clear,
+                                lineWidth: 1
+                            )
+                    )
+                    .contentShape(Rectangle())
+                    .onSubmit { focusedField = nil }
             }
 
             // Email (read-only)
@@ -442,13 +477,19 @@ struct EditProfileView: View {
     // MARK: - Data Loading
 
     private func loadData() {
+        // The local name is the source of truth before authentication or sync.
+        if let storedName = UserPersistence.userFirstName,
+           !storedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            firstName = storedName
+        }
+
         // Load user info from Firebase Auth
         if let user = Auth.auth().currentUser {
             userEmail = user.email ?? ""
         }
 
         // Load first name from FirebaseManager
-        if let user = FirebaseManager.shared.currentUser {
+        if firstName.isEmpty, let user = FirebaseManager.shared.currentUser {
             firstName = user.displayName ?? ""
         }
 
@@ -461,44 +502,51 @@ struct EditProfileView: View {
     // MARK: - Save Profile
 
     private func saveProfile() {
-        guard let uid = Auth.auth().currentUser?.uid,
-              let user = Auth.auth().currentUser else { return }
+        let trimmedFirstName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedFirstName.isEmpty else {
+            saveErrorMessage = NSLocalizedString("editprofile.first_name_required", comment: "")
+            focusedField = .firstName
+            return
+        }
 
         isSaving = true
+        focusedField = nil
         HapticManager.medium()
 
+        // Persist immediately so profile editing works offline and before sign-in.
+        UserPersistence.userFirstName = trimmedFirstName
+
         Task {
-            do {
-                // 1. Update Firebase Auth displayName (this is what ProfileCardView uses)
-                let changeRequest = user.createProfileChangeRequest()
-                changeRequest.displayName = firstName
-                try await changeRequest.commitChanges()
+            if let user = Auth.auth().currentUser {
+                // Sync remotely when available, while keeping the local save if the network fails.
+                do {
+                    let changeRequest = user.createProfileChangeRequest()
+                    changeRequest.displayName = trimmedFirstName
+                    try await changeRequest.commitChanges()
+                } catch {
+                    #if DEBUG
+                    print("Profile Auth name sync failed: \(error)")
+                    #endif
+                }
 
-                // 2. Save first name to Firestore
-                try await FirebaseManager.shared.updateUserProfile(
-                    uid: uid,
-                    updates: ["firstName": firstName, "displayName": firstName]
-                )
+                do {
+                    try await FirebaseManager.shared.updateUserProfile(
+                        uid: user.uid,
+                        updates: ["firstName": trimmedFirstName, "displayName": trimmedFirstName]
+                    )
+                } catch {
+                    #if DEBUG
+                    print("Profile Firestore name sync failed: \(error)")
+                    #endif
+                }
+            }
 
-                // 3. Save to UserDefaults for offline access
-                UserDefaults.standard.set(firstName, forKey: "userFirstName")
-
-                // 4. Notify other views to refresh immediately
+            await MainActor.run {
+                firstName = trimmedFirstName
+                isSaving = false
                 NotificationCenter.default.post(name: NSNotification.Name("ProfileUpdated"), object: nil)
-
-                await MainActor.run {
-                    isSaving = false
-                    HapticManager.success()
-                    dismiss()
-                }
-            } catch {
-                #if DEBUG
-                print("Error saving profile: \(error)")
-                #endif
-                await MainActor.run {
-                    isSaving = false
-                    HapticManager.error()
-                }
+                HapticManager.success()
+                dismiss()
             }
         }
     }

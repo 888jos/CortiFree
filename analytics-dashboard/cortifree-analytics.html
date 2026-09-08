@@ -139,12 +139,14 @@ o
             display: flex;
             gap: 16px;
             align-items: center;
+            flex-wrap: wrap;
             margin-bottom: 40px;
         }
 
         .period-selector {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .period-btn {
@@ -168,6 +170,44 @@ o
             background: var(--accent-orange);
             border-color: var(--accent-orange);
             color: white;
+        }
+
+        .custom-date-controls {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .custom-date-controls.visible {
+            display: flex;
+        }
+
+        .date-input {
+            height: 36px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 0 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .date-separator {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .period-range-label {
+            flex-basis: 100%;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .condensed-toggle {
@@ -986,17 +1026,25 @@ o
             <!-- Controls -->
         <div class="controls">
             <div class="period-selector">
-                <button class="period-btn active" onclick="setPeriod('today')">Today</button>
-                <button class="period-btn" onclick="setPeriod('yesterday')">Yesterday</button>
-                <button class="period-btn" onclick="setPeriod('7d')">Last 7 Days</button>
-                <button class="period-btn" onclick="setPeriod('30d')">Last Month</button>
-                <button class="period-btn" onclick="setPeriod('all')">All Time</button>
-                <button class="period-btn" onclick="setPeriod('custom')">Custom</button>
+                <button class="period-btn" data-period="today">Today</button>
+                <button class="period-btn" data-period="yesterday">Yesterday</button>
+                <button class="period-btn" data-period="7d">Last 7 Days</button>
+                <button class="period-btn active" data-period="30d">Last Month</button>
+                <button class="period-btn" data-period="90d">Last 3 Months</button>
+                <button class="period-btn" data-period="all">All Time</button>
+                <button class="period-btn" data-period="custom">Custom</button>
+            </div>
+            <div class="custom-date-controls" id="customDateControls">
+                <input type="date" class="date-input" id="customStartDate" aria-label="Custom start date">
+                <span class="date-separator">to</span>
+                <input type="date" class="date-input" id="customEndDate" aria-label="Custom end date">
+                <button class="period-btn" id="customApplyPeriod">Apply</button>
             </div>
             <label class="condensed-toggle">
                 <input type="checkbox" id="condensedView" checked>
                 <span>Condensed View</span>
             </label>
+            <div class="period-range-label" id="periodRangeLabel">Last Month</div>
         </div>
 
         <!-- KPI Cards -->
@@ -1575,11 +1623,69 @@ o
         // PERIOD MANAGEMENT
         // ============================================
 
-        function setPeriod(period) {
-            document.querySelectorAll('.period-btn').forEach(btn => {
+        function formatDateInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function startOfDay(date) {
+            const normalized = new Date(date);
+            normalized.setHours(0, 0, 0, 0);
+            return normalized;
+        }
+
+        function endOfDay(date) {
+            const normalized = new Date(date);
+            normalized.setHours(23, 59, 59, 999);
+            return normalized;
+        }
+
+        function setActivePeriodButton(period, selectedButton) {
+            document.querySelectorAll('.period-selector .period-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            const target = selectedButton || document.querySelector(`.period-selector .period-btn[data-period="${period}"]`);
+            if (target) {
+                target.classList.add('active');
+            }
+        }
+
+        function toggleCustomDateControls(show) {
+            const controls = document.getElementById('customDateControls');
+            if (controls) {
+                controls.classList.toggle('visible', show);
+            }
+        }
+
+        function syncCustomInputs() {
+            const startInput = document.getElementById('customStartDate');
+            const endInput = document.getElementById('customEndDate');
+            if (!startInput || !endInput || !currentPeriod.start || !currentPeriod.end) return;
+            startInput.value = formatDateInput(currentPeriod.start);
+            endInput.value = formatDateInput(currentPeriod.end);
+        }
+
+        function updatePeriodRangeLabel() {
+            const label = document.getElementById('periodRangeLabel');
+            if (!label) return;
+
+            if (!currentPeriod.start) {
+                label.textContent = 'All Time';
+                return;
+            }
+
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            label.textContent = `${formatter.format(currentPeriod.start)} - ${formatter.format(currentPeriod.end)}`;
+        }
+
+        function setPeriod(period, selectedButton) {
+            setActivePeriodButton(period, selectedButton);
 
             const now = new Date();
             currentPeriod.name = period;
@@ -1608,20 +1714,65 @@ o
                     currentPeriod.start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
                     currentPeriod.end = new Date();
                     break;
+                case '90d':
+                    // Last 3 months
+                    currentPeriod.start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+                    currentPeriod.end = new Date();
+                    break;
                 case 'all':
                     // All time
                     currentPeriod.start = null;
                     currentPeriod.end = new Date();
                     break;
                 case 'custom':
-                    // Custom period (default to last 30 days)
-                    currentPeriod.start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-                    currentPeriod.end = new Date();
-                    break;
+                    // Show the calendar picker. The query runs when Apply is clicked.
+                    currentPeriod.start = currentPeriod.start || new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    currentPeriod.end = currentPeriod.end || new Date();
+                    toggleCustomDateControls(true);
+                    syncCustomInputs();
+                    updatePeriodRangeLabel();
+                    return;
             }
 
+            toggleCustomDateControls(false);
+            updatePeriodRangeLabel();
             fetchAndRenderMetrics();
         }
+
+        function applyCustomPeriod() {
+            const startInput = document.getElementById('customStartDate');
+            const endInput = document.getElementById('customEndDate');
+            if (!startInput || !endInput || !startInput.value || !endInput.value) {
+                alert('Please select both start and end dates.');
+                return;
+            }
+
+            const start = startOfDay(new Date(`${startInput.value}T00:00:00`));
+            const end = endOfDay(new Date(`${endInput.value}T00:00:00`));
+
+            if (start > end) {
+                alert('Start date must be before end date.');
+                return;
+            }
+
+            currentPeriod.name = 'custom';
+            currentPeriod.start = start;
+            currentPeriod.end = end;
+            setActivePeriodButton('custom');
+            toggleCustomDateControls(true);
+            updatePeriodRangeLabel();
+            fetchAndRenderMetrics();
+        }
+
+        window.setPeriod = setPeriod;
+        window.applyCustomPeriod = applyCustomPeriod;
+        window.getCurrentPeriod = function() {
+            return {
+                name: currentPeriod.name,
+                start: currentPeriod.start ? currentPeriod.start.toISOString() : null,
+                end: currentPeriod.end ? currentPeriod.end.toISOString() : null
+            };
+        };
 
         // ============================================
         // DATA FETCHING (REAL FIREBASE DATA)
@@ -1665,8 +1816,24 @@ o
                 const totalUsers = installSnapshot.size;
                 const totalUsersAllTime = allTimeInstallSnapshot.size;
                 const onboardingCompleted = onboardingCompletedSnapshot.size;
-                // Trials démarrés dans la période (subscription_purchased inclut is_trial=true et is_trial=false)
-                const trialsStarted = trialSnapshot.size;
+
+                // Séparer trials (is_trial=true) et yearly converts (is_trial=false + yearly product)
+                let trialsStarted = 0;
+                let yearlyConverts = 0;
+                trialSnapshot.forEach(doc => {
+                    const d = doc.data();
+                    const isTrial = d.is_trial === true || d.is_trial === 'true';
+                    const isConverted = d.is_trial === false || d.is_trial === 'false';
+                    if (isTrial) {
+                        trialsStarted++;
+                    } else if (isConverted) {
+                        const pid = (d.product_id || '').toLowerCase();
+                        if (pid.includes('annual') || pid.includes('yearly') || pid.includes('year')) {
+                            yearlyConverts++;
+                        }
+                    }
+                });
+                console.log(`📊 subscription_purchased total: ${trialSnapshot.size}, trialsStarted: ${trialsStarted}, yearlyConverts: ${yearlyConverts}`);
                 console.log(`📊 Installs: ${totalUsers}, Onboarding completed: ${onboardingCompleted}`);
 
                 // Calculate average streak
@@ -1730,9 +1897,8 @@ o
 
                 const ltv = activeSubscriptions > 0 ? revenue / activeSubscriptions : 0;
                 const rpi = totalUsersAllTime > 0 ? revenue / totalUsersAllTime : 0;
-                // Trial to Paid = paid subs / (paid subs + active trials) — source: RevenueCat only
-                const totalTrialPool = activeSubscriptions + activeTrials;
-                const trialToPaid = totalTrialPool > 0 ? ((activeSubscriptions / totalTrialPool) * 100).toFixed(1) : 0;
+                // Trial to Paid = yearly converts / trials started — Firestore, période, yearly only
+                const trialToPaid = trialsStarted > 0 ? ((yearlyConverts / trialsStarted) * 100).toFixed(1) : 0;
 
                 console.log('✅ Data fetched successfully');
 
@@ -1755,6 +1921,7 @@ o
                     activeSubscriptions,
                     activeTrials,
                     trialsStarted,
+                    yearlyConverts,
                     revenue,
                     ltv,
                     rpi,
@@ -2030,14 +2197,14 @@ o
                 {
                     title: 'Download to Trial',
                     value: `${data.downloadToTrial}%`,
-                    subtitle: `${data.trialsStarted} subscription_purchased / installs — période`,
+                    subtitle: `${data.trialsStarted} yearly trials started / ${data.totalUsers} installs — période`,
                     badge: getBadge(parseFloat(data.downloadToTrial), { good: 15, average: 8 }),
                     sparklineKey: 'downloadToTrial'
                 },
                 {
                     title: 'Trial to Paid',
                     value: `${data.trialToPaid}%`,
-                    subtitle: 'Paid / (Paid + Active trials) — RevenueCat',
+                    subtitle: `${data.yearlyConverts} yearly converts / ${data.trialsStarted} trials — Firestore`,
                     badge: parseFloat(data.trialToPaid) > 0 ? getBadge(parseFloat(data.trialToPaid), { good: 25, average: 12 }) : null,
                     sparklineKey: 'trialToPaid'
                 },
@@ -2432,8 +2599,21 @@ o
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Dashboard loading...');
+            currentPeriod.name = '30d';
             currentPeriod.start = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            currentPeriod.end = new Date();
+            setActivePeriodButton('30d');
+            updatePeriodRangeLabel();
             fetchAndRenderMetrics();
+
+            document.querySelectorAll('.period-selector .period-btn[data-period]').forEach(button => {
+                button.addEventListener('click', () => setPeriod(button.dataset.period, button));
+            });
+
+            const customApplyButton = document.getElementById('customApplyPeriod');
+            if (customApplyButton) {
+                customApplyButton.addEventListener('click', applyCustomPeriod);
+            }
 
             // Setup condensed view toggle
             const condensedCheckbox = document.getElementById('condensedView');

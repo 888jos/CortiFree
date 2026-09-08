@@ -89,6 +89,7 @@ struct AuthenticationView: View {
     @State private var errorMessage: String?
 
     var onComplete: () -> Void
+    var onSkip: () -> Void
 
     var body: some View {
         ZStack {
@@ -216,6 +217,17 @@ struct AuthenticationView: View {
                     }
                     .padding(.horizontal, 32)
                 }
+
+                Button(action: {
+                    HapticManager.light()
+                    onSkip()
+                }) {
+                    Text("Skip ->")
+                        .font(.custom("Poppins-Medium", size: 16))
+                        .foregroundColor(.white.opacity(0.9))
+                        .underline()
+                }
+                .padding(.top, 20)
 
                 // Error message
                 if let errorMessage = errorMessage {
@@ -1356,5 +1368,5 @@ struct CustomTextFieldStyle: TextFieldStyle {
 }
 
 #Preview {
-    AuthenticationView(onComplete: {})
+    AuthenticationView(onComplete: {}, onSkip: {})
 }

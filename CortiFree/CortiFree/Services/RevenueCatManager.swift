@@ -194,6 +194,10 @@ class RevenueCatManager: ObservableObject {
         // STRICT CHECK: only entitlements["pro"]?.isActive == true grants premium
         hasPremiumEntitlement = customerInfo.entitlements[entitlementID]?.isActive == true
 
+        if hasPremiumEntitlement {
+            OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+        }
+
         // Mark that we've received a definitive answer from RevenueCat
         isPremiumStatusReady = true
 
@@ -451,6 +455,16 @@ class RevenueCatManager: ObservableObject {
             return false
         }
         return entitlement.willRenew
+    }
+
+    /// User had Pro at least once, but no longer has active Pro access.
+    var hasInactivePreviousProEntitlement: Bool {
+        guard let entitlement = customerInfo?.entitlements[entitlementID] else {
+            return false
+        }
+
+        return entitlement.isActive == false
+            && entitlement.expirationDate != nil
     }
 
     // MARK: - Diagnostics

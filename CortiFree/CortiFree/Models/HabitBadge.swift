@@ -26,6 +26,10 @@ struct HabitBadge: Identifiable, Codable {
         return min(Double(progress) / Double(requirement), 1.0)
     }
 
+    var badgeAssetName: String {
+        "habit_badge_\(habitId)"
+    }
+
     enum BadgeLevel: String, Codable, CaseIterable {
         case bronze
         case silver
@@ -47,6 +51,15 @@ struct HabitBadge: Identifiable, Codable {
             case .silver: return NSLocalizedString("badge.level.silver", comment: "")
             case .gold: return NSLocalizedString("badge.level.gold", comment: "")
             case .diamond: return NSLocalizedString("badge.level.diamond", comment: "")
+            }
+        }
+
+        var englishDisplayName: String {
+            switch self {
+            case .bronze: return "Bronze"
+            case .silver: return "Silver"
+            case .gold: return "Gold"
+            case .diamond: return "Diamond"
             }
         }
 
@@ -182,6 +195,20 @@ extension HabitBadge {
         case "nature": return NSLocalizedString("badge.habit.nature", comment: "")
         case "social": return NSLocalizedString("badge.habit.social", comment: "")
         case "sleep": return NSLocalizedString("badge.habit.sleep", comment: "")
+        default: return habitId.capitalized
+        }
+    }
+
+    static func englishHabitDisplayName(_ habitId: String) -> String {
+        switch habitId {
+        case "meditation": return "Meditation"
+        case "breathing": return "Breathing"
+        case "journal": return "Journal"
+        case "sport": return "Exercise"
+        case "water": return "Water"
+        case "nature": return "Nature"
+        case "social": return "Social"
+        case "sleep": return "Sleep"
         default: return habitId.capitalized
         }
     }

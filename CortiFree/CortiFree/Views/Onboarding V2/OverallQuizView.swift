@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SuperwallKit
 
 struct OverallQuizView: View {
     let onComplete: (OverallQuizData) -> Void
@@ -16,13 +17,13 @@ struct OverallQuizView: View {
     @State private var selectedGender: Int? = nil
     @State private var selectedAge: Int? = nil
     @State private var selectedReasons: Set<Int> = []
-    @State private var selectedAcquisition: Int? = nil
     @State private var selectedDuration: Int? = nil
     @State private var isGoingBack: Bool = false
+    @State private var isTransitioning: Bool = false
     @State private var quizStartTime: Date?
     @State private var questionStartTime: Date?
 
-    private let totalQuestions = 5
+    private let totalQuestions = 4
 
     private var progress: Double {
         Double(currentQuestionIndex) / Double(totalQuestions)
@@ -83,13 +84,6 @@ struct OverallQuizView: View {
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
-                    } else if currentQuestionIndex == 4 {
-                        acquisitionQuestion
-                            .id(4)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
-                                removal: .move(edge: isGoingBack ? .trailing : .leading)
-                            ))
                     }
                 }
 
@@ -111,6 +105,18 @@ struct OverallQuizView: View {
         }
     }
 
+    // MARK: - Navigation
+
+    private func advance() {
+        guard !isTransitioning else { return }
+        guard currentQuestionIndex < totalQuestions - 1 else { return }
+        isTransitioning = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            currentQuestionIndex += 1
+            isTransitioning = false
+        }
+    }
+
     // MARK: - Question Tracking
 
     private func trackQuestionViewed(_ index: Int) {
@@ -118,8 +124,7 @@ struct OverallQuizView: View {
             "Raisons du stress",
             "Durée du stress",
             "Genre",
-            "Âge",
-            "Comment as-tu découvert CortiFree ?"
+            "Âge"
         ]
         MixpanelManager.shared.trackOnboardingQuizQuestionViewed(
             questionNumber: index + 1,
@@ -133,8 +138,7 @@ struct OverallQuizView: View {
             "Raisons du stress",
             "Durée du stress",
             "Genre",
-            "Âge",
-            "Comment as-tu découvert CortiFree ?"
+            "Âge"
         ]
         let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
         MixpanelManager.shared.trackOnboardingQuizQuestionAnswered(
@@ -219,57 +223,36 @@ struct OverallQuizView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 20)
 
-            // Answer buttons
-            VStack(spacing: 22) {
-                OverallAnswerButton(
-                    number: 1,
-                    text: "onboarding_v2.overall.gender_male".localized,
-                    isSelected: selectedGender == 0,
-                    onTap: {
-                        HapticManager.light()
-                        trackQuestionAnswered(2, answerIndex: 0, answerText: "onboarding_v2.overall.gender_male".localized)
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedGender = 0
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    OverallIdentityCard(
+                        imageName: "onboarding_identity_male",
+                        title: "onboarding_v2.overall.gender_male".localized,
+                        isSelected: selectedGender == 0
+                    ) {
+                        selectGender(0, answerText: "onboarding_v2.overall.gender_male".localized)
                     }
-                )
 
-                OverallAnswerButton(
-                    number: 2,
-                    text: "onboarding_v2.overall.gender_female".localized,
-                    isSelected: selectedGender == 1,
-                    onTap: {
-                        HapticManager.light()
-                        trackQuestionAnswered(2, answerIndex: 1, answerText: "onboarding_v2.overall.gender_female".localized)
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedGender = 1
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
+                    OverallIdentityCard(
+                        imageName: "onboarding_identity_female",
+                        title: "onboarding_v2.overall.gender_female".localized,
+                        isSelected: selectedGender == 1
+                    ) {
+                        selectGender(1, answerText: "onboarding_v2.overall.gender_female".localized)
                     }
-                )
+                }
 
                 OverallAnswerButton(
                     number: 3,
                     text: "onboarding_v2.overall.gender_other".localized,
                     isSelected: selectedGender == 2,
                     onTap: {
-                        HapticManager.light()
-                        trackQuestionAnswered(2, answerIndex: 2, answerText: "onboarding_v2.overall.gender_other".localized)
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            selectedGender = 2
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            currentQuestionIndex += 1
-                        }
+                        selectGender(2, answerText: "onboarding_v2.overall.gender_other".localized)
                     }
                 )
             }
-            .padding(.horizontal, 34)
+            .disabled(isTransitioning)
+            .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
     }
@@ -308,67 +291,22 @@ struct OverallQuizView: View {
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 selectedAge = index
                             }
+                            guard !isTransitioning else { return }
+                            isTransitioning = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
+                                completeQuiz()
                             }
                         }
                     )
                 }
             }
+            .disabled(isTransitioning)
             .padding(.horizontal, 34)
             .padding(.bottom, 40)
         }
     }
 
-    // MARK: - Question 3: Acquisition (How discovered CortiFree)
-
-    private var acquisitionQuestion: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Question text
-            Text("onboarding_v2.habits.q10".localized)
-                .font(.faroRegular(18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-
-            // Answer buttons
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 22) {
-                    ForEach(0..<6, id: \.self) { index in
-                        let acquisitionTexts = [
-                            "onboarding_v2.habits.q10_opt1".localized,
-                            "onboarding_v2.habits.q10_opt2".localized,
-                            "onboarding_v2.habits.q10_opt3".localized,
-                            "onboarding_v2.habits.q10_opt4".localized,
-                            "onboarding_v2.habits.q10_opt5".localized,
-                            "onboarding_v2.habits.q10_opt6".localized
-                        ]
-                        OverallAnswerButton(
-                            number: index + 1,
-                            text: acquisitionTexts[index],
-                            isSelected: selectedAcquisition == index,
-                            onTap: {
-                                HapticManager.light()
-                                trackQuestionAnswered(4, answerIndex: index, answerText: acquisitionTexts[index])
-                                withAnimation(.easeInOut(duration: 0.5)) {
-                                    selectedAcquisition = index
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                    completeQuiz()
-                                }
-                            }
-                        )
-                    }
-                }
-                .padding(.horizontal, 34)
-                .padding(.bottom, 40)
-            }
-        }
-    }
-
-    // MARK: - Question 4: Reason (Multiple Choice)
+    // MARK: - Question 1: Reason (Multiple Choice)
 
     private var reasonQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -494,9 +432,7 @@ struct OverallQuizView: View {
                             ]
                             let selectedTexts = selectedReasons.sorted().compactMap { reasonTexts[safe: $0] }.joined(separator: ", ")
                             trackQuestionAnswered(0, answerIndex: selectedReasons.count, answerText: selectedTexts)
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                currentQuestionIndex += 1
-                            }
+                            advance()
                         }) {
                             Text(StringKeys.Common.continueButton)
                                 .font(.custom("Poppins-SemiBold", size: 16))
@@ -516,7 +452,7 @@ struct OverallQuizView: View {
         }
     }
 
-    // MARK: - Question 5: Duration
+    // MARK: - Question 2: Duration
 
     private var durationQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -549,13 +485,12 @@ struct OverallQuizView: View {
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 selectedDuration = index
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                currentQuestionIndex += 1
-                            }
+                            advance()
                         }
                     )
                 }
             }
+            .disabled(isTransitioning)
             .padding(.horizontal, 34)
             .padding(.bottom, 40)
         }
@@ -577,14 +512,6 @@ struct OverallQuizView: View {
             "onboarding_v2.overall.age_45_54".localized,
             "onboarding_v2.overall.age_55_plus".localized
         ]
-        let acquisitionOptions = [
-            "App Store",
-            "Instagram",
-            "TikTok",
-            "Bouche à oreille",
-            "Publicité",
-            "Autre"
-        ]
         let reasonOptions = [
             "onboarding_v2.overall.reason_sleep".localized,
             "onboarding_v2.overall.reason_anxiety".localized,
@@ -601,13 +528,16 @@ struct OverallQuizView: View {
             "onboarding_v2.overall.duration_years".localized
         ]
 
-        let selectedReasonTexts = selectedReasons.sorted().map { reasonOptions[$0] }
-        let acquisitionChannel = acquisitionOptions[selectedAcquisition ?? 5]
+        let genderIndex = selectedGender ?? 2
+        let genderCode = ["male", "female", "other"][genderIndex]
+        persistGender(genderCode)
 
+        let selectedReasonTexts = selectedReasons.sorted().map { reasonOptions[$0] }
         let data = OverallQuizData(
-            gender: genderOptions[selectedGender ?? 0],
+            gender: genderOptions[genderIndex],
+            genderCode: genderCode,
             age: ageOptions[selectedAge ?? 0],
-            acquisitionChannel: acquisitionChannel,
+            acquisitionChannel: nil,
             reasons: selectedReasonTexts,
             duration: durationOptions[selectedDuration ?? 0]
         )
@@ -620,19 +550,31 @@ struct OverallQuizView: View {
         MixpanelManager.shared.trackOnboardingOverallQuizCompleted(
             firstName: "",
             age: ageInt,
-            gender: genderOptions[selectedGender ?? 0],
+            gender: genderCode,
             stressReasons: selectedReasonTexts,
             stressDuration: durationOptions[selectedDuration ?? 0],
             timeToComplete: totalTime
         )
 
-        // Track acquisition channel separately
-        MixpanelManager.shared.trackOnboardingMarketingData(
-            acquisitionChannel: acquisitionChannel,
-            previousAppExperience: nil
-        )
-
         onComplete(data)
+    }
+
+    private func selectGender(_ index: Int, answerText: String) {
+        guard !isTransitioning else { return }
+
+        let genderCode = ["male", "female", "other"][index]
+        HapticManager.light()
+        trackQuestionAnswered(2, answerIndex: index, answerText: answerText)
+        persistGender(genderCode)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            selectedGender = index
+        }
+        advance()
+    }
+
+    private func persistGender(_ genderCode: String) {
+        UserDefaults.standard.set(genderCode, forKey: "onboarding_gender")
+        Superwall.shared.setUserAttributes(["gender": genderCode])
     }
 
     // Helper to extract age from string like "18-24 ans"
@@ -652,6 +594,7 @@ struct OverallAnswerButton: View {
     let number: Int
     let text: String
     let isSelected: Bool
+    var isDisabled: Bool = false
     let onTap: () -> Void
 
     var body: some View {
@@ -697,6 +640,52 @@ struct OverallAnswerButton: View {
         .buttonStyle(PlainButtonStyle())
         .scaleEffect(isSelected ? 0.98 : 1.0)
         .opacity(isSelected ? 0.9 : 1.0)
+        .disabled(isDisabled)
+    }
+}
+
+struct OverallIdentityCard: View {
+    let imageName: String
+    let title: String
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 0) {
+                ZStack(alignment: .topTrailing) {
+                    Image(imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 176)
+                        .clipped()
+
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundStyle(Color(hex: "67DB3D"), .black)
+                            .padding(10)
+                    }
+                }
+
+                Text(title)
+                    .font(.custom("Poppins-SemiBold", size: 16))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .background(Color(hex: "131146"))
+            }
+            .background(Color(hex: "131146"))
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(isSelected ? Color(hex: "67DB3D") : Color(hex: "4CC6FF").opacity(0.45), lineWidth: isSelected ? 3 : 1)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
 
@@ -704,8 +693,9 @@ struct OverallAnswerButton: View {
 
 struct OverallQuizData {
     let gender: String
+    let genderCode: String
     let age: String
-    let acquisitionChannel: String
+    let acquisitionChannel: String?
     let reasons: [String]
     let duration: String
 }

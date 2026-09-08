@@ -31,6 +31,7 @@ struct BreathingDetailFlowView: View {
 
     // Completion
     @State private var showCompletion = false
+    @State private var didRecordCompletion = false
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -256,9 +257,18 @@ struct BreathingDetailFlowView: View {
     // MARK: - Completion
 
     private func completeExercise() {
+        guard !didRecordCompletion else { return }
+        didRecordCompletion = true
         isExerciseActive = false
         voiceOverManager.stop()
         HapticManager.success()
+
+        ExerciseSessionRecorder.shared.record(
+            exerciseID: pattern.name,
+            category: .breathing,
+            durationSeconds: Int(duration.rounded()),
+            source: "breathing_flow"
+        )
 
         withAnimation(.easeInOut(duration: 0.5)) {
             showCompletion = true

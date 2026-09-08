@@ -28,7 +28,7 @@ class VoiceOverManager: NSObject, ObservableObject {
     // MARK: - Configuration
 
     private func detectLanguage() {
-        let languageCode = Locale.current.languageCode ?? "fr"
+        let languageCode = Locale.current.language.languageCode?.identifier ?? "fr"
         currentLanguage = languageCode == "en" ? "en-US" : "fr-FR"
     }
 

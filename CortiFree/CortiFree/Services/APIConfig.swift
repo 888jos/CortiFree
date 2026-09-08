@@ -86,7 +86,7 @@ final class APIConfig {
     let tiktokEventAppId: String = "6758314805"
 
     /// TikTok App ID (the longer TikTok-specific ID)
-    let tiktokAppId: String = "7606716625122770951"
+    let tiktokAppId: String = "7613749779029295122"
 
     /// TikTok Access Token
     /// Add TIKTOK_ACCESS_TOKEN to Info.plist

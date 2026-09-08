@@ -48,18 +48,24 @@
 	<true/>
 	<key>NSAdvertisingAttributionReportEndpoint</key>
 	<string>https://api-adservices.apple.com/api/v1/</string>
+	<key>NSCameraUsageDescription</key>
+	<string>CortiFree uses the camera for an optional wellness photo preview.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>CortiFree utilise le micro pour les exercices de respiration guidée.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CortiFree uses your photo library for an optional wellness photo preview.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>CortiFree utilise cet identifiant pour personnaliser votre expérience et mesurer l'efficacité des publicités.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>CortiFree envoie des rappels pour vos routines quotidiennes.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>REVENUECAT_API_KEY</key>
 	<string>appl_SfyPvLkFFQKWDdIDvePwFwccztX</string>
 	<key>SUPERWALL_API_KEY</key>
 	<string>pk_JPmmC0H5be4yqTnw24VTm</string>
 	<key>TIKTOK_ACCESS_TOKEN</key>
-	<string>TTX3y4d9Cr2WIUm1vGCqNxm6ad4Jk7gX</string>
+	<string>TTVa4hylh9udluAy3EyCN62raaaUC5jV</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
@@ -325,6 +331,10 @@
 		<dict>
 			<key>SKAdNetworkIdentifier</key>
 			<string>9yg77x724h.skadnetwork</string>
+		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>6yxml2yyag.skadnetwork</string>
 		</dict>
 	</array>
 	<key>UIAppFonts</key>

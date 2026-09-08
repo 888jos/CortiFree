@@ -12,6 +12,12 @@
 
 import SwiftUI
 
+private enum HabitsQuizIntermission {
+    case earlyPattern
+    case preliminaryProfile
+    case cortiFreeComparison
+}
+
 struct HabitsQuizView: View {
     let onComplete: (HabitsQuizResult) -> Void
 
@@ -20,6 +26,8 @@ struct HabitsQuizView: View {
     @State private var selectedAnswer: Int? = nil
     @State private var answers: [Int] = Array(repeating: 0, count: 12)
     @State private var isGoingBack: Bool = false
+    @State private var isTransitioning: Bool = false
+    @State private var activeIntermission: HabitsQuizIntermission?
     @State private var questionStartTime: Date?
     @State private var quizStartTime: Date?
 
@@ -35,36 +43,41 @@ struct HabitsQuizView: View {
 
     var body: some View {
         ZStack {
-            // Galaxy background (same as app)
-            GalaxyBackgroundView(intensity: 1.0)
-                .ignoresSafeArea()
+            if let activeIntermission {
+                intermissionView(activeIntermission)
+                .transition(.opacity)
+            } else {
+                // Galaxy background (same as app)
+                GalaxyBackgroundView(intensity: 1.0)
+                    .ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Navigation header
-                    headerSection
-                        .padding(.top, 50)
-
-                    // Question content with fixed title
+                ScrollView {
                     VStack(spacing: 0) {
-                    // Fixed Question Number Title
-                    Text("Question #\(currentQuestionNumber)")
-                        .font(.faroBold(24))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 30)
-                        .id("questionTitle") // Keep it stable
+                        // Navigation header
+                        headerSection
+                            .padding(.top, 50)
 
-                    // Sliding content
-                    questionContent
-                        .id(currentQuestionIndex)
-                        .transition(.asymmetric(
-                            insertion: .move(edge: isGoingBack ? .leading : .trailing),
-                            removal: .move(edge: isGoingBack ? .trailing : .leading)
-                        ))
-                }
+                        // Question content with fixed title
+                        VStack(spacing: 0) {
+                            // Fixed Question Number Title
+                            Text("Question #\(currentQuestionNumber)")
+                                .font(.faroBold(24))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.top, 30)
+                                .id("questionTitle") // Keep it stable
 
-                    Spacer(minLength: 100)
+                            // Sliding content
+                            questionContent
+                                .id(currentQuestionIndex)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                    removal: .move(edge: isGoingBack ? .trailing : .leading)
+                                ))
+                        }
+
+                        Spacer(minLength: 100)
+                    }
                 }
             }
         }
@@ -83,6 +96,44 @@ struct HabitsQuizView: View {
         }
     }
 
+    @ViewBuilder
+    private func intermissionView(_ intermission: HabitsQuizIntermission) -> some View {
+        switch intermission {
+        case .earlyPattern:
+            HabitsQuizInsightView(
+                mode: .earlyPattern,
+                answers: answers,
+                onBack: returnToCurrentQuestion,
+                onContinue: continueAfterIntermission
+            )
+        case .preliminaryProfile:
+            HabitsQuizInsightView(
+                mode: .preliminaryProfile,
+                answers: answers,
+                onBack: returnToCurrentQuestion,
+                onContinue: continueAfterIntermission
+            )
+        case .cortiFreeComparison:
+            CortiFreeComparisonView(
+                previousAppExperience: answers[9],
+                onBack: returnToCurrentQuestion,
+                onContinue: continueAfterIntermission
+            )
+        }
+    }
+
+    private func returnToCurrentQuestion() {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            activeIntermission = nil
+        }
+    }
+
+    private func continueAfterIntermission() {
+        activeIntermission = nil
+        isTransitioning = true
+        advanceToNextQuestion()
+    }
+
     // MARK: - Question Tracking
 
     private func trackQuestionViewed(_ index: Int) {
@@ -99,6 +150,7 @@ struct HabitsQuizView: View {
         HStack(spacing: 0) {
             // Back button (left)
             Button(action: {
+                guard !isTransitioning else { return }
                 HapticManager.light()
                 if currentQuestionIndex > 0 {
                     // Track back button click
@@ -188,6 +240,8 @@ struct HabitsQuizView: View {
                     text: options[index],
                     isSelected: selectedAnswer == index,
                     onTap: {
+                        guard !isTransitioning else { return }
+                        isTransitioning = true
                         HapticManager.light()
                         withAnimation(.easeInOut(duration: 0.5)) {
                             selectedAnswer = index
@@ -208,12 +262,32 @@ struct HabitsQuizView: View {
                         // Save answer and advance
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             answers[currentQuestionIndex] = index
-                            advanceToNextQuestion()
+                            let intermission: HabitsQuizIntermission?
+                            switch currentQuestionIndex {
+                            case 2:
+                                intermission = .earlyPattern
+                            case 7:
+                                intermission = .preliminaryProfile
+                            case 9:
+                                intermission = .cortiFreeComparison
+                            default:
+                                intermission = nil
+                            }
+
+                            if let intermission {
+                                isTransitioning = false
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    activeIntermission = intermission
+                                }
+                            } else {
+                                advanceToNextQuestion()
+                            }
                         }
                     }
                 )
             }
         }
+        .disabled(isTransitioning)
         .padding(.horizontal, 34)
         .padding(.bottom, 40)
     }
@@ -221,14 +295,22 @@ struct HabitsQuizView: View {
     // MARK: - Navigation
 
     private func advanceToNextQuestion() {
+        guard currentQuestionIndex < totalQuestions else {
+            isTransitioning = false
+            return
+        }
         if currentQuestionIndex < totalQuestions - 1 {
             isGoingBack = false
             withAnimation(.easeInOut(duration: 0.5)) {
                 currentQuestionIndex += 1
                 selectedAnswer = nil
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                isTransitioning = false
+            }
         } else {
             // Quiz complete
+            isTransitioning = false
             calculateAndComplete()
         }
     }

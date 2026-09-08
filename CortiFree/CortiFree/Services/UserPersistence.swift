@@ -22,6 +22,7 @@ final class UserPersistence {
 
         // User Info
         case userFirstName = "userFirstName"
+        case localUserID = "localUserID"
         case selectedGoals = "selectedGoals"
 
         // Streaks & Progress
@@ -132,6 +133,17 @@ final class UserPersistence {
                 remove(.userFirstName)
             }
         }
+    }
+
+    /// Stable device-local identity used for offline progress before sign-in.
+    static var localUserID: String {
+        if let stored = string(for: .localUserID), !stored.isEmpty {
+            return stored
+        }
+
+        let generated = UUID().uuidString
+        set(.localUserID, string: generated)
+        return generated
     }
 
     // Streaks

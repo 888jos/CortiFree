@@ -181,7 +181,7 @@ class MixpanelManager {
         track(event: "onboarding_welcome_clicked")
     }
 
-    // 2. Overall Quiz (5 questions: genre, âge, découverte, raisons stress, durée stress)
+    // 2. Overall Quiz (4 questions: raisons stress, durée stress, genre, âge)
     func trackOnboardingOverallQuizViewed() {
         track(event: "onboarding_overall_quiz_viewed")
     }
@@ -346,7 +346,8 @@ class MixpanelManager {
         track(event: "onboarding_authentication_clicked", properties: [
             "auth_method": authMethod
         ])
-        // TikTok: CompleteRegistration
+        // TikTok: Identify user then CompleteRegistration
+        TikTokManager.shared.identify(userId: userId)
         TikTokManager.shared.trackCompleteRegistration(method: authMethod)
         // PostHog
         PostHogManager.shared.trackRegistration(method: authMethod)

@@ -12,13 +12,15 @@ import SwiftUI
 
 struct GalaxyBackgroundView: View {
     let intensity: Double
+    let isAnimated: Bool
 
     @State private var staticStars: [StaticStar] = []
     @State private var twinklingStars: [TwinklingStar] = []
     @State private var shootingStars: [ShootingStar] = []
 
-    init(intensity: Double = 1.0) {
+    init(intensity: Double = 1.0, isAnimated: Bool = true) {
         self.intensity = max(0.5, min(2.0, intensity))
+        self.isAnimated = isAnimated
     }
 
     var body: some View {
@@ -53,19 +55,23 @@ struct GalaxyBackgroundView: View {
             .ignoresSafeArea()
             .drawingGroup()
 
-            // Twinkling stars - lightweight SwiftUI opacity animations
-            ForEach(twinklingStars) { star in
-                TwinklingStarView(star: star)
-            }
-            .ignoresSafeArea()
-
-            // Shooting stars - rare, minimal cost
-            ShootingStarsLayer(shootingStars: $shootingStars)
+            if isAnimated {
+                // Twinkling stars - lightweight SwiftUI opacity animations
+                ForEach(twinklingStars) { star in
+                    TwinklingStarView(star: star)
+                }
                 .ignoresSafeArea()
+
+                // Shooting stars - rare, minimal cost
+                ShootingStarsLayer(shootingStars: $shootingStars)
+                    .ignoresSafeArea()
+            }
         }
         .onAppear {
             generateStars()
-            scheduleShootingStars()
+            if isAnimated {
+                scheduleShootingStars()
+            }
         }
     }
 
@@ -73,7 +79,7 @@ struct GalaxyBackgroundView: View {
 
     private func generateStars() {
         let staticCount = Int(30.0 * intensity)
-        let twinkleCount = Int(10.0 * intensity)
+        let twinkleCount = isAnimated ? Int(10.0 * intensity) : 0
 
         staticStars = (0..<staticCount).map { _ in
             StaticStar(

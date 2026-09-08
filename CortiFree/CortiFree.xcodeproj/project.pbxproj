@@ -462,7 +462,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
@@ -473,7 +473,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree.CortiFreeWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -495,7 +495,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
@@ -506,7 +506,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree.CortiFreeWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -647,7 +647,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -659,7 +659,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.9;
+				MARKETING_VERSION = 3.0;
 				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -683,7 +683,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -695,7 +695,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.9;
+				MARKETING_VERSION = 3.0;
 				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -899,7 +899,7 @@
 			repositoryURL = "https://github.com/superwall/Superwall-iOS";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.8.3;
+				minimumVersion = 4.14.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

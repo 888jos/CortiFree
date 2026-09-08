@@ -18,7 +18,7 @@ class FirebaseManager: ObservableObject {
     @Published var isLoading = false
 
     private init() {
-        // DO NOT configure Firestore settings - causes crash
+        // Firestore settings are configured in AppDelegate before first use
     }
 
     // MARK: - User Management
@@ -434,13 +434,24 @@ class FirebaseManager: ObservableObject {
 
         // Update habit tracking stats
         if var tracking = try await fetchHabitTracking(uid: uid, habitId: habitId) {
-            tracking.markCompleted(on: date)
+            let isNewProgramDay = !tracking.completedDays.contains(programDay)
+            if isNewProgramDay {
+                tracking.markCompleted(on: date)
+            }
 
             // Add program day to completedDays array if not already present
-            if !tracking.completedDays.contains(programDay) {
+            if isNewProgramDay {
                 tracking.completedDays.append(programDay)
                 tracking.completedDays.sort() // Keep array sorted
             }
+
+            try await db.collection("users").document(uid)
+                .collection("habit_tracking").document(habitId)
+                .setData(tracking.toFirestore())
+        } else {
+            var tracking = HabitTracking(habitId: habitId, habitTitle: habitId.capitalized)
+            tracking.markCompleted(on: date)
+            tracking.completedDays = [programDay]
 
             try await db.collection("users").document(uid)
                 .collection("habit_tracking").document(habitId)

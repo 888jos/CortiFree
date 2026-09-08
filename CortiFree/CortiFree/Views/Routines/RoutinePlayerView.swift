@@ -13,7 +13,6 @@ struct RoutinePlayerView: View {
 
     @State private var currentStepIndex = 0
     @State private var showCompletion = false
-    @State private var pulseAnimation = false
 
     // Exercise presentation states
     @State private var showBreathingExercise = false
@@ -59,14 +58,10 @@ struct RoutinePlayerView: View {
                 RoutineCompletionOverlay(routine: routine) {
                     dismiss()
                 }
-                .transition(.opacity)
             }
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
-            withAnimation(Animation.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-                pulseAnimation = true
-            }
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -190,7 +185,6 @@ struct RoutinePlayerView: View {
                 }
             }
             .padding(.horizontal, 24)
-            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentStepIndex)
         }
     }
 
@@ -202,13 +196,11 @@ struct RoutinePlayerView: View {
                 Circle()
                     .fill(Color(hex: routine.color).opacity(0.2))
                     .frame(width: 180, height: 180)
-                    .scaleEffect(pulseAnimation ? 1.2 : 1.0)
-                    .opacity(pulseAnimation ? 0.3 : 0.6)
+                    .opacity(0.6)
 
                 Circle()
                     .fill(Color(hex: routine.color).opacity(0.3))
                     .frame(width: 140, height: 140)
-                    .scaleEffect(pulseAnimation ? 1.1 : 1.0)
 
                 Image(systemName: currentStep.icon)
                     .font(.system(size: 50, weight: .regular))
@@ -249,10 +241,6 @@ struct RoutinePlayerView: View {
                 }
             }
             .id(currentStepIndex)
-            .transition(.asymmetric(
-                insertion: .move(edge: .trailing).combined(with: .opacity),
-                removal: .move(edge: .leading).combined(with: .opacity)
-            ))
         }
     }
 
@@ -450,9 +438,7 @@ struct RoutinePlayerView: View {
 
         if currentStepIndex < routine.steps.count - 1 {
             HapticManager.light()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                currentStepIndex += 1
-            }
+            currentStepIndex += 1
         } else {
             completeRoutine()
         }
@@ -466,9 +452,7 @@ struct RoutinePlayerView: View {
 
         if currentStepIndex > 0 {
             HapticManager.light()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                currentStepIndex -= 1
-            }
+            currentStepIndex -= 1
         }
     }
 
@@ -483,9 +467,7 @@ struct RoutinePlayerView: View {
         // Track routine completion for rating request
         AppRatingService.shared.trackRoutineCompletion()
 
-        withAnimation {
-            showCompletion = true
-        }
+        showCompletion = true
     }
 
     private func formatDuration(_ seconds: Int) -> String {
@@ -505,7 +487,6 @@ struct RoutinePlayerView: View {
 struct RoutineCompletionOverlay: View {
     let routine: Routine
     let onDismiss: () -> Void
-    @State private var showContent = false
 
     var body: some View {
         ZStack {
@@ -523,8 +504,6 @@ struct RoutineCompletionOverlay: View {
                         .font(.system(size: 80))
                         .foregroundColor(Color(hex: routine.color))
                 }
-                .scaleEffect(showContent ? 1.0 : 0.5)
-                .opacity(showContent ? 1.0 : 0.0)
 
                 VStack(spacing: 8) {
                     Text(NSLocalizedString("routines.completed.title", comment: ""))
@@ -536,7 +515,6 @@ struct RoutineCompletionOverlay: View {
                         .font(.custom("Poppins-Medium", size: 18))
                         .foregroundColor(Color(hex: routine.color))
                 }
-                .opacity(showContent ? 1.0 : 0.0)
 
                 // Stats
                 HStack(spacing: 24) {
@@ -568,7 +546,6 @@ struct RoutineCompletionOverlay: View {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.white.opacity(0.1))
                 )
-                .opacity(showContent ? 1.0 : 0.0)
 
                 // Continue button
                 Button(action: onDismiss) {
@@ -591,14 +568,8 @@ struct RoutineCompletionOverlay: View {
                 .buttonStyle(ScaleButtonStyle())
                 .padding(.horizontal, 40)
                 .padding(.top, 8)
-                .opacity(showContent ? 1.0 : 0.0)
             }
             .padding(40)
-        }
-        .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.2)) {
-                showContent = true
-            }
         }
     }
 }

@@ -28,11 +28,11 @@ struct HabitBadgeRow: View {
 
                 // Habit name and progress
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(HabitBadge.habitDisplayName(habitId))
+                    Text(HabitBadge.englishHabitDisplayName(habitId))
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
 
-                    Text("\(currentProgress)/\(totalTasks) tâches")
+                    Text("\(currentProgress)/\(totalTasks) tasks")
                         .font(.custom("Poppins-Regular", size: 12))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -102,46 +102,15 @@ struct BadgeMiniView: View {
     let badge: HabitBadge
 
     var body: some View {
-        VStack(spacing: 6) {
-            ZStack {
-                // Badge circle
-                Circle()
-                    .fill(
-                        badge.isUnlocked
-                        ? LinearGradient(
-                            colors: [
-                                Color(hex: badge.level.color),
-                                Color(hex: badge.level.color).opacity(0.7)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        : LinearGradient(
-                            colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 50, height: 50)
-
-                // Glow effect for unlocked badges
-                if badge.isUnlocked {
-                    Circle()
-                        .stroke(Color(hex: badge.level.color).opacity(0.5), lineWidth: 2)
-                        .frame(width: 54, height: 54)
-                        .blur(radius: 4)
-                }
-
-                // Icon or Lock
-                if badge.isUnlocked {
-                    Text(badge.level.emoji)
-                        .font(.system(size: 24))
-                } else {
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.3))
-                }
-            }
+            VStack(spacing: 6) {
+            BadgeOctagonMark(
+                icon: HabitBadge.habitIcon(badge.habitId),
+                number: nil,
+                isUnlocked: badge.isUnlocked,
+                accent: Color(hex: badge.level.color),
+                size: 50,
+                assetName: badge.badgeAssetName
+            )
 
             // Requirement text
             Text("\(badge.requirement)")
@@ -157,6 +126,7 @@ struct BadgeDetailSheet: View {
 
     let badge: HabitBadge
     let currentProgress: Int
+    var usesEnglishLabels = true
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -177,46 +147,18 @@ struct BadgeDetailSheet: View {
 
                 // Large badge display
                 ZStack {
-                    // Glow
-                    if badge.isUnlocked {
-                        Circle()
-                            .fill(Color(hex: badge.level.color).opacity(0.3))
-                            .frame(width: 140, height: 140)
-                            .blur(radius: 30)
-                    }
-
-                    // Badge
-                    Circle()
-                        .fill(
-                            badge.isUnlocked
-                            ? LinearGradient(
-                                colors: [
-                                    Color(hex: badge.level.color),
-                                    Color(hex: badge.level.color).opacity(0.7)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            : LinearGradient(
-                                colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 120, height: 120)
-
-                    if badge.isUnlocked {
-                        Text(badge.level.emoji)
-                            .font(.system(size: 60))
-                    } else {
-                        Image(systemName: "lock.fill")
-                            .font(.system(size: 40, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.3))
-                    }
+                    BadgeOctagonMark(
+                        icon: HabitBadge.habitIcon(badge.habitId),
+                        number: nil,
+                        isUnlocked: badge.isUnlocked,
+                        accent: Color(hex: badge.level.color),
+                        size: 120,
+                        assetName: badge.badgeAssetName
+                    )
                 }
 
                 // Title
-                Text("\(HabitBadge.habitDisplayName(badge.habitId)) - \(badge.level.displayName)")
+                Text("\(habitName) - \(levelName)")
                     .font(.custom("Poppins-Bold", size: 24))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
@@ -224,13 +166,13 @@ struct BadgeDetailSheet: View {
                 // Status
                 if badge.isUnlocked {
                     if let unlockedDate = badge.unlockedAt {
-                        Text("Débloqué le \(formattedDate(unlockedDate))")
+                        Text("Unlocked on \(formattedDate(unlockedDate))")
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.7))
                     }
                 } else {
                     VStack(spacing: 8) {
-                        Text("\(currentProgress) / \(badge.requirement) tâches")
+                        Text("\(currentProgress) / \(badge.requirement) tasks")
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.white)
 
@@ -248,7 +190,7 @@ struct BadgeDetailSheet: View {
                         .frame(height: 12)
                         .frame(maxWidth: 200)
 
-                        Text("Encore \(max(0, badge.requirement - currentProgress)) tâches")
+                        Text("\(max(0, badge.requirement - currentProgress)) tasks remaining")
                             .font(.custom("Poppins-Regular", size: 12))
                             .foregroundColor(.white.opacity(0.6))
                     }
@@ -260,7 +202,7 @@ struct BadgeDetailSheet: View {
                 Button(action: {
                     dismiss()
                 }) {
-                    Text("Fermer")
+                    Text("Close")
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -282,10 +224,22 @@ struct BadgeDetailSheet: View {
         }
     }
 
+    private var habitName: String {
+        usesEnglishLabels
+            ? HabitBadge.englishHabitDisplayName(badge.habitId)
+            : HabitBadge.habitDisplayName(badge.habitId)
+    }
+
+    private var levelName: String {
+        usesEnglishLabels ? badge.level.englishDisplayName : badge.level.displayName
+    }
+
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
-        formatter.locale = Locale(identifier: "fr_FR")
+        formatter.locale = usesEnglishLabels
+            ? Locale(identifier: "en_US_POSIX")
+            : Locale.current
         return formatter.string(from: date)
     }
 }

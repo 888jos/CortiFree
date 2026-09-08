@@ -77,19 +77,19 @@ struct AchievementUnlockView: View {
                 // Card content
                 VStack(spacing: 16) {
                     // Title
-                    Text("achievement.unlocked".localized)
+                    Text("Achievement Unlocked!")
                         .font(Font.Poppins.custom(.bold, size: 22))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
                     // Achievement name
-                    Text(achievement.title)
+                    Text(achievement.englishTitle)
                         .font(.custom("Poppins-Bold", size: 20))
                         .foregroundColor(categoryColor)
                         .multilineTextAlignment(.center)
 
                     // Description
-                    Text(achievement.description)
+                    Text(achievement.englishDescription)
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.8))
                         .multilineTextAlignment(.center)
@@ -121,7 +121,7 @@ struct AchievementUnlockView: View {
                 Button(action: {
                     dismissCard()
                 }) {
-                    Text("common.continue".localized)
+                    Text("Continue")
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -244,13 +244,13 @@ struct AchievementUnlockView: View {
     private var categoryName: String {
         switch achievement.category {
         case .streak:
-            return "achievement.category.streak".localized
+            return "Streak"
         case .completion:
-            return "achievement.category.completion".localized
+            return "Completion"
         case .habit:
-            return "achievement.category.habit".localized
+            return "Habit"
         case .special:
-            return "achievement.category.special".localized
+            return "Special"
         }
     }
 }

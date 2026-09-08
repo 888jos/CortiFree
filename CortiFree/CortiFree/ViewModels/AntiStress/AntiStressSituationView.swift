@@ -17,11 +17,19 @@ struct AntiStressSituationView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Galaxy background
-                GalaxyBackgroundView(intensity: 1.0)
+                GalaxyBackgroundView(intensity: 1.0, isAnimated: false)
 
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 32) {
+                GeometryReader { geometry in
+                    let horizontalPadding: CGFloat = 24
+                    let columnSpacing: CGFloat = 16
+                    let rowSpacing: CGFloat = 12
+                    let headerHeight: CGFloat = 84
+                    let verticalSpacing: CGFloat = 20
+                    let availableWidth = geometry.size.width - (horizontalPadding * 2) - columnSpacing
+                    let availableHeight = geometry.size.height - headerHeight - verticalSpacing - (rowSpacing * 2) - 28
+                    let cardSize = max(88, min(availableWidth / 2, availableHeight / 3))
+
+                    VStack(spacing: verticalSpacing) {
                         // Header
                         VStack(spacing: 12) {
                             Text(NSLocalizedString("antistress.situation.title", comment: ""))
@@ -41,14 +49,14 @@ struct AntiStressSituationView: View {
                                 .multilineTextAlignment(.center)
                                 .lineSpacing(4)
                         }
-                        .padding(.top, 20)
                         .padding(.horizontal, 32)
+                        .frame(height: headerHeight)
 
                         // Situation Grid (2x3)
                         let situations = StressSituation.allCases
-                        VStack(spacing: 16) {
+                        VStack(spacing: rowSpacing) {
                             ForEach(0..<(situations.count + 1) / 2, id: \.self) { row in
-                                HStack(spacing: 16) {
+                                HStack(spacing: columnSpacing) {
                                     ForEach(0..<2) { col in
                                         let index = row * 2 + col
                                         if index < situations.count {
@@ -65,18 +73,19 @@ struct AntiStressSituationView: View {
                                                     }
                                                 }
                                             )
+                                            .frame(width: cardSize, height: cardSize)
                                         } else {
                                             Color.clear
-                                                .aspectRatio(1.0, contentMode: .fit)
+                                                .frame(width: cardSize, height: cardSize)
                                         }
                                     }
                                 }
                             }
                         }
-                        .padding(.horizontal, 24)
-
-                        Spacer(minLength: 40)
+                        .frame(maxWidth: .infinity)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .padding(.top, 8)
                 }
             }
             .navigationDestination(isPresented: $showRecommendations) {

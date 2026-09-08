@@ -3,7 +3,7 @@
 //  CortiFree
 //
 //  TikTok App Events SDK integration for ad conversion tracking
-//  Events: Registration, ViewContent (paywall), StartTrial, Purchase
+//  Events: Registration, ViewContent (paywall), StartTrial, Purchase, LaunchApp, Login, Identify
 //  Uses official TikTokBaseEvent / TikTokContentsEvent API
 //
 
@@ -47,15 +47,64 @@ final class TikTokManager {
         #endif
     }
 
+    // MARK: - User Identification
+
+    /// Link events to a specific user — call after successful authentication
+    func identify(userId: String, email: String? = nil) {
+        #if canImport(TikTokBusinessSDK)
+        TikTokBusiness.identify(
+            withExternalID: userId,
+            externalUserName: nil,
+            phoneNumber: nil,
+            email: email
+        )
+        #if DEBUG
+        print("📊 TikTok: Identify (userId: \(userId))")
+        #endif
+        #endif
+    }
+
+    /// Clear identity on sign out
+    func logout() {
+        #if canImport(TikTokBusinessSDK)
+        TikTokBusiness.logout()
+        #if DEBUG
+        print("📊 TikTok: Logout")
+        #endif
+        #endif
+    }
+
     // MARK: - Standard Events
 
-    /// User completed authentication (Google/Apple/Email sign in)
+    /// App launched — call once after SDK init
+    func trackLaunchApp() {
+        #if canImport(TikTokBusinessSDK)
+        let event = TikTokBaseEvent(eventName: TTEventName.launchAPP.rawValue)
+        TikTokBusiness.trackTTEvent(event)
+        #if DEBUG
+        print("📊 TikTok: LaunchApp")
+        #endif
+        #endif
+    }
+
+    /// User completed authentication (Google/Apple/Email sign in — first time)
     func trackCompleteRegistration(method: String) {
         #if canImport(TikTokBusinessSDK)
         let event = TikTokBaseEvent(eventName: TTEventName.registration.rawValue)
         TikTokBusiness.trackTTEvent(event)
         #if DEBUG
         print("📊 TikTok: Registration (method: \(method))")
+        #endif
+        #endif
+    }
+
+    /// Returning user logged in (not first registration)
+    func trackLogin() {
+        #if canImport(TikTokBusinessSDK)
+        let event = TikTokBaseEvent(eventName: TTEventName.login.rawValue)
+        TikTokBusiness.trackTTEvent(event)
+        #if DEBUG
+        print("📊 TikTok: Login")
         #endif
         #endif
     }

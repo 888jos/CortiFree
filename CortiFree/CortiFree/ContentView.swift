@@ -18,9 +18,11 @@ struct ContentView: View {
     enum Tab {
         case home
         case tasks
+        case progress
         case library
         case profile
     }
+
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -33,6 +35,8 @@ struct ContentView: View {
                     HomeView(isScrolling: $isScrolling, scrollTimer: $scrollTimer)
                 case .tasks:
                     TasksV2View()
+                case .progress:
+                    ProgressDashboardView()
                 case .library:
                     LibraryView()
                 case .profile:
@@ -41,7 +45,7 @@ struct ContentView: View {
             }
 
             // Custom Tab Bar - Smart hide/show on scroll
-            CustomTabBar(selectedTab: $selectedTab, themeColor: Color(hex: "B794F6"))
+            CustomTabBar(selectedTab: $selectedTab)
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
 
@@ -51,15 +55,24 @@ struct ContentView: View {
                     Spacer()
                     MiniPlayer()
                         .padding(.horizontal, 24)
-                        .padding(.bottom, isScrolling ? 8 : 88)
+                        .padding(.bottom, isScrolling ? 8 : 96)
                 }
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
             }
         }
         .ignoresSafeArea(.keyboard)
+        .onAppear {
+            #if DEBUG
+            if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_PROGRESS"] == "1" {
+                selectedTab = .progress
+            }
+            #endif
+        }
         .onOpenURL { url in
             if url.scheme == "cortifree" && url.host == "tasks" {
                 selectedTab = .tasks
+            } else if url.scheme == "cortifree" && url.host == "progress" {
+                selectedTab = .progress
             }
         }
     }
@@ -69,15 +82,35 @@ struct ContentView: View {
 
 struct CustomTabBar: View {
     @Binding var selectedTab: ContentView.Tab
-    let themeColor: Color
 
+    @ViewBuilder
     var body: some View {
+        if #available(iOS 26.0, *) {
+            tabButtons
+                .glassEffect(
+                    .regular
+                        .tint(Color(hex: "17182E").opacity(0.82))
+                        .interactive(),
+                    in: RoundedRectangle(cornerRadius: 22, style: .continuous)
+                )
+                .environment(\.colorScheme, .dark)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 6)
+        } else {
+            tabButtons
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .environment(\.colorScheme, .dark)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 6)
+        }
+    }
+
+    private var tabButtons: some View {
         HStack(spacing: 0) {
             TabBarButton(
                 icon: "house.fill",
                 title: NSLocalizedString("tab.home", comment: ""),
-                isSelected: selectedTab == .home,
-                themeColor: themeColor
+                isSelected: selectedTab == .home
             ) {
                 if selectedTab != .home {
                     selectedTab = .home
@@ -85,10 +118,9 @@ struct CustomTabBar: View {
             }
 
             TabBarButton(
-                icon: "checkmark.circle.fill",
+                icon: "list.bullet.clipboard.fill",
                 title: NSLocalizedString("tab.plan", comment: ""),
-                isSelected: selectedTab == .tasks,
-                themeColor: themeColor
+                isSelected: selectedTab == .tasks
             ) {
                 if selectedTab != .tasks {
                     selectedTab = .tasks
@@ -96,10 +128,19 @@ struct CustomTabBar: View {
             }
 
             TabBarButton(
-                icon: "book.fill",
+                icon: "chart.line.uptrend.xyaxis",
+                title: NSLocalizedString("tab.progress", comment: ""),
+                isSelected: selectedTab == .progress
+            ) {
+                if selectedTab != .progress {
+                    selectedTab = .progress
+                }
+            }
+
+            TabBarButton(
+                icon: "books.vertical.fill",
                 title: NSLocalizedString("tab.library", comment: ""),
-                isSelected: selectedTab == .library,
-                themeColor: themeColor
+                isSelected: selectedTab == .library
             ) {
                 if selectedTab != .library {
                     selectedTab = .library
@@ -109,24 +150,16 @@ struct CustomTabBar: View {
             TabBarButton(
                 icon: "person.fill",
                 title: NSLocalizedString("tab.profile", comment: ""),
-                isSelected: selectedTab == .profile,
-                themeColor: themeColor
+                isSelected: selectedTab == .profile
             ) {
                 if selectedTab != .profile {
                     selectedTab = .profile
                 }
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 12)
-        .frame(height: 72)
-        .background(
-            RoundedRectangle(cornerRadius: 24)
-                .fill(Color(hex: "1A1B3A"))
-                .shadow(color: .black.opacity(0.3), radius: 10, y: -5)
-        )
-        .padding(.horizontal, 24)
-        .padding(.bottom, 8)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 5)
+        .frame(height: 62)
         .fixedSize(horizontal: false, vertical: true)
     }
 }
@@ -135,32 +168,42 @@ struct TabBarButton: View {
     let icon: String
     let title: String
     let isSelected: Bool
-    let themeColor: Color
     let action: () -> Void
+
 
     var body: some View {
         Button(action: {
             HapticManager.light()
-            action()
+            withAnimation(.spring(response: 0.38, dampingFraction: 0.8)) {
+                action()
+            }
         }) {
-            VStack(spacing: 4) {
+            VStack(spacing: 3) {
                 Image(systemName: icon)
-                    .font(.custom("Poppins-SemiBold", size: 20))
-                    .foregroundColor(isSelected ? themeColor : .white.opacity(0.4))
+                    .font(.system(size: 19, weight: isSelected ? .semibold : .regular))
+                    .frame(height: 24)
 
                 Text(title)
-                    .font(.custom("Poppins-Medium", size: 10))
-                    .foregroundColor(isSelected ? themeColor : .white.opacity(0.4))
+                    .font(.system(size: 10, weight: isSelected ? .semibold : .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
+            .foregroundStyle(isSelected ? .primary : .secondary)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? themeColor.opacity(0.1) : .clear)
-            )
+            .frame(height: 48)
+            .contentShape(Rectangle())
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(.primary.opacity(0.1))
+                }
+            }
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
+
 }
 
 #Preview {

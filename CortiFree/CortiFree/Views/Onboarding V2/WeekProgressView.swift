@@ -54,7 +54,7 @@ struct WeekProgressView: View {
 
     // Force week titles to display correctly (Week 1, Week 5, Week 10)
     private func getWeekTitle() -> String {
-        String(format: StringKeys.Onboarding.WeekProgress.weekNumber, currentWeek)
+        "onboarding.week_progress.week_number".localized(currentWeek)
     }
 
     // Responsive label offsets that scale with iPad

@@ -18,6 +18,8 @@ struct GuidedMeditationSessionView: View {
     @State private var showConfetti = false
     @State private var showCompletion = false
     @State private var orbScale: CGFloat = 1.0
+    @State private var sessionStartedAt = Date()
+    @State private var didRecordCompletion = false
 
     private var allSteps: [String] {
         support.content.sections.flatMap { $0.steps ?? [] }
@@ -83,6 +85,7 @@ struct GuidedMeditationSessionView: View {
             }
         }
         .onAppear {
+            sessionStartedAt = Date()
             startOrbAnimation()
         }
     }
@@ -260,7 +263,16 @@ struct GuidedMeditationSessionView: View {
     }
 
     private func completeSession() {
+        guard !didRecordCompletion else { return }
+        didRecordCompletion = true
         // XP system removed - using scoring system instead
+
+        ExerciseSessionRecorder.shared.record(
+            exerciseID: support.id,
+            category: .meditation,
+            durationSeconds: Int(Date().timeIntervalSince(sessionStartedAt).rounded()),
+            source: "guided_meditation"
+        )
 
         HapticManager.success()
 

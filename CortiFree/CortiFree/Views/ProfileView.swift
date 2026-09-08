@@ -173,7 +173,8 @@ struct ProfileView: View {
                     // Tab selector
                     tabSelector
                         .padding(.horizontal, 32)
-                        .offset(y: -32) // Remonter les tabs pour réduire l'espace avec la bannière
+                        .padding(.top, 8)
+                        .padding(.bottom, 12)
 
                     // Content based on selected tab with smooth transition
                     TabView(selection: $selectedTab) {
@@ -181,7 +182,7 @@ struct ProfileView: View {
                         ScrollView(showsIndicators: false) {
                             cortiFreeScoreSection
                                 .padding(.horizontal, 32)
-                                .padding(.top, 12)
+                                .padding(.top, 8)
 
                             Spacer(minLength: 100)
                         }
@@ -191,21 +192,25 @@ struct ProfileView: View {
                         ScrollView(showsIndicators: false) {
                             habitsSection
                                 .padding(.horizontal, 32)
-                                .padding(.top, 24)
+                                .padding(.top, 8)
 
                             Spacer(minLength: 100)
                         }
                         .tag(ProfileTab.habits)
 
                         // Achievements Section (scrollable)
-                        achievementsSection
-                            .padding(.horizontal, 32)
-                            .padding(.top, 24)
-                            .tag(ProfileTab.achievements)
+                        ScrollView(showsIndicators: false) {
+                            achievementsSection
+                                .padding(.horizontal, 32)
+                                .padding(.top, 8)
+
+                            Spacer(minLength: 100)
+                        }
+                        .tag(ProfileTab.achievements)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .animation(.appSpring, value: selectedTab)
-                    .offset(y: -32) // Remonter le contenu pour suivre les tabs
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
         }
@@ -284,9 +289,15 @@ struct ProfileView: View {
                         ))
                         .frame(width: 80, height: 80)
 
-                    Text(String((firstName.isEmpty ? getUserFirstName() : firstName).prefix(1)).uppercased())
-                        .font(.faroBold(32))
-                        .foregroundColor(.white)
+                    if !(firstName.isEmpty ? getUserFirstName() : firstName).isEmpty {
+                        Text(String((firstName.isEmpty ? getUserFirstName() : firstName).prefix(1)).uppercased())
+                            .font(.faroBold(32))
+                            .foregroundColor(.white)
+                    } else {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 28, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
                 }
                 .overlay(
                     Circle()
@@ -318,9 +329,11 @@ struct ProfileView: View {
             // User Info
             VStack(alignment: .leading, spacing: 6) {
                 // Name
-                Text(firstName.isEmpty ? getUserFirstName() : firstName)
-                    .font(.faroBold(20))
-                    .foregroundColor(.white)
+                if !(firstName.isEmpty ? getUserFirstName() : firstName).isEmpty {
+                    Text(firstName.isEmpty ? getUserFirstName() : firstName)
+                        .font(.faroBold(20))
+                        .foregroundColor(.white)
+                }
 
                 // Removed level display - no longer using XP/Levels system
             }
@@ -404,6 +417,7 @@ struct ProfileView: View {
                 .fill(Color.white.opacity(0.2))
         )
         .frame(maxWidth: 300)
+        .zIndex(2)
     }
 
     // MARK: - CortiFree Score Section (Compact)
@@ -550,14 +564,15 @@ struct ProfileView: View {
     // MARK: - Helper Methods
 
     private func getUserFirstName() -> String {
+        if let storedName = UserPersistence.userFirstName?.trimmingCharacters(in: .whitespacesAndNewlines), !storedName.isEmpty {
+            return storedName
+        }
         if let user = Auth.auth().currentUser {
-            if let displayName = user.displayName {
-                return displayName.components(separatedBy: " ").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
-            } else if let email = user.email {
-                return email.components(separatedBy: "@").first ?? NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+            if let displayName = user.displayName, !displayName.isEmpty {
+                return displayName.components(separatedBy: " ").first ?? ""
             }
         }
-        return NSLocalizedString(StringKeys.Common.defaultUserName, comment: "")
+        return ""
     }
 
     private func getHabitId(from habitName: String) -> String {
@@ -739,12 +754,14 @@ struct ProfileView: View {
 
     private func getHabitProgress(_ habitId: String) -> Int {
         let stats = viewModel.habitProgress[habitId]
-        return stats?.completed ?? 0
+        if let completed = stats?.completed { return completed }
+        let userId = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
+        return LocalProgressStore.completedCount(for: habitId, userID: userId)
     }
 
     private func getHabitTotal(_ habitId: String) -> Int {
         let stats = viewModel.habitProgress[habitId]
-        return stats?.total ?? 0
+        return stats?.total ?? TaskStatusService.habitTotals[habitId, default: 0]
     }
 }
 

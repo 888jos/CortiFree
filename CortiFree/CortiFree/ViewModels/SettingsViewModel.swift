@@ -355,29 +355,27 @@ class SettingsViewModel: ObservableObject {
     }
 
     func calculateLocalDataSize() {
-        Task {
-            let fileManager = FileManager.default
-            guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-                localDataSize = "0 MB"
-                return
-            }
+        let fileManager = FileManager.default
+        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            localDataSize = "0 MB"
+            return
+        }
 
-            var totalSize: Int64 = 0
+        var totalSize: Int64 = 0
 
-            if let enumerator = fileManager.enumerator(at: documentsURL, includingPropertiesForKeys: [.fileSizeKey]) {
-                for case let fileURL as URL in enumerator {
-                    do {
-                        let resourceValues = try fileURL.resourceValues(forKeys: [.fileSizeKey])
-                        totalSize += Int64(resourceValues.fileSize ?? 0)
-                    } catch {
-                        continue
-                    }
+        if let enumerator = fileManager.enumerator(at: documentsURL, includingPropertiesForKeys: [.fileSizeKey]) {
+            for case let fileURL as URL in enumerator {
+                do {
+                    let resourceValues = try fileURL.resourceValues(forKeys: [.fileSizeKey])
+                    totalSize += Int64(resourceValues.fileSize ?? 0)
+                } catch {
+                    continue
                 }
             }
-
-            let sizeInMB = Double(totalSize) / 1_048_576.0
-            localDataSize = String(format: "%.1f MB", sizeInMB)
         }
+
+        let sizeInMB = Double(totalSize) / 1_048_576.0
+        localDataSize = String(format: "%.1f MB", sizeInMB)
     }
 
     private func loadSubscriptionStatus() {

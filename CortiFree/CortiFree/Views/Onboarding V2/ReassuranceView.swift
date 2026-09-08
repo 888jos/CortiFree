@@ -10,7 +10,10 @@ import SwiftUI
 import AVKit
 
 struct ReassuranceView: View {
+    let gender: String?
     let onStartQuiz: () -> Void
+
+    private let textSpeedMultiplier = 1.25
 
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var displayedText: String = ""
@@ -20,14 +23,23 @@ struct ReassuranceView: View {
     @State private var screenViewTime: Date?
 
     private var fullText: String {
-        let message1 = "onboarding_v2.reassurance.message_part1".localized
+        let message1: String
+        switch gender {
+        case "male":
+            message1 = "onboarding_v2.reassurance.message_part1_male".localized
+        case "female":
+            message1 = "onboarding_v2.reassurance.message_part1_female".localized
+        default:
+            message1 = "onboarding_v2.reassurance.message_part1_neutral".localized
+        }
         let message2 = "onboarding_v2.reassurance.message_part2".localized
         let message3 = "onboarding_v2.reassurance.message_part3".localized
         let message4 = "onboarding_v2.reassurance.message_part4".localized
         return "\(message1)\n\n\(message2)\n\n\(message3)\n\n\(message4)"
     }
 
-    init(onStartQuiz: @escaping () -> Void) {
+    init(gender: String? = nil, onStartQuiz: @escaping () -> Void) {
+        self.gender = gender
         self.onStartQuiz = onStartQuiz
     }
 
@@ -172,8 +184,9 @@ struct ReassuranceView: View {
             HapticManager.light()
         }
 
-        // Continue animation with slight delay (x1.25 faster)
-        let delay: Double = fullText[index].isWhitespace ? 0.0096 : 0.048
+        // Reveal the text 1.25x faster than the previous timing.
+        let baseDelay: Double = fullText[index].isWhitespace ? 0.0096 : 0.048
+        let delay = baseDelay / textSpeedMultiplier
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             animateNextCharacter()
         }

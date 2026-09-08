@@ -37,6 +37,7 @@ struct TasksV2View: View {
     @State private var habitTracking: [String: HabitTracking] = [:]
     @State private var isLoadingData: Bool = true
     @State private var loadingError: String? = nil
+    @State private var hasLoadedData: Bool = false
 
     // Actual day the user is on (calculated from start date)
     private var actualDay: Int {
@@ -648,6 +649,8 @@ struct TasksV2View: View {
             })
         }
         .onAppear {
+            guard !hasLoadedData else { return }
+            hasLoadedData = true
             // Delay Firebase loading to prevent freeze
             Task {
                 try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second delay
@@ -974,6 +977,15 @@ struct TasksV2View: View {
         taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .done
         syncWidgetCache()
 
+        // Persist locally first so Progress/Profile update even when the network is slow.
+        LocalProgressStore.recordCompletion(
+            taskID: task.id,
+            habitID: getHabitId(for: task),
+            programDay: currentDay,
+            durationSeconds: durationSeconds(for: task),
+            userID: Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
+        )
+
         // Toujours recalculer les streaks normalement
         // Skip = "pas encore fait", donc valider après un skip continue le streak normalement
         updateTaskStreak(task)
@@ -984,12 +996,33 @@ struct TasksV2View: View {
             showFlameAnimation = true
         }
 
-        // Save to Firebase and apply impact scoring
+        // Apply local score immediately, then sync remote services when available.
         Task {
-            guard let userId = Auth.auth().currentUser?.uid else { return }
-
-            // Determine habit ID from task title
             let habitId = getHabitId(for: task)
+            let validatedDay = currentDay
+
+            do {
+                let updatedScores = try await ImpactScoringService.shared.applyTaskImpact(habitId: habitId)
+                await MainActor.run {
+                    self.globalScore = updatedScores.roundedScores.global
+                }
+
+                await MainActor.run {
+                    NotificationCenter.default.post(name: NSNotification.Name("TaskValidated"), object: nil)
+                }
+            } catch {
+                #if DEBUG
+                print("Error updating local score: \(error)")
+                #endif
+            }
+
+            guard let userId = Auth.auth().currentUser?.uid else {
+                let habitProgress = try? await TaskStatusService.shared.calculateHabitProgress()
+                if let stats = habitProgress?[habitId] {
+                    await habitBadgeService.checkHabitBadges(habitId: habitId, tasksCompleted: stats.completed)
+                }
+                return
+            }
 
             do {
                 // Save task status to Firebase
@@ -1000,20 +1033,20 @@ struct TasksV2View: View {
                 )
 
                 // Mark habit completed (for streaks and tracking)
-                try await FirebaseManager.shared.markHabitCompleted(uid: userId, habitId: habitId, programDay: currentDay)
+                try await FirebaseManager.shared.markHabitCompleted(uid: userId, habitId: habitId, programDay: validatedDay)
 
-                // Apply impact to domain scores
-                let updatedScores = try await ImpactScoringService.shared.applyTaskImpact(habitId: habitId)
+                // Keep Progress backed by the same completion, including task duration.
+                try? await ProgressAnalyticsService.shared.recordTaskCompletion(
+                    taskID: task.id,
+                    habitID: habitId,
+                    programDay: validatedDay,
+                    durationSeconds: durationSeconds(for: task)
+                )
 
                 // Reload habit tracking data
                 let updatedTracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: userId)
                 await MainActor.run {
                     self.habitTracking = updatedTracking
-                    // Update global score with rounded average of 5 domains
-                    self.globalScore = updatedScores.roundedScores.global
-
-                    // Notify ProfileView to refresh habit progress
-                    NotificationCenter.default.post(name: NSNotification.Name("TaskValidated"), object: nil)
                 }
 
                 // Check achievements and milestones
@@ -1073,6 +1106,19 @@ struct TasksV2View: View {
         }
     }
 
+    private func durationSeconds(for task: HabitTask) -> Int {
+        let habitId = getHabitId(for: task)
+        guard ["breathing", "meditation", "sport"].contains(habitId) else { return 0 }
+
+        let durationText = task.duration.lowercased()
+        let value = durationText
+            .split(whereSeparator: { !$0.isNumber })
+            .first
+            .flatMap { Int($0) } ?? 0
+        guard value > 0 else { return 0 }
+        return durationText.contains("h") ? value * 60 * 60 : value * 60
+    }
+
     private func skipTask(_ task: HabitTask) {
         // Only allow skipping on the current day
         guard currentDay == actualDay else {
@@ -1112,6 +1158,14 @@ struct TasksV2View: View {
 
                 // If task was previously validated, reverse the impact on scores
                 if wasValidated {
+                    if let userId = Auth.auth().currentUser?.uid {
+                        LocalProgressStore.removeCompletion(
+                            taskID: task.id,
+                            programDay: currentDay,
+                            userID: userId
+                        )
+                    }
+
                     // Remove habit completion from tracking
                     try await FirebaseManager.shared.removeHabitCompletion(uid: userId, habitId: habitId, programDay: currentDay)
 

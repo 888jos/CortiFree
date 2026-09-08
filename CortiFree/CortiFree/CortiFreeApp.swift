@@ -24,11 +24,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
-        // Configure Firebase ONLY - NO Firestore settings to avoid crash
+        // Configure Firebase
         FirebaseApp.configure()
 
-        // DO NOT configure Firestore settings here - it crashes the app
-        // Firestore will use default settings
+        // Enable Firestore offline persistence (must be set before first Firestore access)
+        let firestoreSettings = FirestoreSettings()
+        firestoreSettings.cacheSettings = PersistentCacheSettings(sizeBytes: 50 * 1024 * 1024 as NSNumber)
+        Firestore.firestore().settings = firestoreSettings
 
         // Set notification delegate
         UNUserNotificationCenter.current().delegate = self
@@ -44,6 +46,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         // Initialize TikTok App Events SDK
         TikTokManager.shared.initialize()
+        TikTokManager.shared.trackLaunchApp()
 
         // Request App Tracking Transparency (ATT) permission for TikTok attribution
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -60,13 +63,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Configure Superwall with RevenueCat as PurchaseController
         let purchaseController = RCPurchaseController()
         let superwallOptions = SuperwallOptions()
-        let savedLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "fr"
+        let savedLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "en"
         superwallOptions.localeIdentifier = savedLanguage == "fr" ? "fr_FR" : "en_US"
         Superwall.configure(
             apiKey: APIConfig.shared.superwallAPIKey,
             purchaseController: purchaseController,
             options: superwallOptions
         )
+        if let gender = UserDefaults.standard.string(forKey: "onboarding_gender") {
+            Superwall.shared.setUserAttributes(["gender": gender])
+        }
         purchaseController.syncSubscriptionStatus()
 
         // Sync RevenueCat with Firebase user on app launch
@@ -160,9 +166,13 @@ struct CortiFreeApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var authViewModel = AuthViewModel()
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showDailyCheckIn = false
 
     // IMPORTANT: Use @AppStorage to make onboarding completion reactive
     @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
+    #if DEBUG
+    @AppStorage("debugSkipOnboardingToHome") private var debugSkipOnboardingToHome: Bool = false
+    #endif
 
     // DEBUG: Set to true to skip onboarding and go directly to HomeView
     #if DEBUG
@@ -173,6 +183,22 @@ struct CortiFreeApp: App {
 
     var body: some Scene {
         WindowGroup {
+            Group {
+            #if DEBUG
+            if debugSkipOnboardingToHome {
+                ContentView()
+                    .environmentObject(authViewModel)
+            } else if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
+                OnboardingV2FlowView()
+                    .environmentObject(authViewModel)
+            } else if authViewModel.isAuthenticated {
+                ContentView()
+                    .environmentObject(authViewModel)
+            } else {
+                AuthView()
+                    .environmentObject(authViewModel)
+            }
+            #else
             // First launch: check if onboarding is completed
             // IMPORTANT: Use @AppStorage variable for reactive updates
             if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
@@ -188,6 +214,18 @@ struct CortiFreeApp: App {
                 AuthView()
                     .environmentObject(authViewModel)
             }
+            #endif
+            }
+            .onOpenURL(perform: handleIncomingURL)
+            .onAppear {
+                presentDailyCheckInIfNeeded()
+            }
+            .onChange(of: authViewModel.isAuthenticated) { _, isAuthenticated in
+                if isAuthenticated { presentDailyCheckInIfNeeded() }
+            }
+            .fullScreenCover(isPresented: $showDailyCheckIn) {
+                DailyCheckInView(targetDate: DailyCheckInService.shared.previousDay())
+            }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             handleScenePhaseChange(oldPhase: oldPhase, newPhase: newPhase)
@@ -198,8 +236,12 @@ struct CortiFreeApp: App {
 
     private func handleScenePhaseChange(oldPhase: ScenePhase, newPhase: ScenePhase) {
         switch newPhase {
+        case .inactive:
+            startOnboardingDropOffLiveActivityIfNeeded()
+
         case .background:
             // User left the app - schedule re-engagement notifications if onboarding incomplete
+            startOnboardingDropOffLiveActivityIfNeeded()
             scheduleReengagementIfNeeded()
 
         case .active:
@@ -208,13 +250,92 @@ struct CortiFreeApp: App {
             #if DEBUG
             print("📱 App became active")
             #endif
-
-        case .inactive:
-            break
+            presentDailyCheckInIfNeeded()
 
         @unknown default:
             break
         }
+    }
+
+    private func presentDailyCheckInIfNeeded() {
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_DAILY_CHECKIN"] == "1" {
+            showDailyCheckIn = true
+            return
+        }
+        #endif
+        guard !showDailyCheckIn,
+              DailyCheckInService.shared.shouldPresent() else { return }
+        DailyCheckInService.shared.markPrompted()
+        showDailyCheckIn = true
+    }
+
+    private func startOnboardingDropOffLiveActivityIfNeeded() {
+        let defaults = UserDefaults.standard
+        let onboardingSessionIsActive = defaults.bool(forKey: "onboarding_session_active")
+        let onboardingCompleted = defaults.bool(forKey: "onboardingV2Completed")
+        let hardPaywallWasViewed = defaults.bool(forKey: "hasSeenPaywall")
+        guard onboardingSessionIsActive || !onboardingCompleted || hardPaywallWasViewed else { return }
+
+        let revenueCat = RevenueCatManager.shared
+        guard revenueCat.isPremiumStatusReady else { return }
+        if revenueCat.hasPremiumEntitlement {
+            OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+            return
+        }
+
+        let savedStep = max(defaults.integer(forKey: "onboarding_live_activity_step"), 1)
+        let savedTotal = max(defaults.integer(forKey: "onboarding_live_activity_total_steps"), 1)
+        OnboardingLiveActivityManager.shared.startForOnboardingDropOff(
+            currentStep: savedStep,
+            totalSteps: savedTotal,
+            hasSeenPaywall: hardPaywallWasViewed
+        )
+    }
+
+    private func handleIncomingURL(_ url: URL) {
+        guard url.scheme == "cortifree", url.host == SuperwallPlacement.liveGift else { return }
+
+        let revenueCat = RevenueCatManager.shared
+        guard revenueCat.isPremiumStatusReady else {
+            Task {
+                await revenueCat.refreshCustomerInfo(forceServerFetch: true)
+                if revenueCat.isPremiumStatusReady, !revenueCat.hasPremiumEntitlement {
+                    presentLiveGiftPaywall()
+                } else if revenueCat.hasPremiumEntitlement {
+                    OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+                }
+            }
+            return
+        }
+        guard !revenueCat.hasPremiumEntitlement else {
+            OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+            return
+        }
+
+        presentLiveGiftPaywall()
+    }
+
+    private func presentLiveGiftPaywall() {
+        MixpanelManager.shared.track(
+            event: "live_gift_opened",
+            properties: ["placement": SuperwallPlacement.liveGift]
+        )
+
+        let handler = PaywallPresentationHandler()
+        handler.onDismiss { _, result in
+            switch result {
+            case .purchased, .restored:
+                OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+            case .declined:
+                break
+            }
+        }
+        Superwall.shared.register(
+            placement: SuperwallPlacement.liveGift,
+            params: ["source": "live_activity"],
+            handler: handler
+        )
     }
 
     private func scheduleReengagementIfNeeded() {

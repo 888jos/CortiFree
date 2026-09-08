@@ -11,6 +11,16 @@ import FirebaseFirestore
 
 class TaskStatusService {
     static let shared = TaskStatusService()
+    static let habitTotals: [String: Int] = [
+        "meditation": 47,
+        "breathing": 47,
+        "journal": 66,
+        "sport": 28,
+        "water": 66,
+        "nature": 28,
+        "social": 28,
+        "sleep": 132
+    ]
     private let db = Firestore.firestore()
 
     private init() {}
@@ -84,21 +94,15 @@ class TaskStatusService {
 
     /// Calcule les statistiques de progression par habitude
     func calculateHabitProgress() async throws -> [String: (completed: Int, total: Int)] {
-        let statuses = try await loadAllTaskStatuses()
+        // Keep Profile and Achievements useful while offline or before Firebase sync completes.
+        let statuses = (try? await loadAllTaskStatuses()) ?? [:]
 
         print("📊 TaskStatusService: Loaded \(statuses.count) days with task statuses")
 
         // Dictionnaire pour compter les tâches par habitude
-        var habitStats: [String: (completed: Int, total: Int)] = [
-            "meditation": (0, 47),
-            "breathing": (0, 47),
-            "journal": (0, 66),
-            "sport": (0, 28),
-            "water": (0, 66),
-            "nature": (0, 28),
-            "social": (0, 28),
-            "sleep": (0, 132)
-        ]
+        var habitStats = Dictionary(uniqueKeysWithValues: Self.habitTotals.map { habitId, total in
+            (habitId, (completed: 0, total: total))
+        })
 
         // Parcourir tous les statuts et compter les tâches complétées
         var totalTasksDone = 0
@@ -118,6 +122,18 @@ class TaskStatusService {
                     print("⚠️ Unknown habit for task '\(taskTitle)' → \(habitId)")
                 }
             }
+        }
+
+        let userId = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
+        var localCounts: [String: Int] = [:]
+        for completion in LocalProgressStore.load(for: userId) {
+            localCounts[completion.habitID, default: 0] += 1
+        }
+
+        for (habitId, localCount) in localCounts {
+            guard var stats = habitStats[habitId] else { continue }
+            stats.completed = max(stats.completed, localCount)
+            habitStats[habitId] = stats
         }
 
         print("📊 Total tasks done: \(totalTasksDone)")

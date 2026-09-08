@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct LoadingAnalysisView: View {
+    private let speedMultiplier = 1.5
+
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var displayedProgress: Int = 0
     @State private var currentSubtitle: String = "onboarding_v2.loading.understanding".localized
@@ -125,9 +127,8 @@ struct LoadingAnalysisView: View {
     }
 
     private func startProgressAnimation() {
-        // 6 phases of 1.25s each = 7.5s total
-        let phaseDuration: Double = 1.25
-        _ = 0.04 // Update interval (40ms / 25 FPS) - not used directly
+        // Six phases now complete in about five seconds total.
+        let phaseDuration: Double = 1.25 / speedMultiplier
 
         // Phase 1: 0-17% avec "Compréhension des réponses"
         animatePhase(from: 0, to: 17, duration: phaseDuration, subtitle: subtitles[0]) {

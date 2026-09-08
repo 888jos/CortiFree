@@ -11,21 +11,34 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import UserNotifications
 
 struct OnboardingV2FlowView: View {
+    @Environment(\.scenePhase) private var scenePhase
+
+    private let enablesLiveActivityWhenAlreadyCompleted: Bool
+
     @State private var currentStep: OnboardingStep = .welcome
     @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
     @AppStorage("onboardingCheckpoint") private var savedCheckpoint: String = ""
     @AppStorage("hasSeenPaywall") private var hasSeenPaywall: Bool = false
     @AppStorage("onboardingLanguage") private var onboardingLanguage: String = "en" // Track language used
+    #if DEBUG
+    @AppStorage("debugSkipOnboardingToHome") private var debugSkipOnboardingToHome: Bool = false
+    #endif
     @State private var overallQuizData: OverallQuizData?
     @State private var habitsQuizResult: HabitsQuizResult?
     @State private var selectedSymptoms: Set<String> = []
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var onboardingStartTime: Date?
+    @State private var suppressDropOffLiveActivity = false
 
     private let firebaseManager = FirebaseManager.shared
+
+    init(enablesLiveActivityWhenAlreadyCompleted: Bool = false) {
+        self.enablesLiveActivityWhenAlreadyCompleted = enablesLiveActivityWhenAlreadyCompleted
+    }
 
     // MARK: - Onboarding Steps
 
@@ -42,6 +55,7 @@ struct OnboardingV2FlowView: View {
         case authentication
         case loading
         case cortiFreeRating
+        case glowScan
         case eightHabitsIntro
         case weekProgress
         case eightHabits
@@ -63,12 +77,12 @@ struct OnboardingV2FlowView: View {
                 return .sixtyDayExplanation
             case .authentication, .loading:
                 return .authentication
-            case .cortiFreeRating, .eightHabitsIntro, .weekProgress:
+            case .cortiFreeRating, .glowScan, .eightHabitsIntro, .weekProgress:
                 return .cortiFreeRating
             case .eightHabits, .notificationPermissions, .habitsProgress, .commitmentPledge:
                 return .eightHabits
             case .socialProof, .complete:
-                return .socialProof
+                return .complete
             }
         }
     }
@@ -76,8 +90,9 @@ struct OnboardingV2FlowView: View {
     var body: some View {
         ZStack {
             currentStepView
+                .id(currentStep)
+                .transition(.opacity)
         }
-        .transition(.opacity)
         .animation(.easeInOut(duration: 0.3), value: currentStep)
         .onAppear {
             // Track onboarding start time
@@ -94,11 +109,39 @@ struct OnboardingV2FlowView: View {
 
             // Resume from checkpoint or paywall if applicable
             resumeFromCheckpoint()
+            markOnboardingSessionActive()
         }
         .onChange(of: currentStep) { _, newStep in
             // Save checkpoint when step changes
             saveCheckpoint(newStep)
+            persistLiveActivityProgress(newStep)
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .inactive || newPhase == .background {
+                startDropOffLiveActivity()
+            }
+        }
+        .onDisappear {
+            startDropOffLiveActivity()
+            UserDefaults.standard.set(false, forKey: "onboarding_session_active")
+        }
+        #if DEBUG
+        .overlay(alignment: .top) {
+            Button(action: skipOnboardingToHome) {
+                Label("DEBUG: SKIP TO HOME", systemImage: "ladybug.fill")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(Color.red.opacity(0.94))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .zIndex(1_000)
+        }
+        #endif
     }
 
     // MARK: - Checkpoint Management
@@ -129,16 +172,51 @@ struct OnboardingV2FlowView: View {
         // Save checkpoint for re-engagement notifications
         UserDefaults.standard.set(step.rawValue, forKey: "last_onboarding_checkpoint")
 
-        // Mark paywall as seen when reaching complete step
-        if step == .complete {
-            hasSeenPaywall = true
-            UserDefaults.standard.set(true, forKey: "saw_paywall_without_accepting")
-        }
-
         #if DEBUG
         print("💾 Saved checkpoint: \(step.rawValue)")
         #endif
     }
+
+    private func markOnboardingSessionActive() {
+        UserDefaults.standard.set(true, forKey: "onboarding_session_active")
+        persistLiveActivityProgress(currentStep)
+    }
+
+    private func persistLiveActivityProgress(_ step: OnboardingStep) {
+        let stepIndex = (OnboardingStep.allCases.firstIndex(of: step) ?? 0) + 1
+        UserDefaults.standard.set(stepIndex, forKey: "onboarding_live_activity_step")
+        UserDefaults.standard.set(OnboardingStep.allCases.count, forKey: "onboarding_live_activity_total_steps")
+    }
+
+    private func startDropOffLiveActivity() {
+        guard !suppressDropOffLiveActivity else { return }
+        guard !isOnboardingComplete || enablesLiveActivityWhenAlreadyCompleted else { return }
+
+        let revenueCat = RevenueCatManager.shared
+        if hasSeenPaywall {
+            guard revenueCat.isPremiumStatusReady else { return }
+            guard !revenueCat.hasPremiumEntitlement else {
+                OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+                return
+            }
+        }
+
+        let stepIndex = (OnboardingStep.allCases.firstIndex(of: currentStep) ?? 0) + 1
+        OnboardingLiveActivityManager.shared.startForOnboardingDropOff(
+            currentStep: stepIndex,
+            totalSteps: OnboardingStep.allCases.count,
+            hasSeenPaywall: hasSeenPaywall
+        )
+    }
+
+    #if DEBUG
+    private func skipOnboardingToHome() {
+        suppressDropOffLiveActivity = true
+        UserDefaults.standard.set(false, forKey: "onboarding_session_active")
+        OnboardingLiveActivityManager.shared.end()
+        debugSkipOnboardingToHome = true
+    }
+    #endif
 
     @ViewBuilder
     private var currentStepView: some View {
@@ -156,9 +234,8 @@ struct OnboardingV2FlowView: View {
 
         case .reassurance:
             ReassuranceView(
+                gender: overallQuizData?.genderCode,
                 onStartQuiz: {
-                    // Request App Store rating after reassurance
-                    AppRatingService.shared.requestRating()
                     currentStep = .habitsQuiz
                 }
             )
@@ -219,6 +296,10 @@ struct OnboardingV2FlowView: View {
                     // Mark user as authenticated for re-engagement tracking
                     UserDefaults.standard.set(true, forKey: "user_is_authenticated")
                     currentStep = .loading
+                },
+                onSkip: {
+                    UserDefaults.standard.set(false, forKey: "user_is_authenticated")
+                    currentStep = .loading
                 }
             )
 
@@ -231,7 +312,23 @@ struct OnboardingV2FlowView: View {
             CortiFreeRatingView(
                 habitsQuizResult: habitsQuizResult ?? HabitsQuizResult(answers: Array(repeating: 0, count: 12)),
                 onContinue: {
+                    currentStep = .glowScan
+                }
+            )
+
+        case .glowScan:
+            GlowScanFlowView(
+                context: GlowOnboardingContext(
+                    primaryGoal: habitsQuizResult?.primaryGoal ?? "balance",
+                    appearanceConcern: habitsQuizResult?.appearanceConcern ?? "",
+                    symptoms: Array(selectedSymptoms),
+                    reasons: overallQuizData?.reasons ?? []
+                ),
+                onComplete: {
                     currentStep = .eightHabitsIntro
+                },
+                onExit: {
+                    currentStep = .cortiFreeRating
                 }
             )
 
@@ -248,9 +345,9 @@ struct OnboardingV2FlowView: View {
         case .eightHabits:
             EightHabitsFlowView(onComplete: {
                 #if DEBUG
-                print("✅ OnboardingV2FlowView: Transition .eightHabits → .notificationPermissions")
+                print("✅ OnboardingV2FlowView: Checking notification permission")
                 #endif
-                currentStep = .notificationPermissions
+                continueAfterNotificationPermissionCheck()
             })
 
         case .notificationPermissions:
@@ -275,15 +372,10 @@ struct OnboardingV2FlowView: View {
 
         case .commitmentPledge:
             CommitmentPledgeView(onContinue: {
-                currentStep = .socialProof
-            })
-
-        case .socialProof:
-            SocialProofFlowView(onComplete: {
                 currentStep = .complete
             })
 
-        case .complete:
+        case .socialProof, .complete:
             OnboardingCompletionView(
                 habitsQuizResult: habitsQuizResult,
                 selectedSymptoms: selectedSymptoms,
@@ -300,14 +392,38 @@ struct OnboardingV2FlowView: View {
         }
     }
 
+    private func continueAfterNotificationPermissionCheck() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let permissionIsGranted: Bool
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                permissionIsGranted = true
+            case .denied, .notDetermined:
+                permissionIsGranted = false
+            @unknown default:
+                permissionIsGranted = false
+            }
+
+            DispatchQueue.main.async {
+                currentStep = permissionIsGranted ? .habitsProgress : .notificationPermissions
+            }
+        }
+    }
+
     private func completeOnboarding() {
         // Clear checkpoint data since onboarding is complete
         savedCheckpoint = ""
-        hasSeenPaywall = false // Reset for potential future use
+        let isPremium = RevenueCatManager.shared.hasPremiumEntitlement
+        if isPremium {
+            hasSeenPaywall = false
+        }
 
         // Clear re-engagement tracking
         UserDefaults.standard.set("completed", forKey: "last_onboarding_checkpoint")
-        UserDefaults.standard.set(false, forKey: "saw_paywall_without_accepting")
+        if isPremium {
+            UserDefaults.standard.set(false, forKey: "saw_paywall_without_accepting")
+        }
+        UserDefaults.standard.set(false, forKey: "onboarding_session_active")
 
         // Cancel all re-engagement notifications
         NotificationService.shared.cancelReengagementNotifications()
@@ -336,6 +452,11 @@ struct OnboardingV2FlowView: View {
 
         // Using @AppStorage, this will automatically trigger view update
         isOnboardingComplete = true
+        if isPremium {
+            OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+        } else if hasSeenPaywall {
+            OnboardingLiveActivityManager.shared.showLiveGiftOffer()
+        }
 
         #if DEBUG
         print("✅ Onboarding completed - checkpoints cleared, routineStartDate set")
@@ -364,6 +485,7 @@ struct OnboardingV2FlowView: View {
         let userData: [String: Any] = [
             "age": data.age,
             "gender": data.gender,
+            "genderCode": data.genderCode,
             "stressReasons": data.reasons,
             "stressDuration": data.duration,
             "onboardingCompletedAt": Date()

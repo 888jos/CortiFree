@@ -10,169 +10,246 @@ import SwiftUI
 struct AchievementsView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject private var achievementService = AchievementService.shared
+    @ObservedObject private var habitBadgeService = HabitBadgeService.shared
 
-    @State private var selectedCategory: Achievement.AchievementCategory? = nil
     @State private var selectedAchievement: Achievement? = nil
-    @State private var showDetail = false
+    @State private var selectedHabitBadge: HabitBadge? = nil
+    #if DEBUG
+    @State private var debugAllBadgesUnlocked = true
+    #endif
 
     var body: some View {
         ZStack {
-            // Background
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.65)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
                 HStack {
-                    Button(action: {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Achievements")
+                            .font(.faroBold(28))
+                            .foregroundColor(.white)
+
+                        Text("\(achievementService.unlockedCount)/\(achievementService.totalCount) Unlocked")
+                            .font(.faroRegular(13))
+                            .foregroundColor(.white.opacity(0.62))
+                    }
+
+                    Spacer()
+
+                    Button {
                         HapticManager.light()
                         dismiss()
-                    }) {
+                    } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
-                            .frame(width: 40, height: 40)
-                            .background(
-                                Circle()
-                                    .fill(Color.white.opacity(0.1))
-                            )
+                            .frame(width: 44, height: 44)
                     }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 18)
 
-                    Spacer()
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 24) {
+                        summaryCard
 
-                    VStack(spacing: 4) {
-                        Text("achievements.title".localized)
-                            .font(Font.Poppins.custom(.bold, size: 24))
+                        Text("Streaks")
+                            .font(.faroSemiBold(19))
                             .foregroundColor(.white)
 
-                        Text(String(format: "achievements.unlocked_count".localized, achievementService.unlockedCount, achievementService.totalCount))
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-
-                    Spacer()
-
-                    // Placeholder for symmetry
-                    Color.clear
-                        .frame(width: 40, height: 40)
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 60)
-                .padding(.bottom, 24)
-
-                // Progress bar
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        // Background
-                        Capsule()
-                            .fill(Color.white.opacity(0.1))
-                            .frame(height: 8)
-
-                        // Progress
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color(hex: "B794F6"),
-                                        Color(hex: "9B59B6")
-                                    ],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: geo.size.width * achievementService.completionPercentage, height: 8)
-                    }
-                }
-                .frame(height: 8)
-                .padding(.horizontal, 40)
-                .padding(.bottom, 24)
-
-                // Category filters
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        CategoryFilterButton(
-                            title: "achievements.category.all".localized,
-                            isSelected: selectedCategory == nil,
-                            color: Color(hex: "B794F6")
+                        LazyVGrid(
+                            columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
+                            spacing: 10
                         ) {
-                            selectedCategory = nil
-                        }
-
-                        CategoryFilterButton(
-                            title: "achievement.category.streak".localized,
-                            isSelected: selectedCategory == .streak,
-                            color: Color(hex: "FF8800")
-                        ) {
-                            selectedCategory = .streak
-                        }
-
-                        CategoryFilterButton(
-                            title: "achievement.category.completion".localized,
-                            isSelected: selectedCategory == .completion,
-                            color: Color(hex: "2ECC71")
-                        ) {
-                            selectedCategory = .completion
-                        }
-
-                        CategoryFilterButton(
-                            title: "achievement.category.habit".localized,
-                            isSelected: selectedCategory == .habit,
-                            color: Color(hex: "B794F6")
-                        ) {
-                            selectedCategory = .habit
-                        }
-
-
-                        CategoryFilterButton(
-                            title: "achievement.category.special".localized,
-                            isSelected: selectedCategory == .special,
-                            color: Color(hex: "E74C3C")
-                        ) {
-                            selectedCategory = .special
-                        }
-                    }
-                    .padding(.horizontal, 24)
-                }
-                .padding(.bottom, 24)
-
-                // Achievement grid
-                ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 20),
-                        GridItem(.flexible(), spacing: 20),
-                        GridItem(.flexible(), spacing: 20)
-                    ], spacing: 24) {
-                        ForEach(filteredAchievements) { achievement in
-                            Button(action: {
-                                HapticManager.light()
-                                selectedAchievement = achievement
-                                showDetail = true
-                            }) {
+                            ForEach(achievementService.achievements) { achievement in
                                 AchievementBadge(
                                     achievement: achievement,
-                                    size: .medium
+                                    size: .gallery,
+                                    onTap: { selectedAchievement = achievement },
+                                    usesEnglishLabels: true
                                 )
+                                .frame(maxWidth: .infinity)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
+
+                        Text("Habits")
+                            .font(.faroSemiBold(19))
+                            .foregroundColor(.white)
+                            .padding(.top, 8)
+
+                        VStack(spacing: 22) {
+                            ForEach(HabitBadge.allHabitIds, id: \.self) { habitId in
+                                habitBadgeSection(for: habitId)
+                            }
+                        }
+
+                        #if DEBUG
+                        Button {
+                            HapticManager.light()
+                            debugAllBadgesUnlocked.toggle()
+                            achievementService.setAllUnlockedForDebug(debugAllBadgesUnlocked)
+                            habitBadgeService.setAllUnlockedForDebug(debugAllBadgesUnlocked)
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: debugAllBadgesUnlocked ? "lock.fill" : "checkmark.seal.fill")
+                                    .font(.system(size: 14, weight: .semibold))
+                                Text(
+                                    debugAllBadgesUnlocked
+                                        ? "Show all locked"
+                                        : "Show all unlocked"
+                                )
+                                .font(.faroSemiBold(13))
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 46)
+                            .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(.white.opacity(0.16), lineWidth: 1)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        #endif
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 40)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 36)
                 }
             }
         }
-        .sheet(isPresented: $showDetail) {
-            if let achievement = selectedAchievement {
-                AchievementDetailView(achievement: achievement)
-            }
+        .fullScreenCover(item: $selectedAchievement) { achievement in
+            AchievementDetailView(achievement: achievement)
+        }
+        .sheet(item: $selectedHabitBadge) { badge in
+            BadgeDetailSheet(
+                badge: badge,
+                currentProgress: habitBadgeService.badges(for: badge.habitId).map(\.progress).max() ?? badge.progress,
+                usesEnglishLabels: true
+            )
+        }
+        .task {
+            await achievementService.loadAchievements()
+            await habitBadgeService.loadHabitBadges()
+            #if DEBUG
+            achievementService.setAllUnlockedForDebug(true)
+            habitBadgeService.setAllUnlockedForDebug(true)
+            debugAllBadgesUnlocked = true
+            #endif
         }
     }
 
-    private var filteredAchievements: [Achievement] {
-        if let category = selectedCategory {
-            return achievementService.achievements.filter { $0.category == category }
+    private var summaryCard: some View {
+        HStack(spacing: 0) {
+            summaryValue(
+                "\(totalUnlockedCount)",
+                label: "Unlocked"
+            )
+            Divider().overlay(.white.opacity(0.12)).frame(height: 46)
+            summaryValue(
+                "\(totalBadgeCount)",
+                label: "Total"
+            )
+            Divider().overlay(.white.opacity(0.12)).frame(height: 46)
+            summaryValue(
+                "\(Int((globalCompletionPercentage * 100).rounded()))%",
+                label: "Complete"
+            )
         }
-        return achievementService.achievements
+        .padding(.vertical, 18)
+        .background(Color(hex: "49288C").opacity(0.30))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.08), lineWidth: 1))
+    }
+
+    private func summaryValue(_ value: String, label: String) -> some View {
+        VStack(spacing: 5) {
+            Text(value)
+                .font(.faroBold(25))
+                .foregroundColor(.white)
+            Text(label)
+                .font(.faroRegular(11))
+                .foregroundColor(.white.opacity(0.58))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private func habitBadgeSection(for habitId: String) -> some View {
+        let badges = habitBadgeService.badges(for: habitId)
+        let progress = badges.map(\.progress).max() ?? 0
+        let total = badges.map(\.requirement).max() ?? 0
+
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+            Label(HabitBadge.englishHabitDisplayName(habitId), systemImage: HabitBadge.habitIcon(habitId))
+                    .font(.faroSemiBold(14))
+                    .foregroundColor(.white)
+
+                Spacer()
+
+                Text("\(progress)/\(total)")
+                    .font(.faroRegular(11))
+                    .foregroundColor(.white.opacity(0.55))
+            }
+
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4),
+                spacing: 8
+            ) {
+                ForEach(badges.sorted { $0.level.percentage < $1.level.percentage }) { badge in
+                    HabitBadgeGalleryItem(badge: badge) {
+                        selectedHabitBadge = badge
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var totalUnlockedCount: Int {
+        achievementService.unlockedCount + habitBadgeService.unlockedBadgesCount
+    }
+
+    private var totalBadgeCount: Int {
+        achievementService.totalCount + habitBadgeService.totalBadgesCount
+    }
+
+    private var globalCompletionPercentage: Double {
+        guard totalBadgeCount > 0 else { return 0 }
+        return Double(totalUnlockedCount) / Double(totalBadgeCount)
+    }
+}
+
+private struct HabitBadgeGalleryItem: View {
+    let badge: HabitBadge
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 6) {
+                BadgeOctagonMark(
+                    icon: HabitBadge.habitIcon(badge.habitId),
+                    number: nil,
+                    isUnlocked: badge.isUnlocked,
+                    accent: Color(hex: badge.level.color),
+                    size: 64,
+                    assetName: badge.badgeAssetName
+                )
+
+                Text("\(badge.requirement)")
+                    .font(.faroRegular(10))
+                    .foregroundColor(badge.isUnlocked ? .white : .white.opacity(0.45))
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -211,111 +288,118 @@ struct AchievementDetailView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            Color.black.opacity(0.9)
-                .ignoresSafeArea()
+            GalaxyBackgroundView(intensity: 0.55)
 
-            VStack(spacing: 24) {
-                Spacer()
-
-                // Large badge
-                AchievementBadge(
-                    achievement: achievement,
-                    size: .large
-                )
-
-                // Details
-                VStack(spacing: 12) {
-                    Text(achievement.title)
-                        .font(.custom("Poppins-Bold", size: 28))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-
-                    Text(achievement.description)
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.white.opacity(0.8))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
-
-                    // Progress or unlock date
-                    if achievement.isUnlocked, let unlockedAt = achievement.unlockedAt {
-                        HStack(spacing: 6) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(Color(hex: "2ECC71"))
-
-                            Text(String(format: "achievements.unlocked_date".localized, formatDate(unlockedAt)))
-                                .font(.custom("Poppins-Medium", size: 14))
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        .padding(.top, 8)
-                    } else if achievement.progress > 0 {
-                        VStack(spacing: 8) {
-                            Text(String(format: "achievements.progress".localized, achievement.progress, achievement.requirement))
-                                .font(.custom("Poppins-SemiBold", size: 16))
-                                .foregroundColor(.white)
-
-                            GeometryReader { geo in
-                                ZStack(alignment: .leading) {
-                                    Capsule()
-                                        .fill(Color.white.opacity(0.2))
-                                        .frame(height: 8)
-
-                                    Capsule()
-                                        .fill(categoryColor)
-                                        .frame(width: geo.size.width * achievement.progressPercentage, height: 8)
-                                }
-                            }
-                            .frame(height: 8)
-                            .padding(.horizontal, 40)
-                        }
-                        .padding(.top, 8)
-                    } else {
-                        Text("achievements.not_started".localized)
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.5))
-                            .padding(.top, 8)
+            VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button {
+                        HapticManager.light()
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 44, height: 44)
                     }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 10)
+
+                Spacer(minLength: 30)
+
+                badgeVisual
+                    .frame(width: 190, height: 190)
+
+                Text(achievement.isUnlocked ? "Achievement Unlocked!" : "Not started yet")
+                    .font(.faroSemiBold(12))
+                    .foregroundColor(.white.opacity(0.58))
+                    .textCase(.uppercase)
+                    .padding(.top, 28)
+
+                Text(achievement.englishTitle)
+                    .font(.faroBold(30))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 10)
+
+                Text(achievement.englishDescription)
+                    .font(.faroRegular(15))
+                    .foregroundColor(.white.opacity(0.72))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 12)
+
+                if achievement.isUnlocked, let unlockedAt = achievement.unlockedAt {
+                    Label(
+                        "Unlocked on \(formatDate(unlockedAt))",
+                        systemImage: "checkmark.circle.fill"
+                    )
+                    .font(.faroRegular(13))
+                    .foregroundColor(.white.opacity(0.68))
+                    .padding(.top, 18)
+                } else {
+                    VStack(spacing: 9) {
+                        Text("Progress: \(achievement.progress)/\(achievement.requirement)")
+                            .font(.faroSemiBold(13))
+                            .foregroundColor(.white)
+
+                        GeometryReader { geo in
+                            ZStack(alignment: .leading) {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.1))
+
+                                Capsule()
+                                    .fill(Color(hex: "B794F6"))
+                                    .frame(width: geo.size.width * achievement.progressPercentage)
+                            }
+                        }
+                        .frame(height: 7)
+                    }
+                    .padding(.horizontal, 40)
+                    .padding(.top, 18)
                 }
 
                 Spacer()
-
-                // Dismiss button
-                Button(action: {
-                    HapticManager.light()
-                    dismiss()
-                }) {
-                    Text("achievements.close".localized)
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white.opacity(0.15))
-                        )
-                }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 40)
             }
         }
     }
 
-    private var categoryColor: Color {
-        switch achievement.category {
-        case .streak:
-            return Color(hex: "FF8800")
-        case .completion:
-            return Color(hex: "2ECC71")
-        case .habit:
-            return Color(hex: "B794F6")
-        case .special:
-            return Color(hex: "E74C3C")
+    @ViewBuilder
+    private var badgeVisual: some View {
+        ZStack {
+            BadgeOctagonShape()
+                .fill(achievement.isUnlocked ? Color(hex: "B794F6").opacity(0.24) : Color.white.opacity(0.08))
+                .overlay {
+                    BadgeOctagonShape()
+                        .stroke(achievement.isUnlocked ? Color(hex: "B794F6").opacity(0.72) : Color.white.opacity(0.22), lineWidth: 3)
+                }
+
+            if let assetName = achievement.badgeAssetName {
+                Image(assetName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 132, height: 132)
+                    .saturation(achievement.isUnlocked ? 1 : 0)
+                    .opacity(achievement.isUnlocked ? 1 : 0.28)
+            } else {
+                Image(systemName: achievement.icon)
+                    .font(.system(size: 82, weight: .semibold))
+                    .foregroundColor(.white.opacity(achievement.isUnlocked ? 1 : 0.28))
+            }
+
+            if !achievement.isUnlocked {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.72))
+            }
         }
     }
 
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateStyle = .medium
         return formatter.string(from: date)
     }

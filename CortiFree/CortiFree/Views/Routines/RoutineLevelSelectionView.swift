@@ -12,7 +12,6 @@ struct RoutineLevelSelectionView: View {
     @Environment(\.dismiss) var dismiss
     @State private var selectedRoutine: Routine?
     @State private var showPlayer = false
-    @State private var appearAnimation = false
 
     private var routines: [Routine] {
         Routine.routines(for: category)
@@ -43,13 +42,6 @@ struct RoutineLevelSelectionView: View {
                             ) {
                                 selectedRoutine = routine
                             }
-                            .opacity(appearAnimation ? 1 : 0)
-                            .offset(y: appearAnimation ? 0 : 30)
-                            .animation(
-                                .spring(response: 0.5, dampingFraction: 0.8)
-                                .delay(Double(index) * 0.1),
-                                value: appearAnimation
-                            )
                         }
 
                         Spacer(minLength: 120)
@@ -60,11 +52,6 @@ struct RoutineLevelSelectionView: View {
             }
         }
         .navigationBarHidden(true)
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                appearAnimation = true
-            }
-        }
         .onChange(of: selectedRoutine) { _, newValue in
             if newValue != nil {
                 showPlayer = true
@@ -265,8 +252,6 @@ struct RoutineLevelCard: View {
                             )
                     )
             )
-            .scaleEffect(isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(
