@@ -92,6 +92,17 @@ struct OnboardingV2FlowView: View {
             currentStepView
                 .id(currentStep)
                 .transition(.opacity)
+
+            if mascotMessage != nil {
+                VStack {
+                    OnboardingMascotDialogueView(message: mascotMessage ?? "")
+                        .padding(.horizontal, 18)
+                        .padding(.top, 8)
+                    Spacer()
+                }
+                .allowsHitTesting(false)
+                .zIndex(20)
+            }
         }
         .animation(.easeInOut(duration: 0.3), value: currentStep)
         .onAppear {
@@ -142,6 +153,23 @@ struct OnboardingV2FlowView: View {
             .zIndex(1_000)
         }
         #endif
+    }
+
+    private var mascotMessage: String? {
+        switch currentStep {
+        case .overall:
+            return "onboarding.mascot.overall".localized
+        case .habitsQuiz:
+            return "onboarding.mascot.habits".localized
+        case .stressPatternValidation:
+            return "onboarding.mascot.pattern".localized
+        case .symptomChecker:
+            return "onboarding.mascot.symptoms".localized
+        case .cortisolScienceHook, .sixtyDayExplanation, .scientificPlan:
+            return "onboarding.mascot.plan".localized
+        default:
+            return nil
+        }
     }
 
     // MARK: - Checkpoint Management

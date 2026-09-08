@@ -34,20 +34,14 @@ struct FirstLaunchWelcomeView: View {
 
             VStack(spacing: 0) {
 
-                // ── Logo centré ──
+                // ── Mascot introduction ──
                 if showLogo {
-                    VStack(spacing: 10) {
-                        Image("AppLogo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 96, height: 96)
-
-                        Text("CortiFree")
-                            .font(.faroBold(20))
-                            .foregroundColor(.white.opacity(0.9))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 68)
+                    OnboardingMascotDialogueView(
+                        message: "first_launch.mascot_intro".localized,
+                        prominent: true
+                    )
+                    .padding(.horizontal, 24)
+                    .padding(.top, 42)
                     .transition(.opacity.combined(with: .scale(scale: 0.92)))
                 }
 
