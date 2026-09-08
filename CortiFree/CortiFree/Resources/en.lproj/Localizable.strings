@@ -4103,7 +4103,7 @@
 "paywall_custom.fallback_focus" = "Your focus returns, effortless flow state";
 "first_launch.cta_sub" = "Free quiz · 5 minutes";
 "editprofile.first_name_required" = "Enter a first name before saving your profile.";
-"first_launch.mascot_intro" = "Hi, I'm here to help you feel calmer, sleep better, and build small habits that make a real difference.";
+"first_launch.mascot_intro" = "I'm here to help you feel calmer and build a better daily rhythm.";
 "onboarding.mascot.overall" = "Let's start with a few questions so I can understand what you need most.";
 "onboarding.mascot.habits" = "There are no right or wrong answers. Tell me what your days actually feel like.";
 "onboarding.mascot.pattern" = "That helps me see your stress pattern more clearly.";

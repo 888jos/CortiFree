@@ -137,19 +137,18 @@ struct OnboardingV2FlowView: View {
             UserDefaults.standard.set(false, forKey: "onboarding_session_active")
         }
         #if DEBUG
-        .overlay(alignment: .top) {
+        .overlay(alignment: .leading) {
             Button(action: skipOnboardingToHome) {
-                Label("DEBUG: SKIP TO HOME", systemImage: "ladybug.fill")
-                    .font(.system(size: 15, weight: .bold))
+                Image(systemName: "house.fill")
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+                    .frame(width: 54, height: 54)
                     .background(Color.red.opacity(0.94))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(Circle())
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
+            .accessibilityLabel("DEBUG: Skip to Home")
+            .padding(.leading, 12)
             .zIndex(1_000)
         }
         #endif

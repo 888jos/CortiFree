@@ -3903,7 +3903,7 @@
 "paywall_custom.fallback_focus" = "Ta concentration revient, le flow sans effort";
 "first_launch.cta_sub" = "Quiz gratuit · 5 minutes";
 "editprofile.first_name_required" = "Saisis un prénom avant d'enregistrer ton profil.";
-"first_launch.mascot_intro" = "Salut, je suis là pour t'aider à te sentir plus calme, mieux dormir et construire de petites habitudes qui font vraiment la différence.";
+"first_launch.mascot_intro" = "Je suis là pour t'aider à te sentir plus calme et construire un meilleur rythme au quotidien.";
 "onboarding.mascot.overall" = "Commençons par quelques questions pour comprendre ce dont tu as le plus besoin.";
 "onboarding.mascot.habits" = "Il n'y a pas de bonne ou de mauvaise réponse. Dis-moi simplement ce que tu ressens vraiment au quotidien.";
 "onboarding.mascot.pattern" = "Cela m'aide à mieux comprendre ton schéma de stress.";
