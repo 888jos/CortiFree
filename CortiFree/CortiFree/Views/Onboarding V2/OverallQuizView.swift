@@ -26,7 +26,7 @@ struct OverallQuizView: View {
     private let totalQuestions = 4
 
     private var progress: Double {
-        Double(currentQuestionIndex) / Double(totalQuestions)
+        Double(currentQuestionIndex + 1) / Double(totalQuestions)
     }
 
     private var currentQuestionNumber: Int {
@@ -43,18 +43,14 @@ struct OverallQuizView: View {
                 VStack(spacing: 0) {
                     // Navigation header
                     headerSection
-                        .padding(.top, 50)
+                        .padding(.top, 12)
 
-                    // Question content with fixed title
+                    OnboardingMascotDialogueView(message: currentQuestionText)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 18)
+
+                    // Question content
                     VStack(spacing: 0) {
-                    // Fixed Question Number Title
-                    Text("Question #\(currentQuestionNumber)")
-                        .font(.faroBold(24))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 30)
-                        .id("questionTitle") // Keep it stable
-
                     // Sliding content
                     if currentQuestionIndex == 0 {
                         reasonQuestion
@@ -102,6 +98,15 @@ struct OverallQuizView: View {
         .onChange(of: currentQuestionIndex) { _, newIndex in
             questionStartTime = Date()
             trackQuestionViewed(newIndex)
+        }
+    }
+
+    private var currentQuestionText: String {
+        switch currentQuestionIndex {
+        case 0: return "onboarding_v2.overall.reason_question".localized
+        case 1: return "onboarding_v2.overall.duration_question".localized
+        case 2: return "onboarding_v2.overall.gender_question".localized
+        default: return "onboarding_v2.overall.age_question".localized
         }
     }
 
@@ -214,15 +219,6 @@ struct OverallQuizView: View {
 
     private var genderQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Question text
-            Text("onboarding_v2.overall.gender_question".localized)
-                .font(.faroRegular(18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
                     OverallIdentityCard(
@@ -261,15 +257,6 @@ struct OverallQuizView: View {
 
     private var ageQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Question text
-            Text("onboarding_v2.overall.age_question".localized)
-                .font(.faroRegular(18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-
             // Answer buttons
             VStack(spacing: 22) {
                 ForEach(0..<6, id: \.self) { index in
@@ -310,15 +297,6 @@ struct OverallQuizView: View {
 
     private var reasonQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Question text
-            Text("onboarding_v2.overall.reason_question".localized)
-                .font(.faroRegular(18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-
             // Answer buttons
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 22) {
@@ -456,15 +434,6 @@ struct OverallQuizView: View {
 
     private var durationQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Question text
-            Text("onboarding_v2.overall.duration_question".localized)
-                .font(.faroRegular(18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-
             // Answer buttons
             VStack(spacing: 22) {
                 ForEach(0..<5, id: \.self) { index in

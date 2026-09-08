@@ -61,6 +61,10 @@ struct ReassuranceView: View {
 
             ScrollView {
                 VStack(spacing: 0) {
+                    LottieView(filename: "sloth_meditate.json", loopMode: .loop)
+                        .frame(width: 104, height: 104)
+                        .padding(.bottom, 8)
+
                     // Animated text at top (centered)
                     VStack(spacing: 32) {
                     Text(displayedText)

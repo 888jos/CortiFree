@@ -34,7 +34,7 @@ struct HabitsQuizView: View {
     private let totalQuestions = 12
 
     private var progress: Double {
-        Double(currentQuestionIndex) / Double(totalQuestions)
+        Double(currentQuestionIndex + 1) / Double(totalQuestions)
     }
 
     private var currentQuestionNumber: Int {
@@ -55,18 +55,14 @@ struct HabitsQuizView: View {
                     VStack(spacing: 0) {
                         // Navigation header
                         headerSection
-                            .padding(.top, 50)
+                            .padding(.top, 12)
 
-                        // Question content with fixed title
+                        OnboardingMascotDialogueView(message: getQuestion(at: currentQuestionIndex).text)
+                            .padding(.horizontal, 24)
+                            .padding(.top, 18)
+
+                        // Question content
                         VStack(spacing: 0) {
-                            // Fixed Question Number Title
-                            Text("Question #\(currentQuestionNumber)")
-                                .font(.faroBold(24))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.top, 30)
-                                .id("questionTitle") // Keep it stable
-
                             // Sliding content
                             questionContent
                                 .id(currentQuestionIndex)
@@ -216,15 +212,6 @@ struct HabitsQuizView: View {
         let question = getQuestion(at: currentQuestionIndex)
 
         VStack(alignment: .leading, spacing: 16) {
-            // Question text
-            Text(question.text)
-                .font(.faroRegular(18))
-                .foregroundColor(.white)
-                .lineSpacing(4)
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
-
             // Answers
             answersView(options: question.options)
         }

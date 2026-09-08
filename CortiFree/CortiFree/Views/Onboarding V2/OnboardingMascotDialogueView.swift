@@ -21,27 +21,39 @@ struct OnboardingMascotDialogueView: View {
                 .lineSpacing(2)
                 .padding(.horizontal, prominent ? 16 : 12)
                 .padding(.vertical, prominent ? 13 : 10)
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .overlay(alignment: .bottomLeading) {
-                    Triangle()
+                .background {
+                    Circle()
                         .fill(Color.white)
-                        .frame(width: 12, height: 12)
-                        .rotationEffect(.degrees(45))
-                        .offset(x: -4, y: 4)
+                        .frame(width: 15, height: 15)
+                        .offset(x: -6, y: 17)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(Color.white)
                 }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-private struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.closeSubpath()
-        return path
+struct OnboardingProgressBar: View {
+    let progress: Double
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.white.opacity(0.18))
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(hex: "B794F6"), Color(hex: "D4B4FF")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: geometry.size.width * min(max(progress, 0), 1))
+            }
+        }
+        .frame(height: 8)
+        .accessibilityValue("\(Int(progress * 100)) percent")
     }
 }

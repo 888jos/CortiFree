@@ -156,14 +156,12 @@ struct OnboardingV2FlowView: View {
 
     private var mascotMessage: String? {
         switch currentStep {
-        case .overall:
-            return "onboarding.mascot.overall".localized
-        case .habitsQuiz:
-            return "onboarding.mascot.habits".localized
+        case .overall, .habitsQuiz:
+            return nil
         case .stressPatternValidation:
             return "onboarding.mascot.pattern".localized
         case .symptomChecker:
-            return "onboarding.mascot.symptoms".localized
+            return nil
         case .cortisolScienceHook, .sixtyDayExplanation, .scientificPlan:
             return "onboarding.mascot.plan".localized
         default:
