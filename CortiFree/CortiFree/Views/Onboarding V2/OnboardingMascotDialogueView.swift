@@ -30,8 +30,8 @@ struct OnboardingMascotDialogueView: View {
                     ZStack(alignment: .leading) {
                         SpeechBubbleTail()
                             .fill(Color.white)
-                            .frame(width: 18, height: 24)
-                            .offset(x: -1)
+                            .frame(width: 22, height: 30)
+                            .offset(x: -11)
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .fill(Color.white)
                     }

@@ -229,6 +229,7 @@ struct OverallQuizView: View {
                     ) {
                         selectGender(0, answerText: "onboarding_v2.overall.gender_male".localized)
                     }
+                    .frame(width: genderCardWidth)
 
                     OverallIdentityCard(
                         imageName: "onboarding_identity_female",
@@ -237,8 +238,9 @@ struct OverallQuizView: View {
                     ) {
                         selectGender(1, answerText: "onboarding_v2.overall.gender_female".localized)
                     }
+                    .frame(width: genderCardWidth)
                 }
-                .padding(.horizontal, 26)
+                .frame(height: 224)
 
                 OverallAnswerButton(
                     number: 3,
@@ -253,6 +255,11 @@ struct OverallQuizView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
+    }
+
+    private var genderCardWidth: CGFloat {
+        let availableWidth = UIScreen.main.bounds.width - 48
+        return max(0, (availableWidth - 12) / 2)
     }
 
     // MARK: - Question 2: Age
