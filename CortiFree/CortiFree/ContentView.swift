@@ -14,6 +14,7 @@ struct ContentView: View {
     @ObservedObject private var planetSettings = PlanetSettings.shared
     @State private var isScrolling = false
     @State private var scrollTimer: Timer?
+    @State private var isAssistantPresented = false
 
     enum Tab {
         case home
@@ -59,8 +60,30 @@ struct ContentView: View {
                 }
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
             }
+
+            Button {
+                HapticManager.light()
+                isAssistantPresented = true
+            } label: {
+                Image("cortifree_assistant_avatar")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 54, height: 54)
+                    .padding(4)
+                    .background(Color(hex: "17182E").opacity(0.94), in: Circle())
+                    .overlay(Circle().stroke(Color.white.opacity(0.55), lineWidth: 1))
+                    .shadow(color: Color.black.opacity(0.32), radius: 10, y: 5)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Open CortiFree Assistant")
+            .padding(.trailing, 20)
+            .padding(.bottom, isScrolling ? 78 : 82)
+            .transition(.scale.combined(with: .opacity))
         }
         .ignoresSafeArea(.keyboard)
+        .sheet(isPresented: $isAssistantPresented) {
+            AssistantChatView()
+        }
         .onAppear {
             #if DEBUG
             if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_PROGRESS"] == "1" {

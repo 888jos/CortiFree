@@ -33,6 +33,7 @@ final class APIConfig {
         case mixpanelToken = "MIXPANEL_TOKEN"
         case googleClientID = "GIDClientID" // Standard Google Sign-In key
         case tiktokAccessToken = "TIKTOK_ACCESS_TOKEN"
+        case deepSeekAPIKey = "DEEPSEEK_API_KEY"
     }
 
     // MARK: - Private Methods
@@ -96,6 +97,19 @@ final class APIConfig {
         }
         Logger.warning("TikTok access token not found in Info.plist", category: .analytics)
         return ""
+    }
+
+    /// DeepSeek key for development only. Prefer a server-side proxy in production.
+    /// The key is intentionally not bundled in source control.
+    var deepSeekAPIKey: String? {
+        if let environmentKey = ProcessInfo.processInfo.environment["DEEPSEEK_API_KEY"],
+           !environmentKey.isEmpty {
+            return environmentKey
+        }
+        guard let key = value(for: .deepSeekAPIKey), !key.isEmpty, !key.hasPrefix("$(") else {
+            return nil
+        }
+        return key
     }
 
     // MARK: - Validation
