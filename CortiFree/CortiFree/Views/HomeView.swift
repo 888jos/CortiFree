@@ -138,6 +138,11 @@ struct HomeView: View {
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
+                                    Button(action: restartOnboardingFromBeginning) {
+                                        Text("↻ Restart Onboarding From Start")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
                                     Button(action: {
                                         launchOnboardingFromAuthDebug()
                                     }) {
@@ -314,6 +319,19 @@ struct HomeView: View {
         UserDefaults.standard.set(OnboardingV2FlowView.OnboardingStep.authentication.rawValue, forKey: "last_onboarding_checkpoint")
         UserDefaults.standard.set(false, forKey: "hasSeenPaywall")
         UserDefaults.standard.set(false, forKey: "saw_paywall_without_accepting")
+        showOnboarding = true
+    }
+
+    private func restartOnboardingFromBeginning() {
+        let defaults = UserDefaults.standard
+        defaults.set(false, forKey: "onboardingV2Completed")
+        defaults.removeObject(forKey: "onboardingCheckpoint")
+        defaults.removeObject(forKey: "last_onboarding_checkpoint")
+        defaults.set(false, forKey: "hasSeenPaywall")
+        defaults.set(false, forKey: "saw_paywall_without_accepting")
+        defaults.set(false, forKey: "onboarding_session_active")
+        defaults.set(false, forKey: "debugSkipOnboardingToHome")
+        OnboardingLiveActivityManager.shared.end()
         showOnboarding = true
     }
     #endif
