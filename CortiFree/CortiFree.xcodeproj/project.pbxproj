@@ -15,17 +15,13 @@
 		804F1D8A2F4CF13600374D9D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804F1D892F4CF13600374D9D /* SwiftUI.framework */; };
 		804F1D9B2F4CF13700374D9D /* CortiFreeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		805099B72F4BC34E002841B9 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 805099B62F4BC34E002841B9 /* PostHog */; };
-		80622A4A2F1701B9000C459F /* ReceiptParser in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A492F1701B9000C459F /* ReceiptParser */; };
 		80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4B2F1701B9000C459F /* RevenueCat */; };
 		80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4D2F1701B9000C459F /* RevenueCatUI */; };
 		8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8077CC292ECF8AF400742806 /* Mixpanel */; };
 		8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9902EA8CBCA007C9606 /* FirebaseAuth */; };
 		8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9922EA8CBCA007C9606 /* FirebaseFirestore */; };
 		80E85E8D2F3762E300E18C4B /* CortiFree.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 80E85E8C2F3762E300E18C4B /* CortiFree.storekit */; };
-		80F600CC2E85D5BF008F58FB /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600CB2E85D5BF008F58FB /* FirebaseAI */; };
 		80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600CD2E85D5BF008F58FB /* FirebaseAnalytics */; };
-		80F600D02E85D5BF008F58FB /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600CF2E85D5BF008F58FB /* FirebaseAnalyticsCore */; };
-		80F600D22E85D5BF008F58FB /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600D12E85D5BF008F58FB /* FirebaseAnalyticsIdentitySupport */; };
 		80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600D62E85EAA9008F58FB /* SuperwallKit */; };
 /* End PBXBuildFile section */
 
@@ -137,16 +133,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80F600D22E85D5BF008F58FB /* FirebaseAnalyticsIdentitySupport in Frameworks */,
 				803AC4DE2F40CED0007B3B5A /* TikTokBusinessSDK in Frameworks */,
 				8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */,
 				80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */,
 				80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */,
-				80F600D02E85D5BF008F58FB /* FirebaseAnalyticsCore in Frameworks */,
 				80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */,
 				8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */,
-				80622A4A2F1701B9000C459F /* ReceiptParser in Frameworks */,
-				80F600CC2E85D5BF008F58FB /* FirebaseAI in Frameworks */,
 				8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */,
 				805099B72F4BC34E002841B9 /* PostHog in Frameworks */,
 				80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */,
@@ -250,10 +242,7 @@
 			);
 			name = CortiFree;
 			packageProductDependencies = (
-				80F600CB2E85D5BF008F58FB /* FirebaseAI */,
 				80F600CD2E85D5BF008F58FB /* FirebaseAnalytics */,
-				80F600CF2E85D5BF008F58FB /* FirebaseAnalyticsCore */,
-				80F600D12E85D5BF008F58FB /* FirebaseAnalyticsIdentitySupport */,
 				80F600D62E85EAA9008F58FB /* SuperwallKit */,
 				8097F9902EA8CBCA007C9606 /* FirebaseAuth */,
 				8097F9922EA8CBCA007C9606 /* FirebaseFirestore */,
@@ -261,7 +250,6 @@
 				8077CC292ECF8AF400742806 /* Mixpanel */,
 				8021AEC92ED91A0100541E54 /* GoogleSignIn */,
 				8021AECB2ED91A0100541E54 /* GoogleSignInSwift */,
-				80622A492F1701B9000C459F /* ReceiptParser */,
 				80622A4B2F1701B9000C459F /* RevenueCat */,
 				80622A4D2F1701B9000C459F /* RevenueCatUI */,
 				803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */,
@@ -930,11 +918,6 @@
 			package = 805099B52F4BC34E002841B9 /* XCRemoteSwiftPackageReference "posthog-ios" */;
 			productName = PostHog;
 		};
-		80622A492F1701B9000C459F /* ReceiptParser */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
-			productName = ReceiptParser;
-		};
 		80622A4B2F1701B9000C459F /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
@@ -960,25 +943,10 @@
 			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
 		};
-		80F600CB2E85D5BF008F58FB /* FirebaseAI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAI;
-		};
 		80F600CD2E85D5BF008F58FB /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
-		};
-		80F600CF2E85D5BF008F58FB /* FirebaseAnalyticsCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsCore;
-		};
-		80F600D12E85D5BF008F58FB /* FirebaseAnalyticsIdentitySupport */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsIdentitySupport;
 		};
 		80F600D62E85EAA9008F58FB /* SuperwallKit */ = {
 			isa = XCSwiftPackageProductDependency;
