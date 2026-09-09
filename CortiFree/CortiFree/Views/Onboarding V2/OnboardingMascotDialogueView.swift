@@ -9,7 +9,7 @@ struct OnboardingMascotDialogueView: View {
     let message: String
     var prominent: Bool = false
 
-    private var mascotSize: CGFloat { prominent ? 165 : 90 }
+    private var mascotSize: CGFloat { prominent ? 223 : 122 }
 
     var body: some View {
         HStack(alignment: .center, spacing: prominent ? 8 : 6) {
@@ -21,29 +21,30 @@ struct OnboardingMascotDialogueView: View {
                 .foregroundStyle(Color(hex: "1A1A4E"))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(2)
-                .padding(.horizontal, prominent ? 20 : 18)
+                .padding(.horizontal, prominent ? 24 : 22)
                 .padding(.vertical, 12)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: mascotSize)
+                .frame(maxWidth: .infinity, minHeight: mascotSize, maxHeight: mascotSize, alignment: .center)
                 .background {
-                    SpeechBubbleShape()
-                        .fill(Color.white)
+                    ZStack(alignment: .leading) {
+                        SpeechBubbleTail()
+                            .fill(Color.white)
+                            .frame(width: 18, height: 24)
+                            .offset(x: -1)
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(Color.white)
+                    }
                 }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-private struct SpeechBubbleShape: Shape {
+private struct SpeechBubbleTail: Shape {
     func path(in rect: CGRect) -> Path {
-        let tailWidth: CGFloat = 15
-        let tailHeight: CGFloat = 20
-        let bubbleRect = CGRect(x: tailWidth, y: 0, width: max(0, rect.width - tailWidth), height: rect.height)
-        let midY = rect.midY
-        var path = Path(roundedRect: bubbleRect, cornerRadius: 18)
-        path.move(to: CGPoint(x: tailWidth + 1, y: midY - tailHeight / 2))
-        path.addLine(to: CGPoint(x: 0, y: midY))
-        path.addLine(to: CGPoint(x: tailWidth + 1, y: midY + tailHeight / 2))
+        var path = Path()
+        path.move(to: CGPoint(x: rect.maxX, y: 0))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
         path.closeSubpath()
         return path
     }

@@ -238,6 +238,7 @@ struct OverallQuizView: View {
                         selectGender(1, answerText: "onboarding_v2.overall.gender_female".localized)
                     }
                 }
+                .padding(.horizontal, 10)
 
                 OverallAnswerButton(
                     number: 3,
