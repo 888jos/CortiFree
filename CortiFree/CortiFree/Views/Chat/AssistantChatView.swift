@@ -58,7 +58,7 @@ struct AssistantChatView: View {
                     .foregroundStyle(.white)
                     .frame(width: 42, height: 42)
             }
-            .accessibilityLabel("Close assistant")
+            .accessibilityLabel("Close Milo")
 
             Image("cortifree_assistant_avatar")
                 .resizable()
@@ -66,12 +66,9 @@ struct AssistantChatView: View {
                 .frame(width: 38, height: 38)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("CortiFree Assistant")
+                Text("Milo")
                     .font(.custom("Poppins-SemiBold", size: 17))
                     .foregroundStyle(.white)
-                Text("A calmer next step")
-                    .font(.custom("Poppins-Regular", size: 12))
-                    .foregroundStyle(.white.opacity(0.62))
             }
             Spacer()
         }

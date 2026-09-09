@@ -56,12 +56,12 @@ struct ContentView: View {
                         Image("cortifree_assistant_avatar")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 70, height: 70)
+                            .frame(width: 84, height: 84)
                             .scaleEffect(assistantPulse ? 1.025 : 1.0)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Open CortiFree Assistant")
-                    .offset(x: 8, y: -24)
+                    .offset(x: -12, y: -44)
                 }
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
