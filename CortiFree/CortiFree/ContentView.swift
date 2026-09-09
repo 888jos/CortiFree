@@ -68,11 +68,7 @@ struct ContentView: View {
                 Image("cortifree_assistant_avatar")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 54, height: 54)
-                    .padding(4)
-                    .background(Color(hex: "17182E").opacity(0.94), in: Circle())
-                    .overlay(Circle().stroke(Color.white.opacity(0.55), lineWidth: 1))
-                    .shadow(color: Color.black.opacity(0.32), radius: 10, y: 5)
+                    .frame(width: 58, height: 58)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Open CortiFree Assistant")
