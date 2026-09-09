@@ -15,6 +15,11 @@ struct FirstLaunchWelcomeView: View {
     @State private var screenViewTime: Date?
 
     @State private var hasContinued = false
+    @State private var displayedIntro = ""
+
+    private var introText: String {
+        "first_launch.mascot_intro".localized
+    }
 
     var body: some View {
         ZStack {
@@ -30,7 +35,7 @@ struct FirstLaunchWelcomeView: View {
                 LottieView(filename: "sloth_intro.json", loopMode: .loop)
                     .frame(width: 190, height: 190)
 
-                Text("first_launch.mascot_intro".localized)
+                Text(displayedIntro)
                     .font(.faroBold(28))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
@@ -63,6 +68,14 @@ struct FirstLaunchWelcomeView: View {
         .onAppear {
             screenViewTime = Date()
             MixpanelManager.shared.trackOnboardingWelcomeViewed()
+        }
+        .task(id: introText) {
+            displayedIntro = ""
+            for character in introText {
+                guard !Task.isCancelled else { return }
+                displayedIntro.append(character)
+                try? await Task.sleep(nanoseconds: 32_000_000)
+            }
         }
     }
 
