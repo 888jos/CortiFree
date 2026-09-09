@@ -60,6 +60,7 @@ struct HabitsQuizView: View {
                         OnboardingMascotDialogueView(message: getQuestion(at: currentQuestionIndex).text)
                             .padding(.horizontal, 24)
                             .padding(.top, 18)
+                            .padding(.bottom, 24)
 
                         // Question content
                         VStack(spacing: 0) {

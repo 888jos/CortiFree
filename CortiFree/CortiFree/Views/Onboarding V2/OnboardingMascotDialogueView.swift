@@ -9,28 +9,43 @@ struct OnboardingMascotDialogueView: View {
     let message: String
     var prominent: Bool = false
 
+    private var mascotSize: CGFloat { prominent ? 165 : 90 }
+
     var body: some View {
-        HStack(alignment: .bottom, spacing: prominent ? 8 : 4) {
+        HStack(alignment: .center, spacing: prominent ? 8 : 6) {
             LottieView(filename: "sloth_meditate.json", loopMode: .loop)
-                .frame(width: prominent ? 132 : 72, height: prominent ? 132 : 72)
+                .frame(width: mascotSize, height: mascotSize)
 
             Text(message)
-                .font(.poppinsSemiBold(prominent ? 15 : 13))
+                .font(.poppinsSemiBold(prominent ? 19 : 17))
                 .foregroundStyle(Color(hex: "1A1A4E"))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(2)
-                .padding(.horizontal, prominent ? 16 : 12)
-                .padding(.vertical, prominent ? 13 : 10)
+                .padding(.horizontal, prominent ? 20 : 18)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: mascotSize)
                 .background {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 15, height: 15)
-                        .offset(x: -6, y: 17)
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    SpeechBubbleShape()
                         .fill(Color.white)
                 }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct SpeechBubbleShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let tailWidth: CGFloat = 15
+        let tailHeight: CGFloat = 20
+        let bubbleRect = CGRect(x: tailWidth, y: 0, width: max(0, rect.width - tailWidth), height: rect.height)
+        let midY = rect.midY
+        var path = Path(roundedRect: bubbleRect, cornerRadius: 18)
+        path.move(to: CGPoint(x: tailWidth + 1, y: midY - tailHeight / 2))
+        path.addLine(to: CGPoint(x: 0, y: midY))
+        path.addLine(to: CGPoint(x: tailWidth + 1, y: midY + tailHeight / 2))
+        path.closeSubpath()
+        return path
     }
 }
 

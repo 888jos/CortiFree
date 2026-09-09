@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var isScrolling = false
     @State private var scrollTimer: Timer?
     @State private var isAssistantPresented = false
+    @State private var assistantPulse = false
 
     enum Tab {
         case home
@@ -47,6 +48,21 @@ struct ContentView: View {
 
             // Custom Tab Bar - Smart hide/show on scroll
             CustomTabBar(selectedTab: $selectedTab)
+                .overlay(alignment: .topTrailing) {
+                    Button {
+                        HapticManager.light()
+                        isAssistantPresented = true
+                    } label: {
+                        Image("cortifree_assistant_avatar")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 70, height: 70)
+                            .scaleEffect(assistantPulse ? 1.025 : 1.0)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Open CortiFree Assistant")
+                    .offset(x: 8, y: -24)
+                }
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
 
@@ -61,26 +77,15 @@ struct ContentView: View {
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
             }
 
-            Button {
-                HapticManager.light()
-                isAssistantPresented = true
-            } label: {
-                Image("cortifree_assistant_avatar")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 58, height: 58)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Open CortiFree Assistant")
-            .padding(.trailing, 20)
-            .padding(.bottom, isScrolling ? 78 : 82)
-            .transition(.scale.combined(with: .opacity))
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isAssistantPresented) {
             AssistantChatView()
         }
         .onAppear {
+            withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
+                assistantPulse = true
+            }
             #if DEBUG
             if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_PROGRESS"] == "1" {
                 selectedTab = .progress

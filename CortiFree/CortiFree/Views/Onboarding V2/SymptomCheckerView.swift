@@ -68,6 +68,7 @@ struct SymptomCheckerView: View {
                 OnboardingMascotDialogueView(message: "symptom_checker.select_all".localized)
                     .padding(.horizontal, 20)
                     .padding(.top, 12)
+                    .padding(.bottom, 24)
 
                 // ── Header — left aligned, no logo ──
                 VStack(alignment: .leading, spacing: 12) {
