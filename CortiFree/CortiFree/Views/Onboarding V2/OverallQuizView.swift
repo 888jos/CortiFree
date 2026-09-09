@@ -567,6 +567,7 @@ struct OverallAnswerButton: View {
     let isSelected: Bool
     var isDisabled: Bool = false
     let onTap: () -> Void
+    @State private var isRevealed = false
 
     var body: some View {
         Button(action: onTap) {
@@ -574,13 +575,13 @@ struct OverallAnswerButton: View {
                 // Toggle avec numéro ou checkmark
                 ZStack {
                     Circle()
-                        .fill(isSelected ? Color(hex: "#67DB3D") : Color(hex: "4CC6FF"))
+                        .fill(isSelected ? Color(hex: "D4B4FF") : Color(hex: "4CC6FF"))
                         .frame(width: 24, height: 24)
 
                     if isSelected {
                         Image(systemName: "checkmark")
                             .font(.custom("Poppins-Bold", size: 12))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(hex: "1A1A4E"))
                     } else {
                         Text("\(number)")
                             .font(.custom("Poppins-Bold", size: 12))
@@ -598,11 +599,11 @@ struct OverallAnswerButton: View {
             .frame(height: 54)
             .background(
                 RoundedRectangle(cornerRadius: 40)
-                    .fill(Color(hex: "131146").opacity(0.8))
+                    .fill(isSelected ? Color(hex: "B794F6") : Color(hex: "131146").opacity(0.8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 40)
                             .stroke(
-                                Color(hex: "1B1864"),
+                                isSelected ? Color(hex: "D4B4FF") : Color(hex: "1B1864"),
                                 lineWidth: 2
                             )
                     )
@@ -610,7 +611,14 @@ struct OverallAnswerButton: View {
         }
         .buttonStyle(PlainButtonStyle())
         .scaleEffect(isSelected ? 0.98 : 1.0)
-        .opacity(isSelected ? 0.9 : 1.0)
+        .opacity(isRevealed ? (isSelected ? 0.96 : 1.0) : 0)
+        .offset(y: isRevealed ? 0 : 18)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.28).delay(0.55 + Double(max(number - 1, 0)) * 0.07)) {
+                isRevealed = true
+            }
+        }
+        .onDisappear { isRevealed = false }
         .disabled(isDisabled)
     }
 }

@@ -8,22 +8,24 @@ import SwiftUI
 struct OnboardingMascotDialogueView: View {
     let message: String
     var prominent: Bool = false
+    @State private var displayedMessage = ""
 
     private var mascotSize: CGFloat { prominent ? 223 : 122 }
+    private var bubbleHeight: CGFloat { mascotSize * 0.8 }
 
     var body: some View {
         HStack(alignment: .center, spacing: prominent ? 8 : 6) {
             LottieView(filename: "sloth_meditate.json", loopMode: .loop)
                 .frame(width: mascotSize, height: mascotSize)
 
-            Text(message)
+            Text(displayedMessage)
                 .font(.poppinsSemiBold(prominent ? 19 : 17))
                 .foregroundStyle(Color(hex: "1A1A4E"))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(2)
                 .padding(.horizontal, prominent ? 24 : 22)
                 .padding(.vertical, 12)
-                .frame(maxWidth: .infinity, minHeight: mascotSize, maxHeight: mascotSize, alignment: .center)
+                .frame(maxWidth: .infinity, minHeight: bubbleHeight, maxHeight: bubbleHeight, alignment: .center)
                 .background {
                     ZStack(alignment: .leading) {
                         SpeechBubbleTail()
@@ -36,6 +38,14 @@ struct OnboardingMascotDialogueView: View {
                 }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .task(id: message) {
+            displayedMessage = ""
+            for character in message {
+                guard !Task.isCancelled else { return }
+                displayedMessage.append(character)
+                try? await Task.sleep(nanoseconds: 20_000_000)
+            }
+        }
     }
 }
 
