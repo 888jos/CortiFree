@@ -74,7 +74,8 @@ struct DailyCheckInView: View {
         checkInSlide(
             eyebrow: "daily_checkin.eyebrow".localized,
             title: "daily_checkin.mood_title".localized,
-            subtitle: "daily_checkin.mood_subtitle".localized
+            subtitle: "daily_checkin.mood_subtitle".localized,
+            mascotMessage: "daily_checkin.mascot_mood".localized
         ) {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3), spacing: 12) {
                 ForEach(Mood.allCases, id: \.self) { value in
@@ -110,7 +111,8 @@ struct DailyCheckInView: View {
         checkInSlide(
             eyebrow: "daily_checkin.eyebrow".localized,
             title: "daily_checkin.recovery_title".localized,
-            subtitle: "daily_checkin.recovery_subtitle".localized
+            subtitle: "daily_checkin.recovery_subtitle".localized,
+            mascotMessage: "daily_checkin.mascot_recovery".localized
         ) {
             VStack(spacing: 22) {
                 scaleRow(title: "daily_checkin.stress".localized, icon: "waveform.path.ecg", value: $stress, reversed: true)
@@ -124,7 +126,8 @@ struct DailyCheckInView: View {
         checkInSlide(
             eyebrow: "daily_checkin.journal_eyebrow".localized,
             title: "daily_checkin.reflection_title".localized,
-            subtitle: "daily_checkin.reflection_subtitle".localized
+            subtitle: "daily_checkin.reflection_subtitle".localized,
+            mascotMessage: "daily_checkin.mascot_reflection".localized
         ) {
             TextEditor(text: $note)
                 .font(.custom("Poppins-Regular", size: 14))
@@ -149,10 +152,15 @@ struct DailyCheckInView: View {
         eyebrow: String,
         title: String,
         subtitle: String,
+        mascotMessage: String,
         @ViewBuilder content: () -> Content
     ) -> some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 18) {
+                OnboardingMascotDialogueView(message: mascotMessage)
+                    .frame(height: 122)
+                    .clipped()
+
                 VStack(alignment: .leading, spacing: 7) {
                     Text(eyebrow.uppercased())
                         .font(.custom("Poppins-SemiBold", size: 10))
@@ -251,6 +259,13 @@ struct DailyCheckInView: View {
                     energy: energy,
                     note: note,
                     for: targetDate
+                )
+                MixpanelManager.shared.trackDailyCheckInCompleted(
+                    mood: mood.rawValue,
+                    stress: stress,
+                    sleep: sleep,
+                    energy: energy,
+                    hasNote: !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 )
                 HapticManager.success()
                 dismiss()

@@ -96,6 +96,9 @@
 "progress.journey.domain_empty" = "Termine une activité pour commencer à suivre ce domaine.";
 "daily_checkin.skip" = "Pas maintenant";
 "daily_checkin.eyebrow" = "Bilan d'hier";
+"daily_checkin.mascot_mood" = "Comment te sens-tu aujourd'hui ? Tu peux être totalement honnête avec moi.";
+"daily_checkin.mascot_recovery" = "Écoutons ton corps un instant. Comment as-tu récupéré ?";
+"daily_checkin.mascot_reflection" = "Avant de terminer, y a-t-il quelque chose que tu aimerais me confier ?";
 "daily_checkin.mood_title" = "Comment t'es-tu senti ?";
 "daily_checkin.mood_subtitle" = "Choisis l'émotion qui décrit le mieux l'ensemble de ta journée d'hier.";
 "daily_checkin.recovery_title" = "Comment ton corps a-t-il récupéré ?";
@@ -3042,6 +3045,25 @@
 "onboarding_v2.reassurance.message_part1_female" = "Tu n'es pas seule dans cette situation.";
 "onboarding_v2.reassurance.message_part1_neutral" = "Tu n'es pas la seule personne dans cette situation.";
 "onboarding_v2.reassurance.message_part2" = "CortiFree est construit sur la psychologie comportementale et la science de la régulation du système nerveux.";
+"onboarding_v2.reassurance.personalized" = "Tu cherches du soutien pour %@. À %@, et après avoir vécu cela pendant %@, il est normal que cela pèse sur ton quotidien.";
+"onboarding_v2.reassurance.reason_sleep" = "ton sommeil et ton repos";
+"onboarding_v2.reassurance.reason_anxiety" = "ton stress et ton anxiété";
+"onboarding_v2.reassurance.reason_energy" = "ton énergie";
+"onboarding_v2.reassurance.reason_focus" = "ta concentration";
+"onboarding_v2.reassurance.reason_mental" = "ton bien-être mental";
+"onboarding_v2.reassurance.reason_difficult" = "une période difficile";
+"onboarding_v2.reassurance.reason_habits" = "la construction de nouvelles habitudes";
+"onboarding_v2.reassurance.age_under_18" = "ton âge";
+"onboarding_v2.reassurance.age_18_24" = "18–24 ans";
+"onboarding_v2.reassurance.age_25_34" = "25–34 ans";
+"onboarding_v2.reassurance.age_35_44" = "35–44 ans";
+"onboarding_v2.reassurance.age_45_54" = "45–54 ans";
+"onboarding_v2.reassurance.age_55_plus" = "55 ans ou plus";
+"onboarding_v2.reassurance.duration_weeks" = "quelques semaines";
+"onboarding_v2.reassurance.duration_2_6_months" = "2 à 6 mois";
+"onboarding_v2.reassurance.duration_6_12_months" = "6 mois à 1 an";
+"onboarding_v2.reassurance.duration_1_year_plus" = "plus d'un an";
+"onboarding_v2.reassurance.duration_years" = "plusieurs années";
 "onboarding_v2.reassurance.message_part3" = "Maintenant, nous allons faire un petit quiz pour mieux comprendre ta situation et personnaliser ton parcours.";
 "onboarding_v2.reassurance.message_part4" = "Tes réponses sont totalement confidentielles. Personne n'y a accès et elles ne seront jamais revendues ou partagées.";
 "onboarding_v2.reassurance.start_quiz" = "Commencer le quiz";
@@ -3438,6 +3460,7 @@
 "onboarding_v2.week_progress.transformation" = "Transformation durable";
 
 // MARK: - Onboarding V2 - Notification Permissions
+"onboarding_v2.notifications.mascot_message" = "Je te rappellerai de pratiquer pour que cela devienne une habitude !";
 "onboarding_v2.notifications.stay_motivated" = "Reste motivé(e) chaque jour";
 "onboarding_v2.notifications.gentle_reminders" = "Des rappels bienveillants pour maintenir ta progression";
 "onboarding_v2.notifications.personalized" = "Rappels personnalisés à tes moments clés";
@@ -3801,7 +3824,7 @@
 "first_launch.cortisol_word" = "cortisol.";
 "first_launch.cortisol_desc" = "L'hormone du stress chronique qui empêche\nton corps de se régénérer — même quand tu te reposes.";
 "first_launch.solution_pill" = "En 66 jours, on peut le rééquilibrer.";
-"first_launch.cta_button" = "Analyser mon cortisol";
+"first_launch.cta_button" = "Répondre à Milo";
 
 // MARK: - CustomPaywallView
 
@@ -3903,7 +3926,10 @@
 "paywall_custom.fallback_focus" = "Ta concentration revient, le flow sans effort";
 "first_launch.cta_sub" = "Quiz gratuit · 5 minutes";
 "editprofile.first_name_required" = "Saisis un prénom avant d'enregistrer ton profil.";
-"first_launch.mascot_intro" = "Je suis là pour t'aider à te sentir plus calme et construire un meilleur rythme au quotidien.";
+"first_launch.mascot_intro" = "Salut, moi c'est Milo, ton compagnon personnel pour t'aider à retrouver ton éclat, ta sérénité et ta concentration. J'ai quelques questions à te poser pour créer ton plan personnalisé.";
+"first_launch.mascot_greeting" = "Salut, moi c'est Milo";
+"first_launch.mascot_role" = "Ton guide personnel pour retrouver le calme, mieux dormir et te concentrer.";
+"first_launch.mascot_plan" = "Réponds à quelques questions. Je créerai ton plan.";
 "onboarding.mascot.overall" = "Commençons par quelques questions pour comprendre ce dont tu as le plus besoin.";
 "onboarding.mascot.habits" = "Il n'y a pas de bonne ou de mauvaise réponse. Dis-moi simplement ce que tu ressens vraiment au quotidien.";
 "onboarding.mascot.pattern" = "Cela m'aide à mieux comprendre ton schéma de stress.";
@@ -3911,23 +3937,30 @@
 "onboarding.mascot.plan" = "Je rassemble tes réponses pour que ton plan soit vraiment personnel.";
 
 // MARK: - Glow Scan
+"glow.intro.eyebrow" = "Une pause pour toi";
 "glow.intro.title" = "Découvre ton profil Glow";
 "glow.intro.body" = "Ajoute une photo facultative et relie-la à tes habitudes de récupération pour créer un aperçu bien-être simple. Ta photo n'est pas enregistrée.";
+"glow.intro.benefit_one" = "Observe comment ta récupération se manifeste aujourd'hui";
+"glow.intro.benefit_two" = "Un aperçu personnalisé selon tes réponses";
+"glow.intro.benefit_three" = "Ta photo reste sur ton appareil";
 "glow.cta.start" = "Démarrer mon Glow Scan";
-"glow.capture.title" = "Prends une photo rapide";
-"glow.capture.body" = "Utilise si possible une lumière naturelle. Ceci est un aperçu bien-être, pas une évaluation médicale.";
-"glow.cta.take_photo" = "Prendre une photo";
+"glow.cta.skip" = "Passer pour le moment";
+"glow.capture.eyebrow" = "Étape 1 sur 2";
+"glow.capture.title" = "Scanne ton visage avec des mouvements guidés";
+"glow.capture.body" = "Suis les indications de gauche au centre, puis vers la droite. Garde ton visage dans le cadre avec une lumière douce et régulière.";
+"glow.capture.guide" = "Nous te guiderons du profil gauche au centre, puis vers le profil droit.";
+"glow.cta.take_photo" = "Démarrer le scan du visage";
 "glow.cta.choose_photo" = "Choisir dans la photothèque";
 "glow.debug.preview" = "DEBUG : utiliser l'aperçu";
-"glow.capture.camera_unavailable" = "Appareil photo indisponible. Choisis plutôt une photo dans ta photothèque.";
-"glow.capture.camera_denied" = "L'accès à l'appareil photo est désactivé. Tu peux choisir une photo dans ta photothèque.";
+"glow.capture.camera_unavailable" = "Ton appareil photo est indisponible. Tu peux choisir une photo dans ta photothèque.";
+"glow.capture.camera_denied" = "L'accès à l'appareil photo est désactivé. Active-le dans Réglages pour terminer le scan guidé, ou choisis une photo dans ta photothèque.";
 "glow.analyzing.title" = "Création de ton profil Glow";
 "glow.analyzing.step.one" = "Préparation de ton aperçu bien-être...";
 "glow.analyzing.step.two" = "Lecture de tes réponses de récupération...";
 "glow.analyzing.step.three" = "Mise en relation avec ta routine...";
 "glow.analyzing.step.four" = "Ton profil Glow est prêt.";
 "glow.results.eyebrow" = "Ton aperçu bien-être";
-"glow.results.title" = "Ton Glow Score";
+"glow.results.title" = "Ton score CortiFree";
 "glow.results.out_of" = "sur 100";
 "glow.results.body" = "Une estimation douce basée sur tes réponses d'onboarding et ton check-in du jour. Ce n'est pas un diagnostic.";
 "glow.results.insights" = "Tes observations";

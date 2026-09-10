@@ -31,9 +31,9 @@ final class APIConfig {
         case revenueCatAPIKey = "REVENUECAT_API_KEY"
         case superwallAPIKey = "SUPERWALL_API_KEY"
         case mixpanelToken = "MIXPANEL_TOKEN"
+        case amplitudeAPIKey = "AMPLITUDE_API_KEY"
         case googleClientID = "GIDClientID" // Standard Google Sign-In key
         case tiktokAccessToken = "TIKTOK_ACCESS_TOKEN"
-        case deepSeekAPIKey = "DEEPSEEK_API_KEY"
     }
 
     // MARK: - Private Methods
@@ -77,6 +77,17 @@ final class APIConfig {
         return nil
     }
 
+    /// Amplitude Analytics API key
+    var amplitudeAPIKey: String? {
+        if let key = value(for: .amplitudeAPIKey), !key.isEmpty, !key.hasPrefix("$(") {
+            return key
+        }
+        #if DEBUG
+        Logger.warning("Amplitude API key not found in Info.plist", category: .analytics)
+        #endif
+        return nil
+    }
+
     /// Google Sign-In Client ID
     /// Usually already in Info.plist as GIDClientID
     var googleClientID: String? {
@@ -99,19 +110,6 @@ final class APIConfig {
         return ""
     }
 
-    /// DeepSeek key for development only. Prefer a server-side proxy in production.
-    /// The key is intentionally not bundled in source control.
-    var deepSeekAPIKey: String? {
-        if let environmentKey = ProcessInfo.processInfo.environment["DEEPSEEK_API_KEY"],
-           !environmentKey.isEmpty {
-            return environmentKey
-        }
-        guard let key = value(for: .deepSeekAPIKey), !key.isEmpty, !key.hasPrefix("$(") else {
-            return nil
-        }
-        return key
-    }
-
     // MARK: - Validation
 
     /// Check if all required API keys are configured
@@ -127,6 +125,7 @@ final class APIConfig {
         Logger.info("  - RevenueCat: \(value(for: .revenueCatAPIKey) != nil ? "✅" : "⚠️ Using fallback")", category: .subscription)
         Logger.info("  - Superwall: \(value(for: .superwallAPIKey) != nil ? "✅" : "⚠️ Using fallback")", category: .subscription)
         Logger.info("  - Mixpanel: \(value(for: .mixpanelToken) != nil ? "✅" : "❌ Not configured")", category: .analytics)
+        Logger.info("  - Amplitude: \(value(for: .amplitudeAPIKey) != nil ? "✅" : "❌ Not configured")", category: .analytics)
         Logger.info("  - Google: \(value(for: .googleClientID) != nil ? "✅" : "❌ Not configured")", category: .auth)
         Logger.info("  - TikTok: \(value(for: .tiktokAccessToken) != nil ? "✅" : "⚠️ Not configured")", category: .analytics)
     }

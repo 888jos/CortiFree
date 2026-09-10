@@ -119,7 +119,7 @@ struct AuthSignUpView: View {
                         )
                     }
 
-                    // Google
+                    if false {
                     Button(action: {
                         HapticManager.light()
                         showGoogleAuth = true
@@ -140,6 +140,7 @@ struct AuthSignUpView: View {
                             RoundedRectangle(cornerRadius: 40)
                                 .stroke(Color.white, lineWidth: 2)
                         )
+                    }
                     }
 
                     // Email
@@ -291,7 +292,7 @@ struct AuthLoginView: View {
                         )
                     }
 
-                    // Google
+                    if false {
                     Button(action: {
                         HapticManager.light()
                         showGoogleAuth = true
@@ -312,6 +313,7 @@ struct AuthLoginView: View {
                             RoundedRectangle(cornerRadius: 40)
                                 .stroke(Color.white, lineWidth: 2)
                         )
+                    }
                     }
 
                     // Email
@@ -695,7 +697,7 @@ struct AuthEmailFormView: View {
                             )
                         }
 
-                        // Google
+                        if false {
                         Button(action: {
                             HapticManager.light()
                             showGoogleAuth = true
@@ -716,6 +718,7 @@ struct AuthEmailFormView: View {
                                 RoundedRectangle(cornerRadius: 24)
                                     .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
                             )
+                        }
                         }
                     }
                     .padding(.horizontal, 32)
@@ -1147,7 +1150,7 @@ struct AuthAppleView: View {
 
                 // Other auth methods
                 HStack(spacing: 16) {
-                    // Google
+                    if false {
                     Button(action: {
                         HapticManager.light()
                         showGoogleAuth = true
@@ -1168,6 +1171,7 @@ struct AuthAppleView: View {
                             RoundedRectangle(cornerRadius: 24)
                                 .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
                         )
+                    }
                     }
 
                     // Email

@@ -14,16 +14,16 @@ struct MeditationListView: View {
     @State private var showMeditationSupport = false
     @State private var selectedMeditationSupport: MeditationSupport?
 
-    private var meditations: [(id: String, icon: String, titleKey: String)] {
+    private var meditations: [(id: String, imageName: String, titleKey: String)] {
         [
-            ("conscious-breathing", "wind", "library.meditation.conscious_breathing"),
-            ("body-scan", "figure.stand", "library.meditation.body_scan"),
-            ("mindfulness", "eye.fill", "library.meditation.mindfulness"),
-            ("grounding", "leaf.fill", "library.meditation.grounding"),
-            ("visualization", "sparkles", "library.meditation.visualization"),
-            ("compassion", "heart.fill", "library.meditation.compassion"),
-            ("focus-clarity", "brain.head.profile", "library.meditation.focus"),
-            ("yoga-nidra", "moon.stars.fill", "library.meditation.sleep")
+            ("conscious-breathing", "meditation_01", "library.meditation.conscious_breathing"),
+            ("body-scan", "meditation_02", "library.meditation.body_scan"),
+            ("mindfulness", "meditation_03", "library.meditation.mindfulness"),
+            ("grounding", "meditation_04", "library.meditation.grounding"),
+            ("visualization", "meditation_05", "library.meditation.visualization"),
+            ("compassion", "meditation_06", "library.meditation.compassion"),
+            ("focus-clarity", "meditation_07", "library.meditation.focus"),
+            ("yoga-nidra", "meditation_08", "library.meditation.sleep")
         ]
     }
 
@@ -44,7 +44,7 @@ struct MeditationListView: View {
                     ], spacing: 24) {
                         ForEach(meditations, id: \.id) { meditation in
                             MeditationCard(
-                                icon: meditation.icon,
+                                imageName: meditation.imageName,
                                 title: languageManager.localized(meditation.titleKey)
                             ) {
                                 if let support = MeditationSupport.support(for: meditation.id) {
@@ -97,7 +97,7 @@ struct MeditationListView: View {
 }
 
 struct MeditationCard: View {
-    let icon: String
+    let imageName: String
     let title: String
     let action: () -> Void
 
@@ -117,10 +117,17 @@ struct MeditationCard: View {
             action()
         }) {
             ZStack {
-                // Centered icon
-                Image(systemName: icon)
-                    .font(.system(size: 32, weight: .semibold))
-                    .foregroundColor(Color(hex: "F4EFFF"))
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+
+                LinearGradient(
+                    colors: [.black.opacity(0.62), .clear, .black.opacity(0.52)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
 
                 // Title avec étoile en haut à gauche
                 VStack {
@@ -147,13 +154,9 @@ struct MeditationCard: View {
             .frame(maxWidth: .infinity, minHeight: 160)
             .aspectRatio(1, contentMode: .fit)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(hex: "2A1E47"))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color(hex: "F4EFFF").opacity(0.3), lineWidth: 1)
-                    )
+                RoundedRectangle(cornerRadius: 16).fill(Color(hex: "2A1E47"))
             )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())

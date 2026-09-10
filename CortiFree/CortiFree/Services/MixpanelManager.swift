@@ -30,6 +30,7 @@ class MixpanelManager {
         // Firebase Analytics is auto-initialized with Firebase SDK
         // Just set user properties
         registerSuperProperties()
+        AmplitudeManager.shared.initialize()
 
         isInitialized = true
         #if DEBUG
@@ -59,6 +60,7 @@ class MixpanelManager {
     func identify(userId: String) {
         // Set Firebase user ID
         Analytics.setUserID(userId)
+        AmplitudeManager.shared.identify(userId: userId)
     }
 
     func setUserProfile(
@@ -85,6 +87,14 @@ class MixpanelManager {
         if let primaryGoal = primaryGoal {
             Analytics.setUserProperty(primaryGoal, forName: "primary_goal")
         }
+
+        var properties: [String: Any] = [:]
+        if let firstName { properties["first_name"] = firstName }
+        if let age { properties["age"] = age }
+        if let gender { properties["gender"] = gender }
+        if let globalScore { properties["global_score"] = globalScore }
+        if let primaryGoal { properties["primary_goal"] = primaryGoal }
+        AmplitudeManager.shared.setUserProperties(properties)
     }
 
     func updateUserProgress(
@@ -179,6 +189,16 @@ class MixpanelManager {
 
     func trackOnboardingWelcomeContinue(timeSpent: Double = 0) {
         track(event: "onboarding_welcome_clicked")
+    }
+
+    /// Canonical screen-level event for Amplitude funnels. Specific screen
+    /// events remain available for backwards-compatible Firebase dashboards.
+    func trackOnboardingScreenViewed(screenName: String, stepNumber: Int, totalSteps: Int) {
+        track(event: "onboarding_screen_viewed", properties: [
+            "screen_name": screenName,
+            "step_number": stepNumber,
+            "total_steps": totalSteps
+        ])
     }
 
     // 2. Overall Quiz (4 questions: raisons stress, durée stress, genre, âge)
@@ -438,7 +458,11 @@ class MixpanelManager {
         dailyRitualEnabled: Bool,
         weeklyReportEnabled: Bool
     ) {
-        // Pas nécessaire pour le funnel basique
+        track(event: "onboarding_notifications_permission_requested", properties: [
+            "streak_enabled": streakEnabled,
+            "daily_ritual_enabled": dailyRitualEnabled,
+            "weekly_report_enabled": weeklyReportEnabled
+        ])
     }
 
     func trackOnboardingNotificationPermissionsContinue(
@@ -446,11 +470,18 @@ class MixpanelManager {
         dailyRitualEnabled: Bool = false,
         weeklyReportEnabled: Bool = false
     ) {
-        track(event: "onboarding_notifications_clicked")
+        track(event: "onboarding_notifications_clicked", properties: [
+            "streak_enabled": streakEnabled,
+            "daily_ritual_enabled": dailyRitualEnabled,
+            "weekly_report_enabled": weeklyReportEnabled
+        ])
     }
 
     func trackOnboardingNotificationPermissionsGranted(granted: Bool) {
-        // Pas nécessaire pour le funnel basique
+        track(event: "onboarding_notifications_permission_result", properties: [
+            "granted": granted
+        ])
+        track(event: granted ? "onboarding_notifications_permission_granted" : "onboarding_notifications_permission_denied")
     }
 
     // 14. Habits Progress Flow
@@ -498,7 +529,10 @@ class MixpanelManager {
 
     // 17. Onboarding Completion (Paywall)
     func trackOnboardingCompletionViewed(quizAnswersCount: Int = 0, hasQuizData: Bool = false) {
-        track(event: "onboarding_paywall_viewed")
+        track(event: "onboarding_paywall_viewed", properties: [
+            "quiz_answers_count": quizAnswersCount,
+            "has_quiz_data": hasQuizData
+        ])
         // TikTok: ViewContent (paywall seen)
         TikTokManager.shared.trackViewContent()
         // PostHog
@@ -519,7 +553,18 @@ class MixpanelManager {
         age: Int? = nil,
         gender: String? = nil
     ) {
-        track(event: "onboarding_completed")
+        var properties: [String: Any] = [:]
+        if let totalTime { properties["total_time_seconds"] = totalTime }
+        if let quizGlobalScore { properties["quiz_global_score"] = quizGlobalScore }
+        if let selectedGoalsCount { properties["selected_goals_count"] = selectedGoalsCount }
+        if let notificationsEnabled { properties["notifications_enabled"] = notificationsEnabled }
+        if let userId { properties["user_id"] = userId }
+        if let firstName { properties["first_name"] = firstName }
+        if let age { properties["age"] = age }
+        if let gender { properties["gender"] = gender }
+        properties["current_streak"] = UserPersistence.streakDays
+        properties["best_streak"] = UserPersistence.bestStreak
+        track(event: "onboarding_completed", properties: properties)
     }
 
     // Onboarding Drop-off (plus nécessaire avec les funnels viewed/clicked)
@@ -582,6 +627,18 @@ class MixpanelManager {
             "skipped_count": skippedCount,
             "global_score": globalScore,
             "global_streak": globalStreak
+        ])
+    }
+
+    func trackDailyCheckInCompleted(mood: String, stress: Int, sleep: Int, energy: Int, hasNote: Bool) {
+        track(event: "daily_checkin_completed", properties: [
+            "mood": mood,
+            "stress": stress,
+            "sleep": sleep,
+            "energy": energy,
+            "has_note": hasNote,
+            "current_streak": UserPersistence.streakDays,
+            "best_streak": UserPersistence.bestStreak
         ])
     }
 
@@ -878,6 +935,11 @@ class MixpanelManager {
             Analytics.logEvent(event, parameters: nil)
         }
 
+        // Mirror the same canonical event and properties to Amplitude.
+        // Keeping this at the shared entry point covers the complete onboarding
+        // flow, including legacy screens that still call track(event:).
+        AmplitudeManager.shared.track(event: event, properties: properties.map { Dictionary(uniqueKeysWithValues: $0.map { ($0.key, $0.value) }) })
+
         // 2. ALSO send to Firestore for dashboard (with full data)
         Task {
             await sendToFirestore(event: event, properties: properties)
@@ -897,7 +959,8 @@ class MixpanelManager {
         var eventData: [String: Any] = [
             "event_name": event,
             "timestamp": Timestamp(date: Date()),
-            "user_id": Auth.auth().currentUser?.uid ?? "anonymous"
+            "user_id": Auth.auth().currentUser?.uid ?? "anonymous",
+            "source": "firebase_amplitude_bridge"
         ]
 
         // Add properties if available
@@ -926,11 +989,13 @@ class MixpanelManager {
         #if DEBUG
         print("[Analytics] ℹ️ Firebase Analytics auto-flushes, no manual flush needed")
         #endif
+        AmplitudeManager.shared.flush()
     }
 
     func reset() {
         // Reset Firebase Analytics user ID
         Analytics.setUserID(nil)
+        AmplitudeManager.shared.reset()
     }
 
     // MARK: - Purchase Tracking

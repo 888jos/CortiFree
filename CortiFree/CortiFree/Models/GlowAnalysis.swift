@@ -37,11 +37,27 @@ struct GlowOnboardingContext {
     let appearanceConcern: String
     let symptoms: [String]
     let reasons: [String]
+    let domainScore: Int?
 
     static let empty = GlowOnboardingContext(
         primaryGoal: "balance",
         appearanceConcern: "",
         symptoms: [],
-        reasons: []
+        reasons: [],
+        domainScore: nil
     )
+
+    init(
+        primaryGoal: String,
+        appearanceConcern: String,
+        symptoms: [String],
+        reasons: [String],
+        domainScore: Int? = nil
+    ) {
+        self.primaryGoal = primaryGoal
+        self.appearanceConcern = appearanceConcern
+        self.symptoms = symptoms
+        self.reasons = reasons
+        self.domainScore = domainScore
+    }
 }

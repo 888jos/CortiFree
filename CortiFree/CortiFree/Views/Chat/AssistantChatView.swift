@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 struct AssistantChatView: View {
     @Environment(\.dismiss) private var dismiss
@@ -6,9 +7,15 @@ struct AssistantChatView: View {
     @State private var draft = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var selectedRecommendation: AssistantRecommendation?
+    @State private var recommendationsByMessage: [Int: [AssistantRecommendation]] = [:]
+    @AppStorage("assistant.daily.date") private var assistantDailyDate = ""
+    @AppStorage("assistant.daily.usage") private var assistantDailyUsage = 0
+
+    private let dailyLimit = 12
 
     private let systemPrompt = """
-    You are the CortiFree wellness assistant. Be warm, concise, and practical. Your scope is broad everyday wellbeing: stress regulation, breathing, meditation, sleep routines, journaling, focus, energy, habits, and using the user's CortiFree plan. You may recommend exercises from CortiFree such as breathing, meditation, relaxing sounds, journaling, and the anti-stress flow. Never diagnose cortisol, anxiety, or medical conditions, interpret a face scan as medical evidence, or claim to measure cortisol. For urgent danger, self-harm, chest pain, severe breathing trouble, or other emergencies, tell the user to contact local emergency services. Politely redirect unrelated requests back to wellbeing.
+    You are the CortiFree wellness assistant. Respond in concise, formal prose with no markdown, bold text, or bullet lists. Use at most three short sentences. Give practical wellbeing guidance about stress, breathing, meditation, sleep, sounds, focus, energy, habits, journaling, and the CortiFree plan. Recommend only content that exists in CortiFree. Never diagnose cortisol, anxiety, or medical conditions, interpret a face scan as medical evidence, or claim to measure cortisol. For urgent danger, self-harm, chest pain, severe breathing trouble, or other emergencies, tell the user to contact local emergency services. Politely redirect unrelated requests back to wellbeing.
     """
 
     init() {
@@ -48,6 +55,10 @@ struct AssistantChatView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear { refreshDailyQuotaIfNeeded() }
+        .sheet(item: $selectedRecommendation) { recommendation in
+            recommendationDestination(for: recommendation)
+        }
     }
 
     private var header: some View {
@@ -82,8 +93,16 @@ struct AssistantChatView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(Array(messages.enumerated()), id: \.offset) { index, message in
-                        messageBubble(message)
-                            .id(index)
+                        VStack(alignment: .leading, spacing: 8) {
+                            messageBubble(message)
+
+                            if let recommendations = recommendationsByMessage[index] {
+                                ForEach(recommendations) { recommendation in
+                                    recommendationButton(recommendation)
+                                }
+                            }
+                        }
+                        .id(index)
                     }
                     if isLoading {
                         HStack(spacing: 8) {
@@ -190,6 +209,8 @@ struct AssistantChatView: View {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !isLoading else { return }
 
+        refreshDailyQuotaIfNeeded()
+
         draft = ""
         errorMessage = nil
         messages.append(DeepSeekChatMessage(role: "user", content: text))
@@ -204,6 +225,20 @@ struct AssistantChatView: View {
             return
         }
 
+        if isPlanCheckRequest(text) {
+            let responseIndex = messages.count
+            messages.append(DeepSeekChatMessage(role: "assistant", content: planCheckResponse))
+            recommendationsByMessage[responseIndex] = planRecommendations
+            return
+        }
+
+        guard assistantDailyUsage < dailyLimit else {
+            messages.append(DeepSeekChatMessage(role: "assistant", content: "I can continue helping later. For now, choose one of the exercises already available in CortiFree."))
+            return
+        }
+
+        assistantDailyUsage += 1
+
         isLoading = true
 
         Task {
@@ -214,7 +249,12 @@ struct AssistantChatView: View {
                 ] + messages
                 let response = try await DeepSeekChatService.shared.reply(to: requestMessages)
                 await MainActor.run {
-                    messages.append(DeepSeekChatMessage(role: "assistant", content: response))
+                    let responseIndex = messages.count
+                    messages.append(DeepSeekChatMessage(role: "assistant", content: cleanAssistantResponse(response)))
+                    let recommendations = recommendations(for: text)
+                    if !recommendations.isEmpty {
+                        recommendationsByMessage[responseIndex] = recommendations
+                    }
                     isLoading = false
                 }
             } catch {
@@ -228,9 +268,37 @@ struct AssistantChatView: View {
 
     private var appContext: String {
         let defaults = UserDefaults.standard
-        let routine = defaults.string(forKey: "selectedRoutineTitle") ?? "No routine title recorded"
+        let routineID = defaults.string(forKey: "selectedRoutineId") ?? ""
+        let selectedRoutine = Routine.routine(for: routineID)
+        let routine = selectedRoutine?.localizedName ?? defaults.string(forKey: "selectedRoutineTitle") ?? "No routine selected"
         let goal = defaults.string(forKey: "selected_goal") ?? defaults.string(forKey: "selectedGoal") ?? "No goal recorded"
-        return "Current local CortiFree context: routine=\(routine); goal=\(goal). Use this context only to personalize suggestions. Do not invent missing progress or plan details."
+        let steps = selectedRoutine?.steps.map { step in
+            let reference = step.referenceId.map { " [\($0)]" } ?? ""
+            return "\(step.type.rawValue)\(reference), \(max(1, step.duration / 60)) min"
+        }.joined(separator: "; ") ?? "No routine steps recorded"
+        return "Current local CortiFree plan: routine=\(routine); routine_id=\(routineID.isEmpty ? "none" : routineID); goal=\(goal); week=\(max(1, UserPersistence.currentWeek)); day=\(max(1, UserPersistence.currentDay)); steps=\(steps). This is the user's actual in-app plan context. Use it when answering plan questions. Never say the plan details are unavailable when this context is present. Do not invent progress."
+    }
+
+    private var selectedRoutine: Routine? {
+        guard let id = UserDefaults.standard.string(forKey: "selectedRoutineId") else { return nil }
+        return Routine.routine(for: id)
+    }
+
+    private var planCheckResponse: String {
+        guard let routine = selectedRoutine else {
+            return "Your CortiFree plan is ready to personalize. Choose a routine in CortiFree, then I can guide you through its next step."
+        }
+        let firstStep = routine.steps.first?.localizedInstruction ?? "your first planned exercise"
+        return "Your current plan is \(routine.localizedName), lasting \(routine.formattedDuration). It includes \(routine.steps.count) steps for \(routine.impactDomains.joined(separator: ", ")). Your next step is \(firstStep)."
+    }
+
+    private var planRecommendations: [AssistantRecommendation] {
+        [breathingRecommendation(.coherence), meditationRecommendation("mindfulness"), soundRecommendation("forest")]
+    }
+
+    private func isPlanCheckRequest(_ text: String) -> Bool {
+        let normalized = text.lowercased()
+        return normalized.contains("check my plan") || normalized.contains("current plan") || normalized.contains("mon plan") || normalized.contains("plan actuel")
     }
 
     private func isWithinWellbeingScope(_ text: String) -> Bool {
@@ -241,9 +309,137 @@ struct AssistantChatView: View {
 
     private func isEmergency(_ text: String) -> Bool {
         let normalized = text.lowercased()
-        let terms = ["suicide", "kill myself", "self harm", "self-harm", "can't breathe", "cannot breathe", "chest pain", "overdose"]
+        let terms = ["suicide", "kill myself", "self harm", "self-harm", "hurt myself", "can't breathe", "cannot breathe", "chest pain", "overdose"]
         return terms.contains { normalized.contains($0) }
     }
+
+    private func refreshDailyQuotaIfNeeded() {
+        let today = Self.dateKeyFormatter.string(from: Date())
+        guard assistantDailyDate != today else { return }
+        assistantDailyDate = today
+        assistantDailyUsage = 0
+    }
+
+    private func cleanAssistantResponse(_ response: String) -> String {
+        let lines = response
+            .replacingOccurrences(of: "**", with: "")
+            .components(separatedBy: .newlines)
+            .map { line in
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
+                    return String(trimmed.dropFirst(2))
+                }
+                return trimmed
+            }
+            .filter { !$0.isEmpty }
+        return String(lines.joined(separator: " ").prefix(520))
+    }
+
+    private func recommendations(for text: String) -> [AssistantRecommendation] {
+        let normalized = text.lowercased()
+
+        if normalized.contains("sleep") || normalized.contains("sommeil") || normalized.contains("insomnia") || normalized.contains("dormir") {
+            return [breathingRecommendation(.fourSevenEight), meditationRecommendation("yoga-nidra"), soundRecommendation("night")]
+        }
+
+        if normalized.contains("sound") || normalized.contains("son") || normalized.contains("noise") || normalized.contains("bruit") || normalized.contains("rain") || normalized.contains("pluie") {
+            return [soundRecommendation("rain"), soundRecommendation("ocean"), soundRecommendation("fire")]
+        }
+
+        if normalized.contains("focus") || normalized.contains("concentr") {
+            return [breathingRecommendation(.coherence), meditationRecommendation("focus-clarity"), soundRecommendation("whitenoise")]
+        }
+
+        return planRecommendations
+    }
+
+    private func breathingRecommendation(_ pattern: BreathingPattern) -> AssistantRecommendation {
+        AssistantRecommendation(id: "breathing-\(pattern.name)", title: pattern.displayName, subtitle: "Une respiration guidée adaptée à votre état du moment.", kind: .breathing(pattern))
+    }
+
+    private func meditationRecommendation(_ id: String) -> AssistantRecommendation {
+        let support = MeditationSupport.support(for: id)
+        return AssistantRecommendation(id: "meditation-\(id)", title: support?.localizedTitle ?? id, subtitle: support?.benefit ?? "Une méditation guidée pour retrouver un état plus stable.", kind: .meditation(id))
+    }
+
+    private func soundRecommendation(_ id: String) -> AssistantRecommendation {
+        let exercise = Exercise.sounds.first(where: { $0.id == id })
+        return AssistantRecommendation(id: "sound-\(id)", title: exercise?.title ?? id.capitalized, subtitle: exercise?.description ?? "Un son continu pour créer une ambiance calme.", kind: .sound(id))
+    }
+
+    private func recommendationButton(_ recommendation: AssistantRecommendation) -> some View {
+        Button {
+            if case .sound(let id) = recommendation.kind,
+               let exercise = Exercise.sounds.first(where: { $0.id == id }) {
+                SoundPlayer.shared.play(exercise: exercise)
+            } else {
+                selectedRecommendation = recommendation
+            }
+        } label: {
+            HStack(spacing: 12) {
+                Image("cortifree_assistant_avatar")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 42, height: 42)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(recommendation.title)
+                        .font(.custom("Poppins-SemiBold", size: 14))
+                        .foregroundStyle(.white)
+                    Text(recommendation.subtitle)
+                        .font(.custom("Poppins-Regular", size: 12))
+                        .foregroundStyle(.white.opacity(0.68))
+                        .multilineTextAlignment(.leading)
+                }
+
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .foregroundStyle(Color.appTheme)
+            }
+            .padding(12)
+            .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .padding(.leading, 0)
+    }
+
+    @ViewBuilder
+    private func recommendationDestination(for recommendation: AssistantRecommendation) -> some View {
+        switch recommendation.kind {
+        case .breathing(let pattern):
+            BreathingExerciseDetailView(pattern: pattern)
+        case .meditation(let id):
+            if let support = MeditationSupport.support(for: id) {
+                MeditationSupportView(support: support)
+            } else {
+                MeditationListView()
+            }
+        case .sound:
+            SoundsListView()
+        }
+    }
+
+    private static let dateKeyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+}
+
+private struct AssistantRecommendation: Identifiable {
+    enum Kind {
+        case breathing(BreathingPattern)
+        case meditation(String)
+        case sound(String)
+    }
+
+    let id: String
+    let title: String
+    let subtitle: String
+    let kind: Kind
 }
 
 #Preview {

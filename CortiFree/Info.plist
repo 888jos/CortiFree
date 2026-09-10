@@ -64,8 +64,6 @@
 	<string>appl_SfyPvLkFFQKWDdIDvePwFwccztX</string>
 	<key>SUPERWALL_API_KEY</key>
 	<string>pk_JPmmC0H5be4yqTnw24VTm</string>
-	<key>DEEPSEEK_API_KEY</key>
-	<string>$(DEEPSEEK_API_KEY)</string>
 	<key>TIKTOK_ACCESS_TOKEN</key>
 	<string>TTVa4hylh9udluAy3EyCN62raaaUC5jV</string>
 	<key>SKAdNetworkItems</key>

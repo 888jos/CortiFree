@@ -297,6 +297,9 @@
 "progress.journey.domain_empty" = "Complete an activity to start tracking this domain.";
 "daily_checkin.skip" = "Not now";
 "daily_checkin.eyebrow" = "Yesterday's check-in";
+"daily_checkin.mascot_mood" = "How are you feeling today? You can be completely honest with me.";
+"daily_checkin.mascot_recovery" = "Let’s check in with your body. How did you recharge?";
+"daily_checkin.mascot_reflection" = "Before we finish, is there anything you’d like to share with me?";
 "daily_checkin.mood_title" = "How did you feel?";
 "daily_checkin.mood_subtitle" = "Choose the feeling that best describes yesterday overall.";
 "daily_checkin.recovery_title" = "How did your body recover?";
@@ -3194,6 +3197,25 @@
 "onboarding_v2.reassurance.message_part1_female" = "You're not alone in this situation.";
 "onboarding_v2.reassurance.message_part1_neutral" = "You're not alone in this situation.";
 "onboarding_v2.reassurance.message_part2" = "CortiFree is built on behavioral psychology and nervous system regulation science.";
+"onboarding_v2.reassurance.personalized" = "You're looking for support with %@. At %@, and after dealing with this for %@, it makes sense that it's affecting your everyday life.";
+"onboarding_v2.reassurance.reason_sleep" = "sleep and rest";
+"onboarding_v2.reassurance.reason_anxiety" = "stress and anxiety";
+"onboarding_v2.reassurance.reason_energy" = "your energy";
+"onboarding_v2.reassurance.reason_focus" = "your focus";
+"onboarding_v2.reassurance.reason_mental" = "your mental well-being";
+"onboarding_v2.reassurance.reason_difficult" = "a difficult period";
+"onboarding_v2.reassurance.reason_habits" = "building healthier habits";
+"onboarding_v2.reassurance.age_under_18" = "your stage of life";
+"onboarding_v2.reassurance.age_18_24" = "18–24";
+"onboarding_v2.reassurance.age_25_34" = "25–34";
+"onboarding_v2.reassurance.age_35_44" = "35–44";
+"onboarding_v2.reassurance.age_45_54" = "45–54";
+"onboarding_v2.reassurance.age_55_plus" = "55 or over";
+"onboarding_v2.reassurance.duration_weeks" = "a few weeks";
+"onboarding_v2.reassurance.duration_2_6_months" = "2 to 6 months";
+"onboarding_v2.reassurance.duration_6_12_months" = "6 months to a year";
+"onboarding_v2.reassurance.duration_1_year_plus" = "more than a year";
+"onboarding_v2.reassurance.duration_years" = "several years";
 "onboarding_v2.reassurance.message_part3" = "Now, we'll do a quick quiz to better understand your situation and personalize your journey.";
 "onboarding_v2.reassurance.message_part4" = "Your responses are completely confidential. No one has access to them and they will never be sold or shared.";
 "onboarding_v2.reassurance.start_quiz" = "Start the quiz";
@@ -3590,6 +3612,7 @@
 "onboarding_v2.week_progress.transformation" = "Lasting transformation";
 
 // MARK: - Onboarding V2 - Notification Permissions
+"onboarding_v2.notifications.mascot_message" = "I'll remind you to practice so it becomes a habit!";
 "onboarding_v2.notifications.stay_motivated" = "Stay motivated every day";
 "onboarding_v2.notifications.gentle_reminders" = "Gentle reminders to maintain your progress";
 "onboarding_v2.notifications.personalized" = "Personalized reminders at your key moments";
@@ -4001,7 +4024,7 @@
 "first_launch.cortisol_word" = "cortisol.";
 "first_launch.cortisol_desc" = "The chronic stress hormone that stops\nyour body from recovering — even when you rest.";
 "first_launch.solution_pill" = "In 66 days, we can rebalance it.";
-"first_launch.cta_button" = "Analyze my cortisol";
+"first_launch.cta_button" = "Answer Milo";
 
 // MARK: - CustomPaywallView
 
@@ -4103,7 +4126,10 @@
 "paywall_custom.fallback_focus" = "Your focus returns, effortless flow state";
 "first_launch.cta_sub" = "Free quiz · 5 minutes";
 "editprofile.first_name_required" = "Enter a first name before saving your profile.";
-"first_launch.mascot_intro" = "I'm here to help you feel calmer and build a better daily rhythm.";
+"first_launch.mascot_intro" = "Hey, I'm Milo, your personal companion here to help you rediscover your glow, serenity, and focus. I have a few questions for you so I can create your personalized plan.";
+"first_launch.mascot_greeting" = "Hey, I'm Milo";
+"first_launch.mascot_role" = "Your personal guide to feel calmer, sleep better, and focus.";
+"first_launch.mascot_plan" = "Answer a few questions. I’ll create your plan.";
 "onboarding.mascot.overall" = "Let's start with a few questions so I can understand what you need most.";
 "onboarding.mascot.habits" = "There are no right or wrong answers. Tell me what your days actually feel like.";
 "onboarding.mascot.pattern" = "That helps me see your stress pattern more clearly.";
@@ -4111,23 +4137,30 @@
 "onboarding.mascot.plan" = "I'm putting your answers together so your plan feels personal to you.";
 
 // MARK: - Glow Scan
+"glow.intro.eyebrow" = "A gentle check-in";
 "glow.intro.title" = "Meet your Glow Profile";
 "glow.intro.body" = "Take an optional photo and connect it with your recovery habits to create a simple wellness snapshot. Your photo is not saved.";
+"glow.intro.benefit_one" = "See how your recovery is showing up today";
+"glow.intro.benefit_two" = "Get a snapshot shaped by your onboarding answers";
+"glow.intro.benefit_three" = "Your photo stays on your device";
 "glow.cta.start" = "Start my Glow Scan";
-"glow.capture.title" = "Take a quick photo";
-"glow.capture.body" = "Use natural light if you can. This is a wellness preview, not a medical assessment.";
-"glow.cta.take_photo" = "Take a photo";
+"glow.cta.skip" = "Skip for now";
+"glow.capture.eyebrow" = "Step 1 of 2";
+"glow.capture.title" = "Scan your face with guided movements";
+"glow.capture.body" = "Follow the prompts from left to center, then to right. Keep your face in the frame and use soft, even light.";
+"glow.capture.guide" = "We’ll guide you from left profile to center, then to right profile.";
+"glow.cta.take_photo" = "Start face scan";
 "glow.cta.choose_photo" = "Choose from library";
 "glow.debug.preview" = "DEBUG: Use preview scan";
-"glow.capture.camera_unavailable" = "Camera unavailable. Choose a photo from your library instead.";
-"glow.capture.camera_denied" = "Camera access is off. You can choose a photo from your library instead.";
+"glow.capture.camera_unavailable" = "Your camera is unavailable. You can choose a photo from your library instead.";
+"glow.capture.camera_denied" = "Camera access is off. Enable it in Settings to complete your guided face scan, or choose a photo from your library.";
 "glow.analyzing.title" = "Building your Glow Profile";
 "glow.analyzing.step.one" = "Preparing your wellness snapshot...";
 "glow.analyzing.step.two" = "Reviewing your recovery inputs...";
 "glow.analyzing.step.three" = "Connecting your habits to your routine...";
 "glow.analyzing.step.four" = "Your Glow Profile is ready.";
 "glow.results.eyebrow" = "Your wellness snapshot";
-"glow.results.title" = "Your Glow Score";
+"glow.results.title" = "Your CortiFree Score";
 "glow.results.out_of" = "out of 100";
 "glow.results.body" = "A gentle estimate based on your onboarding answers and today's check-in. It is not a diagnosis.";
 "glow.results.insights" = "Your insights";

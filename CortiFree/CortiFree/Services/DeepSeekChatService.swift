@@ -26,35 +26,19 @@ final class DeepSeekChatService {
     static let shared = DeepSeekChatService()
     private init() {}
 
-    private struct RequestBody: Encodable {
-        let model: String
-        let messages: [DeepSeekChatMessage]
-        let temperature: Double
-        let stream: Bool
-    }
-
     private struct ResponseBody: Decodable {
-        struct Choice: Decodable {
-            let message: DeepSeekChatMessage
-        }
-        let choices: [Choice]
+        let content: String
     }
 
     func reply(to messages: [DeepSeekChatMessage]) async throws -> String {
-        guard let apiKey = APIConfig.shared.deepSeekAPIKey else {
+        guard let endpoint = URL(string: "https://us-central1-cortifree-app.cloudfunctions.net/deepSeekChat") else {
             throw DeepSeekChatError.notConfigured
         }
 
-        var request = URLRequest(url: URL(string: "https://api.deepseek.com/chat/completions")!)
+        var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try JSONEncoder().encode(RequestBody(
-            model: "deepseek-chat",
-            messages: messages,
-            temperature: 0.6,
-            stream: false
-        ))
+        request.httpBody = try JSONEncoder().encode(["messages": messages])
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -66,10 +50,9 @@ final class DeepSeekChatService {
         }
 
         let decoded = try JSONDecoder().decode(ResponseBody.self, from: data)
-        guard let content = decoded.choices.first?.message.content,
-              !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard !decoded.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw DeepSeekChatError.invalidResponse
         }
-        return content
+        return decoded.content
     }
 }

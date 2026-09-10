@@ -72,6 +72,8 @@ fastlane/test_output
 # Uncomment these if you don't want to commit sensitive files
 # GoogleService-Info.plist
 # .env
+functions/node_modules/
+functions/.env*
 
 # Claude Code
 .claude/

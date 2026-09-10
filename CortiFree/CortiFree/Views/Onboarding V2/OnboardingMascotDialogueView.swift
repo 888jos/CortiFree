@@ -22,9 +22,12 @@ struct OnboardingMascotDialogueView: View {
                 .font(.poppinsSemiBold(prominent ? 19 : 17))
                 .foregroundStyle(Color(hex: "1A1A4E"))
                 .multilineTextAlignment(.leading)
-                .lineSpacing(2)
+                .lineSpacing(0)
+                .lineLimit(4)
+                .minimumScaleFactor(0.58)
+                .allowsTightening(true)
                 .padding(.horizontal, prominent ? 24 : 22)
-                .padding(.vertical, 12)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, minHeight: bubbleHeight, maxHeight: bubbleHeight, alignment: .center)
                 .background {
                     ZStack(alignment: .leading) {

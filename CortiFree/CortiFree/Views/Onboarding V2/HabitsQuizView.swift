@@ -13,9 +13,10 @@
 import SwiftUI
 
 private enum HabitsQuizIntermission {
-    case earlyPattern
-    case preliminaryProfile
+    case breathingIntro
+    case facialScan
     case cortiFreeComparison
+    case notifications
 }
 
 struct HabitsQuizView: View {
@@ -96,19 +97,22 @@ struct HabitsQuizView: View {
     @ViewBuilder
     private func intermissionView(_ intermission: HabitsQuizIntermission) -> some View {
         switch intermission {
-        case .earlyPattern:
-            HabitsQuizInsightView(
-                mode: .earlyPattern,
-                answers: answers,
-                onBack: returnToCurrentQuestion,
-                onContinue: continueAfterIntermission
+        case .breathingIntro:
+            OnboardingBreathingIntroView(
+                onContinue: continueAfterIntermission,
+                onBack: returnToCurrentQuestion
             )
-        case .preliminaryProfile:
-            HabitsQuizInsightView(
-                mode: .preliminaryProfile,
-                answers: answers,
-                onBack: returnToCurrentQuestion,
-                onContinue: continueAfterIntermission
+        case .facialScan:
+            GlowScanFlowView(
+                context: GlowOnboardingContext(
+                    primaryGoal: "balance",
+                    appearanceConcern: appearanceConcern(for: answers[8]),
+                    symptoms: [],
+                    reasons: [],
+                    domainScore: HabitsQuizResult(answers: answers).cortiFreeScore
+                ),
+                onComplete: continueAfterIntermission,
+                onExit: continueAfterIntermission
             )
         case .cortiFreeComparison:
             CortiFreeComparisonView(
@@ -116,6 +120,11 @@ struct HabitsQuizView: View {
                 onBack: returnToCurrentQuestion,
                 onContinue: continueAfterIntermission
             )
+        case .notifications:
+            NotificationPermissionsView(onContinue: {
+                activeIntermission = nil
+                calculateAndComplete()
+            })
         }
     }
 
@@ -253,11 +262,13 @@ struct HabitsQuizView: View {
                             let intermission: HabitsQuizIntermission?
                             switch currentQuestionIndex {
                             case 2:
-                                intermission = .earlyPattern
-                            case 7:
-                                intermission = .preliminaryProfile
+                                intermission = .breathingIntro
+                            case 8:
+                                intermission = .facialScan
                             case 9:
                                 intermission = .cortiFreeComparison
+                            case 11:
+                                intermission = .notifications
                             default:
                                 intermission = nil
                             }
@@ -278,6 +289,11 @@ struct HabitsQuizView: View {
         .disabled(isTransitioning)
         .padding(.horizontal, 34)
         .padding(.bottom, 40)
+    }
+
+    private func appearanceConcern(for answerIndex: Int) -> String {
+        let concerns = ["Feeling good in my skin", "A few imperfections", "Visible fatigue", "Dark circles and dull complexion"]
+        return concerns[safe: answerIndex] ?? concerns[0]
     }
 
     // MARK: - Navigation
@@ -616,6 +632,17 @@ struct HabitsQuizResult {
     /// Score global (moyenne des 4 domaines)
     var globalScore: Int {
         (stressScore + sleepScore + energyScore + focusScore) / 4
+    }
+
+    /// Unified pre-scan score. Balance is derived from serenity and focus,
+    /// so it receives a smaller weight to avoid counting those domains twice.
+    var cortiFreeScore: Int {
+        let weighted = Double(stressScore) * 0.22
+            + Double(sleepScore) * 0.22
+            + Double(energyScore) * 0.22
+            + Double(focusScore) * 0.22
+            + Double(balanceScore) * 0.12
+        return Int(weighted.rounded())
     }
 
     /// Score d'équilibre (stress + focus)

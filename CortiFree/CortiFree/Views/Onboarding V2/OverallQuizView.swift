@@ -221,7 +221,7 @@ struct OverallQuizView: View {
     private var genderQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(spacing: 16) {
-                HStack(spacing: 12) {
+                HStack(spacing: 28) {
                     OverallIdentityCard(
                         imageName: "onboarding_identity_male",
                         title: "onboarding_v2.overall.gender_male".localized,
@@ -240,7 +240,8 @@ struct OverallQuizView: View {
                     }
                     .frame(width: genderCardWidth)
                 }
-                .frame(height: 224)
+                .frame(height: 190)
+                .frame(maxWidth: .infinity)
 
                 OverallAnswerButton(
                     number: 3,
@@ -259,7 +260,9 @@ struct OverallQuizView: View {
 
     private var genderCardWidth: CGFloat {
         let availableWidth = UIScreen.main.bounds.width - 48
-        return max(0, (availableWidth - 12) / 2)
+        // Keep both identity cards narrower than the answer buttons so the
+        // larger gap never changes the progress/header layout.
+        return max(0, ((availableWidth - 20 - 16) / 2) * 0.8)
     }
 
     // MARK: - Question 2: Age
@@ -490,14 +493,17 @@ struct OverallQuizView: View {
             "onboarding_v2.overall.age_45_54".localized,
             "onboarding_v2.overall.age_55_plus".localized
         ]
+        let ageCodes = ["under_18", "18_24", "25_34", "35_44", "45_54", "55_plus"]
         let reasonOptions = [
             "onboarding_v2.overall.reason_sleep".localized,
             "onboarding_v2.overall.reason_anxiety".localized,
             "onboarding_v2.overall.reason_energy".localized,
+            "onboarding_v2.overall.reason_focus".localized,
             "onboarding_v2.overall.reason_mental".localized,
             "onboarding_v2.overall.reason_difficult".localized,
             "onboarding_v2.overall.reason_habits".localized
         ]
+        let reasonCodes = ["sleep", "anxiety", "energy", "focus", "mental", "difficult", "habits"]
         let durationOptions = [
             "onboarding_v2.overall.duration_weeks".localized,
             "onboarding_v2.overall.duration_2_6_months".localized,
@@ -505,6 +511,7 @@ struct OverallQuizView: View {
             "onboarding_v2.overall.duration_1_year_plus".localized,
             "onboarding_v2.overall.duration_years".localized
         ]
+        let durationCodes = ["weeks", "2_6_months", "6_12_months", "1_year_plus", "years"]
 
         let genderIndex = selectedGender ?? 2
         let genderCode = ["male", "female", "other"][genderIndex]
@@ -515,9 +522,12 @@ struct OverallQuizView: View {
             gender: genderOptions[genderIndex],
             genderCode: genderCode,
             age: ageOptions[selectedAge ?? 0],
+            ageCode: ageCodes[selectedAge ?? 0],
             acquisitionChannel: nil,
             reasons: selectedReasonTexts,
-            duration: durationOptions[selectedDuration ?? 0]
+            reasonCodes: selectedReasons.sorted().map { reasonCodes[$0] },
+            duration: durationOptions[selectedDuration ?? 0],
+            durationCode: durationCodes[selectedDuration ?? 0]
         )
 
         // Track quiz completion
@@ -644,13 +654,13 @@ struct OverallIdentityCard: View {
                         .resizable()
                         .scaledToFill()
                         .frame(maxWidth: .infinity)
-                        .frame(height: 176)
+                        .frame(height: 141)
                         .clipped()
 
                     if isSelected {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 24, weight: .semibold))
-                            .foregroundStyle(Color(hex: "67DB3D"), .black)
+                            .foregroundStyle(Color(hex: "FF6B9D"), .black)
                             .padding(10)
                     }
                 }
@@ -666,7 +676,7 @@ struct OverallIdentityCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .stroke(isSelected ? Color(hex: "67DB3D") : Color(hex: "4CC6FF").opacity(0.45), lineWidth: isSelected ? 3 : 1)
+                    .stroke(isSelected ? Color(hex: "FF6B9D") : Color(hex: "4CC6FF").opacity(0.45), lineWidth: isSelected ? 3 : 1)
             }
         }
         .buttonStyle(.plain)
@@ -681,9 +691,12 @@ struct OverallQuizData {
     let gender: String
     let genderCode: String
     let age: String
+    let ageCode: String
     let acquisitionChannel: String?
     let reasons: [String]
+    let reasonCodes: [String]
     let duration: String
+    let durationCode: String
 }
 
 // MARK: - Preview

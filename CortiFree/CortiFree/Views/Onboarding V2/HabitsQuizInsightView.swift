@@ -36,10 +36,12 @@ struct HabitsQuizInsightView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 26) {
                         VStack(spacing: 12) {
-                            Text(titleKey.localized)
-                                .font(.faroBold(30))
-                                .foregroundStyle(.white)
-                                .multilineTextAlignment(.center)
+                            if mode == .earlyPattern {
+                                Text(titleKey.localized)
+                                    .font(.faroBold(30))
+                                    .foregroundStyle(.white)
+                                    .multilineTextAlignment(.center)
+                            }
 
                             Text(subtitleKey.localized)
                                 .font(.custom("Poppins-Regular", size: 15))
@@ -195,7 +197,7 @@ struct HabitsQuizInsightView: View {
                     labelKey: "onboarding_v2.insight.metric.sleep",
                     icon: "bed.double.fill",
                     score: score(forQuestion: 2),
-                    color: Color(hex: "67DB3D"),
+                    color: Color(hex: "FF6B9D"),
                     priorityKey: "onboarding_v2.insight.pattern.priority.sleep"
                 )
             ]
@@ -231,7 +233,7 @@ struct HabitsQuizInsightView: View {
                     labelKey: "onboarding_v2.insight.metric.focus",
                     icon: "scope",
                     score: result.focusScore,
-                    color: Color(hex: "67DB3D"),
+                    color: Color(hex: "FF6B9D"),
                     priorityKey: "onboarding_v2.insight.profile.priority.focus"
                 )
             ]

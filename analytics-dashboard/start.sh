@@ -35,4 +35,4 @@ sleep 2 && open "http://localhost:8000/cortifree-analytics.html" &
 
 # Lancer le serveur Python
 cd "$DIR"
-python3 -m http.server 8000
+python3 dashboard_server.py --port 8000

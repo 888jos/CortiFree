@@ -77,7 +77,7 @@ struct RevenueCatPaywallView: View {
             VStack(spacing: 24) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 80))
-                    .foregroundColor(.green)
+                    .foregroundColor(Color(hex: "FF6B9D"))
 
                 Text(languageManager.currentLanguage == .french ?
                      "Vous êtes Premium !" :

@@ -78,7 +78,7 @@ struct OnboardingV2FlowView: View {
             case .authentication, .loading:
                 return .authentication
             case .cortiFreeRating, .glowScan, .eightHabitsIntro, .weekProgress:
-                return .cortiFreeRating
+                return .eightHabitsIntro
             case .eightHabits, .notificationPermissions, .habitsProgress, .commitmentPledge:
                 return .eightHabits
             case .socialProof, .complete:
@@ -92,17 +92,6 @@ struct OnboardingV2FlowView: View {
             currentStepView
                 .id(currentStep)
                 .transition(.opacity)
-
-            if mascotMessage != nil {
-                VStack {
-                    OnboardingMascotDialogueView(message: mascotMessage ?? "")
-                        .padding(.horizontal, 18)
-                        .padding(.top, 8)
-                    Spacer()
-                }
-                .allowsHitTesting(false)
-                .zIndex(20)
-            }
         }
         .animation(.easeInOut(duration: 0.3), value: currentStep)
         .onAppear {
@@ -121,11 +110,13 @@ struct OnboardingV2FlowView: View {
             // Resume from checkpoint or paywall if applicable
             resumeFromCheckpoint()
             markOnboardingSessionActive()
+            trackOnboardingScreen(currentStep)
         }
         .onChange(of: currentStep) { _, newStep in
             // Save checkpoint when step changes
             saveCheckpoint(newStep)
             persistLiveActivityProgress(newStep)
+            trackOnboardingScreen(newStep)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .inactive || newPhase == .background {
@@ -152,21 +143,6 @@ struct OnboardingV2FlowView: View {
             .zIndex(1_000)
         }
         #endif
-    }
-
-    private var mascotMessage: String? {
-        switch currentStep {
-        case .overall, .habitsQuiz:
-            return nil
-        case .stressPatternValidation:
-            return "onboarding.mascot.pattern".localized
-        case .symptomChecker:
-            return nil
-        case .cortisolScienceHook, .sixtyDayExplanation, .scientificPlan:
-            return "onboarding.mascot.plan".localized
-        default:
-            return nil
-        }
     }
 
     // MARK: - Checkpoint Management
@@ -207,6 +183,15 @@ struct OnboardingV2FlowView: View {
         persistLiveActivityProgress(currentStep)
     }
 
+    private func trackOnboardingScreen(_ step: OnboardingStep) {
+        let stepNumber = (OnboardingStep.allCases.firstIndex(of: step) ?? 0) + 1
+        MixpanelManager.shared.trackOnboardingScreenViewed(
+            screenName: step.rawValue,
+            stepNumber: stepNumber,
+            totalSteps: OnboardingStep.allCases.count
+        )
+    }
+
     private func persistLiveActivityProgress(_ step: OnboardingStep) {
         let stepIndex = (OnboardingStep.allCases.firstIndex(of: step) ?? 0) + 1
         UserDefaults.standard.set(stepIndex, forKey: "onboarding_live_activity_step")
@@ -238,7 +223,9 @@ struct OnboardingV2FlowView: View {
     private func skipOnboardingToHome() {
         suppressDropOffLiveActivity = true
         UserDefaults.standard.set(false, forKey: "onboarding_session_active")
+        UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
         OnboardingLiveActivityManager.shared.end()
+        isOnboardingComplete = true
         debugSkipOnboardingToHome = true
     }
     #endif
@@ -259,7 +246,7 @@ struct OnboardingV2FlowView: View {
 
         case .reassurance:
             ReassuranceView(
-                gender: overallQuizData?.genderCode,
+                overallData: overallQuizData,
                 onStartQuiz: {
                     currentStep = .habitsQuiz
                 }
@@ -329,17 +316,19 @@ struct OnboardingV2FlowView: View {
             )
 
         case .loading:
-            LoadingAnalysisView(onComplete: {
-                currentStep = .cortiFreeRating
-            })
-
-        case .cortiFreeRating:
-            CortiFreeRatingView(
-                habitsQuizResult: habitsQuizResult ?? HabitsQuizResult(answers: Array(repeating: 0, count: 12)),
-                onContinue: {
-                    currentStep = .glowScan
+            LoadingAnalysisView(
+                habitsQuizResult: habitsQuizResult,
+                selectedSymptoms: selectedSymptoms,
+                onComplete: {
+                    currentStep = .eightHabitsIntro
                 }
             )
+
+        case .cortiFreeRating:
+            // Legacy checkpoint compatibility: skip the deprecated rating screen.
+            EightHabitsIntroView(onContinue: {
+                currentStep = .weekProgress
+            })
 
         case .glowScan:
             GlowScanFlowView(
@@ -347,13 +336,14 @@ struct OnboardingV2FlowView: View {
                     primaryGoal: habitsQuizResult?.primaryGoal ?? "balance",
                     appearanceConcern: habitsQuizResult?.appearanceConcern ?? "",
                     symptoms: Array(selectedSymptoms),
-                    reasons: overallQuizData?.reasons ?? []
+                    reasons: overallQuizData?.reasons ?? [],
+                    domainScore: habitsQuizResult?.cortiFreeScore
                 ),
                 onComplete: {
-                    currentStep = .eightHabitsIntro
+                    currentStep = .stressPatternValidation
                 },
                 onExit: {
-                    currentStep = .cortiFreeRating
+                    currentStep = .stressPatternValidation
                 }
             )
 
@@ -419,18 +409,26 @@ struct OnboardingV2FlowView: View {
 
     private func continueAfterNotificationPermissionCheck() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let permissionIsGranted: Bool
             switch settings.authorizationStatus {
             case .authorized, .provisional, .ephemeral:
-                permissionIsGranted = true
-            case .denied, .notDetermined:
-                permissionIsGranted = false
+                DispatchQueue.main.async {
+                    currentStep = .habitsProgress
+                }
+            case .notDetermined:
+                DispatchQueue.main.async {
+                    currentStep = .notificationPermissions
+                }
+            case .denied:
+                // A previous denial is handled later in the main app, not by
+                // repeatedly interrupting the onboarding flow.
+                UserDefaults.standard.set(false, forKey: "notificationsEnabled")
+                DispatchQueue.main.async {
+                    currentStep = .habitsProgress
+                }
             @unknown default:
-                permissionIsGranted = false
-            }
-
-            DispatchQueue.main.async {
-                currentStep = permissionIsGranted ? .habitsProgress : .notificationPermissions
+                DispatchQueue.main.async {
+                    currentStep = .habitsProgress
+                }
             }
         }
     }
@@ -535,4 +533,241 @@ struct OnboardingV2FlowView: View {
 
 #Preview {
     OnboardingV2FlowView()
+}
+
+// MARK: - Breathing introduction
+
+/// A short, skippable first exercise that lets users experience the core loop
+/// before answering the onboarding questions.
+struct OnboardingBreathingIntroView: View {
+    let onContinue: () -> Void
+    let onBack: () -> Void
+
+    @StateObject private var planetSettings = PlanetSettings.shared
+    @State private var isStarted = false
+    @State private var hasSeenIntro = false
+    @State private var isComplete = false
+    @State private var elapsedSeconds = 0
+    @State private var circleScale: CGFloat = 0.82
+    @State private var breathGeneration = 0
+    @State private var hasExited = false
+
+    private let duration = 30
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        ZStack {
+            GalaxyBackgroundView(intensity: 0.9)
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                header
+
+                if hasSeenIntro {
+                    exerciseContent
+                } else {
+                    introductionContent
+                }
+
+                VStack(spacing: 12) {
+                    if !isStarted || isComplete {
+                        Button(action: primaryAction) {
+                            Text(primaryTitle)
+                                .font(.poppinsSemiBold(17))
+                                .foregroundStyle(Color(hex: "1A1A4E"))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 24)
+                    }
+
+                    if !isComplete {
+                        Button("Skip") {
+                            HapticManager.light()
+                            exitToNextStep()
+                        }
+                        .font(.poppinsMedium(14))
+                        .foregroundStyle(.white.opacity(0.62))
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.bottom, 34)
+            }
+        }
+        .onReceive(timer) { _ in
+            guard isStarted, !isComplete else { return }
+            elapsedSeconds += 1
+            if elapsedSeconds >= duration {
+                isComplete = true
+                circleScale = 1.0
+                HapticManager.medium()
+            }
+        }
+        .onChange(of: isStarted) { _, started in
+            guard started else { return }
+            startBreathingCycle()
+        }
+    }
+
+    private var introductionContent: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 30)
+
+            LottieView(filename: "sloth_intro.json", loopMode: .loop)
+                .frame(width: 132, height: 132)
+                .accessibilityHidden(true)
+
+            Text("Take a calmer moment")
+                .font(.faroBold(29))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .padding(.top, 18)
+
+            Text("Take a slow breath with me. We’ll begin with one simple step.")
+                .font(.poppinsRegular(16))
+                .foregroundStyle(.white.opacity(0.72))
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.horizontal, 30)
+                .padding(.top, 10)
+
+            Spacer()
+        }
+    }
+
+    private var exerciseContent: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 20)
+
+            VStack(spacing: 8) {
+                Text(isComplete ? "Nice work" : "Take a breath")
+                    .font(.faroBold(30))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+
+                Text(isComplete ? "You just created a calm moment." : "Follow the circle: breathe in for 4 seconds, then out for 6.")
+                    .font(.poppinsRegular(16))
+                    .foregroundStyle(.white.opacity(0.72))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 28)
+            }
+
+            Spacer(minLength: 18)
+
+            ZStack {
+                BreathingCircle(
+                    planet: planetSettings.selectedPlanet,
+                    size: 270,
+                    haloOpacity: isStarted ? 0.5 : 0.3
+                )
+                .scaleEffect(circleScale)
+
+                VStack(spacing: 5) {
+                    Text(isStarted ? phaseTitle : "Ready?")
+                        .font(.faroBold(25))
+                        .foregroundStyle(.white)
+
+                    Text(isStarted ? timeText : "4 in / 6 out")
+                        .font(.poppinsMedium(16))
+                        .foregroundStyle(.white.opacity(0.78))
+                        .monospacedDigit()
+                }
+            }
+            // The breathing animation is contained inside a fixed frame, so
+            // the header and CTA never move when the circle expands.
+            .frame(width: 300, height: 300)
+
+            Spacer()
+        }
+    }
+
+    private var header: some View {
+        HStack {
+            Button {
+                HapticManager.light()
+                onBack()
+            } label: {
+                Image(systemName: "arrow.left")
+                    .font(.system(size: 21, weight: .medium))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Back")
+
+            Spacer()
+
+            if !isStarted {
+                Button("Skip") {
+                    HapticManager.light()
+                    exitToNextStep()
+                }
+                .font(.poppinsMedium(14))
+                .foregroundStyle(.white.opacity(0.72))
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.top, 14)
+    }
+
+    private var primaryTitle: String {
+        if isComplete { return "Continue" }
+        return "Begin breathing (30s)"
+    }
+
+    private func exitToNextStep() {
+        guard !hasExited else { return }
+        hasExited = true
+        onContinue()
+    }
+
+    private var phaseTitle: String {
+        elapsedSeconds % 10 < 4 ? "Inhale" : "Exhale"
+    }
+
+    private var timeText: String {
+        String(format: "00:%02d", max(duration - elapsedSeconds, 0))
+    }
+
+    private func primaryAction() {
+        HapticManager.light()
+        if isComplete {
+            onContinue()
+        } else if !hasSeenIntro {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                hasSeenIntro = true
+            }
+        } else if !isStarted {
+            isStarted = true
+        }
+    }
+
+    private func startBreathingCycle() {
+        breathGeneration += 1
+        animateInhale(generation: breathGeneration)
+    }
+
+    private func animateInhale(generation: Int) {
+        guard isStarted, !isComplete, generation == breathGeneration else { return }
+        withAnimation(.easeInOut(duration: 4)) {
+            circleScale = 1.0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            animateExhale(generation: generation)
+        }
+    }
+
+    private func animateExhale(generation: Int) {
+        guard isStarted, !isComplete, generation == breathGeneration else { return }
+        withAnimation(.easeInOut(duration: 6)) {
+            circleScale = 0.82
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+            animateInhale(generation: generation)
+        }
+    }
 }

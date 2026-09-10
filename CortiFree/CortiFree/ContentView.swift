@@ -56,12 +56,13 @@ struct ContentView: View {
                         Image("cortifree_assistant_avatar")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 84, height: 84)
+                            .frame(width: 96, height: 96)
                             .scaleEffect(assistantPulse ? 1.025 : 1.0)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Open CortiFree Assistant")
-                    .offset(x: -12, y: -44)
+                    // Keep the floating assistant fully above the navigation bar.
+                    .offset(x: -10, y: -104)
                 }
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
@@ -81,6 +82,8 @@ struct ContentView: View {
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isAssistantPresented) {
             AssistantChatView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {

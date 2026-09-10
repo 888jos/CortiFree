@@ -17,11 +17,13 @@ struct GlowScanFlowView: View {
     @State private var screen: Screen = .intro
     @State private var capturedImage: UIImage?
     @State private var showPicker = false
+    @State private var showLiveScanner = false
     @State private var pickerSource: UIImagePickerController.SourceType = .photoLibrary
     @State private var permissionMessage = ""
     @State private var analysis: GlowAnalysis?
     @State private var analysisProgress = 0
     @State private var analysisTask: Task<Void, Never>?
+    @State private var hasExited = false
 
     private let analyzer = LocalGlowAnalysisService()
 
@@ -55,6 +57,18 @@ struct GlowScanFlowView: View {
         .sheet(isPresented: $showPicker) {
             ImagePicker(image: $capturedImage, sourceType: pickerSource)
         }
+        .fullScreenCover(isPresented: $showLiveScanner) {
+            GlowCameraScannerView(
+                onComplete: { image in
+                    showLiveScanner = false
+                    capturedImage = image
+                },
+                onSkip: {
+                    showLiveScanner = false
+                    beginAnalysis(image: nil, source: "camera_skipped")
+                }
+            )
+        }
         .onChange(of: capturedImage) { _, image in
             guard let image else { return }
             beginAnalysis(image: image, source: pickerSource == .camera ? "camera" : "library")
@@ -67,23 +81,40 @@ struct GlowScanFlowView: View {
 
     private var introView: some View {
         pageScaffold {
-            Spacer(minLength: 30)
-            Image(systemName: "sparkles.rectangle.stack.fill")
-                .font(.system(size: 74, weight: .light))
-                .foregroundStyle(Color(hex: "B794F6"))
-                .padding(.bottom, 28)
+            Spacer(minLength: 24)
+            Image("glow_scan_hero")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .frame(height: 360)
+                .padding(.horizontal, 4)
+                .padding(.bottom, 8)
 
             Text(NSLocalizedString("glow.intro.title", comment: ""))
                 .font(.faroBold(34))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
             Text(NSLocalizedString("glow.intro.body", comment: ""))
                 .font(.poppinsRegular(16))
                 .foregroundStyle(.white.opacity(0.78))
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 16)
+
+            glowTrustBadges
+
+            VStack(alignment: .leading, spacing: 14) {
+                glowBenefit("checkmark.circle.fill", key: "glow.intro.benefit_one")
+                glowBenefit("sparkles", key: "glow.intro.benefit_two")
+                glowBenefit("lock.shield.fill", key: "glow.intro.benefit_three")
+            }
+            .padding(18)
+            .background(Color(hex: "1A1A4E").opacity(0.68))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .padding(.top, 24)
 
             Spacer()
 
@@ -96,29 +127,26 @@ struct GlowScanFlowView: View {
 
     private var captureView: some View {
         pageScaffold {
+            Text(NSLocalizedString("glow.capture.eyebrow", comment: ""))
+                .font(.poppinsSemiBold(13))
+                .foregroundStyle(Color(hex: "B794F6"))
+                .textCase(.uppercase)
+                .padding(.bottom, 8)
+
             Text(NSLocalizedString("glow.capture.title", comment: ""))
                 .font(.faroBold(30))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
             Text(NSLocalizedString("glow.capture.body", comment: ""))
                 .font(.poppinsRegular(15))
                 .foregroundStyle(.white.opacity(0.72))
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 12)
 
-            ZStack {
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(Color(hex: "1A1A4E").opacity(0.72))
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(Color.white.opacity(0.65), lineWidth: 2)
-                Image(systemName: "person.crop.rectangle")
-                    .font(.system(size: 88, weight: .thin))
-                    .foregroundStyle(.white.opacity(0.78))
-            }
-            .frame(maxWidth: 310)
-            .aspectRatio(0.82, contentMode: .fit)
-            .padding(.vertical, 26)
+            scannerGuide
 
             if !permissionMessage.isEmpty {
                 Text(permissionMessage)
@@ -159,16 +187,26 @@ struct GlowScanFlowView: View {
 
     private var analyzingView: some View {
         pageScaffold {
-            Spacer()
-            Image(systemName: "sparkles")
-                .font(.system(size: 60, weight: .light))
-                .foregroundStyle(Color(hex: "B794F6"))
-                .symbolEffect(.pulse, isActive: !reduceMotion)
+            Spacer(minLength: 24)
+            ZStack {
+                Circle()
+                    .stroke(Color(hex: "B794F6").opacity(0.2), lineWidth: 12)
+                Circle()
+                    .trim(from: 0, to: CGFloat(analysisProgress + 1) / 4)
+                    .stroke(Color(hex: "D4B4FF"), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeInOut, value: analysisProgress)
+                Image(systemName: "face.smiling")
+                    .font(.system(size: 54, weight: .light))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: 170, height: 170)
 
             Text(NSLocalizedString("glow.analyzing.title", comment: ""))
                 .font(.faroBold(30))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 28)
 
             Text(analysisMessage)
@@ -177,10 +215,16 @@ struct GlowScanFlowView: View {
                 .multilineTextAlignment(.center)
                 .padding(.top, 12)
 
-            ProgressView(value: Double(analysisProgress), total: 4)
-                .tint(Color(hex: "B794F6"))
-                .padding(.horizontal, 48)
-                .padding(.top, 28)
+            VStack(alignment: .leading, spacing: 13) {
+                analysisStep("glow.analyzing.step.one", index: 0)
+                analysisStep("glow.analyzing.step.two", index: 1)
+                analysisStep("glow.analyzing.step.three", index: 2)
+                analysisStep("glow.analyzing.step.four", index: 3)
+            }
+            .padding(20)
+            .background(Color(hex: "1A1A4E").opacity(0.68))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .padding(.top, 26)
             Spacer()
         }
     }
@@ -197,6 +241,8 @@ struct GlowScanFlowView: View {
                     Text(NSLocalizedString("glow.results.title", comment: ""))
                         .font(.faroBold(34))
                         .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(.top, 10)
 
                     scoreView
@@ -243,6 +289,7 @@ struct GlowScanFlowView: View {
                 .font(.faroBold(32))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 24)
 
             Text(NSLocalizedString("glow.reset.body", comment: ""))
@@ -278,7 +325,7 @@ struct GlowScanFlowView: View {
             HStack {
                 Button {
                     HapticManager.light()
-                    if screen == .intro { onExit() } else if screen == .capture { screen = .intro } else if screen == .results { screen = .capture } else if screen == .reset { screen = .results }
+                    if screen == .intro { exitScan() } else if screen == .capture { screen = .intro } else if screen == .results { screen = .capture } else if screen == .reset { screen = .results }
                 } label: {
                     Image(systemName: "arrow.left")
                         .font(.system(size: 20, weight: .semibold))
@@ -288,6 +335,16 @@ struct GlowScanFlowView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel(NSLocalizedString("glow.accessibility.back", comment: ""))
                 Spacer()
+
+                if screen == .intro || screen == .capture {
+                    Button(NSLocalizedString("glow.cta.skip", comment: "")) {
+                        HapticManager.light()
+                        exitScan()
+                    }
+                    .font(.poppinsMedium(14))
+                    .foregroundStyle(.white.opacity(0.78))
+                    .buttonStyle(.plain)
+                }
             }
             .padding(.horizontal, 18)
             .padding(.top, 10)
@@ -296,6 +353,12 @@ struct GlowScanFlowView: View {
                 .padding(.horizontal, 24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+    }
+
+    private func exitScan() {
+        guard !hasExited else { return }
+        hasExited = true
+        onExit()
     }
 
     private var scoreView: some View {
@@ -365,6 +428,68 @@ struct GlowScanFlowView: View {
         }
     }
 
+    private var scannerGuide: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(Color.black.opacity(0.28))
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(Color.white.opacity(0.22), lineWidth: 1)
+
+            VStack(spacing: 18) {
+                ZStack {
+                    Circle()
+                        .stroke(Color.white.opacity(0.32), style: StrokeStyle(lineWidth: 2, dash: [8, 8]))
+                    Circle()
+                        .stroke(Color(hex: "B794F6"), lineWidth: 5)
+                        .padding(8)
+                    Image(systemName: "person.crop.circle")
+                        .font(.system(size: 80, weight: .thin))
+                        .foregroundStyle(.white.opacity(0.82))
+                }
+                .frame(width: 190, height: 190)
+
+                Text(NSLocalizedString("glow.capture.guide", comment: ""))
+                    .font(.poppinsMedium(15))
+                    .foregroundStyle(.white.opacity(0.78))
+                    .multilineTextAlignment(.center)
+            }
+            .padding(24)
+        }
+        .frame(maxWidth: 310)
+        .aspectRatio(0.82, contentMode: .fit)
+        .padding(.vertical, 22)
+    }
+
+    private func glowBenefit(_ icon: String, key: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .foregroundStyle(Color(hex: "B794F6"))
+            Text(NSLocalizedString(key, comment: ""))
+                .font(.poppinsRegular(14))
+                .foregroundStyle(.white.opacity(0.78))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var glowTrustBadges: some View {
+        Image("glow_trust_badges")
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: 340)
+        .frame(maxWidth: .infinity)
+        .padding(.top, 16)
+    }
+
+    private func analysisStep(_ key: String, index: Int) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: analysisProgress >= index ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(analysisProgress >= index ? Color(hex: "FF6B9D") : .white.opacity(0.28))
+            Text(NSLocalizedString(key, comment: ""))
+                .font(.poppinsRegular(14))
+                .foregroundStyle(analysisProgress >= index ? .white : .white.opacity(0.38))
+        }
+    }
+
     private func primaryButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
@@ -405,15 +530,13 @@ struct GlowScanFlowView: View {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             MixpanelManager.shared.track(event: "onboarding_glow_camera_permission_granted")
-            pickerSource = .camera
-            showPicker = true
+            showLiveScanner = true
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.async {
                     if granted {
                         MixpanelManager.shared.track(event: "onboarding_glow_camera_permission_granted")
-                        pickerSource = .camera
-                        showPicker = true
+                        showLiveScanner = true
                     } else {
                         MixpanelManager.shared.track(event: "onboarding_glow_camera_permission_denied")
                         permissionMessage = NSLocalizedString("glow.capture.camera_denied", comment: "")

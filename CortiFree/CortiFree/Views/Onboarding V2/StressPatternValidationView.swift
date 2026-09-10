@@ -61,7 +61,7 @@ struct StressPatternValidationView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 22))
-                        .foregroundColor(Color(hex: "67DB3D"))
+                        .foregroundColor(Color(hex: "FF6B9D"))
 
                     Text("stress_pattern.analysis_complete".localized)
                         .font(.faroSemiBold(22))
@@ -207,7 +207,7 @@ struct StressPatternValidationView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
                             LinearGradient(
-                                colors: [Color(hex: "67DB3D"), Color(hex: "22C55E")],
+                                colors: [Color(hex: "FF6B9D"), Color(hex: "E9B6FF")],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )

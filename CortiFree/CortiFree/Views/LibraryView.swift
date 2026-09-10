@@ -357,6 +357,7 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "wind",
+                        imageName: "guided_breathing_01",
                         title: NSLocalizedString("library.breathing.deep_abdominal", comment: ""),
                         isPlaying: false
                     ) {
@@ -365,6 +366,7 @@ struct LibraryView: View {
 
                     SoundItem(
                         icon: "moon.stars.fill",
+                        imageName: "guided_breathing_02",
                         title: NSLocalizedString("library.breathing.4_7_8", comment: ""),
                         isPlaying: false
                     ) {
@@ -375,6 +377,7 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "heart.fill",
+                        imageName: "guided_breathing_03",
                         title: NSLocalizedString("library.breathing.cardiac_coherence", comment: ""),
                         isPlaying: false
                     ) {
@@ -383,6 +386,7 @@ struct LibraryView: View {
 
                     SoundItem(
                         icon: "bed.double.fill",
+                        imageName: "guided_breathing_04",
                         title: NSLocalizedString("library.breathing.slow", comment: ""),
                         isPlaying: false
                     ) {
@@ -394,6 +398,7 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "triangle",
+                            imageName: "guided_breathing_05",
                             title: NSLocalizedString("library.breathing.triangle", comment: ""),
                             isPlaying: false
                         ) {
@@ -402,6 +407,7 @@ struct LibraryView: View {
 
                         SoundItem(
                             icon: "square",
+                            imageName: "guided_breathing_06",
                             title: NSLocalizedString("library.breathing.box", comment: ""),
                             isPlaying: false
                         ) {
@@ -412,6 +418,7 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "bolt.fill",
+                            imageName: "guided_breathing_07",
                             title: NSLocalizedString("library.breathing.kapalabhati", comment: ""),
                             isPlaying: false
                         ) {
@@ -420,6 +427,7 @@ struct LibraryView: View {
 
                         SoundItem(
                             icon: "flame.fill",
+                            imageName: "guided_breathing_08",
                             title: NSLocalizedString("library.breathing.bhastrika", comment: ""),
                             isPlaying: false
                         ) {
@@ -478,6 +486,7 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "wind",
+                        imageName: "meditation_01",
                         title: NSLocalizedString("library.meditation.conscious_breathing", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "conscious-breathing" && soundPlayer.isPlaying
                     ) {
@@ -486,6 +495,7 @@ struct LibraryView: View {
 
                     SoundItem(
                         icon: "figure.stand",
+                        imageName: "meditation_02",
                         title: NSLocalizedString("library.meditation.body_scan", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "body-scan" && soundPlayer.isPlaying
                     ) {
@@ -496,6 +506,7 @@ struct LibraryView: View {
                 HStack(spacing: 12) {
                     SoundItem(
                         icon: "eye.fill",
+                        imageName: "meditation_03",
                         title: NSLocalizedString("library.meditation.mindfulness", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "mindfulness" && soundPlayer.isPlaying
                     ) {
@@ -504,6 +515,7 @@ struct LibraryView: View {
 
                     SoundItem(
                         icon: "leaf.fill",
+                        imageName: "meditation_04",
                         title: NSLocalizedString("library.meditation.grounding", comment: ""),
                         isPlaying: soundPlayer.currentExercise?.id == "grounding" && soundPlayer.isPlaying
                     ) {
@@ -515,6 +527,7 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "sparkles",
+                            imageName: "meditation_05",
                             title: NSLocalizedString("library.meditation.visualization", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "visualization" && soundPlayer.isPlaying
                         ) {
@@ -523,6 +536,7 @@ struct LibraryView: View {
 
                         SoundItem(
                             icon: "heart.fill",
+                            imageName: "meditation_06",
                             title: NSLocalizedString("library.meditation.compassion", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "compassion" && soundPlayer.isPlaying
                         ) {
@@ -533,6 +547,7 @@ struct LibraryView: View {
                     HStack(spacing: 12) {
                         SoundItem(
                             icon: "brain.head.profile",
+                            imageName: "meditation_07",
                             title: NSLocalizedString("library.meditation.focus", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "focus-clarity" && soundPlayer.isPlaying
                         ) {
@@ -541,6 +556,7 @@ struct LibraryView: View {
 
                         SoundItem(
                             icon: "moon.stars.fill",
+                            imageName: "meditation_08",
                             title: NSLocalizedString("library.meditation.sleep", comment: ""),
                             isPlaying: soundPlayer.currentExercise?.id == "yoga-nidra" && soundPlayer.isPlaying
                         ) {
@@ -711,6 +727,7 @@ struct CategoryButton: View {
 
 struct SoundItem: View {
     let icon: String
+    var imageName: String? = nil
     let title: String
     let isPlaying: Bool
     let action: () -> Void
@@ -721,15 +738,22 @@ struct SoundItem: View {
             action()
         }) {
             HStack(spacing: 12) {
-                // SF Symbol in circle (left)
-                ZStack {
-                    Circle()
-                        .fill(Color(hex: "0E0530"))
-                        .frame(width: 45, height: 45)
+                if let imageName {
+                    Image(imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 58, height: 58)
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                } else {
+                    ZStack {
+                        Circle()
+                            .fill(Color(hex: "0E0530"))
+                            .frame(width: 45, height: 45)
 
-                    Image(systemName: icon)
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
+                        Image(systemName: icon)
+                            .font(.system(size: 20))
+                            .foregroundColor(.white)
+                    }
                 }
 
                 // Title (right)

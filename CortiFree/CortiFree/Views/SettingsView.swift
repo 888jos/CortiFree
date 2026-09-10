@@ -5,6 +5,7 @@ import FirebaseFirestore
 import StoreKit
 import RevenueCat
 import RevenueCatUI
+import UserNotifications
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -268,7 +269,10 @@ struct SettingsView: View {
                     icon: "bell.fill",
                     title: StringKeys.Settings.notificationsToggle,
                     subtitle: NSLocalizedString("settings.notifications.subtitle", comment: ""),
-                    isOn: $viewModel.notificationsEnabled
+                    isOn: Binding(
+                        get: { viewModel.notificationsEnabled },
+                        set: handleNotificationsToggle
+                    )
                 )
             }
         }
@@ -801,6 +805,43 @@ struct SettingsView: View {
     }
 
     // MARK: - Debug Actions
+
+    private func handleNotificationsToggle(_ enabled: Bool) {
+        guard enabled else {
+            viewModel.notificationsEnabled = false
+            NotificationService.shared.cancelDailyNotifications()
+            return
+        }
+
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                NotificationService.shared.requestNotificationPermission { granted in
+                    DispatchQueue.main.async {
+                        viewModel.notificationsEnabled = granted
+                        if granted {
+                            NotificationService.shared.scheduleDailyNotifications()
+                        }
+                    }
+                }
+            case .authorized, .provisional, .ephemeral:
+                DispatchQueue.main.async {
+                    viewModel.notificationsEnabled = true
+                    NotificationService.shared.scheduleDailyNotifications()
+                }
+            case .denied:
+                DispatchQueue.main.async {
+                    viewModel.notificationsEnabled = false
+                    guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+                    UIApplication.shared.open(settingsURL)
+                }
+            @unknown default:
+                DispatchQueue.main.async {
+                    viewModel.notificationsEnabled = false
+                }
+            }
+        }
+    }
 
     private func resetUserDefaults() {
         HapticManager.success()

@@ -223,8 +223,11 @@ struct CortiFreeApp: App {
             .onChange(of: authViewModel.isAuthenticated) { _, isAuthenticated in
                 if isAuthenticated { presentDailyCheckInIfNeeded() }
             }
-            .fullScreenCover(isPresented: $showDailyCheckIn) {
+            .sheet(isPresented: $showDailyCheckIn) {
                 DailyCheckInView(targetDate: DailyCheckInService.shared.previousDay())
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .presentationCornerRadius(28)
             }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in

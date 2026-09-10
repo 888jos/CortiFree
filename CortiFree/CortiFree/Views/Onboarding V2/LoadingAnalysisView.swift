@@ -12,21 +12,74 @@ struct LoadingAnalysisView: View {
     private let speedMultiplier = 1.5
 
     @ObservedObject var languageManager = LanguageManager.shared
+    let habitsQuizResult: HabitsQuizResult?
+    let selectedSymptoms: Set<String>
+    let onComplete: () -> Void
     @State private var displayedProgress: Int = 0
     @State private var currentSubtitle: String = "onboarding_v2.loading.understanding".localized
     @State private var showResultsButton: Bool = false
     @State private var screenViewTime: Date?
-    let onComplete: () -> Void
+
+    init(
+        habitsQuizResult: HabitsQuizResult? = nil,
+        selectedSymptoms: Set<String> = [],
+        onComplete: @escaping () -> Void
+    ) {
+        self.habitsQuizResult = habitsQuizResult
+        self.selectedSymptoms = selectedSymptoms
+        self.onComplete = onComplete
+    }
 
     private var subtitles: [String] {
-        [
-            "onboarding_v2.loading.understanding".localized,
-            "onboarding_v2.loading.profile_analysis".localized,
-            "onboarding_v2.loading.data_processing".localized,
-            "onboarding_v2.loading.personalizing".localized,
-            "onboarding_v2.loading.plan_creation".localized,
-            "onboarding_v2.loading.finalizing".localized
+        guard let result = habitsQuizResult else {
+            return [
+                "onboarding_v2.loading.understanding".localized,
+                "onboarding_v2.loading.profile_analysis".localized,
+                "onboarding_v2.loading.data_processing".localized,
+                "onboarding_v2.loading.personalizing".localized,
+                "onboarding_v2.loading.plan_creation".localized,
+                "onboarding_v2.loading.finalizing".localized
+            ]
+        }
+
+        let isFrench = languageManager.currentLanguage == .french
+        let goal = localizedGoal(result.primaryGoal, isFrench: isFrench)
+        let time = result.availableTime
+        let symptomCount = selectedSymptoms.count
+
+        if isFrench {
+            return [
+                "Nous repérons les points qui pèsent le plus sur ton quotidien.",
+                "Ton objectif prioritaire : \(goal.lowercased()).",
+                "Nous ajustons le rythme à tes \(time) minutes disponibles par jour.",
+                symptomCount > 0
+                    ? "Nous intégrons les \(symptomCount) signaux que tu as sélectionnés."
+                    : "Nous gardons ton parcours simple et progressif.",
+                "Nous choisissons des exercices adaptés à ton niveau actuel.",
+                "Ton parcours personnalisé est prêt."
+            ]
+        }
+
+        return [
+            "We are identifying what weighs most on your daily routine.",
+            "Your priority: \(goal.lowercased()).",
+            "We are matching the pace to your \(time) minutes per day.",
+            symptomCount > 0
+                ? "We are including the \(symptomCount) signals you selected."
+                : "We are keeping your path simple and progressive.",
+            "We are choosing exercises for your current level.",
+            "Your personalized path is ready."
         ]
+    }
+
+    private func localizedGoal(_ goal: String, isFrench: Bool) -> String {
+        switch goal {
+        case "sleep": return isFrench ? "le sommeil" : "sleep"
+        case "stress": return isFrench ? "le calme" : "calm"
+        case "energy": return isFrench ? "l’énergie" : "energy"
+        case "focus": return isFrench ? "la concentration" : "focus"
+        default: return isFrench ? "l’équilibre" : "balance"
+        }
     }
 
     var body: some View {

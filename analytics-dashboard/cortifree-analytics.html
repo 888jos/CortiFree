@@ -954,6 +954,28 @@ o
             line-height: 1.6;
         }
 
+        .analytics-pipeline-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 18px 0 0;
+            padding: 12px 16px;
+            border: 1px solid rgba(181, 137, 255, 0.28);
+            border-radius: 12px;
+            background: rgba(181, 137, 255, 0.08);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .analytics-pipeline-dot {
+            width: 8px;
+            height: 8px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            background: #8ee6a8;
+            box-shadow: 0 0 0 4px rgba(142, 230, 168, 0.12);
+        }
+
         /* Responsive adjustments */
         @media (max-width: 1600px) {
             .ai-sidebar-panel {
@@ -1010,6 +1032,10 @@ o
                 <button class="nav-tab active" onclick="switchPage('overview')">📊 Overview</button>
                 <button class="nav-tab" onclick="switchPage('ad-simulator')">🎯 Ad Simulator</button>
                 <a href="technical-docs.html" class="nav-tab" style="text-decoration: none;">📚 Documentation</a>
+            </div>
+            <div class="analytics-pipeline-banner" id="analyticsPipelineBanner">
+                <span class="analytics-pipeline-dot"></span>
+                <span id="analyticsPipelineText">Onboarding events are mirrored to Amplitude from the iOS app. Loading the Amplitude funnel…</span>
             </div>
         </header>
 
@@ -1908,6 +1934,13 @@ o
                 const accountsCreated = usersSnapshot.size;
                 const authRate = totalUsers > 0 ? ((accountsCreated / totalUsers) * 100).toFixed(1) : 0;
 
+                const funnelData = await fetchOnboardingFunnel();
+                const funnelUsers = funnelData['onboarding_welcome_viewed'] || totalUsers;
+                const glowScans = funnelData['onboarding_glow_completed'] || 0;
+                const notificationGrants = funnelData['onboarding_notifications_permission_granted'] || 0;
+                const glowScanRate = funnelUsers > 0 ? ((glowScans / funnelUsers) * 100).toFixed(1) : 0;
+                const notificationOptInRate = funnelUsers > 0 ? ((notificationGrants / funnelUsers) * 100).toFixed(1) : 0;
+
                 return {
                     totalUsers,
                     onboardingCompleted,
@@ -1915,6 +1948,12 @@ o
                     authRate,
                     accountsCreated,
                     avgStreak,
+                    usersWithStreak,
+                    streakRate: totalUsers > 0 ? ((usersWithStreak / totalUsers) * 100).toFixed(1) : 0,
+                    glowScans,
+                    glowScanRate,
+                    notificationGrants,
+                    notificationOptInRate,
                     totalTasks,
                     habitStats,
                     retentionRates,
@@ -1927,13 +1966,35 @@ o
                     rpi,
                     downloadToTrial,
                     trialToPaid,
-                    funnelData: await fetchOnboardingFunnel()
+                    funnelData
                 };
 
             } catch (error) {
                 console.error('❌ Error fetching data:', error);
                 throw error;
             }
+        }
+
+        function amplitudeDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+
+        async function fetchAmplitudeFunnel() {
+            // The local dashboard server keeps the Amplitude secret key off the browser.
+            // Amplitude's export endpoint is used for bounded date ranges; all-time stays on Firestore.
+            if (!currentPeriod.start || !currentPeriod.end) return null;
+            const params = new URLSearchParams({
+                start: amplitudeDate(currentPeriod.start),
+                end: amplitudeDate(currentPeriod.end)
+            });
+            const response = await fetch(`/api/amplitude/funnel?${params.toString()}`);
+            if (!response.ok) throw new Error(`Amplitude proxy returned ${response.status}`);
+            const result = await response.json();
+            if (!result.eventCounts) throw new Error(result.error || 'Invalid Amplitude response');
+            return result.eventCounts;
         }
 
         async function fetchOnboardingFunnel() {
@@ -1987,6 +2048,21 @@ o
             funnelSteps.forEach(step => { funnelData[step] = new Set(); });
 
             try {
+                try {
+                    const amplitudeData = await fetchAmplitudeFunnel();
+                    if (amplitudeData) {
+                        funnelSteps.forEach(step => { funnelData[step] = amplitudeData[step] || 0; });
+                        funnelData.__source = 'Amplitude';
+                        const sourceText = document.getElementById('analyticsPipelineText');
+                        if (sourceText) sourceText.textContent = 'Onboarding funnel live from Amplitude. Firebase remains available for detailed event analysis.';
+                        return funnelData;
+                    }
+                } catch (amplitudeError) {
+                    console.warn('⚠️ Amplitude funnel unavailable, using Firestore fallback:', amplitudeError.message);
+                    const sourceText = document.getElementById('analyticsPipelineText');
+                    if (sourceText) sourceText.textContent = 'Amplitude unavailable for this range. Showing the Firestore mirror instead.';
+                }
+
                 // Single query: get all analytics events, filter client-side
                 let query = db.collection('analytics_events');
                 if (currentPeriod.start && currentPeriod.end) {
@@ -2012,6 +2088,7 @@ o
                 funnelSteps.forEach(step => {
                     funnelData[step] = funnelData[step].size;
                 });
+                funnelData.__source = 'Firestore';
                 console.log('📊 Funnel data:', funnelData);
             } catch (e) {
                 console.warn('⚠️ Could not fetch funnel data:', e.message);
@@ -2221,6 +2298,27 @@ o
                     subtitle: `${data.accountsCreated} comptes créés / installs — période`,
                     badge: getBadge(parseFloat(data.authRate), { good: 70, average: 45 }),
                     sparklineKey: 'onboarding'
+                },
+                {
+                    title: 'Glow Scan Completion',
+                    value: `${data.glowScanRate}%`,
+                    subtitle: `${data.glowScans} users completed the face scan / ${data.funnelData['onboarding_welcome_viewed'] || data.totalUsers} installs`,
+                    badge: getBadge(parseFloat(data.glowScanRate), { good: 60, average: 35 }),
+                    sparklineKey: 'onboarding'
+                },
+                {
+                    title: 'Notification Opt-in',
+                    value: `${data.notificationOptInRate}%`,
+                    subtitle: `${data.notificationGrants} users granted notifications / installs`,
+                    badge: getBadge(parseFloat(data.notificationOptInRate), { good: 55, average: 30 }),
+                    sparklineKey: 'onboarding'
+                },
+                {
+                    title: 'Active Streak',
+                    value: `${data.avgStreak} days`,
+                    subtitle: `${data.streakRate}% of users currently have a streak`,
+                    badge: null,
+                    sparklineKey: 'avgStreak'
                 },
             ];
 

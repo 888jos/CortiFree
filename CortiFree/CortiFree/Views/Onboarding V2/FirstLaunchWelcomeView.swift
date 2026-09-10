@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import UserNotifications
 
 struct FirstLaunchWelcomeView: View {
     let onContinue: () -> Void
@@ -15,12 +14,6 @@ struct FirstLaunchWelcomeView: View {
     @State private var screenViewTime: Date?
 
     @State private var hasContinued = false
-    @State private var displayedIntro = ""
-
-    private var introText: String {
-        "first_launch.mascot_intro".localized
-    }
-
     var body: some View {
         ZStack {
             GalaxyBackgroundView(intensity: 1.0)
@@ -35,13 +28,36 @@ struct FirstLaunchWelcomeView: View {
                 LottieView(filename: "sloth_intro.json", loopMode: .loop)
                     .frame(width: 190, height: 190)
 
-                Text(displayedIntro)
-                    .font(.faroBold(28))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .padding(.horizontal, 28)
-                    .padding(.top, 20)
+                ZStack {
+                    VStack(spacing: 12) {
+                        Text("first_launch.mascot_greeting".localized)
+                            .font(.faroBold(25))
+                            .foregroundStyle(.white)
+
+                        Text("first_launch.mascot_role".localized)
+                            .font(.poppinsRegular(16))
+                            .foregroundStyle(.white.opacity(0.86))
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(3)
+
+                        Text("first_launch.mascot_plan".localized)
+                            .font(.poppinsRegular(15))
+                            .foregroundStyle(.white.opacity(0.68))
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(3)
+                    }
+
+                    IntroSparkle(color: Color(hex: "FFB7E8"), size: 18, delay: 0.0)
+                        .offset(x: -150, y: -42)
+                    IntroSparkle(color: Color(hex: "E9B6FF"), size: 12, delay: 0.35)
+                        .offset(x: 151, y: -28)
+                    IntroSparkle(color: Color(hex: "FF8EDB"), size: 10, delay: 0.7)
+                        .offset(x: 137, y: 48)
+                    IntroSparkle(color: Color(hex: "D4B4FF"), size: 14, delay: 1.05)
+                        .offset(x: -142, y: 55)
+                }
+                .padding(.horizontal, 30)
+                .padding(.top, 20)
 
                 Spacer()
 
@@ -69,14 +85,6 @@ struct FirstLaunchWelcomeView: View {
             screenViewTime = Date()
             MixpanelManager.shared.trackOnboardingWelcomeViewed()
         }
-        .task(id: introText) {
-            displayedIntro = ""
-            for character in introText {
-                guard !Task.isCancelled else { return }
-                displayedIntro.append(character)
-                try? await Task.sleep(nanoseconds: 32_000_000)
-            }
-        }
     }
 
     private func continueToQuiz() {
@@ -86,20 +94,7 @@ struct FirstLaunchWelcomeView: View {
         let timeSpent = screenViewTime.map { Date().timeIntervalSince($0) } ?? 0
         HapticManager.medium()
 
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            if settings.authorizationStatus == .notDetermined {
-                NotificationService.shared.requestNotificationPermission { granted in
-                    UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
-                    DispatchQueue.main.async {
-                        finishWelcome(timeSpent: timeSpent)
-                    }
-                }
-            } else {
-                DispatchQueue.main.async {
-                    finishWelcome(timeSpent: timeSpent)
-                }
-            }
-        }
+        finishWelcome(timeSpent: timeSpent)
     }
 
     private func finishWelcome(timeSpent: TimeInterval) {
@@ -110,6 +105,30 @@ struct FirstLaunchWelcomeView: View {
         }
     }
 
+}
+
+private struct IntroSparkle: View {
+    let color: Color
+    let size: CGFloat
+    let delay: Double
+
+    @State private var isShining = false
+
+    var body: some View {
+        Image(systemName: "sparkle")
+            .font(.system(size: size, weight: .medium))
+            .foregroundStyle(color)
+            .shadow(color: color.opacity(0.75), radius: 8)
+            .scaleEffect(isShining ? 1.18 : 0.62)
+            .opacity(isShining ? 1.0 : 0.35)
+            .animation(
+                .easeInOut(duration: 1.35)
+                    .repeatForever(autoreverses: true)
+                    .delay(delay),
+                value: isShining
+            )
+            .onAppear { isShining = true }
+    }
 }
 
 #Preview {

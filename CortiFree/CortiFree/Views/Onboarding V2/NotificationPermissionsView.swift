@@ -8,7 +8,6 @@
 
 import SwiftUI
 import UserNotifications
-import UIKit
 
 struct NotificationPermissionsView: View {
     let onContinue: () -> Void
@@ -18,6 +17,7 @@ struct NotificationPermissionsView: View {
     @State private var enableDailyRitual: Bool = true
     @State private var enableWeeklyReport: Bool = true
     @State private var screenViewTime: Date?
+    @State private var isRequestingPermission = false
 
     var body: some View {
         ZStack {
@@ -34,6 +34,14 @@ struct NotificationPermissionsView: View {
 
             ScrollView {
                 VStack(spacing: 0) {
+                    OnboardingMascotDialogueView(
+                        message: "onboarding_v2.notifications.mascot_message".localized,
+                        prominent: false
+                    )
+                    .padding(.horizontal, 24)
+                    .padding(.top, 34)
+                    .padding(.bottom, 30)
+
                     // Title
                     Text("onboarding_v2.notifications.stay_motivated".localized)
                     .font(.faroBold(28))
@@ -84,10 +92,12 @@ struct NotificationPermissionsView: View {
 
                     // Continue button
                     Button(action: {
+                        guard !isRequestingPermission else { return }
                     #if DEBUG
                     print("🔔 NotificationPermissionsView: Bouton Suivant cliqué - Navigation vers HabitsProgress")
                     #endif
                     HapticManager.medium()
+                    isRequestingPermission = true
 
                     // Track permission request
                     MixpanelManager.shared.trackOnboardingNotificationPermissionRequested(
@@ -123,6 +133,7 @@ struct NotificationPermissionsView: View {
                     .padding(.horizontal, 24)
                     .padding(.bottom, 40)
                 }
+                .disabled(isRequestingPermission)
             }
         }
         .onAppear {
@@ -137,24 +148,31 @@ struct NotificationPermissionsView: View {
             case .notDetermined:
                 NotificationService.shared.requestNotificationPermission { granted in
                     UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
+                    MixpanelManager.shared.trackOnboardingNotificationPermissionsGranted(granted: granted)
                     DispatchQueue.main.async {
+                        isRequestingPermission = false
                         onContinue()
                     }
                 }
             case .denied:
+                UserDefaults.standard.set(false, forKey: "notificationsEnabled")
+                MixpanelManager.shared.trackOnboardingNotificationPermissionsGranted(granted: false)
                 DispatchQueue.main.async {
-                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(settingsURL)
-                    }
+                    isRequestingPermission = false
+                    // Do not bounce the user to Settings from onboarding. The app may
+                    // offer a contextual reminder later in the main experience.
                     onContinue()
                 }
             case .authorized, .provisional, .ephemeral:
                 UserDefaults.standard.set(true, forKey: "notificationsEnabled")
+                MixpanelManager.shared.trackOnboardingNotificationPermissionsGranted(granted: true)
                 DispatchQueue.main.async {
+                    isRequestingPermission = false
                     onContinue()
                 }
             @unknown default:
                 DispatchQueue.main.async {
+                    isRequestingPermission = false
                     onContinue()
                 }
             }

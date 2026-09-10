@@ -359,7 +359,7 @@ struct CortiFreeStatCard: View {
                 if let increase = increase {
                     Text("(+\(increase))")
                         .font(.faroBold(20))
-                        .foregroundColor(.green)
+                        .foregroundColor(Color(hex: "FF6B9D"))
                 }
             }
 
@@ -376,7 +376,7 @@ struct CortiFreeStatCard: View {
 
                     // Progress - Red for current, Green for potential - Animated from startProgress
                     Rectangle()
-                        .fill(increase == nil ? Color.red : Color.green)
+                        .fill(increase == nil ? Color.red : Color(hex: "FF6B9D"))
                         .frame(width: geometry.size.width * (animateProgress ? progress : startProgress), height: 8)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                 }

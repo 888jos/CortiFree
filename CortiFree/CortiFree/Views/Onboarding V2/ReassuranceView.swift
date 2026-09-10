@@ -10,10 +10,10 @@ import SwiftUI
 import AVKit
 
 struct ReassuranceView: View {
-    let gender: String?
+    let overallData: OverallQuizData?
     let onStartQuiz: () -> Void
 
-    private let textSpeedMultiplier = 1.25
+    private let textSpeedMultiplier = 1.875
 
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var displayedText: String = ""
@@ -24,7 +24,7 @@ struct ReassuranceView: View {
 
     private var fullText: String {
         let message1: String
-        switch gender {
+        switch overallData?.genderCode {
         case "male":
             message1 = "onboarding_v2.reassurance.message_part1_male".localized
         case "female":
@@ -32,14 +32,33 @@ struct ReassuranceView: View {
         default:
             message1 = "onboarding_v2.reassurance.message_part1_neutral".localized
         }
-        let message2 = "onboarding_v2.reassurance.message_part2".localized
+        let message2 = personalizedMessage
         let message3 = "onboarding_v2.reassurance.message_part3".localized
         let message4 = "onboarding_v2.reassurance.message_part4".localized
         return "\(message1)\n\n\(message2)\n\n\(message3)\n\n\(message4)"
     }
 
-    init(gender: String? = nil, onStartQuiz: @escaping () -> Void) {
-        self.gender = gender
+    private var personalizedMessage: String {
+        guard let data = overallData else {
+            return "onboarding_v2.reassurance.message_part2".localized
+        }
+
+        let reason = data.reasonCodes
+            .map { "onboarding_v2.reassurance.reason_\($0)".localized }
+            .joined(separator: ", ")
+        let age = "onboarding_v2.reassurance.age_\(data.ageCode)".localized
+        let duration = "onboarding_v2.reassurance.duration_\(data.durationCode)".localized
+
+        return String(
+            format: "onboarding_v2.reassurance.personalized".localized,
+            reason,
+            age,
+            duration
+        )
+    }
+
+    init(overallData: OverallQuizData? = nil, onStartQuiz: @escaping () -> Void) {
+        self.overallData = overallData
         self.onStartQuiz = onStartQuiz
     }
 
@@ -62,7 +81,7 @@ struct ReassuranceView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     LottieView(filename: "sloth_meditate.json", loopMode: .loop)
-                        .frame(width: 104, height: 104)
+                .frame(width: 156, height: 156)
                         .padding(.bottom, 8)
 
                     // Animated text at top (centered)
@@ -76,9 +95,10 @@ struct ReassuranceView: View {
                         .padding(.horizontal, 40)
 
                 }
-                .padding(.top, 80)
+                // Keep the copy visible after the larger mascot artwork.
+                .padding(.top, 20)
 
-                    Spacer(minLength: 100)
+                    Spacer(minLength: 48)
 
                     // Bottom button section (appear after badges)
                     if showButton {
@@ -124,7 +144,7 @@ struct ReassuranceView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.horizontal, 40)
-                    .padding(.bottom, 50)
+                    .padding(.bottom, 32)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }

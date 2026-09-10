@@ -141,7 +141,7 @@ struct AuthenticationView: View {
                 Spacer()
 
                 // Lottie animation
-                LottieView(filename: "Flower Animation", loopMode: .loop)
+                LottieView(filename: "sloth_intro.json", loopMode: .loop)
                     .responsiveFrame(width: 320, height: 320)
                     .responsivePadding(.bottom, 32)
 
@@ -170,7 +170,8 @@ struct AuthenticationView: View {
                     }
                     .padding(.horizontal, 32)
 
-                    // Continue with Google
+                    // Google Sign-In is intentionally disabled for release.
+                    if false {
                     Button(action: {
                         HapticManager.light()
                         showGoogleAuth = true
@@ -193,6 +194,7 @@ struct AuthenticationView: View {
                         )
                     }
                     .padding(.horizontal, 32)
+                    }
 
                     // Continue with Email
                     Button(action: {
@@ -556,7 +558,7 @@ struct EmailAuthView: View {
 
                                         if passwordsMatch {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.green)
+                                                .foregroundColor(Color(hex: "FF6B9D"))
                                         }
                                     }
                                     .padding(14)
@@ -567,7 +569,7 @@ struct EmailAuthView: View {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(
                                                         focusedField == .confirmPassword ?
-                                                        (passwordsMatch ? Color.green : Color.red) :
+                                                        (passwordsMatch ? Color(hex: "FF6B9D") : Color.red) :
                                                             Color.white.opacity(0.3),
                                                         lineWidth: 1.5
                                                     )
@@ -665,7 +667,7 @@ struct EmailAuthView: View {
                                 )
                             }
 
-                            // Google
+                            if false {
                             Button(action: {
                                 HapticManager.light()
                                 showGoogleAuth = true
@@ -686,6 +688,7 @@ struct EmailAuthView: View {
                                     RoundedRectangle(cornerRadius: 24)
                                         .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
                                 )
+                            }
                             }
                         }
                         .padding(.horizontal, 32)
@@ -1177,7 +1180,7 @@ struct AppleAuthView: View {
 
                 // Other auth methods
                 HStack(spacing: 16) {
-                    // Google
+                    if false {
                     Button(action: {
                         HapticManager.light()
                         showGoogleAuth = true
@@ -1198,6 +1201,7 @@ struct AppleAuthView: View {
                             RoundedRectangle(cornerRadius: 24)
                                 .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
                         )
+                    }
                     }
 
                     // Email

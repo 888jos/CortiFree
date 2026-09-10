@@ -12,7 +12,7 @@ struct CortiFreeComparisonView: View {
 
     @State private var animateCurves = false
 
-    private let cortiFreeColor = Color(hex: "67DB3D")
+    private let cortiFreeColor = Color(hex: "72D572")
     private let baselineColor = Color.white.opacity(0.42)
 
     var body: some View {

@@ -61,15 +61,6 @@ struct SymptomCheckerView: View {
 
             VStack(spacing: 0) {
 
-                OnboardingProgressBar(progress: 0.75)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 12)
-
-                OnboardingMascotDialogueView(message: "symptom_checker.select_all".localized)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 12)
-                    .padding(.bottom, 24)
-
                 // ── Header — left aligned, no logo ──
                 VStack(alignment: .leading, spacing: 12) {
                     Text("symptom_checker.title".localized)
@@ -95,7 +86,7 @@ struct SymptomCheckerView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-                .padding(.top, 14)
+                .padding(.top, 34)
                 .padding(.bottom, 24)
 
                 // ── Scroll content ──

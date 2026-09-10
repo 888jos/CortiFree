@@ -14,16 +14,16 @@ struct BreathingListView: View {
     @State private var showBreathingDetail = false
     @State private var selectedBreathingPattern: BreathingPattern?
 
-    private var breathingExercises: [(pattern: BreathingPattern, icon: String, titleKey: String)] {
+    private var breathingExercises: [(pattern: BreathingPattern, imageName: String, titleKey: String)] {
         [
-            (.deepAbdominal, "wind", "library.breathing.deep_abdominal"),
-            (.fourSevenEight, "moon.stars.fill", "library.breathing.4_7_8"),
-            (.coherence, "heart.fill", "library.breathing.cardiac_coherence"),
-            (.slow66, "bed.double.fill", "library.breathing.slow"),
-            (.triangle, "triangle", "library.breathing.triangle"),
-            (.boxBreathing, "square", "library.breathing.box"),
-            (.kapalabhati, "bolt.fill", "library.breathing.kapalabhati"),
-            (.bhastrika, "flame.fill", "library.breathing.bhastrika")
+            (.deepAbdominal, "guided_breathing_01", "library.breathing.deep_abdominal"),
+            (.fourSevenEight, "guided_breathing_02", "library.breathing.4_7_8"),
+            (.coherence, "guided_breathing_03", "library.breathing.cardiac_coherence"),
+            (.slow66, "guided_breathing_04", "library.breathing.slow"),
+            (.triangle, "guided_breathing_05", "library.breathing.triangle"),
+            (.boxBreathing, "guided_breathing_06", "library.breathing.box"),
+            (.kapalabhati, "guided_breathing_07", "library.breathing.kapalabhati"),
+            (.bhastrika, "guided_breathing_08", "library.breathing.bhastrika")
         ]
     }
 
@@ -44,7 +44,7 @@ struct BreathingListView: View {
                     ], spacing: 24) {
                         ForEach(breathingExercises, id: \.titleKey) { exercise in
                             BreathingCard(
-                                icon: exercise.icon,
+                                imageName: exercise.imageName,
                                 title: languageManager.localized(exercise.titleKey)
                             ) {
                                 selectedBreathingPattern = exercise.pattern
@@ -95,7 +95,7 @@ struct BreathingListView: View {
 }
 
 struct BreathingCard: View {
-    let icon: String
+    let imageName: String
     let title: String
     let action: () -> Void
 
@@ -115,10 +115,17 @@ struct BreathingCard: View {
             action()
         }) {
             ZStack {
-                // Centered icon
-                Image(systemName: icon)
-                    .font(.system(size: 32, weight: .semibold))
-                    .foregroundColor(Color(hex: "E4F9FF"))
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+
+                LinearGradient(
+                    colors: [.black.opacity(0.62), .clear, .black.opacity(0.52)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
 
                 // Title avec étoile en haut à gauche
                 VStack {
@@ -145,13 +152,9 @@ struct BreathingCard: View {
             .frame(maxWidth: .infinity, minHeight: 160)
             .aspectRatio(1, contentMode: .fit)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(hex: "16233A"))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color(hex: "E4F9FF").opacity(0.3), lineWidth: 1)
-                    )
+                RoundedRectangle(cornerRadius: 16).fill(Color(hex: "16233A"))
             )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())

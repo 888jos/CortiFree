@@ -292,7 +292,7 @@ struct SimpleAnswerButton: View {
         Button(action: onTap) {
             HStack {
                 Circle()
-                    .fill(isSelected ? Color(hex: "67DB3D") : Color.white.opacity(0.2))
+                    .fill(isSelected ? Color(hex: "FF6B9D") : Color.white.opacity(0.2))
                     .frame(width: 20, height: 20)
                     .overlay(
                         isSelected ?

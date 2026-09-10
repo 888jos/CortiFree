@@ -15,6 +15,7 @@
 		804F1D8A2F4CF13600374D9D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804F1D892F4CF13600374D9D /* SwiftUI.framework */; };
 		804F1D9B2F4CF13700374D9D /* CortiFreeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		805099B72F4BC34E002841B9 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 805099B62F4BC34E002841B9 /* PostHog */; };
+		80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 80A000022F4BC34E002841B9 /* AmplitudeSwift */; };
 		80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4B2F1701B9000C459F /* RevenueCat */; };
 		80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4D2F1701B9000C459F /* RevenueCatUI */; };
 		8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8077CC292ECF8AF400742806 /* Mixpanel */; };
@@ -141,6 +142,7 @@
 				8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */,
 				8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */,
 				805099B72F4BC34E002841B9 /* PostHog in Frameworks */,
+				80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */,
 				80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */,
 				8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */,
 				802C49B12EBBB2340084B356 /* Lottie in Frameworks */,
@@ -254,6 +256,7 @@
 				80622A4D2F1701B9000C459F /* RevenueCatUI */,
 				803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */,
 				805099B62F4BC34E002841B9 /* PostHog */,
+				80A000022F4BC34E002841B9 /* AmplitudeSwift */,
 			);
 			productName = CortiFree;
 			productReference = 80F600A02E85D4A0008F58FB /* CortiFree.app */;
@@ -346,6 +349,7 @@
 				80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				803AC4DC2F40CED0007B3B5A /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */,
 				805099B52F4BC34E002841B9 /* XCRemoteSwiftPackageReference "posthog-ios" */,
+				80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80F600A12E85D4A0008F58FB /* Products */;
@@ -637,6 +641,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = RSC662VDU8;
+				AMPLITUDE_API_KEY = "cea46c8db502b00ad059927287d88b08";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -673,6 +678,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = RSC662VDU8;
+				AMPLITUDE_API_KEY = "cea46c8db502b00ad059927287d88b08";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -858,6 +864,14 @@
 				minimumVersion = 3.41.2;
 			};
 		};
+		80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/amplitude/Amplitude-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.0;
+			};
+		};
 		80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
@@ -917,6 +931,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 805099B52F4BC34E002841B9 /* XCRemoteSwiftPackageReference "posthog-ios" */;
 			productName = PostHog;
+		};
+		80A000022F4BC34E002841B9 /* AmplitudeSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */;
+			productName = AmplitudeSwift;
 		};
 		80622A4B2F1701B9000C459F /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
