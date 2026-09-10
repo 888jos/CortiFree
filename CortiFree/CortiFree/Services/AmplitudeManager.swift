@@ -21,8 +21,8 @@ final class AmplitudeManager {
 
         amplitude = Amplitude(configuration: Configuration(
             apiKey: apiKey,
-            autocapture: [.sessions, .appLifecycles],
-            serverZone: .EU
+            serverZone: .EU,
+            autocapture: [.sessions, .appLifecycles]
         ))
         isInitialized = true
 
