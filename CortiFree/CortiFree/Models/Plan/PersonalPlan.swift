@@ -39,15 +39,9 @@ enum PlanGoal: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    var colors: [Color] {
-        switch self {
-        case .stress: return [Color(hex: "7B5CFF"), Color(hex: "B794F6")]
-        case .sleep: return [Color(hex: "312E81"), Color(hex: "8B5CF6")]
-        case .energy: return [Color(hex: "F59E0B"), Color(hex: "B794F6")]
-        case .focus: return [Color(hex: "6366F1"), Color(hex: "22D3EE")]
-        case .emotional: return [Color(hex: "F472B6"), Color(hex: "A855F7")]
-        }
-    }
+    /// Every goal shares the brand gradient: the goal is told apart by its symbol and
+    /// name, so the Plan tab keeps a single, consistent colour identity.
+    var colors: [Color] { [PlanPalette.accentDeep, PlanPalette.accent] }
 }
 
 // MARK: - Weekly themes

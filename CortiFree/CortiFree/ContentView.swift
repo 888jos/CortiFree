@@ -41,7 +41,7 @@ struct ContentView: View {
                 case .home:
                     HomeView(isScrolling: $isScrolling, scrollTimer: $scrollTimer)
                 case .tasks:
-                    TasksV2View()
+                    TasksV2View(isScrolling: $isScrolling)
                 case .progress:
                     ProgressDashboardView()
                 case .library:
@@ -69,6 +69,9 @@ struct ContentView: View {
                     // Keep the floating assistant above the tab bar, and above the mini player when one is showing.
                     .offset(x: -10, y: isMiniPlayerVisible ? -176 : -104)
                     .animation(.spring(response: 0.4, dampingFraction: 0.85), value: isMiniPlayerVisible)
+                    // Out of the way while the content scrolls (it would cover the cards' checkmarks).
+                    .opacity(isScrolling ? 0 : 1)
+                    .allowsHitTesting(!isScrolling)
                 }
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)

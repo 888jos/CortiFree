@@ -4550,6 +4550,12 @@
 "plan.loading" = "Dein Plan wird vorbereitet…";
 "plan.cycle" = "Zyklus %d";
 "plan.evening_label" = "Heute Abend";
+"plan.slot.morning" = "Morgen";
+"plan.slot.day" = "Tagsüber";
+"plan.slot.evening" = "Abend";
+"plan.next.title" = "Nächster Schritt";
+"plan.next.start" = "Starten";
+"plan.next.all_done" = "Tag geschafft, gut gemacht!";
 "plan.short.title" = "Wenig Zeit heute?";
 "plan.short.subtitle" = "Wechsle zu den Kurzversionen: das Wichtigste in wenigen Minuten.";
 "plan.short.badge" = "Kurzversion";

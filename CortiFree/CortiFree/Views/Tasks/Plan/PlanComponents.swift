@@ -10,11 +10,18 @@ import SwiftUI
 
 // MARK: - Palette
 
+/// Single colour system for the Plan tab: one brand accent (shared with the Library
+/// and the player), neutral surfaces, and a "done" green used for completion only.
 enum PlanPalette {
-    static let accent = Color(hex: "B794F6")
+    static let accent = AudioPalette.accent
+    static let accentDeep = Color(hex: "7B5CFF")
     static let deep = Color(hex: "0A0515")
     static let plum = Color(hex: "1A0A2E")
     static let done = Color(hex: "8FE3C3")
+    static let secondaryText = Color.white.opacity(0.62)
+    static let tertiaryText = Color.white.opacity(0.42)
+    static let thumbnail = Color.white.opacity(0.08)
+    static var itemGradient: [Color] { [accentDeep, accent] }
 }
 
 // MARK: - Glass
@@ -109,9 +116,9 @@ struct PlanBackground: View {
         ZStack {
             LinearGradient(colors: [PlanPalette.deep, PlanPalette.plum, PlanPalette.deep],
                            startPoint: .topLeading, endPoint: .bottomTrailing)
-            RadialGradient(colors: [(goal?.colors.last ?? PlanPalette.accent).opacity(0.30), .clear],
+            RadialGradient(colors: [PlanPalette.accent.opacity(0.24), .clear],
                            center: .init(x: 0.85, y: 0.02), startRadius: 10, endRadius: 420)
-            RadialGradient(colors: [(goal?.colors.first ?? PlanPalette.accent).opacity(0.22), .clear],
+            RadialGradient(colors: [PlanPalette.accentDeep.opacity(0.18), .clear],
                            center: .init(x: 0.05, y: 0.35), startRadius: 10, endRadius: 360)
         }
         .ignoresSafeArea()
@@ -178,7 +185,7 @@ struct PlanProgressCard: View {
                         ZStack(alignment: .leading) {
                             Capsule().fill(.white.opacity(0.10))
                             Capsule()
-                                .fill(LinearGradient(colors: plan.goal.colors, startPoint: .leading, endPoint: .trailing))
+                                .fill(LinearGradient(colors: PlanPalette.itemGradient, startPoint: .leading, endPoint: .trailing))
                                 .frame(width: geo.size.width * fill)
                         }
                     }
@@ -225,7 +232,7 @@ struct PlanProgressCard: View {
             }
         }
         .padding(18)
-        .planGlass(cornerRadius: 26, tint: plan.goal.colors.last)
+        .planGlass(cornerRadius: 26)
     }
 
     private var weekDays: [Int] {
@@ -270,6 +277,119 @@ struct PlanShortToggle: View {
     }
 }
 
+// MARK: - Thumbnail
+
+/// Same square illustration for every item kind (clipped, never bleeding out of the card).
+struct PlanThumbnail: View {
+    let display: PlanItemDisplay
+    var size: CGFloat = 60
+    var cornerRadius: CGFloat = 16
+    var showsPlay = false
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(PlanPalette.thumbnail)
+            if let imageName = display.imageName, UIImage(named: imageName) != nil {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
+            } else {
+                Image(systemName: display.symbol)
+                    .font(.system(size: size * 0.36, weight: .semibold))
+                    .foregroundStyle(PlanPalette.accent)
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .strokeBorder(.white.opacity(0.10), lineWidth: 1)
+        )
+        .overlay(alignment: .bottomTrailing) {
+            if showsPlay {
+                Image(systemName: "play.fill")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 22, height: 22)
+                    .background(Circle().fill(.black.opacity(0.45)))
+                    .padding(5)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+}
+
+// MARK: - Day slot header
+
+struct PlanSlotHeader: View {
+    let slot: PlanDaySlot
+
+    var body: some View {
+        Label(slot.localizedTitle, systemImage: slot.symbol)
+            .font(Font.Poppins.custom(.semiBold, size: 13))
+            .foregroundStyle(PlanPalette.secondaryText)
+            .textCase(.uppercase)
+            .tracking(0.6)
+            .padding(.top, 6)
+            .accessibilityAddTraits(.isHeader)
+    }
+}
+
+// MARK: - Next step
+
+/// Highlights the first item left to do today, with a direct start button.
+struct PlanNextStepCard: View {
+    let item: PlanItem
+    let display: PlanItemDisplay
+    let onStart: () -> Void
+
+    var body: some View {
+        Button {
+            HapticManager.medium()
+            onStart()
+        } label: {
+            HStack(spacing: 16) {
+                PlanThumbnail(display: display, size: 84, cornerRadius: 20)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("plan.next.title".localized)
+                        .font(Font.Poppins.custom(.semiBold, size: 11))
+                        .tracking(0.8)
+                        .textCase(.uppercase)
+                        .foregroundStyle(PlanPalette.accent)
+                    Text(display.title)
+                        .font(.faroSemiBold(20))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    HStack(spacing: 8) {
+                        Label(item.kind == .habit ? "plan.action.open".localized : "plan.next.start".localized,
+                              systemImage: item.kind == .habit ? "arrow.right" : "play.fill")
+                            .font(Font.Poppins.custom(.semiBold, size: 13))
+                            .foregroundStyle(PlanPalette.deep)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(Capsule().fill(PlanPalette.accent))
+                        if let duration = display.durationLabel {
+                            Text(duration)
+                                .font(Font.Poppins.custom(.medium, size: 13))
+                                .foregroundStyle(PlanPalette.secondaryText)
+                        }
+                    }
+                    .padding(.top, 2)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(16)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .planGlass(cornerRadius: 26, tint: PlanPalette.accent, interactive: true)
+        .accessibilityElement(children: .combine)
+    }
+}
+
 // MARK: - Item card
 
 struct PlanItemCard: View {
@@ -292,39 +412,38 @@ struct PlanItemCard: View {
                 onOpen()
             }) {
                 HStack(spacing: 14) {
-                    artwork
+                    PlanThumbnail(display: display, showsPlay: item.kind == .audio || item.kind == .evening)
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 6) {
-                            Text(display.kindLabel.uppercased())
-                                .font(Font.Poppins.custom(.semiBold, size: 10))
-                                .tracking(0.8)
-                                .foregroundStyle(display.colors.first ?? PlanPalette.accent)
-                                .brightness(0.25)
+                            Text(display.kindLabel)
+                                .font(Font.Poppins.custom(.medium, size: 12))
+                                .foregroundStyle(PlanPalette.tertiaryText)
+                            if let duration = display.durationLabel {
+                                Text("·").foregroundStyle(PlanPalette.tertiaryText)
+                                Text(duration)
+                                    .font(Font.Poppins.custom(.medium, size: 12))
+                                    .foregroundStyle(PlanPalette.tertiaryText)
+                            }
                             if isShort && (item.shortRefID != nil || item.shortMinutes != nil) {
                                 Text("plan.short.badge".localized)
-                                    .font(Font.Poppins.custom(.medium, size: 9))
-                                    .foregroundStyle(.white.opacity(0.85))
+                                    .font(Font.Poppins.custom(.medium, size: 10))
+                                    .foregroundStyle(PlanPalette.accent)
                                     .padding(.horizontal, 6).padding(.vertical, 2)
-                                    .background(Capsule().fill(.white.opacity(0.12)))
+                                    .background(Capsule().fill(PlanPalette.accent.opacity(0.15)))
                             }
                         }
                         Text(display.title)
                             .font(Font.Poppins.custom(.semiBold, size: 16))
-                            .foregroundStyle(.white)
-                            .strikethrough(isDone, color: .white.opacity(0.5))
+                            .foregroundStyle(.white.opacity(isDone ? 0.55 : 1))
+                            .strikethrough(isDone, color: .white.opacity(0.4))
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
-                        HStack(spacing: 6) {
-                            if let duration = display.durationLabel {
-                                Label(duration, systemImage: "clock")
-                                    .labelStyle(.titleAndIcon)
-                            }
-                            if !display.subtitle.isEmpty {
-                                Text(display.subtitle).lineLimit(1)
-                            }
+                        if !display.subtitle.isEmpty {
+                            Text(display.subtitle)
+                                .font(Font.Poppins.custom(.regular, size: 12))
+                                .foregroundStyle(PlanPalette.secondaryText)
+                                .lineLimit(1)
                         }
-                        .font(Font.Poppins.custom(.regular, size: 12))
-                        .foregroundStyle(.white.opacity(0.6))
                     }
                     Spacer(minLength: 0)
                 }
@@ -339,8 +458,8 @@ struct PlanItemCard: View {
             } label: {
                 ZStack {
                     Circle()
-                        .strokeBorder(isDone ? PlanPalette.done : .white.opacity(0.35), lineWidth: 2)
-                        .background(Circle().fill(isDone ? PlanPalette.done.opacity(0.9) : .clear))
+                        .strokeBorder(isDone ? PlanPalette.done : .white.opacity(0.3), lineWidth: 2)
+                        .background(Circle().fill(isDone ? PlanPalette.done : .clear))
                     if isDone {
                         Image(systemName: "checkmark")
                             .font(.system(size: 13, weight: .bold))
@@ -351,7 +470,7 @@ struct PlanItemCard: View {
                             .foregroundStyle(.white.opacity(0.5))
                     }
                 }
-                .frame(width: 30, height: 30)
+                .frame(width: 28, height: 28)
                 .frame(width: 44, height: 44)
                 .contentShape(Circle())
             }
@@ -359,9 +478,9 @@ struct PlanItemCard: View {
             .opacity(isEditable ? 1 : 0.5)
             .accessibilityLabel((isDone ? "plan.action.undo" : "plan.action.mark_done").localized)
         }
-        .padding(14)
-        .planGlass(cornerRadius: 22, tint: isDone ? PlanPalette.done : display.colors.first, interactive: true)
-        .opacity(isSkipped ? 0.55 : 1)
+        .padding(12)
+        .planGlass(cornerRadius: 22, interactive: true)
+        .opacity(isSkipped ? 0.5 : 1)
         .contextMenu {
             if isEditable {
                 Button { onToggleDone() } label: {
@@ -383,34 +502,6 @@ struct PlanItemCard: View {
         case .audio, .evening: return "plan.action.play".localized
         case .habit: return "plan.action.open".localized
         }
-    }
-
-    @ViewBuilder
-    private var artwork: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(LinearGradient(colors: display.colors, startPoint: .topLeading, endPoint: .bottomTrailing))
-            if item.kind == .habit, let imageName = display.imageName, UIImage(named: imageName) != nil {
-                Image(imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            } else {
-                Image(systemName: display.symbol)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-            if item.kind == .audio || item.kind == .evening {
-                Image(systemName: "play.fill")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 20, height: 20)
-                    .background(Circle().fill(.black.opacity(0.35)))
-                    .offset(x: 20, y: 20)
-            }
-        }
-        .frame(width: 58, height: 58)
-        .accessibilityHidden(true)
     }
 }
 
@@ -457,6 +548,6 @@ struct PlanFinishedCard: View {
             .planGlassButtonStyle(prominent: false)
         }
         .padding(22)
-        .planGlass(cornerRadius: 28, tint: plan.goal.colors.last)
+        .planGlass(cornerRadius: 28, tint: PlanPalette.accent)
     }
 }

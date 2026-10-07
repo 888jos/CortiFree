@@ -4553,6 +4553,12 @@
 "plan.loading" = "Préparation de ton plan…";
 "plan.cycle" = "Cycle %d";
 "plan.evening_label" = "Ce soir";
+"plan.slot.morning" = "Matin";
+"plan.slot.day" = "Journée";
+"plan.slot.evening" = "Soir";
+"plan.next.title" = "Prochaine étape";
+"plan.next.start" = "Commencer";
+"plan.next.all_done" = "Journée bouclée, bravo !";
 "plan.short.title" = "Peu de temps aujourd'hui ?";
 "plan.short.subtitle" = "Passe aux versions courtes, l'essentiel en quelques minutes.";
 "plan.short.badge" = "Version courte";

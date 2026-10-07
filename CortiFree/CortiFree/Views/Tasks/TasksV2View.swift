@@ -33,6 +33,9 @@ struct TasksV2View: View {
         let task: HabitTask
     }
 
+    /// Hides the tab bar (and Milo) while scrolling down, like the Home tab.
+    @Binding var isScrolling: Bool
+
     @ObservedObject private var store = PersonalPlanStore.shared
     @ObservedObject private var player = GuidedSessionPlayer.shared
     @ObservedObject private var achievementService = AchievementService.shared
@@ -151,9 +154,13 @@ struct TasksV2View: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 12)
-                    .padding(.bottom, 120)
+                    // Clears the tab bar, the mini player and Milo.
+                    .padding(.bottom, player.currentSession == nil ? 150 : 230)
                 }
                 .scrollIndicators(.hidden)
+                .onScrollGeometryChange(for: CGFloat.self) { $0.contentOffset.y } action: { old, new in
+                    updateScrolling(old: old, new: new)
+                }
                 .refreshable { await reloadData() }
             } else {
                 VStack(spacing: 14) {
@@ -212,6 +219,7 @@ struct TasksV2View: View {
                 await reloadData()
             }
         }
+        .onDisappear { isScrolling = false }
         .onReceive(NotificationCenter.default.publisher(for: .personalPlanDidChange)) { _ in
             syncWidgetCache()
         }
@@ -309,7 +317,7 @@ struct TasksV2View: View {
                     .accessibilityAddTraits(.isHeader)
                 Text(theme.localizedSubtitle)
                     .font(Font.Poppins.custom(.regular, size: 14))
-                    .foregroundStyle(.white.opacity(0.65))
+                    .foregroundStyle(PlanPalette.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -318,11 +326,10 @@ struct TasksV2View: View {
     @ViewBuilder
     private func daySection(_ plan: PersonalPlan) -> some View {
         let items = currentItems
-        let dayItems = items.filter { $0.kind != .evening }
-        let evening = items.filter { $0.kind == .evening }
         let doneCount = items.filter { status($0) == .done }.count
         let week = (displayedDay - 1) / 7 + 1
         let short = isViewingToday && isShortMode
+        let nextItem = isViewingToday && !plan.isFinished ? items.first { status($0) == .todo } : nil
 
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
@@ -333,34 +340,45 @@ struct TasksV2View: View {
                 Spacer()
                 Text(String(format: "plan.done_count".localized, doneCount, items.count))
                     .font(Font.Poppins.custom(.medium, size: 13))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(PlanPalette.secondaryText)
             }
 
             if !isViewingToday && !(plan.isFinished && isShowingCurrentDay) {
                 Label("plan.past_day".localized, systemImage: "clock.arrow.circlepath")
                     .font(Font.Poppins.custom(.regular, size: 12))
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(PlanPalette.secondaryText)
+            }
+
+            if let nextItem {
+                PlanNextStepCard(
+                    item: nextItem,
+                    display: nextItem.display(week: week, short: short && nextItem.kind != .evening),
+                    onStart: { open(nextItem, short: short && nextItem.kind != .evening) }
+                )
+            } else if isViewingToday && !items.isEmpty && doneCount == items.count {
+                Label("plan.next.all_done".localized, systemImage: "checkmark.seal.fill")
+                    .font(Font.Poppins.custom(.semiBold, size: 15))
+                    .foregroundStyle(PlanPalette.done)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .planGlass(cornerRadius: 22, tint: PlanPalette.done)
             }
 
             if isViewingToday && !(plan.isFinished) {
                 PlanShortToggle(isOn: shortBinding)
             }
 
-            PlanGlassGroup {
-                VStack(spacing: 12) {
-                    ForEach(dayItems) { item in
-                        card(item, week: week, short: short)
+            ForEach(PlanDaySlot.allCases) { slot in
+                let slotItems = items.filter { PlanDaySlot.slot(for: $0) == slot }
+                if !slotItems.isEmpty {
+                    PlanSlotHeader(slot: slot)
+                    PlanGlassGroup {
+                        VStack(spacing: 10) {
+                            ForEach(slotItems) { item in
+                                card(item, week: week, short: short && item.kind != .evening)
+                            }
+                        }
                     }
-                }
-            }
-
-            if !evening.isEmpty {
-                Label("plan.evening_label".localized, systemImage: "moon.stars.fill")
-                    .font(Font.Poppins.custom(.semiBold, size: 14))
-                    .foregroundStyle(.white.opacity(0.8))
-                    .padding(.top, 6)
-                ForEach(evening) { item in
-                    card(item, week: week, short: false)
                 }
             }
         }
@@ -407,6 +425,19 @@ struct TasksV2View: View {
         .buttonStyle(.plain)
         .planGlass(cornerRadius: 20, interactive: true)
         .padding(.top, 6)
+    }
+
+    // MARK: - Scroll
+
+    private func updateScrolling(old: CGFloat, new: CGFloat) {
+        let delta = new - old
+        if new < 40 {
+            if isScrolling { withAnimation(.easeInOut(duration: 0.25)) { isScrolling = false } }
+        } else if delta > 6, !isScrolling {
+            withAnimation(.easeOut(duration: 0.2)) { isScrolling = true }
+        } else if delta < -6, isScrolling {
+            withAnimation(.easeInOut(duration: 0.25)) { isScrolling = false }
+        }
     }
 
     // MARK: - Actions
@@ -635,6 +666,6 @@ struct TasksV2View: View {
 }
 
 #Preview {
-    TasksV2View()
+    TasksV2View(isScrolling: .constant(false))
         .environment(\.locale, Locale(identifier: "en"))
 }

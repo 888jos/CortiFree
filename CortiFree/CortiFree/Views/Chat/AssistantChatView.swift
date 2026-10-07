@@ -220,13 +220,6 @@ struct AssistantChatView: View {
             return
         }
 
-        if isPlanCheckRequest(text) {
-            let responseIndex = messages.count
-            messages.append(DeepSeekChatMessage(role: "assistant", content: planCheckResponse))
-            recommendationsByMessage[responseIndex] = recommendations(for: text)
-            return
-        }
-
         guard assistantDailyUsage < dailyLimit else {
             messages.append(DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.quota.reached")))
             return
@@ -262,34 +255,7 @@ struct AssistantChatView: View {
     }
 
     private var appContext: String {
-        let defaults = UserDefaults.standard
-        let routineID = defaults.string(forKey: "selectedRoutineId") ?? ""
-        let selectedRoutine = Routine.routine(for: routineID)
-        let routine = selectedRoutine?.localizedName ?? defaults.string(forKey: "selectedRoutineTitle") ?? "No routine selected"
-        let goal = defaults.string(forKey: "selected_goal") ?? defaults.string(forKey: "selectedGoal") ?? "No goal recorded"
-        let steps = selectedRoutine?.steps.map { step in
-            let reference = step.referenceId.map { " [\($0)]" } ?? ""
-            return "\(step.type.rawValue)\(reference), \(max(1, step.duration / 60)) min"
-        }.joined(separator: "; ") ?? "No routine steps recorded"
-        return "Current local CortiFree plan: routine=\(routine); routine_id=\(routineID.isEmpty ? "none" : routineID); goal=\(goal); week=\(max(1, UserPersistence.currentWeek)); day=\(max(1, UserPersistence.currentDay)); steps=\(steps). This is the user's actual in-app plan context. Use it when answering plan questions. Never say the plan details are unavailable when this context is present. Do not invent progress."
-    }
-
-    private var selectedRoutine: Routine? {
-        guard let id = UserDefaults.standard.string(forKey: "selectedRoutineId") else { return nil }
-        return Routine.routine(for: id)
-    }
-
-    private var planCheckResponse: String {
-        guard let routine = selectedRoutine else {
-            return LanguageManager.shared.localizedString(for: "assistant.plan.unavailable")
-        }
-        let firstStep = routine.steps.first?.localizedInstruction ?? "your first planned exercise"
-        return String(format: LanguageManager.shared.localizedString(for: "assistant.plan.summary"), routine.localizedName, routine.formattedDuration, routine.steps.count, routine.impactDomains.joined(separator: ", "), firstStep)
-    }
-
-    private func isPlanCheckRequest(_ text: String) -> Bool {
-        let normalized = text.lowercased()
-        return normalized.contains("check my plan") || normalized.contains("current plan") || normalized.contains("mon plan") || normalized.contains("plan actuel")
+        PlanAssistantContext.current()
     }
 
     private func isEmergency(_ text: String) -> Bool {
@@ -332,26 +298,45 @@ struct AssistantChatView: View {
     private func nextRecommendation(for text: String) -> AssistantRecommendation {
         let normalized = text.lowercased()
         let breathing = BreathingPattern.allPatterns
-        let meditations = Exercise.meditations
         let sounds = Exercise.sounds
         let index = recommendationRotation
+        recommendationRotation += 1
         if containsAny(normalized, ["sound", "son", "music", "musique", "noise", "bruit"]), let item = sounds[safe: index % max(1, sounds.count)] {
-            recommendationRotation += 1
             return soundRecommendation(item.id)
         }
-        if containsAny(normalized, ["meditat", "mindful", "pleine conscience", "journal", "focus", "concentr", "concentration"]), let item = meditations[safe: index % max(1, meditations.count)] {
-            recommendationRotation += 1
-            return meditationRecommendation(item.id)
+        let wantsBreathing = containsAny(normalized, ["breath", "respir", "atem", "呼吸", "호흡"])
+        if !wantsBreathing, let category = sessionCategory(for: normalized) {
+            let sessions = GuidedSessionCatalog.sessions(in: category).sorted { $0.durationMinutes < $1.durationMinutes }
+            if let session = sessions[safe: index % max(1, sessions.count)] {
+                return sessionRecommendation(session)
+            }
         }
         let sleepRequest = containsAny(normalized, ["sleep", "dormir", "sommeil"])
         let breathingIndex = sleepRequest ? (breathing.firstIndex(where: { $0.name.lowercased().contains("slow") }) ?? index % max(1, breathing.count)) : index % max(1, breathing.count)
-        if let item = breathing[safe: breathingIndex] {
-            recommendationRotation += 1
-            return breathingRecommendation(item)
+        return breathingRecommendation(breathing[safe: breathingIndex] ?? breathing[0])
+    }
+
+    /// Guided-session category matching the request, or the plan goal for a generic meditation request.
+    private func sessionCategory(for text: String) -> AudioSessionCategory? {
+        let rules: [([String], AudioSessionCategory)] = [
+            (["sleep", "dormir", "sommeil", "insomn", "schlaf", "睡眠", "잠"], .sleep),
+            (["focus", "concentr", "fokus", "集中", "집중"], .focus),
+            (["anxi", "angoiss", "panic", "panique", "angst", "不安", "불안"], .anxiety),
+            (["morning", "matin", "energy", "énergie", "energie", "fatigue", "tired", "morgen"], .morning),
+            (["work", "travail", "boulot", "bureau", "arbeit", "trabajo"], .workBreak),
+            (["body", "corps", "tension", "muscle", "dos", "nuque", "körper", "cuerpo"], .bodyRelax),
+            (["sad", "triste", "compassion", "lonely", "seul", "difficile", "traurig"], .selfCompassion),
+            (["stress", "estrés", "ストレス", "스트레스"], .stressSOS)
+        ]
+        if let match = rules.first(where: { containsAny(text, $0.0) }) { return match.1 }
+        guard containsAny(text, ["meditat", "médit", "mindful", "pleine conscience", "journal", "séance", "session"]) else { return nil }
+        switch PersonalPlanStore.shared.plan?.goal {
+        case .sleep: return .sleep
+        case .energy: return .morning
+        case .focus: return .focus
+        case .emotional: return .selfCompassion
+        default: return .stressSOS
         }
-        if let item = meditations[safe: index % max(1, meditations.count)] { return meditationRecommendation(item.id) }
-        if let item = sounds[safe: index % max(1, sounds.count)] { return soundRecommendation(item.id) }
-        return breathingRecommendation(breathing[0])
     }
 
     private func containsAny(_ text: String, _ terms: [String]) -> Bool {
@@ -362,9 +347,8 @@ struct AssistantChatView: View {
         AssistantRecommendation(id: "breathing-\(pattern.name)", title: pattern.displayName, subtitle: LanguageManager.shared.localizedString(for: "assistant.recommendation.breathing"), kind: .breathing(pattern))
     }
 
-    private func meditationRecommendation(_ id: String) -> AssistantRecommendation {
-        let support = MeditationSupport.support(for: id)
-        return AssistantRecommendation(id: "meditation-\(id)", title: support?.localizedTitle ?? id, subtitle: support?.benefit ?? LanguageManager.shared.localizedString(for: "assistant.recommendation.meditation"), kind: .meditation(id))
+    private func sessionRecommendation(_ session: GuidedSession) -> AssistantRecommendation {
+        AssistantRecommendation(id: "session-\(session.id)", title: session.localizedTitle, subtitle: "\(session.durationMinutes) min · \(session.localizedSubtitle)", kind: .session(session))
     }
 
     private func soundRecommendation(_ id: String) -> AssistantRecommendation {
@@ -377,6 +361,12 @@ struct AssistantChatView: View {
             if case .sound(let id) = recommendation.kind,
                let exercise = Exercise.sounds.first(where: { $0.id == id }) {
                 SoundPlayer.shared.play(exercise: exercise)
+            } else if case .session(let session) = recommendation.kind {
+                // The full player is presented from the root view: close the chat first.
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    GuidedSessionPlayer.shared.play(session, presentFullPlayer: true)
+                }
             } else {
                 selectedRecommendation = recommendation
             }
@@ -415,13 +405,7 @@ struct AssistantChatView: View {
         switch recommendation.kind {
         case .breathing(let pattern):
             BreathingExerciseDetailView(pattern: pattern)
-        case .meditation(let id):
-            if let support = MeditationSupport.support(for: id) {
-                MeditationSupportView(support: support)
-            } else {
-                MeditationListView()
-            }
-        case .sound:
+        case .session, .sound:
             SoundsListView()
         }
     }
@@ -438,7 +422,7 @@ struct AssistantChatView: View {
 private struct AssistantRecommendation: Identifiable {
     enum Kind {
         case breathing(BreathingPattern)
-        case meditation(String)
+        case session(GuidedSession)
         case sound(String)
     }
 

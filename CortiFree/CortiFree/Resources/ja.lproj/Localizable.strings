@@ -4557,6 +4557,12 @@
 "plan.loading" = "プランを準備しています…";
 "plan.cycle" = "サイクル%d";
 "plan.evening_label" = "今夜";
+"plan.slot.morning" = "朝";
+"plan.slot.day" = "日中";
+"plan.slot.evening" = "夜";
+"plan.next.title" = "次のステップ";
+"plan.next.start" = "はじめる";
+"plan.next.all_done" = "今日は完了、よくできました！";
 "plan.short.title" = "今日は時間がない？";
 "plan.short.subtitle" = "ショート版に切り替えて、数分で大切なことだけ。";
 "plan.short.badge" = "ショート版";

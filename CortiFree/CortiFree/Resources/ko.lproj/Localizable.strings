@@ -4557,6 +4557,12 @@
 "plan.loading" = "플랜을 준비하고 있어요…";
 "plan.cycle" = "%d번째 사이클";
 "plan.evening_label" = "오늘 저녁";
+"plan.slot.morning" = "아침";
+"plan.slot.day" = "낮";
+"plan.slot.evening" = "저녁";
+"plan.next.title" = "다음 단계";
+"plan.next.start" = "시작하기";
+"plan.next.all_done" = "오늘 완료, 잘했어요!";
 "plan.short.title" = "오늘 시간이 부족한가요?";
 "plan.short.subtitle" = "짧은 버전으로 바꿔 몇 분 안에 핵심만 해요.";
 "plan.short.badge" = "짧은 버전";
