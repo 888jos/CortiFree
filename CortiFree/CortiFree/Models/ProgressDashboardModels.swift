@@ -33,13 +33,6 @@ struct ProgressActivityMetric: Codable, Identifiable, Equatable {
     var id: String { category.rawValue }
 }
 
-struct ProgressScorePoint: Codable, Identifiable, Equatable {
-    let date: Date
-    let score: Double
-
-    var id: Date { date }
-}
-
 struct ProgressDomainTrend: Codable, Identifiable, Equatable {
     enum Domain: String, Codable, CaseIterable {
         case serenity
@@ -82,9 +75,6 @@ struct ProgressDashboardData: Codable, Equatable {
     let activities: [ProgressActivityMetric]
     let domainTrends: [ProgressDomainTrend]
     let topActivity: ProgressActivityCategory?
-    let baselineScore: Double?
-    let currentScore: Double?
-    let scoreHistory: [ProgressScorePoint]
 
     static let empty = ProgressDashboardData(
         generatedAt: Date(),
@@ -96,10 +86,7 @@ struct ProgressDashboardData: Codable, Equatable {
             ProgressActivityMetric(category: $0, durationSeconds: 0, sessionCount: 0)
         },
         domainTrends: [],
-        topActivity: nil,
-        baselineScore: nil,
-        currentScore: nil,
-        scoreHistory: []
+        topActivity: nil
     )
 
     func days(in period: ProgressPeriod, relativeTo now: Date = Date(), calendar: Calendar = .current) -> [ProgressDay] {

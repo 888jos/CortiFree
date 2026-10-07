@@ -31,7 +31,7 @@ final class DeepSeekChatService {
     }
 
     func reply(to messages: [DeepSeekChatMessage]) async throws -> String {
-        guard let endpoint = URL(string: "https://us-central1-cortifree-app.cloudfunctions.net/deepSeekChat") else {
+        guard let endpoint = URL(string: "https://cortifree-milo.jossel1-biot.workers.dev") else {
             throw DeepSeekChatError.notConfigured
         }
 

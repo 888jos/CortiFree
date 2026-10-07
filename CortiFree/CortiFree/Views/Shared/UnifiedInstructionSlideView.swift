@@ -325,7 +325,7 @@ struct UnifiedInstructionSlideView: View {
                 // Header avec numéro + durée
                 HStack(spacing: 12) {
                     // Numéro du slide
-                    Text("\(NSLocalizedString("exercise.slide.step_label", comment: "Step label")) \(currentSlide + 1)")
+                    Text("\(LanguageManager.shared.localizedString(for: "exercise.slide.step_label")) \(currentSlide + 1)")
                         .font(.custom("Poppins-Bold", size: 14))
                         .tracking(2)
                         .foregroundColor(Color(hex: steps[currentSlide].color))
@@ -453,7 +453,7 @@ struct UnifiedInstructionSlideView: View {
                 }
             }) {
                 HStack(spacing: 12) {
-                    Text(currentSlide < totalSlides - 1 ? NSLocalizedString("exercise.slide.next", comment: "Next button") : NSLocalizedString("exercise.slide.finish", comment: "Finish button"))
+                    Text(currentSlide < totalSlides - 1 ? LanguageManager.shared.localizedString(for: "exercise.slide.next") : LanguageManager.shared.localizedString(for: "exercise.slide.finish"))
                         .font(.custom("Poppins-Bold", size: 18))
                     Image(systemName: currentSlide < totalSlides - 1 ? "chevron.right" : "checkmark.circle.fill")
                         .font(.custom("Poppins-SemiBold", size: 18))
@@ -511,7 +511,7 @@ struct CompletionOverlay: View {
                     .foregroundColor(Color(hex: "B794F6"))
 
                 // Message
-                Text(NSLocalizedString("exercise.completion.title", comment: "Exercise completed title"))
+                Text(LanguageManager.shared.localizedString(for: "exercise.completion.title"))
                     .font(.custom("Poppins-SemiBold", size: 28))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
@@ -525,7 +525,7 @@ struct CompletionOverlay: View {
                     HapticManager.light()
                     onDismiss()
                 }) {
-                    Text(NSLocalizedString("exercise.completion.continue", comment: "Continue button"))
+                    Text(LanguageManager.shared.localizedString(for: "exercise.completion.continue"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

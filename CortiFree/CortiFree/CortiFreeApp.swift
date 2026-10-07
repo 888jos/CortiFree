@@ -14,11 +14,7 @@ import UserNotifications
 #if canImport(GoogleSignIn)
 import GoogleSignIn
 #endif
-#if canImport(Mixpanel)
-import Mixpanel
-#endif
 import SuperwallKit
-import AppTrackingTransparency
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication,
@@ -35,27 +31,20 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Set notification delegate
         UNUserNotificationCenter.current().delegate = self
 
+        // Keep the daily reminders scheduled (they used to be set only from Settings).
+        NotificationService.shared.syncDailyNotificationsWithPreference()
+
         // Register custom fonts
         FontManager.registerFonts()
 
-        // Initialize Mixpanel Analytics
-        MixpanelManager.shared.initialize()
+        // Initialize analytics (Amplitude)
+        AnalyticsManager.shared.initialize()
 
         // Initialize PostHog Analytics
         PostHogManager.shared.initialize()
 
         // Initialize TikTok App Events SDK
         TikTokManager.shared.initialize()
-        TikTokManager.shared.trackLaunchApp()
-
-        // Request App Tracking Transparency (ATT) permission for TikTok attribution
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            ATTrackingManager.requestTrackingAuthorization { status in
-                #if DEBUG
-                print("📊 ATT status: \(status.rawValue)")
-                #endif
-            }
-        }
 
         // Configure RevenueCat SDK
         RevenueCatManager.shared.configure()
@@ -123,7 +112,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let notificationId = response.notification.request.identifier
 
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "notification_clicked",
             properties: [
                 "notification_id": notificationId,
@@ -144,7 +133,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let notificationId = notification.request.identifier
 
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "notification_received",
             properties: [
                 "notification_id": notificationId,
@@ -158,6 +147,179 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         // Show notification banner and play sound even when app is in foreground
         completionHandler([.banner, .sound])
+    }
+}
+
+/// Resolves RevenueCat before showing the authenticated app. Only users with an
+/// active `pro` entitlement get in; anyone else sees the Superwall paywall and,
+/// if they dismiss it, a locked screen (hard paywall). If the subscription status
+/// can't be determined (offline / RevenueCat unavailable) we fail open so paying
+/// users are never locked out.
+private struct AuthenticatedAppRootView: View {
+    @ObservedObject private var revenueCat = RevenueCatManager.shared
+    @ObservedObject var authViewModel: AuthViewModel
+    @State private var accessResolved = false
+    @State private var isLocked = false
+    @State private var isPresentingPaywall = false
+    @State private var isRestoring = false
+
+    var body: some View {
+        ZStack {
+            if accessResolved {
+                ContentView()
+                    .environmentObject(authViewModel)
+            } else if isLocked {
+                SubscriptionLockedView(
+                    isRestoring: isRestoring,
+                    onUnlock: presentPaywall,
+                    onRestore: restorePurchases
+                )
+            } else {
+                GalaxyBackgroundView(intensity: 0.8)
+                    .ignoresSafeArea()
+                ProgressView()
+                    .tint(.white)
+            }
+        }
+        .task {
+            await resolveAccess()
+        }
+        .onChange(of: revenueCat.hasPremiumEntitlement) { _, isPremium in
+            if isPremium {
+                isLocked = false
+                accessResolved = true
+            }
+        }
+    }
+
+    @MainActor
+    private func resolveAccess() async {
+        guard !accessResolved else { return }
+
+        if !revenueCat.isPremiumStatusReady {
+            await revenueCat.refreshCustomerInfo(forceServerFetch: true)
+        }
+
+        guard !Task.isCancelled else { return }
+
+        // Active subscribers go straight in. Unknown status fails open.
+        if revenueCat.hasPremiumEntitlement || !revenueCat.isPremiumStatusReady {
+            accessResolved = true
+            return
+        }
+
+        presentPaywall()
+    }
+
+    /// Lapsed trial/subscribers get the winback offer, everyone else the main campaign.
+    @MainActor
+    private func presentPaywall() {
+        guard !isPresentingPaywall else { return }
+        isPresentingPaywall = true
+
+        let placement = revenueCat.hasInactivePreviousProEntitlement
+            ? "winback_cancelled_trial"
+            : SuperwallPlacement.onboarding
+
+        let handler = PaywallPresentationHandler()
+        handler.onDismiss { _, _ in
+            Task { @MainActor in finishPaywallPresentation() }
+        }
+        handler.onSkip { _ in
+            Task { @MainActor in finishPaywallPresentation() }
+        }
+        handler.onError { _ in
+            Task { @MainActor in finishPaywallPresentation() }
+        }
+
+        Superwall.shared.register(
+            placement: placement,
+            params: ["source": "authenticated_launch"],
+            handler: handler
+        ) {
+            Task { @MainActor in finishPaywallPresentation() }
+        }
+    }
+
+    @MainActor
+    private func finishPaywallPresentation() {
+        isPresentingPaywall = false
+        if revenueCat.hasPremiumEntitlement {
+            isLocked = false
+            accessResolved = true
+        } else {
+            isLocked = true
+        }
+    }
+
+    private func restorePurchases() {
+        guard !isRestoring else { return }
+        isRestoring = true
+        Task { @MainActor in
+            _ = try? await revenueCat.restorePurchases()
+            isRestoring = false
+            if revenueCat.hasPremiumEntitlement {
+                isLocked = false
+                accessResolved = true
+            }
+        }
+    }
+}
+
+/// Shown to signed-in users without an active subscription after they close the paywall.
+private struct SubscriptionLockedView: View {
+    let isRestoring: Bool
+    let onUnlock: () -> Void
+    let onRestore: () -> Void
+
+    var body: some View {
+        ZStack {
+            GalaxyBackgroundView(intensity: 0.8)
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Spacer()
+
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 44, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                Text(LanguageManager.shared.localizedString(for: "access_locked.title"))
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+
+                Text(LanguageManager.shared.localizedString(for: "access_locked.subtitle"))
+                    .font(.system(size: 16))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+
+                Spacer()
+
+                Button(action: onUnlock) {
+                    Text(LanguageManager.shared.localizedString(for: "access_locked.unlock"))
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color(hex: "B794F6"), in: Capsule())
+                }
+                .padding(.horizontal, 24)
+
+                Button(action: onRestore) {
+                    if isRestoring {
+                        ProgressView().tint(.white)
+                    } else {
+                        Text(LanguageManager.shared.localizedString(for: "access_locked.restore"))
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                }
+                .disabled(isRestoring)
+                .padding(.bottom, 32)
+            }
+        }
     }
 }
 
@@ -192,8 +354,7 @@ struct CortiFreeApp: App {
                 OnboardingV2FlowView()
                     .environmentObject(authViewModel)
             } else if authViewModel.isAuthenticated {
-                ContentView()
-                    .environmentObject(authViewModel)
+                AuthenticatedAppRootView(authViewModel: authViewModel)
             } else {
                 AuthView()
                     .environmentObject(authViewModel)
@@ -207,8 +368,7 @@ struct CortiFreeApp: App {
                     .environmentObject(authViewModel)
             } else if authViewModel.isAuthenticated {
                 // User is authenticated and onboarding completed - show main app
-                ContentView()
-                    .environmentObject(authViewModel)
+                AuthenticatedAppRootView(authViewModel: authViewModel)
             } else {
                 // Onboarding completed but not authenticated - show auth screens
                 AuthView()
@@ -320,7 +480,7 @@ struct CortiFreeApp: App {
     }
 
     private func presentLiveGiftPaywall() {
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "live_gift_opened",
             properties: ["placement": SuperwallPlacement.liveGift]
         )

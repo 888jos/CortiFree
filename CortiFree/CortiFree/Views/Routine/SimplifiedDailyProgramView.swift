@@ -167,23 +167,7 @@ struct SimplifiedDailyProgramView: View {
             }
         }
         .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.12),
-                            Color.white.opacity(0.06)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(routine.color.opacity(0.3), lineWidth: 1)
-                )
-        )
+        .glassCard(cornerRadius: 20)
         .opacity(animateIn ? 1 : 0)
         .scaleEffect(animateIn ? 1 : 0.9)
     }
@@ -228,23 +212,7 @@ struct SimplifiedDailyProgramView: View {
             }
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            (weeklyObjective?.color ?? routine.color).opacity(0.25),
-                            (weeklyObjective?.color ?? routine.color).opacity(0.1)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke((weeklyObjective?.color ?? routine.color).opacity(0.4), lineWidth: 1.5)
-                )
-        )
+        .glassCard(cornerRadius: 20, tint: weeklyObjective?.color ?? routine.color)
     }
 
     // MARK: - Tasks Section
@@ -301,22 +269,10 @@ struct SimplifiedDailyProgramView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: "FFD700").opacity(0.2),
-                            Color(hex: "FFD700").opacity(0.1)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color(hex: "FFD700").opacity(0.4), lineWidth: 1.5)
-                )
+        .glassCard(cornerRadius: 20, tint: Color(hex: "FFD700"))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(Color(hex: "FFD700").opacity(0.35), lineWidth: 1)
         )
     }
 
@@ -520,28 +476,10 @@ struct TaskCard: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(
-                    LinearGradient(
-                        colors: isCompleted ? [
-                            routineColor.opacity(0.2),
-                            routineColor.opacity(0.1)
-                        ] : [
-                            Color.white.opacity(0.08),
-                            Color.white.opacity(0.04)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(
-                            isCompleted ? routineColor.opacity(0.4) : Color.white.opacity(0.1),
-                            lineWidth: 1
-                        )
-                )
+        .glassCard(cornerRadius: 18, tint: isCompleted ? routineColor : nil)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(routineColor.opacity(isCompleted ? 0.4 : 0), lineWidth: 1)
         )
         .animation(.easeInOut(duration: 0.3), value: showDetail)
     }

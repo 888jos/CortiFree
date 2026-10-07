@@ -19,7 +19,23 @@ final class DailyCheckInService {
            Calendar.current.startOfDay(for: settings.programStartDate) >= Calendar.current.startOfDay(for: date) {
             return false
         }
+        // The check-in shown from the app shell is for the previous day.
+        // Never prompt again when that check-in was already completed.
+        guard !hasCompleted(on: previousDay(relativeTo: date)) else { return false }
         return UserDefaults.standard.string(forKey: promptedDayKey) != dayKey(for: date)
+    }
+
+    /// Whether a check-in exists for the requested calendar day.
+    /// Kept local so Home can decide without another Firestore read.
+    func hasCompleted(on date: Date = Date()) -> Bool {
+        UserDefaults.standard.string(forKey: completedDayKey) == dayKey(for: date)
+    }
+
+    /// Used by Home for the retry shortcut after the user skipped the prompt.
+    func shouldShowHomeShortcut(on date: Date = Date()) -> Bool {
+        guard UserPersistence.hasCompletedOnboarding,
+              Auth.auth().currentUser != nil else { return false }
+        return !hasCompleted(on: previousDay(relativeTo: date))
     }
 
     func markPrompted(on date: Date = Date()) {
@@ -93,7 +109,7 @@ final class DailyCheckInService {
             try await JournalService.shared.saveEntry(journalEntry)
         }
 
-        UserDefaults.standard.set(dayKey(for: Date()), forKey: completedDayKey)
+        UserDefaults.standard.set(dayKey(for: record.date), forKey: completedDayKey)
         NotificationCenter.default.post(name: NSNotification.Name("DailyCheckInSaved"), object: nil)
     }
 

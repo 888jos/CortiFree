@@ -78,7 +78,7 @@ struct AchievementBadge: View {
     let achievement: Achievement
     let size: BadgeSize
     var onTap: (() -> Void)? = nil
-    var usesEnglishLabels = true
+    var usesEnglishLabels = false
 
     @State private var isPressed = false
     @State private var triggerShake = false
@@ -185,7 +185,7 @@ struct AchievementBadge: View {
             // Progress text - ALWAYS show for streaks, locked at requirement when unlocked
             if size != .small {
                 let displayProgress = achievement.isUnlocked ? achievement.requirement : achievement.progress
-                Text("\(displayProgress)/\(achievement.requirement) \(usesEnglishLabels ? "Days" : "Jours")")
+                Text(String(format: "achievements.progress".localized, displayProgress, achievement.requirement))
                     .font(.custom("Poppins-Regular", size: 10))
                     .foregroundColor(.white.opacity(achievement.isUnlocked ? 0.7 : 0.5))
             }

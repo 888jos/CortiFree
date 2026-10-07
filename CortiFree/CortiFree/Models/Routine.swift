@@ -31,7 +31,7 @@ enum RoutineCategory: String, CaseIterable {
     }
 
     var localizedName: String {
-        NSLocalizedString(nameKey, comment: "")
+        LanguageManager.shared.localizedString(for: nameKey)
     }
 
     var icon: String {
@@ -65,7 +65,7 @@ enum RoutineCategory: String, CaseIterable {
     }
 
     var localizedDescription: String {
-        NSLocalizedString(descriptionKey, comment: "")
+        LanguageManager.shared.localizedString(for: descriptionKey)
     }
 
     var durationRange: String {
@@ -90,7 +90,7 @@ struct RoutineStep: Identifiable, Codable {
     let icon: String              // SF Symbol name
 
     var localizedInstruction: String {
-        NSLocalizedString(instructionKey, comment: "")
+        LanguageManager.shared.localizedString(for: instructionKey)
     }
 }
 
@@ -110,11 +110,11 @@ struct Routine: Identifiable {
     var imageName: String { category.imageName }
 
     var localizedName: String {
-        NSLocalizedString(nameKey, comment: "")
+        LanguageManager.shared.localizedString(for: nameKey)
     }
 
     var localizedDescription: String {
-        NSLocalizedString(descriptionKey, comment: "")
+        LanguageManager.shared.localizedString(for: descriptionKey)
     }
 
     var formattedDuration: String {
@@ -130,9 +130,9 @@ struct Routine: Identifiable {
 
     var difficultyText: String {
         switch difficulty {
-        case 1: return NSLocalizedString("routine.difficulty.beginner", comment: "")
-        case 2: return NSLocalizedString("routine.difficulty.intermediate", comment: "")
-        case 3: return NSLocalizedString("routine.difficulty.advanced", comment: "")
+        case 1: return LanguageManager.shared.localizedString(for: "routine.difficulty.beginner")
+        case 2: return LanguageManager.shared.localizedString(for: "routine.difficulty.intermediate")
+        case 3: return LanguageManager.shared.localizedString(for: "routine.difficulty.advanced")
         default: return ""
         }
     }

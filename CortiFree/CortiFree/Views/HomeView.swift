@@ -21,14 +21,14 @@ struct HomeView: View {
     @State private var showMeditationList = false
     @State private var showSoundsList = false
     @State private var showJournal = false
+    @State private var showDailyCheckIn = false
+    @State private var showDailyCheckInShortcut = false
     @State private var showSettings = false
     @State private var showOnboarding = false
     @State private var showCustomPaywall = false
     @State private var showRatingSocialProofDebug = false
-    @State private var showGlowScanDebug = false
     @State private var currentTime = Date() // For countdown updates
     @State private var didInitProgram = false
-    @State private var didCheckCancelledTrialWinback = false
 
     // Smart scroll detection
     @State private var lastScrollOffset: CGFloat = 0
@@ -64,30 +64,30 @@ struct HomeView: View {
     private var personalizedPhrase: String {
         switch selectedRoutineTitle.lowercased() {
         case let title where title.contains("anxiété") || title.contains("anxiety"):
-            return NSLocalizedString("home.goal.anxiety", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.anxiety")
         case let title where title.contains("sommeil") || title.contains("sleep"):
-            return NSLocalizedString("home.goal.sleep", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.sleep")
         case let title where title.contains("concentration") || title.contains("focus"):
-            return NSLocalizedString("home.goal.concentration", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.concentration")
         case let title where title.contains("fatigue"):
-            return NSLocalizedString("home.goal.fatigue", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.fatigue")
         case let title where title.contains("tension"):
-            return NSLocalizedString("home.goal.tension", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.tension")
         case let title where title.contains("contrôle") || title.contains("control"):
-            return NSLocalizedString("home.goal.control", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.control")
         case let title where title.contains("énergie") || title.contains("energy"):
-            return NSLocalizedString("home.goal.energy", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.energy")
         case let title where title.contains("émotions") || title.contains("emotions"):
-            return NSLocalizedString("home.goal.emotions", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.emotions")
         default:
-            return NSLocalizedString("home.goal.default", comment: "")
+            return LanguageManager.shared.localizedString(for: "home.goal.default")
         }
     }
 
     var body: some View {
         ZStack {
-            // Galaxy animated background
-            GalaxyBackgroundView(intensity: 1.0)
+            // Galaxy animated background (calmer so glass surfaces read well)
+            GalaxyBackgroundView(intensity: 0.75)
 
             if viewModel.isLoading {
                 ProgressView()
@@ -115,6 +115,12 @@ struct HomeView: View {
                                 MotivationalMessageCard(viewModel: motivationalVM)
                                     .padding(.top, 20)
                                     .offset(y: scrollOffset * 0.3)
+
+                                if showDailyCheckInShortcut {
+                                    dailyCheckInShortcut
+                                        .padding(.top, 14)
+                                        .offset(y: scrollOffset * 0.35)
+                                }
 
                                 // Avatar Progress Card - 66 days grid
                                 AvatarProgressCard()
@@ -146,7 +152,7 @@ struct HomeView: View {
                                     Button(action: {
                                         launchOnboardingFromAuthDebug()
                                     }) {
-                                        Text("🛠 Onboarding From Auth")
+                                        Text("🛠 Current Flow From Auth")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
@@ -157,11 +163,6 @@ struct HomeView: View {
                                     }
                                     Button(action: { showRatingSocialProofDebug = true }) {
                                         Text("⭐ Rating Social Proof")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: { showGlowScanDebug = true }) {
-                                        Text("DEBUG: Glow Scan")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
@@ -209,6 +210,12 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showJournal) {
             JournalHomeView()
         }
+        .sheet(isPresented: $showDailyCheckIn) {
+            DailyCheckInView(targetDate: DailyCheckInService.shared.previousDay())
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+        }
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
         }
@@ -229,12 +236,6 @@ struct HomeView: View {
                 showRatingSocialProofDebug = false
             }
         }
-        .fullScreenCover(isPresented: $showGlowScanDebug) {
-            GlowScanFlowView(
-                onComplete: { showGlowScanDebug = false },
-                onExit: { showGlowScanDebug = false }
-            )
-        }
         #endif
         .onAppear {
             // Refresh motivational message to pick up any name changes from profile edit
@@ -253,11 +254,61 @@ struct HomeView: View {
                 AppRatingService.shared.trackProgramDay7()
             }
 
-            triggerCancelledTrialWinbackIfNeeded()
+            refreshDailyCheckInShortcut()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("DailyCheckInSaved"))) { _ in
+            showDailyCheckInShortcut = false
         }
     }
 
     // MARK: - Smart Scroll Handling
+
+    private var dailyCheckInShortcut: some View {
+        Button {
+            HapticManager.light()
+            showDailyCheckIn = true
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "checkmark.message.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 42, height: 42)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.appTheme, Color.appThemeSecondary],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        in: Circle()
+                    )
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("home.daily_checkin.title".localized)
+                        .font(.custom("Poppins-SemiBold", size: 15))
+                        .foregroundColor(.white)
+                    Text("home.daily_checkin.subtitle".localized)
+                        .font(.custom("Poppins-Regular", size: 12))
+                        .foregroundColor(.white.opacity(0.62))
+                }
+
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(Color.appThemeSecondary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 13)
+            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .glassCard(cornerRadius: 18, tint: Color.appTheme, interactive: true)
+        }
+        .buttonStyle(ScaleButtonStyle())
+        .padding(.horizontal, AppConstants.Layout.paddingLarge)
+        .accessibilityLabel("home.daily_checkin.title".localized)
+    }
+
+    private func refreshDailyCheckInShortcut() {
+        showDailyCheckInShortcut = DailyCheckInService.shared.shouldShowHomeShortcut()
+    }
 
     private func handleScroll(offset: CGFloat) {
         // Calculate scroll velocity (direction and speed)
@@ -292,22 +343,6 @@ struct HomeView: View {
         }
     }
 
-    private func triggerCancelledTrialWinbackIfNeeded() {
-        guard !didCheckCancelledTrialWinback else { return }
-        didCheckCancelledTrialWinback = true
-
-        Task {
-            await RevenueCatManager.shared.refreshCustomerInfo(forceServerFetch: true)
-
-            guard RevenueCatManager.shared.hasInactivePreviousProEntitlement else { return }
-
-            #if DEBUG
-            print("↩️ Triggering previous Pro winback placement")
-            #endif
-            Superwall.shared.register(placement: "winback_cancelled_trial")
-        }
-    }
-
     #if DEBUG
     private func triggerSuperwallDebugPlacement(_ placement: String) {
         print("🧪 Triggering Superwall debug placement: \(placement)")
@@ -315,10 +350,12 @@ struct HomeView: View {
     }
 
     private func launchOnboardingFromAuthDebug() {
-        UserDefaults.standard.set(OnboardingV2FlowView.OnboardingStep.authentication.rawValue, forKey: "onboardingCheckpoint")
-        UserDefaults.standard.set(OnboardingV2FlowView.OnboardingStep.authentication.rawValue, forKey: "last_onboarding_checkpoint")
-        UserDefaults.standard.set(false, forKey: "hasSeenPaywall")
-        UserDefaults.standard.set(false, forKey: "saw_paywall_without_accepting")
+        let defaults = UserDefaults.standard
+        defaults.set(true, forKey: "debugStartOnboardingFromAuth")
+        defaults.removeObject(forKey: "onboardingCheckpoint")
+        defaults.removeObject(forKey: "last_onboarding_checkpoint")
+        defaults.set(false, forKey: "hasSeenPaywall")
+        defaults.set(false, forKey: "saw_paywall_without_accepting")
         showOnboarding = true
     }
 
@@ -352,10 +389,14 @@ struct HomeView: View {
                 showSettings = true
             }) {
                 Image(systemName: "gearshape.fill")
-                    .font(.system(size: 24))
+                    .font(.system(size: 19, weight: .semibold))
                     .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Circle())
             }
-            .accessibleButton(label: AccessibilityLabels.settings, hint: NSLocalizedString("accessibility.hint.open_settings", comment: ""))
+            .buttonStyle(.plain)
+            .glassCircle(interactive: true)
+            .accessibleButton(label: AccessibilityLabels.settings, hint: LanguageManager.shared.localizedString(for: "accessibility.hint.open_settings"))
         }
     }
 
@@ -384,10 +425,11 @@ struct HomeView: View {
     // MARK: - Quick Actions
 
     private var quickActionsRow: some View {
+        GlassGroup(spacing: 22) {
         HStack(spacing: 22) {
             QuickActionButtonNew(
                 icon: "wind",
-                title: NSLocalizedString("quickaction.breathing", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "quickaction.breathing"),
                 hapticStyle: .light
             ) {
                 showBreathingList = true
@@ -395,7 +437,7 @@ struct HomeView: View {
 
             QuickActionButtonNew(
                 icon: "figure.mind.and.body",
-                title: NSLocalizedString("quickaction.meditation", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "quickaction.meditation"),
                 hapticStyle: .light
             ) {
                 showMeditationList = true
@@ -403,7 +445,7 @@ struct HomeView: View {
 
             QuickActionButtonNew(
                 icon: "waveform",
-                title: NSLocalizedString("quickaction.sounds", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "quickaction.sounds"),
                 hapticStyle: .light
             ) {
                 showSoundsList = true
@@ -411,11 +453,12 @@ struct HomeView: View {
 
             QuickActionButtonNew(
                 icon: "book.fill",
-                title: NSLocalizedString("quickaction.journal", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "quickaction.journal"),
                 hapticStyle: .light
             ) {
                 showJournal = true
             }
+        }
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -429,12 +472,12 @@ struct HomeView: View {
         return VStack(spacing: 0) {
             VStack(spacing: 12) {
                 // First line: "Continue de briller"
-                Text(NSLocalizedString(StringKeys.Home.keepShining, comment: ""))
+                Text(LanguageManager.shared.localizedString(for: StringKeys.Home.keepShining))
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(.white)
 
                 // Second line: "Tu atteindras [objectif] dans :"
-                Text(String(format: NSLocalizedString(StringKeys.Home.routineCountdown, comment: ""), selectedRoutineTitle))
+                Text(String(format: LanguageManager.shared.localizedString(for: StringKeys.Home.routineCountdown), selectedRoutineTitle))
                     .font(.custom("Poppins-Regular", size: 14))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
@@ -443,26 +486,22 @@ struct HomeView: View {
                 VStack(spacing: 4) {
                     HStack(spacing: 8) {
                         // Days
-                        TimeUnitView(value: time.days, unit: time.days > 1 ? NSLocalizedString(StringKeys.Common.days, comment: "") : NSLocalizedString(StringKeys.Common.day, comment: ""))
+                        TimeUnitView(value: time.days, unit: time.days > 1 ? LanguageManager.shared.localizedString(for: StringKeys.Common.days) : LanguageManager.shared.localizedString(for: StringKeys.Common.day))
 
                         // Hours
-                        TimeUnitView(value: time.hours, unit: time.hours > 1 ? NSLocalizedString(StringKeys.Common.hours, comment: "") : NSLocalizedString(StringKeys.Common.hour, comment: ""))
+                        TimeUnitView(value: time.hours, unit: time.hours > 1 ? LanguageManager.shared.localizedString(for: StringKeys.Common.hours) : LanguageManager.shared.localizedString(for: StringKeys.Common.hour))
                     }
 
                     HStack(spacing: 8) {
                         // Minutes
-                        TimeUnitView(value: time.minutes, unit: time.minutes > 1 ? NSLocalizedString(StringKeys.Common.minutes, comment: "") : NSLocalizedString(StringKeys.Common.minute, comment: ""))
+                        TimeUnitView(value: time.minutes, unit: time.minutes > 1 ? LanguageManager.shared.localizedString(for: StringKeys.Common.minutes) : LanguageManager.shared.localizedString(for: StringKeys.Common.minute))
 
                         // Seconds
-                        TimeUnitView(value: time.seconds, unit: time.seconds > 1 ? NSLocalizedString(StringKeys.Common.seconds, comment: "") : NSLocalizedString(StringKeys.Common.second, comment: ""))
+                        TimeUnitView(value: time.seconds, unit: time.seconds > 1 ? LanguageManager.shared.localizedString(for: StringKeys.Common.seconds) : LanguageManager.shared.localizedString(for: StringKeys.Common.second))
                     }
                 }
                 .padding(AppConstants.Layout.paddingMedium)
-                .background(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                        .fill(AppConstants.Colors.darkBackground)
-                )
-                .shadow(color: Color.black.opacity(0.25), radius: 4, x: 1, y: 3)
+                .glassCard(cornerRadius: AppConstants.Layout.cornerRadius + 4)
             }
         }
         .frame(maxWidth: .infinity)
@@ -476,17 +515,17 @@ struct HomeView: View {
 
     private func getLevelName(_ level: Int) -> String {
         switch level {
-        case 1: return NSLocalizedString(StringKeys.Levels.beginnerSerene, comment: "")
-        case 2: return NSLocalizedString(StringKeys.Levels.noviceCalm, comment: "")
-        case 3: return NSLocalizedString(StringKeys.Levels.apprenticeZen, comment: "")
-        case 4: return NSLocalizedString(StringKeys.Levels.practitionerAwakened, comment: "")
-        case 5: return NSLocalizedString(StringKeys.Levels.confirmedMeditator, comment: "")
-        case 6: return NSLocalizedString(StringKeys.Levels.expertCalm, comment: "")
-        case 7: return NSLocalizedString(StringKeys.Levels.masterCalm, comment: "")
-        case 8: return NSLocalizedString(StringKeys.Levels.peacefulGuru, comment: "")
-        case 9: return NSLocalizedString(StringKeys.Levels.enlightenedSage, comment: "")
-        case 10: return NSLocalizedString(StringKeys.Levels.immortalLegend, comment: "")
-        default: return level > 10 ? NSLocalizedString(StringKeys.Levels.supremeMaster, comment: "") : NSLocalizedString(StringKeys.Levels.novice, comment: "")
+        case 1: return LanguageManager.shared.localizedString(for: StringKeys.Levels.beginnerSerene)
+        case 2: return LanguageManager.shared.localizedString(for: StringKeys.Levels.noviceCalm)
+        case 3: return LanguageManager.shared.localizedString(for: StringKeys.Levels.apprenticeZen)
+        case 4: return LanguageManager.shared.localizedString(for: StringKeys.Levels.practitionerAwakened)
+        case 5: return LanguageManager.shared.localizedString(for: StringKeys.Levels.confirmedMeditator)
+        case 6: return LanguageManager.shared.localizedString(for: StringKeys.Levels.expertCalm)
+        case 7: return LanguageManager.shared.localizedString(for: StringKeys.Levels.masterCalm)
+        case 8: return LanguageManager.shared.localizedString(for: StringKeys.Levels.peacefulGuru)
+        case 9: return LanguageManager.shared.localizedString(for: StringKeys.Levels.enlightenedSage)
+        case 10: return LanguageManager.shared.localizedString(for: StringKeys.Levels.immortalLegend)
+        default: return level > 10 ? LanguageManager.shared.localizedString(for: StringKeys.Levels.supremeMaster) : LanguageManager.shared.localizedString(for: StringKeys.Levels.novice)
         }
     }
 
@@ -510,39 +549,14 @@ struct HomeView: View {
                         .font(.system(size: 20))
                         .foregroundColor(.white)
 
-                    Text(NSLocalizedString(StringKeys.Home.antiStressButton, comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: StringKeys.Home.antiStressButton))
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                 }
                 .frame(maxWidth: 320, minHeight: 54)
-                .background(
-                    ZStack {
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "6B21E8"),
-                                Color(hex: "9333EA"),
-                                Color(hex: "C084FC")
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.15),
-                                Color.clear
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 60))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 60)
-                            .stroke(Color(hex: "E9D5FF").opacity(0.4), lineWidth: 1)
-                    )
-                )
-                .shadow(color: Color(hex: "9333EA").opacity(0.55), radius: 18, x: 0, y: 6)
+                .contentShape(Capsule())
             }
+            .buttonStyle(.glassPrimary(tint: Color(hex: "9333EA")))
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -562,18 +576,8 @@ struct HomeView: View {
                 }
 
                 // No settings found - this is first time after paywall
-                // Fetch onboarding score from user document
-                let userDoc = try await Firestore.firestore()
-                    .collection("users")
-                    .document(userId)
-                    .getDocument()
-
-                let onboardingScore = userDoc.data()?["onboardingScore"] as? Int ?? 50
-
                 // Create settings with smart start date calculation
-                let settings = UserSettings(
-                    onboardingScore: onboardingScore
-                )
+                let settings = UserSettings()
 
                 // Save settings
                 try await FirebaseManager.shared.saveUserSettings(uid: userId, settings: settings)
@@ -611,11 +615,7 @@ struct QuickActionButtonNew: View {
                     .font(.system(size: 24))
                     .foregroundColor(.white)
                     .responsiveFrame(width: 60, height: 60)
-                    .background(
-                        Circle()
-                            .fill(AppConstants.Colors.darkBackground)
-                    )
-                    .shadow(color: Color.black.opacity(0.25), radius: 4, x: 1, y: 3)
+                    .glassCircle(interactive: true)
 
                 Text(title)
                     .font(.custom("Poppins-Regular", size: 12))
@@ -652,11 +652,11 @@ struct AntiStressView: View {
 
             VStack(spacing: 60) {
                 VStack(spacing: 12) {
-                    Text(NSLocalizedString(StringKeys.Home.breatheDeeply, comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: StringKeys.Home.breatheDeeply))
                         .font(.faroSemiBold(28))
                         .foregroundColor(.white)
 
-                    Text(breatheIn ? NSLocalizedString(StringKeys.Home.breatheIn, comment: "") : NSLocalizedString(StringKeys.Home.breatheOut, comment: ""))
+                    Text(breatheIn ? LanguageManager.shared.localizedString(for: StringKeys.Home.breatheIn) : LanguageManager.shared.localizedString(for: StringKeys.Home.breatheOut))
                         .font(.custom("Poppins-Regular", size: 18))
                         .foregroundColor(AppConstants.Colors.textSecondary)
                 }
@@ -692,16 +692,13 @@ struct AntiStressView: View {
                 Button(action: {
                     dismiss()
                 }) {
-                    Text(NSLocalizedString(StringKeys.Common.close, comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: StringKeys.Common.close))
                         .font(.custom("Poppins-Medium", size: 16))
                         .foregroundColor(Color.appTheme)
                         .padding(.horizontal, 40)
                         .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 30)
-                                .stroke(Color.appTheme, lineWidth: 2)
-                        )
                 }
+                .buttonStyle(.glassSecondary)
                 .padding(.bottom, 60)
             }
         }
@@ -720,8 +717,8 @@ struct RoutineDetailsView: View {
         // For now, generic evidence. Can be customized per routine later
         return [
             (
-                title: NSLocalizedString(StringKeys.Home.neuroplasticity, comment: ""),
-                description: NSLocalizedString(StringKeys.Home.neuroplasticityDesc, comment: "")
+                title: LanguageManager.shared.localizedString(for: StringKeys.Home.neuroplasticity),
+                description: LanguageManager.shared.localizedString(for: StringKeys.Home.neuroplasticityDesc)
             ),
             (
                 title: "Réduction du cortisol",
@@ -747,12 +744,12 @@ struct RoutineDetailsView: View {
                 VStack(spacing: 24) {
                     // Header
                     VStack(spacing: 12) {
-                        Text(NSLocalizedString(StringKeys.Home.why66Days, comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: StringKeys.Home.why66Days))
                             .font(.faroBold(28))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
 
-                        Text(NSLocalizedString(StringKeys.Home.scientificEvidence, comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: StringKeys.Home.scientificEvidence))
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(.white.opacity(0.7))
                     }
@@ -777,7 +774,7 @@ struct RoutineDetailsView: View {
                                 .font(.faroBold(36))
                                 .foregroundColor(.white)
 
-                            Text(daysRemaining > 1 ? NSLocalizedString(StringKeys.Common.days, comment: "") : NSLocalizedString(StringKeys.Common.day, comment: ""))
+                            Text(daysRemaining > 1 ? LanguageManager.shared.localizedString(for: StringKeys.Common.days) : LanguageManager.shared.localizedString(for: StringKeys.Common.day))
                                 .font(.custom("Poppins-Medium", size: 18))
                                 .foregroundColor(.white.opacity(0.9))
                                 .offset(y: 6)
@@ -785,10 +782,7 @@ struct RoutineDetailsView: View {
                     }
                     .padding(.vertical, 20)
                     .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusLarge)
-                            .fill(AppConstants.Colors.darkBackground.opacity(0.6))
-                    )
+                    .glassCard(cornerRadius: AppConstants.Layout.cornerRadiusLarge)
                     .padding(.horizontal, 24)
 
                     // Scientific evidence cards
@@ -807,23 +801,14 @@ struct RoutineDetailsView: View {
                     Button(action: {
                         dismiss()
                     }) {
-                        Text(NSLocalizedString(StringKeys.Common.close, comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: StringKeys.Common.close))
                             .font(.custom("Poppins-Medium", size: 16))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 54)
-                            .background(
-                                LinearGradient(
-                                    colors: [
-                                        Color(hex: "73DE85"),
-                                        Color(hex: "53D7D9")
-                                    ],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 27))
+                            .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassPrimary)
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
                     .padding(.bottom, 40)
@@ -874,10 +859,8 @@ struct EvidenceCard: View {
             }
         }
         .padding(AppConstants.Layout.spacingXLarge)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                .fill(AppConstants.Colors.darkBackground.opacity(0.4))
-        )
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassCard(cornerRadius: AppConstants.Layout.cornerRadius + 4)
     }
 }
 

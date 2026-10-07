@@ -14,7 +14,7 @@ struct RoutineDetailView: View {
 
     var body: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 0.8)
+            GalaxyBackgroundView(intensity: 0.7)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -66,16 +66,14 @@ struct RoutineDetailView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
-
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
@@ -83,20 +81,13 @@ struct RoutineDetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: routine.icon)
                         .font(.system(size: 12))
-                    Text(NSLocalizedString("routines.badge", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "routines.badge"))
                         .font(.custom("Poppins-Bold", size: 11))
                 }
                 .foregroundColor(Color(hex: routine.color))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(Color(hex: routine.color).opacity(0.2))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color(hex: routine.color).opacity(0.5), lineWidth: 1)
-                        )
-                )
+                .glassCapsule(tint: Color(hex: routine.color))
 
                 Spacer()
 
@@ -125,12 +116,13 @@ struct RoutineDetailView: View {
 
     // MARK: - Info Section
     private var infoSection: some View {
+        GlassGroup(spacing: 12) {
         HStack(spacing: 12) {
             // Duration
             InfoPill(icon: "clock.fill", text: routine.formattedDuration, color: routine.color)
 
             // Steps count
-            InfoPill(icon: "list.number", text: "\(routine.steps.count) \(NSLocalizedString("routines.steps", comment: ""))", color: routine.color)
+            InfoPill(icon: "list.number", text: "\(routine.steps.count) \(LanguageManager.shared.localizedString(for: "routines.steps"))", color: routine.color)
 
             // Difficulty
             HStack(spacing: 4) {
@@ -142,23 +134,23 @@ struct RoutineDetailView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(
-                Capsule()
-                    .fill(Color.white.opacity(0.1))
-            )
+            .glassCapsule()
+        }
         }
     }
 
     // MARK: - Impact Section
     private var impactSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(NSLocalizedString("routines.impact", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "routines.impact"))
                 .font(.custom("Poppins-SemiBold", size: 16))
                 .foregroundColor(.white)
 
-            HStack(spacing: 8) {
-                ForEach(routine.impactDomains, id: \.self) { domain in
-                    ImpactBadge(domain: domain, color: routine.color)
+            GlassGroup(spacing: 8) {
+                HStack(spacing: 8) {
+                    ForEach(routine.impactDomains, id: \.self) { domain in
+                        ImpactBadge(domain: domain, color: routine.color)
+                    }
                 }
             }
         }
@@ -168,7 +160,7 @@ struct RoutineDetailView: View {
     // MARK: - Steps Section
     private var stepsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(NSLocalizedString("routines.program", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "routines.program"))
                 .font(.custom("Poppins-SemiBold", size: 18))
                 .foregroundColor(.white)
 
@@ -189,37 +181,15 @@ struct RoutineDetailView: View {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 24))
 
-                    Text(NSLocalizedString("routines.start", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "routines.start"))
                         .font(.custom("Poppins-Bold", size: 18))
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 64)
-                .background(
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 32)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: routine.color), Color(hex: routine.color).opacity(0.7)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .blur(radius: 20)
-                            .offset(y: 8)
-
-                        RoundedRectangle(cornerRadius: 32)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: routine.color), Color(hex: routine.color).opacity(0.8)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    }
-                )
+                .contentShape(Capsule())
             }
-            .buttonStyle(ScaleButtonStyle())
+            .buttonStyle(.glassPrimary(tint: Color(hex: routine.color)))
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
@@ -250,10 +220,7 @@ struct InfoPill: View {
         .foregroundColor(Color(hex: color))
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(
-            Capsule()
-                .fill(Color(hex: color).opacity(0.15))
-        )
+        .glassCapsule(tint: Color(hex: color))
     }
 }
 
@@ -262,19 +229,12 @@ struct ImpactBadge: View {
     let color: String
 
     var body: some View {
-        Text(NSLocalizedString("domain.\(domain.lowercased())", comment: ""))
+        Text(LanguageManager.shared.localizedString(for: "domain.\(domain.lowercased())"))
             .font(.custom("Poppins-Medium", size: 12))
             .foregroundColor(Color(hex: color))
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Color(hex: color).opacity(0.15))
-                    .overlay(
-                        Capsule()
-                            .stroke(Color(hex: color).opacity(0.3), lineWidth: 1)
-                    )
-            )
+            .glassCapsule(tint: Color(hex: color))
     }
 }
 
@@ -316,10 +276,7 @@ struct StepPreviewRow: View {
             Spacer()
         }
         .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.05))
-        )
+        .glassCard(cornerRadius: 16)
     }
 
     private func formatStepDuration(_ seconds: Int) -> String {

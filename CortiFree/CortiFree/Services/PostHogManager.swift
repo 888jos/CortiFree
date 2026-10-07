@@ -3,7 +3,7 @@
 //  CortiFree
 //
 //  PostHog analytics integration
-//  Mirrors the same events as MixpanelManager for cross-validation
+//  Mirrors the same events as AnalyticsManager for cross-validation
 //
 
 import Foundation

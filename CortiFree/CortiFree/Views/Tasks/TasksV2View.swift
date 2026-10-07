@@ -2,1383 +2,635 @@
 //  TasksV2View.swift
 //  CortiFree
 //
-//  Created by Claude on 14/11/2025.
-//  Vue principale des tâches d'habitudes avec header et liste
+//  Plan tab: the user's personalized 28-day plan (PersonalPlanStore).
+//  Each day = 1 breathing exercise + 1 guided audio session (+ short version)
+//  + 2–3 goal-weighted habits (+ evening wind-down for sleep goals).
+//
+//  Completion history stays keyed by the absolute program day (UserSettings.programStartDate)
+//  in task_statuses, so streaks and history survive plan changes.
 //
 
 import SwiftUI
 import FirebaseAuth
 
 struct TasksV2View: View {
-    @ObservedObject private var achievementService = AchievementService.shared
-    @ObservedObject private var habitBadgeService = HabitBadgeService.shared
-    @State private var selectedTask: HabitTask?
-    @State private var selectedTab: TaskTab = .todos
-    @State private var taskStatuses: [String: [String: TaskStatus]] = [:] // [day: [taskTitle: status]]
-    @State private var currentDay: Int = 1 // Day 1 to 66
-    @State private var showAddTask = false
-    @State private var globalScore: Int = AppConstants.Program.defaultInitialScore // Current global score (average of 5 domains, rounded)
-    @State private var initialGlobalScore: Int = AppConstants.Program.defaultInitialScore // Initial score from onboarding
-    @State private var taskStreaks: [String: Int] = [:] // Track individual task streaks
-    @State private var globalStreak: Int = 0 // Global streak (consecutive days with at least 1 task validated)
-    @State private var showConfetti: Bool = false // Confetti animation trigger
-    @State private var showSuccessCheckmark: Bool = false // Success checkmark animation trigger
-    @State private var showFlameAnimation: Bool = false // Flame streak animation trigger (first task of day)
-    @State private var isRefreshing: Bool = false // Pull to refresh state
-    @State private var showFutureWeekAlert: Bool = false // Show blocking screen for future weeks
-
-    // Undo functionality for skip action
-    @State private var showUndoToast: Bool = false
-    @State private var skippedTask: HabitTask?
-    @State private var undoWorkItem: DispatchWorkItem?
-
-    // Firebase data
-    @State private var userSettings: UserSettings?
-    @State private var habitTracking: [String: HabitTracking] = [:]
-    @State private var isLoadingData: Bool = true
-    @State private var loadingError: String? = nil
-    @State private var hasLoadedData: Bool = false
-
-    // Actual day the user is on (calculated from start date)
-    private var actualDay: Int {
-        return userSettings?.currentProgramDay ?? 1
-    }
-
-    // Computed score increase since day 1
-    private var globalScoreIncrease: Int {
-        return globalScore - initialGlobalScore
-    }
-
-    enum TaskTab {
-        case todos
-        case done
-        case skipped
-    }
-
     enum TaskStatus {
         case todo
         case done
         case skipped
     }
 
-    // Computed property: Tasks for current DAY only
-    private var tasks: [HabitTask] {
-        var dailyTasks: [HabitTask] = []
-        let week = WeeklyHabitProgression.currentWeek(for: currentDay)
-        let dayOfWeek = (currentDay - 1) % 7 // 0 = lundi, 6 = dimanche
-
-        // 1. SE LEVER (matin) - titre dynamique selon la semaine
-        let sleepVariants = HabitVariantConfig.getSleepVariants(forDay: currentDay)
-
-        // Ajouter "Se lever avant 7h"
-        if sleepVariants.count > 0 {
-            let sleepData = habitTracking[AppConstants.Habits.ID.sleep]
-            dailyTasks.append(HabitTask(
-                title: sleepVariants[0].title,
-                frequency: "", // For compatibility
-                duration: "", // Pas de durée pour le sommeil
-                frequencyText: StringKeys.Frequency.daily,
-                difficulty: AppConstants.Habits.Difficulty.medium,
-                streak: sleepData?.currentStreak ?? 0,
-                imageName: sleepVariants[0].imageName,
-                totalCompletions: sleepData?.totalCompletions ?? 0,
-                last7Days: sleepData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: sleepData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_sleep")
-            ))
-        }
-
-        // 2. RESPIRATION (matin) - Offset 1 pour disperser
-        let breathingProgression = WeeklyHabitProgression.breathingProgression(week: week)
-        let breathingDuration = WeeklyHabitProgression.formatProgressionDisplay(breathingProgression)
-        let breathingVariant = HabitVariantConfig.getBreathingVariant()
-        // Afficher seulement certains jours selon fréquence
-        let showBreathing = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: breathingProgression.frequencyPerWeek, habitOffset: 1)
-
-        if showBreathing {
-            let breathingData = habitTracking[AppConstants.Habits.ID.breathing]
-            dailyTasks.append(HabitTask(
-                title: breathingVariant.title,
-                frequency: breathingDuration, // For compatibility
-                duration: breathingDuration,
-                frequencyText: breathingProgression.formattedFrequency,
-                difficulty: AppConstants.Habits.Difficulty.easy,
-                streak: breathingData?.currentStreak ?? 0,
-                imageName: "habit_breathe",
-                totalCompletions: breathingData?.totalCompletions ?? 0,
-                last7Days: breathingData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: breathingData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_breathe")
-            ))
-        }
-
-        // 3. MÉDITATION (matin) - Offset 3 pour disperser par rapport à respiration
-        let meditationProgression = WeeklyHabitProgression.meditationProgression(week: week)
-        let meditationDuration = WeeklyHabitProgression.formatProgressionDisplay(meditationProgression)
-        let meditationVariant = HabitVariantConfig.getMeditationVariant()
-        let showMeditation = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: meditationProgression.frequencyPerWeek, habitOffset: 3)
-
-        if showMeditation {
-            let meditationData = habitTracking[AppConstants.Habits.ID.meditation]
-            dailyTasks.append(HabitTask(
-                title: meditationVariant.title,
-                frequency: meditationDuration,
-                duration: meditationDuration,
-                frequencyText: meditationProgression.formattedFrequency,
-                difficulty: AppConstants.Habits.Difficulty.hard,
-                streak: meditationData?.currentStreak ?? 0,
-                imageName: "habit_meditate",
-                totalCompletions: meditationData?.totalCompletions ?? 0,
-                last7Days: meditationData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: meditationData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_meditate")
-            ))
-        }
-
-        // 4. HYDRATATION (toute la journée) - titre dynamique selon la semaine
-        let waterVariant = HabitVariantConfig.getWaterVariant(forDay: currentDay)
-        let waterData = habitTracking[AppConstants.Habits.ID.water]
-
-        dailyTasks.append(HabitTask(
-            title: waterVariant.title,
-            frequency: "", // For compatibility
-            duration: "", // Pas de durée pour l'eau
-            frequencyText: StringKeys.Frequency.daily,
-            difficulty: AppConstants.Habits.Difficulty.easy,
-            streak: waterData?.currentStreak ?? 0,
-            imageName: waterVariant.imageName,
-            totalCompletions: waterData?.totalCompletions ?? 0,
-            last7Days: waterData?.last7Days ?? [false, false, false, false, false, false, false],
-            completedDays: waterData?.completedDays ?? [],
-            impactAreas: HabitTask.getImpactAreas(for: "habit_water")
-        ))
-
-        // 5. SPORT (journée) - Variante selon le jour - Offset 0
-        let sportProgression = WeeklyHabitProgression.sportProgression(week: week)
-        let sportDuration = WeeklyHabitProgression.formatProgressionDisplay(sportProgression)
-        let showSport = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: sportProgression.frequencyPerWeek, habitOffset: 0)
-
-        if showSport, let sportVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.sport) {
-            let sportData = habitTracking[AppConstants.Habits.ID.sport]
-            dailyTasks.append(HabitTask(
-                title: sportVariant.title,
-                frequency: sportDuration,
-                duration: sportDuration,
-                frequencyText: sportProgression.formattedFrequency,
-                difficulty: AppConstants.Habits.Difficulty.hard,
-                streak: sportData?.currentStreak ?? 0,
-                imageName: sportVariant.imageName,
-                totalCompletions: sportData?.totalCompletions ?? 0,
-                last7Days: sportData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: sportData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_sport")
-            ))
-        }
-
-        // 6. NATURE (après-midi) - Offset 2 pour décaler par rapport à sport
-        let natureProgression = WeeklyHabitProgression.natureProgression(week: week)
-        let natureDuration = WeeklyHabitProgression.formatProgressionDisplay(natureProgression)
-        let showNature = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: natureProgression.frequencyPerWeek, habitOffset: 2)
-
-        if showNature, let natureVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.nature) {
-            let natureData = habitTracking[AppConstants.Habits.ID.nature]
-            dailyTasks.append(HabitTask(
-                title: natureVariant.title,
-                frequency: natureDuration,
-                duration: natureDuration,
-                frequencyText: natureProgression.formattedFrequency,
-                difficulty: AppConstants.Habits.Difficulty.medium,
-                streak: natureData?.currentStreak ?? 0,
-                imageName: natureVariant.imageName,
-                totalCompletions: natureData?.totalCompletions ?? 0,
-                last7Days: natureData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: natureData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_nature")
-            ))
-        }
-
-        // 7. SOCIAL (soirée) - Offset 4 pour décaler par rapport à sport et nature
-        let socialProgression = WeeklyHabitProgression.socialProgression(week: week)
-        let showSocial = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: socialProgression.frequencyPerWeek, habitOffset: 4)
-
-        if showSocial, let socialVariant = HabitVariantConfig.variantForDay(currentDay, habitType: AppConstants.Habits.ID.social) {
-            let socialData = habitTracking[AppConstants.Habits.ID.social]
-            dailyTasks.append(HabitTask(
-                title: socialVariant.title,
-                frequency: "", // For compatibility
-                duration: "", // Pas de durée pour le social
-                frequencyText: socialProgression.formattedFrequency,
-                difficulty: AppConstants.Habits.Difficulty.medium,
-                streak: socialData?.currentStreak ?? 0,
-                imageName: socialVariant.imageName,
-                totalCompletions: socialData?.totalCompletions ?? 0,
-                last7Days: socialData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: socialData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_social")
-            ))
-        }
-
-        // 8. JOURNAL (soir)
-        let journalProgression = WeeklyHabitProgression.journalProgression(week: week)
-        let journalDuration = WeeklyHabitProgression.formatProgressionDisplay(journalProgression)
-        let journalVariant = HabitVariantConfig.getJournalVariant()
-        let showJournal = shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: journalProgression.frequencyPerWeek)
-
-        if showJournal {
-            let journalData = habitTracking[AppConstants.Habits.ID.journal]
-            dailyTasks.append(HabitTask(
-                title: journalVariant.title,
-                frequency: journalDuration,
-                duration: journalDuration,
-                frequencyText: journalProgression.formattedFrequency,
-                difficulty: AppConstants.Habits.Difficulty.medium,
-                streak: journalData?.currentStreak ?? 0,
-                imageName: journalVariant.imageName,
-                totalCompletions: journalData?.totalCompletions ?? 0,
-                last7Days: journalData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: journalData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_journal")
-            ))
-        }
-
-        // 9. SE COUCHER AVANT 23H (soir)
-        if sleepVariants.count > 1 {
-            let sleepData = habitTracking[AppConstants.Habits.ID.sleep]
-            dailyTasks.append(HabitTask(
-                title: sleepVariants[1].title,
-                frequency: "", // For compatibility
-                duration: "", // Pas de durée pour le sommeil
-                frequencyText: StringKeys.Frequency.daily,
-                difficulty: AppConstants.Habits.Difficulty.medium,
-                streak: sleepData?.currentStreak ?? 0,
-                imageName: sleepVariants[1].imageName,
-                totalCompletions: sleepData?.totalCompletions ?? 0,
-                last7Days: sleepData?.last7Days ?? [false, false, false, false, false, false, false],
-                completedDays: sleepData?.completedDays ?? [],
-                impactAreas: HabitTask.getImpactAreas(for: "habit_sleep")
-            ))
-        }
-
-        return dailyTasks
+    private struct BreathingLaunch: Identifiable {
+        let id = UUID()
+        let item: PlanItem
+        let pattern: BreathingPattern
+        let minutes: Int
     }
 
-    // Helper function to determine if a task should be shown on a given day
-    private func shouldShowTask(dayOfWeek: Int, frequencyPerWeek: Int) -> Bool {
-        return shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: frequencyPerWeek, habitOffset: 0)
+    private struct HabitSelection: Identifiable {
+        var id: String { item.id }
+        let item: PlanItem
+        let task: HabitTask
     }
 
-    /// Version avec offset pour disperser nature, social et sport sur des jours différents
-    private func shouldShowTask(dayOfWeek: Int, frequencyPerWeek: Int, habitOffset: Int) -> Bool {
-        if frequencyPerWeek >= 7 { return true } // Daily
+    @ObservedObject private var store = PersonalPlanStore.shared
+    @ObservedObject private var player = GuidedSessionPlayer.shared
+    @ObservedObject private var achievementService = AchievementService.shared
+    @ObservedObject private var habitBadgeService = HabitBadgeService.shared
 
-        // Appliquer l'offset pour décaler les jours selon l'habitude
-        let adjustedDay = (dayOfWeek + habitOffset) % 7
+    @State private var userSettings: UserSettings?
+    @State private var habitTracking: [String: HabitTracking] = [:]
+    @State private var taskStatuses: [String: [String: TaskStatus]] = [:]
+    @State private var viewedPlanDay: Int?
+    @State private var globalStreak: Int = 0
+    @State private var hasLoadedData = false
 
-        // Distribuer les tâches de manière équilibrée dans la semaine
-        switch frequencyPerWeek {
-        case 1: return adjustedDay == 3 // Un jour par semaine
-        case 2: return adjustedDay == 1 || adjustedDay == 4 // 2 jours espacés
-        case 3: return adjustedDay == 0 || adjustedDay == 2 || adjustedDay == 5 // 3 jours espacés
-        case 4: return adjustedDay != 2 && adjustedDay != 5 // Tous sauf 2 jours
-        case 5: return adjustedDay != 6 && adjustedDay != 3 // Tous sauf 2 jours
-        case 6: return adjustedDay != 0 // Tous sauf 1 jour
-        default: return true
+    @State private var breathingLaunch: BreathingLaunch?
+    @State private var habitSelection: HabitSelection?
+    @State private var showWhy = false
+    @State private var goalPickerMode: PlanGoalPickerSheet.Mode?
+    @State private var showConfetti = false
+    @State private var showSuccessCheckmark = false
+    @State private var showFlameAnimation = false
+    /// Audio item waiting for the player to finish (marks it done automatically).
+    @State private var pendingAudioItem: PlanItem?
+
+    /// "yyyy-MM-dd" of the day the short mode was enabled (auto-resets the next day).
+    @AppStorage("plan.shortModeDay") private var shortModeDay: String = ""
+
+    // MARK: - Day math
+
+    private var plan: PersonalPlan? { store.plan }
+    private var todayIndex: Int { plan?.dayIndex() ?? 1 }
+    private var displayedDay: Int { min(viewedPlanDay ?? todayIndex, PersonalPlan.length) }
+    /// True when today's plan day is shown (false once the 28 days are over).
+    private var isViewingToday: Bool { displayedDay == todayIndex }
+    private var isShowingCurrentDay: Bool { viewedPlanDay == nil || viewedPlanDay == todayIndex }
+
+    /// Absolute program day (history key) for today.
+    private var actualAbsoluteDay: Int {
+        userSettings?.currentProgramDay ?? UserSettings.loadFromUserDefaults()?.currentProgramDay ?? 1
+    }
+
+    private func absoluteDay(forPlanDay day: Int) -> Int {
+        max(1, actualAbsoluteDay - (todayIndex - day))
+    }
+
+    private var todayKey: String {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.dateFormat = "yyyy-MM-dd"
+        return f.string(from: Date())
+    }
+
+    private var isShortMode: Bool { shortModeDay == todayKey }
+
+    private var shortBinding: Binding<Bool> {
+        Binding(
+            get: { isShortMode },
+            set: { newValue in
+                HapticManager.light()
+                shortModeDay = newValue ? todayKey : ""
+            }
+        )
+    }
+
+    private var currentItems: [PlanItem] {
+        plan?.day(displayedDay)?.items ?? []
+    }
+
+    private func status(_ item: PlanItem, planDay: Int? = nil) -> TaskStatus {
+        let day = absoluteDay(forPlanDay: planDay ?? displayedDay)
+        return taskStatuses[dayKey(day)]?[item.statusKey] ?? .todo
+    }
+
+    private var completedPlanDays: Set<Int> {
+        guard plan != nil else { return [] }
+        var days = Set<Int>()
+        for day in 1...min(todayIndex, PersonalPlan.length) {
+            let statuses = taskStatuses[dayKey(absoluteDay(forPlanDay: day))] ?? [:]
+            if statuses.values.contains(.done) { days.insert(day) }
         }
+        return days
     }
+
+    // MARK: - Body
 
     var body: some View {
         ZStack {
-            // Simple gradient background for better performance
-            LinearGradient(
-                colors: [
-                    Color(hex: "0A0515"),
-                    Color(hex: "1a0a2e"),
-                    Color(hex: "0A0515")
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            PlanBackground(goal: plan?.goal)
 
-            VStack(spacing: 0) {
-                // Header section
-                VStack(spacing: 8) {
-                    // Top row: Streak and Global Score
-                    HStack(spacing: 16) {
-                        // Flame streak
-                        HStack(spacing: 4) {
-                            Image(systemName: "flame.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(AppConstants.Colors.streakOrange)
+            if let plan {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        header(plan)
 
-                            Text("\(globalStreak)")
-                                .font(Font.Poppins.custom(.bold, size: 16))
-                                .foregroundColor(.white)
-                        }
-
-                        Spacer()
-
-                        // Global Score display
-                        HStack(spacing: 4) {
-                            Image(systemName: "star.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white)
-
-                            Text("\(globalScore)")
-                                .font(Font.Poppins.custom(.bold, size: 16))
-                                .foregroundColor(.white)
-
-                            Text("(\(globalScoreIncrease >= 0 ? "+" : "")\(globalScoreIncrease))")
-                                .font(.custom("Poppins-Regular", size: 12))
-                                .foregroundColor(.white.opacity(0.5))
-                        }
-                    }
-                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
-                    .padding(.top, 16)
-
-                    // Day counter
-                    HStack {
-                        Text(currentDay <= 66 ? String(format: NSLocalizedString("tasks.day_counter", comment: ""), currentDay) : String(format: NSLocalizedString("tasks.day_counter_extended", comment: ""), currentDay))
-                            .font(.faroBold(48))
-                            .foregroundColor(.white)
-
-                        Spacer()
-
-                        // Navigation arrows
-                        HStack(spacing: 12) {
-                            Button(action: {
-                                HapticManager.light()
-                                if currentDay > 1 {
-                                    withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
-                                        currentDay -= 1
-                                    }
+                        PlanProgressCard(
+                            plan: plan,
+                            displayedDay: displayedDay,
+                            todayIndex: todayIndex,
+                            completedDays: completedPlanDays,
+                            onSelectDay: { day in
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                    viewedPlanDay = day == todayIndex ? nil : day
                                 }
-                            }) {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 20, weight: .bold))
-                                    .foregroundColor(currentDay > 1 ? .white : .white.opacity(0.3))
                             }
-                            .disabled(currentDay <= 1)
+                        )
 
-                            Button(action: {
-                                HapticManager.light()
-                                let targetDay = currentDay + 1
-                                let currentWeek = WeeklyHabitProgression.currentWeek(for: actualDay)
-                                let targetWeek = WeeklyHabitProgression.currentWeek(for: targetDay)
-
-                                // Week lock: prevent navigating to future weeks
-                                if targetWeek <= currentWeek {
-                                    withAnimation(.easeInOut(duration: AppConstants.Animation.standardDuration)) {
-                                        currentDay = targetDay
-                                    }
-                                } else {
-                                    showFutureWeekAlert = true
-                                }
-                            }) {
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 20, weight: .bold))
-                                    .foregroundColor(.white)
-                            }
+                        if plan.isFinished && isShowingCurrentDay {
+                            PlanFinishedCard(
+                                plan: plan,
+                                onContinue: { startNextCycle(goal: nil) },
+                                onChangeGoal: { goalPickerMode = .nextCycle }
+                            )
                         }
+
+                        daySection(plan)
+
+                        whyButton
                     }
-                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
-
-                    // Encouragement text
-                    Text(NSLocalizedString("tasks.encouragement", comment: ""))
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white.opacity(0.6))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, AppConstants.Layout.paddingLarge)
-                        .padding(.bottom, 8)
-
-                    // Tabs: À faire, Fait, Passé
-                    HStack(spacing: 12) {
-                        // À faire tab
-                        Button(action: {
-                            HapticManager.light()
-                            selectedTab = .todos
-                        }) {
-                            HStack(spacing: 4) {
-                                Text(NSLocalizedString("tasks.todo", comment: ""))
-                                    .font(.custom(selectedTab == .todos ? "Poppins-SemiBold" : "Poppins-Regular", size: 14))
-                                    .foregroundColor(selectedTab == .todos ? .black : .white.opacity(0.6))
-
-                                Text("\(todoCount)")
-                                    .font(Font.Poppins.custom(.bold, size: 12))
-                                    .foregroundColor(selectedTab == .todos ? .black.opacity(0.6) : .white.opacity(0.4))
-                            }
-                            .padding(.horizontal, AppConstants.Layout.paddingMedium)
-                            .padding(.vertical, AppConstants.Layout.paddingSmall)
-                            .background(
-                                RoundedRectangle(cornerRadius: AppConstants.Layout.paddingSmall)
-                                    .fill(selectedTab == .todos ? .white : Color.clear)
-                            )
-                        }
-
-                        // Done tab
-                        Button(action: {
-                            HapticManager.light()
-                            selectedTab = .done
-                        }) {
-                            HStack(spacing: 4) {
-                                Text(NSLocalizedString("tasks.done", comment: ""))
-                                    .font(.custom(selectedTab == .done ? "Poppins-SemiBold" : "Poppins-Regular", size: 14))
-                                    .foregroundColor(selectedTab == .done ? .black : .white.opacity(0.6))
-
-                                Text("\(doneCount)")
-                                    .font(Font.Poppins.custom(.bold, size: 12))
-                                    .foregroundColor(selectedTab == .done ? .black.opacity(0.6) : .white.opacity(0.4))
-                            }
-                            .padding(.horizontal, AppConstants.Layout.paddingMedium)
-                            .padding(.vertical, AppConstants.Layout.paddingSmall)
-                            .background(
-                                RoundedRectangle(cornerRadius: AppConstants.Layout.paddingSmall)
-                                    .fill(selectedTab == .done ? .white : Color.clear)
-                            )
-                        }
-
-                        // Skipped tab
-                        Button(action: {
-                            HapticManager.light()
-                            selectedTab = .skipped
-                        }) {
-                            HStack(spacing: 4) {
-                                Text(NSLocalizedString("tasks.skipped", comment: ""))
-                                    .font(.custom(selectedTab == .skipped ? "Poppins-SemiBold" : "Poppins-Regular", size: 14))
-                                    .foregroundColor(selectedTab == .skipped ? .black : .white.opacity(0.6))
-
-                                Text("\(skippedCount)")
-                                    .font(Font.Poppins.custom(.bold, size: 12))
-                                    .foregroundColor(selectedTab == .skipped ? .black.opacity(0.6) : .white.opacity(0.4))
-                            }
-                            .padding(.horizontal, AppConstants.Layout.paddingMedium)
-                            .padding(.vertical, AppConstants.Layout.paddingSmall)
-                            .background(
-                                RoundedRectangle(cornerRadius: AppConstants.Layout.paddingSmall)
-                                    .fill(selectedTab == .skipped ? .white : Color.clear)
-                            )
-                        }
-
-                        Spacer()
-                    }
-                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
-                    .padding(.bottom, 16)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
+                    .padding(.bottom, 120)
                 }
-
-                // Tasks list with pull to refresh
-                RefreshableScrollView(
-                    isRefreshing: $isRefreshing,
-                    action: {
-                        // Simulate refresh
-                        try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
-                        // Here you could reload tasks from Firebase
-                        HapticManager.success()
-                    }
-                ) {
-                    VStack(spacing: 20) {
-                        if let error = loadingError {
-                            // Show error state with retry button
-                            VStack(spacing: 24) {
-                                Spacer()
-
-                                // Error icon
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.system(size: 60))
-                                    .foregroundColor(.orange)
-
-                                // Error message
-                                VStack(spacing: 8) {
-                                    Text(NSLocalizedString("tasks.error_loading", comment: ""))
-                                        .font(.faroSemiBold(20))
-                                        .foregroundColor(.white)
-
-                                    Text(error)
-                                        .font(Font.Poppins.custom(.regular, size: 14))
-                                        .foregroundColor(.white.opacity(0.7))
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal, 32)
-                                }
-
-                                // Retry button
-                                Button(action: {
-                                    HapticManager.medium()
-                                    loadingError = nil
-                                    loadFirebaseData()
-                                }) {
-                                    Text(NSLocalizedString("tasks.retry", comment: ""))
-                                        .font(Font.Poppins.custom(.semiBold, size: 16))
-                                        .foregroundColor(.black)
-                                        .padding(.horizontal, 32)
-                                        .padding(.vertical, 12)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                                                .fill(.white)
-                                        )
-                                }
-                                .minimumTouchTarget()
-
-                                Spacer()
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 100)
-                        } else if isLoadingData {
-                            // Show skeleton loaders while loading
-                            ForEach(0..<5, id: \.self) { index in
-                                SkeletonTaskCard()
-                                    .cascadeAppear(index: index, totalCount: 5, baseDelay: 0.05)
-                            }
-                        } else if filteredTasks.isEmpty {
-                            // Show empty state when no tasks
-                            VStack(spacing: 24) {
-                                Spacer()
-
-                                // Empty state icon
-                                Image(systemName: selectedTab == .done ? "checkmark.circle" : selectedTab == .skipped ? "xmark.circle" : "tray")
-                                    .font(.system(size: 60))
-                                    .foregroundColor(.white.opacity(0.3))
-
-                                // Empty state message
-                                VStack(spacing: 8) {
-                                    Text(emptyStateTitle)
-                                        .font(.faroSemiBold(18))
-                                        .foregroundColor(.white)
-
-                                    Text(emptyStateMessage)
-                                        .font(Font.Poppins.custom(.regular, size: 14))
-                                        .foregroundColor(.white.opacity(0.6))
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal, 32)
-                                }
-
-                                Spacer()
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 100)
-                        } else {
-                            // Show actual tasks when loaded
-                            ForEach(Array(filteredTasks.enumerated()), id: \.offset) { index, task in
-                                HabitTaskCard(
-                                    title: task.title,
-                                    duration: task.duration,
-                                    frequencyText: task.frequencyText,
-                                    difficulty: task.difficulty,
-                                    streak: getTaskStreak(task),
-                                    imageName: task.imageName,
-                                    action: {
-                                        HapticManager.light()
-                                        selectedTask = task
-                                    },
-                                    onValidate: {
-                                        validateTask(task)
-                                    },
-                                    onSkip: {
-                                        skipTaskWithUndo(task)
-                                    }
-                                )
-                                .bouncePress()
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        guard currentDay == actualDay else { return }
-                                        HapticManager.medium()
-                                        skipTaskWithUndo(task)
-                                    } label: {
-                                        Label(NSLocalizedString("tasks.skip", comment: ""), systemImage: "xmark.circle")
-                                    }
-                                    .tint(currentDay == actualDay ? .red : .gray)
-                                }
-                                .swipeActions(edge: .leading, allowsFullSwipe: currentDay == actualDay) {
-                                    Button {
-                                        guard currentDay == actualDay else { return }
-                                        HapticManager.success()
-                                        validateTask(task)
-                                    } label: {
-                                        Label(NSLocalizedString("tasks.validate", comment: ""), systemImage: "checkmark.circle")
-                                    }
-                                    .tint(currentDay == actualDay ? .green : .gray)
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, AppConstants.Layout.paddingLarge)
-                    .padding(.bottom, 100)
-                }
-
-                // Undo Toast
-                if showUndoToast {
-                    UndoToast(
-                        message: NSLocalizedString("tasks.task_skipped", comment: ""),
-                        duration: 5.0,
-                        undoAction: restoreSkippedTask
-                    )
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .zIndex(1000)
+                .scrollIndicators(.hidden)
+                .refreshable { await reloadData() }
+            } else {
+                VStack(spacing: 14) {
+                    ProgressView().tint(.white)
+                    Text("plan.loading".localized)
+                        .font(Font.Poppins.custom(.regular, size: 14))
+                        .foregroundStyle(.white.opacity(0.7))
                 }
             }
         }
-        .fullScreenCover(item: $selectedTask) { task in
-            // Create task with correct streak (from getTaskStreak, not the stored value)
-            let taskWithCorrectStreak = HabitTask(
-                title: task.title,
-                frequency: task.frequency,
-                duration: task.duration,
-                frequencyText: task.frequencyText,
-                difficulty: task.difficulty,
-                streak: getTaskStreak(task),
-                imageName: task.imageName,
-                totalCompletions: task.totalCompletions,
-                last7Days: task.last7Days,
-                completedDays: task.completedDays,
-                impactAreas: task.impactAreas
-            )
-            HabitTaskDetailView(
-                task: taskWithCorrectStreak,
-                onValidate: {
-                    validateTask(task)
-                    selectedTask = nil
-                },
-                onSkip: {
-                    skipTask(task)
-                    selectedTask = nil
-                },
-                isCurrentDay: currentDay == actualDay
+        .fullScreenCover(item: $breathingLaunch) { launch in
+            BreathingDetailFlowView(
+                pattern: launch.pattern,
+                duration: TimeInterval(max(1, launch.minutes) * 60),
+                onComplete: { markDone(launch.item) }
             )
         }
-        .sheet(isPresented: $showAddTask) {
-            AddTaskManuallyView(onDismiss: {
-                showAddTask = false
-            })
+        .fullScreenCover(item: $habitSelection) { selection in
+            HabitTaskDetailView(
+                task: selection.task,
+                onValidate: {
+                    markDone(selection.item)
+                    habitSelection = nil
+                },
+                onSkip: {
+                    skip(selection.item)
+                    habitSelection = nil
+                },
+                isCurrentDay: isViewingToday
+            )
+        }
+        .sheet(isPresented: $showWhy) {
+            if let plan {
+                PlanWhySheet(plan: plan, onChangeGoal: { goalPickerMode = .change })
+            }
+        }
+        .sheet(item: Binding(
+            get: { goalPickerMode.map { GoalPickerToken(mode: $0) } },
+            set: { goalPickerMode = $0?.mode }
+        )) { token in
+            PlanGoalPickerSheet(currentGoal: plan?.goal, mode: token.mode) { goal in
+                if token.mode == .nextCycle {
+                    startNextCycle(goal: goal)
+                } else {
+                    store.regenerate(goal: goal)
+                    viewedPlanDay = nil
+                    AnalyticsManager.shared.track(event: "plan_goal_changed", properties: ["goal": goal.rawValue])
+                }
+            }
         }
         .onAppear {
             guard !hasLoadedData else { return }
             hasLoadedData = true
-            // Delay Firebase loading to prevent freeze
             Task {
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second delay
-                loadFirebaseData()
-                checkAndResetStreaksIfNeeded()
+                await store.ensurePlan()
+                await reloadData()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .personalPlanDidChange)) { _ in
+            syncWidgetCache()
+        }
+        .onChange(of: player.didFinish) { _, finished in
+            guard finished, let item = pendingAudioItem,
+                  let current = player.currentSession?.id,
+                  current == item.refID || current == item.shortRefID else { return }
+            pendingAudioItem = nil
+            markDone(item)
+        }
         .confetti(isActive: showConfetti)
-        .overlay(
-            Group {
-                if showFutureWeekAlert {
-                    FutureWeekBlockingView(
-                        currentWeek: WeeklyHabitProgression.currentWeek(for: actualDay),
-                        onDismiss: {
-                            showFutureWeekAlert = false
-                        }
-                    )
-                }
-
-                // Achievement unlock popup
+        .overlay {
+            ZStack {
                 if achievementService.showAchievementPopup, let achievement = achievementService.newlyUnlockedAchievement {
                     AchievementUnlockView(achievement: achievement) {
                         achievementService.showAchievementPopup = false
                     }
                     .transition(.opacity)
                 }
-
-
-                // Success checkmark animation
                 if showSuccessCheckmark {
-                    SuccessCheckmarkView {
-                        showSuccessCheckmark = false
-                    }
-                    .transition(.scale.combined(with: .opacity))
+                    SuccessCheckmarkView { showSuccessCheckmark = false }
+                        .transition(.scale.combined(with: .opacity))
                 }
-
-                // Flame streak animation (first task of day)
                 if showFlameAnimation {
                     FlameStreakAnimation(isShowing: $showFlameAnimation)
                         .transition(.scale.combined(with: .opacity))
                 }
-
-                // Habit badge unlock popup
                 if habitBadgeService.showBadgePopup, let badge = habitBadgeService.newlyUnlockedBadge {
                     BadgeEvolutionView(badge: badge, isPresented: $habitBadgeService.showBadgePopup)
                         .transition(.opacity)
                 }
             }
+        }
+    }
+
+    private struct GoalPickerToken: Identifiable {
+        let mode: PlanGoalPickerSheet.Mode
+        var id: String { mode == .change ? "change" : "next" }
+    }
+
+    // MARK: - Sections
+
+    private func header(_ plan: PersonalPlan) -> some View {
+        let theme = PlanWeekTheme.forWeek((displayedDay - 1) / 7 + 1)
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                HStack(spacing: 5) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(AppConstants.Colors.streakOrange)
+                    Text("\(globalStreak)")
+                        .font(Font.Poppins.custom(.bold, size: 15))
+                        .foregroundStyle(.white)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .planGlassCapsule(interactive: false)
+                .accessibilityElement(children: .combine)
+
+                Spacer()
+
+                PlanGlassGroup(spacing: 8) {
+                    HStack(spacing: 8) {
+                        PlanIconButton(systemName: "sparkles", label: "plan.why.button".localized) { showWhy = true }
+                        Menu {
+                            Button { goalPickerMode = .change } label: {
+                                Label("plan.change.button".localized, systemImage: "target")
+                            }
+                            Button { store.regenerate(goal: plan.goalChosenByUser ? plan.goal : nil); viewedPlanDay = nil } label: {
+                                Label("plan.regenerate".localized, systemImage: "arrow.triangle.2.circlepath")
+                            }
+                        } label: {
+                            Image(systemName: "slider.horizontal.3")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(width: 42, height: 42)
+                                .contentShape(Circle())
+                        }
+                        .planGlassCapsule()
+                        .accessibilityLabel("plan.change.button".localized)
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(String(format: "plan.header.week".localized, (displayedDay - 1) / 7 + 1) + " · " + theme.localizedTitle)
+                    .font(Font.Poppins.custom(.semiBold, size: 12))
+                    .foregroundStyle(PlanPalette.accent)
+                    .textCase(.uppercase)
+                    .tracking(0.6)
+                Text(plan.localizedTitle)
+                    .font(.faroBold(32))
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                Text(theme.localizedSubtitle)
+                    .font(Font.Poppins.custom(.regular, size: 14))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func daySection(_ plan: PersonalPlan) -> some View {
+        let items = currentItems
+        let dayItems = items.filter { $0.kind != .evening }
+        let evening = items.filter { $0.kind == .evening }
+        let doneCount = items.filter { status($0) == .done }.count
+        let week = (displayedDay - 1) / 7 + 1
+        let short = isViewingToday && isShortMode
+
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(isViewingToday ? "plan.today".localized : String(format: "plan.day_title".localized, displayedDay))
+                    .font(.faroSemiBold(22))
+                    .foregroundStyle(.white)
+                    .accessibilityAddTraits(.isHeader)
+                Spacer()
+                Text(String(format: "plan.done_count".localized, doneCount, items.count))
+                    .font(Font.Poppins.custom(.medium, size: 13))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+
+            if !isViewingToday && !(plan.isFinished && isShowingCurrentDay) {
+                Label("plan.past_day".localized, systemImage: "clock.arrow.circlepath")
+                    .font(Font.Poppins.custom(.regular, size: 12))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+
+            if isViewingToday && !(plan.isFinished) {
+                PlanShortToggle(isOn: shortBinding)
+            }
+
+            PlanGlassGroup {
+                VStack(spacing: 12) {
+                    ForEach(dayItems) { item in
+                        card(item, week: week, short: short)
+                    }
+                }
+            }
+
+            if !evening.isEmpty {
+                Label("plan.evening_label".localized, systemImage: "moon.stars.fill")
+                    .font(Font.Poppins.custom(.semiBold, size: 14))
+                    .foregroundStyle(.white.opacity(0.8))
+                    .padding(.top, 6)
+                ForEach(evening) { item in
+                    card(item, week: week, short: false)
+                }
+            }
+        }
+    }
+
+    private func card(_ item: PlanItem, week: Int, short: Bool) -> some View {
+        PlanItemCard(
+            item: item,
+            display: item.display(week: week, short: short),
+            status: status(item),
+            isShort: short,
+            isEditable: isViewingToday,
+            onOpen: { open(item, short: short) },
+            onToggleDone: { toggleDone(item) },
+            onSkip: { skip(item) }
         )
     }
 
-    // Load data from Firebase
-    private func loadFirebaseData() {
-        Task {
-            isLoadingData = true
-            loadingError = nil // Clear any previous error
-            defer { isLoadingData = false }
-
-            guard let userId = Auth.auth().currentUser?.uid else { return }
-
-            do {
-                // Load user settings
-                if let settings = try await FirebaseManager.shared.fetchUserSettings(uid: userId) {
-                    await MainActor.run {
-                        self.userSettings = settings
-                        self.currentDay = settings.currentProgramDay
-                        self.initialGlobalScore = settings.onboardingScore
-                    }
-                } else {
-                    // Create default settings if not found
-                    let defaultSettings = UserSettings()
-                    try await FirebaseManager.shared.saveUserSettings(uid: userId, settings: defaultSettings)
-                    await MainActor.run {
-                        self.userSettings = defaultSettings
-                        self.initialGlobalScore = defaultSettings.onboardingScore
-                    }
+    private var whyButton: some View {
+        Button {
+            HapticManager.light()
+            showWhy = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(PlanPalette.accent)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("plan.why.button".localized)
+                        .font(Font.Poppins.custom(.semiBold, size: 15))
+                        .foregroundStyle(.white)
+                    Text("plan.why.subtitle".localized)
+                        .font(Font.Poppins.custom(.regular, size: 12))
+                        .foregroundStyle(.white.opacity(0.6))
                 }
-
-                // Load current global score from domain scores
-                let currentScores = try await ImpactScoringService.shared.fetchCurrentScores()
-                await MainActor.run {
-                    // Global score = rounded average of 5 domains
-                    self.globalScore = currentScores.roundedScores.global
-                }
-
-                // Load habit tracking data
-                let tracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: userId)
-                await MainActor.run {
-                    self.habitTracking = tracking
-                }
-
-                // Load task statuses from Firebase
-                let statuses = try await TaskStatusService.shared.loadAllTaskStatuses()
-                await MainActor.run {
-                    // Convert String status to TaskStatus enum
-                    var convertedStatuses: [String: [String: TaskStatus]] = [:]
-                    for (dayKey, dayTasks) in statuses {
-                        var taskDict: [String: TaskStatus] = [:]
-                        for (taskTitle, statusString) in dayTasks {
-                            switch statusString {
-                            case "done":
-                                taskDict[taskTitle] = .done
-                            case "skipped":
-                                taskDict[taskTitle] = .skipped
-                            default:
-                                taskDict[taskTitle] = .todo
-                            }
-                        }
-                        convertedStatuses[dayKey] = taskDict
-                    }
-                    self.taskStatuses = convertedStatuses
-                }
-
-                // If no habit tracking exists, initialize it
-                if tracking.isEmpty {
-                    try await FirebaseManager.shared.initializeHabitTracking(uid: userId)
-                    // Reload after initialization
-                    let newTracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: userId)
-                    await MainActor.run {
-                        self.habitTracking = newTracking
-                    }
-                }
-
-                // Calculate global streak from all habits
-                await MainActor.run {
-                    updateGlobalStreak()
-                    syncWidgetCache()
-                }
-            } catch {
-                #if DEBUG
-                print("Error loading Firebase data: \(error)")
-                #endif
-                // Set error state for UI display
-                await MainActor.run {
-                    self.loadingError = error.localizedDescription
-                    // Use default values if Firebase fails
-                    self.userSettings = UserSettings.loadFromUserDefaults() ?? UserSettings()
-                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.4))
             }
+            .padding(16)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .planGlass(cornerRadius: 20, interactive: true)
+        .padding(.top, 6)
     }
 
-    // Check if previous days were missed (no validation) and reset streaks accordingly
-    // IMPORTANT: We check the day BEFORE yesterday, not yesterday
-    // This gives the user the current day to maintain their streak
-    // Example: Day 3 starts, user had streak of 2 (days 1 & 2)
-    // - We check day 1 (actualDay - 2), not day 2
-    // - Streak stays at 2 until end of day 3
-    // - If user validates on day 3 -> streak becomes 3
-    // - If day 3 ends with no validation -> streak resets on day 4
-    private func checkAndResetStreaksIfNeeded() {
-        // Only check if we're at least on day 3 (need day before yesterday to exist)
-        if actualDay > 2 {
-            let dayBeforeYesterday = actualDay - 2
-            let dayBeforeYesterdayStatuses = taskStatuses[dayKey(dayBeforeYesterday)] ?? [:]
-            let hadValidationDayBeforeYesterday = dayBeforeYesterdayStatuses.values.contains(.done)
+    // MARK: - Actions
 
-            // Also check yesterday
-            let yesterday = actualDay - 1
-            let yesterdayStatuses = taskStatuses[dayKey(yesterday)] ?? [:]
-            let hadValidationYesterday = yesterdayStatuses.values.contains(.done)
-
-            // Reset streak only if BOTH day before yesterday AND yesterday had no validation
-            // This means the user missed a full day without doing anything
-            if !hadValidationDayBeforeYesterday && !hadValidationYesterday {
-                // Missed at least one full day, reset streak
-                globalStreak = 0
-
-                // Also reset all task streaks
-                for task in tasks {
-                    let key = taskKey(task)
-                    taskStreaks[key] = 0
-                }
-            } else {
-                // Update streaks normally based on completion history
-                updateGlobalStreak()
-                for task in tasks {
-                    updateTaskStreak(task)
-                }
-            }
-        } else {
-            // Day 1 or 2: just update streaks normally (no reset possible yet)
-            updateGlobalStreak()
-            for task in tasks {
-                updateTaskStreak(task)
-            }
+    private func open(_ item: PlanItem, short: Bool) {
+        switch item.kind {
+        case .breathing:
+            breathingLaunch = BreathingLaunch(item: item, pattern: item.breathingPattern(short: short), minutes: item.resolvedMinutes(short: short))
+        case .audio, .evening:
+            let sessionID = item.resolvedRefID(short: short)
+            if isViewingToday { pendingAudioItem = item }
+            PlanPlaybackRouter.play(sessionID: sessionID)
+        case .habit:
+            habitSelection = HabitSelection(item: item, task: habitTask(for: item))
         }
+        AnalyticsManager.shared.track(event: "plan_item_opened", properties: [
+            "kind": item.kind.rawValue, "ref": item.resolvedRefID(short: short), "plan_day": displayedDay, "short": short
+        ])
     }
 
-    // Computed properties for counts
-    private var todoCount: Int {
-        tasks.filter { getTaskStatus($0) == .todo }.count
+    private func habitTask(for item: PlanItem) -> HabitTask {
+        let week = (displayedDay - 1) / 7 + 1
+        let info = item.habitVariantInfo(week: week)
+        let tracking = habitTracking[item.refID]
+        return HabitTask(
+            title: info.title,
+            frequency: "",
+            duration: "",
+            frequencyText: "frequency.daily".localized,
+            difficulty: AppConstants.Habits.Difficulty.easy,
+            streak: tracking?.currentStreak ?? 0,
+            imageName: info.imageName,
+            totalCompletions: tracking?.totalCompletions ?? 0,
+            last7Days: tracking?.last7Days ?? Array(repeating: false, count: 7),
+            completedDays: tracking?.completedDays ?? []
+        )
     }
 
-    private var doneCount: Int {
-        tasks.filter { getTaskStatus($0) == .done }.count
+    private func toggleDone(_ item: PlanItem) {
+        if status(item) == .done { undo(item) } else { markDone(item) }
     }
 
-    private var skippedCount: Int {
-        tasks.filter { getTaskStatus($0) == .skipped }.count
-    }
-
-    // Filtered tasks based on selected tab
-    private var filteredTasks: [HabitTask] {
-        switch selectedTab {
-        case .todos:
-            return tasks.filter { getTaskStatus($0) == .todo }
-        case .done:
-            return tasks.filter { getTaskStatus($0) == .done }
-        case .skipped:
-            return tasks.filter { getTaskStatus($0) == .skipped }
-        }
-    }
-
-    // Empty state properties
-    private var emptyStateTitle: String {
-        switch selectedTab {
-        case .todos:
-            return NSLocalizedString("tasks.empty.todo_title", comment: "")
-        case .done:
-            return NSLocalizedString("tasks.empty.done_title", comment: "")
-        case .skipped:
-            return NSLocalizedString("tasks.empty.skipped_title", comment: "")
-        }
-    }
-
-    private var emptyStateMessage: String {
-        switch selectedTab {
-        case .todos:
-            return NSLocalizedString("tasks.empty.todo_message", comment: "")
-        case .done:
-            return NSLocalizedString("tasks.empty.done_message", comment: "")
-        case .skipped:
-            return NSLocalizedString("tasks.empty.skipped_message", comment: "")
-        }
-    }
-
-    // Helper functions
-    private func dayKey(_ day: Int) -> String {
-        return "day_\(day)"
-    }
-
-    private func taskKey(_ task: HabitTask) -> String {
-        return task.title
-    }
-
-    private func getTaskStatus(_ task: HabitTask) -> TaskStatus {
-        return taskStatuses[dayKey(currentDay)]?[taskKey(task)] ?? .todo
-    }
-
-    private func getTaskStreak(_ task: HabitTask) -> Int {
-        return taskStreaks[taskKey(task)] ?? 0
-    }
-
-    private func updateTaskStreak(_ task: HabitTask) {
-        let key = taskKey(task)
-        var streak = 0
-
-        // Count consecutive days with validation, starting from actualDay going backwards
-        for day in stride(from: actualDay, through: 1, by: -1) {
-            let status = taskStatuses[dayKey(day)]?[key]
-            if status == .done {
-                streak += 1
-            } else {
-                break
-            }
-        }
-
-        taskStreaks[key] = streak
-    }
-
-    private func updateGlobalStreak() {
-        var streak = 0
-
-        // Count consecutive days with at least 1 validated task, starting from actualDay going backwards
-        for day in stride(from: actualDay, through: 1, by: -1) {
-            let dayStatuses = taskStatuses[dayKey(day)] ?? [:]
-            let hasValidation = dayStatuses.values.contains(.done)
-
-            if hasValidation {
-                streak += 1
-            } else {
-                break
-            }
-        }
-
-        globalStreak = streak
-
-        // Save to UserDefaults to sync with other views (AvatarProgressCard, SettingsView)
-        UserDefaults.standard.set(streak, forKey: "streakDays")
-
-        // Also update best streak if current streak is higher
-        let currentBestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
-        if streak > currentBestStreak {
-            UserDefaults.standard.set(streak, forKey: "bestStreak")
-        }
-
-        // Notify other views to refresh streak display
-        NotificationCenter.default.post(name: NSNotification.Name("StreakUpdated"), object: nil)
-    }
-
-    private func validateTask(_ task: HabitTask) {
-        guard currentDay == actualDay else {
-            HapticManager.error()
-            return
-        }
+    private func markDone(_ item: PlanItem) {
+        guard isViewingToday, status(item) != .done else { return }
+        let day = absoluteDay(forPlanDay: displayedDay)
+        let key = dayKey(day)
+        let isFirstToday = !(taskStatuses[key]?.values.contains(.done) ?? false)
+        let seconds = item.resolvedMinutes(short: isShortMode) * 60
+        let userID = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
 
         HapticManager.success()
-
-        // Show success checkmark animation
-        withAnimation {
-            showSuccessCheckmark = true
+        taskStatuses[key, default: [:]][item.statusKey] = .done
+        withAnimation { showSuccessCheckmark = true }
+        if isFirstToday { showFlameAnimation = true }
+        let allDone = currentItems.allSatisfy { status($0) == .done }
+        if allDone {
+            showConfetti = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showConfetti = false }
         }
 
-        // Initialize day dictionary if needed
-        if taskStatuses[dayKey(currentDay)] == nil {
-            taskStatuses[dayKey(currentDay)] = [:]
-        }
-
-        // Check if this is the first task of the day BEFORE updating status
-        let tasksCompletedBeforeThis = taskStatuses[dayKey(currentDay)]?.values.filter { $0 == .done }.count ?? 0
-        let isFirstTaskToday = tasksCompletedBeforeThis == 0
-
-        taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .done
-        syncWidgetCache()
-
-        // Persist locally first so Progress/Profile update even when the network is slow.
-        LocalProgressStore.recordCompletion(
-            taskID: task.id,
-            habitID: getHabitId(for: task),
-            programDay: currentDay,
-            durationSeconds: durationSeconds(for: task),
-            userID: Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
-        )
-
-        // Toujours recalculer les streaks normalement
-        // Skip = "pas encore fait", donc valider après un skip continue le streak normalement
-        updateTaskStreak(task)
+        LocalProgressStore.recordCompletion(taskID: item.statusKey, habitID: item.habitID, programDay: day,
+                                            durationSeconds: seconds, userID: userID)
         updateGlobalStreak()
-
-        // Trigger flame animation if this is the first task of the day
-        if isFirstTaskToday {
-            showFlameAnimation = true
-        }
-
-        // Apply local score immediately, then sync remote services when available.
-        Task {
-            let habitId = getHabitId(for: task)
-            let validatedDay = currentDay
-
-            do {
-                let updatedScores = try await ImpactScoringService.shared.applyTaskImpact(habitId: habitId)
-                await MainActor.run {
-                    self.globalScore = updatedScores.roundedScores.global
-                }
-
-                await MainActor.run {
-                    NotificationCenter.default.post(name: NSNotification.Name("TaskValidated"), object: nil)
-                }
-            } catch {
-                #if DEBUG
-                print("Error updating local score: \(error)")
-                #endif
-            }
-
-            guard let userId = Auth.auth().currentUser?.uid else {
-                let habitProgress = try? await TaskStatusService.shared.calculateHabitProgress()
-                if let stats = habitProgress?[habitId] {
-                    await habitBadgeService.checkHabitBadges(habitId: habitId, tasksCompleted: stats.completed)
-                }
-                return
-            }
-
-            do {
-                // Save task status to Firebase
-                try await TaskStatusService.shared.saveTaskStatus(
-                    day: currentDay,
-                    taskTitle: taskKey(task),
-                    status: "done"
-                )
-
-                // Mark habit completed (for streaks and tracking)
-                try await FirebaseManager.shared.markHabitCompleted(uid: userId, habitId: habitId, programDay: validatedDay)
-
-                // Keep Progress backed by the same completion, including task duration.
-                try? await ProgressAnalyticsService.shared.recordTaskCompletion(
-                    taskID: task.id,
-                    habitID: habitId,
-                    programDay: validatedDay,
-                    durationSeconds: durationSeconds(for: task)
-                )
-
-                // Reload habit tracking data
-                let updatedTracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: userId)
-                await MainActor.run {
-                    self.habitTracking = updatedTracking
-                }
-
-                // Check achievements and milestones
-                let tasksCompletedToday = taskStatuses[dayKey(currentDay)]?.values.filter { $0 == .done }.count ?? 0
-                await achievementService.checkAchievements(
-                    taskCompleted: habitId,
-                    currentDay: currentDay,
-                    currentStreak: globalStreak,
-                    tasksCompletedToday: tasksCompletedToday
-                )
-
-
-                // Check habit badges
-                let habitProgress = try? await TaskStatusService.shared.calculateHabitProgress()
-                if let progress = habitProgress, let stats = progress[habitId] {
-                    await habitBadgeService.checkHabitBadges(habitId: habitId, tasksCompleted: stats.completed)
-                }
-            } catch {
-                #if DEBUG
-                print("Error saving task validation: \(error)")
-                #endif
-            }
-        }
-
-        // Trigger confetti animation
-        showConfetti = true
-        // Reset confetti after animation completes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            showConfetti = false
-        }
-    }
-
-    private func getHabitId(for task: HabitTask) -> String {
-        // Map task image names to habit IDs
-        switch task.imageName {
-        case "habit_sleep", "habit_sleep_wake", "habit_sleep_bed", "habit_sleep_morning", "habit_sleep_evening", "habit_sleep_night":
-            return "sleep"
-        case "habit_breathe":
-            return "breathing"
-        case "habit_meditate":
-            return "meditation"
-        case "habit_water":
-            return "water"
-        case _ where task.imageName.contains("sport"):
-            return "sport"
-        case _ where task.imageName.contains("nature"):
-            return "nature"
-        case _ where task.imageName.contains("social"):
-            return "social"
-        case "habit_journal":
-            return "journal"
-        default:
-            #if DEBUG
-            print("⚠️ Unknown habit image: \(task.imageName)")
-            #endif
-            return "unknown"
-        }
-    }
-
-    private func durationSeconds(for task: HabitTask) -> Int {
-        let habitId = getHabitId(for: task)
-        guard ["breathing", "meditation", "sport"].contains(habitId) else { return 0 }
-
-        let durationText = task.duration.lowercased()
-        let value = durationText
-            .split(whereSeparator: { !$0.isNumber })
-            .first
-            .flatMap { Int($0) } ?? 0
-        guard value > 0 else { return 0 }
-        return durationText.contains("h") ? value * 60 * 60 : value * 60
-    }
-
-    private func skipTask(_ task: HabitTask) {
-        // Only allow skipping on the current day
-        guard currentDay == actualDay else {
-            HapticManager.error()
-            return
-        }
-
-        HapticManager.medium()
-
-        // Check if task was previously validated
-        let previousStatus = taskStatuses[dayKey(currentDay)]?[taskKey(task)]
-        let wasValidated = previousStatus == .done
-
-        // Initialize day dictionary if needed
-        if taskStatuses[dayKey(currentDay)] == nil {
-            taskStatuses[dayKey(currentDay)] = [:]
-        }
-
-        taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .skipped
         syncWidgetCache()
+        AnalyticsManager.shared.track(event: "plan_item_completed", properties: [
+            "kind": item.kind.rawValue, "habit": item.habitID, "plan_day": displayedDay, "goal": plan?.goal.rawValue ?? ""
+        ])
 
-        // NE PAS toucher aux streaks - skip = "pas encore fait"
-        // Les streaks seront recalculés correctement quand on valide
-        // Ou au début du jour suivant si jamais validé
-
-        // Save skip status to Firebase and reverse points if task was previously validated
+        let tasksDoneToday = taskStatuses[key]?.values.filter { $0 == .done }.count ?? 0
+        let streak = globalStreak
         Task {
-            guard let userId = Auth.auth().currentUser?.uid else { return }
-            let habitId = getHabitId(for: task)
-
-            do {
-                try await TaskStatusService.shared.saveTaskStatus(
-                    day: currentDay,
-                    taskTitle: taskKey(task),
-                    status: "skipped"
-                )
-
-                // If task was previously validated, reverse the impact on scores
-                if wasValidated {
-                    if let userId = Auth.auth().currentUser?.uid {
-                        LocalProgressStore.removeCompletion(
-                            taskID: task.id,
-                            programDay: currentDay,
-                            userID: userId
-                        )
-                    }
-
-                    // Remove habit completion from tracking
-                    try await FirebaseManager.shared.removeHabitCompletion(uid: userId, habitId: habitId, programDay: currentDay)
-
-                    // Reverse the impact on domain scores (negative impact)
-                    let updatedScores = try await ImpactScoringService.shared.reverseTaskImpact(habitId: habitId)
-
-                    // Reload habit tracking data
-                    let updatedTracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: userId)
-                    await MainActor.run {
-                        self.habitTracking = updatedTracking
-                        // Update global score with reversed scores
-                        self.globalScore = updatedScores.roundedScores.global
-
-                        // Notify ProfileView to refresh habit progress
-                        NotificationCenter.default.post(name: NSNotification.Name("TaskSkippedAfterValidation"), object: nil)
-                    }
-                }
-            } catch {
-                #if DEBUG
-                print("Error saving skip status: \(error)")
-                #endif
-            }
-        }
-    }
-
-    private func skipTaskWithUndo(_ task: HabitTask) {
-        HapticManager.medium()
-
-        // Cancel any pending permanent skip
-        undoWorkItem?.cancel()
-
-        // Store the task for potential restoration
-        skippedTask = task
-
-        // Soft skip (mark as skipped but keep reference)
-        skipTask(task)
-
-        // Show undo toast
-        withAnimation(.appSpring) {
-            showUndoToast = true
-        }
-
-        // Schedule permanent skip after 5 seconds
-        let workItem = DispatchWorkItem {
-            withAnimation(.appSpring) {
-                showUndoToast = false
-            }
-            skippedTask = nil
-        }
-
-        undoWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: workItem)
-    }
-
-    private func restoreSkippedTask() {
-        HapticManager.light()
-
-        // Cancel permanent skip
-        undoWorkItem?.cancel()
-
-        // Restore task if it exists
-        if let task = skippedTask {
-            // Initialize day dictionary if needed
-            if taskStatuses[dayKey(currentDay)] == nil {
-                taskStatuses[dayKey(currentDay)] = [:]
-            }
-
-            // Set task back to todo status
-            taskStatuses[dayKey(currentDay)]?[taskKey(task)] = .todo
-            syncWidgetCache()
-
-            // Recalculate streaks
-            updateTaskStreak(task)
-            updateGlobalStreak()
-
-            // Save todo status to Firebase
-            Task {
+            NotificationCenter.default.post(name: NSNotification.Name("TaskValidated"), object: nil)
+            if let uid = Auth.auth().currentUser?.uid {
                 do {
-                    try await TaskStatusService.shared.saveTaskStatus(
-                        day: currentDay,
-                        taskTitle: taskKey(task),
-                        status: "todo"
-                    )
+                    try await TaskStatusService.shared.saveTaskStatus(day: day, taskTitle: item.statusKey, status: "done")
+                    try await FirebaseManager.shared.markHabitCompleted(uid: uid, habitId: item.habitID, programDay: day)
+                    try? await ProgressAnalyticsService.shared.recordTaskCompletion(
+                        taskID: item.statusKey, habitID: item.habitID, programDay: day, durationSeconds: seconds)
+                    habitTracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: uid)
+                    await achievementService.checkAchievements(taskCompleted: item.habitID, currentDay: day,
+                                                               currentStreak: streak, tasksCompletedToday: tasksDoneToday)
                 } catch {
                     #if DEBUG
-                    print("Error restoring task status: \(error)")
+                    print("⚠️ Plan: error saving completion: \(error)")
                     #endif
                 }
             }
+            if let stats = (try? await TaskStatusService.shared.calculateHabitProgress())?[item.habitID] {
+                await habitBadgeService.checkHabitBadges(habitId: item.habitID, tasksCompleted: stats.completed)
+            }
         }
-
-        // Hide toast
-        withAnimation(.appSpring) {
-            showUndoToast = false
-        }
-
-        skippedTask = nil
     }
 
-    // MARK: - Widget Sync
+    private func undo(_ item: PlanItem) {
+        guard isViewingToday else { return }
+        let day = absoluteDay(forPlanDay: displayedDay)
+        let key = dayKey(day)
+        HapticManager.light()
+        taskStatuses[key, default: [:]][item.statusKey] = .todo
+        let userID = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
+        LocalProgressStore.removeCompletion(taskID: item.statusKey, programDay: day, userID: userID)
+        // Keep the habit credited if another item of the same habit is still done today.
+        let habitStillDone = currentItems.contains { $0.id != item.id && $0.habitID == item.habitID && status($0) == .done }
+        updateGlobalStreak()
+        syncWidgetCache()
 
-    /// Synchronise le widget avec exactement les tâches affichées aujourd'hui.
-    /// Appelé après chaque changement de statut (validate, skip, restore).
+        Task {
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            try? await TaskStatusService.shared.saveTaskStatus(day: day, taskTitle: item.statusKey, status: "todo")
+            if !habitStillDone {
+                try? await FirebaseManager.shared.removeHabitCompletion(uid: uid, habitId: item.habitID, programDay: day)
+            }
+            NotificationCenter.default.post(name: NSNotification.Name("TaskSkippedAfterValidation"), object: nil)
+            if let tracking = try? await FirebaseManager.shared.fetchAllHabitTracking(uid: uid) { habitTracking = tracking }
+        }
+    }
+
+    private func skip(_ item: PlanItem) {
+        guard isViewingToday else { return }
+        if status(item) == .done { undo(item) }
+        let day = absoluteDay(forPlanDay: displayedDay)
+        HapticManager.medium()
+        taskStatuses[dayKey(day), default: [:]][item.statusKey] = .skipped
+        syncWidgetCache()
+        Task {
+            try? await TaskStatusService.shared.saveTaskStatus(day: day, taskTitle: item.statusKey, status: "skipped")
+        }
+    }
+
+    private func startNextCycle(goal: PlanGoal?) {
+        store.startNextCycle(goal: goal)
+        viewedPlanDay = nil
+        AnalyticsManager.shared.track(event: "plan_next_cycle", properties: ["goal": (goal ?? plan?.goal)?.rawValue ?? ""])
+    }
+
+    // MARK: - Data
+
+    private func reloadData() async {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            userSettings = UserSettings.loadFromUserDefaults() ?? UserSettings()
+            updateGlobalStreak()
+            syncWidgetCache()
+            return
+        }
+        do {
+            if let settings = try await FirebaseManager.shared.fetchUserSettings(uid: uid) {
+                userSettings = settings
+            } else {
+                let defaults = UserSettings()
+                try? await FirebaseManager.shared.saveUserSettings(uid: uid, settings: defaults)
+                userSettings = defaults
+            }
+
+            var tracking = try await FirebaseManager.shared.fetchAllHabitTracking(uid: uid)
+            if tracking.isEmpty {
+                try? await FirebaseManager.shared.initializeHabitTracking(uid: uid)
+                tracking = (try? await FirebaseManager.shared.fetchAllHabitTracking(uid: uid)) ?? [:]
+            }
+            habitTracking = tracking
+
+            let statuses = try await TaskStatusService.shared.loadAllTaskStatuses()
+            var converted: [String: [String: TaskStatus]] = [:]
+            for (day, tasks) in statuses {
+                converted[day] = tasks.mapValues { value in
+                    switch value {
+                    case "done": return .done
+                    case "skipped": return .skipped
+                    default: return .todo
+                    }
+                }
+            }
+            taskStatuses = converted
+        } catch {
+            #if DEBUG
+            print("⚠️ Plan: error loading data: \(error)")
+            #endif
+            if userSettings == nil { userSettings = UserSettings.loadFromUserDefaults() ?? UserSettings() }
+        }
+        updateGlobalStreak()
+        syncWidgetCache()
+    }
+
+    private func dayKey(_ day: Int) -> String { "day_\(day)" }
+
+    /// Consecutive days (absolute program days) with at least one validated item.
+    /// A day without validation yet (today) doesn't break the streak.
+    private func updateGlobalStreak() {
+        var streak = 0
+        let today = actualAbsoluteDay
+        let todayDone = taskStatuses[dayKey(today)]?.values.contains(.done) ?? false
+        var day = todayDone ? today : today - 1
+        while day >= 1, taskStatuses[dayKey(day)]?.values.contains(.done) ?? false {
+            streak += 1
+            day -= 1
+        }
+        globalStreak = streak
+        UserDefaults.standard.set(streak, forKey: "streakDays")
+        if streak > UserDefaults.standard.integer(forKey: "bestStreak") {
+            UserDefaults.standard.set(streak, forKey: "bestStreak")
+        }
+        NotificationCenter.default.post(name: NSNotification.Name("StreakUpdated"), object: nil)
+    }
+
+    // MARK: - Widget
+
     private func syncWidgetCache() {
-        let dayTasks = tasks  // computed property — tâches exactes du jour actuel
-        let dayStatuses = taskStatuses[dayKey(currentDay)] ?? [:]
-
-        let widgetTasks = dayTasks.map { task -> WidgetTask in
-            let status = dayStatuses[taskKey(task)] ?? .todo
-            let habitId = getHabitId(for: task)
-            let sfSymbol = sfSymbolForHabit(habitId, imageName: task.imageName)
+        guard let plan, let day = plan.day(min(todayIndex, PersonalPlan.length)) else { return }
+        let statuses = taskStatuses[dayKey(actualAbsoluteDay)] ?? [:]
+        let week = day.week
+        let widgetTasks = day.items.map { item -> WidgetTask in
+            let display = item.display(week: week, short: isShortMode)
+            let status = statuses[item.statusKey] ?? .todo
             return WidgetTask(
-                id: task.title, // titre = clé stable pour le jour
-                title: task.title,
+                id: item.statusKey,
+                title: display.title,
                 emoji: "",
-                sfSymbol: sfSymbol,
+                sfSymbol: item.kind == .habit ? PlanItem.habitSymbol(item.refID) : (item.kind == .breathing ? "wind" : "headphones"),
                 completed: status == .done,
                 cancelled: status == .skipped,
                 recommendedTime: nil,
-                habitId: habitId
+                habitId: item.habitID
             )
         }
-
-        WidgetDataStore.saveTasks(widgetTasks, programDay: actualDay)
-    }
-
-    private func sfSymbolForHabit(_ habitId: String, imageName: String = "") -> String {
-        switch habitId {
-        case "breathing":  return "wind"
-        case "meditation": return "figure.mind.and.body"
-        case "water":      return "drop.fill"
-        case "sport":      return "figure.run"
-        case "sleep":
-            // Distingue lever (morning) et coucher (night)
-            return imageName.contains("morning") ? "sunrise.fill" : "moon.zzz.fill"
-        case "nature":     return "leaf.fill"
-        case "journal":    return "book.fill"
-        case "social":     return "person.2.fill"
-        default:           return "checkmark.circle.fill"
-        }
-    }
-}
-
-// MARK: - Future Week Blocking View
-struct FutureWeekBlockingView: View {
-    let currentWeek: Int
-    let onDismiss: () -> Void
-
-    var body: some View {
-        ZStack {
-            // Semi-transparent background
-            Color.black.opacity(0.8)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    HapticManager.light()
-                    onDismiss()
-                }
-
-            // Card with explanation
-            VStack(spacing: 24) {
-                // Icon - friendly hourglass instead of lock
-                Image(systemName: "hourglass.bottomhalf.filled")
-                    .font(.system(size: 56))
-                    .foregroundColor(Color(hex: "B794F6"))
-
-                // Title
-                Text(String(format: NSLocalizedString("tasks.week_locked_title", comment: ""), currentWeek + 1))
-                    .font(.faroBold(24))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-
-                // Explanation
-                VStack(spacing: 12) {
-                    Text(String(format: NSLocalizedString("tasks.week_locked_current", comment: ""), currentWeek))
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.white.opacity(0.9))
-                        .multilineTextAlignment(.center)
-
-                    Text(String(format: NSLocalizedString("tasks.week_locked_unlock", comment: ""), currentWeek + 1))
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
-
-                    Text(NSLocalizedString("tasks.week_locked_encouragement", comment: ""))
-                        .font(.custom("Poppins-SemiBold", size: 15))
-                        .foregroundColor(Color(hex: "B794F6"))
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 8)
-                }
-
-                // Dismiss button
-                Button(action: {
-                    HapticManager.medium()
-                    onDismiss()
-                }) {
-                    Text(NSLocalizedString("tasks.understood", comment: ""))
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(hex: "B794F6"))
-                        )
-                }
-            }
-            .padding(32)
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color(hex: "1a0a2e"))
-            )
-            .padding(.horizontal, 32)
-        }
+        WidgetDataStore.saveTasks(widgetTasks, programDay: actualAbsoluteDay)
     }
 }
 

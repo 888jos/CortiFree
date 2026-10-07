@@ -53,59 +53,59 @@ enum CoreError: LocalizedError {
         switch self {
         // Authentication
         case .authenticationFailed(let reason):
-            return String(format: NSLocalizedString("error.auth.failed", comment: ""), reason)
+            return String(format: LanguageManager.shared.localizedString(for: "error.auth.failed"), reason)
         case .userNotFound:
-            return NSLocalizedString("error.auth.user_not_found", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.auth.user_not_found")
         case .invalidCredentials:
-            return NSLocalizedString("error.auth.invalid_credentials", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.auth.invalid_credentials")
         case .sessionExpired:
-            return NSLocalizedString("error.auth.session_expired", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.auth.session_expired")
         case .emailAlreadyInUse:
-            return NSLocalizedString("error.auth.email_in_use", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.auth.email_in_use")
         case .weakPassword:
-            return NSLocalizedString("error.auth.weak_password", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.auth.weak_password")
 
         // Network
         case .networkUnavailable:
-            return NSLocalizedString("error.network.unavailable", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.network.unavailable")
         case .serverError(let code):
-            return String(format: NSLocalizedString("error.network.server_error", comment: ""), code)
+            return String(format: LanguageManager.shared.localizedString(for: "error.network.server_error"), code)
         case .timeout:
-            return NSLocalizedString("error.network.timeout", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.network.timeout")
         case .invalidResponse:
-            return NSLocalizedString("error.network.invalid_response", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.network.invalid_response")
 
         // Data
         case .dataCorrupted:
-            return NSLocalizedString("error.data.corrupted", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.data.corrupted")
         case .documentNotFound(let collection, let id):
-            return String(format: NSLocalizedString("error.data.document_not_found", comment: ""), collection, id)
+            return String(format: LanguageManager.shared.localizedString(for: "error.data.document_not_found"), collection, id)
         case .saveFailed(let reason):
-            return String(format: NSLocalizedString("error.data.save_failed", comment: ""), reason)
+            return String(format: LanguageManager.shared.localizedString(for: "error.data.save_failed"), reason)
         case .fetchFailed(let reason):
-            return String(format: NSLocalizedString("error.data.fetch_failed", comment: ""), reason)
+            return String(format: LanguageManager.shared.localizedString(for: "error.data.fetch_failed"), reason)
         case .decodingFailed:
-            return NSLocalizedString("error.data.decoding_failed", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.data.decoding_failed")
         case .encodingFailed:
-            return NSLocalizedString("error.data.encoding_failed", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.data.encoding_failed")
 
         // Validation
         case .invalidInput(let field, let reason):
-            return String(format: NSLocalizedString("error.validation.invalid_input", comment: ""), field, reason)
+            return String(format: LanguageManager.shared.localizedString(for: "error.validation.invalid_input"), field, reason)
         case .missingRequiredField(let field):
-            return String(format: NSLocalizedString("error.validation.missing_field", comment: ""), field)
+            return String(format: LanguageManager.shared.localizedString(for: "error.validation.missing_field"), field)
         case .invalidFormat(let field):
-            return String(format: NSLocalizedString("error.validation.invalid_format", comment: ""), field)
+            return String(format: LanguageManager.shared.localizedString(for: "error.validation.invalid_format"), field)
 
         // Business Logic
         case .operationNotAllowed(let reason):
-            return String(format: NSLocalizedString("error.business.not_allowed", comment: ""), reason)
+            return String(format: LanguageManager.shared.localizedString(for: "error.business.not_allowed"), reason)
         case .insufficientPermissions:
-            return NSLocalizedString("error.business.insufficient_permissions", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.business.insufficient_permissions")
         case .resourceNotAvailable:
-            return NSLocalizedString("error.business.resource_unavailable", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.business.resource_unavailable")
         case .dailyLimitExceeded:
-            return NSLocalizedString("error.business.daily_limit", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.business.daily_limit")
 
         // Unknown
         case .unknown(let error):
@@ -116,17 +116,17 @@ enum CoreError: LocalizedError {
     var recoverySuggestion: String? {
         switch self {
         case .networkUnavailable:
-            return NSLocalizedString("error.recovery.check_connection", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.recovery.check_connection")
         case .invalidCredentials:
-            return NSLocalizedString("error.recovery.check_credentials", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.recovery.check_credentials")
         case .sessionExpired:
-            return NSLocalizedString("error.recovery.sign_in_again", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.recovery.sign_in_again")
         case .weakPassword:
-            return NSLocalizedString("error.recovery.stronger_password", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.recovery.stronger_password")
         case .timeout:
-            return NSLocalizedString("error.recovery.try_again", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.recovery.try_again")
         case .dailyLimitExceeded:
-            return NSLocalizedString("error.recovery.try_tomorrow", comment: "")
+            return LanguageManager.shared.localizedString(for: "error.recovery.try_tomorrow")
         default:
             return nil
         }
@@ -151,14 +151,14 @@ enum CoreError: LocalizedError {
 /// Service-specific error wrapper
 enum ServiceError: LocalizedError {
     case firebase(CoreError)
-    case mixpanel(CoreError)
+    case analytics(CoreError)
     case authentication(CoreError)
     case storage(CoreError)
 
     var underlyingError: CoreError {
         switch self {
         case .firebase(let error),
-             .mixpanel(let error),
+             .analytics(let error),
              .authentication(let error),
              .storage(let error):
             return error

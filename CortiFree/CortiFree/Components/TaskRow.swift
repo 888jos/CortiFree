@@ -93,10 +93,7 @@ struct TaskRow: View {
                 .padding(.top, 20)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 14)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(hex: "2A2B5A").opacity(0.6))
-                )
+                .glassCard(cornerRadius: 12, interactive: onTap != nil)
 
                 // Recommended time (top left corner inside the card)
                 if let time = task.recommendedTime {

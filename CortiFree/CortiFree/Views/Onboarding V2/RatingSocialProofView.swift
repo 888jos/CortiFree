@@ -122,18 +122,8 @@ struct RatingSocialProofView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(
-                    RoundedRectangle(cornerRadius: 28)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: "B794F6"), Color(hex: "D4B4FF")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                )
-                .shadow(color: Color(hex: "B794F6").opacity(0.35), radius: 16, y: 8)
             }
+            .buttonStyle(.glassPrimary)
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
@@ -189,14 +179,7 @@ private struct RatingProofReviewCard: View {
             }
         }
         .padding(15)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color(hex: "131146").opacity(0.78))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-        )
+        .glassCard(cornerRadius: 18)
     }
 }
 

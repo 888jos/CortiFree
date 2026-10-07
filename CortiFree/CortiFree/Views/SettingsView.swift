@@ -4,21 +4,15 @@ import FirebaseAuth
 import FirebaseFirestore
 import StoreKit
 import RevenueCat
-import RevenueCatUI
 import UserNotifications
+import AuthenticationServices
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authViewModel: AuthViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var revenueCatManager = RevenueCatManager.shared
-    @AppStorage("appLanguage") private var appLanguage: String = {
-        // Détection de la région pour la langue par défaut
-        let regionCode = Locale.current.region?.identifier ?? ""
-        let frenchSpeakingRegions = ["FR", "BE", "CH", "CA", "LU", "MC", "CD", "CI", "SN", "ML", "NE", "BF", "BJ", "TG", "CM", "GA", "CG", "MG", "RE", "GP", "MQ", "GF", "NC", "PF"]
-
-        // Si région francophone -> français, sinon anglais
-        return frenchSpeakingRegions.contains(regionCode) ? "fr" : "en"
-    }()
+    @ObservedObject private var languageManager = LanguageManager.shared
 
     // ViewModel for settings management
     @StateObject private var viewModel = SettingsViewModel()
@@ -27,9 +21,6 @@ struct SettingsView: View {
     @State private var showLanguagePicker: Bool = false
     @State private var showDebugSection: Bool = false
     @State private var versionTapCount: Int = 0
-    @State private var showSafari: Bool = false
-    @State private var safariURL: URL?
-    @State private var showProfileEdit: Bool = false
     @State private var showDeleteAccountAlert: Bool = false
     @State private var showSignOutAlert: Bool = false
     @State private var showLanguageChangeAlert: Bool = false
@@ -40,13 +31,25 @@ struct SettingsView: View {
     @State private var bugReportText: String = ""
     @State private var bugReportScreenshot: UIImage? = nil
     @State private var showBugReportSuccess: Bool = false
+    @State private var isSubmittingBugReport: Bool = false
     @State private var showCustomerCenter: Bool = false
     @State private var showLogin: Bool = false
     @State private var showReauthAlert: Bool = false
-    @State private var reauthEmail: String = ""
     @State private var reauthPassword: String = ""
     @State private var deleteError: String?
     @State private var showDeleteError: Bool = false
+    @State private var isDeletingAccount: Bool = false
+    @State private var isRestoringPurchases: Bool = false
+    @State private var infoAlertMessage: String?
+
+    private static let appStoreID = "6758314805"
+    private static let supportEmail = "cortifree@driftstudio.app"
+
+    private var appVersionString: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        return "\(version) (\(build))"
+    }
 
     var body: some View {
         ZStack {
@@ -64,30 +67,35 @@ struct SettingsView: View {
             }
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $showLanguagePicker) {
+        .sheet(isPresented: $showLanguagePicker, onDismiss: {
+            // Present the confirmation only once the sheet is gone (an alert raised
+            // while a sheet is dismissing is silently dropped by SwiftUI).
+            if pendingLanguage != nil {
+                showLanguageChangeAlert = true
+            }
+        }) {
             LanguagePickerSheet(
-                selectedLanguage: $appLanguage,
+                selectedLanguage: .constant(languageManager.currentLanguage.rawValue),
                 onLanguageChange: { newLanguage in
                     pendingLanguage = newLanguage
-                    showLanguageChangeAlert = true
                 }
             )
         }
-        .alert(NSLocalizedString("settings.alert.signout.title", comment: ""), isPresented: $showSignOutAlert) {
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
-            Button(NSLocalizedString("settings.alert.signout.title", comment: ""), role: .destructive) {
+        .alert(LanguageManager.shared.localizedString(for: "settings.alert.signout.title"), isPresented: $showSignOutAlert) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
+            Button(LanguageManager.shared.localizedString(for: "settings.alert.signout.title"), role: .destructive) {
                 signOut()
             }
         } message: {
-            Text(NSLocalizedString("settings.alert.signout.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.alert.signout.message"))
         }
-        .alert(NSLocalizedString("settings.alert.delete.title", comment: ""), isPresented: $showDeleteAccountAlert) {
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
-            Button(NSLocalizedString("settings.alert.delete.button", comment: ""), role: .destructive) {
+        .alert(LanguageManager.shared.localizedString(for: "settings.alert.delete.title"), isPresented: $showDeleteAccountAlert) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
+            Button(LanguageManager.shared.localizedString(for: "settings.alert.delete.button"), role: .destructive) {
                 deleteAccount()
             }
         } message: {
-            Text(NSLocalizedString("settings.alert.delete.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.alert.delete.message"))
         }
         .alert(StringKeys.Settings.languageRestartNote, isPresented: $showLanguageChangeAlert) {
             Button(StringKeys.Common.cancel, role: .cancel) {
@@ -99,56 +107,83 @@ struct SettingsView: View {
                 }
             }
         } message: {
-            Text(NSLocalizedString("settings.alert.language_restart.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.alert.language_restart.message"))
         }
-        .alert(NSLocalizedString("settings.alert.reset_defaults.title", comment: ""), isPresented: $showResetUserDefaultsAlert) {
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
-            Button(NSLocalizedString("settings.alert.reset_defaults.button", comment: ""), role: .destructive) {
+        .alert(LanguageManager.shared.localizedString(for: "settings.alert.reset_defaults.title"), isPresented: $showResetUserDefaultsAlert) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
+            Button(LanguageManager.shared.localizedString(for: "settings.alert.reset_defaults.button"), role: .destructive) {
                 resetUserDefaults()
             }
         } message: {
-            Text(NSLocalizedString("settings.alert.reset_defaults.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.alert.reset_defaults.message"))
         }
-        .alert(NSLocalizedString("settings.alert.clear_data.title", comment: ""), isPresented: $showClearAllDataAlert) {
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
-            Button(NSLocalizedString("settings.alert.clear_data.button", comment: ""), role: .destructive) {
+        .alert(LanguageManager.shared.localizedString(for: "settings.alert.clear_data.title"), isPresented: $showClearAllDataAlert) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
+            Button(LanguageManager.shared.localizedString(for: "settings.alert.clear_data.button"), role: .destructive) {
                 clearAllData()
             }
         } message: {
-            Text(NSLocalizedString("settings.alert.clear_data.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.alert.clear_data.message"))
         }
         .alert(
-            LanguageManager.shared.currentLanguage == .french ?
-                "Confirmer votre identité" : "Confirm your identity",
+            LanguageManager.shared.localizedString(for: "inline.settingsview.language.00"),
             isPresented: $showReauthAlert
         ) {
             SecureField(
-                LanguageManager.shared.currentLanguage == .french ?
-                    "Mot de passe" : "Password",
+                LanguageManager.shared.localizedString(for: "inline.settingsview.language.01"),
                 text: $reauthPassword
             )
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) {
                 reauthPassword = ""
             }
-            Button(NSLocalizedString("settings.alert.delete.button", comment: ""), role: .destructive) {
-                reauthenticateAndDelete()
+            Button(LanguageManager.shared.localizedString(for: "settings.alert.delete.button"), role: .destructive) {
+                let password = reauthPassword
                 reauthPassword = ""
+                reauthenticateAndDelete(password: password)
             }
         } message: {
-            Text(LanguageManager.shared.currentLanguage == .french ?
-                 "Entrez votre mot de passe pour supprimer votre compte." :
-                 "Enter your password to delete your account.")
+            Text(LanguageManager.shared.localizedString(for: "inline.settingsview.language.02"))
         }
         .alert(
-            LanguageManager.shared.currentLanguage == .french ? "Erreur" : "Error",
+            LanguageManager.shared.localizedString(for: "inline.settingsview.language.03"),
             isPresented: $showDeleteError
         ) {
-            Button("OK", role: .cancel) {}
+            Button(LanguageManager.shared.localizedString(for: "common.ok"), role: .cancel) {}
         } message: {
             Text(deleteError ?? "")
         }
+        .alert(
+            LanguageManager.shared.localizedString(for: "settings.title"),
+            isPresented: Binding(
+                get: { infoAlertMessage != nil },
+                set: { if !$0 { infoAlertMessage = nil } }
+            )
+        ) {
+            Button(LanguageManager.shared.localizedString(for: "common.ok"), role: .cancel) {}
+        } message: {
+            Text(infoAlertMessage ?? "")
+        }
+        .overlay {
+            if isDeletingAccount {
+                ZStack {
+                    Color.black.opacity(0.5).ignoresSafeArea()
+                    ProgressView()
+                        .tint(.white)
+                        .scaleEffect(1.4)
+                }
+            }
+        }
+        .allowsHitTesting(!isDeletingAccount)
         .onAppear {
             viewModel.calculateLocalDataSize()
+            viewModel.refreshNotificationAuthorization()
+            NotificationService.shared.syncDailyNotificationsWithPreference()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Returning from the iOS Settings app after changing the permission
+            guard phase == .active else { return }
+            viewModel.refreshNotificationAuthorization()
+            NotificationService.shared.syncDailyNotificationsWithPreference()
         }
         .sheet(isPresented: $showBugReport) {
             BugReportSheet(
@@ -162,14 +197,12 @@ struct SettingsView: View {
                 }
             )
         }
-        .alert(NSLocalizedString("settings.bug_report.success", comment: ""), isPresented: $showBugReportSuccess) {
-            Button("OK", role: .cancel) { }
+        .alert(LanguageManager.shared.localizedString(for: "settings.bug_report.success"), isPresented: $showBugReportSuccess) {
+            Button(LanguageManager.shared.localizedString(for: "common.ok"), role: .cancel) { }
         } message: {
-            Text("Merci pour votre retour ! Nous examinerons votre rapport rapidement.")
+            Text(LanguageManager.shared.localizedString(for: "settings.bug_report.success_message"))
         }
-        .sheet(isPresented: $showCustomerCenter) {
-            CustomerCenterView()
-        }
+        .manageSubscriptionsSheet(isPresented: $showCustomerCenter)
         .fullScreenCover(isPresented: $showLogin) {
             AuthenticationView(
                 onComplete: {
@@ -190,13 +223,17 @@ struct SettingsView: View {
                 dismiss()
             }) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 20, weight: .medium))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Circle())
             }
+            .buttonStyle(.plain)
+            .glassCircle(interactive: true)
 
             Spacer()
 
-            Text(NSLocalizedString("settings.title", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.title"))
                 .font(.faroBold(24))
                 .foregroundColor(.white)
 
@@ -204,11 +241,11 @@ struct SettingsView: View {
 
             // Invisible spacer for centering
             Color.clear
-                .frame(width: 24, height: 24)
+                .frame(width: 44, height: 44)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 60)
-        .padding(.bottom, 20)
+        .padding(.top, 50)
+        .padding(.bottom, 16)
     }
 
     // MARK: - Settings Scroll View
@@ -220,9 +257,11 @@ struct SettingsView: View {
                 privacySecuritySection
                 aboutSupportSection
 
+                #if DEBUG
                 if showDebugSection {
                     debugSection
                 }
+                #endif
 
                 Spacer()
                     .frame(height: 100)
@@ -233,13 +272,13 @@ struct SettingsView: View {
 
     // MARK: - Profile & Objective Section
     private var profileObjectiveSection: some View {
-        settingsSection(title: NSLocalizedString("settings.section.profile", comment: ""), icon: "person.circle.fill") {
+        settingsSection(title: LanguageManager.shared.localizedString(for: "settings.section.profile"), icon: "person.circle.fill") {
             VStack(spacing: 0) {
                 if !authViewModel.isAuthenticated {
                     settingsRow(
                         icon: "person.crop.circle.badge.plus",
-                        title: NSLocalizedString("onboarding_v2.auth.login_button", comment: ""),
-                        subtitle: NSLocalizedString("progress.error.signed_out", comment: ""),
+                        title: LanguageManager.shared.localizedString(for: "onboarding_v2.auth.login_button"),
+                        subtitle: LanguageManager.shared.localizedString(for: "progress.error.signed_out"),
                         showChevron: true
                     ) {
                         HapticManager.light()
@@ -253,8 +292,8 @@ struct SettingsView: View {
 
                 settingsRow(
                     icon: "globe",
-                    title: NSLocalizedString("settings.language", comment: ""),
-                    subtitle: appLanguage == "en" ? "English" : "Français",
+                    title: LanguageManager.shared.localizedString(for: "settings.language"),
+                    subtitle: languageManager.currentLanguage.displayName,
                     showChevron: true
                 ) {
                     HapticManager.light()
@@ -268,9 +307,9 @@ struct SettingsView: View {
                 settingsToggleRow(
                     icon: "bell.fill",
                     title: StringKeys.Settings.notificationsToggle,
-                    subtitle: NSLocalizedString("settings.notifications.subtitle", comment: ""),
+                    subtitle: LanguageManager.shared.localizedString(for: "settings.notifications.subtitle"),
                     isOn: Binding(
-                        get: { viewModel.notificationsEnabled },
+                        get: { viewModel.notificationsEnabled && viewModel.notificationsAuthorized },
                         set: handleNotificationsToggle
                     )
                 )
@@ -280,29 +319,39 @@ struct SettingsView: View {
 
     // MARK: - Subscription Section
     private var subscriptionSection: some View {
-        settingsSection(title: "Abonnement", icon: "crown.fill") {
+        settingsSection(title: LanguageManager.shared.localizedString(for: "settings.subscription_premium"), icon: "crown.fill") {
             VStack(spacing: 0) {
                 // RevenueCat subscription status
                 settingsRow(
                     icon: revenueCatManager.hasPremiumEntitlement ? "checkmark.circle.fill" : "circle",
-                    title: NSLocalizedString("settings.subscription.status", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "settings.subscription.status"),
                     subtitle: revenueCatManager.hasPremiumEntitlement ?
-                        (LanguageManager.shared.currentLanguage == .french ? "Premium actif" : "Premium active") :
-                        (LanguageManager.shared.currentLanguage == .french ? "Non abonné" : "Not subscribed"),
+                        (LanguageManager.shared.localizedString(for: "inline.settingsview.language.04")) :
+                        (LanguageManager.shared.localizedString(for: "inline.settingsview.language.05")),
                     showChevron: false
                 ) {}
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                // RevenueCat Customer Center
-                settingsRow(icon: "gearshape.fill", title: NSLocalizedString("settings.subscription.manage", comment: ""), subtitle: NSLocalizedString("settings.subscription.manage_subtitle", comment: ""), showChevron: true) {
+                // Apple subscription management
+                settingsRow(icon: "gearshape.fill", title: LanguageManager.shared.localizedString(for: "settings.subscription.manage"), subtitle: LanguageManager.shared.localizedString(for: "settings.subscription.manage_subtitle"), showChevron: true) {
                     HapticManager.light()
                     showCustomerCenter = true
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "rectangle.portrait.and.arrow.right", title: NSLocalizedString("settings.signout", comment: ""), subtitle: nil, showChevron: false, isDestructive: true) {
-                    HapticManager.medium()
-                    showSignOutAlert = true
+                settingsRow(icon: "arrow.clockwise.circle.fill", title: LanguageManager.shared.localizedString(for: "settings.restore_purchases"), subtitle: nil, showChevron: false) {
+                    HapticManager.light()
+                    restorePurchases()
+                }
+                .disabled(isRestoringPurchases)
+
+                if authViewModel.isAuthenticated {
+                    Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+
+                    settingsRow(icon: "rectangle.portrait.and.arrow.right", title: LanguageManager.shared.localizedString(for: "settings.signout"), subtitle: nil, showChevron: false, isDestructive: true) {
+                        HapticManager.medium()
+                        showSignOutAlert = true
+                    }
                 }
             }
         }
@@ -310,45 +359,49 @@ struct SettingsView: View {
 
     // MARK: - Privacy & Security Section
     private var privacySecuritySection: some View {
-        settingsSection(title: NSLocalizedString("settings.section.privacy", comment: ""), icon: "lock.shield.fill") {
+        settingsSection(title: LanguageManager.shared.localizedString(for: "settings.section.privacy"), icon: "lock.shield.fill") {
             VStack(spacing: 0) {
-                settingsRow(icon: "doc.text.fill", title: NSLocalizedString("settings.privacy.policy", comment: ""), subtitle: nil, showChevron: true) {
+                settingsRow(icon: "doc.text.fill", title: LanguageManager.shared.localizedString(for: "settings.privacy.policy"), subtitle: nil, showChevron: true) {
                     HapticManager.light()
                     LegalDocumentsHelper.openPrivacyPolicy()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "doc.plaintext.fill", title: NSLocalizedString("settings.privacy.terms", comment: ""), subtitle: nil, showChevron: true) {
+                settingsRow(icon: "doc.plaintext.fill", title: LanguageManager.shared.localizedString(for: "settings.privacy.terms"), subtitle: nil, showChevron: true) {
                     HapticManager.light()
                     LegalDocumentsHelper.openTerms()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "building.columns.fill", title: NSLocalizedString("settings.privacy.legal_notice", comment: ""), subtitle: nil, showChevron: true) {
+                settingsRow(icon: "building.columns.fill", title: LanguageManager.shared.localizedString(for: "settings.privacy.legal_notice"), subtitle: nil, showChevron: true) {
                     HapticManager.light()
                     LegalDocumentsHelper.openLegalNotice()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "trash.fill", title: NSLocalizedString("settings.privacy.delete_account", comment: ""), subtitle: NSLocalizedString("settings.privacy.delete_account_subtitle", comment: ""), showChevron: true, isDestructive: true) {
-                    HapticManager.heavy()
-                    showDeleteAccountAlert = true
+                if authViewModel.isAuthenticated {
+                    settingsRow(icon: "trash.fill", title: LanguageManager.shared.localizedString(for: "settings.privacy.delete_account"), subtitle: LanguageManager.shared.localizedString(for: "settings.privacy.delete_account_subtitle"), showChevron: true, isDestructive: true) {
+                        HapticManager.heavy()
+                        showDeleteAccountAlert = true
+                    }
+                    Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
                 }
+
+                settingsRowContent(icon: "internaldrive.fill", title: LanguageManager.shared.localizedString(for: "settings.privacy.local_data"), subtitle: viewModel.localDataSize, showChevron: false, isDestructive: false)
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "internaldrive.fill", title: "Données locales", subtitle: viewModel.localDataSize, showChevron: false) {}
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
-
-                settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: StringKeys.Settings.icloudSync, subtitle: NSLocalizedString("settings.privacy.icloud_subtitle", comment: ""), isOn: $viewModel.syncEnabled)
+                // Syncs the preferences to the user's Firestore account (not iCloud)
+                settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: LanguageManager.shared.localizedString(for: "settings.privacy.cloud_sync"), subtitle: LanguageManager.shared.localizedString(for: "settings.privacy.cloud_sync_subtitle"), isOn: $viewModel.syncEnabled)
             }
         }
     }
 
     // MARK: - About & Support Section
     private var aboutSupportSection: some View {
-        settingsSection(title: NSLocalizedString("settings.section.about", comment: ""), icon: "info.circle.fill") {
+        settingsSection(title: LanguageManager.shared.localizedString(for: "settings.section.about"), icon: "info.circle.fill") {
             VStack(spacing: 0) {
                 Button(action: {
+                    #if DEBUG
                     HapticManager.light()
                     versionTapCount += 1
                     if versionTapCount >= 3 {
@@ -360,32 +413,33 @@ struct SettingsView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         versionTapCount = 0
                     }
+                    #endif
                 }) {
-                    settingsRowContent(icon: "app.badge.fill", title: NSLocalizedString("settings.about.version", comment: ""), subtitle: "1.0.0 (Build 1)", showChevron: false, isDestructive: false)
+                    settingsRowContent(icon: "app.badge.fill", title: LanguageManager.shared.localizedString(for: "settings.about.version"), subtitle: appVersionString, showChevron: false, isDestructive: false)
                 }
                 .buttonStyle(PlainButtonStyle())
 
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "envelope.fill", title: NSLocalizedString("settings.about.contact", comment: ""), subtitle: "cortifree@driftstudio.app", showChevron: true) {
+                settingsRow(icon: "envelope.fill", title: LanguageManager.shared.localizedString(for: "settings.about.contact"), subtitle: Self.supportEmail, showChevron: true) {
                     HapticManager.light()
-                    openURL("mailto:cortifree@driftstudio.app")
+                    openURL("mailto:\(Self.supportEmail)")
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "ladybug.fill", title: NSLocalizedString("settings.bug_report.title", comment: ""), subtitle: NSLocalizedString("settings.bug_report.subtitle", comment: ""), showChevron: true) {
+                settingsRow(icon: "ladybug.fill", title: LanguageManager.shared.localizedString(for: "settings.bug_report.title"), subtitle: LanguageManager.shared.localizedString(for: "settings.bug_report.subtitle"), showChevron: true) {
                     HapticManager.light()
                     showBugReport = true
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "star.fill", title: NSLocalizedString("settings.about.rate", comment: ""), subtitle: NSLocalizedString("settings.about.rate_subtitle", comment: ""), showChevron: true) {
+                settingsRow(icon: "star.fill", title: LanguageManager.shared.localizedString(for: "settings.about.rate"), subtitle: LanguageManager.shared.localizedString(for: "settings.about.rate_subtitle"), showChevron: true) {
                     HapticManager.light()
                     requestAppReview()
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
-                settingsRow(icon: "link", title: NSLocalizedString("settings.about.follow", comment: ""), subtitle: "@cortifree", showChevron: true) {
+                settingsRow(icon: "link", title: LanguageManager.shared.localizedString(for: "settings.about.follow"), subtitle: "@cortifree", showChevron: true) {
                     HapticManager.light()
                     openURL("https://twitter.com/cortifree")
                 }
@@ -394,6 +448,7 @@ struct SettingsView: View {
     }
 
     // MARK: - Debug Section
+    #if DEBUG
     private var debugSection: some View {
         settingsSection(title: "🐛 Debug", icon: "ladybug.fill") {
             VStack(spacing: 0) {
@@ -411,12 +466,13 @@ struct SettingsView: View {
 
                 settingsRow(icon: "arrow.clockwise.circle.fill", title: "Force sync", subtitle: nil, showChevron: false) {
                     HapticManager.light()
-                    // Force sync is handled automatically by Firebase
+                    viewModel.syncToFirebase()
                 }
             }
         }
         .transition(.opacity.combined(with: .scale(scale: 0.9)))
     }
+    #endif
 
     // MARK: - Section Builder
     @ViewBuilder
@@ -441,10 +497,7 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 content()
             }
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(hex: "131146"))
-            )
+            .glassCard(cornerRadius: 22)
         }
     }
 
@@ -612,12 +665,15 @@ struct SettingsView: View {
 
     // MARK: - Helper Functions
     private func openURL(_ urlString: String) {
-        if let url = URL(string: urlString) {
-            if urlString.hasPrefix("http") {
-                safariURL = url
-                showSafari = true
-            } else {
-                UIApplication.shared.open(url)
+        guard let url = URL(string: urlString) else { return }
+        UIApplication.shared.open(url) { success in
+            if !success && url.scheme == "mailto" {
+                // No Mail account configured: show the address so the user can copy it
+                UIPasteboard.general.string = Self.supportEmail
+                infoAlertMessage = String(
+                    format: LanguageManager.shared.localizedString(for: "settings.contact.no_mail_app"),
+                    Self.supportEmail
+                )
             }
         }
     }
@@ -627,8 +683,7 @@ struct SettingsView: View {
     private func applyLanguageChange(_ newLanguage: String) {
         HapticManager.success()
 
-        // Update @AppStorage variable immediately
-        appLanguage = newLanguage
+        pendingLanguage = nil
 
         // Update LanguageManager (this will update bundle and post notification)
         if let language = LanguageManager.Language(rawValue: newLanguage) {
@@ -649,8 +704,23 @@ struct SettingsView: View {
     }
 
     private func requestAppReview() {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: windowScene)
+        // SKStoreReviewController is rate-limited (and never shows in TestFlight), so an
+        // explicit "Rate the app" button opens the App Store review page instead.
+        openURL("https://apps.apple.com/app/id\(Self.appStoreID)?action=write-review")
+    }
+
+    private func restorePurchases() {
+        isRestoringPurchases = true
+        Task {
+            do {
+                _ = try await RevenueCatManager.shared.restorePurchases()
+                infoAlertMessage = LanguageManager.shared.localizedString(
+                    for: revenueCatManager.hasPremiumEntitlement ? "settings.restore.success" : "settings.restore.nothing"
+                )
+            } catch {
+                infoAlertMessage = error.localizedDescription
+            }
+            isRestoringPurchases = false
         }
     }
 
@@ -670,146 +740,166 @@ struct SettingsView: View {
         dismiss()
     }
 
+    // MARK: - Account Deletion
+
     private func deleteAccount() {
-        HapticManager.success()
-
-        Task {
-            do {
-                guard let user = Auth.auth().currentUser else { return }
-                let userId = user.uid
-
-                // Delete user data from Firestore first
-                let db = Firestore.firestore()
-                try await db.collection("users").document(userId).delete()
-
-                // Delete sub-collections if any
-                let settingsRef = db.collection("users").document(userId).collection("settings")
-                let settingsDocs = try await settingsRef.getDocuments()
-                for doc in settingsDocs.documents {
-                    try await doc.reference.delete()
-                }
-
-                // Delete Firebase auth account
-                try await user.delete()
-
-                // Logout RevenueCat
-                await RevenueCatManager.shared.logout()
-
-                // Clear all local data
-                let domain = Bundle.main.bundleIdentifier!
-                UserDefaults.standard.removePersistentDomain(forName: domain)
-                UserDefaults.standard.synchronize()
-
-                // Update auth state
-                await MainActor.run {
-                    authViewModel.signOut()
-                    dismiss()
-                }
-            } catch let error as NSError {
-                if error.code == AuthErrorCode.requiresRecentLogin.rawValue {
-                    // Need re-authentication — show re-auth prompt
-                    await MainActor.run {
-                        reauthEmail = Auth.auth().currentUser?.email ?? ""
-                        showReauthAlert = true
-                    }
-                } else {
-                    await MainActor.run {
-                        deleteError = error.localizedDescription
-                        showDeleteError = true
-                    }
-                    #if DEBUG
-                    print("❌ Error deleting account: \(error)")
-                    #endif
-                }
-            }
+        guard let user = Auth.auth().currentUser else {
+            deleteError = AccountDeletionService.DeletionError.notSignedIn.errorDescription
+            showDeleteError = true
+            return
         }
-    }
 
-    private func reauthenticateAndDelete() {
-        Task {
-            do {
-                guard let user = Auth.auth().currentUser else { return }
-                let credential = EmailAuthProvider.credential(withEmail: reauthEmail, password: reauthPassword)
-                try await user.reauthenticate(with: credential)
-
-                // Now retry delete
-                deleteAccount()
-            } catch {
-                await MainActor.run {
+        switch AccountDeletionService.shared.reauthMethod(for: user) {
+        case .password:
+            // Firebase requires a recent sign-in: ask for the password BEFORE deleting anything
+            showReauthAlert = true
+        case .apple:
+            Task {
+                do {
+                    try await AccountDeletionService.shared.reauthenticateWithApple()
+                    await performAccountDeletion()
+                } catch {
+                    // User cancelled the Apple sheet: stay silent
+                    if (error as? ASAuthorizationError)?.code == .canceled { return }
                     deleteError = error.localizedDescription
                     showDeleteError = true
                 }
             }
+        case .none, .unsupported:
+            Task { await performAccountDeletion() }
+        }
+    }
+
+    private func reauthenticateAndDelete(password: String) {
+        Task {
+            do {
+                try await AccountDeletionService.shared.reauthenticateWithPassword(password: password)
+                await performAccountDeletion()
+            } catch {
+                deleteError = error.localizedDescription
+                showDeleteError = true
+            }
+        }
+    }
+
+    @MainActor
+    private func performAccountDeletion() async {
+        isDeletingAccount = true
+        do {
+            try await AccountDeletionService.shared.deleteAccount()
+            HapticManager.success()
+            isDeletingAccount = false
+            // Resets auth state → CortiFreeApp shows the onboarding/auth root again
+            authViewModel.signOut()
+            dismiss()
+        } catch AccountDeletionService.DeletionError.requiresRecentLogin {
+            isDeletingAccount = false
+            if Auth.auth().currentUser?.providerData.contains(where: { $0.providerID == "password" }) == true {
+                showReauthAlert = true
+            } else {
+                deleteError = AccountDeletionService.DeletionError.requiresRecentLogin.errorDescription
+                showDeleteError = true
+            }
+        } catch {
+            isDeletingAccount = false
+            HapticManager.error()
+            deleteError = error.localizedDescription
+            showDeleteError = true
+            #if DEBUG
+            print("❌ Error deleting account: \(error)")
+            #endif
         }
     }
 
     // MARK: - Bug Report
 
     private func submitBugReport() {
-        HapticManager.success()
+        guard !isSubmittingBugReport else { return }
+
+        // firestore.rules: bug_reports create requires userId == request.auth.uid,
+        // so signed-out users send the report by email instead.
+        guard let user = Auth.auth().currentUser else {
+            sendBugReportByEmail()
+            return
+        }
+
+        isSubmittingBugReport = true
+        let screenshot = bugReportScreenshot
+        let description = bugReportText
 
         Task {
+            var reportData: [String: Any] = [
+                "userId": user.uid,
+                "userEmail": user.email ?? "unknown",
+                "description": description,
+                "appVersion": appVersionString,
+                "iosVersion": UIDevice.current.systemVersion,
+                "deviceModel": UIDevice.current.model,
+                "language": LanguageManager.shared.currentLanguage.rawValue,
+                "createdAt": FieldValue.serverTimestamp(),
+                "status": "new"
+            ]
+
+            // Screenshot resized to stay under the Firestore 1 MB document limit
+            if let screenshot, let data = ProfilePhotoStorage.compressedJPEG(from: screenshot, maxDimension: 800) {
+                reportData["screenshotBase64"] = data.base64EncodedString()
+            }
+
             do {
-                let db = Firestore.firestore()
-                let userId = Auth.auth().currentUser?.uid ?? "anonymous"
-                let userEmail = Auth.auth().currentUser?.email ?? "unknown"
-
-                var reportData: [String: Any] = [
-                    "userId": userId,
-                    "userEmail": userEmail,
-                    "description": bugReportText,
-                    "appVersion": "1.0.0",
-                    "iosVersion": UIDevice.current.systemVersion,
-                    "deviceModel": UIDevice.current.model,
-                    "createdAt": FieldValue.serverTimestamp(),
-                    "status": "new"
-                ]
-
-                // Upload screenshot if available (resized to fit Firestore limit)
-                if let screenshot = bugReportScreenshot {
-                    // Resize image to max 800px width to stay under Firestore 1MB limit
-                    let maxWidth: CGFloat = 800
-                    let scale = min(maxWidth / screenshot.size.width, 1.0)
-                    let newSize = CGSize(width: screenshot.size.width * scale, height: screenshot.size.height * scale)
-
-                    UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-                    screenshot.draw(in: CGRect(origin: .zero, size: newSize))
-                    let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-                    UIGraphicsEndImageContext()
-
-                    if let resized = resizedImage,
-                       let imageData = resized.jpegData(compressionQuality: 0.5) {
-                        let base64String = imageData.base64EncodedString()
-                        reportData["screenshotBase64"] = base64String
-                    }
-                }
-
-                // Save to Firestore
-                try await db.collection("bug_reports").addDocument(data: reportData)
-
-                // Reset form and close
+                try await Firestore.firestore().collection("bug_reports").addDocument(data: reportData)
+                HapticManager.success()
                 bugReportText = ""
                 bugReportScreenshot = nil
                 showBugReport = false
+                isSubmittingBugReport = false
+                // Let the sheet finish dismissing before presenting the confirmation
+                try? await Task.sleep(nanoseconds: 500_000_000)
                 showBugReportSuccess = true
-
-                #if DEBUG
-                print("✅ Bug report submitted successfully")
-                #endif
             } catch {
                 #if DEBUG
                 print("❌ Error submitting bug report: \(error)")
                 #endif
+                isSubmittingBugReport = false
+                // Network / rules failure: fall back to email so the report isn't lost
+                sendBugReportByEmail()
             }
         }
     }
 
-    // MARK: - Debug Actions
+    private func sendBugReportByEmail() {
+        let subject = "CortiFree bug report (\(appVersionString))"
+        let body = "\(bugReportText)\n\n—\niOS \(UIDevice.current.systemVersion) · \(UIDevice.current.model) · \(appVersionString)"
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = Self.supportEmail
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: subject),
+            URLQueryItem(name: "body", value: body)
+        ]
+        showBugReport = false
+        bugReportText = ""
+        bugReportScreenshot = nil
+        guard let url = components.url else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            UIApplication.shared.open(url) { success in
+                if !success {
+                    UIPasteboard.general.string = Self.supportEmail
+                    infoAlertMessage = String(
+                        format: LanguageManager.shared.localizedString(for: "settings.contact.no_mail_app"),
+                        Self.supportEmail
+                    )
+                }
+            }
+        }
+    }
+
+    // MARK: - Notifications
 
     private func handleNotificationsToggle(_ enabled: Bool) {
         guard enabled else {
             viewModel.notificationsEnabled = false
             NotificationService.shared.cancelDailyNotifications()
+            NotificationService.shared.cancelStreakDangerNotification()
             return
         }
 
@@ -819,19 +909,24 @@ struct SettingsView: View {
                 NotificationService.shared.requestNotificationPermission { granted in
                     DispatchQueue.main.async {
                         viewModel.notificationsEnabled = granted
-                        if granted {
-                            NotificationService.shared.scheduleDailyNotifications()
-                        }
+                        viewModel.notificationsAuthorized = granted
+                        UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
+                        NotificationService.shared.syncDailyNotificationsWithPreference()
                     }
                 }
             case .authorized, .provisional, .ephemeral:
                 DispatchQueue.main.async {
                     viewModel.notificationsEnabled = true
-                    NotificationService.shared.scheduleDailyNotifications()
+                    viewModel.notificationsAuthorized = true
+                    UserDefaults.standard.set(true, forKey: "notificationsEnabled")
+                    NotificationService.shared.syncDailyNotificationsWithPreference()
                 }
             case .denied:
                 DispatchQueue.main.async {
-                    viewModel.notificationsEnabled = false
+                    // Keep the user's intent; the toggle turns on once iOS permission is granted
+                    // (re-checked when the app becomes active again).
+                    viewModel.notificationsEnabled = true
+                    viewModel.notificationsAuthorized = false
                     guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
                     UIApplication.shared.open(settingsURL)
                 }
@@ -843,6 +938,7 @@ struct SettingsView: View {
         }
     }
 
+    #if DEBUG
     private func resetUserDefaults() {
         HapticManager.success()
 
@@ -876,6 +972,7 @@ struct SettingsView: View {
         viewModel.loadSettings()
         viewModel.calculateLocalDataSize()
     }
+    #endif
 
 }
 

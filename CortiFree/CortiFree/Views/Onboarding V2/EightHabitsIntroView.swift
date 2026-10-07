@@ -88,7 +88,7 @@ struct EightHabitsIntroView: View {
                     // Continue button
                 Button(action: {
                     HapticManager.medium()
-                    MixpanelManager.shared.trackOnboardingEightHabitsIntroContinue()
+                    AnalyticsManager.shared.trackOnboardingEightHabitsIntroContinue()
                     onContinue()
                 }) {
                     HStack(spacing: 8) {
@@ -101,18 +101,15 @@ struct EightHabitsIntroView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .responsiveHeight(56)
-                    .background(
-                        RoundedRectangle(cornerRadius: ResponsiveLayout.padding(base: 28))
-                            .fill(Color(hex: "B794F6"))
-                    )
                 }
+                .buttonStyle(.glassPrimary(cornerRadius: ResponsiveLayout.padding(base: 28)))
                 .responsivePadding(.horizontal, 32)
                 .responsivePadding(.bottom, 40)
                 }
             }
         }
         .onAppear {
-            MixpanelManager.shared.trackOnboardingEightHabitsIntroViewed()
+            AnalyticsManager.shared.trackOnboardingEightHabitsIntroViewed()
         }
     }
 }

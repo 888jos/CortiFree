@@ -296,17 +296,37 @@ class RevenueCatManager: ObservableObject {
         }
 
         let value = intro.subscriptionPeriod.value
-        let isFr = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
+        let language = LanguageManager.shared.currentLanguage
+
+        func unit(
+            french: (String, String),
+            english: (String, String),
+            spanish: (String, String),
+            german: (String, String),
+            japanese: (String, String),
+            korean: (String, String)
+        ) -> String {
+            let forms: (String, String)
+            switch language {
+            case .french: forms = french
+            case .english: forms = english
+            case .spanish: forms = spanish
+            case .german: forms = german
+            case .japanese: forms = japanese
+            case .korean: forms = korean
+            }
+            return value == 1 ? forms.0 : forms.1
+        }
 
         switch intro.subscriptionPeriod.unit {
         case .day:
-            return "\(value) " + (isFr ? (value == 1 ? "jour" : "jours") : (value == 1 ? "day" : "days"))
+            return "\(value) " + unit(french: ("jour", "jours"), english: ("day", "days"), spanish: ("día", "días"), german: ("Tag", "Tage"), japanese: ("日", "日"), korean: ("일", "일"))
         case .week:
-            return "\(value) " + (isFr ? (value == 1 ? "semaine" : "semaines") : (value == 1 ? "week" : "weeks"))
+            return "\(value) " + unit(french: ("semaine", "semaines"), english: ("week", "weeks"), spanish: ("semana", "semanas"), german: ("Woche", "Wochen"), japanese: ("週間", "週間"), korean: ("주", "주"))
         case .month:
-            return "\(value) " + (isFr ? "mois" : (value == 1 ? "month" : "months"))
+            return "\(value) " + unit(french: ("mois", "mois"), english: ("month", "months"), spanish: ("mes", "meses"), german: ("Monat", "Monate"), japanese: ("ヶ月", "ヶ月"), korean: ("개월", "개월"))
         case .year:
-            return "\(value) " + (isFr ? (value == 1 ? "an" : "ans") : (value == 1 ? "year" : "years"))
+            return "\(value) " + unit(french: ("an", "ans"), english: ("year", "years"), spanish: ("año", "años"), german: ("Jahr", "Jahre"), japanese: ("年", "年"), korean: ("년", "년"))
         @unknown default:
             return nil
         }
@@ -372,7 +392,7 @@ class RevenueCatManager: ObservableObject {
             #endif
 
             // NE PAS tracker ici — le tracking est fait au niveau du call site (vue)
-            // pour éviter le double-fire (RevenueCatManager + NativePaywallView)
+            // pour éviter le double-fire (RevenueCatManager + paywall)
 
             return refreshedInfo
         } catch {

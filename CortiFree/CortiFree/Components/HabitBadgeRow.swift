@@ -28,7 +28,7 @@ struct HabitBadgeRow: View {
 
                 // Habit name and progress
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(HabitBadge.englishHabitDisplayName(habitId))
+                    Text(HabitBadge.habitDisplayName(habitId))
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
 
@@ -78,10 +78,7 @@ struct HabitBadgeRow: View {
             .frame(height: 6)
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.05))
-        )
+        .glassCard(cornerRadius: 16)
         .sheet(isPresented: $showDetail) {
             if let badge = selectedBadge {
                 BadgeDetailSheet(badge: badge, currentProgress: currentProgress)
@@ -126,7 +123,6 @@ struct BadgeDetailSheet: View {
 
     let badge: HabitBadge
     let currentProgress: Int
-    var usesEnglishLabels = true
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -166,13 +162,13 @@ struct BadgeDetailSheet: View {
                 // Status
                 if badge.isUnlocked {
                     if let unlockedDate = badge.unlockedAt {
-                        Text("Unlocked on \(formattedDate(unlockedDate))")
+                        Text(String(format: "badge.unlocked_date".localized, formattedDate(unlockedDate)))
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.7))
                     }
                 } else {
                     VStack(spacing: 8) {
-                        Text("\(currentProgress) / \(badge.requirement) tasks")
+                        Text(String(format: "badge.progress".localized, currentProgress, badge.requirement))
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.white)
 
@@ -190,7 +186,7 @@ struct BadgeDetailSheet: View {
                         .frame(height: 12)
                         .frame(maxWidth: 200)
 
-                        Text("\(max(0, badge.requirement - currentProgress)) tasks remaining")
+                        Text(String(format: "badge.remaining".localized, max(0, badge.requirement - currentProgress)))
                             .font(.custom("Poppins-Regular", size: 12))
                             .foregroundColor(.white.opacity(0.6))
                     }
@@ -202,22 +198,14 @@ struct BadgeDetailSheet: View {
                 Button(action: {
                     dismiss()
                 }) {
-                    Text("Close")
+                    Text("achievements.close".localized)
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                        )
+                        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
+                .buttonStyle(.glassPrimary(tint: GlassTokens.accent, cornerRadius: 16))
                 .padding(.horizontal, 40)
                 .padding(.bottom, 20)
             }
@@ -225,21 +213,17 @@ struct BadgeDetailSheet: View {
     }
 
     private var habitName: String {
-        usesEnglishLabels
-            ? HabitBadge.englishHabitDisplayName(badge.habitId)
-            : HabitBadge.habitDisplayName(badge.habitId)
+        HabitBadge.habitDisplayName(badge.habitId)
     }
 
     private var levelName: String {
-        usesEnglishLabels ? badge.level.englishDisplayName : badge.level.displayName
+        badge.level.displayName
     }
 
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
-        formatter.locale = usesEnglishLabels
-            ? Locale(identifier: "en_US_POSIX")
-            : Locale.current
+        formatter.locale = LanguageManager.shared.currentLanguage.locale
         return formatter.string(from: date)
     }
 }

@@ -3,11 +3,12 @@
   "description": "CortiFree Firebase Cloud Functions",
   "private": true,
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "index.js",
   "scripts": {
-    "lint": "node --check index.js"
+    "lint": "node --check index.js",
+    "migration:export": "node scripts/export-firestore-for-convex.js"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0",

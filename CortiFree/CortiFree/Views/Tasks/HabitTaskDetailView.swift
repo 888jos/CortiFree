@@ -50,7 +50,7 @@ struct HabitTaskDetailView: View {
                             .font(Font.Poppins.custom(.bold, size: 20))
                             .foregroundColor(.white)
 
-                        Text(NSLocalizedString("task.detail.days", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "task.detail.days"))
                             .font(.custom("Poppins-Regular", size: 12))
                             .foregroundColor(.white.opacity(0.5))
                     }
@@ -79,13 +79,13 @@ struct HabitTaskDetailView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(alignment: .top) {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(NSLocalizedString("task.detail.progression_66_days", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.progression_66_days"))
                                         .font(.custom("Poppins-SemiBold", size: 16))
                                         .foregroundColor(.white)
 
                                     let occurrenceDays = getExpectedOccurrenceDays()
 
-                                    Text("\(occurrenceDays.count) \(NSLocalizedString("task.detail.occurrences", comment: ""))")
+                                    Text("\(occurrenceDays.count) \(LanguageManager.shared.localizedString(for: "task.detail.occurrences"))")
                                         .font(.custom("Poppins-Regular", size: 11))
                                         .foregroundColor(Color(hex: "B794F6"))
                                 }
@@ -98,7 +98,7 @@ struct HabitTaskDetailView: View {
                                         .font(Font.Poppins.custom(.bold, size: 14))
                                         .foregroundColor(.white)
 
-                                    Text(NSLocalizedString("task.detail.total", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.total"))
                                         .font(.custom("Poppins-Regular", size: 10))
                                         .foregroundColor(.white.opacity(0.6))
                                 }
@@ -130,13 +130,9 @@ struct HabitTaskDetailView: View {
 
                         // Impact section title - centered
                         VStack(spacing: 4) {
-                            Text(NSLocalizedString("task.detail.habit_improves", comment: ""))
+                            Text(LanguageManager.shared.localizedString(for: "task.detail.habit_improves"))
                                 .font(.custom("Poppins-SemiBold", size: 16))
                                 .foregroundColor(.white)
-
-                            Text(NSLocalizedString("task.detail.cortifree_score_domains", comment: ""))
-                                .font(.custom("Poppins-Regular", size: 11))
-                                .foregroundColor(Color(hex: "B794F6"))
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 8)
@@ -176,7 +172,7 @@ struct HabitTaskDetailView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "star.fill")
                                         .font(.system(size: 11))
-                                    Text(NSLocalizedString("task.detail.domain.global", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.global"))
                                         .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
@@ -186,7 +182,7 @@ struct HabitTaskDetailView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "leaf.fill")
                                         .font(.system(size: 11))
-                                    Text(NSLocalizedString("task.detail.domain.serenity", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.serenity"))
                                         .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
@@ -196,7 +192,7 @@ struct HabitTaskDetailView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "moon.fill")
                                         .font(.system(size: 11))
-                                    Text(NSLocalizedString("task.detail.domain.sleep", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.sleep"))
                                         .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
@@ -206,7 +202,7 @@ struct HabitTaskDetailView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "bolt.fill")
                                         .font(.system(size: 11))
-                                    Text(NSLocalizedString("task.detail.domain.energy", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.energy"))
                                         .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
@@ -216,17 +212,17 @@ struct HabitTaskDetailView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "target")
                                         .font(.system(size: 11))
-                                    Text(NSLocalizedString("task.detail.domain.focus", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.focus"))
                                         .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
                                 .offset(x: -95, y: 52)
 
-                                // Équilibre - Top left
+                                // Glow - Top left
                                 HStack(spacing: 4) {
-                                    Image(systemName: "heart.fill")
+                                    Image(systemName: "sparkles")
                                         .font(.system(size: 11))
-                                    Text(NSLocalizedString("task.detail.domain.balance", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.glow"))
                                         .font(.custom("Poppins-SemiBold", size: 11))
                                 }
                                 .foregroundColor(.white)
@@ -257,7 +253,7 @@ struct HabitTaskDetailView: View {
                             Image(systemName: "xmark")
                                 .font(.system(size: 16, weight: .semibold))
 
-                            Text(NSLocalizedString("task.detail.button.skip", comment: ""))
+                            Text(LanguageManager.shared.localizedString(for: "task.detail.button.skip"))
                                 .font(.custom("Poppins-SemiBold", size: 16))
                         }
                         .foregroundColor(.white)
@@ -281,7 +277,7 @@ struct HabitTaskDetailView: View {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 16, weight: .semibold))
 
-                            Text(NSLocalizedString("task.detail.button.validate", comment: ""))
+                            Text(LanguageManager.shared.localizedString(for: "task.detail.button.validate"))
                                 .font(.custom("Poppins-SemiBold", size: 16))
                         }
                         .foregroundColor(.white)
@@ -397,29 +393,26 @@ struct HabitTaskDetailView: View {
         }
     }
 
-    // Helper function to convert impact areas to progress array for radar chart
-    // Order: [Global, Sérénité, Sommeil, Énergie, Focus, Équilibre]
+    // Relative emphasis of each habit on the radar chart.
+    // Order: [Global, Sérénité, Sommeil, Énergie, Focus, Glow]
     private func getImpactProgress() -> [Double] {
-        // Get the real impact weights from HabitImpactWeights
         let habitId = getHabitId(for: task.imageName)
-        let impact = HabitImpactWeights.impactForHabit(habitId)
 
-        // Normalize weights to 0-1 scale for radar chart display
-        // Max weight per task ≈ 0.3 (some habits have higher weights)
-        // We'll use 65 as max since that's the total progression over 66 days
-        // But for display, we normalize relative to the strongest impact
-        let maxWeight = max(impact.serenity, impact.sleep, impact.energy, impact.focus, impact.balance, 0.001)
+        // [Sérénité, Sommeil, Énergie, Focus, Glow], normalized to the strongest area
+        let domains: [Double]
+        switch habitId {
+        case "meditation", "breathing", "social": domains = [1, 0, 0, 0, 0]
+        case "nature": domains = [1, 0, 0, 0, 0.1]
+        case "journal": domains = [0, 0, 0, 1, 0]
+        case "sport": domains = [0, 0, 1, 0, 0.35]
+        case "water": domains = [0, 0, 1, 0, 0.25]
+        case "sleep": domains = [0, 1, 0, 0, 0.2]
+        default: domains = [0, 0, 0, 0, 0]
+        }
 
-        let normalizedSerenity = impact.serenity / maxWeight
-        let normalizedSleep = impact.sleep / maxWeight
-        let normalizedEnergy = impact.energy / maxWeight
-        let normalizedFocus = impact.focus / maxWeight
-        let normalizedBalance = impact.balance / maxWeight
-
-        // Global is the average of all domains
-        let global = (normalizedSerenity + normalizedSleep + normalizedEnergy + normalizedFocus + normalizedBalance) / 5.0
-
-        return [global, normalizedSerenity, normalizedSleep, normalizedEnergy, normalizedFocus, normalizedBalance]
+        // Global is the average of all areas
+        let global = domains.reduce(0, +) / Double(domains.count)
+        return [global] + domains
     }
 
     // Helper to map image name to habit ID
@@ -445,53 +438,6 @@ struct HabitTaskDetailView: View {
     }
 }
 
-// MARK: - Impact Stat Card
-
-struct ImpactStatCard: View {
-    let icon: String
-    let title: String
-    let increase: Int
-    let color: Color
-    let animateProgress: Bool
-
-    var body: some View {
-        HStack(spacing: 12) {
-            // Icon on the left
-            Image(systemName: icon)
-                .font(.system(size: 24))
-                .foregroundColor(color)
-                .frame(width: 32, height: 32)
-
-            // Title on the right
-            Text(title)
-                .font(.custom("Poppins-SemiBold", size: 14))
-                .foregroundColor(.white)
-
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            color.opacity(0.15),
-                            color.opacity(0.05)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(color.opacity(0.3), lineWidth: 1)
-                )
-        )
-    }
-}
-
 // MARK: - Models
 
 struct HabitTask: Identifiable {
@@ -506,59 +452,6 @@ struct HabitTask: Identifiable {
     let totalCompletions: Int
     let last7Days: [Bool] // true if completed that day
     let completedDays: [Int] // Program days completed (1-66+)
-    let impactAreas: [ImpactArea]
-
-    // Static function to generate impact areas based on habit image name
-    // Uses real impact weights from HabitImpactWeights
-    static func getImpactAreas(for imageName: String) -> [ImpactArea] {
-        // Map image name to habit ID
-        let habitId: String
-        if imageName.contains("sleep") || imageName.contains("sommeil") {
-            habitId = "sleep"
-        } else if imageName.contains("breathe") || imageName.contains("respir") {
-            habitId = "breathing"
-        } else if imageName.contains("meditate") || imageName.contains("médita") {
-            habitId = "meditation"
-        } else if imageName.contains("water") || imageName.contains("eau") {
-            habitId = "water"
-        } else if imageName.contains("sport") || imageName.contains("exercice") {
-            habitId = "sport"
-        } else if imageName.contains("nature") {
-            habitId = "nature"
-        } else if imageName.contains("social") || imageName.contains("ami") {
-            habitId = "social"
-        } else if imageName.contains("journal") {
-            habitId = "journal"
-        } else {
-            habitId = "unknown"
-        }
-
-        // Get real impact weights
-        let impact = HabitImpactWeights.impactForHabit(habitId)
-
-        // Convert weights to ImpactArea array
-        // Scale weights to display values (multiply by ~100 for better visual)
-        // Sort by descending impact value to show most important first
-        let isFrench = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-        var areas = [
-            ImpactArea(icon: "leaf.fill", title: isFrench ? "Sérénité" : "Serenity", increaseValue: Int(impact.serenity * 100), color: Color(hex: "9B59B6")),
-            ImpactArea(icon: "moon.fill", title: isFrench ? "Sommeil" : "Sleep", increaseValue: Int(impact.sleep * 100), color: Color(hex: "E74C3C")),
-            ImpactArea(icon: "bolt.fill", title: isFrench ? "Énergie" : "Energy", increaseValue: Int(impact.energy * 100), color: Color(hex: "1ABC9C")),
-            ImpactArea(icon: "target", title: "Focus", increaseValue: Int(impact.focus * 100), color: Color(hex: "2ECC71")),
-            ImpactArea(icon: "heart.fill", title: isFrench ? "Équilibre" : "Balance", increaseValue: Int(impact.balance * 100), color: Color(hex: "3498DB"))
-        ]
-
-        // Sort by impact value (descending) and keep only top 4
-        areas.sort { $0.increaseValue > $1.increaseValue }
-        return Array(areas.prefix(4))
-    }
-}
-
-struct ImpactArea {
-    let icon: String
-    let title: String
-    let increaseValue: Int
-    let color: Color
 }
 
 // MARK: - Preview
@@ -574,8 +467,7 @@ struct ImpactArea {
         imageName: "habit_water",
         totalCompletions: 24,
         last7Days: [true, true, false, true, true, true, true],
-        completedDays: [1, 2, 4, 5, 6, 7],
-        impactAreas: HabitTask.getImpactAreas(for: "habit_water")
+        completedDays: [1, 2, 4, 5, 6, 7]
     )
 
     HabitTaskDetailView(

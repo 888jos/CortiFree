@@ -27,7 +27,7 @@ struct HabitsQuizInsightView: View {
 
     var body: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.8)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -72,7 +72,7 @@ struct HabitsQuizInsightView: View {
 
                 Button(action: {
                     HapticManager.medium()
-                    MixpanelManager.shared.track(
+                    AnalyticsManager.shared.track(
                         event: "onboarding_quiz_transition_continued",
                         properties: ["transition_type": mode.analyticsName]
                     )
@@ -84,18 +84,17 @@ struct HabitsQuizInsightView: View {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 15, weight: .semibold))
                     }
-                    .foregroundStyle(Color(hex: "1A1A4E"))
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .contentShape(Capsule())
                 }
+                .buttonStyle(.glassPrimary)
                 .padding(.horizontal, 34)
                 .padding(.bottom, 46)
             }
         }
         .onAppear {
-            MixpanelManager.shared.track(
+            AnalyticsManager.shared.track(
                 event: "onboarding_quiz_transition_viewed",
                 properties: ["transition_type": mode.analyticsName]
             )
@@ -164,12 +163,7 @@ struct HabitsQuizInsightView: View {
             }
         }
         .padding(20)
-        .background(Color(hex: "111032").opacity(0.88))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
-        }
+        .glassCard(cornerRadius: 20)
     }
 
     private var metrics: [InsightMetric] {
@@ -197,7 +191,7 @@ struct HabitsQuizInsightView: View {
                     labelKey: "onboarding_v2.insight.metric.sleep",
                     icon: "bed.double.fill",
                     score: score(forQuestion: 2),
-                    color: Color(hex: "FF6B9D"),
+                    color: Color(hex: "B794F6"),
                     priorityKey: "onboarding_v2.insight.pattern.priority.sleep"
                 )
             ]
@@ -233,7 +227,7 @@ struct HabitsQuizInsightView: View {
                     labelKey: "onboarding_v2.insight.metric.focus",
                     icon: "scope",
                     score: result.focusScore,
-                    color: Color(hex: "FF6B9D"),
+                    color: Color(hex: "B794F6"),
                     priorityKey: "onboarding_v2.insight.profile.priority.focus"
                 )
             ]

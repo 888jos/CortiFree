@@ -22,13 +22,13 @@ struct HabitVariantConfig {
     static func wakeUpTitle(for week: Int) -> String {
         switch week {
         case 1:
-            return NSLocalizedString("habit.wake_before_8h30", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.wake_before_8h30")
         case 2, 3:
-            return NSLocalizedString("habit.wake_before_8h", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.wake_before_8h")
         case 4, 5:
-            return NSLocalizedString("habit.wake_before_7h30", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.wake_before_7h30")
         default: // 6-10
-            return NSLocalizedString("habit.wake_before_7h", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.wake_before_7h")
         }
     }
 
@@ -36,13 +36,13 @@ struct HabitVariantConfig {
     static func bedtimeTitle(for week: Int) -> String {
         switch week {
         case 1:
-            return NSLocalizedString("habit.sleep_before_23h30", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.sleep_before_23h30")
         case 2, 3:
-            return NSLocalizedString("habit.sleep_before_23h", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.sleep_before_23h")
         case 4, 5:
-            return NSLocalizedString("habit.sleep_before_22h30", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.sleep_before_22h30")
         default: // 6-10
-            return NSLocalizedString("habit.sleep_before_22h", comment: "")
+            return LanguageManager.shared.localizedString(for: "habit.sleep_before_22h")
         }
     }
 
@@ -67,12 +67,12 @@ struct HabitVariantConfig {
         [
             HabitVariantInfo(
                 imageName: "habit_sleep_morning",
-                title: NSLocalizedString("habit.wake_before_7h", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.wake_before_7h"),
                 frequency: "frequency.daily"
             ),
             HabitVariantInfo(
                 imageName: "habit_sleep_night",
-                title: NSLocalizedString("habit.sleep_before_22h", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sleep_before_22h"),
                 frequency: "frequency.daily"
             )
         ]
@@ -83,7 +83,7 @@ struct HabitVariantConfig {
     static var breathingVariant: HabitVariantInfo {
         HabitVariantInfo(
             imageName: "habit_breathe",
-            title: NSLocalizedString("habit.breathing_title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "habit.breathing_title"),
             frequency: "frequency.daily"
         )
     }
@@ -91,7 +91,7 @@ struct HabitVariantConfig {
     static var meditationVariant: HabitVariantInfo {
         HabitVariantInfo(
             imageName: "habit_meditate",
-            title: NSLocalizedString("habit.meditation_title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "habit.meditation_title"),
             frequency: "frequency.daily"
         )
     }
@@ -99,7 +99,7 @@ struct HabitVariantConfig {
     static var journalVariant: HabitVariantInfo {
         HabitVariantInfo(
             imageName: "habit_journal",
-            title: NSLocalizedString("habit.journal_title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "habit.journal_title"),
             frequency: "frequency.daily"
         )
     }
@@ -122,7 +122,7 @@ struct HabitVariantConfig {
     static func getWaterVariant(for week: Int) -> HabitVariantInfo {
         return HabitVariantInfo(
             imageName: "habit_water",
-            title: String(format: NSLocalizedString("habit.water_title", comment: ""), waterTarget(for: week)),
+            title: String(format: LanguageManager.shared.localizedString(for: "habit.water_title"), waterTarget(for: week)),
             frequency: "frequency.daily"
         )
     }
@@ -137,7 +137,7 @@ struct HabitVariantConfig {
     static var waterVariant: HabitVariantInfo {
         HabitVariantInfo(
             imageName: "habit_water",
-            title: NSLocalizedString("habit.water_title_legacy", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "habit.water_title_legacy"),
             frequency: "frequency.daily"
         )
     }
@@ -148,17 +148,17 @@ struct HabitVariantConfig {
         [
             HabitVariantInfo(
                 imageName: "habit_nature_balade",
-                title: NSLocalizedString("habit.nature_walk", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.nature_walk"),
                 frequency: "frequency.2x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_nature_randonnee",
-                title: NSLocalizedString("habit.nature_trek", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.nature_trek"),
                 frequency: "frequency.2x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_nature_velo",
-                title: NSLocalizedString("habit.nature_bike", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.nature_bike"),
                 frequency: "frequency.2x_week"
             )
         ]
@@ -170,37 +170,37 @@ struct HabitVariantConfig {
         [
             HabitVariantInfo(
                 imageName: "habit_sport_boxe",
-                title: NSLocalizedString("habit.sport_boxing", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sport_boxing"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_sport_corde",
-                title: NSLocalizedString("habit.sport_jump_rope", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sport_jump_rope"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_sport_dance",
-                title: NSLocalizedString("habit.sport_dance", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sport_dance"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_sport_etirements",
-                title: NSLocalizedString("habit.sport_stretching", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sport_stretching"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_sport_natation",
-                title: NSLocalizedString("habit.sport_swimming", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sport_swimming"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_sport_renforcement",
-                title: NSLocalizedString("habit.sport_strength", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sport_strength"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_sport_courir",
-                title: NSLocalizedString("habit.sport_running", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.sport_running"),
                 frequency: "frequency.3x_week"
             )
         ]
@@ -212,32 +212,32 @@ struct HabitVariantConfig {
         [
             HabitVariantInfo(
                 imageName: "habit_social_creative",
-                title: NSLocalizedString("habit.social_creative", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.social_creative"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_social_appel",
-                title: NSLocalizedString("habit.social_call", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.social_call"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_social_cuisiner",
-                title: NSLocalizedString("habit.social_meal", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.social_meal"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_social_film",
-                title: NSLocalizedString("habit.social_movie", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.social_movie"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_social_jeu",
-                title: NSLocalizedString("habit.social_games", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.social_games"),
                 frequency: "frequency.3x_week"
             ),
             HabitVariantInfo(
                 imageName: "habit_social_verre",
-                title: NSLocalizedString("habit.social_drinks", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "habit.social_drinks"),
                 frequency: "frequency.3x_week"
             )
         ]

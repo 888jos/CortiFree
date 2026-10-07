@@ -65,12 +65,12 @@ class AuthViewModel: ObservableObject {
     // Inscription
     func signUp(email: String, password: String, username: String) async {
         guard !email.isEmpty, !password.isEmpty, !username.isEmpty else {
-            errorMessage = NSLocalizedString("error.validation.missing_field", comment: "")
+            errorMessage = LanguageManager.shared.localizedString(for: "error.validation.missing_field")
             return
         }
 
         guard password.count >= 6 else {
-            errorMessage = NSLocalizedString("error.auth.weak_password", comment: "")
+            errorMessage = LanguageManager.shared.localizedString(for: "error.auth.weak_password")
             return
         }
 
@@ -81,7 +81,7 @@ class AuthViewModel: ObservableObject {
             let user = try await firebase.auth.signUp(email: email, password: password, displayName: username)
             currentUser = user
             isAuthenticated = true
-            successMessage = NSLocalizedString("auth.success.account_created", comment: "")
+            successMessage = LanguageManager.shared.localizedString(for: "auth.success.account_created")
 
             // Identify user in RevenueCat with Firebase UID
             await RevenueCatManager.shared.identifyUser(userId: user.uid)
@@ -99,7 +99,7 @@ class AuthViewModel: ObservableObject {
     // Connexion
     func signIn(email: String, password: String) async {
         guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = NSLocalizedString("error.validation.missing_field", comment: "")
+            errorMessage = LanguageManager.shared.localizedString(for: "error.validation.missing_field")
             return
         }
 
@@ -117,7 +117,7 @@ class AuthViewModel: ObservableObject {
             await RevenueCatManager.shared.identifyUser(userId: user.uid)
 
             isAuthenticated = true
-            successMessage = NSLocalizedString("auth.success.login", comment: "")
+            successMessage = LanguageManager.shared.localizedString(for: "auth.success.login")
         } catch let error as CoreError {
             errorMessage = error.errorDescription
             ErrorHandler.shared.handle(error, context: "AuthViewModel.signIn", showToUser: false)
@@ -138,6 +138,9 @@ class AuthViewModel: ObservableObject {
 
                 try await firebase.auth.signOut()
 
+                // Unlink analytics / paywall identities from the signed-out account
+                AccountDeletionService.resetThirdPartyIdentities()
+
                 currentUser = nil
                 isAuthenticated = false
                 hasCompletedOnboarding = false
@@ -148,7 +151,7 @@ class AuthViewModel: ObservableObject {
                 UserDefaults.standard.removeObject(forKey: "subscriptionProductID")
                 UserDefaults.standard.removeObject(forKey: "current_subscription_status")
 
-                successMessage = NSLocalizedString("auth.success.logout", comment: "")
+                successMessage = LanguageManager.shared.localizedString(for: "auth.success.logout")
             } catch let error as CoreError {
                 errorMessage = error.errorDescription
                 ErrorHandler.shared.handle(error, context: "AuthViewModel.signOut", showToUser: false)
@@ -162,7 +165,7 @@ class AuthViewModel: ObservableObject {
     // Réinitialiser le mot de passe
     func resetPassword(email: String) async {
         guard !email.isEmpty else {
-            errorMessage = NSLocalizedString("error.validation.missing_field", comment: "")
+            errorMessage = LanguageManager.shared.localizedString(for: "error.validation.missing_field")
             return
         }
 
@@ -171,7 +174,7 @@ class AuthViewModel: ObservableObject {
 
         do {
             try await firebase.auth.resetPassword(email: email)
-            successMessage = NSLocalizedString("auth.success.reset_email_sent", comment: "")
+            successMessage = LanguageManager.shared.localizedString(for: "auth.success.reset_email_sent")
         } catch let error as CoreError {
             errorMessage = error.errorDescription
             ErrorHandler.shared.handle(error, context: "AuthViewModel.resetPassword", showToUser: false)

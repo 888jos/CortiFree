@@ -20,42 +20,42 @@ struct GroundingExerciseView: View {
 
     let steps = [
         GroundingStep(
-            sense: NSLocalizedString("exercise.grounding_basic.step_1.sense", comment: ""),
+            sense: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_1.sense"),
             icon: "eye.fill",
-            instruction: NSLocalizedString("exercise.grounding_basic.step_1.instruction", comment: ""),
-            subtitle: NSLocalizedString("exercise.grounding_basic.step_1.subtitle", comment: ""),
+            instruction: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_1.instruction"),
+            subtitle: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_1.subtitle"),
             count: 5,
             color: "73DE85"
         ),
         GroundingStep(
-            sense: NSLocalizedString("exercise.grounding_basic.step_2.sense", comment: ""),
+            sense: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_2.sense"),
             icon: "hand.raised.fill",
-            instruction: NSLocalizedString("exercise.grounding_basic.step_2.instruction", comment: ""),
-            subtitle: NSLocalizedString("exercise.grounding_basic.step_2.subtitle", comment: ""),
+            instruction: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_2.instruction"),
+            subtitle: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_2.subtitle"),
             count: 4,
             color: "66BB6A"
         ),
         GroundingStep(
-            sense: NSLocalizedString("exercise.grounding_basic.step_3.sense", comment: ""),
+            sense: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_3.sense"),
             icon: "ear.fill",
-            instruction: NSLocalizedString("exercise.grounding_basic.step_3.instruction", comment: ""),
-            subtitle: NSLocalizedString("exercise.grounding_basic.step_3.subtitle", comment: ""),
+            instruction: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_3.instruction"),
+            subtitle: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_3.subtitle"),
             count: 3,
             color: "00FF88"
         ),
         GroundingStep(
-            sense: NSLocalizedString("exercise.grounding_basic.step_4.sense", comment: ""),
+            sense: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_4.sense"),
             icon: "nose.fill",
-            instruction: NSLocalizedString("exercise.grounding_basic.step_4.instruction", comment: ""),
-            subtitle: NSLocalizedString("exercise.grounding_basic.step_4.subtitle", comment: ""),
+            instruction: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_4.instruction"),
+            subtitle: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_4.subtitle"),
             count: 2,
             color: "9B7BF1"
         ),
         GroundingStep(
-            sense: NSLocalizedString("exercise.grounding_basic.step_5.sense", comment: ""),
+            sense: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_5.sense"),
             icon: "mouth.fill",
-            instruction: NSLocalizedString("exercise.grounding_basic.step_5.instruction", comment: ""),
-            subtitle: NSLocalizedString("exercise.grounding_basic.step_5.subtitle", comment: ""),
+            instruction: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_5.instruction"),
+            subtitle: LanguageManager.shared.localizedString(for: "exercise.grounding_basic.step_5.subtitle"),
             count: 1,
             color: "FF6B9D"
         )
@@ -87,10 +87,14 @@ struct GroundingExerciseView: View {
                         voiceOverManager.stop()
                         dismiss()
                     }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundColor(.white.opacity(0.6))
+                        Image(systemName: "xmark")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.85))
+                            .frame(width: 40, height: 40)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
 
                     Spacer()
 
@@ -114,22 +118,17 @@ struct GroundingExerciseView: View {
                         }
                     }) {
                         ZStack {
-                            Circle()
-                                .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.2) : Color.white.opacity(0.1))
-                                .frame(width: 44, height: 44)
-                                .blur(radius: 8)
-
-                            Circle()
-                                .fill(voiceOverManager.isEnabled ? Color(hex: "B388FF").opacity(0.3) : Color(hex: "1A1B3A").opacity(0.9))
-                                .frame(width: 44, height: 44)
-
                             Image(systemName: voiceOverManager.isEnabled ? "speaker.wave.3.fill" : "speaker.slash.fill")
                                 .font(.custom("Poppins-SemiBold", size: 16))
                                 .foregroundColor(voiceOverManager.isEnabled ? Color(hex: "B388FF") : .white.opacity(0.7))
                                 .scaleEffect(voiceOverManager.isSpeaking ? 1.1 : 1.0)
                                 .animation(.easeInOut(duration: 0.3).repeatForever(autoreverses: true), value: voiceOverManager.isSpeaking)
                         }
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(tint: voiceOverManager.isEnabled ? Color(hex: "B388FF") : nil, interactive: true)
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
@@ -200,23 +199,14 @@ struct GroundingExerciseView: View {
                     HapticManager.light()
                     nextStep()
                 }) {
-                    Text(currentStep < steps.count - 1 ? NSLocalizedString("exercise.button.next", comment: "") : NSLocalizedString("exercise.button.finish", comment: ""))
+                    Text(currentStep < steps.count - 1 ? LanguageManager.shared.localizedString(for: "exercise.button.next") : LanguageManager.shared.localizedString(for: "exercise.button.finish"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
+                .buttonStyle(.glassPrimary(tint: Color.appTheme, cornerRadius: 16))
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }

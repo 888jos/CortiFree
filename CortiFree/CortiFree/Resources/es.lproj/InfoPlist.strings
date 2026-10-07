@@ -1,0 +1,9 @@
+/* Generated from the English CortiFree localization. */
+"NSPhotoLibraryUsageDescription" = "CortiFree necesita acceso a su biblioteca de fotos para permitirle ahorrar y compartir su progreso.";
+"NSCameraUsageDescription" = "CortiFree necesita acceso a la cámara para realizar el Glow Scan y ofrecer una estimación visual de tu bienestar.";
+"CFBundleDisplayName" = "CortiFree";
+"NSHumanReadableCopyright" = "© 2025 CortiFree. Todos los derechos reservados.";
+"NSLocationWhenInUseUsageDescription" = "CortiFree utiliza su ubicación para proporcionar sugerencias de actividad personalizadas basadas en su área.";
+"NSMotionUsageDescription" = "CortiFree utiliza el seguimiento de movimiento para supervisar su actividad física y proporcionar mejores recomendaciones de ejercicio.";
+"NSPhotoLibraryAddUsageDescription" = "CortiFree necesita permiso para guardar imágenes a su biblioteca de fotos.";
+"NSMicrophoneUsageDescription" = "CortiFree necesita acceso al micrófono para ejercicios guiados de meditación y respiración.";

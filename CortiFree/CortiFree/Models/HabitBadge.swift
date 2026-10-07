@@ -47,10 +47,10 @@ struct HabitBadge: Identifiable, Codable {
 
         var displayName: String {
             switch self {
-            case .bronze: return NSLocalizedString("badge.level.bronze", comment: "")
-            case .silver: return NSLocalizedString("badge.level.silver", comment: "")
-            case .gold: return NSLocalizedString("badge.level.gold", comment: "")
-            case .diamond: return NSLocalizedString("badge.level.diamond", comment: "")
+            case .bronze: return LanguageManager.shared.localizedString(for: "badge.level.bronze")
+            case .silver: return LanguageManager.shared.localizedString(for: "badge.level.silver")
+            case .gold: return LanguageManager.shared.localizedString(for: "badge.level.gold")
+            case .diamond: return LanguageManager.shared.localizedString(for: "badge.level.diamond")
             }
         }
 
@@ -187,14 +187,14 @@ extension HabitBadge {
     /// Nom affiché de l'habitude
     static func habitDisplayName(_ habitId: String) -> String {
         switch habitId {
-        case "meditation": return NSLocalizedString("badge.habit.meditation", comment: "")
-        case "breathing": return NSLocalizedString("badge.habit.breathing", comment: "")
-        case "journal": return NSLocalizedString("badge.habit.journal", comment: "")
-        case "sport": return NSLocalizedString("badge.habit.sport", comment: "")
-        case "water": return NSLocalizedString("badge.habit.water", comment: "")
-        case "nature": return NSLocalizedString("badge.habit.nature", comment: "")
-        case "social": return NSLocalizedString("badge.habit.social", comment: "")
-        case "sleep": return NSLocalizedString("badge.habit.sleep", comment: "")
+        case "meditation": return LanguageManager.shared.localizedString(for: "badge.habit.meditation")
+        case "breathing": return LanguageManager.shared.localizedString(for: "badge.habit.breathing")
+        case "journal": return LanguageManager.shared.localizedString(for: "badge.habit.journal")
+        case "sport": return LanguageManager.shared.localizedString(for: "badge.habit.sport")
+        case "water": return LanguageManager.shared.localizedString(for: "badge.habit.water")
+        case "nature": return LanguageManager.shared.localizedString(for: "badge.habit.nature")
+        case "social": return LanguageManager.shared.localizedString(for: "badge.habit.social")
+        case "sleep": return LanguageManager.shared.localizedString(for: "badge.habit.sleep")
         default: return habitId.capitalized
         }
     }

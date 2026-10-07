@@ -28,8 +28,10 @@ struct ResetPasswordView: View {
                             .font(.custom("Poppins-SemiBold", size: 18))
                             .foregroundColor(.white)
                             .frame(width: 36, height: 36)
-                            .background(Circle().fill(Color.white.opacity(0.1)))
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
 
                     Spacer()
                 }
@@ -63,15 +65,9 @@ struct ResetPasswordView: View {
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 50)
-                                .background(
-                                    LinearGradient(
-                                        colors: [Color.appTheme, Color.appThemeSecondary],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .clipShape(RoundedRectangle(cornerRadius: 25))
+                                .contentShape(Capsule())
                         }
+                        .buttonStyle(.glassPrimary(tint: Color.appTheme))
                         .padding(.horizontal, 24)
                         .padding(.top, 16)
                     }
@@ -121,11 +117,11 @@ struct ResetPasswordView: View {
                             }
                             .padding(16)
                             .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.white.opacity(0.1))
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(Color.white.opacity(0.06))
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                                     )
                             )
                         }
@@ -172,17 +168,10 @@ struct ResetPasswordView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color.appTheme, Color.appThemeSecondary],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 25))
+                            .contentShape(Capsule())
                         }
+                        .buttonStyle(.glassPrimary(tint: Color.appTheme))
                         .disabled(authViewModel.isLoading || email.isEmpty)
-                        .opacity(authViewModel.isLoading || email.isEmpty ? 0.6 : 1.0)
                         .padding(.horizontal, 24)
                     }
                 }

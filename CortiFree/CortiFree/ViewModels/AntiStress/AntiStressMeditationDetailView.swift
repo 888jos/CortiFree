@@ -91,7 +91,9 @@ struct AntiStressMeditationDetailView: View {
             }
         }
         .fullScreenCover(isPresented: $showMeditationSession) {
-            GuidedMeditationSessionView(support: meditationSupport)
+            // Guided audio session (Stress SOS → Quick reset)
+            GuidedSessionAutoPlayView(session: GuidedSessionCatalog.session(forLegacyID: meditationSupport.meditationId))
+                .presentationBackground(.clear)
         }
     }
 
@@ -138,7 +140,7 @@ struct AntiStressMeditationDetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 12))
-                    Text(NSLocalizedString("meditation_detail.category_badge", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "meditation_detail.category_badge"))
                         .font(.custom("Poppins-Bold", size: 11))
                 }
                 .foregroundColor(Color.appTheme)
@@ -163,12 +165,12 @@ struct AntiStressMeditationDetailView: View {
     private var compactTitleSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Title
-            Text(NSLocalizedString("meditation_detail.title", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "meditation_detail.title"))
                 .font(.faroBold(28))
                 .foregroundColor(.white)
 
             // Description courte
-            Text(NSLocalizedString("meditation_detail.subtitle", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "meditation_detail.subtitle"))
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(.white.opacity(0.8))
                 .lineSpacing(4)
@@ -192,7 +194,7 @@ struct AntiStressMeditationDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("meditation_detail.how_it_works", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "meditation_detail.how_it_works"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -206,7 +208,7 @@ struct AntiStressMeditationDetailView: View {
 
                 // Description - Expandable
                 if showHowItWorks {
-                    Text(NSLocalizedString("meditation_detail.how_it_works_text", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "meditation_detail.how_it_works_text"))
                         .font(.custom("Poppins-Regular", size: 15))
                         .foregroundColor(Color(hex: "E5E5E5"))
                         .lineSpacing(8)
@@ -262,7 +264,7 @@ struct AntiStressMeditationDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("meditation_detail.scientific_data", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "meditation_detail.scientific_data"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -348,14 +350,14 @@ struct AntiStressMeditationDetailView: View {
 
     private var scientificEvidences: [String] {
         return [
-            NSLocalizedString("meditation_detail.evidence_1", comment: ""),
-            NSLocalizedString("meditation_detail.evidence_2", comment: ""),
-            NSLocalizedString("meditation_detail.evidence_3", comment: "")
+            LanguageManager.shared.localizedString(for: "meditation_detail.evidence_1"),
+            LanguageManager.shared.localizedString(for: "meditation_detail.evidence_2"),
+            LanguageManager.shared.localizedString(for: "meditation_detail.evidence_3")
         ]
     }
 
     private var scientificSources: [String] {
-        return [NSLocalizedString("meditation_detail.source", comment: "")]
+        return [LanguageManager.shared.localizedString(for: "meditation_detail.source")]
     }
 
     // MARK: - Benefits Section
@@ -367,7 +369,7 @@ struct AntiStressMeditationDetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text(NSLocalizedString("meditation_detail.benefits", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "meditation_detail.benefits"))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }
@@ -385,10 +387,10 @@ struct AntiStressMeditationDetailView: View {
 
     private var benefits: [String] {
         return [
-            NSLocalizedString("meditation_detail.benefit.reduce_stress", comment: ""),
-            NSLocalizedString("meditation_detail.benefit.improve_focus", comment: ""),
-            NSLocalizedString("meditation_detail.benefit.soothe_mind", comment: ""),
-            NSLocalizedString("meditation_detail.benefit.mental_clarity", comment: "")
+            LanguageManager.shared.localizedString(for: "meditation_detail.benefit.reduce_stress"),
+            LanguageManager.shared.localizedString(for: "meditation_detail.benefit.improve_focus"),
+            LanguageManager.shared.localizedString(for: "meditation_detail.benefit.soothe_mind"),
+            LanguageManager.shared.localizedString(for: "meditation_detail.benefit.mental_clarity")
         ]
     }
 
@@ -428,7 +430,7 @@ struct AntiStressMeditationDetailView: View {
                 Image(systemName: "play.circle.fill")
                     .font(.system(size: 24))
 
-                Text(NSLocalizedString("meditation_detail.start_meditation", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "meditation_detail.start_meditation"))
                     .font(.custom("Poppins-Bold", size: 18))
             }
             .foregroundColor(.white)

@@ -12,7 +12,6 @@ import FirebaseFirestore
 struct UserSettings: Codable {
     // MARK: - Program Settings
     var programStartDate: Date // Date de début du programme (jour 1)
-    var onboardingScore: Int // Score initial du quiz (0-100)
 
     // MARK: - Sleep Settings
     var wakeUpTime: String // Format "HH:mm" ex: "07:00"
@@ -51,7 +50,6 @@ struct UserSettings: Codable {
 
     init(
         programStartDate: Date = UserSettings.calculateProgramStartDate(),
-        onboardingScore: Int = 50,
         wakeUpTime: String = "07:00",
         bedTime: String = "23:00",
         preferredSportActivities: [String] = [],
@@ -62,7 +60,6 @@ struct UserSettings: Codable {
         eveningReminderTime: String? = "20:00"
     ) {
         self.programStartDate = programStartDate
-        self.onboardingScore = onboardingScore
         self.wakeUpTime = wakeUpTime
         self.bedTime = bedTime
         self.preferredSportActivities = preferredSportActivities
@@ -91,7 +88,6 @@ struct UserSettings: Codable {
     func toFirestore() -> [String: Any] {
         return [
             "programStartDate": Timestamp(date: programStartDate),
-            "onboardingScore": onboardingScore,
             "wakeUpTime": wakeUpTime,
             "bedTime": bedTime,
             "preferredSportActivities": preferredSportActivities,
@@ -107,7 +103,6 @@ struct UserSettings: Codable {
         guard let data = document.data() else { return nil }
 
         let programStartDate = (data["programStartDate"] as? Timestamp)?.dateValue() ?? Date()
-        let onboardingScore = data["onboardingScore"] as? Int ?? 50
         let wakeUpTime = data["wakeUpTime"] as? String ?? "07:00"
         let bedTime = data["bedTime"] as? String ?? "23:00"
         let preferredSportActivities = data["preferredSportActivities"] as? [String] ?? []
@@ -119,7 +114,6 @@ struct UserSettings: Codable {
 
         return UserSettings(
             programStartDate: programStartDate,
-            onboardingScore: onboardingScore,
             wakeUpTime: wakeUpTime,
             bedTime: bedTime,
             preferredSportActivities: preferredSportActivities,

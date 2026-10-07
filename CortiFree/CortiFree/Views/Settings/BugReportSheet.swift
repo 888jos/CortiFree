@@ -31,11 +31,11 @@ struct BugReportSheet: View {
                     .padding(24)
                 }
             }
-            .navigationTitle(NSLocalizedString("settings.bug_report.title", comment: ""))
+            .navigationTitle(LanguageManager.shared.localizedString(for: "settings.bug_report.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(NSLocalizedString("settings.bug_report.cancel", comment: "")) {
+                    Button(LanguageManager.shared.localizedString(for: "settings.bug_report.cancel")) {
                         onCancel()
                     }
                     .foregroundColor(Color(hex: "B794F6"))
@@ -59,27 +59,22 @@ struct BugReportSheet: View {
 
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(NSLocalizedString("settings.bug_report.description_label", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.bug_report.description_label"))
                 .font(.custom("Poppins-SemiBold", size: 16))
                 .foregroundColor(.white)
 
             TextEditor(text: $bugReportText)
                 .frame(minHeight: 150)
                 .padding(12)
-                .background(Color(hex: "B794F6").opacity(0.1))
-                .cornerRadius(12)
                 .foregroundColor(.white)
                 .scrollContentBackground(.hidden)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(hex: "B794F6").opacity(0.3), lineWidth: 1)
-                )
+                .glassCard(cornerRadius: 18)
         }
     }
 
     private var screenshotSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(NSLocalizedString("settings.bug_report.screenshot_label", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.bug_report.screenshot_label"))
                 .font(.custom("Poppins-SemiBold", size: 16))
                 .foregroundColor(.white)
 
@@ -89,7 +84,7 @@ struct BugReportSheet: View {
                         .resizable()
                         .scaledToFit()
                         .frame(maxHeight: 200)
-                        .cornerRadius(12)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
                     Button(action: {
                         bugReportScreenshot = nil
@@ -108,19 +103,14 @@ struct BugReportSheet: View {
                     HStack {
                         Image(systemName: "photo.on.rectangle.angled")
                             .font(.system(size: 20))
-                        Text(NSLocalizedString("settings.bug_report.choose_image", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "settings.bug_report.choose_image"))
                             .font(.custom("Poppins-Medium", size: 14))
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color(hex: "B794F6").opacity(0.2))
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(hex: "B794F6").opacity(0.4), lineWidth: 1)
-                    )
                 }
+                .buttonStyle(.glassSecondary(tint: Color(hex: "B794F6"), cornerRadius: 18))
             }
         }
     }
@@ -129,33 +119,14 @@ struct BugReportSheet: View {
         Button(action: {
             onSubmit()
         }) {
-            Text(NSLocalizedString("settings.bug_report.submit", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "settings.bug_report.submit"))
                 .font(.custom("Poppins-SemiBold", size: 16))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(buttonBackground)
-                .cornerRadius(12)
-                .shadow(
-                    color: bugReportText.isEmpty ? .clear : Color(hex: "7C3AED").opacity(0.4),
-                    radius: 12,
-                    x: 0,
-                    y: 6
-                )
         }
+        .buttonStyle(.glassPrimary(tint: Color(hex: "7C3AED")))
         .disabled(bugReportText.isEmpty)
-    }
-
-    private var buttonBackground: some ShapeStyle {
-        if bugReportText.isEmpty {
-            return AnyShapeStyle(Color.gray.opacity(0.5))
-        } else {
-            return AnyShapeStyle(LinearGradient(
-                colors: [Color(hex: "7C3AED"), Color(hex: "5B21B6")],
-                startPoint: .leading,
-                endPoint: .trailing
-            ))
-        }
     }
 }
 

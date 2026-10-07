@@ -36,7 +36,7 @@ class AuthModule: ObservableObject {
 
     /// Sign up with email, password, and display name
     /// Creates both Firebase Auth user and Firestore profile
-    /// Integrates with Mixpanel for analytics
+    /// Integrates with analytics for analytics
     func signUp(email: String, password: String, displayName: String) async throws -> FirebaseAuth.User {
         do {
             // Create Firebase Auth user
@@ -63,9 +63,9 @@ class AuthModule: ObservableObject {
 
             try await db.collection("users").document(user.uid).setData(userData)
 
-            // Set Mixpanel profile
-            MixpanelManager.shared.identify(userId: user.uid)
-            MixpanelManager.shared.trackOnboardingWelcomeViewed()
+            // Set analytics profile
+            AnalyticsManager.shared.identify(userId: user.uid)
+            AnalyticsManager.shared.trackOnboardingWelcomeViewed()
 
             // Update state
             self.currentUser = user
@@ -82,7 +82,7 @@ class AuthModule: ObservableObject {
     }
 
     /// Sign in with email and password
-    /// Updates last login timestamp and tracks session in Mixpanel
+    /// Updates last login timestamp and tracks session in analytics
     func signIn(email: String, password: String) async throws -> FirebaseAuth.User {
         do {
             let authResult = try await auth.signIn(withEmail: email, password: password)
@@ -93,8 +93,8 @@ class AuthModule: ObservableObject {
                 .document(user.uid)
                 .updateData(["lastLoginAt": Timestamp(date: Date())])
 
-            // Track session in Mixpanel
-            MixpanelManager.shared.trackSessionStarted()
+            // Track session in analytics
+            AnalyticsManager.shared.trackSessionStarted()
 
             // Update state
             self.currentUser = user

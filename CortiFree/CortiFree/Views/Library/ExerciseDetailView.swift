@@ -221,12 +221,12 @@ struct ExerciseDetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text(NSLocalizedString("exercise.about", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "exercise.about"))
                     .font(.faroSemiBold(18))
                     .foregroundColor(.white)
             }
 
-            Text(String(format: NSLocalizedString("exercise.about_description", comment: ""), exercise.type.displayName.lowercased()))
+            Text(String(format: LanguageManager.shared.localizedString(for: "exercise.about_description"), exercise.type.displayName.lowercased()))
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(Color(hex: "E5E5E5"))
                 .lineSpacing(8)
@@ -275,7 +275,7 @@ struct ExerciseDetailView: View {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 24))
 
-                    Text(NSLocalizedString("exercise.start_exercise", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "exercise.start_exercise"))
                         .font(.faroBold(18))
                 }
                 .foregroundColor(.white)
@@ -435,7 +435,7 @@ struct ExerciseTimerView: View {
                 HapticManager.light()
                 onComplete()
             }) {
-                Text(NSLocalizedString("exercise.stop", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "exercise.stop"))
                     .font(.custom("Poppins-Medium", size: 16))
                     .foregroundColor(Color.appTheme)
                     .padding(.horizontal, 40)
@@ -455,11 +455,11 @@ struct ExerciseTimerView: View {
                 .font(.system(size: 80))
                 .foregroundColor(Color.appTheme)
 
-            Text(NSLocalizedString("exercise.congrats", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "exercise.congrats"))
                 .font(.faroSemiBold(32))
                 .foregroundColor(.white)
 
-            Text(NSLocalizedString("exercise.completed_message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "exercise.completed_message"))
                 .font(.custom("Poppins-Regular", size: 18))
                 .foregroundColor(.white.opacity(0.8))
 
@@ -467,7 +467,7 @@ struct ExerciseTimerView: View {
                 HapticManager.success()
                 onComplete()
             }) {
-                Text(NSLocalizedString("exercise.finish", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "exercise.finish"))
                     .font(.faroSemiBold(18))
                     .foregroundColor(.white)
                     .frame(maxWidth: 200)

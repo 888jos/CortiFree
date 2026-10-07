@@ -8,42 +8,6 @@
 
 import SwiftUI
 
-// MARK: - Simple Domain Score Component
-
-struct SimpleDomainScore: View {
-    let icon: String
-    let title: String
-    let value: Int
-    let color: Color
-    var scoreDifference: Int? = nil
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 6) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundColor(color)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.custom("Poppins-Medium", size: 11))
-                    .foregroundColor(.white.opacity(0.8))
-
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(value)")
-                        .font(Font.Poppins.custom(.bold, size: 20))
-                        .foregroundColor(.white)
-
-                    if let diff = scoreDifference, diff > 0 {
-                        Text("(+\(diff))")
-                            .font(Font.Poppins.custom(.bold, size: 12))
-                            .foregroundColor(.green)
-                    }
-                }
-            }
-        }
-    }
-}
-
 // MARK: - Horizontal Habit Bar Component
 
 struct HorizontalHabitBar: View {
@@ -105,11 +69,15 @@ struct HorizontalHabitBar: View {
             }
             .frame(height: 8)
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.05))
-        )
+        .padding(14)
+        .glassCard(cornerRadius: 16)
+        .onChange(of: progress) { _, newProgress in
+            // Data loads asynchronously; animate to the new value when visible
+            guard animationTrigger else { return }
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
+                animatedProgress = newProgress
+            }
+        }
         .onChange(of: animationTrigger) { oldValue, newValue in
             // Reset and animate when tab becomes visible
             if newValue {
@@ -166,7 +134,7 @@ struct SingleEvolvingHabitBadge: View {
             )
 
             // Habit name
-            Text(HabitBadge.englishHabitDisplayName(habitId))
+            Text(HabitBadge.habitDisplayName(habitId))
                 .font(.custom("Poppins-Medium", size: 11))
                 .foregroundColor(.white)
                 .lineLimit(1)
@@ -245,11 +213,11 @@ struct HabitBadgeDetailSheet: View {
 
                     // Title
                     VStack(spacing: 8) {
-                        Text(HabitBadge.englishHabitDisplayName(habitId))
+                        Text(HabitBadge.habitDisplayName(habitId))
                             .font(.custom("Poppins-Bold", size: 28))
                             .foregroundColor(.white)
 
-                        Text(currentBadge.level.englishDisplayName)
+                        Text(currentBadge.level.displayName)
                             .font(.custom("Poppins-SemiBold", size: 18))
                             .foregroundColor(Color(hex: currentBadge.level.color))
                     }
@@ -268,7 +236,7 @@ struct HabitBadgeDetailSheet: View {
                                 )
 
                                 // Level name
-                                Text(badge.level.englishDisplayName)
+                                Text(badge.level.displayName)
                                     .font(.custom("Poppins-Medium", size: 14))
                                     .foregroundColor(.white)
                                     .frame(width: 80, alignment: .leading)
@@ -307,48 +275,29 @@ struct HabitBadgeDetailSheet: View {
                                     .font(.system(size: 16))
                                     .foregroundColor(badge.isUnlocked ? Color(hex: badge.level.color) : .white.opacity(0.3))
                             }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, 16)
                         }
                     }
                     .padding(.vertical, 20)
+                    .glassCard(cornerRadius: 22)
+                    .padding(.horizontal, 16)
 
                     // Close button
                     Button(action: {
                         HapticManager.light()
                         dismiss()
                     }) {
-                        Text("Close")
+                        Text("achievements.close".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                            )
                     }
+                    .buttonStyle(.glassPrimary)
                     .padding(.horizontal, 40)
                     .padding(.bottom, 40)
                 }
             }
         }
     }
-}
-
-#Preview {
-    SimpleDomainScore(
-        icon: "heart.fill",
-        title: "Sérénité",
-        value: 75,
-        color: .pink,
-        scoreDifference: 12
-    )
-    .padding()
-    .background(Color.black)
 }

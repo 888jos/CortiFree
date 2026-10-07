@@ -19,6 +19,12 @@ class ProfileManager: ObservableObject {
     @Published var currentPerformance: [String: HabitPerformance] = [:]
     @Published var isLoading = false
 
+    // Keep aggregates briefly in memory. Profile views are often recreated
+    // during testing; without this guard each appearance fans out into 16+
+    // Firestore reads again.
+    private var performanceCache: [String: (loadedAt: Date, value: [String: HabitPerformance])] = [:]
+    private let cacheInterval: TimeInterval = 60
+
     private init() {}
 
     // MARK: - Personal Info Management
@@ -73,6 +79,9 @@ class ProfileManager: ObservableObject {
 
     /// Récupère les objectifs actuels de l'utilisateur
     func fetchCurrentGoals(uid: String) async throws -> [String: HabitGoal] {
+        if !currentGoals.isEmpty {
+            return currentGoals
+        }
         DispatchQueue.main.async {
             self.isLoading = true
         }
@@ -191,6 +200,10 @@ class ProfileManager: ObservableObject {
     func fetchAllPerformances(uid: String) async throws -> [String: HabitPerformance] {
         let habitIds = ["meditation", "breathing", "journal", "sport", "water", "nature", "social", "sleep"]
 
+        if let cached = performanceCache[uid], Date().timeIntervalSince(cached.loadedAt) < cacheInterval {
+            return cached.value
+        }
+
         let performances = try await withThrowingTaskGroup(of: (String, HabitPerformance)?.self) { group in
             for habitId in habitIds {
                 group.addTask {
@@ -212,6 +225,7 @@ class ProfileManager: ObservableObject {
 
         await MainActor.run {
             self.currentPerformance = performances
+            self.performanceCache[uid] = (Date(), performances)
         }
 
         return performances

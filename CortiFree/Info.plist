@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AMPLITUDE_API_KEY</key>
+	<string>$(AMPLITUDE_API_KEY)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -54,18 +56,14 @@
 	<string>CortiFree utilise le micro pour les exercices de respiration guidée.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>CortiFree uses your photo library for an optional wellness photo preview.</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>CortiFree utilise cet identifiant pour personnaliser votre expérience et mesurer l'efficacité des publicités.</string>
-	<key>NSUserNotificationsUsageDescription</key>
-	<string>CortiFree envoie des rappels pour vos routines quotidiennes.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>CortiFree envoie des rappels pour vos routines quotidiennes.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>CortiFree utilise cet identifiant pour personnaliser votre expérience et mesurer l'efficacité des publicités.</string>
 	<key>REVENUECAT_API_KEY</key>
 	<string>appl_SfyPvLkFFQKWDdIDvePwFwccztX</string>
-	<key>SUPERWALL_API_KEY</key>
-	<string>pk_JPmmC0H5be4yqTnw24VTm</string>
-	<key>TIKTOK_ACCESS_TOKEN</key>
-	<string>TTVa4hylh9udluAy3EyCN62raaaUC5jV</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
@@ -337,6 +335,10 @@
 			<string>6yxml2yyag.skadnetwork</string>
 		</dict>
 	</array>
+	<key>SUPERWALL_API_KEY</key>
+	<string>pk_JPmmC0H5be4yqTnw24VTm</string>
+	<key>TIKTOK_ACCESS_TOKEN</key>
+	<string>TTVa4hylh9udluAy3EyCN62raaaUC5jV</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Poppins-Bold.ttf</string>
@@ -369,5 +371,14 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
 </dict>
 </plist>

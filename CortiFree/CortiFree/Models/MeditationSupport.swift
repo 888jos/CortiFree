@@ -205,14 +205,7 @@ extension MeditationSupport {
                     ],
                     prompts: nil,
                     steps: nil,
-                    affirmations: [
-                        "Je mérite amour et compassion",
-                        "Je suis assez, tel que je suis",
-                        "Je m'accueille avec douceur",
-                        "Je me pardonne mes erreurs",
-                        "Je suis digne de bienveillance",
-                        "Je prends soin de moi avec tendresse"
-                    ]
+                    affirmations: []
                 )
             ])
         ),
@@ -284,28 +277,28 @@ extension MeditationSupport {
 extension MeditationSupport {
     var localizedTitle: String {
         switch meditationId {
-        case "conscious-breathing": return NSLocalizedString("meditation.conscious_breathing.title", comment: "")
-        case "body-scan": return NSLocalizedString("meditation.body_scan.title", comment: "")
-        case "mindfulness": return NSLocalizedString("meditation.mindfulness.title", comment: "")
-        case "grounding": return NSLocalizedString("meditation.grounding.title", comment: "")
-        case "visualization": return NSLocalizedString("meditation.visualization.title", comment: "")
-        case "compassion": return NSLocalizedString("meditation.compassion.title", comment: "")
-        case "focus-clarity": return NSLocalizedString("meditation.focus_clarity.title", comment: "")
-        case "yoga-nidra": return NSLocalizedString("meditation.yoga_nidra.title", comment: "")
+        case "conscious-breathing": return LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.title")
+        case "body-scan": return LanguageManager.shared.localizedString(for: "meditation.body_scan.title")
+        case "mindfulness": return LanguageManager.shared.localizedString(for: "meditation.mindfulness.title")
+        case "grounding": return LanguageManager.shared.localizedString(for: "meditation.grounding.title")
+        case "visualization": return LanguageManager.shared.localizedString(for: "meditation.visualization.title")
+        case "compassion": return LanguageManager.shared.localizedString(for: "meditation.compassion.title")
+        case "focus-clarity": return LanguageManager.shared.localizedString(for: "meditation.focus_clarity.title")
+        case "yoga-nidra": return LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.title")
         default: return title
         }
     }
 
     var localizedBenefit: String {
         switch meditationId {
-        case "conscious-breathing": return NSLocalizedString("meditation.conscious_breathing.benefit", comment: "")
-        case "body-scan": return NSLocalizedString("meditation.body_scan.benefit", comment: "")
-        case "mindfulness": return NSLocalizedString("meditation.mindfulness.benefit", comment: "")
-        case "grounding": return NSLocalizedString("meditation.grounding.benefit", comment: "")
-        case "visualization": return NSLocalizedString("meditation.visualization.benefit", comment: "")
-        case "compassion": return NSLocalizedString("meditation.compassion.benefit", comment: "")
-        case "focus-clarity": return NSLocalizedString("meditation.focus_clarity.benefit", comment: "")
-        case "yoga-nidra": return NSLocalizedString("meditation.yoga_nidra.benefit", comment: "")
+        case "conscious-breathing": return LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.benefit")
+        case "body-scan": return LanguageManager.shared.localizedString(for: "meditation.body_scan.benefit")
+        case "mindfulness": return LanguageManager.shared.localizedString(for: "meditation.mindfulness.benefit")
+        case "grounding": return LanguageManager.shared.localizedString(for: "meditation.grounding.benefit")
+        case "visualization": return LanguageManager.shared.localizedString(for: "meditation.visualization.benefit")
+        case "compassion": return LanguageManager.shared.localizedString(for: "meditation.compassion.benefit")
+        case "focus-clarity": return LanguageManager.shared.localizedString(for: "meditation.focus_clarity.benefit")
+        case "yoga-nidra": return LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.benefit")
         default: return benefit
         }
     }
@@ -313,21 +306,21 @@ extension MeditationSupport {
     var detailedDescription: String {
         switch meditationId {
         case "conscious-breathing":
-            return NSLocalizedString("meditation.conscious_breathing.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.detailed_description")
         case "body-scan":
-            return NSLocalizedString("meditation.body_scan.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.body_scan.detailed_description")
         case "mindfulness":
-            return NSLocalizedString("meditation.mindfulness.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.mindfulness.detailed_description")
         case "grounding":
-            return NSLocalizedString("meditation.grounding.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.grounding.detailed_description")
         case "visualization":
-            return NSLocalizedString("meditation.visualization.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.visualization.detailed_description")
         case "compassion":
-            return NSLocalizedString("meditation.compassion.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.compassion.detailed_description")
         case "focus-clarity":
-            return NSLocalizedString("meditation.focus_clarity.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.focus_clarity.detailed_description")
         case "yoga-nidra":
-            return NSLocalizedString("meditation.yoga_nidra.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.detailed_description")
         default:
             return content.sections.first?.content ?? ""
         }
@@ -337,59 +330,59 @@ extension MeditationSupport {
         switch meditationId {
         case "conscious-breathing":
             return [
-                NSLocalizedString("meditation.conscious_breathing.benefit_1", comment: ""),
-                NSLocalizedString("meditation.conscious_breathing.benefit_2", comment: ""),
-                NSLocalizedString("meditation.conscious_breathing.benefit_3", comment: ""),
-                NSLocalizedString("meditation.conscious_breathing.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.benefit_4")
             ]
         case "body-scan":
             return [
-                NSLocalizedString("meditation.body_scan.benefit_1", comment: ""),
-                NSLocalizedString("meditation.body_scan.benefit_2", comment: ""),
-                NSLocalizedString("meditation.body_scan.benefit_3", comment: ""),
-                NSLocalizedString("meditation.body_scan.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.body_scan.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.body_scan.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.body_scan.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.body_scan.benefit_4")
             ]
         case "mindfulness":
             return [
-                NSLocalizedString("meditation.mindfulness.benefit_1", comment: ""),
-                NSLocalizedString("meditation.mindfulness.benefit_2", comment: ""),
-                NSLocalizedString("meditation.mindfulness.benefit_3", comment: ""),
-                NSLocalizedString("meditation.mindfulness.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.mindfulness.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.mindfulness.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.mindfulness.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.mindfulness.benefit_4")
             ]
         case "grounding":
             return [
-                NSLocalizedString("meditation.grounding.benefit_1", comment: ""),
-                NSLocalizedString("meditation.grounding.benefit_2", comment: ""),
-                NSLocalizedString("meditation.grounding.benefit_3", comment: ""),
-                NSLocalizedString("meditation.grounding.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.grounding.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.grounding.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.grounding.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.grounding.benefit_4")
             ]
         case "visualization":
             return [
-                NSLocalizedString("meditation.visualization.benefit_1", comment: ""),
-                NSLocalizedString("meditation.visualization.benefit_2", comment: ""),
-                NSLocalizedString("meditation.visualization.benefit_3", comment: ""),
-                NSLocalizedString("meditation.visualization.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.visualization.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.visualization.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.visualization.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.visualization.benefit_4")
             ]
         case "compassion":
             return [
-                NSLocalizedString("meditation.compassion.benefit_1", comment: ""),
-                NSLocalizedString("meditation.compassion.benefit_2", comment: ""),
-                NSLocalizedString("meditation.compassion.benefit_3", comment: ""),
-                NSLocalizedString("meditation.compassion.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.compassion.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.compassion.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.compassion.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.compassion.benefit_4")
             ]
         case "focus-clarity":
             return [
-                NSLocalizedString("meditation.focus_clarity.benefit_1", comment: ""),
-                NSLocalizedString("meditation.focus_clarity.benefit_2", comment: ""),
-                NSLocalizedString("meditation.focus_clarity.benefit_3", comment: ""),
-                NSLocalizedString("meditation.focus_clarity.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.focus_clarity.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.focus_clarity.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.focus_clarity.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.focus_clarity.benefit_4")
             ]
         case "yoga-nidra":
             return [
-                NSLocalizedString("meditation.yoga_nidra.benefit_1", comment: ""),
-                NSLocalizedString("meditation.yoga_nidra.benefit_2", comment: ""),
-                NSLocalizedString("meditation.yoga_nidra.benefit_3", comment: ""),
-                NSLocalizedString("meditation.yoga_nidra.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.benefit_1"),
+                LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.benefit_2"),
+                LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.benefit_3"),
+                LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.benefit_4")
             ]
         default:
             return []
@@ -400,59 +393,59 @@ extension MeditationSupport {
         switch meditationId {
         case "conscious-breathing":
             return [
-                NSLocalizedString("meditation.conscious_breathing.evidence_1", comment: ""),
-                NSLocalizedString("meditation.conscious_breathing.evidence_2", comment: ""),
-                NSLocalizedString("meditation.conscious_breathing.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.evidence_3")
             ]
         case "body-scan":
             return [
-                NSLocalizedString("meditation.body_scan.evidence_1", comment: ""),
-                NSLocalizedString("meditation.body_scan.evidence_2", comment: ""),
-                NSLocalizedString("meditation.body_scan.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.body_scan.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.body_scan.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.body_scan.evidence_3")
             ]
         case "mindfulness":
             return [
-                NSLocalizedString("meditation.mindfulness.evidence_1", comment: ""),
-                NSLocalizedString("meditation.mindfulness.evidence_2", comment: ""),
-                NSLocalizedString("meditation.mindfulness.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.mindfulness.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.mindfulness.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.mindfulness.evidence_3")
             ]
         case "grounding":
             return [
-                NSLocalizedString("meditation.grounding.evidence_1", comment: ""),
-                NSLocalizedString("meditation.grounding.evidence_2", comment: ""),
-                NSLocalizedString("meditation.grounding.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.grounding.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.grounding.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.grounding.evidence_3")
             ]
         case "visualization":
             return [
-                NSLocalizedString("meditation.visualization.evidence_1", comment: ""),
-                NSLocalizedString("meditation.visualization.evidence_2", comment: ""),
-                NSLocalizedString("meditation.visualization.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.visualization.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.visualization.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.visualization.evidence_3")
             ]
         case "compassion":
             return [
-                NSLocalizedString("meditation.compassion.evidence_1", comment: ""),
-                NSLocalizedString("meditation.compassion.evidence_2", comment: ""),
-                NSLocalizedString("meditation.compassion.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.compassion.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.compassion.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.compassion.evidence_3")
             ]
         case "focus-clarity":
             return [
-                NSLocalizedString("meditation.focus_clarity.evidence_1", comment: ""),
-                NSLocalizedString("meditation.focus_clarity.evidence_2", comment: ""),
-                NSLocalizedString("meditation.focus_clarity.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.focus_clarity.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.focus_clarity.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.focus_clarity.evidence_3")
             ]
         case "yoga-nidra":
             return [
-                NSLocalizedString("meditation.yoga_nidra.evidence_1", comment: ""),
-                NSLocalizedString("meditation.yoga_nidra.evidence_2", comment: ""),
-                NSLocalizedString("meditation.yoga_nidra.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.evidence_1"),
+                LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.evidence_2"),
+                LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.evidence_3")
             ]
         default:
-            return [NSLocalizedString("meditation.default.evidence", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "meditation.default.evidence")]
         }
     }
 
     var scientificSources: [String] {
-        return [NSLocalizedString("meditation_detail.source", comment: "")]
+        return [LanguageManager.shared.localizedString(for: "meditation_detail.source")]
     }
 
     // Keep for backward compatibility
@@ -470,8 +463,8 @@ extension MeditationSupport {
         // Retourner les steps avec copywriting amélioré selon le type
         if let steps = section.steps {
             return enhancedSteps(for: meditationId, steps: steps)
-        } else if let affirmations = section.affirmations {
-            return enhancedAffirmations(affirmations: affirmations)
+        } else if section.affirmations != nil {
+            return enhancedAffirmations()
         }
 
         return []
@@ -482,273 +475,273 @@ extension MeditationSupport {
         case "conscious-breathing":
             return [
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.conscious_breathing.step_1.title", comment: "Conscious breathing step 1 title"),
-                    subtitle: NSLocalizedString("meditation.conscious_breathing.step_1.subtitle", comment: "Conscious breathing step 1 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_1.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_1.subtitle"),
                     icon: "figure.mind.and.body",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.conscious_breathing.step_1.duration", comment: "Conscious breathing step 1 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_1.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.conscious_breathing.step_2.title", comment: "Conscious breathing step 2 title"),
-                    subtitle: NSLocalizedString("meditation.conscious_breathing.step_2.subtitle", comment: "Conscious breathing step 2 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_2.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_2.subtitle"),
                     icon: "wind",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.conscious_breathing.step_2.duration", comment: "Conscious breathing step 2 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_2.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.conscious_breathing.step_3.title", comment: "Conscious breathing step 3 title"),
-                    subtitle: NSLocalizedString("meditation.conscious_breathing.step_3.subtitle", comment: "Conscious breathing step 3 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_3.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_3.subtitle"),
                     icon: "nose.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.conscious_breathing.step_3.duration", comment: "Conscious breathing step 3 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_3.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.conscious_breathing.step_4.title", comment: "Conscious breathing step 4 title"),
-                    subtitle: NSLocalizedString("meditation.conscious_breathing.step_4.subtitle", comment: "Conscious breathing step 4 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_4.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_4.subtitle"),
                     icon: "arrow.uturn.backward",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.conscious_breathing.step_4.duration", comment: "Conscious breathing step 4 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_4.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.conscious_breathing.step_5.title", comment: "Conscious breathing step 5 title"),
-                    subtitle: NSLocalizedString("meditation.conscious_breathing.step_5.subtitle", comment: "Conscious breathing step 5 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_5.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_5.subtitle"),
                     icon: "timer",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.conscious_breathing.step_5.duration", comment: "Conscious breathing step 5 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.step_5.duration")
                 )
             ]
 
         case "body-scan":
             return [
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.body_scan.step_1.title", comment: "Meditation body scan step 1 title"),
-                    subtitle: NSLocalizedString("meditation.body_scan.step_1.subtitle", comment: "Meditation body scan step 1 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_1.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_1.subtitle"),
                     icon: "shoeprints.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.body_scan.step_1.duration", comment: "Meditation body scan step 1 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_1.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.body_scan.step_2.title", comment: "Meditation body scan step 2 title"),
-                    subtitle: NSLocalizedString("meditation.body_scan.step_2.subtitle", comment: "Meditation body scan step 2 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_2.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_2.subtitle"),
                     icon: "figure.walk",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.body_scan.step_2.duration", comment: "Meditation body scan step 2 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_2.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.body_scan.step_3.title", comment: "Meditation body scan step 3 title"),
-                    subtitle: NSLocalizedString("meditation.body_scan.step_3.subtitle", comment: "Meditation body scan step 3 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_3.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_3.subtitle"),
                     icon: "figure.stand",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.body_scan.step_3.duration", comment: "Meditation body scan step 3 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_3.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.body_scan.step_4.title", comment: "Meditation body scan step 4 title"),
-                    subtitle: NSLocalizedString("meditation.body_scan.step_4.subtitle", comment: "Meditation body scan step 4 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_4.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_4.subtitle"),
                     icon: "lungs.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.body_scan.step_4.duration", comment: "Meditation body scan step 4 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_4.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.body_scan.step_5.title", comment: "Meditation body scan step 5 title"),
-                    subtitle: NSLocalizedString("meditation.body_scan.step_5.subtitle", comment: "Meditation body scan step 5 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_5.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_5.subtitle"),
                     icon: "face.smiling",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.body_scan.step_5.duration", comment: "Meditation body scan step 5 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.body_scan.step_5.duration")
                 )
             ]
 
         case "mindfulness":
             return [
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.mindfulness.step_1.title", comment: "Mindfulness step 1 title"),
-                    subtitle: NSLocalizedString("meditation.mindfulness.step_1.subtitle", comment: "Mindfulness step 1 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_1.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_1.subtitle"),
                     icon: "figure.mind.and.body",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.mindfulness.step_1.duration", comment: "Mindfulness step 1 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_1.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.mindfulness.step_2.title", comment: "Mindfulness step 2 title"),
-                    subtitle: NSLocalizedString("meditation.mindfulness.step_2.subtitle", comment: "Mindfulness step 2 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_2.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_2.subtitle"),
                     icon: "wind",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.mindfulness.step_2.duration", comment: "Mindfulness step 2 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_2.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.mindfulness.step_3.title", comment: "Mindfulness step 3 title"),
-                    subtitle: NSLocalizedString("meditation.mindfulness.step_3.subtitle", comment: "Mindfulness step 3 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_3.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_3.subtitle"),
                     icon: "brain.head.profile",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.mindfulness.step_3.duration", comment: "Mindfulness step 3 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_3.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.mindfulness.step_4.title", comment: "Mindfulness step 4 title"),
-                    subtitle: NSLocalizedString("meditation.mindfulness.step_4.subtitle", comment: "Mindfulness step 4 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_4.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_4.subtitle"),
                     icon: "cloud.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.mindfulness.step_4.duration", comment: "Mindfulness step 4 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_4.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.mindfulness.step_5.title", comment: "Mindfulness step 5 title"),
-                    subtitle: NSLocalizedString("meditation.mindfulness.step_5.subtitle", comment: "Mindfulness step 5 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_5.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_5.subtitle"),
                     icon: "arrow.circlepath",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.mindfulness.step_5.duration", comment: "Mindfulness step 5 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.mindfulness.step_5.duration")
                 )
             ]
 
         case "grounding":
             return [
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.grounding.step_1.title", comment: "Meditation grounding step 1 title"),
-                    subtitle: NSLocalizedString("meditation.grounding.step_1.subtitle", comment: "Meditation grounding step 1 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.grounding.step_1.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.grounding.step_1.subtitle"),
                     icon: "eye.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.grounding.step_1.duration", comment: "Meditation grounding step 1 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.grounding.step_1.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.grounding.step_2.title", comment: "Meditation grounding step 2 title"),
-                    subtitle: NSLocalizedString("meditation.grounding.step_2.subtitle", comment: "Meditation grounding step 2 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.grounding.step_2.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.grounding.step_2.subtitle"),
                     icon: "hand.raised.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.grounding.step_2.duration", comment: "Meditation grounding step 2 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.grounding.step_2.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.grounding.step_3.title", comment: "Meditation grounding step 3 title"),
-                    subtitle: NSLocalizedString("meditation.grounding.step_3.subtitle", comment: "Meditation grounding step 3 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.grounding.step_3.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.grounding.step_3.subtitle"),
                     icon: "ear.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.grounding.step_3.duration", comment: "Meditation grounding step 3 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.grounding.step_3.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.grounding.step_4.title", comment: "Meditation grounding step 4 title"),
-                    subtitle: NSLocalizedString("meditation.grounding.step_4.subtitle", comment: "Meditation grounding step 4 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.grounding.step_4.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.grounding.step_4.subtitle"),
                     icon: "nose.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.grounding.step_4.duration", comment: "Meditation grounding step 4 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.grounding.step_4.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.grounding.step_5.title", comment: "Meditation grounding step 5 title"),
-                    subtitle: NSLocalizedString("meditation.grounding.step_5.subtitle", comment: "Meditation grounding step 5 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.grounding.step_5.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.grounding.step_5.subtitle"),
                     icon: "mouth.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.grounding.step_5.duration", comment: "Meditation grounding step 5 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.grounding.step_5.duration")
                 )
             ]
 
         case "visualization":
             return [
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.visualization.step_1.title", comment: "Visualization step 1 title"),
-                    subtitle: NSLocalizedString("meditation.visualization.step_1.subtitle", comment: "Visualization step 1 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.visualization.step_1.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.visualization.step_1.subtitle"),
                     icon: "eye.slash.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.visualization.step_1.duration", comment: "Visualization step 1 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.visualization.step_1.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.visualization.step_2.title", comment: "Visualization step 2 title"),
-                    subtitle: NSLocalizedString("meditation.visualization.step_2.subtitle", comment: "Visualization step 2 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.visualization.step_2.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.visualization.step_2.subtitle"),
                     icon: "sparkles",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.visualization.step_2.duration", comment: "Visualization step 2 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.visualization.step_2.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.visualization.step_3.title", comment: "Visualization step 3 title"),
-                    subtitle: NSLocalizedString("meditation.visualization.step_3.subtitle", comment: "Visualization step 3 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.visualization.step_3.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.visualization.step_3.subtitle"),
                     icon: "paintpalette.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.visualization.step_3.duration", comment: "Visualization step 3 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.visualization.step_3.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.visualization.step_4.title", comment: "Visualization step 4 title"),
-                    subtitle: NSLocalizedString("meditation.visualization.step_4.subtitle", comment: "Visualization step 4 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.visualization.step_4.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.visualization.step_4.subtitle"),
                     icon: "speaker.wave.3.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.visualization.step_4.duration", comment: "Visualization step 4 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.visualization.step_4.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.visualization.step_5.title", comment: "Visualization step 5 title"),
-                    subtitle: NSLocalizedString("meditation.visualization.step_5.subtitle", comment: "Visualization step 5 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.visualization.step_5.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.visualization.step_5.subtitle"),
                     icon: "hand.raised.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.visualization.step_5.duration", comment: "Visualization step 5 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.visualization.step_5.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.visualization.step_6.title", comment: "Visualization step 6 title"),
-                    subtitle: NSLocalizedString("meditation.visualization.step_6.subtitle", comment: "Visualization step 6 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.visualization.step_6.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.visualization.step_6.subtitle"),
                     icon: "house.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.visualization.step_6.duration", comment: "Visualization step 6 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.visualization.step_6.duration")
                 )
             ]
 
         case "focus-clarity":
             return [
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.focus_clarity.step_1.title", comment: "Focus clarity step 1 title"),
-                    subtitle: NSLocalizedString("meditation.focus_clarity.step_1.subtitle", comment: "Focus clarity step 1 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_1.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_1.subtitle"),
                     icon: "target",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.focus_clarity.step_1.duration", comment: "Focus clarity step 1 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_1.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.focus_clarity.step_2.title", comment: "Focus clarity step 2 title"),
-                    subtitle: NSLocalizedString("meditation.focus_clarity.step_2.subtitle", comment: "Focus clarity step 2 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_2.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_2.subtitle"),
                     icon: "eye.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.focus_clarity.step_2.duration", comment: "Focus clarity step 2 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_2.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.focus_clarity.step_3.title", comment: "Focus clarity step 3 title"),
-                    subtitle: NSLocalizedString("meditation.focus_clarity.step_3.subtitle", comment: "Focus clarity step 3 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_3.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_3.subtitle"),
                     icon: "arrow.uturn.backward",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.focus_clarity.step_3.duration", comment: "Focus clarity step 3 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_3.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.focus_clarity.step_4.title", comment: "Focus clarity step 4 title"),
-                    subtitle: NSLocalizedString("meditation.focus_clarity.step_4.subtitle", comment: "Focus clarity step 4 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_4.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_4.subtitle"),
                     icon: "drop.fill",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.focus_clarity.step_4.duration", comment: "Focus clarity step 4 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.step_4.duration")
                 )
             ]
 
         case "yoga-nidra":
             return [
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.yoga_nidra.step_1.title", comment: "Yoga nidra step 1 title"),
-                    subtitle: NSLocalizedString("meditation.yoga_nidra.step_1.subtitle", comment: "Yoga nidra step 1 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_1.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_1.subtitle"),
                     icon: "bed.double.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.yoga_nidra.step_1.duration", comment: "Yoga nidra step 1 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_1.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.yoga_nidra.step_2.title", comment: "Yoga nidra step 2 title"),
-                    subtitle: NSLocalizedString("meditation.yoga_nidra.step_2.subtitle", comment: "Yoga nidra step 2 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_2.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_2.subtitle"),
                     icon: "figure.stand",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.yoga_nidra.step_2.duration", comment: "Yoga nidra step 2 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_2.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.yoga_nidra.step_3.title", comment: "Yoga nidra step 3 title"),
-                    subtitle: NSLocalizedString("meditation.yoga_nidra.step_3.subtitle", comment: "Yoga nidra step 3 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_3.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_3.subtitle"),
                     icon: "sparkles",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.yoga_nidra.step_3.duration", comment: "Yoga nidra step 3 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_3.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.yoga_nidra.step_4.title", comment: "Yoga nidra step 4 title"),
-                    subtitle: NSLocalizedString("meditation.yoga_nidra.step_4.subtitle", comment: "Yoga nidra step 4 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_4.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_4.subtitle"),
                     icon: "wind",
                     color: "8C9EFF",
-                    estimatedDuration: NSLocalizedString("meditation.yoga_nidra.step_4.duration", comment: "Yoga nidra step 4 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_4.duration")
                 ),
                 UnifiedInstructionStep(
-                    title: NSLocalizedString("meditation.yoga_nidra.step_5.title", comment: "Yoga nidra step 5 title"),
-                    subtitle: NSLocalizedString("meditation.yoga_nidra.step_5.subtitle", comment: "Yoga nidra step 5 subtitle"),
+                    title: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_5.title"),
+                    subtitle: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_5.subtitle"),
                     icon: "moon.zzz.fill",
                     color: "B388FF",
-                    estimatedDuration: NSLocalizedString("meditation.yoga_nidra.step_5.duration", comment: "Yoga nidra step 5 duration")
+                    estimatedDuration: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.step_5.duration")
                 )
             ]
 
@@ -766,54 +759,54 @@ extension MeditationSupport {
         }
     }
 
-    private func enhancedAffirmations(affirmations: [String]) -> [UnifiedInstructionStep] {
+    private func enhancedAffirmations() -> [UnifiedInstructionStep] {
         // Pour les affirmations (compassion)
         return [
             UnifiedInstructionStep(
-                title: NSLocalizedString("meditation.compassion.enhanced_step_1.title", comment: ""),
-                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_1.subtitle", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_1.title"),
+                subtitle: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_1.subtitle"),
                 icon: "hand.raised.fill",
                 color: "B388FF",
                 estimatedDuration: "15 sec"
             ),
             UnifiedInstructionStep(
-                title: affirmations[0],
-                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_2.subtitle", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.affirmation_1"),
+                subtitle: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_2.subtitle"),
                 icon: "heart.fill",
                 color: "8C9EFF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
-                title: affirmations[1],
-                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_3.subtitle", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.affirmation_2"),
+                subtitle: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_3.subtitle"),
                 icon: "star.fill",
                 color: "B388FF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
-                title: affirmations[2],
-                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_4.subtitle", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.affirmation_3"),
+                subtitle: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_4.subtitle"),
                 icon: "sparkles",
                 color: "8C9EFF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
-                title: affirmations[3],
-                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_5.subtitle", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.affirmation_4"),
+                subtitle: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_5.subtitle"),
                 icon: "wind",
                 color: "B388FF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
-                title: affirmations[4],
-                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_6.subtitle", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.affirmation_5"),
+                subtitle: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_6.subtitle"),
                 icon: "hands.and.sparkles.fill",
                 color: "8C9EFF",
                 estimatedDuration: "30 sec"
             ),
             UnifiedInstructionStep(
-                title: affirmations[5],
-                subtitle: NSLocalizedString("meditation.compassion.enhanced_step_7.subtitle", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.affirmation_6"),
+                subtitle: LanguageManager.shared.localizedString(for: "meditation.compassion.enhanced_step_7.subtitle"),
                 icon: "face.smiling.fill",
                 color: "B388FF",
                 estimatedDuration: "30 sec"

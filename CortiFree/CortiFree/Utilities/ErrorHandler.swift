@@ -73,7 +73,7 @@ struct DisplayableError: Identifiable {
     init(from error: Error, context: String? = nil) {
         let coreError = CoreError.from(error)
 
-        self.title = NSLocalizedString("error.title.generic", comment: "")
+        self.title = LanguageManager.shared.localizedString(for: "error.title.generic")
         self.message = coreError.errorDescription ?? error.localizedDescription
         self.severity = Self.determineSeverity(for: coreError)
         self.actionButtons = Self.determineActions(for: coreError, context: context)
@@ -102,7 +102,7 @@ struct DisplayableError: Identifiable {
         switch error {
         case .networkUnavailable, .timeout:
             actions.append(ErrorAction(
-                title: NSLocalizedString("error.action.retry", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "error.action.retry"),
                 style: .default,
                 action: {
                     // Retry will be handled by the calling context
@@ -115,7 +115,7 @@ struct DisplayableError: Identifiable {
 
         case .sessionExpired:
             actions.append(ErrorAction(
-                title: NSLocalizedString("error.action.sign_in", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "error.action.sign_in"),
                 style: .default,
                 action: {
                     NotificationCenter.default.post(
@@ -212,11 +212,11 @@ class ErrorHandler: ObservableObject {
     // MARK: - Private Methods
 
     private func trackError(_ error: Error, context: String?, severity: DisplayableError.Severity) {
-        // Track error in Mixpanel
+        // Track error in analytics
         let errorDescription = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         let errorType = String(describing: type(of: error))
 
-        MixpanelManager.shared.trackError(
+        AnalyticsManager.shared.trackError(
             errorType: errorType,
             errorMessage: errorDescription,
             screen: context ?? "unknown",
@@ -240,7 +240,7 @@ private struct ErrorHandlingModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .alert(
-                errorHandler.currentError?.title ?? NSLocalizedString("error.title.generic", comment: ""),
+                errorHandler.currentError?.title ?? LanguageManager.shared.localizedString(for: "error.title.generic"),
                 isPresented: $errorHandler.showError,
                 presenting: errorHandler.currentError
             ) { error in
@@ -254,7 +254,7 @@ private struct ErrorHandlingModifier: ViewModifier {
                 }
 
                 // Default dismiss button
-                Button(NSLocalizedString("common.dismiss", comment: ""), role: .cancel) {
+                Button(LanguageManager.shared.localizedString(for: "common.dismiss"), role: .cancel) {
                     errorHandler.dismiss()
                 }
             } message: { error in

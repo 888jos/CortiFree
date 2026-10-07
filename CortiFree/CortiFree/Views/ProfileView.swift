@@ -3,7 +3,6 @@
 //  CortiFree
 //
 //  Created by Claude on 22/10/2025.
-//  Amélioré avec évaluation CortiFree compacte
 //
 
 import SwiftUI
@@ -15,16 +14,14 @@ struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @ObservedObject private var achievementService = AchievementService.shared
     @ObservedObject private var habitBadgeService = HabitBadgeService.shared
+    // Re-render (localized strings) right after a language change in Settings
+    @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showSettings = false
-    @State private var showProgression = false
-    @State private var showPotentialScores = false
     @State private var showEditProfile = false
-    @State private var showAchievementsView = false
-    @State private var selectedTab: ProfileTab = .score
+    @State private var selectedTab: ProfileTab = .habits
     @State private var firstName: String = ""
 
     enum ProfileTab {
-        case score
         case habits
         case achievements
     }
@@ -33,49 +30,49 @@ struct ProfileView: View {
     private var habits: [(name: String, icon: String, progress: Double, color: Color)] {
         [
             (
-                NSLocalizedString("profile.habit.meditation", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.meditation"),
                 "brain.head.profile",
                 calculateProgress(habitId: "meditation"),
                 Color(hex: "9B59B6")
             ),
             (
-                NSLocalizedString("profile.habit.breathing", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.breathing"),
                 "wind",
                 calculateProgress(habitId: "breathing"),
                 Color(hex: "1ABC9C")
             ),
             (
-                NSLocalizedString("profile.habit.journal", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.journal"),
                 "book.fill",
                 calculateProgress(habitId: "journal"),
                 Color(hex: "E74C3C")
             ),
             (
-                NSLocalizedString("profile.habit.sport", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.sport"),
                 "figure.run",
                 calculateProgress(habitId: "sport"),
                 Color(hex: "2ECC71")
             ),
             (
-                NSLocalizedString("profile.habit.water", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.water"),
                 "drop.fill",
                 calculateProgress(habitId: "water"),
                 Color(hex: "3498DB")
             ),
             (
-                NSLocalizedString("profile.habit.nature", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.nature"),
                 "leaf.fill",
                 calculateProgress(habitId: "nature"),
                 Color(hex: "27AE60")
             ),
             (
-                NSLocalizedString("profile.habit.sleep", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.sleep"),
                 "moon.fill",
                 calculateProgress(habitId: "sleep"),
                 Color(hex: "E67E22")
             ),
             (
-                NSLocalizedString("profile.habit.social", comment: ""),
+                LanguageManager.shared.localizedString(for: "profile.habit.social"),
                 "person.2.fill",
                 calculateProgress(habitId: "social"),
                 Color(hex: "F39C12")
@@ -90,63 +87,10 @@ struct ProfileView: View {
         return Double(stats.completed) / Double(stats.total)
     }
 
-    // Calculate global score (average of 5 domains) - Using real data from ViewModel
-    private var globalScore: Int {
-        let scores = showPotentialScores ? viewModel.potentialScores : viewModel.domainScores
-        guard !scores.isEmpty, scores.count > 0 else { return 0 }
-        let average = scores.reduce(0, +) / Double(scores.count)
-        // Validate against NaN
-        guard !average.isNaN && average.isFinite else { return 0 }
-        // Scores are already 0-100, no need to multiply by 100
-        return Int(round(average))
-    }
-
-    // Full 6-domain array for radar chart (Global + 5 domains) - Using real data from ViewModel
-    // Radar chart expects values 0-1, so divide by 100
-    private var radarScores: [Double] {
-        let scores = showPotentialScores ? viewModel.potentialScores : viewModel.domainScores
-        guard !scores.isEmpty, scores.count > 0 else { return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
-        let global = scores.reduce(0, +) / Double(scores.count)
-        // Validate against NaN and normalize to 0-1 range
-        let validGlobal = (global.isNaN || !global.isFinite) ? 0.0 : global / 100.0
-        let validScores = scores.map { score in
-            let valid = (score.isNaN || !score.isFinite) ? 0.0 : score
-            return valid / 100.0  // Normalize to 0-1 range
-        }
-        return [validGlobal] + validScores
-    }
-
-    // Domain colors
-    private let domainColors: [Color] = [
-        Color(hex: "9B59B6"), // Sérénité - Dark Purple
-        Color(hex: "E74C3C"), // Sommeil - Red
-        Color(hex: "1ABC9C"), // Énergie - Teal
-        Color(hex: "2ECC71"), // Focus - Green
-        Color(hex: "3498DB")  // Équilibre - Blue
-    ]
-
-    private let domainIcons: [String] = [
-        "leaf.fill",    // Sérénité
-        "moon.fill",    // Sommeil
-        "bolt.fill",    // Énergie
-        "target",       // Focus
-        "heart.fill"    // Équilibre
-    ]
-
-    private var domainNames: [String] {
-        [
-            NSLocalizedString("profile.domain.serenity", comment: ""),
-            NSLocalizedString("profile.domain.sleep", comment: ""),
-            NSLocalizedString("profile.domain.energy", comment: ""),
-            NSLocalizedString("profile.domain.focus", comment: ""),
-            NSLocalizedString("profile.domain.balance", comment: "")
-        ]
-    }
-
     var body: some View {
         ZStack {
             // Galaxy animated background
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.75)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -178,16 +122,6 @@ struct ProfileView: View {
 
                     // Content based on selected tab with smooth transition
                     TabView(selection: $selectedTab) {
-                        // CortiFree Score Section (scrollable)
-                        ScrollView(showsIndicators: false) {
-                            cortiFreeScoreSection
-                                .padding(.horizontal, 32)
-                                .padding(.top, 8)
-
-                            Spacer(minLength: 100)
-                        }
-                        .tag(ProfileTab.score)
-
                         // Habits Section (scrollable)
                         ScrollView(showsIndicators: false) {
                             habitsSection
@@ -228,6 +162,7 @@ struct ProfileView: View {
             firstName = getUserFirstName()
             // Refresh profile data when view appears
             Task {
+                await viewModel.loadProfilePhoto()
                 await viewModel.refreshProfile()
                 // Load habit badges immediately
                 await habitBadgeService.loadHabitBadges()
@@ -240,8 +175,9 @@ struct ProfileView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ProfileUpdated"))) { _ in
-            // Refresh firstName when profile is updated
+            // Refresh firstName / photo when profile is updated
             firstName = getUserFirstName()
+            Task { await viewModel.loadProfilePhoto() }
         }
     }
 
@@ -289,7 +225,13 @@ struct ProfileView: View {
                         ))
                         .frame(width: 80, height: 80)
 
-                    if !(firstName.isEmpty ? getUserFirstName() : firstName).isEmpty {
+                    if let photo = viewModel.profilePhoto {
+                        Image(uiImage: photo)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 80, height: 80)
+                            .clipShape(Circle())
+                    } else if !(firstName.isEmpty ? getUserFirstName() : firstName).isEmpty {
                         Text(String((firstName.isEmpty ? getUserFirstName() : firstName).prefix(1)).uppercased())
                             .font(.faroBold(32))
                             .foregroundColor(.white)
@@ -349,7 +291,10 @@ struct ProfileView: View {
                     .font(.system(size: 20))
                     .foregroundColor(.white)
                     .frame(width: 44, height: 44)
+                    .contentShape(Circle())
             }
+            .buttonStyle(.plain)
+            .glassCircle(interactive: true)
         }
     }
 
@@ -357,24 +302,6 @@ struct ProfileView: View {
 
     private var tabSelector: some View {
         HStack(spacing: 2) {
-            // Score CortiFree tab
-            Button(action: {
-                HapticManager.light()
-                withAnimation(.appSpring) {
-                    selectedTab = .score
-                }
-            }) {
-                Text(NSLocalizedString("profile.tab.score", comment: ""))
-                    .font(.custom(selectedTab == .score ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
-                    .foregroundColor(selectedTab == .score ? .black : .white.opacity(0.7))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(selectedTab == .score ? .white : Color.clear)
-                    )
-            }
-
             // Habitudes tab
             Button(action: {
                 HapticManager.light()
@@ -382,13 +309,13 @@ struct ProfileView: View {
                     selectedTab = .habits
                 }
             }) {
-                Text(NSLocalizedString("profile.tab.habits", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "profile.tab.habits"))
                     .font(.custom(selectedTab == .habits ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
                     .foregroundColor(selectedTab == .habits ? .black : .white.opacity(0.7))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
                     .background(
-                        RoundedRectangle(cornerRadius: 6)
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
                             .fill(selectedTab == .habits ? .white : Color.clear)
                     )
             }
@@ -400,143 +327,21 @@ struct ProfileView: View {
                     selectedTab = .achievements
                 }
             }) {
-                Text(NSLocalizedString("profile.tab.badges", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "profile.tab.badges"))
                     .font(.custom(selectedTab == .achievements ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
                     .foregroundColor(selectedTab == .achievements ? .black : .white.opacity(0.7))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
                     .background(
-                        RoundedRectangle(cornerRadius: 6)
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
                             .fill(selectedTab == .achievements ? .white : Color.clear)
                     )
             }
         }
-        .padding(2)
-        .background(
-            RoundedRectangle(cornerRadius: 7)
-                .fill(Color.white.opacity(0.2))
-        )
+        .padding(3)
+        .glassCard(cornerRadius: 12)
         .frame(maxWidth: 300)
         .zIndex(2)
-    }
-
-    // MARK: - CortiFree Score Section (Compact)
-
-    private var cortiFreeScoreSection: some View {
-        VStack(spacing: 24) { // Increased spacing between elements
-            // Header with toggle
-            HStack {
-                VStack(alignment: .leading, spacing: 2) { // Reduced from 4 to 2
-                    Text(NSLocalizedString("profile.score.title", comment: ""))
-                        .font(.faroBold(18))
-                        .foregroundColor(.white)
-
-                    Text(showPotentialScores ? NSLocalizedString("profile.score.potential", comment: "") : NSLocalizedString("profile.score.current", comment: ""))
-                        .font(.custom("Poppins-Regular", size: 11)) // Reduced from 12 to 11
-                        .foregroundColor(.white.opacity(0.6))
-                }
-
-                Spacer()
-
-                // Toggle button
-                Button(action: {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                        showPotentialScores.toggle()
-                    }
-                }) {
-                    Image(systemName: "arrow.left.arrow.right")
-                        .font(.system(size: 14))
-                        .foregroundColor(.white)
-                        .frame(width: 36, height: 36)
-                        .background(
-                            Circle()
-                                .fill(Color.white.opacity(0.15))
-                        )
-                        .rotationEffect(.degrees(showPotentialScores ? 180 : 0))
-                }
-            }
-
-            // Hexagon with scores around it
-            ZStack {
-                // Larger hexagon radar - reduced size
-                HexagonRadarChart(
-                    progress: radarScores,
-                    color: Color(hex: "B794F6"),
-                    size: 220, // Reduced from 256 to 220
-                    showLabels: false
-                )
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
-
-                // Position the 6 scores around the hexagon (Global + 5 domains) - adjusted offsets
-
-                // Global - Top (0°)
-                SimpleDomainScore(
-                    icon: "star.fill",
-                    title: NSLocalizedString("profile.score.global", comment: ""),
-                    value: globalScore,
-                    color: Color(hex: "B794F6"),
-                    scoreDifference: viewModel.onboardingGlobalScore > 0 ? globalScore - viewModel.onboardingGlobalScore : nil
-                )
-                .offset(x: 0, y: -135) // Reduced from -155 to -135
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
-
-                // Sérénité - Top right (60°)
-                SimpleDomainScore(
-                    icon: domainIcons[0],
-                    title: domainNames[0],
-                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 0] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 0] ?? 0.0)),
-                    color: domainColors[0],
-                    scoreDifference: viewModel.onboardingDomainScores[safe: 0] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 0] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 0] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 0] ?? 0.0)) : nil
-                )
-                .offset(x: 125, y: -65) // Reduced from 145/-75 to 125/-65
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
-
-                // Sommeil - Bottom right (120°)
-                SimpleDomainScore(
-                    icon: domainIcons[1],
-                    title: domainNames[1],
-                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 1] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 1] ?? 0.0)),
-                    color: domainColors[1],
-                    scoreDifference: viewModel.onboardingDomainScores[safe: 1] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 1] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 1] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 1] ?? 0.0)) : nil
-                )
-                .offset(x: 125, y: 65) // Reduced from 145/75 to 125/65
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
-
-                // Énergie - Bottom (180°)
-                SimpleDomainScore(
-                    icon: domainIcons[2],
-                    title: domainNames[2],
-                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 2] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 2] ?? 0.0)),
-                    color: domainColors[2],
-                    scoreDifference: viewModel.onboardingDomainScores[safe: 2] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 2] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 2] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 2] ?? 0.0)) : nil
-                )
-                .offset(x: 0, y: 135) // Reduced from 155 to 135
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
-
-                // Focus - Bottom left (240°)
-                SimpleDomainScore(
-                    icon: domainIcons[3],
-                    title: domainNames[3],
-                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 3] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 3] ?? 0.0)),
-                    color: domainColors[3],
-                    scoreDifference: viewModel.onboardingDomainScores[safe: 3] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 3] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 3] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 3] ?? 0.0)) : nil
-                )
-                .offset(x: -125, y: 65) // Reduced from -145/75 to -125/65
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
-
-                // Équilibre - Top left (300°)
-                SimpleDomainScore(
-                    icon: domainIcons[4],
-                    title: domainNames[4],
-                    value: showPotentialScores ? Int(round(viewModel.potentialScores[safe: 4] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 4] ?? 0.0)),
-                    color: domainColors[4],
-                    scoreDifference: viewModel.onboardingDomainScores[safe: 4] ?? 0 > 0 ? (showPotentialScores ? Int(round(viewModel.potentialScores[safe: 4] ?? 0.0)) : Int(round(viewModel.domainScores[safe: 4] ?? 0.0))) - Int(round(viewModel.onboardingDomainScores[safe: 4] ?? 0.0)) : nil
-                )
-                .offset(x: -125, y: -65) // Reduced from -145/-75 to -125/-65
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showPotentialScores)
-            }
-            .frame(height: 330) // Reduced from 380 to 330
-        }
     }
 
     // MARK: - Habits Section
@@ -577,14 +382,14 @@ struct ProfileView: View {
 
     private func getHabitId(from habitName: String) -> String {
         switch habitName {
-        case NSLocalizedString("profile.habit.meditation", comment: ""): return "meditation"
-        case NSLocalizedString("profile.habit.breathing", comment: ""): return "breathing"
-        case NSLocalizedString("profile.habit.journal", comment: ""): return "journal"
-        case NSLocalizedString("profile.habit.sport", comment: ""): return "sport"
-        case NSLocalizedString("profile.habit.water", comment: ""): return "water"
-        case NSLocalizedString("profile.habit.nature", comment: ""): return "nature"
-        case NSLocalizedString("profile.habit.sleep", comment: ""): return "sleep"
-        case NSLocalizedString("profile.habit.social", comment: ""): return "social"
+        case LanguageManager.shared.localizedString(for: "profile.habit.meditation"): return "meditation"
+        case LanguageManager.shared.localizedString(for: "profile.habit.breathing"): return "breathing"
+        case LanguageManager.shared.localizedString(for: "profile.habit.journal"): return "journal"
+        case LanguageManager.shared.localizedString(for: "profile.habit.sport"): return "sport"
+        case LanguageManager.shared.localizedString(for: "profile.habit.water"): return "water"
+        case LanguageManager.shared.localizedString(for: "profile.habit.nature"): return "nature"
+        case LanguageManager.shared.localizedString(for: "profile.habit.sleep"): return "sleep"
+        case LanguageManager.shared.localizedString(for: "profile.habit.social"): return "social"
         default: return "unknown"
         }
     }
@@ -601,7 +406,7 @@ struct ProfileView: View {
                 VStack(spacing: 16) {
                     // Section header
                     HStack(spacing: 12) {
-                        Text(NSLocalizedString("profile.achievements.streaks", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "profile.achievements.streaks"))
                             .font(.faroSemiBold(16))
                             .foregroundColor(.white)
 
@@ -640,7 +445,7 @@ struct ProfileView: View {
                 VStack(spacing: 16) {
                     // Section header
                     HStack(spacing: 12) {
-                        Text(NSLocalizedString("profile.achievements.habits", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "profile.achievements.habits"))
                             .font(.faroSemiBold(16))
                             .foregroundColor(.white)
 
@@ -674,9 +479,6 @@ struct ProfileView: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 20)
         }
-        .fullScreenCover(isPresented: $showAchievementsView) {
-            AchievementsView()
-        }
         .overlay(
             Group {
                 // Habit badge unlock popup
@@ -694,11 +496,11 @@ struct ProfileView: View {
         VStack(spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(NSLocalizedString("profile.achievements.badges_title", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "profile.achievements.badges_title"))
                         .font(.faroBold(24))
                         .foregroundColor(.white)
 
-                    Text("\(totalUnlockedBadges)/\(totalBadges) \(NSLocalizedString("profile.achievements.unlocked", comment: ""))")
+                    Text("\(totalUnlockedBadges)/\(totalBadges) \(LanguageManager.shared.localizedString(for: "profile.achievements.unlocked"))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -726,11 +528,13 @@ struct ProfileView: View {
             }
             .frame(height: 8)
 
-            Text("\(Int(globalBadgePercentage * 100))% \(NSLocalizedString("profile.achievements.complete", comment: ""))")
+            Text("\(Int(globalBadgePercentage * 100))% \(LanguageManager.shared.localizedString(for: "profile.achievements.complete"))")
                 .font(.custom("Poppins-Regular", size: 12))
                 .foregroundColor(.white.opacity(0.6))
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(18)
+        .glassCard(cornerRadius: 22)
     }
 
     // MARK: - Helper Computed Properties

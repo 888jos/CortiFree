@@ -16,21 +16,13 @@ class VoiceOverManager: NSObject, ObservableObject {
     @Published var isEnabled = false
 
     private let synthesizer = AVSpeechSynthesizer()
-    private var currentLanguage: String = "fr-FR"
-
     private override init() {
         super.init()
         synthesizer.delegate = self
-        detectLanguage()
         configureAudioSession()
     }
 
     // MARK: - Configuration
-
-    private func detectLanguage() {
-        let languageCode = Locale.current.language.languageCode?.identifier ?? "fr"
-        currentLanguage = languageCode == "en" ? "en-US" : "fr-FR"
-    }
 
     private func configureAudioSession() {
         do {
@@ -52,7 +44,9 @@ class VoiceOverManager: NSObject, ObservableObject {
         }
 
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: currentLanguage)
+        utterance.voice = AVSpeechSynthesisVoice(
+            language: LanguageManager.shared.currentLanguage.locale.identifier
+        )
         utterance.rate = rate // 0.0 to 1.0 (default 0.5 = normal speed)
         utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
@@ -85,12 +79,12 @@ class VoiceOverManager: NSObject, ObservableObject {
     // MARK: - Helper Methods
 
     func announceStep(current: Int, total: Int) {
-        let announcement = String(format: NSLocalizedString("voiceover.step_of", comment: ""), current, total)
+        let announcement = String(format: LanguageManager.shared.localizedString(for: "voiceover.step_of"), current, total)
         speak(announcement)
     }
 
     func announceCompletion() {
-        let announcement = NSLocalizedString("voiceover.completed", comment: "")
+        let announcement = LanguageManager.shared.localizedString(for: "voiceover.completed")
         speak(announcement)
     }
 

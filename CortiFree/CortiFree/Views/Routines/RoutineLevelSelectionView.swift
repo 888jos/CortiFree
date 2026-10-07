@@ -17,14 +17,10 @@ struct RoutineLevelSelectionView: View {
         Routine.routines(for: category)
     }
 
-    private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-    }
-
     var body: some View {
         ZStack {
             // Galaxy background
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.75)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -73,16 +69,14 @@ struct RoutineLevelSelectionView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 44, height: 44)
-
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
@@ -92,7 +86,7 @@ struct RoutineLevelSelectionView: View {
                         .font(.faroBold(22))
                         .foregroundColor(.white)
 
-                    Text(isFrench ? "Choisissez votre intensité" : "Choose your intensity")
+                    Text(LanguageManager.shared.localizedString(for: "inline.routinelevelselectionview.00"))
                         .font(.custom("Poppins-Regular", size: 13))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -118,10 +112,6 @@ struct RoutineLevelCard: View {
 
     @State private var isPressed = false
 
-    private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-    }
-
     // Level-specific styling
     private var levelEmoji: String {
         switch routine.difficulty {
@@ -134,20 +124,16 @@ struct RoutineLevelCard: View {
 
     private var levelLabel: String {
         switch routine.difficulty {
-        case 1: return isFrench ? "Doux" : "Gentle"
-        case 2: return isFrench ? "Modéré" : "Moderate"
-        case 3: return isFrench ? "Intense" : "Intense"
+        case 1: return LanguageManager.shared.localizedString(for: "inline.routinelevelselectionview.01")
+        case 2: return LanguageManager.shared.localizedString(for: "inline.routinelevelselectionview.02")
+        case 3: return LanguageManager.shared.localizedString(for: "inline.routinelevelselectionview.03")
         default: return ""
         }
     }
 
-    private var levelGradient: [Color] {
-        switch routine.difficulty {
-        case 1: return [Color(hex: "5C6BC0").opacity(0.15), Color(hex: "5C6BC0").opacity(0.05)]
-        case 2: return [Color(hex: "5C6BC0").opacity(0.25), Color(hex: "5C6BC0").opacity(0.1)]
-        case 3: return [Color(hex: "5C6BC0").opacity(0.35), Color(hex: "5C6BC0").opacity(0.15)]
-        default: return [Color.white.opacity(0.1), Color.white.opacity(0.05)]
-        }
+    /// Glass tint grows with difficulty (level 1 stays neutral glass).
+    private var levelTint: Color? {
+        routine.difficulty >= 2 ? Color(hex: "5C6BC0") : nil
     }
 
     private var borderOpacity: Double {
@@ -225,7 +211,8 @@ struct RoutineLevelCard: View {
                     Circle()
                         .fill(Color(hex: "5C6BC0"))
                         .frame(width: 50, height: 50)
-                        .shadow(color: Color(hex: "5C6BC0").opacity(0.4), radius: 8, x: 0, y: 4)
+                        .overlay(Circle().strokeBorder(.white.opacity(0.25), lineWidth: 1))
+                        .shadow(color: Color(hex: "5C6BC0").opacity(0.3), radius: 6, x: 0, y: 3)
 
                     Image(systemName: "play.fill")
                         .font(.system(size: 18))
@@ -235,23 +222,15 @@ struct RoutineLevelCard: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: levelGradient,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(
-                                Color(hex: "5C6BC0").opacity(borderOpacity),
-                                lineWidth: 1.5
-                            )
+            .glassCard(cornerRadius: 20, tint: levelTint, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(
+                        Color(hex: "5C6BC0").opacity(borderOpacity),
+                        lineWidth: 1
                     )
             )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(

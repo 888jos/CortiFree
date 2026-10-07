@@ -60,7 +60,7 @@ struct CommitmentPledgeView: View {
 
     var body: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.8)
                 .ignoresSafeArea()
 
             Color.black.opacity(0.3)
@@ -138,7 +138,7 @@ struct CommitmentPledgeView: View {
         }
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.track(event: "onboarding_commitment_viewed", properties: [:])
+            AnalyticsManager.shared.track(event: "onboarding_commitment_viewed", properties: [:])
         }
     }
 
@@ -225,18 +225,10 @@ struct CommitmentPledgeView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, isRecommended ? 16 : 14)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected
-                          ? Color(hex: "B794F6").opacity(0.08)
-                          : Color(hex: "131146").opacity(0.4))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                isSelected ? Color(hex: "B794F6").opacity(0.5) : Color.white.opacity(0.06),
-                                lineWidth: isSelected ? 1.5 : 1
-                            )
-                    )
+            .glassCard(cornerRadius: 16, tint: isSelected ? GlassTokens.accent : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(Color(hex: "B794F6").opacity(isSelected ? 0.6 : 0), lineWidth: 1.5)
             )
         }
     }
@@ -258,8 +250,9 @@ struct CommitmentPledgeView: View {
 
                 // Inner circle
                 Circle()
-                    .fill(Color(hex: "B794F6").opacity(isHolding ? 0.25 : 0.12))
+                    .fill(Color(hex: "B794F6").opacity(isHolding ? 0.18 : 0.0))
                     .frame(width: 100, height: 100)
+                    .glassCircle(tint: GlassTokens.accent)
 
                 // Progress ring on top
                 Circle()
@@ -353,7 +346,7 @@ struct CommitmentPledgeView: View {
         // Track
         if let startTime = screenViewTime {
             let timeSpent = Date().timeIntervalSince(startTime)
-            MixpanelManager.shared.track(
+            AnalyticsManager.shared.track(
                 event: "onboarding_commitment_completed",
                 properties: [
                     "selected_duration": selectedDuration.rawValue,

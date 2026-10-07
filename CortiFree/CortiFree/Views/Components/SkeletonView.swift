@@ -176,10 +176,7 @@ struct SkeletonCard: View {
             SkeletonCircle(size: 44)
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.03))
-        )
+        .glassCard(cornerRadius: 16)
     }
 }
 
@@ -217,10 +214,7 @@ struct SkeletonStatsCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.03))
-        )
+        .glassCard(cornerRadius: 16)
     }
 }
 
@@ -297,10 +291,7 @@ struct SkeletonPageLoader: View {
                         .foregroundColor(.white.opacity(0.6))
 
                     SkeletonTaskRow()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.03))
-                        )
+                        .glassCard(cornerRadius: 12)
                 }
                 .padding(.horizontal, 24)
 

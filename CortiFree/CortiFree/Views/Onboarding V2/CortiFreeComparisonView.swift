@@ -17,7 +17,7 @@ struct CortiFreeComparisonView: View {
 
     var body: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.8)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -54,7 +54,7 @@ struct CortiFreeComparisonView: View {
 
                 Button(action: {
                     HapticManager.medium()
-                    MixpanelManager.shared.track(
+                    AnalyticsManager.shared.track(
                         event: "onboarding_quiz_transition_continued",
                         properties: [
                             "transition_type": "cortifree_comparison",
@@ -70,18 +70,17 @@ struct CortiFreeComparisonView: View {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 15, weight: .semibold))
                     }
-                    .foregroundStyle(Color(hex: "1A1A4E"))
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .contentShape(Capsule())
                 }
+                .buttonStyle(.glassPrimary)
                 .padding(.horizontal, 34)
                 .padding(.bottom, 46)
             }
         }
         .onAppear {
-            MixpanelManager.shared.track(
+            AnalyticsManager.shared.track(
                 event: "onboarding_quiz_transition_viewed",
                 properties: [
                     "transition_type": "cortifree_comparison",
@@ -161,12 +160,7 @@ struct CortiFreeComparisonView: View {
             .frame(height: 260)
         }
         .padding(20)
-        .background(Color(hex: "111032").opacity(0.88))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
-        }
+        .glassCard(cornerRadius: 20)
     }
 
     private var chartGrid: some View {

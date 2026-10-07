@@ -100,21 +100,14 @@ struct AntiStressBreathingDetailView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.15))
-                            .frame(width: 40, height: 40)
-                            .blur(radius: 8)
-
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
-
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
@@ -122,20 +115,13 @@ struct AntiStressBreathingDetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "wind")
                         .font(.system(size: 12))
-                    Text(NSLocalizedString("breathing_detail.category_badge", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "breathing_detail.category_badge"))
                         .font(.custom("Poppins-Bold", size: 11))
                 }
                 .foregroundColor(Color.appTheme)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(Color.appTheme.opacity(0.2))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.appTheme.opacity(0.5), lineWidth: 1)
-                        )
-                )
+                .glassCapsule(tint: Color.appTheme)
             }
             .padding(.horizontal, 24)
             .padding(.top, 20)
@@ -178,7 +164,7 @@ struct AntiStressBreathingDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("breathing_detail.how_it_works", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "breathing_detail.how_it_works"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -201,34 +187,8 @@ struct AntiStressBreathingDetailView: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -236,15 +196,15 @@ struct AntiStressBreathingDetailView: View {
     private var howItWorksText: String {
         switch exerciseType {
         case .guidedBreathing, .consciousBreathing:
-            return NSLocalizedString("breathing_detail.how_it_works.deep_abdominal", comment: "")
+            return LanguageManager.shared.localizedString(for: "breathing_detail.how_it_works.deep_abdominal")
         case .cardiacCoherence:
-            return NSLocalizedString("breathing_detail.how_it_works.cardiac_coherence", comment: "")
+            return LanguageManager.shared.localizedString(for: "breathing_detail.how_it_works.cardiac_coherence")
         case .boxBreathing:
-            return NSLocalizedString("breathing_detail.how_it_works.box_breathing", comment: "")
+            return LanguageManager.shared.localizedString(for: "breathing_detail.how_it_works.box_breathing")
         case .alternateBreathing:
-            return NSLocalizedString("breathing_detail.how_it_works.alternate_breathing", comment: "")
+            return LanguageManager.shared.localizedString(for: "breathing_detail.how_it_works.alternate_breathing")
         default:
-            return NSLocalizedString("breathing_detail.how_it_works.default", comment: "")
+            return LanguageManager.shared.localizedString(for: "breathing_detail.how_it_works.default")
         }
     }
 
@@ -263,7 +223,7 @@ struct AntiStressBreathingDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("breathing_detail.scientific_evidence", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "breathing_detail.scientific_evidence"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -315,34 +275,8 @@ struct AntiStressBreathingDetailView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -351,33 +285,33 @@ struct AntiStressBreathingDetailView: View {
         switch exerciseType {
         case .cardiacCoherence:
             return [
-                NSLocalizedString("breathing_detail.evidence.cardiac_coherence_1", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.cardiac_coherence_2", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.cardiac_coherence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.cardiac_coherence_1"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.cardiac_coherence_2"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.cardiac_coherence_3")
             ]
         case .boxBreathing:
             return [
-                NSLocalizedString("breathing_detail.evidence.box_breathing_1", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.box_breathing_2", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.box_breathing_3", comment: "")
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.box_breathing_1"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.box_breathing_2"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.box_breathing_3")
             ]
         case .alternateBreathing:
             return [
-                NSLocalizedString("breathing_detail.evidence.alternate_breathing_1", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.alternate_breathing_2", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.alternate_breathing_3", comment: "")
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.alternate_breathing_1"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.alternate_breathing_2"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.alternate_breathing_3")
             ]
         default:
             return [
-                NSLocalizedString("breathing_detail.evidence.default_1", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.default_2", comment: ""),
-                NSLocalizedString("breathing_detail.evidence.default_3", comment: "")
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.default_1"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.default_2"),
+                LanguageManager.shared.localizedString(for: "breathing_detail.evidence.default_3")
             ]
         }
     }
 
     private var scientificSources: [String] {
-        return [NSLocalizedString("breathing_detail.source", comment: "")]
+        return [LanguageManager.shared.localizedString(for: "breathing_detail.source")]
     }
 
     // MARK: - Benefits Section
@@ -389,7 +323,7 @@ struct AntiStressBreathingDetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text(NSLocalizedString("breathing_detail.benefits", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "breathing_detail.benefits"))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }
@@ -407,10 +341,10 @@ struct AntiStressBreathingDetailView: View {
 
     private var benefits: [String] {
         return [
-            NSLocalizedString("breathing_detail.benefit.reduce_stress", comment: ""),
-            NSLocalizedString("breathing_detail.benefit.calm_heart", comment: ""),
-            NSLocalizedString("breathing_detail.benefit.improve_sleep", comment: ""),
-            NSLocalizedString("breathing_detail.benefit.soothe_mind", comment: "")
+            LanguageManager.shared.localizedString(for: "breathing_detail.benefit.reduce_stress"),
+            LanguageManager.shared.localizedString(for: "breathing_detail.benefit.calm_heart"),
+            LanguageManager.shared.localizedString(for: "breathing_detail.benefit.improve_sleep"),
+            LanguageManager.shared.localizedString(for: "breathing_detail.benefit.soothe_mind")
         ]
     }
 
@@ -451,7 +385,7 @@ struct AntiStressBreathingDetailView: View {
                     .font(.system(size: 18))
                     .foregroundColor(Color.appTheme)
 
-                Text(NSLocalizedString("breathing_detail.exercise_duration", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "breathing_detail.exercise_duration"))
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(.white)
 
@@ -466,15 +400,17 @@ struct AntiStressBreathingDetailView: View {
 
             // Modern segmented control
             VStack(spacing: 12) {
-                HStack(spacing: 8) {
-                    ForEach(durations, id: \.self) { duration in
-                        DurationPill(
-                            duration: duration,
-                            isSelected: selectedDuration == duration
-                        ) {
-                            HapticManager.light()
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                selectedDuration = duration
+                GlassGroup(spacing: 8) {
+                    HStack(spacing: 8) {
+                        ForEach(durations, id: \.self) { duration in
+                            DurationPill(
+                                duration: duration,
+                                isSelected: selectedDuration == duration
+                            ) {
+                                HapticManager.light()
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    selectedDuration = duration
+                                }
                             }
                         }
                     }
@@ -527,45 +463,15 @@ struct AntiStressBreathingDetailView: View {
                 Image(systemName: "play.circle.fill")
                     .font(.system(size: 24))
 
-                Text(NSLocalizedString("breathing_detail.start_exercise", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "breathing_detail.start_exercise"))
                     .font(.custom("Poppins-Bold", size: 18))
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .frame(height: 64)
-            .background(
-                ZStack {
-                    // Shadow layer
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .blur(radius: 20)
-                        .offset(y: 8)
-
-                    // Main button
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                }
-            )
+            .contentShape(Capsule())
         }
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(.glassPrimary(tint: Color.appTheme))
     }
 }
 

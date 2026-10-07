@@ -52,7 +52,8 @@ class FirebaseManager: ObservableObject {
     }
 
     func updateUserProfile(uid: String, updates: [String: Any]) async throws {
-        try await db.collection("users").document(uid).updateData(updates)
+        // merge: works even when the users/{uid} doc was never created (e.g. some social sign-ins)
+        try await db.collection("users").document(uid).setData(updates, merge: true)
 
         // Refresh current user
         if let updatedUser = try? await fetchUserProfile(uid: uid) {
@@ -85,7 +86,7 @@ class FirebaseManager: ObservableObject {
             "selectedRoutineId": selectedRoutineId
         ])
 
-        // Mixpanel tracking handled separately
+        // analytics tracking handled separately
     }
 
     // MARK: - Routines
@@ -134,7 +135,7 @@ class FirebaseManager: ObservableObject {
             "currentDay": 1
         ])
 
-        // Mixpanel tracking handled separately
+        // analytics tracking handled separately
     }
 
     // MARK: - Exercises
@@ -179,7 +180,7 @@ class FirebaseManager: ObservableObject {
         // Update daily progress (without XP)
         try await updateDailyProgress(uid: uid, date: getCurrentDate())
 
-        // Mixpanel tracking handled separately
+        // analytics tracking handled separately
     }
 
     private func updateDailyProgress(uid: String, date: String) async throws {
@@ -222,7 +223,7 @@ class FirebaseManager: ObservableObject {
             .document()
             .setData(from: feedback)
 
-        // Mixpanel tracking for feedback handled separately
+        // analytics tracking for feedback handled separately
     }
 
     // MARK: - Custom Tasks
@@ -234,7 +235,7 @@ class FirebaseManager: ObservableObject {
             .document()
             .setData(from: task)
 
-        // Mixpanel tracking handled separately
+        // analytics tracking handled separately
     }
 
     func fetchCustomTasks(uid: String) async throws -> [CustomTask] {
@@ -357,7 +358,8 @@ class FirebaseManager: ObservableObject {
     func saveUserSettings(uid: String, settings: UserSettings) async throws {
         try await db.collection("users").document(uid)
             .collection("settings").document("preferences")
-            .setData(settings.toFirestore())
+            // merge: the same doc also holds SettingsViewModel's notifications/experience/privacy maps
+            .setData(settings.toFirestore(), merge: true)
 
         // Also save to UserDefaults for offline access
         settings.saveToUserDefaults()
@@ -535,13 +537,6 @@ class FirebaseManager: ObservableObject {
 
         // Map date strings to completion status
         return dateStrings.map { completionMap[$0] ?? false }
-    }
-
-    func saveOnboardingScore(uid: String, score: Int) async throws {
-        try await db.collection("users").document(uid).updateData([
-            "onboardingScore": score,
-            "onboardingScoreSavedAt": Timestamp()
-        ])
     }
 
     // MARK: - Utility Functions

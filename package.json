@@ -1,0 +1,12 @@
+{
+  "name": "cortifree-backend",
+  "private": true,
+  "scripts": {
+    "convex:dev": "convex dev",
+    "convex:deploy": "convex deploy",
+    "convex:import:help": "convex import --help"
+  },
+  "dependencies": {
+    "convex": "^1.45.0"
+  }
+}

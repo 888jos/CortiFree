@@ -28,35 +28,14 @@ struct FloatingAddButton: View {
 
             action()
         }) {
-            ZStack {
-                // Background gradient
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.appTheme,
-                                Color.appThemeSecondary
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 60, height: 60)
-                    .shadow(
-                        color: Color.appTheme.opacity(0.4),
-                        radius: 8,
-                        x: 0,
-                        y: 4
-                    )
-
-                // Plus icon
-                Image(systemName: "plus")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(.white)
-            }
-            .scaleEffect(isPressed ? 0.9 : 1.0)
+            // Plus icon
+            Image(systemName: "plus")
+                .font(.system(size: 24, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(width: 60, height: 60)
+                .scaleEffect(isPressed ? 0.9 : 1.0)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.glassPrimary(tint: Color.appTheme))
     }
 }
 

@@ -220,7 +220,6 @@ enum AppConstants {
     enum Program {
         static let totalDays: Int = 66
         static let totalWeeks: Int = 10
-        static let defaultInitialScore: Int = 45
         static let daysPerWeek: Int = 7
     }
 

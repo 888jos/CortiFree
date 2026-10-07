@@ -50,29 +50,25 @@ struct UndoToast: View {
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(
-                            RoundedRectangle(cornerRadius: 8)
+                            Capsule()
                                 .fill(Color.appTheme.opacity(0.15))
                         )
                 }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
             .background(
-                ZStack(alignment: .leading) {
-                    // Base background
-                    Color(hex: "2A2B5A")
-
-                    // Progress bar background
-                    GeometryReader { geo in
-                        Rectangle()
-                            .fill(Color.appTheme.opacity(0.2))
-                            .frame(width: geo.size.width * progress)
-                            .animation(.linear(duration: duration), value: progress)
-                    }
+                // Progress bar background
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(Color.appTheme.opacity(0.2))
+                        .frame(width: geo.size.width * progress)
+                        .animation(.linear(duration: duration), value: progress)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             )
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: Color.black.opacity(0.3), radius: 10, y: 5)
+            .glassCard(cornerRadius: 16)
             .padding(.horizontal, 20)
             .padding(.bottom, 100) // Clear TabBar area
         }

@@ -8,6 +8,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import AuthenticationServices
 
 struct EditProfileView: View {
     @Environment(\.dismiss) var dismiss
@@ -25,9 +26,13 @@ struct EditProfileView: View {
     // Photo picker
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage?
+    @State private var storedPhoto: UIImage?
 
     // Loading states
     @State private var isSaving = false
+    @State private var isDeletingAccount = false
+    @State private var showReauthAlert = false
+    @State private var reauthPassword = ""
     @State private var saveErrorMessage: String?
     @FocusState private var focusedField: PersonalInfoField?
 
@@ -38,7 +43,7 @@ struct EditProfileView: View {
     var body: some View {
         ZStack {
             // Galaxy background
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.75)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -77,44 +82,79 @@ struct EditProfileView: View {
             ImagePicker(image: $selectedImage)
         }
         .onChange(of: selectedImage) { _, newImage in
-            if let image = newImage {
+            if let image = newImage, image !== storedPhoto {
                 saveProfilePhoto(image)
             }
         }
-        .alert(NSLocalizedString("editprofile.alert.restart.title", comment: ""), isPresented: $showRestartAlert) {
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
-            Button(NSLocalizedString("editprofile.alert.restart.button", comment: ""), role: .destructive) {
+        .alert(LanguageManager.shared.localizedString(for: "editprofile.alert.restart.title"), isPresented: $showRestartAlert) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
+            Button(LanguageManager.shared.localizedString(for: "editprofile.alert.restart.button"), role: .destructive) {
                 restartProgram()
             }
         } message: {
-            Text(NSLocalizedString("editprofile.alert.restart.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "editprofile.alert.restart.message"))
         }
-        .alert(NSLocalizedString("editprofile.alert.delete.title", comment: ""), isPresented: $showDeleteAlert) {
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
-            Button(NSLocalizedString("editprofile.alert.delete.button", comment: ""), role: .destructive) {
+        .alert(LanguageManager.shared.localizedString(for: "editprofile.alert.delete.title"), isPresented: $showDeleteAlert) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
+            Button(LanguageManager.shared.localizedString(for: "editprofile.alert.delete.button"), role: .destructive) {
                 deleteAccount()
             }
         } message: {
-            Text(NSLocalizedString("editprofile.alert.delete.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "editprofile.alert.delete.message"))
         }
-        .alert(NSLocalizedString("editprofile.alert.logout.title", comment: ""), isPresented: $showLogoutAlert) {
-            Button(NSLocalizedString("common.cancel", comment: ""), role: .cancel) { }
-            Button(NSLocalizedString("editprofile.alert.logout.button", comment: ""), role: .destructive) {
+        .alert(LanguageManager.shared.localizedString(for: "editprofile.alert.logout.title"), isPresented: $showLogoutAlert) {
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
+            Button(LanguageManager.shared.localizedString(for: "editprofile.alert.logout.button"), role: .destructive) {
                 logout()
             }
         } message: {
-            Text(NSLocalizedString("editprofile.alert.logout.message", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "editprofile.alert.logout.message"))
         }
-        .alert("Profile", isPresented: Binding(
+        .alert(LanguageManager.shared.localizedString(for: "editprofile.title"), isPresented: Binding(
             get: { saveErrorMessage != nil },
             set: { if !$0 { saveErrorMessage = nil } }
         )) {
-            Button(NSLocalizedString("common.ok", comment: ""), role: .cancel) {
+            Button(LanguageManager.shared.localizedString(for: "common.ok"), role: .cancel) {
                 saveErrorMessage = nil
             }
         } message: {
-            Text(saveErrorMessage ?? NSLocalizedString("error.generic", comment: ""))
+            Text(saveErrorMessage ?? LanguageManager.shared.localizedString(for: "error.generic"))
         }
+        .alert(
+            LanguageManager.shared.localizedString(for: "inline.settingsview.language.00"),
+            isPresented: $showReauthAlert
+        ) {
+            SecureField(
+                LanguageManager.shared.localizedString(for: "inline.settingsview.language.01"),
+                text: $reauthPassword
+            )
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) {
+                reauthPassword = ""
+            }
+            Button(LanguageManager.shared.localizedString(for: "editprofile.alert.delete.button"), role: .destructive) {
+                let password = reauthPassword
+                reauthPassword = ""
+                Task {
+                    do {
+                        try await AccountDeletionService.shared.reauthenticateWithPassword(password: password)
+                        await performAccountDeletion()
+                    } catch {
+                        saveErrorMessage = error.localizedDescription
+                    }
+                }
+            }
+        } message: {
+            Text(LanguageManager.shared.localizedString(for: "inline.settingsview.language.02"))
+        }
+        .overlay {
+            if isDeletingAccount {
+                ZStack {
+                    Color.black.opacity(0.5).ignoresSafeArea()
+                    ProgressView().tint(.white).scaleEffect(1.4)
+                }
+            }
+        }
+        .allowsHitTesting(!isDeletingAccount)
     }
 
     // MARK: - Header
@@ -126,14 +166,17 @@ struct EditProfileView: View {
                 dismiss()
             }) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(width: 44, height: 44)
+                    .contentShape(Circle())
             }
+            .buttonStyle(.plain)
+            .glassCircle(interactive: true)
 
             Spacer()
 
-            Text(NSLocalizedString("editprofile.title", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "editprofile.title"))
                 .font(.custom(AppConstants.Fonts.bold, size: 20))
                 .foregroundColor(.white)
 
@@ -143,15 +186,20 @@ struct EditProfileView: View {
                 HapticManager.medium()
                 saveProfile()
             }) {
-                if isSaving {
-                    ProgressView()
-                        .tint(.white)
-                } else {
-                    Text(NSLocalizedString("common.save", comment: ""))
-                        .font(.custom(AppConstants.Fonts.semiBold, size: 16))
-                        .foregroundColor(AppConstants.Colors.primaryGreen)
+                Group {
+                    if isSaving {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text(LanguageManager.shared.localizedString(for: "common.save"))
+                            .font(.custom(AppConstants.Fonts.semiBold, size: 16))
+                            .foregroundColor(AppConstants.Colors.primaryGreen)
+                    }
                 }
+                .padding(.horizontal, 16)
+                .frame(height: 40)
             }
+            .buttonStyle(.glassSecondary)
             .disabled(isSaving)
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -214,7 +262,7 @@ struct EditProfileView: View {
                 }
             }
 
-            Text(NSLocalizedString("editprofile.change_photo", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "editprofile.change_photo"))
                 .font(.custom(AppConstants.Fonts.regular, size: 13))
                 .foregroundColor(.white.opacity(0.6))
         }
@@ -231,7 +279,7 @@ struct EditProfileView: View {
                     .font(.system(size: 18))
                     .foregroundColor(AppConstants.Colors.violet)
 
-                Text(NSLocalizedString("editprofile.section.personal_info", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "editprofile.section.personal_info"))
                     .font(.custom(AppConstants.Fonts.semiBold, size: 16))
                     .foregroundColor(.white.opacity(0.8))
 
@@ -240,12 +288,12 @@ struct EditProfileView: View {
 
             // First Name (editable)
             VStack(alignment: .leading, spacing: 8) {
-                Text(NSLocalizedString("editprofile.first_name", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "editprofile.first_name"))
                     .font(.custom(AppConstants.Fonts.medium, size: 13))
                     .foregroundColor(.white.opacity(0.6))
 
                 TextField(
-                    NSLocalizedString("editprofile.first_name", comment: ""),
+                    LanguageManager.shared.localizedString(for: "editprofile.first_name"),
                     text: $firstName
                 )
                     .font(.custom(AppConstants.Fonts.regular, size: 16))
@@ -259,13 +307,13 @@ struct EditProfileView: View {
                     .textFieldStyle(.plain)
                     .padding(AppConstants.Layout.paddingMedium)
                     .background(
-                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
-                            .fill(Color.white.opacity(0.1))
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall, style: .continuous)
+                            .fill(Color.white.opacity(0.06))
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall, style: .continuous)
                             .stroke(
-                                focusedField == .firstName ? AppConstants.Colors.violet : .clear,
+                                focusedField == .firstName ? AppConstants.Colors.violet : Color.white.opacity(0.1),
                                 lineWidth: 1
                             )
                     )
@@ -275,7 +323,7 @@ struct EditProfileView: View {
 
             // Email (read-only)
             VStack(alignment: .leading, spacing: 8) {
-                Text(NSLocalizedString("editprofile.email", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "editprofile.email"))
                     .font(.custom(AppConstants.Fonts.medium, size: 13))
                     .foregroundColor(.white.opacity(0.6))
 
@@ -292,12 +340,13 @@ struct EditProfileView: View {
                 }
                 .padding(AppConstants.Layout.paddingMedium)
                 .background(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
-                        .fill(Color.white.opacity(0.05))
+                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall, style: .continuous)
+                        .fill(Color.white.opacity(0.04))
                 )
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
+        .glassCard(cornerRadius: 22)
     }
 
     // MARK: - Goals Section (66 Days Objectives)
@@ -310,7 +359,7 @@ struct EditProfileView: View {
                     .font(.system(size: 18))
                     .foregroundColor(AppConstants.Colors.primaryGreen)
 
-                Text(NSLocalizedString("editprofile.section.goals", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "editprofile.section.goals"))
                     .font(.custom(AppConstants.Fonts.semiBold, size: 16))
                     .foregroundColor(.white.opacity(0.8))
 
@@ -319,17 +368,18 @@ struct EditProfileView: View {
 
             // 8 Habits with final objectives (aligned with HabitsProgressFlowView)
             VStack(spacing: 12) {
-                goalRow(icon: "wind", name: NSLocalizedString("editprofile.habit.breathing", comment: ""), objective: NSLocalizedString("editprofile.goal.breathing", comment: ""), color: AppConstants.Colors.domainSerenity)
-                goalRow(icon: "brain.head.profile", name: NSLocalizedString("editprofile.habit.meditation", comment: ""), objective: NSLocalizedString("editprofile.goal.meditation", comment: ""), color: AppConstants.Colors.violet)
-                goalRow(icon: "book.fill", name: NSLocalizedString("editprofile.habit.journal", comment: ""), objective: NSLocalizedString("editprofile.goal.journal", comment: ""), color: AppConstants.Colors.journalReflection)
-                goalRow(icon: "figure.run", name: NSLocalizedString("editprofile.habit.sport", comment: ""), objective: NSLocalizedString("editprofile.goal.sport", comment: ""), color: AppConstants.Colors.domainEnergy)
-                goalRow(icon: "drop.fill", name: NSLocalizedString("editprofile.habit.hydration", comment: ""), objective: NSLocalizedString("editprofile.goal.hydration", comment: ""), color: .blue)
-                goalRow(icon: "leaf.fill", name: NSLocalizedString("editprofile.habit.nature", comment: ""), objective: NSLocalizedString("editprofile.goal.nature", comment: ""), color: AppConstants.Colors.domainFocus)
-                goalRow(icon: "person.2.fill", name: NSLocalizedString("editprofile.habit.social", comment: ""), objective: NSLocalizedString("editprofile.goal.social", comment: ""), color: AppConstants.Colors.domainBalance)
-                goalRow(icon: "moon.stars.fill", name: NSLocalizedString("editprofile.habit.sleep", comment: ""), objective: NSLocalizedString("editprofile.goal.sleep", comment: ""), color: AppConstants.Colors.domainSleep)
+                goalRow(icon: "wind", name: LanguageManager.shared.localizedString(for: "editprofile.habit.breathing"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.breathing"), color: AppConstants.Colors.domainSerenity)
+                goalRow(icon: "brain.head.profile", name: LanguageManager.shared.localizedString(for: "editprofile.habit.meditation"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.meditation"), color: AppConstants.Colors.violet)
+                goalRow(icon: "book.fill", name: LanguageManager.shared.localizedString(for: "editprofile.habit.journal"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.journal"), color: AppConstants.Colors.journalReflection)
+                goalRow(icon: "figure.run", name: LanguageManager.shared.localizedString(for: "editprofile.habit.sport"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.sport"), color: AppConstants.Colors.domainEnergy)
+                goalRow(icon: "drop.fill", name: LanguageManager.shared.localizedString(for: "editprofile.habit.hydration"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.hydration"), color: .blue)
+                goalRow(icon: "leaf.fill", name: LanguageManager.shared.localizedString(for: "editprofile.habit.nature"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.nature"), color: AppConstants.Colors.domainFocus)
+                goalRow(icon: "person.2.fill", name: LanguageManager.shared.localizedString(for: "editprofile.habit.social"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.social"), color: AppConstants.Colors.domainBalance)
+                goalRow(icon: "moon.stars.fill", name: LanguageManager.shared.localizedString(for: "editprofile.habit.sleep"), objective: LanguageManager.shared.localizedString(for: "editprofile.goal.sleep"), color: AppConstants.Colors.domainSleep)
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
+        .glassCard(cornerRadius: 22)
     }
 
     // MARK: - Goal Row
@@ -368,7 +418,7 @@ struct EditProfileView: View {
                     .font(.system(size: 18))
                     .foregroundColor(.white.opacity(0.6))
 
-                Text(NSLocalizedString("editprofile.section.account", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "editprofile.section.account"))
                     .font(.custom(AppConstants.Fonts.semiBold, size: 16))
                     .foregroundColor(.white.opacity(0.8))
 
@@ -384,7 +434,7 @@ struct EditProfileView: View {
                     Image(systemName: "arrow.counterclockwise")
                         .font(.system(size: 16, weight: .semibold))
 
-                    Text(NSLocalizedString("editprofile.restart_program", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "editprofile.restart_program"))
                         .font(.custom(AppConstants.Fonts.semiBold, size: 15))
 
                     Spacer()
@@ -397,63 +447,66 @@ struct EditProfileView: View {
                 .padding(AppConstants.Layout.paddingMedium)
                 .background(
                     RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
-                        .fill(AppConstants.Colors.violet.opacity(0.3))
+                        .fill(AppConstants.Colors.violet.opacity(0.22))
                 )
             }
 
-            // Logout Button
-            Button(action: {
-                HapticManager.light()
-                showLogoutAlert = true
-            }) {
-                HStack {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .font(.system(size: 16, weight: .semibold))
+            if authViewModel.isAuthenticated {
+                // Logout Button
+                Button(action: {
+                    HapticManager.light()
+                    showLogoutAlert = true
+                }) {
+                    HStack {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .font(.system(size: 16, weight: .semibold))
 
-                    Text(NSLocalizedString("editprofile.logout", comment: ""))
-                        .font(.custom(AppConstants.Fonts.semiBold, size: 15))
+                        Text(LanguageManager.shared.localizedString(for: "editprofile.logout"))
+                            .font(.custom(AppConstants.Fonts.semiBold, size: 15))
 
-                    Spacer()
+                        Spacer()
 
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14))
-                        .foregroundColor(.white.opacity(0.3))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14))
+                            .foregroundColor(.white.opacity(0.3))
+                    }
+                    .foregroundColor(.white)
+                    .padding(AppConstants.Layout.paddingMedium)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
+                            .fill(Color.white.opacity(0.06))
+                    )
                 }
-                .foregroundColor(.white)
-                .padding(AppConstants.Layout.paddingMedium)
-                .background(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
-                        .fill(Color.white.opacity(0.1))
-                )
-            }
 
-            // Delete Account Button
-            Button(action: {
-                HapticManager.medium()
-                showDeleteAlert = true
-            }) {
-                HStack {
-                    Image(systemName: "trash.fill")
-                        .font(.system(size: 16, weight: .semibold))
+                // Delete Account Button
+                Button(action: {
+                    HapticManager.medium()
+                    showDeleteAlert = true
+                }) {
+                    HStack {
+                        Image(systemName: "trash.fill")
+                            .font(.system(size: 16, weight: .semibold))
 
-                    Text(NSLocalizedString("editprofile.delete_account", comment: ""))
-                        .font(.custom(AppConstants.Fonts.semiBold, size: 15))
+                        Text(LanguageManager.shared.localizedString(for: "editprofile.delete_account"))
+                            .font(.custom(AppConstants.Fonts.semiBold, size: 15))
 
-                    Spacer()
+                        Spacer()
 
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14))
-                        .foregroundColor(.red.opacity(0.5))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14))
+                            .foregroundColor(.red.opacity(0.5))
+                    }
+                    .foregroundColor(.red)
+                    .padding(AppConstants.Layout.paddingMedium)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
+                            .fill(Color.red.opacity(0.14))
+                    )
                 }
-                .foregroundColor(.red)
-                .padding(AppConstants.Layout.paddingMedium)
-                .background(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusSmall)
-                        .fill(Color.red.opacity(0.15))
-                )
             }
         }
         .padding(AppConstants.Layout.paddingLarge)
+        .glassCard(cornerRadius: 22)
     }
 
     // MARK: - App Version Footer
@@ -497,6 +550,12 @@ struct EditProfileView: View {
         if firstName.isEmpty {
             firstName = UserDefaults.standard.string(forKey: "userFirstName") ?? ""
         }
+
+        // Existing profile photo (local copy, saved on every change)
+        if selectedImage == nil, let photo = ProfilePhotoStorage.load() {
+            storedPhoto = photo
+            selectedImage = photo
+        }
     }
 
     // MARK: - Save Profile
@@ -504,7 +563,7 @@ struct EditProfileView: View {
     private func saveProfile() {
         let trimmedFirstName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedFirstName.isEmpty else {
-            saveErrorMessage = NSLocalizedString("editprofile.first_name_required", comment: "")
+            saveErrorMessage = LanguageManager.shared.localizedString(for: "editprofile.first_name_required")
             focusedField = .firstName
             return
         }
@@ -554,32 +613,29 @@ struct EditProfileView: View {
     // MARK: - Save Profile Photo
 
     private func saveProfilePhoto(_ image: UIImage) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-
-        // Compress and convert to base64
-        guard let imageData = image.jpegData(compressionQuality: 0.7),
-              let base64String = imageData.base64EncodedString() as String? else {
-            #if DEBUG
-            print("Error: Could not convert image to base64")
-            #endif
+        // Resized so it fits comfortably in a Firestore field (1 MB doc limit)
+        guard let imageData = ProfilePhotoStorage.compressedJPEG(from: image) else {
+            HapticManager.error()
             return
         }
 
+        // Local first: works offline and for signed-out users
+        ProfilePhotoStorage.save(imageData)
+        NotificationCenter.default.post(name: NSNotification.Name("ProfileUpdated"), object: nil)
+        HapticManager.success()
+
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let base64String = imageData.base64EncodedString()
         Task {
             do {
                 try await FirebaseManager.shared.updateUserProfile(
                     uid: uid,
                     updates: ["profilePhotoBase64": base64String]
                 )
-                #if DEBUG
-                print("✅ Profile photo saved successfully")
-                #endif
-                HapticManager.success()
             } catch {
                 #if DEBUG
                 print("Error saving profile photo: \(error)")
                 #endif
-                HapticManager.error()
             }
         }
     }
@@ -598,12 +654,19 @@ struct EditProfileView: View {
         UserDefaults.standard.set(0, forKey: "streakDays")
         UserDefaults.standard.set(0, forKey: "bestStreak")
 
+        // Day 1 starts today at midnight; keep every other user setting intact
+        let newStartDate = UserSettings.calculateProgramStartDate()
+        UserDefaults.standard.set(newStartDate, forKey: "programStartDate")
+        var localSettings = UserSettings.loadFromUserDefaults() ?? UserSettings()
+        localSettings.programStartDate = newStartDate
+        localSettings.saveToUserDefaults()
+
         // Update Firebase programStartDate
         if let uid = Auth.auth().currentUser?.uid {
             Task {
                 do {
-                    var settings = UserSettings()
-                    settings.programStartDate = Date()
+                    var settings = (try? await FirebaseManager.shared.fetchUserSettings(uid: uid)) ?? localSettings
+                    settings.programStartDate = newStartDate
                     try await FirebaseManager.shared.saveUserSettings(uid: uid, settings: settings)
                     #if DEBUG
                     print("✅ Program restarted to day 1")
@@ -625,30 +688,47 @@ struct EditProfileView: View {
     // MARK: - Delete Account
 
     private func deleteAccount() {
-        HapticManager.success()
+        guard let user = Auth.auth().currentUser else { return }
 
-        Task {
-            do {
-                // Delete Firebase account and all Firestore data
-                try await Auth.auth().currentUser?.delete()
-
-                // Clear all local UserDefaults data
-                if let domain = Bundle.main.bundleIdentifier {
-                    UserDefaults.standard.removePersistentDomain(forName: domain)
-                    UserDefaults.standard.synchronize()
+        switch AccountDeletionService.shared.reauthMethod(for: user) {
+        case .password:
+            showReauthAlert = true
+        case .apple:
+            Task {
+                do {
+                    try await AccountDeletionService.shared.reauthenticateWithApple()
+                    await performAccountDeletion()
+                } catch {
+                    if (error as? ASAuthorizationError)?.code == .canceled { return }
+                    saveErrorMessage = error.localizedDescription
                 }
-
-                // Sign out the user
-                await MainActor.run {
-                    authViewModel.signOut()
-                    dismiss()
-                }
-            } catch {
-                #if DEBUG
-                print("❌ Error deleting account: \(error)")
-                #endif
-                HapticManager.error()
             }
+        case .none, .unsupported:
+            Task { await performAccountDeletion() }
+        }
+    }
+
+    @MainActor
+    private func performAccountDeletion() async {
+        isDeletingAccount = true
+        do {
+            // Firestore data (incl. subcollections), Auth user, identities, local state
+            try await AccountDeletionService.shared.deleteAccount()
+            HapticManager.success()
+            isDeletingAccount = false
+            authViewModel.signOut()
+            dismiss()
+        } catch AccountDeletionService.DeletionError.requiresRecentLogin {
+            isDeletingAccount = false
+            if Auth.auth().currentUser?.providerData.contains(where: { $0.providerID == "password" }) == true {
+                showReauthAlert = true
+            } else {
+                saveErrorMessage = AccountDeletionService.DeletionError.requiresRecentLogin.errorDescription
+            }
+        } catch {
+            isDeletingAccount = false
+            HapticManager.error()
+            saveErrorMessage = error.localizedDescription
         }
     }
 

@@ -108,12 +108,8 @@ extension Font {
 
 struct CardStyle: ViewModifier {
     func body(content: Content) -> some View {
-        content
-            .background(
-                RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                    .fill(AppConstants.Colors.cardBackground)
-            )
-            .shadow(color: Color.black.opacity(0.2), radius: AppConstants.Layout.shadowRadius, x: 0, y: 4)
+        // Liquid Glass card (iOS 26) with material fallback — see Components/Glass/GlassComponents.swift
+        content.glassCard(cornerRadius: AppConstants.Layout.cornerRadius)
     }
 }
 
@@ -124,10 +120,7 @@ struct PrimaryButtonStyle: ViewModifier {
             .foregroundColor(.white)
             .frame(height: AppConstants.Layout.buttonHeight)
             .frame(maxWidth: .infinity)
-            .background(
-                LinearGradient.accent
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusXLarge))
+            .glassCapsule(tint: AppConstants.Colors.violet, interactive: true)
     }
 }
 
@@ -138,10 +131,7 @@ struct SecondaryButtonStyle: ViewModifier {
             .foregroundColor(AppConstants.Colors.violet)
             .frame(height: AppConstants.Layout.buttonHeight)
             .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadiusXLarge)
-                    .stroke(AppConstants.Colors.violet, lineWidth: 2)
-            )
+            .glassCapsule(interactive: true)
     }
 }
 

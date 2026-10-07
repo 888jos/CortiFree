@@ -16,19 +16,21 @@ struct MoodSelector: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(NSLocalizedString("motivational.mood_question", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "motivational.mood_question"))
                 .font(.custom("Poppins-Medium", size: 14))
                 .foregroundColor(.white.opacity(0.8))
 
-            HStack(spacing: 8) {
-                ForEach(moods, id: \.self) { mood in
-                    MoodButton(
-                        mood: mood,
-                        isSelected: selectedMood == mood,
-                        action: {
-                            onMoodSelected(mood)
-                        }
-                    )
+            GlassGroup(spacing: 8) {
+                HStack(spacing: 8) {
+                    ForEach(moods, id: \.self) { mood in
+                        MoodButton(
+                            mood: mood,
+                            isSelected: selectedMood == mood,
+                            action: {
+                                onMoodSelected(mood)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -58,36 +60,14 @@ private struct MoodButton: View {
         }) {
             ZStack {
                 // Background circle
-                Circle()
-                    .fill(
-                        isSelected
-                            ? LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            : LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.5),
-                                    Color(hex: "2A2B5A").opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                    )
+                Color.clear
+                    .frame(width: 48, height: 48)
+                    .glassCircle(tint: isSelected ? Color.appTheme : nil, interactive: true)
                     .overlay(
                         Circle()
-                            .stroke(
-                                isSelected
-                                    ? Color.appTheme.opacity(0.6)
-                                    : Color.white.opacity(0.1),
-                                lineWidth: isSelected ? 2 : 1
-                            )
+                            .strokeBorder(Color.appTheme.opacity(0.7), lineWidth: 1.5)
+                            .opacity(isSelected ? 1 : 0)
                     )
-                    .frame(width: 48, height: 48)
 
                 // Emoji
                 Text(mood.emoji)

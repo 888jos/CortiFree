@@ -37,14 +37,7 @@ struct DailyTodosView: View {
                         }
                     }
                     .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.orange.opacity(0.2))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.orange.opacity(0.4), lineWidth: 1)
-                            )
-                    )
+                    .glassCard(cornerRadius: 16, tint: .orange)
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 12)
@@ -129,14 +122,7 @@ struct DailyTodosView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Color.orange.opacity(0.15))
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
-                    )
-            )
+            .glassCapsule(tint: .orange)
 
             // Progress bar
             if !viewModel.todos.isEmpty {
@@ -204,30 +190,26 @@ struct DailyTodosView: View {
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(.white)
                 .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(Color(hex: "1A1B3A").opacity(0.6))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .stroke(isInputFocused ? Color.appTheme : Color.white.opacity(0.1), lineWidth: 1)
-                        )
+                .glassCard(cornerRadius: 18)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(isInputFocused ? Color.appTheme : Color.clear, lineWidth: 1)
                 )
                 .focused($isInputFocused)
 
             Button(action: addTodo) {
                 Image(systemName: "paperplane.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(newTodoText.isEmpty ? Color.white.opacity(0.3) : Color.appTheme)
+                    .font(.system(size: 20))
+                    .foregroundColor(newTodoText.isEmpty ? Color.white.opacity(0.3) : .white)
+                    .frame(width: 52, height: 52)
+                    .contentShape(Circle())
             }
+            .buttonStyle(.plain)
+            .glassCircle(tint: newTodoText.isEmpty ? nil : Color.appTheme, interactive: true)
             .disabled(newTodoText.isEmpty)
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
-        .background(
-            Rectangle()
-                .fill(Color(hex: "1A1B3A").opacity(0.6))
-                .ignoresSafeArea(edges: .bottom)
-        )
     }
 
     private func addTodo() {
@@ -288,15 +270,8 @@ struct TodoRow: View {
                     .foregroundColor(Color(hex: "FF6B9D"))
             }
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(hex: "1A1B3A").opacity(0.6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
+        .padding(14)
+        .glassCard(cornerRadius: 18)
         .confirmationDialog("Supprimer cette tâche ?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
             Button("Supprimer", role: .destructive) {
                 onDelete()

@@ -11,17 +11,27 @@ import SwiftUI
 struct AddTaskManuallyView: View {
     let onDismiss: () -> Void
     @State private var taskTitle: String = ""
-    @State private var frequency: String = "1x/jour"
+    @State private var frequency: String = {
+        switch LanguageManager.shared.currentLanguage {
+        case .french: return "1x/jour"
+        case .english: return "1x/day"
+        case .spanish: return "1 vez al día"
+        case .german: return "1× täglich"
+        case .japanese: return "1日1回"
+        case .korean: return "하루 1회"
+        }
+    }()
     @State private var difficulty: Int = 2
 
-    private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-    }
-
     private var frequencyOptions: [String] {
-        isFrench
-            ? ["Tous les jours", "1x/jour", "2x/jour", "3x/semaine", "2x/semaine", "1x/semaine"]
-            : ["Every day", "1x/day", "2x/day", "3x/week", "2x/week", "1x/week"]
+        switch LanguageManager.shared.currentLanguage {
+        case .french: return ["Tous les jours", "1x/jour", "2x/jour", "3x/semaine", "2x/semaine", "1x/semaine"]
+        case .english: return ["Every day", "1x/day", "2x/day", "3x/week", "2x/week", "1x/week"]
+        case .spanish: return ["Todos los días", "1 vez al día", "2 veces al día", "3 veces por semana", "2 veces por semana", "1 vez por semana"]
+        case .german: return ["Jeden Tag", "1× täglich", "2× täglich", "3× pro Woche", "2× pro Woche", "1× pro Woche"]
+        case .japanese: return ["毎日", "1日1回", "1日2回", "週3回", "週2回", "週1回"]
+        case .korean: return ["매일", "하루 1회", "하루 2회", "주 3회", "주 2회", "주 1회"]
+        }
     }
 
     var body: some View {
@@ -44,7 +54,7 @@ struct AddTaskManuallyView: View {
 
                     Spacer()
 
-                    Text(isFrench ? "Nouvelle tâche" : "New Task")
+                    Text(LanguageManager.shared.localizedString(for: "inline.addtaskmanuallyview.00"))
                         .font(Font.Poppins.custom(.bold, size: 20))
                         .foregroundColor(.white)
 
@@ -61,11 +71,11 @@ struct AddTaskManuallyView: View {
                     VStack(spacing: 24) {
                         // Title input
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(isFrench ? "Titre de la tâche" : "Task Title")
+                            Text(LanguageManager.shared.localizedString(for: "inline.addtaskmanuallyview.01"))
                                 .font(.custom("Poppins-SemiBold", size: 14))
                                 .foregroundColor(.white)
 
-                            TextField(isFrench ? "Ex: Faire du yoga" : "Ex: Do yoga", text: $taskTitle)
+                            TextField(LanguageManager.shared.localizedString(for: "inline.addtaskmanuallyview.02"), text: $taskTitle)
                                 .font(.custom("Poppins-Regular", size: 16))
                                 .foregroundColor(.white)
                                 .padding(16)
@@ -82,7 +92,7 @@ struct AddTaskManuallyView: View {
 
                         // Frequency picker
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(isFrench ? "Fréquence" : "Frequency")
+                            Text(LanguageManager.shared.localizedString(for: "inline.addtaskmanuallyview.03"))
                                 .font(.custom("Poppins-SemiBold", size: 14))
                                 .foregroundColor(.white)
 
@@ -119,7 +129,7 @@ struct AddTaskManuallyView: View {
 
                         // Difficulty selector
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(isFrench ? "Difficulté" : "Difficulty")
+                            Text(LanguageManager.shared.localizedString(for: "inline.addtaskmanuallyview.04"))
                                 .font(.custom("Poppins-SemiBold", size: 14))
                                 .foregroundColor(.white)
 

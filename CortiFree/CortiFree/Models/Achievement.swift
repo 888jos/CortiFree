@@ -29,12 +29,12 @@ struct Achievement: Identifiable, Codable, Equatable {
 
     /// Localized title
     var title: String {
-        NSLocalizedString(titleKey, comment: "")
+        LanguageManager.shared.localizedString(for: titleKey)
     }
 
     /// Localized description
     var description: String {
-        NSLocalizedString(descriptionKey, comment: "")
+        LanguageManager.shared.localizedString(for: descriptionKey)
     }
 
     var englishTitle: String {

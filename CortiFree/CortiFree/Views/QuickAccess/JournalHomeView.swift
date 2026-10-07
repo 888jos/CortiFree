@@ -158,7 +158,7 @@ struct JournalHomeView: View {
             Spacer()
 
             VStack(spacing: 4) {
-                Text(NSLocalizedString("journal_home.title", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "journal_home.title"))
                     .font(Font.Poppins.custom(.bold, size: 20))
                     .foregroundColor(.white)
 
@@ -187,7 +187,7 @@ struct JournalHomeView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text(NSLocalizedString("journal_home.mood", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "journal_home.mood"))
                     .font(.custom("Poppins-SemiBold", size: 14))
                     .foregroundColor(.white)
             }
@@ -269,7 +269,7 @@ struct JournalHomeView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text(NSLocalizedString("journal_home.photo", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "journal_home.photo"))
                     .font(.custom("Poppins-SemiBold", size: 14))
                     .foregroundColor(.white)
             }
@@ -329,7 +329,7 @@ struct JournalHomeView: View {
                                     .font(.system(size: 24))
                                     .foregroundColor(Color(hex: "B794F6").opacity(0.6))
 
-                                Text(NSLocalizedString("journal_home.photo_add", comment: ""))
+                                Text(LanguageManager.shared.localizedString(for: "journal_home.photo_add"))
                                     .font(.custom("Poppins-Medium", size: 11))
                                     .foregroundColor(.white.opacity(0.5))
                             }
@@ -355,7 +355,7 @@ struct JournalHomeView: View {
                     .font(.system(size: 16))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text(NSLocalizedString("journal_home.my_day", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "journal_home.my_day"))
                     .font(.custom("Poppins-SemiBold", size: 16))
                     .foregroundColor(.white)
 
@@ -383,7 +383,7 @@ struct JournalHomeView: View {
 
                 // Placeholder
                 if journalText.isEmpty {
-                    Text(NSLocalizedString("journal_home.placeholder", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "journal_home.placeholder"))
                         .font(.custom("Poppins-Regular", size: 15))
                         .foregroundColor(.white.opacity(0.4))
                         .padding(.horizontal, 20)
@@ -398,7 +398,7 @@ struct JournalHomeView: View {
                     Text("\(characterCount)")
                         .font(.custom("Poppins-SemiBold", size: 13))
                         .foregroundColor(Color(hex: "B794F6"))
-                    Text(NSLocalizedString("journal_home.characters", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "journal_home.characters"))
                         .font(.custom("Poppins-Regular", size: 13))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -411,7 +411,7 @@ struct JournalHomeView: View {
                     Text("\(wordCount)")
                         .font(.custom("Poppins-SemiBold", size: 13))
                         .foregroundColor(Color(hex: "B794F6"))
-                    Text(NSLocalizedString("journal_home.words", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "journal_home.words"))
                         .font(.custom("Poppins-Regular", size: 13))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -438,7 +438,7 @@ struct JournalHomeView: View {
                 Image(systemName: isToday && todayEntry != nil ? "arrow.triangle.2.circlepath" : "checkmark.circle.fill")
                     .font(.system(size: 20))
 
-                Text(isToday && todayEntry != nil ? NSLocalizedString("journal_home.update", comment: "") : NSLocalizedString("journal_home.save", comment: ""))
+                Text(isToday && todayEntry != nil ? LanguageManager.shared.localizedString(for: "journal_home.update") : LanguageManager.shared.localizedString(for: "journal_home.save"))
                     .font(.custom("Poppins-SemiBold", size: 16))
             }
             .foregroundColor(.white)
@@ -476,7 +476,7 @@ struct JournalHomeView: View {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 14))
 
-                Text(NSLocalizedString("journal_home.view_past_entries", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "journal_home.view_past_entries"))
                     .font(.custom("Poppins-Medium", size: 14))
             }
             .foregroundColor(Color(hex: "B794F6"))
@@ -498,7 +498,7 @@ struct JournalHomeView: View {
                     .font(.system(size: 60))
                     .foregroundColor(Color(hex: "10B981"))
 
-                Text(isToday && todayEntry != nil ? NSLocalizedString("journal_home.entry_updated", comment: "") : NSLocalizedString("journal_home.entry_saved", comment: ""))
+                Text(isToday && todayEntry != nil ? LanguageManager.shared.localizedString(for: "journal_home.entry_updated") : LanguageManager.shared.localizedString(for: "journal_home.entry_saved"))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }

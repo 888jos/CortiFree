@@ -74,6 +74,10 @@ fastlane/test_output
 # .env
 functions/node_modules/
 functions/.env*
+.env.local
+node_modules/
+convex/.env*
+migration/private/
 
 # Claude Code
 .claude/
@@ -81,3 +85,9 @@ functions/.env*
 # Temporary files
 *.log
 *.tmp
+
+# Local build artifacts
+.build-dd/
+.build-log.txt
+.build.sh
+.build.lock

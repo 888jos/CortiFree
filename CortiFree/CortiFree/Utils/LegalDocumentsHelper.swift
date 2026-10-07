@@ -25,14 +25,13 @@ enum LegalDocument {
     }
 
     var displayName: String {
-        let isFrench = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
         switch self {
         case .privacy:
-            return isFrench ? "Politique de Confidentialité" : "Privacy Policy"
+            return LanguageManager.shared.localizedString(for: "inline.legaldocumentshelper.00")
         case .terms:
-            return isFrench ? "Conditions Générales d'Utilisation" : "Terms of Use"
+            return LanguageManager.shared.localizedString(for: "inline.legaldocumentshelper.01")
         case .legalNotice:
-            return isFrench ? "Mentions Légales" : "Legal Notice"
+            return LanguageManager.shared.localizedString(for: "inline.legaldocumentshelper.02")
         }
     }
 }

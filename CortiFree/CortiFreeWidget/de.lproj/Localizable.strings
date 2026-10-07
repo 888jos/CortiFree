@@ -1,0 +1,16 @@
+/* Generated from the English CortiFree localization. */
+"widget.description" = "Ihre täglichen Aufgaben";
+"widget.lockscreen.display_name" = "Cortifrei";
+"widget.display_name" = "Cortifrei";
+"widget.day" = "Tag";
+"widget.footer.low" = "%d%% fertig, es ist ein Anfang!";
+"widget.program" = "CORTIFRE PROGRAMM";
+"widget.footer.almost" = "%d%% fertig, die Ziellinie ist nahe";
+"widget.lockscreen.description" = "CortiFree vom Sperrbildschirm öffnen";
+"widget.day_of" = "/66";
+"widget.footer.high" = "%d%% fertig, du bist auf halbem Weg!";
+"widget.footer.perfect" = "100%% fertig, perfekter Tag ✦";
+"widget.empty" = "Keine Aufgaben für heute";
+"widget.tasks" = "Aufgaben";
+"widget.footer.mid" = "%d%% fertig, Sie sind auf dem richtigen Weg";
+"widget.footer.zero" = "0%% fertig, fangen Sie an!";

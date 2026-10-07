@@ -7,6 +7,8 @@ final class ProgressAnalyticsService {
 
     private let db = Firestore.firestore()
     private let calendar = Calendar.current
+    private var dashboardCache: [String: (loadedAt: Date, value: ProgressDashboardData)] = [:]
+    private let dashboardCacheInterval: TimeInterval = 30
 
     private init() {}
 
@@ -50,9 +52,14 @@ final class ProgressAnalyticsService {
             .collection("completed_tasks")
             .document(documentID)
             .setData(data, merge: true)
+
+        dashboardCache.removeValue(forKey: userID)
     }
 
     func fetchDashboard(userID: String, now: Date = Date()) async throws -> ProgressDashboardData {
+        if let cached = dashboardCache[userID], now.timeIntervalSince(cached.loadedAt) < dashboardCacheInterval {
+            return cached.value
+        }
         guard Auth.auth().currentUser != nil else {
             return fetchLocalDashboard(userID: userID, now: now)
         }
@@ -167,26 +174,19 @@ final class ProgressAnalyticsService {
             currentStartDate: lastSevenDaysStart,
             previousStartDate: previousSevenDaysStart
         )
-        let scoreJourney = parseScoreJourney(
-            userDocument.data() ?? [:],
-            programStartDate: programStartDate,
-            now: now
-        )
-        let scoreDomainTrends = parseDomainTrends(userDocument.data() ?? [:], now: now)
 
-        return ProgressDashboardData(
+        let dashboard = ProgressDashboardData(
             generatedAt: now,
             programStartDate: programStartDate,
             days: days,
             currentStreak: currentStreak,
             bestStreak: max(storedBest, streaks.best),
             activities: activityMetrics,
-            domainTrends: scoreDomainTrends.isEmpty ? checkInTrends : scoreDomainTrends,
-            topActivity: topActivity,
-            baselineScore: scoreJourney.baseline,
-            currentScore: scoreJourney.current,
-            scoreHistory: scoreJourney.history
+            domainTrends: checkInTrends,
+            topActivity: topActivity
         )
+        dashboardCache[userID] = (now, dashboard)
+        return dashboard
     }
 
     private func fetchLocalDashboard(userID: String, now: Date) -> ProgressDashboardData {
@@ -221,10 +221,6 @@ final class ProgressAnalyticsService {
             exerciseRecords: exerciseRecords,
             taskDurations: completedTaskData.durationSecondsByCategory
         )
-        let score = LocalScoreStore.current() ?? LocalScoreStore.baseline()
-        let baseline = LocalScoreStore.baseline()
-        let domainTrends = localDomainTrends(baseline: baseline, current: score)
-
         return ProgressDashboardData(
             generatedAt: now,
             programStartDate: programStartDate,
@@ -232,16 +228,10 @@ final class ProgressAnalyticsService {
             currentStreak: max(streaks.current, UserPersistence.streakDays),
             bestStreak: max(streaks.best, UserPersistence.bestStreak),
             activities: activityMetrics,
-            domainTrends: domainTrends,
+            domainTrends: [],
             topActivity: activityMetrics
                 .filter { $0.sessionCount > 0 }
-                .max(by: { $0.sessionCount < $1.sessionCount })?.category,
-            baselineScore: baseline?.global,
-            currentScore: score?.global,
-            scoreHistory: score.map {
-                [ProgressScorePoint(date: calendar.startOfDay(for: programStartDate), score: baseline?.global ?? $0.global),
-                 ProgressScorePoint(date: today, score: $0.global)]
-            } ?? []
+                .max(by: { $0.sessionCount < $1.sessionCount })?.category
         )
     }
 
@@ -525,102 +515,6 @@ final class ProgressAnalyticsService {
                 sessionCount: taskCounts[category, default: 0] + records.count
             )
         }
-    }
-
-    private func parseDomainTrends(_ data: [String: Any], now: Date) -> [ProgressDomainTrend] {
-        guard let current = data["currentDomainScores"] as? [String: Any] else { return [] }
-        let baseline = data["domainScores"] as? [String: Any]
-        let history = data["domainScoreHistory"] as? [String: Any] ?? [:]
-        let comparisonDate = calendar.date(byAdding: .day, value: -7, to: now) ?? now
-        let formatter = DateFormatter()
-        formatter.calendar = calendar
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd"
-
-        let previousEntry = history.compactMap { key, value -> (Date, [String: Any])? in
-            guard let date = formatter.date(from: key), date <= comparisonDate,
-                  let scores = value as? [String: Any] else { return nil }
-            return (date, scores)
-        }.max(by: { $0.0 < $1.0 })?.1
-
-        return ProgressDomainTrend.Domain.allCases.compactMap { domain in
-            guard let currentValue = number(current[domain.rawValue]) else { return nil }
-            return ProgressDomainTrend(
-                domain: domain,
-                currentValue: currentValue,
-                previousValue: previousEntry.flatMap { number($0[domain.rawValue]) },
-                dayOneValue: baseline.flatMap { number($0[domain.rawValue]) }
-            )
-        }
-    }
-
-    private func localDomainTrends(
-        baseline: UserDomainScores?,
-        current: UserDomainScores?
-    ) -> [ProgressDomainTrend] {
-        guard let current else { return [] }
-
-        let values: [(ProgressDomainTrend.Domain, Double, Double?)] = [
-            (.serenity, current.serenity, baseline?.serenity),
-            (.sleep, current.sleep, baseline?.sleep),
-            (.energy, current.energy, baseline?.energy),
-            (.focus, current.focus, baseline?.focus),
-            (.balance, current.balance, baseline?.balance)
-        ]
-
-        return values.map { domain, value, dayOne in
-            ProgressDomainTrend(domain: domain, currentValue: value, dayOneValue: dayOne)
-        }
-    }
-
-    private func parseScoreJourney(
-        _ data: [String: Any],
-        programStartDate: Date,
-        now: Date
-    ) -> (baseline: Double?, current: Double?, history: [ProgressScorePoint]) {
-        let baselineData = data["domainScores"] as? [String: Any]
-        let currentData = data["currentDomainScores"] as? [String: Any]
-        let rawHistory = data["domainScoreHistory"] as? [String: Any] ?? [:]
-        let formatter = DateFormatter()
-        formatter.calendar = calendar
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd"
-
-        var history = rawHistory.compactMap { key, value -> ProgressScorePoint? in
-            guard let date = formatter.date(from: key),
-                  date >= calendar.startOfDay(for: programStartDate),
-                  date <= now,
-                  let scores = value as? [String: Any],
-                  let score = number(scores["global"]) else { return nil }
-            return ProgressScorePoint(date: date, score: normalizedScore(score))
-        }
-        .sorted { $0.date < $1.date }
-
-        let baseline = number(baselineData?["global"])
-            .map(normalizedScore)
-            ?? history.first?.score
-        let current = number(currentData?["global"])
-            .map(normalizedScore)
-            ?? history.last?.score
-            ?? baseline
-
-        if let baseline,
-           history.first.map({ !calendar.isDate($0.date, inSameDayAs: programStartDate) }) ?? true {
-            history.insert(
-                ProgressScorePoint(date: calendar.startOfDay(for: programStartDate), score: baseline),
-                at: 0
-            )
-        }
-        if let current,
-           history.last.map({ !calendar.isDate($0.date, inSameDayAs: now) }) ?? true {
-            history.append(ProgressScorePoint(date: calendar.startOfDay(for: now), score: current))
-        }
-
-        return (baseline, current, history)
-    }
-
-    private func normalizedScore(_ score: Double) -> Double {
-        min(100, max(0, score))
     }
 
     private func parseCheckInTrends(

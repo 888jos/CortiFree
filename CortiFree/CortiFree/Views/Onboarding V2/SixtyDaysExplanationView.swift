@@ -110,46 +110,43 @@ struct SixtyDaysExplanationView: View {
                         VStack(spacing: 8) {
                             ScientificLinkRow(
                                 logoImage: "logo_psycnet",
-                                title: "How are habits formed: Modelling habit formation...",
+                                title: "onboarding_v2.sixty_days.source_1".localized,
                                 source: "psycnet.apa.org"
                             )
 
                             ScientificLinkRow(
                                 logoImage: "logo_nih",
-                                title: "Making health habitual: the psychology of habit...",
+                                title: "onboarding_v2.sixty_days.source_2".localized,
                                 source: "pmc.ncbi.nlm.nih.gov"
                             )
 
                             ScientificLinkRow(
                                 logoImage: "logo_nih",
-                                title: "Time to Form a Habit: A Systematic Review and...",
+                                title: "onboarding_v2.sixty_days.source_3".localized,
                                 source: "pubmed.ncbi.nlm.nih.gov"
                             )
 
                             ScientificLinkRow(
                                 logoImage: "logo_ucl",
-                                title: "How long does it really take to form a habit...",
+                                title: "onboarding_v2.sixty_days.source_4".localized,
                                 source: "blogs.ucl.ac.uk"
                             )
 
                             ScientificLinkRow(
                                 logoImage: "logo_nih",
-                                title: "'Little by Little' Supports Habit Formation...",
+                                title: "onboarding_v2.sixty_days.source_5".localized,
                                 source: "nihrecord.nih.gov"
                             )
 
                             ScientificLinkRow(
                                 logoImage: "logo_guardian",
-                                title: "66 days to build better sleep habits research...",
+                                title: "onboarding_v2.sixty_days.source_6".localized,
                                 source: "theguardian.com"
                             )
                         }
                     }
                     .padding(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
+                    .glassCard(cornerRadius: 16)
                     .padding(.horizontal, 24)
                     .padding(.bottom, 120)
                 }
@@ -165,7 +162,7 @@ struct SixtyDaysExplanationView: View {
                     // Track continue with time spent
                     if let startTime = screenViewTime {
                         let timeSpent = Date().timeIntervalSince(startTime)
-                        MixpanelManager.shared.trackOnboardingSixtyDaysExplanationContinue(timeSpent: timeSpent)
+                        AnalyticsManager.shared.trackOnboardingSixtyDaysExplanationContinue(timeSpent: timeSpent)
                     }
 
                     onContinue()
@@ -181,17 +178,8 @@ struct SixtyDaysExplanationView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 28)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "B794F6"), Color(hex: "D4B4FF")],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
                 }
+                .buttonStyle(.glassPrimary)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
@@ -199,7 +187,7 @@ struct SixtyDaysExplanationView: View {
         .ignoresSafeArea()
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingSixtyDaysExplanationViewed()
+            AnalyticsManager.shared.trackOnboardingSixtyDaysExplanationViewed()
         }
     }
 }
@@ -231,19 +219,7 @@ struct BenefitStatCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: "B794F6").opacity(0.2),
-                            Color(hex: "B794F6").opacity(0.4)
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-        )
+        .glassCard(cornerRadius: 16, tint: color)
     }
 }
 

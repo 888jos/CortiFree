@@ -22,12 +22,12 @@ enum StressSituation: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .overwhelmed: return NSLocalizedString("antistress.situation.overwhelmed", comment: "")
-        case .insomnia: return NSLocalizedString("antistress.situation.insomnia", comment: "")
-        case .physicalTension: return NSLocalizedString("antistress.situation.physical_tension", comment: "")
-        case .beforeEvent: return NSLocalizedString("antistress.situation.before_event", comment: "")
-        case .anxiety: return NSLocalizedString("antistress.situation.anxiety", comment: "")
-        case .needEnergy: return NSLocalizedString("antistress.situation.need_energy", comment: "")
+        case .overwhelmed: return LanguageManager.shared.localizedString(for: "antistress.situation.overwhelmed")
+        case .insomnia: return LanguageManager.shared.localizedString(for: "antistress.situation.insomnia")
+        case .physicalTension: return LanguageManager.shared.localizedString(for: "antistress.situation.physical_tension")
+        case .beforeEvent: return LanguageManager.shared.localizedString(for: "antistress.situation.before_event")
+        case .anxiety: return LanguageManager.shared.localizedString(for: "antistress.situation.anxiety")
+        case .needEnergy: return LanguageManager.shared.localizedString(for: "antistress.situation.need_energy")
         }
     }
 
@@ -81,41 +81,41 @@ enum AntiStressExerciseType: String, Codable {
 
     var displayName: String {
         switch self {
-        case .guidedBreathing: return NSLocalizedString("antistress.exercise.guided_breathing", comment: "")
-        case .grounding5Senses: return NSLocalizedString("antistress.exercise.grounding_5_senses", comment: "")
-        case .consciousStretching: return NSLocalizedString("antistress.exercise.conscious_stretching", comment: "")
-        case .cardiacCoherence: return NSLocalizedString("antistress.exercise.cardiac_coherence", comment: "")
-        case .audioRelaxation: return NSLocalizedString("antistress.exercise.audio_relaxation", comment: "")
-        case .bodyScan: return NSLocalizedString("antistress.exercise.body_scan", comment: "")
-        case .boxBreathing: return NSLocalizedString("antistress.exercise.box_breathing", comment: "")
-        case .anchoring54321: return NSLocalizedString("antistress.exercise.anchoring_54321", comment: "")
-        case .positiveMantra: return NSLocalizedString("antistress.exercise.positive_mantra", comment: "")
-        case .visualMicroBreak: return NSLocalizedString("antistress.exercise.visual_micro_break", comment: "")
-        case .alternateBreathing: return NSLocalizedString("antistress.exercise.alternate_breathing", comment: "")
-        case .slowWalk: return NSLocalizedString("antistress.exercise.slow_walk", comment: "")
-        case .consciousBreathing: return NSLocalizedString("antistress.exercise.conscious_breathing", comment: "")
-        case .meditation2Min: return NSLocalizedString("antistress.exercise.meditation_2_min", comment: "")
-        case .whiteNoise: return NSLocalizedString("antistress.exercise.white_noise", comment: "")
+        case .guidedBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.guided_breathing")
+        case .grounding5Senses: return LanguageManager.shared.localizedString(for: "antistress.exercise.grounding_5_senses")
+        case .consciousStretching: return LanguageManager.shared.localizedString(for: "antistress.exercise.conscious_stretching")
+        case .cardiacCoherence: return LanguageManager.shared.localizedString(for: "antistress.exercise.cardiac_coherence")
+        case .audioRelaxation: return LanguageManager.shared.localizedString(for: "antistress.exercise.audio_relaxation")
+        case .bodyScan: return LanguageManager.shared.localizedString(for: "antistress.exercise.body_scan")
+        case .boxBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.box_breathing")
+        case .anchoring54321: return LanguageManager.shared.localizedString(for: "antistress.exercise.anchoring_54321")
+        case .positiveMantra: return LanguageManager.shared.localizedString(for: "antistress.exercise.positive_mantra")
+        case .visualMicroBreak: return LanguageManager.shared.localizedString(for: "antistress.exercise.visual_micro_break")
+        case .alternateBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.alternate_breathing")
+        case .slowWalk: return LanguageManager.shared.localizedString(for: "antistress.exercise.slow_walk")
+        case .consciousBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.conscious_breathing")
+        case .meditation2Min: return LanguageManager.shared.localizedString(for: "antistress.exercise.meditation_2_min")
+        case .whiteNoise: return LanguageManager.shared.localizedString(for: "antistress.exercise.white_noise")
         }
     }
 
     var description: String {
         switch self {
-        case .guidedBreathing: return NSLocalizedString("antistress.exercise.guided_breathing.desc", comment: "")
-        case .grounding5Senses: return NSLocalizedString("antistress.exercise.grounding_5_senses.desc", comment: "")
-        case .consciousStretching: return NSLocalizedString("antistress.exercise.conscious_stretching.desc", comment: "")
-        case .cardiacCoherence: return NSLocalizedString("antistress.exercise.cardiac_coherence.desc", comment: "")
-        case .audioRelaxation: return NSLocalizedString("antistress.exercise.audio_relaxation.desc", comment: "")
-        case .bodyScan: return NSLocalizedString("antistress.exercise.body_scan.desc", comment: "")
-        case .boxBreathing: return NSLocalizedString("antistress.exercise.box_breathing.desc", comment: "")
-        case .anchoring54321: return NSLocalizedString("antistress.exercise.anchoring_54321.desc", comment: "")
-        case .positiveMantra: return NSLocalizedString("antistress.exercise.positive_mantra.desc", comment: "")
-        case .visualMicroBreak: return NSLocalizedString("antistress.exercise.visual_micro_break.desc", comment: "")
-        case .alternateBreathing: return NSLocalizedString("antistress.exercise.alternate_breathing.desc", comment: "")
-        case .slowWalk: return NSLocalizedString("antistress.exercise.slow_walk.desc", comment: "")
-        case .consciousBreathing: return NSLocalizedString("antistress.exercise.conscious_breathing.desc", comment: "")
-        case .meditation2Min: return NSLocalizedString("antistress.exercise.meditation_2_min.desc", comment: "")
-        case .whiteNoise: return NSLocalizedString("antistress.exercise.white_noise.desc", comment: "")
+        case .guidedBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.guided_breathing.desc")
+        case .grounding5Senses: return LanguageManager.shared.localizedString(for: "antistress.exercise.grounding_5_senses.desc")
+        case .consciousStretching: return LanguageManager.shared.localizedString(for: "antistress.exercise.conscious_stretching.desc")
+        case .cardiacCoherence: return LanguageManager.shared.localizedString(for: "antistress.exercise.cardiac_coherence.desc")
+        case .audioRelaxation: return LanguageManager.shared.localizedString(for: "antistress.exercise.audio_relaxation.desc")
+        case .bodyScan: return LanguageManager.shared.localizedString(for: "antistress.exercise.body_scan.desc")
+        case .boxBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.box_breathing.desc")
+        case .anchoring54321: return LanguageManager.shared.localizedString(for: "antistress.exercise.anchoring_54321.desc")
+        case .positiveMantra: return LanguageManager.shared.localizedString(for: "antistress.exercise.positive_mantra.desc")
+        case .visualMicroBreak: return LanguageManager.shared.localizedString(for: "antistress.exercise.visual_micro_break.desc")
+        case .alternateBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.alternate_breathing.desc")
+        case .slowWalk: return LanguageManager.shared.localizedString(for: "antistress.exercise.slow_walk.desc")
+        case .consciousBreathing: return LanguageManager.shared.localizedString(for: "antistress.exercise.conscious_breathing.desc")
+        case .meditation2Min: return LanguageManager.shared.localizedString(for: "antistress.exercise.meditation_2_min.desc")
+        case .whiteNoise: return LanguageManager.shared.localizedString(for: "antistress.exercise.white_noise.desc")
         }
     }
 
@@ -259,19 +259,19 @@ extension AntiStressExerciseType {
     var detailedDescription: String {
         switch self {
         case .slowWalk:
-            return NSLocalizedString("antistress.slow_walk.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.slow_walk.detailed_description")
         case .consciousStretching:
-            return NSLocalizedString("antistress.conscious_stretching.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.detailed_description")
         case .audioRelaxation:
-            return NSLocalizedString("antistress.audio_relaxation.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.detailed_description")
         case .whiteNoise:
-            return NSLocalizedString("antistress.white_noise.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.white_noise.detailed_description")
         case .positiveMantra:
-            return NSLocalizedString("antistress.positive_mantra.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.positive_mantra.detailed_description")
         case .visualMicroBreak:
-            return NSLocalizedString("antistress.visual_micro_break.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.detailed_description")
         default:
-            return NSLocalizedString("antistress.default.detailed_description", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.default.detailed_description")
         }
     }
 
@@ -279,45 +279,45 @@ extension AntiStressExerciseType {
         switch self {
         case .slowWalk:
             return [
-                NSLocalizedString("antistress.slow_walk.benefit_1", comment: ""),
-                NSLocalizedString("antistress.slow_walk.benefit_2", comment: ""),
-                NSLocalizedString("antistress.slow_walk.benefit_3", comment: ""),
-                NSLocalizedString("antistress.slow_walk.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.slow_walk.benefit_1"),
+                LanguageManager.shared.localizedString(for: "antistress.slow_walk.benefit_2"),
+                LanguageManager.shared.localizedString(for: "antistress.slow_walk.benefit_3"),
+                LanguageManager.shared.localizedString(for: "antistress.slow_walk.benefit_4")
             ]
         case .consciousStretching:
             return [
-                NSLocalizedString("antistress.conscious_stretching.benefit_1", comment: ""),
-                NSLocalizedString("antistress.conscious_stretching.benefit_2", comment: ""),
-                NSLocalizedString("antistress.conscious_stretching.benefit_3", comment: ""),
-                NSLocalizedString("antistress.conscious_stretching.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.benefit_1"),
+                LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.benefit_2"),
+                LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.benefit_3"),
+                LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.benefit_4")
             ]
         case .audioRelaxation:
             return [
-                NSLocalizedString("antistress.audio_relaxation.benefit_1", comment: ""),
-                NSLocalizedString("antistress.audio_relaxation.benefit_2", comment: ""),
-                NSLocalizedString("antistress.audio_relaxation.benefit_3", comment: ""),
-                NSLocalizedString("antistress.audio_relaxation.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.benefit_1"),
+                LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.benefit_2"),
+                LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.benefit_3"),
+                LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.benefit_4")
             ]
         case .whiteNoise:
             return [
-                NSLocalizedString("antistress.white_noise.benefit_1", comment: ""),
-                NSLocalizedString("antistress.white_noise.benefit_2", comment: ""),
-                NSLocalizedString("antistress.white_noise.benefit_3", comment: ""),
-                NSLocalizedString("antistress.white_noise.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.white_noise.benefit_1"),
+                LanguageManager.shared.localizedString(for: "antistress.white_noise.benefit_2"),
+                LanguageManager.shared.localizedString(for: "antistress.white_noise.benefit_3"),
+                LanguageManager.shared.localizedString(for: "antistress.white_noise.benefit_4")
             ]
         case .positiveMantra:
             return [
-                NSLocalizedString("antistress.positive_mantra.benefit_1", comment: ""),
-                NSLocalizedString("antistress.positive_mantra.benefit_2", comment: ""),
-                NSLocalizedString("antistress.positive_mantra.benefit_3", comment: ""),
-                NSLocalizedString("antistress.positive_mantra.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.positive_mantra.benefit_1"),
+                LanguageManager.shared.localizedString(for: "antistress.positive_mantra.benefit_2"),
+                LanguageManager.shared.localizedString(for: "antistress.positive_mantra.benefit_3"),
+                LanguageManager.shared.localizedString(for: "antistress.positive_mantra.benefit_4")
             ]
         case .visualMicroBreak:
             return [
-                NSLocalizedString("antistress.visual_micro_break.benefit_1", comment: ""),
-                NSLocalizedString("antistress.visual_micro_break.benefit_2", comment: ""),
-                NSLocalizedString("antistress.visual_micro_break.benefit_3", comment: ""),
-                NSLocalizedString("antistress.visual_micro_break.benefit_4", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.benefit_1"),
+                LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.benefit_2"),
+                LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.benefit_3"),
+                LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.benefit_4")
             ]
         default:
             return []
@@ -328,67 +328,67 @@ extension AntiStressExerciseType {
         switch self {
         case .slowWalk:
             return [
-                NSLocalizedString("antistress.slow_walk.evidence_1", comment: ""),
-                NSLocalizedString("antistress.slow_walk.evidence_2", comment: ""),
-                NSLocalizedString("antistress.slow_walk.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.slow_walk.evidence_1"),
+                LanguageManager.shared.localizedString(for: "antistress.slow_walk.evidence_2"),
+                LanguageManager.shared.localizedString(for: "antistress.slow_walk.evidence_3")
             ]
         case .consciousStretching:
             return [
-                NSLocalizedString("antistress.conscious_stretching.evidence_1", comment: ""),
-                NSLocalizedString("antistress.conscious_stretching.evidence_2", comment: ""),
-                NSLocalizedString("antistress.conscious_stretching.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.evidence_1"),
+                LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.evidence_2"),
+                LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.evidence_3")
             ]
         case .audioRelaxation:
             return [
-                NSLocalizedString("antistress.audio_relaxation.evidence_1", comment: ""),
-                NSLocalizedString("antistress.audio_relaxation.evidence_2", comment: ""),
-                NSLocalizedString("antistress.audio_relaxation.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.evidence_1"),
+                LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.evidence_2"),
+                LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.evidence_3")
             ]
         case .whiteNoise:
             return [
-                NSLocalizedString("antistress.white_noise.evidence_1", comment: ""),
-                NSLocalizedString("antistress.white_noise.evidence_2", comment: ""),
-                NSLocalizedString("antistress.white_noise.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.white_noise.evidence_1"),
+                LanguageManager.shared.localizedString(for: "antistress.white_noise.evidence_2"),
+                LanguageManager.shared.localizedString(for: "antistress.white_noise.evidence_3")
             ]
         case .positiveMantra:
             return [
-                NSLocalizedString("antistress.positive_mantra.evidence_1", comment: ""),
-                NSLocalizedString("antistress.positive_mantra.evidence_2", comment: ""),
-                NSLocalizedString("antistress.positive_mantra.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.positive_mantra.evidence_1"),
+                LanguageManager.shared.localizedString(for: "antistress.positive_mantra.evidence_2"),
+                LanguageManager.shared.localizedString(for: "antistress.positive_mantra.evidence_3")
             ]
         case .visualMicroBreak:
             return [
-                NSLocalizedString("antistress.visual_micro_break.evidence_1", comment: ""),
-                NSLocalizedString("antistress.visual_micro_break.evidence_2", comment: ""),
-                NSLocalizedString("antistress.visual_micro_break.evidence_3", comment: "")
+                LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.evidence_1"),
+                LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.evidence_2"),
+                LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.evidence_3")
             ]
         default:
-            return [NSLocalizedString("antistress.default.evidence", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.default.evidence")]
         }
     }
 
     var scientificSources: [String] {
         switch self {
         case .slowWalk:
-            return [NSLocalizedString("antistress.slow_walk.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.slow_walk.source")]
         case .consciousStretching:
-            return [NSLocalizedString("antistress.conscious_stretching.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.source")]
         case .audioRelaxation:
-            return [NSLocalizedString("antistress.audio_relaxation.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.source")]
         case .whiteNoise:
-            return [NSLocalizedString("antistress.white_noise.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.white_noise.source")]
         case .positiveMantra:
-            return [NSLocalizedString("antistress.positive_mantra.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.positive_mantra.source")]
         case .visualMicroBreak:
-            return [NSLocalizedString("antistress.visual_micro_break.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.source")]
         case .bodyScan:
-            return [NSLocalizedString("antistress.body_scan.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.body_scan.source")]
         case .grounding5Senses:
-            return [NSLocalizedString("antistress.grounding_5_senses.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.grounding_5_senses.source")]
         case .anchoring54321:
-            return [NSLocalizedString("antistress.anchoring_54321.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.source")]
         default:
-            return [NSLocalizedString("antistress.default.source", comment: "")]
+            return [LanguageManager.shared.localizedString(for: "antistress.default.source")]
         }
     }
 

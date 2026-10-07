@@ -292,7 +292,7 @@ struct SimpleAnswerButton: View {
         Button(action: onTap) {
             HStack {
                 Circle()
-                    .fill(isSelected ? Color(hex: "FF6B9D") : Color.white.opacity(0.2))
+                    .fill(isSelected ? Color(hex: "B794F6") : Color.white.opacity(0.2))
                     .frame(width: 20, height: 20)
                     .overlay(
                         isSelected ?
@@ -309,9 +309,11 @@ struct SimpleAnswerButton: View {
             }
             .padding(.horizontal, 16)
             .frame(height: 52)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white.opacity(isSelected ? 0.15 : 0.08))
+            .glassCard(cornerRadius: 14, tint: isSelected ? Color(hex: "B794F6") : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(Color(hex: "B794F6"), lineWidth: 1.5)
+                    .opacity(isSelected ? 1 : 0)
             )
         }
         .buttonStyle(PlainButtonStyle())

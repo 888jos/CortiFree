@@ -4,8 +4,8 @@ struct ProgressDashboardView: View {
     @StateObject private var viewModel = ProgressViewModel()
     @ObservedObject private var achievementService = AchievementService.shared
     @ObservedObject private var habitBadgeService = HabitBadgeService.shared
+    @ObservedObject private var planStore = PersonalPlanStore.shared
     @State private var showAchievements = false
-    @State private var selectedDomain: ProgressDomainTrend.Domain = .serenity
 
     var body: some View {
         ZStack {
@@ -19,10 +19,10 @@ struct ProgressDashboardView: View {
                         loadingState
                     } else {
                         overview
-                        scoreJourneySection
+                        journeySection
                         ProgressPhotosSection()
                         trendSection
-                        calendarSection
+                        checkInTrackerSection
                         activitySection
                         milestoneSection
 
@@ -43,8 +43,9 @@ struct ProgressDashboardView: View {
             }
         }
         .onAppear {
-            MixpanelManager.shared.track(event: "progress_tab_opened")
+            AnalyticsManager.shared.track(event: "progress_tab_opened")
             Task {
+                await planStore.ensurePlan()
                 await viewModel.refresh()
                 await achievementService.loadAchievements()
                 await habitBadgeService.loadHabitBadges()
@@ -275,166 +276,35 @@ struct ProgressDashboardView: View {
         achievementService.totalCount + habitBadgeService.totalBadgesCount
     }
 
-    private var scoreJourneySection: some View {
+    private var journeySection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionTitle("progress.journey.title".localized, icon: "chart.line.uptrend.xyaxis")
+            sectionTitle(planStore.plan?.localizedTitle ?? "plan.progress.title".localized, icon: "chart.line.uptrend.xyaxis")
 
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("progress.journey.score".localized)
-                            .font(.faroRegular(11))
-                            .foregroundColor(.white.opacity(0.58))
-                        Text(scoreText(viewModel.data.currentScore))
-                            .font(.faroBold(34))
-                            .foregroundColor(.white)
-                    }
-
-                    Spacer()
-
-                    if let scoreChange {
-                        Label(
-                            String(format: "%+.0f", scoreChange),
-                            systemImage: scoreChange >= 0 ? "arrow.up.right" : "arrow.down.right"
-                        )
-                        .font(.faroSemiBold(13))
+            VStack(alignment: .leading, spacing: 9) {
+                HStack {
+                    Text(String.localizedStringWithFormat("plan.progress.day_count".localized, programDay))
+                        .font(.faroSemiBold(12))
                         .foregroundColor(.white)
-                    }
-                }
-
-                if viewModel.data.scoreHistory.isEmpty {
-                    inlineEmptyState(icon: "chart.line.uptrend.xyaxis", text: "progress.journey.empty".localized)
-                        .frame(height: 100)
-                } else {
-                    ScoreJourneyChart(points: viewModel.data.scoreHistory)
-                        .frame(height: 112)
-
-                    HStack {
-                        scoreEndpoint(
-                            "progress.journey.day_one".localized,
-                            value: scoreText(viewModel.data.baselineScore)
-                        )
-                        Spacer()
-                        scoreEndpoint(
-                            "progress.journey.today".localized,
-                            value: scoreText(viewModel.data.currentScore),
-                            alignment: .trailing
-                        )
-                    }
-                }
-
-                Divider().overlay(.white.opacity(0.1))
-
-                VStack(alignment: .leading, spacing: 9) {
-                    HStack {
-                        Text("progress.journey.program".localized)
-                            .font(.faroSemiBold(12))
-                            .foregroundColor(.white)
-                        Spacer()
-                        Text(String.localizedStringWithFormat("progress.journey.day_count".localized, programDay))
-                            .font(.faroRegular(11))
-                            .foregroundColor(.white.opacity(0.62))
-                    }
-
-                    GeometryReader { geometry in
-                        ZStack(alignment: .leading) {
-                            Capsule().fill(.white.opacity(0.1))
-                            Capsule()
-                                .fill(Color(hex: "B794F6"))
-                                .frame(width: geometry.size.width * programProgress)
-                        }
-                    }
-                    .frame(height: 7)
-                }
-
-                Divider().overlay(.white.opacity(0.1))
-
-                domainProgressSection
-            }
-            .padding(16)
-            .background { progressCardBackground }
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.08), lineWidth: 1))
-        }
-    }
-
-    private var domainProgressSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .center) {
-                Text("progress.journey.domains_title".localized)
-                    .font(.faroSemiBold(13))
-                    .foregroundColor(.white)
-
-                Spacer()
-
-                Menu {
-                    ForEach(ProgressDomainTrend.Domain.allCases, id: \.self) { domain in
-                        Button {
-                            selectedDomain = domain
-                        } label: {
-                            Label(domainTitle(domain), systemImage: domainIcon(domain))
-                        }
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: domainIcon(selectedDomain))
-                            .font(.system(size: 12, weight: .semibold))
-                        Text(domainTitle(selectedDomain))
-                            .font(.faroRegular(11))
-                            .lineLimit(1)
-                        Image(systemName: "chevron.up.chevron.down")
-                            .font(.system(size: 9, weight: .semibold))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-                }
-            }
-
-            if let trend = selectedDomainTrend {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(scoreText(trend.currentValue))
-                        .font(.faroBold(24))
-                        .foregroundColor(.white)
-
                     Spacer()
-
-                    if let changeSinceDayOne = trend.dayOneValue.map({ trend.currentValue - $0 }) {
-                        Text(String(format: "%@%.0f", changeSinceDayOne >= 0 ? "+" : "", changeSinceDayOne))
-                            .font(.faroSemiBold(12))
-                            .foregroundColor(.white.opacity(0.8))
-                    }
+                    Text("\(Int((programProgress * 100).rounded()))%")
+                        .font(.faroRegular(11))
+                        .foregroundColor(.white.opacity(0.62))
                 }
 
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
                         Capsule().fill(.white.opacity(0.1))
                         Capsule()
-                            .fill(.white)
-                            .frame(width: geometry.size.width * scoreProgress(trend))
+                            .fill(Color(hex: "B794F6"))
+                            .frame(width: geometry.size.width * programProgress)
                     }
                 }
                 .frame(height: 7)
-
-                HStack {
-                    scoreEndpoint(
-                        "progress.journey.day_one".localized,
-                        value: trend.dayOneValue.map(scoreText) ?? "--"
-                    )
-                    Spacer()
-                    scoreEndpoint(
-                        "progress.journey.today".localized,
-                        value: scoreText(trend.currentValue),
-                        alignment: .trailing
-                    )
-                }
-            } else {
-                inlineEmptyState(
-                    icon: "chart.line.uptrend.xyaxis",
-                    text: "progress.journey.domain_empty".localized
-                )
             }
+            .padding(16)
+            .background { progressCardBackground }
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.08), lineWidth: 1))
         }
     }
 
@@ -496,27 +366,50 @@ struct ProgressDashboardView: View {
                     Capsule().fill(.white.opacity(0.09))
                     Capsule()
                         .fill(.white)
-                        .frame(width: geometry.size.width * min(1, max(0, trend.currentValue / 100)))
+                        .frame(width: geometry.size.width * CGFloat(trendProgress(trend)))
                 }
             }
             .frame(height: 7)
         }
     }
 
-    private var calendarSection: some View {
+    private var checkInTrackerSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                sectionTitle("progress.calendar.title".localized, icon: "calendar")
+                sectionTitle("progress.checkin_tracker.title".localized, icon: "checkmark.message.fill")
                 Spacer()
-                Text(String.localizedStringWithFormat("progress.best_streak".localized, viewModel.data.bestStreak))
+                Text(String.localizedStringWithFormat("progress.checkin_tracker.completed".localized, checkInCount))
                     .font(.faroRegular(11))
                     .foregroundColor(.white.opacity(0.55))
             }
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 7), count: 7), spacing: 7) {
-                ForEach(calendarDays) { day in
-                    dayCell(day)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 6) {
+                    ForEach(Array(checkInWeeks.enumerated()), id: \.offset) { _, week in
+                        VStack(spacing: 6) {
+                            ForEach(week) { day in
+                                checkInCell(day)
+                            }
+                        }
+                    }
                 }
+                .padding(.vertical, 2)
+            }
+            .scrollClipDisabled()
+
+            HStack(spacing: 8) {
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 12, height: 12)
+                Text("progress.checkin_tracker.empty".localized)
+                    .font(.faroRegular(10))
+                    .foregroundColor(.white.opacity(0.48))
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.appTheme)
+                    .frame(width: 12, height: 12)
+                Text("progress.checkin_tracker.done".localized)
+                    .font(.faroRegular(10))
+                    .foregroundColor(.white.opacity(0.48))
             }
         }
     }
@@ -524,6 +417,42 @@ struct ProgressDashboardView: View {
     private var calendarDays: [ProgressDay] {
         if !viewModel.visibleDays.isEmpty { return viewModel.visibleDays }
         return [ProgressDay(date: Calendar.current.startOfDay(for: Date()), completionCount: 0, moodScore: nil)]
+    }
+
+    private var checkInWeeks: [[ProgressDay]] {
+        let days = calendarDays
+        return stride(from: 0, to: days.count, by: 7).map { start in
+            Array(days[start..<min(start + 7, days.count)])
+        }
+    }
+
+    private var checkInCount: Int {
+        calendarDays.filter { $0.moodScore != nil }.count
+    }
+
+    private func checkInCell(_ day: ProgressDay) -> some View {
+        let completed = day.moodScore != nil
+        let intensity = completed ? 0.55 + min(max(day.moodScore ?? 0.5, 0), 1) * 0.45 : 0.08
+
+        return RoundedRectangle(cornerRadius: 4, style: .continuous)
+            .fill(
+                completed
+                    ? LinearGradient(
+                        colors: [Color.appTheme.opacity(intensity), Color.appThemeSecondary.opacity(intensity)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    : LinearGradient(colors: [Color.white.opacity(0.08)], startPoint: .top, endPoint: .bottom)
+            )
+            .frame(width: 14, height: 14)
+            .overlay {
+                if completed {
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .stroke(Color.white.opacity(0.14), lineWidth: 0.5)
+                }
+            }
+            .accessibilityLabel(day.date.formatted(date: .complete, time: .omitted))
+            .accessibilityValue(completed ? "progress.checkin_tracker.done".localized : "progress.checkin_tracker.empty".localized)
     }
 
     private func dayCell(_ day: ProgressDay) -> some View {
@@ -613,7 +542,7 @@ struct ProgressDashboardView: View {
 
     private func milestoneCard(_ achievement: Achievement) -> some View {
         Button {
-            MixpanelManager.shared.track(event: "progress_milestone_tapped", properties: [
+            AnalyticsManager.shared.track(event: "progress_milestone_tapped", properties: [
                 "achievement_id": achievement.id,
                 "unlocked": achievement.isUnlocked
             ])
@@ -702,22 +631,9 @@ struct ProgressDashboardView: View {
         "progress.domain.\(domain.rawValue)".localized
     }
 
-    private func domainIcon(_ domain: ProgressDomainTrend.Domain) -> String {
-        switch domain {
-        case .serenity: return "leaf.fill"
-        case .sleep: return "moon.fill"
-        case .energy: return "bolt.fill"
-        case .focus: return "target"
-        case .balance: return "heart.fill"
-        }
-    }
-
-    private func scoreProgress(_ trend: ProgressDomainTrend) -> Double {
-        min(1, max(0, trend.currentValue / 100))
-    }
-
-    private var selectedDomainTrend: ProgressDomainTrend? {
-        viewModel.data.domainTrends.first { $0.domain == selectedDomain }
+    private func trendProgress(_ trend: ProgressDomainTrend) -> Double {
+        let scale = max(viewModel.data.domainTrends.map(\.currentValue).max() ?? 0, 1)
+        return min(1, max(0, trend.currentValue / scale))
     }
 
     private func trendLabel(_ trend: ProgressDomainTrend) -> String {
@@ -735,41 +651,14 @@ struct ProgressDashboardView: View {
         }
     }
 
+    /// Day of the personalized 28-day plan (PersonalPlanStore).
     private var programDay: Int {
-        let start = Calendar.current.startOfDay(for: viewModel.data.programStartDate)
-        let today = Calendar.current.startOfDay(for: Date())
-        let elapsed = Calendar.current.dateComponents([.day], from: start, to: today).day ?? 0
-        return min(66, max(1, elapsed + 1))
+        guard let plan = planStore.plan else { return 1 }
+        return min(PersonalPlan.length, plan.dayIndex())
     }
 
     private var programProgress: Double {
-        min(1, max(0, Double(programDay) / 66.0))
-    }
-
-    private var scoreChange: Double? {
-        guard let baseline = viewModel.data.baselineScore,
-              let current = viewModel.data.currentScore else { return nil }
-        return current - baseline
-    }
-
-    private func scoreText(_ score: Double?) -> String {
-        guard let score else { return "--" }
-        return "\(Int(score.rounded()))/100"
-    }
-
-    private func scoreEndpoint(
-        _ label: String,
-        value: String,
-        alignment: HorizontalAlignment = .leading
-    ) -> some View {
-        VStack(alignment: alignment, spacing: 2) {
-            Text(label)
-                .font(.faroRegular(10))
-                .foregroundColor(.white.opacity(0.48))
-            Text(value)
-                .font(.faroSemiBold(12))
-                .foregroundColor(.white)
-        }
+        min(1, max(0, Double(programDay) / Double(PersonalPlan.length)))
     }
 
     private var progressCardBackground: some View {
@@ -806,68 +695,6 @@ struct ProgressDashboardView: View {
                 : "\(minutes) min \(remainingSeconds) sec"
         }
         return "\(remainingSeconds) sec"
-    }
-}
-
-private struct ScoreJourneyChart: View {
-    let points: [ProgressScorePoint]
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                VStack(spacing: 0) {
-                    ForEach(0..<3, id: \.self) { index in
-                        Rectangle()
-                            .fill(.white.opacity(0.07))
-                            .frame(height: 1)
-                        if index < 2 { Spacer() }
-                    }
-                }
-
-                if points.count == 1, let point = points.first {
-                    Circle()
-                        .fill(.white)
-                        .frame(width: 8, height: 8)
-                        .position(x: geometry.size.width / 2, y: yPosition(for: point.score, height: geometry.size.height))
-                } else if points.count > 1 {
-                    Path { path in
-                        for (index, point) in points.enumerated() {
-                            let position = CGPoint(
-                                x: xPosition(for: index, width: geometry.size.width),
-                                y: yPosition(for: point.score, height: geometry.size.height)
-                            )
-                            index == 0 ? path.move(to: position) : path.addLine(to: position)
-                        }
-                    }
-                    .stroke(
-                        Color(hex: "B794F6"),
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
-                    )
-
-                    ForEach(Array(points.enumerated()), id: \.element.id) { index, point in
-                        Circle()
-                            .fill(.white)
-                            .frame(width: index == points.count - 1 ? 9 : 5, height: index == points.count - 1 ? 9 : 5)
-                            .position(
-                                x: xPosition(for: index, width: geometry.size.width),
-                                y: yPosition(for: point.score, height: geometry.size.height)
-                            )
-                    }
-                }
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("progress.journey.chart_accessibility".localized)
-    }
-
-    private func xPosition(for index: Int, width: CGFloat) -> CGFloat {
-        guard points.count > 1 else { return width / 2 }
-        return width * CGFloat(index) / CGFloat(points.count - 1)
-    }
-
-    private func yPosition(for score: Double, height: CGFloat) -> CGFloat {
-        let normalized = min(1, max(0, score / 100))
-        return height - (height * normalized)
     }
 }
 

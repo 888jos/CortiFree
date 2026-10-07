@@ -16,7 +16,7 @@ struct WeekProgressView: View {
     @State private var screenViewTime: Date?
 
     // Configuration des semaines avec progrès individuels pour chaque catégorie
-    // Ordre: [Global, Sérénité, Sommeil, Énergie, Focus, Équilibre]
+    // Ordre: [Global, Sérénité, Sommeil, Énergie, Focus, Glow]
     private var weekData: [(week: Int, dateRange: String, message: String, color: Color, progress: [Double])] {
         let today = Date()
         let calendar = Calendar.current
@@ -35,7 +35,7 @@ struct WeekProgressView: View {
 
         let formatter = DateFormatter()
         // Use language-appropriate locale
-        let localeIdentifier = languageManager.currentLanguage == .french ? "fr_FR" : "en_US"
+        let localeIdentifier = languageManager.currentLanguage.locale.identifier
         formatter.locale = Locale(identifier: localeIdentifier)
         formatter.dateFormat = "d MMM"
 
@@ -106,14 +106,7 @@ struct WeekProgressView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.white.opacity(0.1))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.white.opacity(0.6), lineWidth: 1.5)
-                        )
-                )
+                .glassCapsule()
                 .responsivePadding(.bottom, 32)
 
                 // Motivational message - Flexible height for iPad
@@ -209,11 +202,11 @@ struct WeekProgressView: View {
                             .foregroundColor(.white)
                             .offset(x: -labelOffsets.horizontal, y: labelOffsetsSmall.vertical)
 
-                            // Équilibre - Top left
+                            // Glow - Top left
                             HStack(spacing: 4) {
-                                Image(systemName: "heart.fill")
+                                Image(systemName: "sparkles")
                                     .font(.system(size: 14))
-                                Text(StringKeys.Common.balance)
+                                Text(StringKeys.Common.glow)
                                     .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
@@ -234,7 +227,7 @@ struct WeekProgressView: View {
                             }
                         } else {
                             // Track continue action
-                            MixpanelManager.shared.trackOnboardingWeekProgressContinue()
+                            AnalyticsManager.shared.trackOnboardingWeekProgressContinue()
 
                             onContinue()
                         }
@@ -247,12 +240,11 @@ struct WeekProgressView: View {
                                 .font(.custom("Poppins-SemiBold", size: currentWeek == 10 ? 15 : 16))
                                 .lineLimit(1)
                         }
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 28))
                     }
+                    .buttonStyle(.glassPrimary)
                     .padding(.horizontal, 32)
                     .responsivePadding(.bottom, 40)
 
@@ -266,7 +258,7 @@ struct WeekProgressView: View {
         }
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingWeekProgressViewed()
+            AnalyticsManager.shared.trackOnboardingWeekProgressViewed()
         }
     }
 }

@@ -10,22 +10,18 @@ import SwiftUI
 struct RoutinesView: View {
     @Environment(\.dismiss) var dismiss
 
-    private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-    }
-
     var body: some View {
         NavigationStack {
             ZStack {
                 // Galaxy background
-                GalaxyBackgroundView(intensity: 1.0)
+                GalaxyBackgroundView(intensity: 0.75)
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     // Header
                     header
 
-                    // Routines grid - one big card per category
+                    // One compact card per category, stacked vertically.
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 20) {
                             // Subtitle section
@@ -34,7 +30,7 @@ struct RoutinesView: View {
                                     .font(.system(size: 14))
                                     .foregroundColor(Color(hex: "7E57C2"))
 
-                                Text(isFrench ? "Programmes guidés pour chaque moment" : "Guided programs for every moment")
+                                Text(LanguageManager.shared.localizedString(for: "inline.routinesview.00"))
                                     .font(.custom("Poppins-Regular", size: 14))
                                     .foregroundColor(.white.opacity(0.7))
 
@@ -42,11 +38,13 @@ struct RoutinesView: View {
                             }
                             .padding(.bottom, 4)
 
-                            ForEach(RoutineCategory.allCases, id: \.self) { category in
-                                NavigationLink(destination: RoutineLevelSelectionView(category: category)) {
-                                    RoutineCategoryCardContent(category: category)
+                            LazyVStack(spacing: 12) {
+                                ForEach(RoutineCategory.allCases, id: \.self) { category in
+                                    NavigationLink(destination: RoutineLevelSelectionView(category: category)) {
+                                        RoutineCategoryCardContent(category: category)
+                                    }
+                                    .buttonStyle(RoutineCategoryButtonStyle())
                                 }
-                                .buttonStyle(RoutineCategoryButtonStyle())
                             }
 
                             Spacer(minLength: 100)
@@ -62,13 +60,13 @@ struct RoutinesView: View {
 
     // MARK: - Header
     private var header: some View {
-        ZStack(alignment: .topLeading) {
+            ZStack(alignment: .topLeading) {
             LinearGradient(
                 colors: [Color(hex: "49288C").opacity(0.3), Color.clear],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(height: 120)
+            .frame(height: 76)
             .ignoresSafeArea(edges: .top)
 
             HStack {
@@ -76,20 +74,18 @@ struct RoutinesView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
-
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
-                Text(NSLocalizedString("routines.title", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "routines.title"))
                     .font(.faroBold(20))
                     .foregroundColor(.white)
 
@@ -99,8 +95,10 @@ struct RoutinesView: View {
                 Color.clear.frame(width: 40, height: 40)
             }
             .padding(.horizontal, 24)
-            .padding(.top, 60)
+            .padding(.top, 10)
+            .padding(.bottom, 10)
         }
+        .frame(height: 76)
     }
 }
 
@@ -120,17 +118,13 @@ struct RoutineCategoryButtonStyle: ButtonStyle {
 struct RoutineCategoryCardContent: View {
     let category: RoutineCategory
 
-    private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-    }
-
     var body: some View {
         ZStack(alignment: .topLeading) {
             // Background image
             Image(category.imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(height: 180)
+                .frame(height: 156)
                 .clipped()
 
             // Dark gradient overlay for readability
@@ -150,17 +144,14 @@ struct RoutineCategoryCardContent: View {
                 HStack {
                     // Category type badge
                     HStack(spacing: 6) {
-                        Text(NSLocalizedString("routines.badge", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "routines.badge"))
                             .font(.custom("Poppins-Bold", size: 10))
                             .tracking(1)
                     }
                     .foregroundColor(.white.opacity(0.9))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
-                    .background(
-                        Capsule()
-                            .fill(Color.black.opacity(0.35))
-                    )
+                    .glassCapsule()
 
                     Spacer()
                 }
@@ -172,11 +163,11 @@ struct RoutineCategoryCardContent: View {
                 // Bottom: Title + Info
                 VStack(alignment: .leading, spacing: 10) {
                     Text(category.localizedName)
-                        .font(.faroBold(22))
+                    .font(.faroBold(17))
                         .foregroundColor(.white)
 
                     Text(category.localizedDescription)
-                        .font(.custom("Poppins-Regular", size: 13))
+                        .font(.custom("Poppins-Regular", size: 11))
                         .foregroundColor(.white.opacity(0.8))
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
@@ -185,9 +176,9 @@ struct RoutineCategoryCardContent: View {
                         // Duration range only
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
-                                .font(.system(size: 12))
+                            .font(.system(size: 10))
                             Text(category.durationRange)
-                                .font(.custom("Poppins-Medium", size: 13))
+                                .font(.custom("Poppins-Medium", size: 10))
                         }
                         .foregroundColor(.white.opacity(0.9))
 
@@ -197,25 +188,30 @@ struct RoutineCategoryCardContent: View {
                         ZStack {
                             Circle()
                                 .fill(Color.white)
-                                .frame(width: 36, height: 36)
+                                .frame(width: 30, height: 30)
 
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(Color(hex: "5E35B1"))
                         }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
+                .padding(.horizontal, 12)
+                .padding(.bottom, 12)
             }
         }
-        .frame(height: 180)
+                .frame(height: 156)
         .contentShape(Rectangle())
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(colors: [.white.opacity(0.28), .white.opacity(0.06)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing),
+                    lineWidth: 1
+                )
         )
+        .shadow(color: .black.opacity(0.25), radius: 14, x: 0, y: 6)
     }
 }
 

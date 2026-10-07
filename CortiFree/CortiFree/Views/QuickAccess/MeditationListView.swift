@@ -3,7 +3,7 @@
 //  CortiFree
 //
 //  Created by Claude on 23/10/2025.
-//  Liste des exercices de méditation depuis l'accueil
+//  Full catalogue of guided audio sessions (opened from Home, tasks, assistant).
 //
 
 import SwiftUI
@@ -11,155 +11,114 @@ import SwiftUI
 struct MeditationListView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var languageManager = LanguageManager.shared
-    @State private var showMeditationSupport = false
-    @State private var selectedMeditationSupport: MeditationSupport?
+    @ObservedObject private var player = GuidedSessionPlayer.shared
 
-    private var meditations: [(id: String, imageName: String, titleKey: String)] {
-        [
-            ("conscious-breathing", "meditation_01", "library.meditation.conscious_breathing"),
-            ("body-scan", "meditation_02", "library.meditation.body_scan"),
-            ("mindfulness", "meditation_03", "library.meditation.mindfulness"),
-            ("grounding", "meditation_04", "library.meditation.grounding"),
-            ("visualization", "meditation_05", "library.meditation.visualization"),
-            ("compassion", "meditation_06", "library.meditation.compassion"),
-            ("focus-clarity", "meditation_07", "library.meditation.focus"),
-            ("yoga-nidra", "meditation_08", "library.meditation.sleep")
-        ]
+    /// Optional category to pre-select.
+    var initialCategory: AudioSessionCategory? = nil
+
+    @State private var selectedCategory: AudioSessionCategory?
+    @State private var didApplyInitial = false
+    @State private var showPlayer = false
+
+    private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+
+    private var visibleCategories: [AudioSessionCategory] {
+        if let selectedCategory { return [selectedCategory] }
+        return AudioSessionCategory.allCases
     }
 
     var body: some View {
-        ZStack {
-            // Galaxy background
-            GalaxyBackgroundView(intensity: 1.0)
+        ZStack(alignment: .bottom) {
+            AudioPalette.backgroundGradient.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
-                headerSection
+                header
 
-                // Grid des méditations
                 ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 24),
-                        GridItem(.flexible(), spacing: 24)
-                    ], spacing: 24) {
-                        ForEach(meditations, id: \.id) { meditation in
-                            MeditationCard(
-                                imageName: meditation.imageName,
-                                title: languageManager.localized(meditation.titleKey)
-                            ) {
-                                if let support = MeditationSupport.support(for: meditation.id) {
-                                    selectedMeditationSupport = support
-                                    showMeditationSupport = true
+                    VStack(alignment: .leading, spacing: 28) {
+                        filterChips
+
+                        ForEach(visibleCategories) { category in
+                            VStack(alignment: .leading, spacing: 14) {
+                                LibrarySectionHeader(title: category.title.localized, subtitle: category.subtitle.localized)
+                                    .padding(.horizontal, 20)
+                                LazyVGrid(columns: columns, spacing: 20) {
+                                    ForEach(GuidedSessionCatalog.sessions(in: category)) { session in
+                                        SessionTile(session: session) { start(session) }
+                                    }
                                 }
+                                .padding(.horizontal, 20)
                             }
                         }
                     }
-                    .id(languageManager.refreshID)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
-                    .padding(.bottom, 24)
-
-                    Spacer(minLength: 40)
+                    .padding(.top, 8)
+                    .padding(.bottom, player.currentSession != nil ? 110 : 40)
                 }
+                .id(languageManager.refreshID)
+            }
+
+            if player.currentSession != nil {
+                SessionMiniPlayer(onOpen: { showPlayer = true })
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
             }
         }
-        .sheet(isPresented: $showMeditationSupport) {
-            if let support = selectedMeditationSupport {
-                MeditationSupportView(support: support)
+        .environment(\.colorScheme, .dark)
+        .nowPlayingCover(isPresented: $showPlayer)
+        .onAppear {
+            if !didApplyInitial {
+                selectedCategory = initialCategory
+                didApplyInitial = true
             }
         }
     }
 
-    private var headerSection: some View {
+    private func start(_ session: GuidedSession) {
+        player.play(session)
+        showPlayer = true
+    }
+
+    private var header: some View {
         HStack {
             Button(action: { dismiss() }) {
                 Image(systemName: "chevron.left")
-                    .font(.custom("Poppins-SemiBold", size: 18))
-                    .foregroundColor(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(Color.white.opacity(0.1)))
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .cfGlassCircle()
             }
+            .buttonStyle(.plain)
 
             Spacer()
 
-            Text(languageManager.localized("library.meditation.title"))
-                .font(.faroSemiBold(20))
-                .foregroundColor(.white)
+            Text(languageManager.localized("library.audio.meditations"))
+                .font(.system(size: 19, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
 
             Spacer()
 
-            Color.clear.frame(width: 36, height: 36)
+            Color.clear.frame(width: 40, height: 40)
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 16)
-        .padding(.bottom, 12)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
     }
-}
 
-struct MeditationCard: View {
-    let imageName: String
-    let title: String
-    let action: () -> Void
-
-    @State private var isPressed = false
-
-    var body: some View {
-        Button(action: {
-            HapticManager.light()
-            withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
-                isPressed = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
-                    isPressed = false
+    private var filterChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                LibraryFilterChip(title: languageManager.localized("library.audio.filter.all"), isSelected: selectedCategory == nil) {
+                    withAnimation(.snappy) { selectedCategory = nil }
                 }
-            }
-            action()
-        }) {
-            ZStack {
-                Image(imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-
-                LinearGradient(
-                    colors: [.black.opacity(0.62), .clear, .black.opacity(0.52)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-
-                // Title avec étoile en haut à gauche
-                VStack {
-                    HStack(spacing: 6) {
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(.white)
-
-                        Text(title)
-                            .font(.faroSemiBold(12))
-                            .foregroundColor(.white)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-
-                        Spacer()
+                ForEach(AudioSessionCategory.allCases) { category in
+                    LibraryFilterChip(title: category.title.localized, icon: category.symbol, isSelected: selectedCategory == category) {
+                        withAnimation(.snappy) { selectedCategory = category }
                     }
-                    .padding(.top, 12)
-                    .padding(.leading, 12)
-                    .padding(.trailing, 12)
-
-                    Spacer()
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: 160)
-            .aspectRatio(1, contentMode: .fit)
-            .background(
-                RoundedRectangle(cornerRadius: 16).fill(Color(hex: "2A1E47"))
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 2)
         }
-        .buttonStyle(PlainButtonStyle())
     }
 }
 

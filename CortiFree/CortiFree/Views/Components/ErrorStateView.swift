@@ -17,10 +17,6 @@ struct ErrorStateView: View {
     let iconColor: Color
     let onRetry: (() -> Void)?
 
-    private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-    }
-
     init(
         title: String? = nil,
         message: String,
@@ -28,7 +24,7 @@ struct ErrorStateView: View {
         iconColor: Color = Color(hex: "EC407A"),
         onRetry: (() -> Void)? = nil
     ) {
-        self.title = title ?? (Locale.preferredLanguages.first?.hasPrefix("fr") ?? false ? "Oups !" : "Oops!")
+        self.title = title ?? LanguageManager.shared.localizedString(for: "error.title.generic")
         self.message = message
         self.icon = icon
         self.iconColor = iconColor
@@ -39,9 +35,9 @@ struct ErrorStateView: View {
         VStack(spacing: 24) {
             // Icon
             ZStack {
-                Circle()
-                    .fill(iconColor.opacity(0.15))
+                Color.clear
                     .frame(width: 100, height: 100)
+                    .glassCircle(tint: iconColor)
 
                 Image(systemName: icon)
                     .font(.system(size: 40))
@@ -71,18 +67,15 @@ struct ErrorStateView: View {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 16, weight: .semibold))
 
-                        Text(isFrench ? "Réessayer" : "Try again")
+                        Text(LanguageManager.shared.localizedString(for: "inline.errorstateview.00"))
                             .font(.custom("Poppins-SemiBold", size: 16))
                     }
                     .foregroundColor(.white)
                     .padding(.horizontal, 32)
                     .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 25)
-                            .fill(iconColor)
-                    )
+                    .contentShape(Capsule())
                 }
-                .buttonStyle(ScaleButtonStyle())
+                .buttonStyle(.glassPrimary(tint: iconColor))
             }
         }
         .padding(32)
@@ -96,10 +89,9 @@ struct ErrorStateView: View {
 extension ErrorStateView {
     /// Network error state
     static func networkError(onRetry: @escaping () -> Void) -> ErrorStateView {
-        let isFr = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
         return ErrorStateView(
-            title: isFr ? "Connexion perdue" : "Connection lost",
-            message: isFr ? "Vérifie ta connexion internet et réessaie." : "Check your internet connection and try again.",
+            title: LanguageManager.shared.localizedString(for: "inline.errorstateview.01"),
+            message: LanguageManager.shared.localizedString(for: "inline.errorstateview.02"),
             icon: "wifi.exclamationmark",
             iconColor: Color(hex: "EC407A"),
             onRetry: onRetry
@@ -108,10 +100,9 @@ extension ErrorStateView {
 
     /// Generic error state
     static func genericError(onRetry: @escaping () -> Void) -> ErrorStateView {
-        let isFr = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
         return ErrorStateView(
-            title: isFr ? "Une erreur est survenue" : "Something went wrong",
-            message: isFr ? "Réessaie dans quelques instants." : "Please try again in a moment.",
+            title: LanguageManager.shared.localizedString(for: "inline.errorstateview.03"),
+            message: LanguageManager.shared.localizedString(for: "inline.errorstateview.04"),
             icon: "exclamationmark.triangle.fill",
             iconColor: Color(hex: "FF7043"),
             onRetry: onRetry
@@ -120,10 +111,9 @@ extension ErrorStateView {
 
     /// Data loading error
     static func loadingError(onRetry: @escaping () -> Void) -> ErrorStateView {
-        let isFr = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
         return ErrorStateView(
-            title: isFr ? "Chargement échoué" : "Loading failed",
-            message: isFr ? "Impossible de charger les données." : "Unable to load data.",
+            title: LanguageManager.shared.localizedString(for: "inline.errorstateview.05"),
+            message: LanguageManager.shared.localizedString(for: "inline.errorstateview.06"),
             icon: "arrow.down.circle.fill",
             iconColor: Color(hex: "5C6BC0"),
             onRetry: onRetry
@@ -132,10 +122,9 @@ extension ErrorStateView {
 
     /// Auth error state
     static func authError(onRetry: @escaping () -> Void) -> ErrorStateView {
-        let isFr = Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
         return ErrorStateView(
-            title: isFr ? "Session expirée" : "Session expired",
-            message: isFr ? "Reconnecte-toi pour continuer." : "Please sign in again to continue.",
+            title: LanguageManager.shared.localizedString(for: "inline.errorstateview.07"),
+            message: LanguageManager.shared.localizedString(for: "inline.errorstateview.08"),
             icon: "person.crop.circle.badge.exclamationmark",
             iconColor: Color(hex: "7E57C2"),
             onRetry: onRetry
@@ -147,10 +136,6 @@ extension ErrorStateView {
 struct InlineErrorView: View {
     let message: String
     let onRetry: (() -> Void)?
-
-    private var isFrench: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("fr") ?? false
-    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -169,20 +154,17 @@ struct InlineErrorView: View {
                     HapticManager.light()
                     onRetry()
                 }) {
-                    Text(isFrench ? "Réessayer" : "Retry")
+                    Text(LanguageManager.shared.localizedString(for: "inline.errorstateview.09"))
                         .font(.custom("Poppins-Medium", size: 13))
                         .foregroundColor(Color(hex: "EC407A"))
                 }
             }
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(hex: "EC407A").opacity(0.1))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(hex: "EC407A").opacity(0.3), lineWidth: 1)
-                )
+        .glassCard(cornerRadius: 12, tint: Color(hex: "EC407A"))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color(hex: "EC407A").opacity(0.3), lineWidth: 1)
         )
     }
 }

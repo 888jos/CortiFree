@@ -11,6 +11,7 @@ import SwiftUI
 import Combine
 import FirebaseAuth
 import FirebaseFirestore
+import UserNotifications
 
 @MainActor
 class SettingsViewModel: ObservableObject {
@@ -20,6 +21,8 @@ class SettingsViewModel: ObservableObject {
     // Profile & Objective
     @Published var currentObjective: String = ""
     @Published var notificationsEnabled: Bool = true
+    /// Real system permission (authorized / provisional / ephemeral)
+    @Published var notificationsAuthorized: Bool = false
 
     // Experience & Habits
     @Published var morningRoutineEnabled: Bool = true
@@ -354,16 +357,26 @@ class SettingsViewModel: ObservableObject {
         return Calendar.current.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
     }
 
+    func refreshNotificationAuthorization() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let authorized = [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus)
+            Task { @MainActor [weak self] in
+                self?.notificationsAuthorized = authorized
+            }
+        }
+    }
+
     func calculateLocalDataSize() {
         let fileManager = FileManager.default
-        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            localDataSize = "0 MB"
-            return
+        // Documents + Application Support (progress photos, profile photo, caches of user data)
+        let directories: [URL] = [.documentDirectory, .applicationSupportDirectory].compactMap {
+            fileManager.urls(for: $0, in: .userDomainMask).first
         }
 
         var totalSize: Int64 = 0
 
-        if let enumerator = fileManager.enumerator(at: documentsURL, includingPropertiesForKeys: [.fileSizeKey]) {
+        for directory in directories {
+            guard let enumerator = fileManager.enumerator(at: directory, includingPropertiesForKeys: [.fileSizeKey]) else { continue }
             for case let fileURL as URL in enumerator {
                 do {
                     let resourceValues = try fileURL.resourceValues(forKeys: [.fileSizeKey])

@@ -11,7 +11,7 @@ import Foundation
 
 // MARK: - Localization Keys Structure
 // Organized by screen/feature for easy maintenance
-// Usage: Text(StringKeys.Common.close) instead of Text(NSLocalizedString("common.close", comment: ""))
+// Usage: Text(StringKeys.Common.close) instead of Text(LanguageManager.shared.localizedString(for: "common.close"))
 
 struct StringKeys {
 
@@ -52,6 +52,7 @@ struct StringKeys {
         static var energy: String { "common.energy".localized() }
         static var focus: String { "common.focus".localized() }
         static var balance: String { "common.balance".localized() }
+        static var glow: String { "common.glow".localized() }
     }
 
     // MARK: - Tab Bar

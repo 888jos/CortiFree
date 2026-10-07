@@ -48,10 +48,14 @@ struct GenericExerciseView: View {
                         HapticManager.light()
                         dismiss()
                     }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundColor(.white.opacity(0.6))
+                        Image(systemName: "xmark")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.85))
+                            .frame(width: 40, height: 40)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
                     Spacer()
                 }
                 .padding(.horizontal, 24)
@@ -90,7 +94,7 @@ struct GenericExerciseView: View {
                         .foregroundColor(.white)
                         .monospacedDigit()
 
-                    Text(NSLocalizedString("exercise.generic.enjoy_time", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "exercise.generic.enjoy_time"))
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -102,11 +106,14 @@ struct GenericExerciseView: View {
                     HapticManager.medium()
                     completeExercise()
                 }) {
-                    Text(NSLocalizedString("exercise.generic.finish_now", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "exercise.generic.finish_now"))
                         .font(.custom("Poppins-Medium", size: 16))
-                        .foregroundColor(.white.opacity(0.6))
-                        .padding(.bottom, 40)
+                        .foregroundColor(.white.opacity(0.75))
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 12)
                 }
+                .buttonStyle(.glassSecondary)
+                .padding(.bottom, 40)
             }
 
             // Completion overlay

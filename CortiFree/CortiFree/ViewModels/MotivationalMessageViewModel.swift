@@ -80,7 +80,7 @@ class MotivationalMessageViewModel: ObservableObject {
             timeKey = "motivational.title.night"
         }
 
-        let localizedTitle = NSLocalizedString(timeKey, comment: "")
+        let localizedTitle = LanguageManager.shared.localizedString(for: timeKey)
         if firstName.isEmpty {
             return localizedTitle
                 .replacingOccurrences(of: "\n%@", with: "")
@@ -108,6 +108,6 @@ class MotivationalMessageViewModel: ObservableObject {
 
         // Get the message key
         let messageKey = "motivational.message.\(newIndex)"
-        return NSLocalizedString(messageKey, comment: "")
+        return LanguageManager.shared.localizedString(for: messageKey)
     }
 }

@@ -27,6 +27,16 @@ struct ModernExerciseCard: View {
         }
     }
 
+    // Exercise-specific glass tint (derived from the category background)
+    private var exerciseGlassTint: Color {
+        switch exercise.exerciseType {
+        case .guidedBreathing, .boxBreathing, .consciousBreathing, .alternateBreathing, .cardiacCoherence:
+            return Color(hex: "5B8DEF") // Respiration (blue)
+        default:
+            return GlassTokens.accent // Méditation / others (violet)
+        }
+    }
+
     // Exercise-specific icon color
     private var exerciseIconColor: Color {
         switch exercise.exerciseType {
@@ -101,15 +111,8 @@ struct ModernExerciseCard: View {
             .frame(maxWidth: .infinity)
             .frame(height: isTopMatch ? 180 : 160)
             .aspectRatio(isTopMatch ? nil : 1, contentMode: .fit)
-            .background(exerciseBackgroundColor)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(
-                        exerciseIconColor.opacity(0.3),
-                        lineWidth: 1
-                    )
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .glassCard(cornerRadius: 16, tint: exerciseGlassTint, interactive: true)
             .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())
@@ -123,14 +126,14 @@ struct ModernExerciseCard: View {
     // MARK: - Subviews
 
     private var percentageBadge: some View {
-        Text(isTopMatch ? String(format: NSLocalizedString("antistress.recommended_at", comment: ""), exercise.matchPercentage) : "\(exercise.matchPercentage)%")
+        Text(isTopMatch ? String(format: LanguageManager.shared.localizedString(for: "antistress.recommended_at"), exercise.matchPercentage) : "\(exercise.matchPercentage)%")
             .font(.custom("Poppins-SemiBold", size: isTopMatch ? 12 : 13))
             .foregroundColor(.black)
             .padding(.horizontal, 6)
             .padding(.vertical, 4)
             .background(
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(.white.opacity(0.8))
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(.white.opacity(0.85))
             )
     }
 

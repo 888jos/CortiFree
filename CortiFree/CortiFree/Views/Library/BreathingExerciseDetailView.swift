@@ -2,508 +2,344 @@
 //  BreathingExerciseDetailView.swift
 //  CortiFree
 //
-//  Created by Claude on 23/10/2025.
-//  Version gamifiée et engageante avec UX améliorée
+//  Breathing exercise sheet: full-bleed artwork, title, one line of metadata,
+//  three quiet actions, the duration and a floating start button. Everything
+//  else waits behind « En savoir plus » so the screen invites a tap on start.
 //
 
 import SwiftUI
 
 struct BreathingExerciseDetailView: View {
     let pattern: BreathingPattern
-    @Environment(\.dismiss) var dismiss
-    @State private var selectedDuration: Int = 180 // 3 minutes par défaut
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var languageManager = LanguageManager.shared
+    @ObservedObject private var preferences = BreathingPreferences.shared
+    @ObservedObject private var voiceOverManager = VoiceOverManager.shared
+    @State private var selectedMinutes: Int
+    @State private var detailsExpanded = false
+    @State private var showsAmbiences = false
     @State private var showBreathingExercise = false
-    @State private var pulseAnimation = false
-    @State private var showHowItWorks = true // Expandable card state
-    @State private var showScience = false // Preuves scientifiques
 
-    private let durations = [60, 120, 180, 300, 600] // 1min, 2min, 3min, 5min, 10min
+    private let heroHeight: CGFloat = 430
+
+    init(pattern: BreathingPattern) {
+        self.pattern = pattern
+        _selectedMinutes = State(initialValue: pattern.defaultMinutes)
+    }
+
+    private func t(_ key: String) -> String { languageManager.localizedString(for: key) }
 
     var body: some View {
-        ZStack {
-            // Galaxy background uniforme
-            GalaxyBackgroundView(intensity: 0.8)
+        ZStack(alignment: .topTrailing) {
+            GalaxyBackgroundView(intensity: 0.75)
                 .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                // Custom animated header
-                animatedHeader
-
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 24) {
-                        // Titre compact en haut
-                        compactTitleSection
-
-                        // Comment ça marche - EXPANDABLE CARD
-                        howItWorksExpandableCard
-
-                        // Bienfaits avec badges
-                        benefitsSection
-
-                        // Preuves scientifiques - NOUVEAU
-                        scientificEvidenceCard
-
-                        // Spacer to push duration and button to bottom
-                        Spacer(minLength: 20)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    hero
+                    VStack(alignment: .leading, spacing: 24) {
+                        Text(pattern.localizedBenefit)
+                            .font(.system(size: 19, weight: .regular, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.92))
+                            .fixedSize(horizontal: false, vertical: true)
+                        actions
+                        if pattern.durationChoices.count > 1 { durationPicker }
+                        details
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)
                     .padding(.top, 16)
-                    .padding(.bottom, 180) // Space for fixed bottom section
+                    // Room for the floating start button.
+                    .padding(.bottom, 120)
                 }
+            }
+            .coordinateSpace(name: "breathingDetail")
+            .scrollIndicators(.hidden)
+            .ignoresSafeArea(edges: .top)
 
-                // FIXED BOTTOM SECTION - Duration + Button
-                fixedBottomSection
-            }
+            closeButton
         }
-        .onAppear {
-            withAnimation(Animation.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-                pulseAnimation = true
-            }
+        .safeAreaInset(edge: .bottom, spacing: 0) { startButton }
+        .sheet(isPresented: $showsAmbiences) {
+            BreathingAmbiencePicker()
+                .presentationDetents([.height(290)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(.ultraThinMaterial)
         }
         .fullScreenCover(isPresented: $showBreathingExercise) {
-            BreathingDetailFlowView(
-                pattern: pattern,
-                duration: Double(selectedDuration)
-            ) {
+            BreathingDetailFlowView(pattern: pattern, duration: Double(selectedMinutes * 60)) {
                 showBreathingExercise = false
                 dismiss()
             }
         }
+        .environment(\.colorScheme, .dark)
     }
 
-    // MARK: - Animated Header
+    // MARK: Hero
 
-    private var animatedHeader: some View {
-        ZStack(alignment: .topLeading) {
-            // Gradient header background
-            LinearGradient(
-                colors: [
-                    Color(hex: "49288C").opacity(0.3),
-                    Color.clear
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 120)
-            .ignoresSafeArea(edges: .top)
-
-            HStack {
-                Button(action: {
-                    HapticManager.light()
-                    dismiss()
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.15))
-                            .frame(width: 40, height: 40)
-                            .blur(radius: 8)
-
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
-
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
-                }
-
-                Spacer()
-
-                // Category badge
-                HStack(spacing: 6) {
-                    Image(systemName: "wind")
-                        .font(.system(size: 12))
-                    Text(NSLocalizedString("breathing_detail.category_badge", comment: ""))
-                        .font(.custom("Poppins-Bold", size: 11))
-                }
-                .foregroundColor(Color.appTheme)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(Color.appTheme.opacity(0.2))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.appTheme.opacity(0.5), lineWidth: 1)
-                        )
+    /// Artwork that stretches when pulled down, with the title on its fading lower edge.
+    private var hero: some View {
+        GeometryReader { proxy in
+            let pull = max(proxy.frame(in: .named("breathingDetail")).minY, 0)
+            BreathingArtwork(pattern: pattern)
+                .frame(width: proxy.size.width, height: heroHeight + pull)
+                .clipped()
+                .offset(y: -pull)
+                // Fade the artwork into the galaxy background instead of a solid colour,
+                // so there is no visible seam under the hero.
+                .mask(
+                    LinearGradient(
+                        stops: [.init(color: .black, location: 0), .init(color: .black, location: 0.55), .init(color: .clear, location: 1)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                    .offset(y: -pull)
                 )
+                .overlay {
+                    LinearGradient(colors: [.black.opacity(0.25), .clear], startPoint: .top, endPoint: .center)
+                        .offset(y: -pull)
+                }
+        }
+        .frame(height: heroHeight)
+        .overlay(alignment: .bottomLeading) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(pattern.localizedTitle)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .shadow(color: .black.opacity(0.35), radius: 12, y: 4)
+                Text("\(selectedMinutes) min · \(pattern.rhythmLabel) · \(t("breathing.v2.type"))")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .monospacedDigit()
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 20)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 4)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var closeButton: some View {
+        Button { dismiss() } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 32, height: 32)
+                .background(.ultraThinMaterial, in: Circle())
+                .frame(width: 44, height: 44)
+        }
+        .buttonStyle(PressableCardStyle())
+        .padding(.top, 14)
+        .padding(.trailing, 10)
+        .accessibilityLabel(t("breathing.session.close"))
+    }
+
+    // MARK: Actions
+
+    private var actions: some View {
+        HStack(alignment: .top, spacing: 0) {
+            BreathingRoundAction(
+                title: preferences.ambience?.localizedTitle ?? t("breathing.v2.ambience"),
+                icon: preferences.ambience?.symbol ?? "speaker.wave.2",
+                isActive: preferences.ambience != nil
+            ) { showsAmbiences = true }
+            BreathingRoundAction(
+                title: t("breathing.v2.voice"),
+                icon: voiceOverManager.isEnabled ? "person.wave.2.fill" : "person.wave.2",
+                isActive: voiceOverManager.isEnabled
+            ) { voiceOverManager.isEnabled.toggle() }
+            BreathingRoundAction(
+                title: t("breathing.v2.haptics"),
+                icon: preferences.hapticsEnabled ? "iphone.radiowaves.left.and.right" : "iphone.slash",
+                isActive: preferences.hapticsEnabled
+            ) { preferences.hapticsEnabled.toggle() }
+        }
+        .frame(maxWidth: .infinity)
+        .sensoryFeedback(.selection, trigger: preferences.hapticsEnabled)
+    }
+
+    private var durationPicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(t("breathing.v2.duration"))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(AudioPalette.secondaryText)
+            Picker(t("breathing.v2.duration"), selection: $selectedMinutes) {
+                ForEach(pattern.durationChoices.sorted(), id: \.self) { Text("\($0) min").tag($0) }
+            }
+            .pickerStyle(.segmented)
         }
     }
 
-    // MARK: - Compact Title Section (replaces Hero)
+    // MARK: Details
 
-    private var compactTitleSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Title
-            Text(pattern.displayName)
-                .font(.faroBold(28))
-                .foregroundColor(.white)
-
-            // Description courte
-            Text(pattern.description)
-                .font(.custom("Poppins-Regular", size: 15))
-                .foregroundColor(.white.opacity(0.8))
-                .lineSpacing(4)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    // MARK: - How It Works - EXPANDABLE CARD
-
-    private var howItWorksExpandableCard: some View {
-        Button(action: {
-            HapticManager.light()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                showHowItWorks.toggle()
-            }
-        }) {
-            VStack(alignment: .leading, spacing: 0) {
-                // Header - Always visible
+    private var details: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Divider().overlay(Color.white.opacity(0.08))
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) { detailsExpanded.toggle() }
+            } label: {
                 HStack {
-                    Image(systemName: "info.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(Color.appTheme)
-
-                    Text(NSLocalizedString("breathing_detail.how_it_works", comment: ""))
-                        .font(.faroSemiBold(18))
-                        .foregroundColor(.white)
-
+                    Text(t("breathing.v2.learn_more"))
+                        .font(.system(size: 17, weight: .semibold))
                     Spacer()
-
-                    Image(systemName: showHowItWorks ? "chevron.up" : "chevron.down")
-                        .font(.custom("Poppins-SemiBold", size: 14))
-                        .foregroundColor(Color.white.opacity(0.6))
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 13, weight: .semibold))
+                        .rotationEffect(.degrees(detailsExpanded ? 180 : 0))
                 }
-                .padding(20)
-
-                // Description - Expandable
-                if showHowItWorks {
-                    Text(pattern.detailedDescription)
-                        .font(.custom("Poppins-Regular", size: 15))
-                        .foregroundColor(Color(hex: "E5E5E5"))
-                        .lineSpacing(8)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                }
+                .foregroundStyle(.white)
+                .padding(.vertical, 16)
+                .contentShape(Rectangle())
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(.isHeader)
 
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-
-    // MARK: - Preuves scientifiques
-
-    private var scientificEvidenceCard: some View {
-        Button(action: {
-            HapticManager.light()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                showScience.toggle()
-            }
-        }) {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Image(systemName: "brain.head.profile")
-                        .font(.system(size: 20))
-                        .foregroundColor(Color.appTheme)
-
-                    Text(NSLocalizedString("breathing_detail.scientific_evidence", comment: ""))
-                        .font(.faroSemiBold(18))
-                        .foregroundColor(.white)
-
-                    Spacer()
-
-                    Image(systemName: showScience ? "chevron.up" : "chevron.down")
-                        .font(.custom("Poppins-SemiBold", size: 14))
-                        .foregroundColor(Color.white.opacity(0.6))
-                }
-                .padding(20)
-
-                if showScience {
-                    VStack(alignment: .leading, spacing: 16) {
-                        ForEach(pattern.scientificEvidence, id: \.self) { evidence in
-                            HStack(alignment: .top, spacing: 12) {
-                                Image(systemName: "checkmark.seal.fill")
-                                    .font(.system(size: 18))
-                                    .foregroundColor(Color.appTheme)
-                                    .frame(width: 24)
-
-                                Text(evidence)
-                                    .font(.custom("Poppins-Regular", size: 14))
-                                    .foregroundColor(.white.opacity(0.9))
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
+            if detailsExpanded {
+                VStack(alignment: .leading, spacing: 22) {
+                    detailBlock(t("breathing.v2.when")) {
+                        Text(pattern.localizedWhenToUse)
+                            .font(.system(size: 15))
+                            .foregroundStyle(AudioPalette.secondaryText)
+                            .lineSpacing(4)
+                    }
+                    if !pattern.localizedScience.isEmpty {
+                        detailBlock(t("breathing.v2.science")) {
+                            Text(pattern.localizedScience)
+                                .font(.system(size: 15))
+                                .foregroundStyle(AudioPalette.secondaryText)
+                                .lineSpacing(4)
                         }
-
-                        // Sources scientifiques (3 sources)
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(pattern.scientificSources, id: \.self) { source in
-                                HStack(alignment: .top, spacing: 8) {
-                                    Image(systemName: "doc.text.fill")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(.white.opacity(0.5))
-                                        .frame(width: 16)
-
-                                    Text(source)
-                                        .font(.custom("Poppins-Regular", size: 11))
-                                        .foregroundColor(.white.opacity(0.6))
-                                        .italic()
-                                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                    detailBlock(t("breathing.v2.steps")) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            ForEach(Array(pattern.steps.enumerated()), id: \.offset) { index, step in
+                                HStack(alignment: .center, spacing: 12) {
+                                    Text("\(index + 1)")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundStyle(AudioPalette.accent)
+                                        .frame(width: 24, height: 24)
+                                        .overlay(Circle().strokeBorder(AudioPalette.accent.opacity(0.5), lineWidth: 1))
+                                    Text(step.localizedLabel)
+                                        .font(.system(size: 15))
+                                        .foregroundStyle(.white.opacity(0.85))
+                                    Spacer()
+                                    Text(stepDuration(step.duration))
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundStyle(AudioPalette.secondaryText)
+                                        .monospacedDigit()
                                 }
                             }
                         }
-                        .padding(.top, 8)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                }
-            }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-
-    // MARK: - Benefits Section
-
-    private var benefitsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "heart.circle.fill")
-                    .font(.system(size: 20))
-                    .foregroundColor(Color.appTheme)
-
-                Text(NSLocalizedString("breathing_detail.benefits", comment: ""))
-                    .font(.custom("Poppins-SemiBold", size: 18))
-                    .foregroundColor(.white)
-            }
-
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
-                ForEach(Array(pattern.benefits.enumerated()), id: \.offset) { index, benefit in
-                    BenefitBadge(benefit: benefit, index: index)
-                }
-            }
-        }
-    }
-
-    // MARK: - FIXED BOTTOM SECTION (Duration + Button)
-
-    private var fixedBottomSection: some View {
-        VStack(spacing: 16) {
-            // Duration Selector
-            gamifiedDurationSelector
-
-            // Launch Button
-            launchButton
-        }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 16)
-        .background(
-            ZStack {
-                // Blur background
-                LinearGradient(
-                    colors: [
-                        Color(hex: "01000C"),
-                        Color(hex: "01000C").opacity(0.95)
-                    ],
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-                .ignoresSafeArea(edges: .bottom)
-            }
-        )
-    }
-
-    // MARK: - Modern Duration Selector
-
-    private var gamifiedDurationSelector: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "clock.fill")
-                    .font(.system(size: 18))
-                    .foregroundColor(Color.appTheme)
-
-                Text(NSLocalizedString("breathing_detail.exercise_duration", comment: ""))
-                    .font(.faroSemiBold(16))
-                    .foregroundColor(.white)
-
-                Spacer()
-
-                // Display selected duration with REDUCED font size
-                Text(formatDuration(selectedDuration))
-                    .font(.faroBold(18)) // Reduced from 24
-                    .foregroundColor(Color.appTheme)
-                    .monospacedDigit()
-            }
-
-            // Modern segmented control
-            VStack(spacing: 12) {
-                HStack(spacing: 8) {
-                    ForEach(durations, id: \.self) { duration in
-                        DurationPill(
-                            duration: duration,
-                            isSelected: selectedDuration == duration
-                        ) {
-                            HapticManager.light()
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                selectedDuration = duration
-                            }
-                        }
                     }
                 }
-
-                // Visual indicator bar
-                GeometryReader { geometry in
-                    let pillWidth = (geometry.size.width - CGFloat((durations.count - 1) * 8)) / CGFloat(durations.count)
-                    let selectedIndex = durations.firstIndex(of: selectedDuration) ?? 0
-
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.appTheme, Color.appThemeSecondary],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: pillWidth, height: 4)
-                        .offset(x: CGFloat(selectedIndex) * (pillWidth + 8))
-                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedDuration)
-                }
-                .frame(height: 4)
+                .padding(.bottom, 16)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(0.05))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                    )
-            )
+            Divider().overlay(Color.white.opacity(0.08))
         }
     }
 
-    // CHANGED: Always use "min" format instead of "m"
-    private func formatDuration(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        return "\(minutes) min"
+    private func detailBlock<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title.uppercased())
+                .font(.system(size: 12, weight: .bold))
+                .tracking(0.8)
+                .foregroundStyle(AudioPalette.secondaryText)
+            content()
+        }
     }
 
-    // MARK: - Launch Button
+    private func stepDuration(_ seconds: Double) -> String {
+        seconds == seconds.rounded() ? "\(Int(seconds)) s" : String(format: "%.1f s", seconds)
+    }
 
-    private var launchButton: some View {
-        Button(action: {
-            HapticManager.success()
+    // MARK: Start button
+
+    /// The start button floats above the content, with the background fading in behind it.
+    private var startButton: some View {
+        Button {
+            HapticManager.medium()
             showBreathingExercise = true
-        }) {
-            HStack(spacing: 12) {
-                Image(systemName: "play.circle.fill")
-                    .font(.system(size: 24))
-
-                Text(NSLocalizedString("breathing_detail.start_exercise", comment: ""))
-                    .font(.faroBold(18))
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "play.fill").font(.system(size: 16, weight: .semibold))
+                Text(t("breathing.v2.start")).font(.system(size: 17, weight: .semibold))
             }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .frame(height: 64)
-            .background(
-                ZStack {
-                    // Shadow layer
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .blur(radius: 20)
-                        .offset(y: 8)
-
-                    // Main button
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                }
-            )
+            .foregroundStyle(AudioPalette.backgroundDeep)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background(AudioPalette.accent, in: Capsule())
+            .overlay(Capsule().strokeBorder(.white.opacity(0.35), lineWidth: 0.5))
+            .shadow(color: AudioPalette.accent.opacity(0.4), radius: 18, y: 8)
         }
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(PressableCardStyle())
+        .padding(.horizontal, 20)
+        .padding(.top, 28)
+        .padding(.bottom, 8)
+        .frame(maxWidth: .infinity)
+        .background {
+            LinearGradient(colors: [AudioPalette.background.opacity(0), AudioPalette.background.opacity(0.92)], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+        }
     }
 }
 
-// MARK: - Benefit Badge Component
+// MARK: - Ambience picker
+
+/// Ambience under the exercise: a "None" tile, the 8 loops and the volume.
+struct BreathingAmbiencePicker: View {
+    @ObservedObject private var preferences = BreathingPreferences.shared
+    @ObservedObject private var languageManager = LanguageManager.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(languageManager.localizedString(for: "breathing.v2.ambience"))
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    tile(title: languageManager.localizedString(for: "breathing.v2.none"), icon: "speaker.slash", selected: preferences.ambience == nil) {
+                        preferences.ambience = nil
+                    }
+                    ForEach(AudioAmbience.allCases) { ambience in
+                        tile(title: ambience.localizedTitle, icon: ambience.symbol, selected: preferences.ambience == ambience) {
+                            preferences.ambience = ambience
+                        }
+                    }
+                }
+            }
+            HStack(spacing: 12) {
+                Image(systemName: "speaker.fill").foregroundStyle(AudioPalette.secondaryText)
+                Slider(value: Binding(get: { preferences.ambienceVolume }, set: { preferences.ambienceVolume = $0 }), in: 0...1)
+                    .tint(AudioPalette.accent)
+                Image(systemName: "speaker.wave.3.fill").foregroundStyle(AudioPalette.secondaryText)
+            }
+            .disabled(preferences.ambience == nil)
+            .opacity(preferences.ambience == nil ? 0.4 : 1)
+        }
+        .padding(20)
+        .environment(\.colorScheme, .dark)
+    }
+
+    private func tile(title: String, icon: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button {
+            HapticManager.light()
+            action()
+        } label: {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 20, weight: .medium))
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundStyle(selected ? AudioPalette.accent : .white)
+            .frame(width: 82, height: 82)
+            .background(selected ? AudioPalette.accent.opacity(0.16) : Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(selected ? AudioPalette.accent.opacity(0.6) : Color.white.opacity(0.1), lineWidth: 1))
+        }
+        .buttonStyle(PressableCardStyle())
+    }
+}
+
+// MARK: - Benefit badge (used by the anti-stress detail screens)
 
 struct BenefitBadge: View {
     let benefit: String
@@ -511,224 +347,18 @@ struct BenefitBadge: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.appTheme, Color.appThemeSecondary],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 24, height: 24)
-
-                Image(systemName: "checkmark")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.white)
-            }
-
+            Image(systemName: "checkmark")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(AudioPalette.accent))
             Text(benefit)
                 .font(.faroSemiBold(14))
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "1A1B3A").opacity(0.8),
-                                Color(hex: "2A2B5A").opacity(0.6)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.appTheme.opacity(0.3),
-                                Color.appThemeSecondary.opacity(0.3)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-        )
+        .glassCard(cornerRadius: 16)
     }
-}
-
-// MARK: - BreathingPattern Extension
-
-extension BreathingPattern {
-    var icon: String {
-        switch name {
-        case "DeepAbdominal": return "wind"
-        case "4-7-8": return "moon.stars.fill"
-        case "Coherence": return "heart.fill"
-        case "Slow66": return "bed.double.fill"
-        case "Triangle": return "triangle"
-        case "Box": return "square"
-        case "Kapalabhati": return "bolt.fill"
-        case "Bhastrika": return "flame.fill"
-        default: return "wind"
-        }
-    }
-
-    var detailedDescription: String {
-        switch name {
-        case "DeepAbdominal":
-            return NSLocalizedString("breathing_pattern.deep_abdominal.detailed_description", comment: "")
-        case "4-7-8":
-            return NSLocalizedString("breathing_pattern.four_seven_eight.detailed_description", comment: "")
-        case "Coherence":
-            return NSLocalizedString("breathing_pattern.coherence.detailed_description", comment: "")
-        case "Slow66":
-            return NSLocalizedString("breathing_pattern.slow66.detailed_description", comment: "")
-        case "Triangle":
-            return NSLocalizedString("breathing_pattern.triangle.detailed_description", comment: "")
-        case "Box":
-            return NSLocalizedString("breathing_pattern.box.detailed_description", comment: "")
-        case "Kapalabhati":
-            return NSLocalizedString("breathing_pattern.kapalabhati.detailed_description", comment: "")
-        case "Bhastrika":
-            return NSLocalizedString("breathing_pattern.bhastrika.detailed_description", comment: "")
-        default:
-            return description
-        }
-    }
-
-    var benefits: [String] {
-        switch name {
-        case "DeepAbdominal":
-            return [
-                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.deep_abdominal.benefit_4", comment: "")
-            ]
-        case "4-7-8":
-            return [
-                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.four_seven_eight.benefit_4", comment: "")
-            ]
-        case "Coherence":
-            return [
-                NSLocalizedString("breathing_pattern.coherence.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.coherence.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.coherence.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.coherence.benefit_4", comment: "")
-            ]
-        case "Slow66":
-            return [
-                NSLocalizedString("breathing_pattern.slow66.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.slow66.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.slow66.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.slow66.benefit_4", comment: "")
-            ]
-        case "Triangle":
-            return [
-                NSLocalizedString("breathing_pattern.triangle.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.triangle.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.triangle.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.triangle.benefit_4", comment: "")
-            ]
-        case "Box":
-            return [
-                NSLocalizedString("breathing_pattern.box.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.box.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.box.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.box.benefit_4", comment: "")
-            ]
-        case "Kapalabhati":
-            return [
-                NSLocalizedString("breathing_pattern.kapalabhati.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.kapalabhati.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.kapalabhati.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.kapalabhati.benefit_4", comment: "")
-            ]
-        case "Bhastrika":
-            return [
-                NSLocalizedString("breathing_pattern.bhastrika.benefit_1", comment: ""),
-                NSLocalizedString("breathing_pattern.bhastrika.benefit_2", comment: ""),
-                NSLocalizedString("breathing_pattern.bhastrika.benefit_3", comment: ""),
-                NSLocalizedString("breathing_pattern.bhastrika.benefit_4", comment: "")
-            ]
-        default:
-            return []
-        }
-    }
-
-    var scientificEvidence: [String] {
-        switch name {
-        case "DeepAbdominal":
-            return [
-                NSLocalizedString("breathing_pattern.deep_abdominal.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.deep_abdominal.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.deep_abdominal.evidence_3", comment: "")
-            ]
-        case "4-7-8":
-            return [
-                NSLocalizedString("breathing_pattern.four_seven_eight.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.four_seven_eight.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.four_seven_eight.evidence_3", comment: "")
-            ]
-        case "Coherence":
-            return [
-                NSLocalizedString("breathing_pattern.coherence.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.coherence.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.coherence.evidence_3", comment: "")
-            ]
-        case "Slow66":
-            return [
-                NSLocalizedString("breathing_pattern.slow66.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.slow66.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.slow66.evidence_3", comment: "")
-            ]
-        case "Triangle":
-            return [
-                NSLocalizedString("breathing_pattern.triangle.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.triangle.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.triangle.evidence_3", comment: "")
-            ]
-        case "Box":
-            return [
-                NSLocalizedString("breathing_pattern.box.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.box.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.box.evidence_3", comment: "")
-            ]
-        case "Kapalabhati":
-            return [
-                NSLocalizedString("breathing_pattern.kapalabhati.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.kapalabhati.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.kapalabhati.evidence_3", comment: "")
-            ]
-        case "Bhastrika":
-            return [
-                NSLocalizedString("breathing_pattern.bhastrika.evidence_1", comment: ""),
-                NSLocalizedString("breathing_pattern.bhastrika.evidence_2", comment: ""),
-                NSLocalizedString("breathing_pattern.bhastrika.evidence_3", comment: "")
-            ]
-        default:
-            return [NSLocalizedString("breathing_pattern.default.evidence", comment: "")]
-        }
-    }
-
-    var scientificSources: [String] {
-        return [NSLocalizedString("breathing_detail.source", comment: "")]
-    }
-}
-
-#Preview {
-    BreathingExerciseDetailView(pattern: .fourSevenEight)
-        .environment(\.locale, Locale(identifier: "en"))
 }

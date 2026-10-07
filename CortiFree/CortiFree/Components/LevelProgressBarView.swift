@@ -94,17 +94,7 @@ struct LevelProgressBarView: View {
                 }
                 .padding(.horizontal, 13)
                 .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white.opacity(0.05))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(
-                                    Color.appTheme.opacity(0.3),
-                                    lineWidth: 1
-                                )
-                        )
-                )
+                .glassCard(cornerRadius: 16, tint: Color.appTheme)
             }
         .onAppear {
             withAnimation(.easeInOut(duration: 0.4)) {

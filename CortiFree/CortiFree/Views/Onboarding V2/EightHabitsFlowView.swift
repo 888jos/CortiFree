@@ -306,11 +306,10 @@ struct EightHabitsFlowView: View {
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundColor(.white)
                                     .frame(width: 40, height: 40)
-                                    .background(
-                                        Circle()
-                                            .fill(Color.white.opacity(0.2))
-                                    )
+                                    .contentShape(Circle())
                             }
+                            .buttonStyle(.plain)
+                            .glassCircle(interactive: true)
                             .padding(.leading, 16)
 
                             Spacer()
@@ -330,11 +329,10 @@ struct EightHabitsFlowView: View {
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundColor(.white)
                                     .frame(width: 40, height: 40)
-                                    .background(
-                                        Circle()
-                                            .fill(Color.white.opacity(0.2))
-                                    )
+                                    .contentShape(Circle())
                             }
+                            .buttonStyle(.plain)
+                            .glassCircle(interactive: true)
                             .padding(.trailing, 16)
                         }
                     }
@@ -430,33 +428,7 @@ struct EightHabitsFlowView: View {
                         }
                     }
                     .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color(hex: "B794F6").opacity(0.15),
-                                        Color(hex: "B794F6").opacity(0.05)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                Color(hex: "B794F6").opacity(0.3),
-                                                Color(hex: "D4B4FF").opacity(0.2)
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1
-                                    )
-                            )
-                    )
+                    .glassCard(cornerRadius: 18, tint: GlassTokens.accent)
                     .padding(.horizontal, 24)
                     .padding(.bottom, 140)
 
@@ -479,7 +451,7 @@ struct EightHabitsFlowView: View {
 
                     // Track continue action with analytics
                     let timeSpent = screenViewTime.map { Date().timeIntervalSince($0) } ?? 0
-                    MixpanelManager.shared.trackOnboardingEightHabitsContinue(
+                    AnalyticsManager.shared.trackOnboardingEightHabitsContinue(
                         habitsViewedCount: viewedHabits.count,
                         timeSpent: timeSpent
                     )
@@ -496,19 +468,9 @@ struct EightHabitsFlowView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .contentShape(Rectangle())
-                    .background(
-                        RoundedRectangle(cornerRadius: 28)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "B794F6"), Color(hex: "D4B4FF")],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
+                    .contentShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.glassPrimary)
                 .allowsHitTesting(true)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
@@ -519,7 +481,7 @@ struct EightHabitsFlowView: View {
         .onAppear {
             screenViewTime = Date()
             viewedHabits.insert(currentHabitIndex)
-            MixpanelManager.shared.trackOnboardingEightHabitsFlowViewed()
+            AnalyticsManager.shared.trackOnboardingEightHabitsFlowViewed()
         }
         .onChange(of: currentHabitIndex) { newIndex in
             viewedHabits.insert(newIndex)

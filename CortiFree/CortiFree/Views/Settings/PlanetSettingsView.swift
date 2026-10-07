@@ -22,9 +22,13 @@ struct PlanetSettingsView: View {
                 HStack {
                     Button(action: { dismiss() }) {
                         Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 20))
+                            .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
 
                     Spacer()
 
@@ -37,8 +41,9 @@ struct PlanetSettingsView: View {
                     // Invisible button for balance
                     Button(action: {}) {
                         Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 20))
+                            .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.clear)
+                            .frame(width: 44, height: 44)
                     }
                     .disabled(true)
                 }
@@ -169,6 +174,12 @@ struct PlanetCard: View {
                     .foregroundColor(.white)
             }
             .frame(width: 200)
+            .padding(.vertical, 12)
+            .glassCard(cornerRadius: 28, tint: isSelected ? Color.appTheme : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .strokeBorder(isSelected ? Color.appTheme.opacity(0.6) : Color.clear, lineWidth: 1.5)
+            )
         }
         .buttonStyle(PlainButtonStyle())
     }

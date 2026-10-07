@@ -159,11 +159,9 @@ struct AuthSignUpView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
+                        .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassSecondary)
                 }
                 .padding(.horizontal, 32)
 
@@ -197,7 +195,7 @@ struct AuthSignUpView: View {
             AuthAppleView(onComplete: { showAppleAuth = false }, isSignUp: true)
         }
         .onAppear {
-            MixpanelManager.shared.trackAuthViewDisplayed()
+            AnalyticsManager.shared.trackAuthViewDisplayed()
         }
     }
 }
@@ -332,11 +330,9 @@ struct AuthLoginView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
+                        .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassSecondary)
                 }
                 .padding(.horizontal, 32)
 
@@ -370,7 +366,7 @@ struct AuthLoginView: View {
             AuthAppleView(onComplete: { showAppleAuth = false }, isSignUp: false)
         }
         .onAppear {
-            MixpanelManager.shared.trackLoginViewDisplayed()
+            AnalyticsManager.shared.trackLoginViewDisplayed()
         }
     }
 }
@@ -486,11 +482,11 @@ struct AuthEmailFormView: View {
                                     .focused($focusedField, equals: .username)
                                     .padding(14)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.white.opacity(0.1))
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .fill(Color.white.opacity(0.06))
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(focusedField == .username ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                    .strokeBorder(focusedField == .username ? Color.white.opacity(0.7) : Color.white.opacity(0.12), lineWidth: 1)
                                             )
                                     )
                                     .tint(.white)
@@ -511,11 +507,11 @@ struct AuthEmailFormView: View {
                                 .focused($focusedField, equals: .email)
                                 .padding(14)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.white.opacity(0.1))
+                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .fill(Color.white.opacity(0.06))
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(focusedField == .email ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                .strokeBorder(focusedField == .email ? Color.white.opacity(0.7) : Color.white.opacity(0.12), lineWidth: 1)
                                         )
                                 )
                                 .tint(.white)
@@ -550,11 +546,11 @@ struct AuthEmailFormView: View {
                             }
                             .padding(14)
                             .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.white.opacity(0.1))
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(Color.white.opacity(0.06))
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(focusedField == .password ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .strokeBorder(focusedField == .password ? Color.white.opacity(0.7) : Color.white.opacity(0.12), lineWidth: 1)
                                     )
                             )
                             .tint(.white)
@@ -582,15 +578,15 @@ struct AuthEmailFormView: View {
                                 }
                                 .padding(14)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.white.opacity(0.1))
+                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .fill(Color.white.opacity(0.06))
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(
+                                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                .strokeBorder(
                                                     focusedField == .confirmPassword ?
                                                     (passwordsMatch ? Color.green : Color.red) :
-                                                        Color.white.opacity(0.3),
-                                                    lineWidth: 1.5
+                                                        Color.white.opacity(0.12),
+                                                    lineWidth: 1
                                                 )
                                         )
                                 )
@@ -641,22 +637,22 @@ struct AuthEmailFormView: View {
                             }
                         }
                     }) {
-                        if authViewModel.isLoading {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "0A0A2E")))
-                        } else {
-                            Text(isSignUp ? "Créer mon compte" : "Se connecter")
-                                .font(.custom("Poppins-SemiBold", size: 16))
-                                .foregroundColor(Color(hex: "0A0A2E"))
+                        Group {
+                            if authViewModel.isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            } else {
+                                Text(isSignUp ? "Créer mon compte" : "Se connecter")
+                                    .font(.custom("Poppins-SemiBold", size: 16))
+                            }
                         }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 54)
+                        .contentShape(Capsule())
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 54)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 40))
+                    .buttonStyle(.glassPrimary)
                     .padding(.horizontal, 32)
                     .disabled(authViewModel.isLoading || !isFormValid)
-                    .opacity(authViewModel.isLoading || !isFormValid ? 0.6 : 1.0)
 
                     // Divider - Autre méthode
                     HStack(spacing: 16) {
@@ -916,11 +912,9 @@ struct AuthGoogleView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
-                        )
+                        .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassSecondary)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 50)
@@ -1190,11 +1184,9 @@ struct AuthAppleView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
-                        )
+                        .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassSecondary)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 50)

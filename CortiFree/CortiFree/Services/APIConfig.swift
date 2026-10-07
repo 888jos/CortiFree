@@ -30,7 +30,6 @@ final class APIConfig {
     private enum PlistKey: String {
         case revenueCatAPIKey = "REVENUECAT_API_KEY"
         case superwallAPIKey = "SUPERWALL_API_KEY"
-        case mixpanelToken = "MIXPANEL_TOKEN"
         case amplitudeAPIKey = "AMPLITUDE_API_KEY"
         case googleClientID = "GIDClientID" // Standard Google Sign-In key
         case tiktokAccessToken = "TIKTOK_ACCESS_TOKEN"
@@ -63,18 +62,6 @@ final class APIConfig {
         // Fallback to avoid crash
         Logger.warning("Superwall API key not found in Info.plist, using fallback", category: .subscription)
         return "pk_JPmmC0H5be4yqTnw24VTm"
-    }
-
-    /// Mixpanel Token
-    /// Add MIXPANEL_TOKEN to Info.plist
-    var mixpanelToken: String? {
-        if let token = value(for: .mixpanelToken), !token.isEmpty, !token.hasPrefix("$(") {
-            return token
-        }
-        #if DEBUG
-        Logger.warning("Mixpanel token not found in Info.plist", category: .analytics)
-        #endif
-        return nil
     }
 
     /// Amplitude Analytics API key
@@ -124,7 +111,6 @@ final class APIConfig {
         Logger.info("API Configuration Status:", category: .general)
         Logger.info("  - RevenueCat: \(value(for: .revenueCatAPIKey) != nil ? "✅" : "⚠️ Using fallback")", category: .subscription)
         Logger.info("  - Superwall: \(value(for: .superwallAPIKey) != nil ? "✅" : "⚠️ Using fallback")", category: .subscription)
-        Logger.info("  - Mixpanel: \(value(for: .mixpanelToken) != nil ? "✅" : "❌ Not configured")", category: .analytics)
         Logger.info("  - Amplitude: \(value(for: .amplitudeAPIKey) != nil ? "✅" : "❌ Not configured")", category: .analytics)
         Logger.info("  - Google: \(value(for: .googleClientID) != nil ? "✅" : "❌ Not configured")", category: .auth)
         Logger.info("  - TikTok: \(value(for: .tiktokAccessToken) != nil ? "✅" : "⚠️ Not configured")", category: .analytics)

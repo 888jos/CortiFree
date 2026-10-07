@@ -48,7 +48,7 @@ struct FlameStreakAnimation: View {
             }
 
             // Track analytics
-            MixpanelManager.shared.track(
+            AnalyticsManager.shared.track(
                 event: "flame_streak_animation_shown",
                 properties: [:]
             )

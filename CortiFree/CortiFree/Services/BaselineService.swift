@@ -52,16 +52,6 @@ class BaselineService {
                 "primaryGoal": result.primaryGoal
             ],
 
-            // Domain scores at baseline
-            "domainScores": [
-                "serenity": result.serenityScore,
-                "sleep": result.sleepScore,
-                "energy": result.energyScore,
-                "focus": result.focusScore,
-                "habits": result.habitsScore,
-                "global": result.globalScore
-            ],
-
             // Quiz answers for reference
             "quizAnswers": result.answers
         ]

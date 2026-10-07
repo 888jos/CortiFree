@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 
@@ -15,11 +16,8 @@ class ProfileViewModel: ObservableObject {
     @Published var stats: UserStats?
     @Published var isLoading: Bool = true
     @Published var selectedPeriod: StatsPeriod = .week
-    @Published var domainScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0] // Sérénité, Sommeil, Énergie, Focus, Équilibre
-    @Published var potentialScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0]
-    @Published var onboardingGlobalScore: Int = 0 // Score global calculé pendant l'onboarding
-    @Published var onboardingDomainScores: [Double] = [0.0, 0.0, 0.0, 0.0, 0.0] // Scores onboarding par domaine
     @Published var habitProgress: [String: (completed: Int, total: Int)] = [:] // Progress par habitude
+    @Published var profilePhoto: UIImage? = ProfilePhotoStorage.load()
 
     private let firebaseService = FirebaseService.shared
     private var lastLoadedAt: Date? = nil
@@ -51,9 +49,26 @@ class ProfileViewModel: ObservableObject {
     }
 
     init() {
+        // ProfileView.onAppear triggers refreshProfile(); AvatarProgressCard relies on this initial load.
         Task {
             await loadProfile()
         }
+    }
+
+    /// Local photo first; on a fresh install / new device, restore it from users/{uid}.profilePhotoBase64.
+    func loadProfilePhoto() async {
+        if let local = ProfilePhotoStorage.load() {
+            profilePhoto = local
+            return
+        }
+        profilePhoto = nil
+        guard let uid = Auth.auth().currentUser?.uid,
+              let snapshot = try? await Firestore.firestore().collection("users").document(uid).getDocument(),
+              let base64 = snapshot.data()?["profilePhotoBase64"] as? String,
+              let data = Data(base64Encoded: base64),
+              let image = UIImage(data: data) else { return }
+        ProfilePhotoStorage.save(data)
+        profilePhoto = image
     }
 
     func loadProfile() async {
@@ -62,83 +77,9 @@ class ProfileViewModel: ObservableObject {
         }
         isLoading = true
 
-        if let baseline = LocalScoreStore.baseline() {
-            onboardingGlobalScore = Int(baseline.global.rounded())
-            onboardingDomainScores = [baseline.serenity, baseline.sleep, baseline.energy, baseline.focus, baseline.balance]
-        }
-        if let potential = LocalScoreStore.potential() {
-            potentialScores = [potential.serenity, potential.sleep, potential.energy, potential.focus, potential.balance]
-        }
-
         // Try to fetch user, but don't fail if it doesn't exist
         user = try? await firebaseService.fetchUser()
         stats = try? await firebaseService.fetchStats()
-
-        do {
-            // Load domain scores using ImpactScoringService
-            let currentScores = try await ImpactScoringService.shared.fetchCurrentScores()
-
-            domainScores = [
-                currentScores.serenity,
-                currentScores.sleep,
-                currentScores.energy,
-                currentScores.focus,
-                currentScores.balance
-            ]
-
-            #if DEBUG
-            print("📊 Profile scores loaded: Sérénité=\(currentScores.serenity), Sommeil=\(currentScores.sleep), Énergie=\(currentScores.energy), Focus=\(currentScores.focus), Équilibre=\(currentScores.balance)")
-            #endif
-        } catch {
-            #if DEBUG
-            print("⚠️ Failed to load domain scores: \(error)")
-            #endif
-        }
-
-        do {
-            // Load potential scores from Firebase
-            if let userId = Auth.auth().currentUser?.uid {
-                let userDoc = try await Firestore.firestore()
-                    .collection("users")
-                    .document(userId)
-                    .getDocument()
-
-                if let data = userDoc.data() {
-                    // Firestore may decode numeric fields as Int, Int64, Double, or NSNumber.
-                    if let scores = data["potentialScores"] as? [String: Any] {
-                        let parsed = UserDomainScores.from(scores)
-                        potentialScores = [parsed.serenity, parsed.sleep, parsed.energy, parsed.focus, parsed.balance]
-                    }
-
-                    // Load onboarding global score
-                    if let onboardingScore = Self.numericValue(data["onboardingScore"]) {
-                        onboardingGlobalScore = Int(onboardingScore.rounded())
-                        #if DEBUG
-                        print("📊 Onboarding score loaded: \(onboardingGlobalScore)")
-                        #endif
-                    }
-
-                    // Load onboarding domain scores
-                    if let domainScoresData = data["domainScores"] as? [String: Any] {
-                        let parsed = UserDomainScores.from(domainScoresData)
-                        onboardingDomainScores = [
-                            parsed.serenity,
-                            parsed.sleep,
-                            parsed.energy,
-                            parsed.focus,
-                            parsed.balance
-                        ]
-                        #if DEBUG
-                        print("📊 Onboarding domain scores loaded")
-                        #endif
-                    }
-                }
-            }
-        } catch {
-            #if DEBUG
-            print("⚠️ Failed to load potential scores: \(error)")
-            #endif
-        }
 
         do {
             // Load habit progress statistics
@@ -156,15 +97,6 @@ class ProfileViewModel: ObservableObject {
 
         isLoading = false
         lastLoadedAt = Date()
-    }
-
-    private static func numericValue(_ value: Any?) -> Double? {
-        if let value = value as? Double { return value }
-        if let value = value as? Int { return Double(value) }
-        if let value = value as? Int64 { return Double(value) }
-        if let value = value as? Float { return Double(value) }
-        if let value = value as? NSNumber { return value.doubleValue }
-        return nil
     }
 
     func selectPeriod(_ period: StatsPeriod) {

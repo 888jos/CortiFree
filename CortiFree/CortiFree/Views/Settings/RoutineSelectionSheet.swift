@@ -31,21 +31,23 @@ struct RoutineSelectionSheet: View {
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                            .frame(width: 32, height: 32)
-                            .background(Circle().fill(Color.white.opacity(0.1)))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.85))
+                            .frame(width: 36, height: 36)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
 
                 VStack(spacing: 12) {
-                    Text(NSLocalizedString("settings.change_routine_title", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "settings.change_routine_title"))
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
 
-                    Text(NSLocalizedString("settings.select_new_routine", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "settings.select_new_routine"))
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -102,11 +104,11 @@ struct RoutineSelectionSheet: View {
                                 .font(.system(size: 44))
                                 .foregroundColor(.orange)
 
-                            Text(NSLocalizedString("settings.warning_title", comment: ""))
+                            Text(LanguageManager.shared.localizedString(for: "settings.warning_title"))
                                 .font(.custom("Poppins-Bold", size: 22))
                                 .foregroundColor(.white)
 
-                            Text(NSLocalizedString("settings.change_routine_warning", comment: ""))
+                            Text(LanguageManager.shared.localizedString(for: "settings.change_routine_warning"))
                                 .font(.custom("Poppins-Regular", size: 15))
                                 .foregroundColor(.white.opacity(0.8))
                         }
@@ -115,16 +117,16 @@ struct RoutineSelectionSheet: View {
 
                         // List of what will be reset
                         VStack(alignment: .leading, spacing: 12) {
-                            WarningItem(text: NSLocalizedString("settings.current_progress", comment: ""))
-                            WarningItem(text: NSLocalizedString("settings.task_history", comment: ""))
-                            WarningItem(text: NSLocalizedString("settings.routine_stats", comment: ""))
-                            WarningItem(text: NSLocalizedString("settings.start_date_reset", comment: ""))
+                            WarningItem(text: LanguageManager.shared.localizedString(for: "settings.current_progress"))
+                            WarningItem(text: LanguageManager.shared.localizedString(for: "settings.task_history"))
+                            WarningItem(text: LanguageManager.shared.localizedString(for: "settings.routine_stats"))
+                            WarningItem(text: LanguageManager.shared.localizedString(for: "settings.start_date_reset"))
                         }
                         .padding(.horizontal, 24)
                         .padding(.top, 24)
 
                         // What will be preserved
-                        Text(NSLocalizedString("settings.xp_level_preserved", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "settings.xp_level_preserved"))
                             .font(.custom("Poppins-Regular", size: 13))
                             .foregroundColor(Color.appTheme)
                             .multilineTextAlignment(.center)
@@ -142,20 +144,13 @@ struct RoutineSelectionSheet: View {
                                     changeRoutine(to: plan)
                                 }
                             }) {
-                                Text(NSLocalizedString("settings.confirm_change", comment: ""))
+                                Text(LanguageManager.shared.localizedString(for: "settings.confirm_change"))
                                     .font(.custom("Poppins-SemiBold", size: 16))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 50)
-                                    .background(
-                                        LinearGradient(
-                                            colors: [Color.orange, Color.red],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .clipShape(RoundedRectangle(cornerRadius: 25))
                             }
+                            .buttonStyle(.glassPrimary(tint: Color(hex: "EF5A2F")))
 
                             // Cancel button
                             Button(action: {
@@ -165,31 +160,20 @@ struct RoutineSelectionSheet: View {
                                     pendingPlan = nil
                                 }
                             }) {
-                                Text(NSLocalizedString("common.cancel", comment: ""))
+                                Text(LanguageManager.shared.localizedString(for: "common.cancel"))
                                     .font(.custom("Poppins-Medium", size: 16))
                                     .foregroundColor(.white.opacity(0.7))
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 50)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 25)
-                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                    )
                             }
+                            .buttonStyle(.glassSecondary)
                         }
                         .padding(.horizontal, 24)
                         .padding(.top, 28)
                         .padding(.bottom, 32)
                     }
-                    .background(
-                        RoundedRectangle(cornerRadius: 24)
-                            .fill(Color(hex: "1A1B3A"))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 24)
-                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                            )
-                    )
+                    .glassCard(cornerRadius: 28)
                     .padding(.horizontal, 32)
-                    .shadow(color: Color.black.opacity(0.5), radius: 20, x: 0, y: 10)
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.9)))
             }
@@ -282,19 +266,12 @@ struct RoutineSelectionRow: View {
                 }
             }
             .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        isSelected ?
-                        Color.appTheme.opacity(0.15) :
-                        Color(hex: "131146")
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                isSelected ? Color.appTheme.opacity(0.5) : Color.clear,
-                                lineWidth: 2
-                            )
+            .glassCard(cornerRadius: 20, tint: isSelected ? Color.appTheme : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(
+                        isSelected ? Color.appTheme.opacity(0.6) : Color.clear,
+                        lineWidth: 1.5
                     )
             )
         }
@@ -317,13 +294,13 @@ struct RoutineSelectionRow: View {
 
     private func getDescriptionForRoutine(_ title: String) -> String {
         if title.contains("stress") {
-            return NSLocalizedString("settings.routine_desc.stress", comment: "")
+            return LanguageManager.shared.localizedString(for: "settings.routine_desc.stress")
         } else if title.contains("sommeil") || title.contains("sleep") {
-            return NSLocalizedString("settings.routine_desc.sleep", comment: "")
+            return LanguageManager.shared.localizedString(for: "settings.routine_desc.sleep")
         } else if title.contains("énergie") || title.contains("energy") {
-            return NSLocalizedString("settings.routine_desc.energy", comment: "")
+            return LanguageManager.shared.localizedString(for: "settings.routine_desc.energy")
         } else {
-            return NSLocalizedString("settings.routine_desc.default", comment: "")
+            return LanguageManager.shared.localizedString(for: "settings.routine_desc.default")
         }
     }
 }

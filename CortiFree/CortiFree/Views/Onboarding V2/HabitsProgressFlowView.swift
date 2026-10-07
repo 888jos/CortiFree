@@ -188,13 +188,10 @@ struct HabitsProgressFlowView: View {
                                 .font(.system(size: 17))
                                 .foregroundColor(currentHabitIndex == index ? Color(hex: "B794F6") : .white.opacity(0.5))
                                 .frame(width: 35, height: 35)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 9)
-                                        .fill(currentHabitIndex == index ? Color(hex: "B794F6").opacity(0.2) : Color.white.opacity(0.05))
-                                )
+                                .glassCard(cornerRadius: 10, tint: currentHabitIndex == index ? GlassTokens.accent : nil, interactive: true)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 9)
-                                        .stroke(currentHabitIndex == index ? Color(hex: "B794F6") : Color.white.opacity(0.2), lineWidth: 2)
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .strokeBorder(Color(hex: "B794F6").opacity(currentHabitIndex == index ? 1 : 0), lineWidth: 1.5)
                                 )
                         }
                         .disabled(!shouldRenderChart)
@@ -251,10 +248,7 @@ struct HabitsProgressFlowView: View {
                     }
                 }
                 .padding(24)
-                .background(
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.white.opacity(0.05))
-                )
+                .glassCard(cornerRadius: 24)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
                 .animation(nil, value: currentHabitIndex)
@@ -320,7 +314,7 @@ struct HabitsProgressFlowView: View {
 
                     // Track continue action
                     let timeSpent = screenViewTime.map { Date().timeIntervalSince($0) } ?? 0
-                    MixpanelManager.shared.trackOnboardingProgressContinue(
+                    AnalyticsManager.shared.trackOnboardingProgressContinue(
                         timeSpent: timeSpent
                     )
 
@@ -336,11 +330,9 @@ struct HabitsProgressFlowView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 28)
-                            .fill(Color(hex: "B794F6"))
-                    )
+                    .contentShape(Capsule())
                 }
+                .buttonStyle(.glassPrimary)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
@@ -348,7 +340,7 @@ struct HabitsProgressFlowView: View {
         .task {
             // Track screen view
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingHabitsProgressViewed()
+            AnalyticsManager.shared.trackOnboardingHabitsProgressViewed()
 
             // Initial load: show UI first
             try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 second

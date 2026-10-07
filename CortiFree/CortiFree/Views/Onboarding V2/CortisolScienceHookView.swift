@@ -37,7 +37,7 @@ struct CortisolScienceHookView: View {
 
     var body: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.8)
                 .ignoresSafeArea()
 
             Color.black.opacity(0.35)
@@ -96,7 +96,7 @@ struct CortisolScienceHookView: View {
                 Button(action: {
                     HapticManager.medium()
                     if let startTime = screenViewTime {
-                        MixpanelManager.shared.track(
+                        AnalyticsManager.shared.track(
                             event: "onboarding_science_hook_continue",
                             properties: ["time_spent": Date().timeIntervalSince(startTime)]
                         )
@@ -106,24 +106,22 @@ struct CortisolScienceHookView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(Color(hex: "1A1A4E"))
 
                         Text("cortisol_hook.cta".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(Color(hex: "1A1A4E"))
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 40))
+                    .contentShape(Capsule())
                 }
+                .buttonStyle(.glassPrimary)
                 .padding(.horizontal, 34)
                 .padding(.bottom, 50)
             }
         }
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.track(event: "onboarding_science_hook_viewed")
+            AnalyticsManager.shared.track(event: "onboarding_science_hook_viewed")
             startAnimations()
         }
     }
@@ -240,14 +238,7 @@ struct CortisolScienceHookView: View {
             .padding(.trailing, 30)
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(hex: "0A0A2E").opacity(0.6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 1)
-                )
-        )
+        .glassCard(cornerRadius: 18)
     }
 
     // MARK: - Legend item

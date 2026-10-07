@@ -100,19 +100,16 @@ final class OnboardingLiveActivityManager {
             return
         }
 
-        let isFrench = Locale.current.language.languageCode?.identifier == "fr"
         let state = CortiFreeWidgetAttributes.ContentState(
             phase: .limitedOffer,
             currentStep: 1,
             totalSteps: 1,
-            title: isFrench ? "Un cadeau t'attend" : "A gift is waiting for you",
-            subtitle: isFrench
-                ? "Ton offre personnalisee expire bientot."
-                : "Your personalized offer expires soon.",
+            title: LanguageManager.shared.localizedString(for: "inline.onboardingliveactivitymanager.00"),
+            subtitle: LanguageManager.shared.localizedString(for: "inline.onboardingliveactivitymanager.01"),
             offerEndsAt: endDate,
             imageName: "AppLogo",
             deepLinkPath: SuperwallPlacement.liveGift,
-            ctaTitle: isFrench ? "Ouvrir mon cadeau" : "Open my gift"
+            ctaTitle: LanguageManager.shared.localizedString(for: "inline.onboardingliveactivitymanager.02")
         )
 
         upsert(state, staleDate: endDate)

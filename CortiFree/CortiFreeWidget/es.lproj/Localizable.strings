@@ -1,0 +1,16 @@
+/* Generated from the English CortiFree localization. */
+"widget.description" = "Sus tareas diarias";
+"widget.lockscreen.display_name" = "CortiFree";
+"widget.display_name" = "CortiFree";
+"widget.day" = "Día";
+"widget.footer.low" = "%d%% completado, ¡es un comienzo!";
+"widget.program" = "PROGRAMA CORTIFREE";
+"widget.footer.almost" = "%d%% completado, la meta está cerca";
+"widget.lockscreen.description" = "Abra CortiFree desde la pantalla de bloqueo";
+"widget.day_of" = "/66";
+"widget.footer.high" = "%d%% completado, ¡ya estás a mitad de camino!";
+"widget.footer.perfect" = "100%% hecho, día perfecto";
+"widget.empty" = "Sin tareas para hoy";
+"widget.tasks" = "tareas";
+"widget.footer.mid" = "%d%% completado, vas por buen camino";
+"widget.footer.zero" = "0%% hecho, ¡empezar!";

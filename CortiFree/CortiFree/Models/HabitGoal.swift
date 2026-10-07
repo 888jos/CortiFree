@@ -82,9 +82,9 @@ struct HabitGoal: Codable {
 
     var formattedFrequency: String {
         if frequencyPerWeek >= 7 {
-            return NSLocalizedString("profile.habit.frequency.daily", comment: "")
+            return LanguageManager.shared.localizedString(for: "profile.habit.frequency.daily")
         } else {
-            return "\(frequencyPerWeek)x/\(NSLocalizedString("profile.habit.frequency.week", comment: ""))"
+            return "\(frequencyPerWeek)x/\(LanguageManager.shared.localizedString(for: "profile.habit.frequency.week"))"
         }
     }
 
@@ -133,9 +133,9 @@ struct HabitPerformance: Codable {
     var formattedAverageFrequency: String {
         let avgPerWeek = Int(round(averageCompletionsPerWeek))
         if avgPerWeek >= 7 {
-            return NSLocalizedString("profile.habit.frequency.daily", comment: "")
+            return LanguageManager.shared.localizedString(for: "profile.habit.frequency.daily")
         } else {
-            return "\(avgPerWeek)x/\(NSLocalizedString("profile.habit.frequency.week", comment: ""))"
+            return "\(avgPerWeek)x/\(LanguageManager.shared.localizedString(for: "profile.habit.frequency.week"))"
         }
     }
 

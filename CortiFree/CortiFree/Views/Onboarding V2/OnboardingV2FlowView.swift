@@ -13,6 +13,55 @@ import FirebaseAuth
 import FirebaseFirestore
 import UserNotifications
 
+#if DEBUG
+@MainActor
+enum OnboardingDebugNavigation {
+    static func goHome() {
+        let defaults = UserDefaults.standard
+        defaults.set(false, forKey: "onboarding_session_active")
+        defaults.set(true, forKey: "debugSkipOnboardingToHome")
+        OnboardingLiveActivityManager.shared.end()
+    }
+}
+
+struct OnboardingDebugHomeButton: View {
+    let beforeNavigation: () -> Void
+
+    init(beforeNavigation: @escaping () -> Void = {}) {
+        self.beforeNavigation = beforeNavigation
+    }
+
+    var body: some View {
+        Button {
+            HapticManager.medium()
+            beforeNavigation()
+            OnboardingDebugNavigation.goHome()
+        } label: {
+            Image(systemName: "house.fill")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 46, height: 46)
+                .background(Color.red.opacity(0.94))
+                .clipShape(Circle())
+                .shadow(color: .black.opacity(0.28), radius: 8, y: 3)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("DEBUG: Skip to Home")
+    }
+}
+
+extension View {
+    func onboardingDebugHomeButton() -> some View {
+        overlay(alignment: .topTrailing) {
+            OnboardingDebugHomeButton()
+                .padding(.top, 54)
+                .padding(.trailing, 12)
+                .zIndex(10_000)
+        }
+    }
+}
+#endif
+
 struct OnboardingV2FlowView: View {
     @Environment(\.scenePhase) private var scenePhase
 
@@ -23,9 +72,6 @@ struct OnboardingV2FlowView: View {
     @AppStorage("onboardingCheckpoint") private var savedCheckpoint: String = ""
     @AppStorage("hasSeenPaywall") private var hasSeenPaywall: Bool = false
     @AppStorage("onboardingLanguage") private var onboardingLanguage: String = "en" // Track language used
-    #if DEBUG
-    @AppStorage("debugSkipOnboardingToHome") private var debugSkipOnboardingToHome: Bool = false
-    #endif
     @State private var overallQuizData: OverallQuizData?
     @State private var habitsQuizResult: HabitsQuizResult?
     @State private var selectedSymptoms: Set<String> = []
@@ -54,8 +100,6 @@ struct OnboardingV2FlowView: View {
         case scientificPlan
         case authentication
         case loading
-        case cortiFreeRating
-        case glowScan
         case eightHabitsIntro
         case weekProgress
         case eightHabits
@@ -77,7 +121,7 @@ struct OnboardingV2FlowView: View {
                 return .sixtyDayExplanation
             case .authentication, .loading:
                 return .authentication
-            case .cortiFreeRating, .glowScan, .eightHabitsIntro, .weekProgress:
+            case .eightHabitsIntro, .weekProgress:
                 return .eightHabitsIntro
             case .eightHabits, .notificationPermissions, .habitsProgress, .commitmentPledge:
                 return .eightHabits
@@ -102,8 +146,7 @@ struct OnboardingV2FlowView: View {
 
             // Detect and save language on first load
             if onboardingLanguage.isEmpty || onboardingLanguage == "en" {
-                let systemLanguage = Locale.current.language.languageCode?.identifier ?? "en"
-                onboardingLanguage = systemLanguage.hasPrefix("fr") ? "fr" : "en"
+                onboardingLanguage = LanguageManager.shared.currentLanguage.rawValue
                 print("🌍 Detected onboarding language: \(onboardingLanguage)")
             }
 
@@ -128,19 +171,13 @@ struct OnboardingV2FlowView: View {
             UserDefaults.standard.set(false, forKey: "onboarding_session_active")
         }
         #if DEBUG
-        .overlay(alignment: .leading) {
-            Button(action: skipOnboardingToHome) {
-                Image(systemName: "house.fill")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 54, height: 54)
-                    .background(Color.red.opacity(0.94))
-                    .clipShape(Circle())
+        .overlay(alignment: .topTrailing) {
+            OnboardingDebugHomeButton {
+                suppressDropOffLiveActivity = true
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("DEBUG: Skip to Home")
-            .padding(.leading, 12)
-            .zIndex(1_000)
+            .padding(.top, 54)
+            .padding(.trailing, 12)
+            .zIndex(10_000)
         }
         #endif
     }
@@ -148,6 +185,15 @@ struct OnboardingV2FlowView: View {
     // MARK: - Checkpoint Management
 
     private func resumeFromCheckpoint() {
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "debugStartOnboardingFromAuth") {
+            UserDefaults.standard.removeObject(forKey: "debugStartOnboardingFromAuth")
+            prepareDebugAuthFlow()
+            currentStep = .authentication
+            return
+        }
+        #endif
+
         // If user has seen paywall but not completed onboarding, go directly to paywall
         if hasSeenPaywall && !isOnboardingComplete {
             #if DEBUG
@@ -155,6 +201,11 @@ struct OnboardingV2FlowView: View {
             #endif
             currentStep = .complete
             return
+        }
+
+        // Legacy checkpoints from the removed Glow Scan / score screens resume at authentication
+        if savedCheckpoint == "glowScan" || savedCheckpoint == "glowScore" {
+            savedCheckpoint = OnboardingStep.authentication.rawValue
         }
 
         // If we have a saved checkpoint, resume from there
@@ -166,6 +217,20 @@ struct OnboardingV2FlowView: View {
             currentStep = step.checkpoint
         }
     }
+
+    #if DEBUG
+    /// Recreates the state that normally exists after the quiz so the Home
+    /// debug shortcut exercises the current auth -> analysis flow.
+    private func prepareDebugAuthFlow() {
+        let quizResult = HabitsQuizResult(
+            answers: [1, 1, 2, 1, 2, 1, 2, 1, 1, 0, 1, 1]
+        )
+        let symptoms = ["Difficulty focusing", "Restless sleep"]
+
+        habitsQuizResult = quizResult
+        selectedSymptoms = Set(symptoms)
+    }
+    #endif
 
     private func saveCheckpoint(_ step: OnboardingStep) {
         savedCheckpoint = step.rawValue
@@ -185,7 +250,7 @@ struct OnboardingV2FlowView: View {
 
     private func trackOnboardingScreen(_ step: OnboardingStep) {
         let stepNumber = (OnboardingStep.allCases.firstIndex(of: step) ?? 0) + 1
-        MixpanelManager.shared.trackOnboardingScreenViewed(
+        AnalyticsManager.shared.trackOnboardingScreenViewed(
             screenName: step.rawValue,
             stepNumber: stepNumber,
             totalSteps: OnboardingStep.allCases.count
@@ -220,14 +285,6 @@ struct OnboardingV2FlowView: View {
     }
 
     #if DEBUG
-    private func skipOnboardingToHome() {
-        suppressDropOffLiveActivity = true
-        UserDefaults.standard.set(false, forKey: "onboarding_session_active")
-        UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
-        OnboardingLiveActivityManager.shared.end()
-        isOnboardingComplete = true
-        debugSkipOnboardingToHome = true
-    }
     #endif
 
     @ViewBuilder
@@ -321,29 +378,6 @@ struct OnboardingV2FlowView: View {
                 selectedSymptoms: selectedSymptoms,
                 onComplete: {
                     currentStep = .eightHabitsIntro
-                }
-            )
-
-        case .cortiFreeRating:
-            // Legacy checkpoint compatibility: skip the deprecated rating screen.
-            EightHabitsIntroView(onContinue: {
-                currentStep = .weekProgress
-            })
-
-        case .glowScan:
-            GlowScanFlowView(
-                context: GlowOnboardingContext(
-                    primaryGoal: habitsQuizResult?.primaryGoal ?? "balance",
-                    appearanceConcern: habitsQuizResult?.appearanceConcern ?? "",
-                    symptoms: Array(selectedSymptoms),
-                    reasons: overallQuizData?.reasons ?? [],
-                    domainScore: habitsQuizResult?.cortiFreeScore
-                ),
-                onComplete: {
-                    currentStep = .stressPatternValidation
-                },
-                onExit: {
-                    currentStep = .stressPatternValidation
                 }
             )
 
@@ -475,6 +509,7 @@ struct OnboardingV2FlowView: View {
 
         // Using @AppStorage, this will automatically trigger view update
         isOnboardingComplete = true
+        TikTokManager.shared.requestTrackingAuthorizationIfNeeded()
         if isPremium {
             OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
         } else if hasSeenPaywall {
@@ -489,14 +524,22 @@ struct OnboardingV2FlowView: View {
     // MARK: - Firebase Integration
 
     private func saveDataAndGeneratePlan(result: HabitsQuizResult) {
+        // Plan personnalisé (28 jours) généré à partir des réponses : raison + durée du stress,
+        // âge, réponses du quiz habitudes (domaines les plus fragiles, objectif, temps dispo)
+        // et symptômes. Sauvegardé en local + Firestore users/{uid}/personalized_plan/current.
+        PlanGenerationService.shared.generatePersonalizedPlan(
+            quizResult: result,
+            overallData: overallQuizData,
+            symptoms: selectedSymptoms
+        )
+
         Task {
             // Save quiz responses to Firebase
-            // Le plan est le même pour tous les utilisateurs (SimplifiedRoutineProgram)
             if let overallData = overallQuizData {
                 await saveOverallDataToFirebase(overallData)
             }
             #if DEBUG
-            print("✅ User data saved - using universal program for all users")
+            print("✅ User data saved - personalized plan generated")
             #endif
         }
     }
@@ -548,9 +591,19 @@ struct OnboardingBreathingIntroView: View {
     @State private var hasSeenIntro = false
     @State private var isComplete = false
     @State private var elapsedSeconds = 0
-    @State private var circleScale: CGFloat = 0.82
-    @State private var breathGeneration = 0
+    @State private var breathStartDate: Date?
     @State private var hasExited = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// 4 s inhale / 6 s exhale.
+    private static let introTimeline = BreathingTimeline(pattern: BreathingPattern(
+        key: "onboarding_intro",
+        name: "onboarding_intro",
+        displayName: "4-6",
+        inhaleDuration: 4,
+        exhaleDuration: 6,
+        description: ""
+    ))
 
     private let duration = 30
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -585,7 +638,7 @@ struct OnboardingBreathingIntroView: View {
                     }
 
                     if !isComplete {
-                        Button("Skip") {
+                        Button("onboarding_v2.skip".localized) {
                             HapticManager.light()
                             exitToNextStep()
                         }
@@ -602,7 +655,6 @@ struct OnboardingBreathingIntroView: View {
             elapsedSeconds += 1
             if elapsedSeconds >= duration {
                 isComplete = true
-                circleScale = 1.0
                 HapticManager.medium()
             }
         }
@@ -620,13 +672,13 @@ struct OnboardingBreathingIntroView: View {
                 .frame(width: 132, height: 132)
                 .accessibilityHidden(true)
 
-            Text("Take a calmer moment")
+            Text("onboarding_v2.breathing_intro.title".localized)
                 .font(.faroBold(29))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .padding(.top, 18)
 
-            Text("Take a slow breath with me. We’ll begin with one simple step.")
+            Text("onboarding_v2.breathing_intro.subtitle".localized)
                 .font(.poppinsRegular(16))
                 .foregroundStyle(.white.opacity(0.72))
                 .multilineTextAlignment(.center)
@@ -648,7 +700,7 @@ struct OnboardingBreathingIntroView: View {
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
-                Text(isComplete ? "You just created a calm moment." : "Follow the circle: breathe in for 4 seconds, then out for 6.")
+                Text(isComplete ? "You just created a calm moment." : "Follow the curve: breathe in for 4 seconds, then out for 6.")
                     .font(.poppinsRegular(16))
                     .foregroundStyle(.white.opacity(0.72))
                     .multilineTextAlignment(.center)
@@ -657,28 +709,38 @@ struct OnboardingBreathingIntroView: View {
 
             Spacer(minLength: 18)
 
-            ZStack {
-                BreathingCircle(
-                    planet: planetSettings.selectedPlanet,
-                    size: 270,
-                    haloOpacity: isStarted ? 0.5 : 0.3
-                )
-                .scaleEffect(circleScale)
+            // Same "roller coaster" curve as the breathing sessions: it rises on the
+            // inhale, falls on the exhale and scrolls past the fixed marker.
+            TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: !isStarted || isComplete)) { context in
+                let elapsed = breathStartDate.map { context.date.timeIntervalSince($0) } ?? 0
+                VStack(spacing: 18) {
+                    VStack(spacing: 5) {
+                        Text(isStarted ? phaseTitle(at: elapsed) : "Ready?")
+                            .font(.faroBold(25))
+                            .foregroundStyle(.white)
+                        Text(isStarted ? phaseCountdown(at: elapsed) : "4 in / 6 out")
+                            .font(.poppinsMedium(16))
+                            .foregroundStyle(.white.opacity(0.78))
+                            .monospacedDigit()
+                    }
 
-                VStack(spacing: 5) {
-                    Text(isStarted ? phaseTitle : "Ready?")
-                        .font(.faroBold(25))
-                        .foregroundStyle(.white)
+                    BreathingWaveView(
+                        timeline: Self.introTimeline,
+                        elapsed: isStarted ? elapsed : 0,
+                        accent: AudioPalette.accent,
+                        reduceMotion: reduceMotion
+                    )
+                    .frame(height: 220)
+                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .padding(.horizontal, 20)
 
-                    Text(isStarted ? timeText : "4 in / 6 out")
-                        .font(.poppinsMedium(16))
-                        .foregroundStyle(.white.opacity(0.78))
+                    Text(timeText)
+                        .font(.poppinsMedium(15))
+                        .foregroundStyle(.white.opacity(0.6))
                         .monospacedDigit()
+                        .opacity(isStarted ? 1 : 0)
                 }
             }
-            // The breathing animation is contained inside a fixed frame, so
-            // the header and CTA never move when the circle expands.
-            .frame(width: 300, height: 300)
 
             Spacer()
         }
@@ -701,7 +763,7 @@ struct OnboardingBreathingIntroView: View {
             Spacer()
 
             if !isStarted {
-                Button("Skip") {
+                Button("onboarding_v2.skip".localized) {
                     HapticManager.light()
                     exitToNextStep()
                 }
@@ -725,8 +787,14 @@ struct OnboardingBreathingIntroView: View {
         onContinue()
     }
 
-    private var phaseTitle: String {
-        elapsedSeconds % 10 < 4 ? "Inhale" : "Exhale"
+    private func phaseTitle(at elapsed: Double) -> String {
+        elapsed.truncatingRemainder(dividingBy: 10) < 4 ? "Inhale" : "Exhale"
+    }
+
+    private func phaseCountdown(at elapsed: Double) -> String {
+        let t = elapsed.truncatingRemainder(dividingBy: 10)
+        let remaining = t < 4 ? 4 - t : 10 - t
+        return "\(Int(ceil(remaining)))"
     }
 
     private var timeText: String {
@@ -747,27 +815,6 @@ struct OnboardingBreathingIntroView: View {
     }
 
     private func startBreathingCycle() {
-        breathGeneration += 1
-        animateInhale(generation: breathGeneration)
-    }
-
-    private func animateInhale(generation: Int) {
-        guard isStarted, !isComplete, generation == breathGeneration else { return }
-        withAnimation(.easeInOut(duration: 4)) {
-            circleScale = 1.0
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            animateExhale(generation: generation)
-        }
-    }
-
-    private func animateExhale(generation: Int) {
-        guard isStarted, !isComplete, generation == breathGeneration else { return }
-        withAnimation(.easeInOut(duration: 6)) {
-            circleScale = 0.82
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-            animateInhale(generation: generation)
-        }
+        breathStartDate = Date()
     }
 }

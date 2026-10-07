@@ -75,10 +75,7 @@ struct SymptomCheckerView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(accentPurple.opacity(0.25))
-                        )
+                        .glassCard(cornerRadius: 12, tint: accentPurple)
 
                     Text("symptom_checker.select_all".localized)
                         .font(.custom("Poppins-Regular", size: 14))
@@ -121,7 +118,7 @@ struct SymptomCheckerView: View {
                     Button(action: {
                         HapticManager.medium()
                         if let startTime = screenViewTime {
-                            MixpanelManager.shared.track(
+                            AnalyticsManager.shared.track(
                                 event: "onboarding_symptom_checker_continue",
                                 properties: [
                                     "time_spent": Date().timeIntervalSince(startTime),
@@ -134,12 +131,11 @@ struct SymptomCheckerView: View {
                     }) {
                         Text("symptom_checker.cta".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(Color(hex: "1A1A4E"))
+                            .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 40))
                     }
+                    .buttonStyle(.glassPrimary)
                     .padding(.horizontal, 34)
                     .padding(.bottom, 50)
                     .background(Color.black.opacity(0.85))
@@ -148,7 +144,7 @@ struct SymptomCheckerView: View {
         }
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.track(event: "onboarding_symptom_checker_viewed", properties: [:])
+            AnalyticsManager.shared.track(event: "onboarding_symptom_checker_viewed", properties: [:])
         }
     }
 
@@ -206,9 +202,11 @@ struct SymptomCheckerView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 14)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? accentPurple.opacity(0.18) : Color.white.opacity(0.05))
+            .glassCard(cornerRadius: 14, tint: isSelected ? accentPurple : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(accentPurple, lineWidth: 1.5)
+                    .opacity(isSelected ? 1 : 0)
             )
         }
         .buttonStyle(.plain)

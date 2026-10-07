@@ -32,7 +32,7 @@ struct StressPatternValidationView: View {
         return max(54, min(96, Int(Double(score) * 0.42 + 54)))
     }
 
-    // Kept for Mixpanel tracking
+    // Kept for analytics tracking
     private var cortisolPercentAbove: Int {
         userCortisolValue - avgCortisolValue
     }
@@ -61,7 +61,7 @@ struct StressPatternValidationView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 22))
-                        .foregroundColor(Color(hex: "FF6B9D"))
+                        .foregroundColor(Color(hex: "7ED957"))
 
                     Text("stress_pattern.analysis_complete".localized)
                         .font(.faroSemiBold(22))
@@ -115,7 +115,7 @@ struct StressPatternValidationView: View {
 
                     if let startTime = screenViewTime {
                         let timeSpent = Date().timeIntervalSince(startTime)
-                        MixpanelManager.shared.track(
+                        AnalyticsManager.shared.track(
                             event: "onboarding_stress_pattern_continue",
                             properties: [
                                 "time_spent": timeSpent,
@@ -129,24 +129,23 @@ struct StressPatternValidationView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "stethoscope")
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(Color(hex: "1A1A4E"))
+                            .foregroundColor(.white)
 
                         Text("stress_pattern.cta".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(Color(hex: "1A1A4E"))
+                            .foregroundColor(.white)
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 40))
                 }
+                .buttonStyle(.glassPrimary)
                 .padding(.horizontal, 34)
                 .padding(.bottom, 50)
             }
         }
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.track(
+            AnalyticsManager.shared.track(
                 event: "onboarding_stress_pattern_viewed",
                 properties: ["cortisol_percent_above": cortisolPercentAbove]
             )
@@ -167,7 +166,7 @@ struct StressPatternValidationView: View {
             HStack(alignment: .bottom, spacing: 38) {
                 Spacer()
 
-                // User bar (rouge)
+                // User bar (red: elevated level)
                 VStack(spacing: 0) {
                     Text("\(userCortisolValue)")
                         .font(.faroBold(18))
@@ -180,7 +179,7 @@ struct StressPatternValidationView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
                             LinearGradient(
-                                colors: [Color(hex: "FF8A80"), Color(hex: "EF4444")],
+                                colors: [Color(hex: "FF6B6B"), Color(hex: "EF4444")],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -207,7 +206,7 @@ struct StressPatternValidationView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
                             LinearGradient(
-                                colors: [Color(hex: "FF6B9D"), Color(hex: "E9B6FF")],
+                                colors: [Color(hex: "B7F7A6"), Color(hex: "53B96B")],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )

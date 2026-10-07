@@ -14,9 +14,9 @@ enum ExerciseType: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .breathing: return NSLocalizedString("exercise_type.breathing", comment: "")
-        case .meditation: return NSLocalizedString("exercise_type.meditation", comment: "")
-        case .sound: return NSLocalizedString("exercise_type.sound", comment: "")
+        case .breathing: return LanguageManager.shared.localizedString(for: "exercise_type.breathing")
+        case .meditation: return LanguageManager.shared.localizedString(for: "exercise_type.meditation")
+        case .sound: return LanguageManager.shared.localizedString(for: "exercise_type.sound")
         }
     }
 }
@@ -30,132 +30,150 @@ struct Exercise: Identifiable {
     let audioFileName: String?
     let icon: String
 
-    static let breathingExercises: [Exercise] = [
+    // Computed collections are intentional: titles and descriptions must be
+    // rebuilt after the user changes the app language.
+    static var breathingExercises: [Exercise] {
+        [
         Exercise(id: "deep-abdominal",
-                title: NSLocalizedString("breathing.deep_abdominal.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.deep_abdominal.title"),
                 type: .breathing, duration: 180,
-                description: NSLocalizedString("breathing.deep_abdominal.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.deep_abdominal.description"),
                 audioFileName: nil, icon: "wind"),
         Exercise(id: "478",
-                title: NSLocalizedString("breathing.478.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.478.title"),
                 type: .breathing, duration: 300,
-                description: NSLocalizedString("breathing.478.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.478.description"),
                 audioFileName: nil, icon: "moon.stars.fill"),
         Exercise(id: "coherence",
-                title: NSLocalizedString("breathing.coherence.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.coherence.title"),
                 type: .breathing, duration: 420,
-                description: NSLocalizedString("breathing.coherence.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.coherence.description"),
                 audioFileName: nil, icon: "heart.fill"),
         Exercise(id: "slow-66",
-                title: NSLocalizedString("breathing.slow.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.slow.title"),
                 type: .breathing, duration: 420,
-                description: NSLocalizedString("breathing.slow.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.slow.description"),
                 audioFileName: nil, icon: "bed.double.fill"),
         Exercise(id: "triangle",
-                title: NSLocalizedString("breathing.triangle.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.triangle.title"),
                 type: .breathing, duration: 300,
-                description: NSLocalizedString("breathing.triangle.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.triangle.description"),
                 audioFileName: nil, icon: "triangle"),
         Exercise(id: "box",
-                title: NSLocalizedString("breathing.box.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.box.title"),
                 type: .breathing, duration: 420,
-                description: NSLocalizedString("breathing.box.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.box.description"),
                 audioFileName: nil, icon: "square"),
         Exercise(id: "kapalabhati",
-                title: NSLocalizedString("breathing.kapalabhati.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.kapalabhati.title"),
                 type: .breathing, duration: 300,
-                description: NSLocalizedString("breathing.kapalabhati.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.kapalabhati.description"),
                 audioFileName: nil, icon: "bolt.fill"),
         Exercise(id: "bhastrika",
-                title: NSLocalizedString("breathing.bhastrika.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "breathing.bhastrika.title"),
                 type: .breathing, duration: 300,
-                description: NSLocalizedString("breathing.bhastrika.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "breathing.bhastrika.description"),
                 audioFileName: nil, icon: "flame.fill")
-    ]
+        ]
+    }
 
-    static let sounds: [Exercise] = [
+    static var sounds: [Exercise] {
+        [
         Exercise(id: "rain",
-                title: NSLocalizedString("sounds.rain", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.rain"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.rain.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.rain.description"),
                 audioFileName: "rain.m4a", icon: "cloud.rain.fill"),
         Exercise(id: "ocean",
-                title: NSLocalizedString("sounds.ocean", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.ocean"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.ocean.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.ocean.description"),
                 audioFileName: "ocean.m4a", icon: "water.waves"),
         Exercise(id: "fire",
-                title: NSLocalizedString("sounds.fire", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.fire"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.fire.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.fire.description"),
                 audioFileName: "fire.m4a", icon: "flame.fill"),
         Exercise(id: "whitenoise",
-                title: NSLocalizedString("sounds.whitenoise", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.whitenoise"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.whitenoise.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.whitenoise.description"),
                 audioFileName: "whitenoise.m4a", icon: "waveform"),
         Exercise(id: "wind",
-                title: NSLocalizedString("sounds.morning", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.morning"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.morning.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.morning.description"),
                 audioFileName: "morning.m4a", icon: "sunrise.fill"),
         Exercise(id: "forest",
-                title: NSLocalizedString("sounds.forest", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.forest"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.forest.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.forest.description"),
                 audioFileName: "forest.m4a", icon: "leaf.fill"),
         Exercise(id: "stream",
-                title: NSLocalizedString("sounds.stream", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.stream"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.stream.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.stream.description"),
                 audioFileName: "stream.m4a", icon: "drop.fill"),
         Exercise(id: "night",
-                title: NSLocalizedString("sounds.night", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "sounds.night"),
                 type: .sound, duration: 0,
-                description: NSLocalizedString("sounds.night.description", comment: ""),
+                description: LanguageManager.shared.localizedString(for: "sounds.night.description"),
                 audioFileName: "summer-night.m4a", icon: "moon.stars.fill")
-    ]
+        ]
+    }
 
-    static let meditations: [Exercise] = [
+    // Meditations are guided audio sessions (GuidedSessionPlayer): no bundled mp3.
+    // `guidedSession` maps each legacy id to its audio session.
+    static var meditations: [Exercise] {
+        [
         Exercise(id: "conscious-breathing",
-                title: NSLocalizedString("meditation.conscious_breathing.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.title"),
                 type: .meditation, duration: 180,
-                description: NSLocalizedString("meditation.conscious_breathing.short_description", comment: ""),
-                audioFileName: "conscious-breathing.mp3", icon: "wind"),
+                description: LanguageManager.shared.localizedString(for: "meditation.conscious_breathing.short_description"),
+                audioFileName: nil, icon: "wind"),
         Exercise(id: "body-scan",
-                title: NSLocalizedString("meditation.body_scan.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.body_scan.title"),
                 type: .meditation, duration: 300,
-                description: NSLocalizedString("meditation.body_scan.short_description", comment: ""),
-                audioFileName: "body-scan.mp3", icon: "figure.stand"),
+                description: LanguageManager.shared.localizedString(for: "meditation.body_scan.short_description"),
+                audioFileName: nil, icon: "figure.stand"),
         Exercise(id: "mindfulness",
-                title: NSLocalizedString("meditation.mindfulness.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.mindfulness.title"),
                 type: .meditation, duration: 480,
-                description: NSLocalizedString("meditation.mindfulness.short_description", comment: ""),
-                audioFileName: "mindfulness.mp3", icon: "eye.fill"),
+                description: LanguageManager.shared.localizedString(for: "meditation.mindfulness.short_description"),
+                audioFileName: nil, icon: "eye.fill"),
         Exercise(id: "grounding",
-                title: NSLocalizedString("meditation.grounding.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.grounding.title"),
                 type: .meditation, duration: 480,
-                description: NSLocalizedString("meditation.grounding.short_description", comment: ""),
-                audioFileName: "grounding.mp3", icon: "leaf.fill"),
+                description: LanguageManager.shared.localizedString(for: "meditation.grounding.short_description"),
+                audioFileName: nil, icon: "leaf.fill"),
         Exercise(id: "visualization",
-                title: NSLocalizedString("meditation.visualization.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.visualization.title"),
                 type: .meditation, duration: 600,
-                description: NSLocalizedString("meditation.visualization.short_description", comment: ""),
-                audioFileName: "visualization.mp3", icon: "sparkles"),
+                description: LanguageManager.shared.localizedString(for: "meditation.visualization.short_description"),
+                audioFileName: nil, icon: "sparkles"),
         Exercise(id: "compassion",
-                title: NSLocalizedString("meditation.compassion.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.compassion.title"),
                 type: .meditation, duration: 600,
-                description: NSLocalizedString("meditation.compassion.short_description", comment: ""),
-                audioFileName: "compassion.mp3", icon: "heart.fill"),
+                description: LanguageManager.shared.localizedString(for: "meditation.compassion.short_description"),
+                audioFileName: nil, icon: "heart.fill"),
         Exercise(id: "focus-clarity",
-                title: NSLocalizedString("meditation.focus_clarity.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.title"),
                 type: .meditation, duration: 720,
-                description: NSLocalizedString("meditation.focus_clarity.short_description", comment: ""),
-                audioFileName: "focus-clarity.mp3", icon: "brain.head.profile"),
+                description: LanguageManager.shared.localizedString(for: "meditation.focus_clarity.short_description"),
+                audioFileName: nil, icon: "brain.head.profile"),
         Exercise(id: "yoga-nidra",
-                title: NSLocalizedString("meditation.yoga_nidra.title", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.title"),
                 type: .meditation, duration: 1200,
-                description: NSLocalizedString("meditation.yoga_nidra.short_description", comment: ""),
-                audioFileName: "yoga-nidra.mp3", icon: "moon.stars.fill")
-    ]
+                description: LanguageManager.shared.localizedString(for: "meditation.yoga_nidra.short_description"),
+                audioFileName: nil, icon: "moon.stars.fill")
+        ]
+    }
+}
+
+extension Exercise {
+    /// Guided audio session backing this meditation (nil for breathing / sounds).
+    var guidedSession: GuidedSession? {
+        guard type == .meditation else { return nil }
+        return GuidedSessionCatalog.session(forLegacyID: id)
+    }
 }

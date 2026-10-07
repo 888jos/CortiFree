@@ -109,7 +109,7 @@ struct ReassuranceView: View {
                             // Track button click with time spent
                             if let startTime = screenViewTime {
                                 let timeSpent = Date().timeIntervalSince(startTime)
-                                MixpanelManager.shared.trackOnboardingReassuranceContinue(timeSpent: timeSpent)
+                                AnalyticsManager.shared.trackOnboardingReassuranceContinue(timeSpent: timeSpent)
                             }
 
                             onStartQuiz()
@@ -117,12 +117,12 @@ struct ReassuranceView: View {
                             HStack(spacing: 12) {
                                 Text("onboarding_v2.reassurance.start_quiz".localized)
                                     .font(.custom("Poppins-SemiBold", size: 16))
-                                    .foregroundColor(Color(hex: "1A1A4E"))
+                                    .foregroundColor(.white)
 
                                 // White arrow in dark circle
                                 ZStack {
                                     Circle()
-                                        .fill(Color(hex: "1A1A4E"))
+                                        .fill(Color.white.opacity(0.2))
                                         .frame(width: 32, height: 32)
 
                                     Image(systemName: "arrow.right")
@@ -133,9 +133,8 @@ struct ReassuranceView: View {
                             .padding(.vertical, 12)
                             .padding(.leading, 24)
                             .padding(.trailing, 12)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 40))
                         }
+                        .buttonStyle(.glassPrimary)
 
                         // Time estimate (centered below button)
                         Text("onboarding_v2.reassurance.time_estimate".localized)
@@ -153,7 +152,7 @@ struct ReassuranceView: View {
         .onAppear {
             // Track screen view
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingReassuranceViewed(userName: "")
+            AnalyticsManager.shared.trackOnboardingReassuranceViewed(userName: "")
 
             setupVideo()
             startTextAnimation()

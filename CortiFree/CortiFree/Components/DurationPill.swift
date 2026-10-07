@@ -25,16 +25,12 @@ struct DurationPill: View {
                 .foregroundColor(isSelected ? .white : Color.white.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isSelected ? Color.appTheme.opacity(0.3) : Color.white.opacity(0.05))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(
-                                    isSelected ? Color.appTheme : Color.white.opacity(0.1),
-                                    lineWidth: isSelected ? 2 : 1
-                                )
-                        )
+                .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .glassCard(cornerRadius: 12, tint: isSelected ? Color.appTheme : nil, interactive: true)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(Color.appTheme, lineWidth: 1.5)
+                        .opacity(isSelected ? 1 : 0)
                 )
         }
         .buttonStyle(ScaleButtonStyle())

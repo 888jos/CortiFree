@@ -77,19 +77,19 @@ struct AchievementUnlockView: View {
                 // Card content
                 VStack(spacing: 16) {
                     // Title
-                    Text("Achievement Unlocked!")
+                    Text("achievement.unlocked".localized)
                         .font(Font.Poppins.custom(.bold, size: 22))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
                     // Achievement name
-                    Text(achievement.englishTitle)
+                    Text(achievement.title)
                         .font(.custom("Poppins-Bold", size: 20))
                         .foregroundColor(categoryColor)
                         .multilineTextAlignment(.center)
 
                     // Description
-                    Text(achievement.englishDescription)
+                    Text(achievement.description)
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.8))
                         .multilineTextAlignment(.center)
@@ -121,58 +121,34 @@ struct AchievementUnlockView: View {
                 Button(action: {
                     dismissCard()
                 }) {
-                    Text("Continue")
+                    Text("common.continue".localized)
                         .font(.custom("Poppins-SemiBold", size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            categoryColor,
-                                            categoryColor.opacity(0.8)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                        )
+                        .contentShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius, style: .continuous))
                 }
+                .buttonStyle(.glassPrimary(tint: categoryColor, cornerRadius: AppConstants.Layout.cornerRadius))
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
             }
             .frame(width: 340)
-            .background(
-                RoundedRectangle(cornerRadius: 28)
-                    .fill(
+            .glassCard(cornerRadius: 28, tint: categoryColor)
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .strokeBorder(
                         LinearGradient(
                             colors: [
-                                Color(hex: "1A1A2E"),
-                                Color(hex: "16213E")
+                                categoryColor.opacity(0.45),
+                                categoryColor.opacity(0.1)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
-                        )
+                        ),
+                        lineWidth: 1
                     )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 28)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        categoryColor.opacity(0.6),
-                                        categoryColor.opacity(0.2)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
-                    )
-                    .shadow(color: categoryColor.opacity(0.4), radius: 30, x: 0, y: 15)
-                    .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 10)
             )
+            .shadow(color: categoryColor.opacity(0.25), radius: 30, x: 0, y: 15)
             .scaleEffect(cardScale)
             .opacity(cardOpacity)
             .offset(y: cardOffset)
@@ -244,13 +220,13 @@ struct AchievementUnlockView: View {
     private var categoryName: String {
         switch achievement.category {
         case .streak:
-            return "Streak"
+            return "achievement.category.streak".localized
         case .completion:
-            return "Completion"
+            return "achievement.category.completion".localized
         case .habit:
-            return "Habit"
+            return "achievement.category.habit".localized
         case .special:
-            return "Special"
+            return "achievement.category.special".localized
         }
     }
 }

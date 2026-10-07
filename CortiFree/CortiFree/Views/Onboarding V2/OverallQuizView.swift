@@ -92,7 +92,7 @@ struct OverallQuizView: View {
         .onAppear {
             quizStartTime = Date()
             questionStartTime = Date()
-            MixpanelManager.shared.trackOnboardingOverallQuizViewed()
+            AnalyticsManager.shared.trackOnboardingOverallQuizViewed()
             // Track first question viewed
             trackQuestionViewed(0)
         }
@@ -132,7 +132,7 @@ struct OverallQuizView: View {
             "Genre",
             "Âge"
         ]
-        MixpanelManager.shared.trackOnboardingQuizQuestionViewed(
+        AnalyticsManager.shared.trackOnboardingQuizQuestionViewed(
             questionNumber: index + 1,
             questionText: questionTexts[safe: index] ?? "Question \(index + 1)",
             quizType: "overall"
@@ -147,7 +147,7 @@ struct OverallQuizView: View {
             "Âge"
         ]
         let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
-        MixpanelManager.shared.trackOnboardingQuizQuestionAnswered(
+        AnalyticsManager.shared.trackOnboardingQuizQuestionAnswered(
             questionNumber: index + 1,
             questionText: questionTexts[safe: index] ?? "Question \(index + 1)",
             answerIndex: answerIndex,
@@ -426,12 +426,11 @@ struct OverallQuizView: View {
                         }) {
                             Text(StringKeys.Common.continueButton)
                                 .font(.custom("Poppins-SemiBold", size: 16))
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 54)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 40))
                         }
+                        .buttonStyle(.glassPrimary)
                         .padding(.top, 8)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
@@ -535,7 +534,7 @@ struct OverallQuizView: View {
         let ageString = ageOptions[selectedAge ?? 0]
         let ageInt = extractAgeFromString(ageString)
 
-        MixpanelManager.shared.trackOnboardingOverallQuizCompleted(
+        AnalyticsManager.shared.trackOnboardingOverallQuizCompleted(
             firstName: "",
             age: ageInt,
             gender: genderCode,
@@ -614,16 +613,11 @@ struct OverallAnswerButton: View {
             }
             .padding(.horizontal, 16)
             .frame(height: 54)
-            .background(
-                RoundedRectangle(cornerRadius: 40)
-                    .fill(isSelected ? Color(hex: "B794F6") : Color(hex: "131146").opacity(0.8))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 40)
-                            .stroke(
-                                isSelected ? Color(hex: "D4B4FF") : Color(hex: "1B1864"),
-                                lineWidth: 2
-                            )
-                    )
+            .glassCard(cornerRadius: 27, tint: isSelected ? Color(hex: "B794F6") : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 27, style: .continuous)
+                    .strokeBorder(Color(hex: "D4B4FF"), lineWidth: 2)
+                    .opacity(isSelected ? 1 : 0)
             )
         }
         .buttonStyle(PlainButtonStyle())
@@ -660,7 +654,7 @@ struct OverallIdentityCard: View {
                     if isSelected {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 24, weight: .semibold))
-                            .foregroundStyle(Color(hex: "FF6B9D"), .black)
+                            .foregroundStyle(Color(hex: "B794F6"), .black)
                             .padding(10)
                     }
                 }
@@ -670,13 +664,13 @@ struct OverallIdentityCard: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
-                    .background(Color(hex: "131146"))
             }
-            .background(Color(hex: "131146"))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .glassCard(cornerRadius: 14, tint: isSelected ? Color(hex: "B794F6") : nil, interactive: true)
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .stroke(isSelected ? Color(hex: "FF6B9D") : Color(hex: "4CC6FF").opacity(0.45), lineWidth: isSelected ? 3 : 1)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(Color(hex: "B794F6"), lineWidth: 3)
+                    .opacity(isSelected ? 1 : 0)
             }
         }
         .buttonStyle(.plain)

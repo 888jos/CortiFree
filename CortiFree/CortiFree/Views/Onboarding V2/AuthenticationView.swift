@@ -127,10 +127,16 @@ struct AuthenticationView: View {
 
             VStack(spacing: 0) {
                 // Message at top
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("onboarding_v2.auth.create_account_message".localized)
-                        .font(.faroBold(32))
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("onboarding_v2.auth.title".localized)
+                        .font(.faroBold(30))
                         .foregroundColor(.white)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text("onboarding_v2.auth.subtitle".localized)
+                        .font(.custom("Poppins-Regular", size: 16))
+                        .foregroundColor(.white.opacity(0.76))
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -212,11 +218,9 @@ struct AuthenticationView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
+                        .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassSecondary)
                     .padding(.horizontal, 32)
                 }
 
@@ -224,7 +228,7 @@ struct AuthenticationView: View {
                     HapticManager.light()
                     onSkip()
                 }) {
-                    Text("Skip ->")
+                    Text("onboarding_v2.auth.skip".localized)
                         .font(.custom("Poppins-Medium", size: 16))
                         .foregroundColor(.white.opacity(0.9))
                         .underline()
@@ -259,7 +263,7 @@ struct AuthenticationView: View {
 
                 // Track auth completion
                 if let userId = Auth.auth().currentUser?.uid {
-                    MixpanelManager.shared.trackOnboardingAuthenticationCompleted(
+                    AnalyticsManager.shared.trackOnboardingAuthenticationCompleted(
                         authMethod: "email",
                         userId: userId
                     )
@@ -267,6 +271,9 @@ struct AuthenticationView: View {
 
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
         .fullScreenCover(isPresented: $showGoogleAuth) {
             GoogleAuthView(onComplete: {
@@ -274,7 +281,7 @@ struct AuthenticationView: View {
 
                 // Track auth completion
                 if let userId = Auth.auth().currentUser?.uid {
-                    MixpanelManager.shared.trackOnboardingAuthenticationCompleted(
+                    AnalyticsManager.shared.trackOnboardingAuthenticationCompleted(
                         authMethod: "google",
                         userId: userId
                     )
@@ -282,6 +289,9 @@ struct AuthenticationView: View {
 
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
         .fullScreenCover(isPresented: $showAppleAuth) {
             AppleAuthView(onComplete: {
@@ -289,7 +299,7 @@ struct AuthenticationView: View {
 
                 // Track auth completion
                 if let userId = Auth.auth().currentUser?.uid {
-                    MixpanelManager.shared.trackOnboardingAuthenticationCompleted(
+                    AnalyticsManager.shared.trackOnboardingAuthenticationCompleted(
                         authMethod: "apple",
                         userId: userId
                     )
@@ -297,10 +307,13 @@ struct AuthenticationView: View {
 
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
         .onAppear {
             // Track authentication screen view
-            MixpanelManager.shared.trackOnboardingAuthenticationViewed(firstName: "")
+            AnalyticsManager.shared.trackOnboardingAuthenticationViewed(firstName: "")
         }
     }
 
@@ -310,13 +323,13 @@ struct AuthenticationView: View {
         switch result {
         case .success(let authorization):
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                errorMessage = NSLocalizedString("error.auth.apple_error", comment: "")
+                errorMessage = LanguageManager.shared.localizedString(for: "error.auth.apple_error")
                 return
             }
 
             guard let appleIDToken = appleIDCredential.identityToken,
                   let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                errorMessage = NSLocalizedString("error.auth.token_error", comment: "")
+                errorMessage = LanguageManager.shared.localizedString(for: "error.auth.token_error")
                 return
             }
 
@@ -467,11 +480,11 @@ struct EmailAuthView: View {
                                         .focused($focusedField, equals: .username)
                                         .padding(14)
                                         .background(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .fill(Color.white.opacity(0.1))
+                                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                .fill(Color.white.opacity(0.06))
                                                 .overlay(
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .stroke(focusedField == .username ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                        .strokeBorder(focusedField == .username ? Color.white.opacity(0.7) : Color.white.opacity(0.12), lineWidth: 1)
                                                 )
                                         )
                                         .tint(.white)
@@ -492,11 +505,11 @@ struct EmailAuthView: View {
                                     .focused($focusedField, equals: .email)
                                     .padding(14)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.white.opacity(0.1))
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .fill(Color.white.opacity(0.06))
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(focusedField == .email ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                    .strokeBorder(focusedField == .email ? Color.white.opacity(0.7) : Color.white.opacity(0.12), lineWidth: 1)
                                             )
                                     )
                                     .tint(.white)
@@ -531,11 +544,11 @@ struct EmailAuthView: View {
                                 }
                                 .padding(14)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.white.opacity(0.1))
+                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .fill(Color.white.opacity(0.06))
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(focusedField == .password ? Color.white : Color.white.opacity(0.3), lineWidth: 1.5)
+                                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                .strokeBorder(focusedField == .password ? Color.white.opacity(0.7) : Color.white.opacity(0.12), lineWidth: 1)
                                         )
                                 )
                                 .tint(.white)
@@ -558,20 +571,20 @@ struct EmailAuthView: View {
 
                                         if passwordsMatch {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(Color(hex: "FF6B9D"))
+                                                .foregroundColor(Color(hex: "B794F6"))
                                         }
                                     }
                                     .padding(14)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.white.opacity(0.1))
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .fill(Color.white.opacity(0.06))
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(
+                                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                    .strokeBorder(
                                                         focusedField == .confirmPassword ?
-                                                        (passwordsMatch ? Color(hex: "FF6B9D") : Color.red) :
-                                                            Color.white.opacity(0.3),
-                                                        lineWidth: 1.5
+                                                        (passwordsMatch ? Color(hex: "B794F6") : Color.red) :
+                                                            Color.white.opacity(0.12),
+                                                        lineWidth: 1
                                                     )
                                             )
                                     )
@@ -601,22 +614,22 @@ struct EmailAuthView: View {
 
                         // Submit button
                         Button(action: handleAuth) {
-                            if isLoading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "1A1A4E")))
-                            } else {
-                                Text(isSignUp ? "onboarding_v2.auth.create_my_account".localized : "onboarding_v2.auth.sign_in".localized)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
-                                    .foregroundColor(Color(hex: "1A1A4E"))
+                            Group {
+                                if isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                } else {
+                                    Text(isSignUp ? "onboarding_v2.auth.create_my_account".localized : "onboarding_v2.auth.sign_in".localized)
+                                        .font(.custom("Poppins-SemiBold", size: 16))
+                                }
                             }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 54)
+                            .contentShape(Capsule())
                         }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 40))
+                        .buttonStyle(.glassPrimary)
                         .padding(.horizontal, 32)
                         .disabled(isLoading || !isFormValid)
-                        .opacity(isLoading || !isFormValid ? 0.6 : 1.0)
 
                         // Toggle sign up/in
                         Button(action: {
@@ -705,12 +718,18 @@ struct EmailAuthView: View {
                 showAppleAuth = false
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
         .fullScreenCover(isPresented: $showGoogleAuth) {
             GoogleAuthView(onComplete: {
                 showGoogleAuth = false
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
     }
 
@@ -928,11 +947,9 @@ struct GoogleAuthView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
-                        )
+                        .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassSecondary)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 50)
@@ -943,12 +960,18 @@ struct GoogleAuthView: View {
                 showAppleAuth = false
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
         .fullScreenCover(isPresented: $showEmailAuth) {
             EmailAuthView(onComplete: {
                 showEmailAuth = false
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
     }
 
@@ -1220,11 +1243,9 @@ struct AppleAuthView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
-                        )
+                        .contentShape(Capsule())
                     }
+                    .buttonStyle(.glassSecondary)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 50)
@@ -1245,12 +1266,18 @@ struct AppleAuthView: View {
                 showGoogleAuth = false
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
         .fullScreenCover(isPresented: $showEmailAuth) {
             EmailAuthView(onComplete: {
                 showEmailAuth = false
                 onComplete()
             })
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
     }
 

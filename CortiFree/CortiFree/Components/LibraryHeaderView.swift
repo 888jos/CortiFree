@@ -56,7 +56,7 @@ struct LibraryHeaderView: View {
             VStack(spacing: 0) {
                 // Title "Librairie" - positioned in upper portion of image
                 HStack {
-                    Text(NSLocalizedString("library.title", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "library.title"))
                         .font(.faroBold(24))
                         .foregroundColor(Color(hex: "FFFFFF"))
                         .shadow(
@@ -73,10 +73,11 @@ struct LibraryHeaderView: View {
                 Spacer()
 
                 // Icon Row - overlapping bottom of image by ~30px
+                GlassGroup(spacing: 30) {
                 HStack(spacing: 30) {
                     LibraryIconButton(
                         section: .respiration,
-                        title: NSLocalizedString("library.icon.breathing", comment: ""),
+                        title: LanguageManager.shared.localizedString(for: "library.icon.breathing"),
                         iconName: "wind"
                     ) {
                         onIconTap(.respiration)
@@ -84,7 +85,7 @@ struct LibraryHeaderView: View {
 
                     LibraryIconButton(
                         section: .meditation,
-                        title: NSLocalizedString("library.icon.meditation", comment: ""),
+                        title: LanguageManager.shared.localizedString(for: "library.icon.meditation"),
                         iconName: "figure.mind.and.body"
                     ) {
                         onIconTap(.meditation)
@@ -92,7 +93,7 @@ struct LibraryHeaderView: View {
 
                     LibraryIconButton(
                         section: .journal,
-                        title: NSLocalizedString("library.icon.journal", comment: ""),
+                        title: LanguageManager.shared.localizedString(for: "library.icon.journal"),
                         iconName: "book.closed.fill"
                     ) {
                         onIconTap(.journal)
@@ -100,11 +101,12 @@ struct LibraryHeaderView: View {
 
                     LibraryIconButton(
                         section: .recherches,
-                        title: NSLocalizedString("library.icon.studies", comment: ""),
+                        title: LanguageManager.shared.localizedString(for: "library.icon.studies"),
                         iconName: "book.fill"
                     ) {
                         onIconTap(.recherches)
                     }
+                }
                 }
                 .padding(.bottom, -30)
             }
@@ -164,15 +166,10 @@ struct LibraryIconButton: View {
             VStack(spacing: 6) {
                 // Circular icon container
                 ZStack {
-                    // Background circle
-                    Circle()
-                        .fill(Color(hex: "130C57"))
+                    // Glass circle
+                    Color.clear
                         .frame(width: 60, height: 60)
-
-                    // Stroke border
-                    Circle()
-                        .stroke(Color(hex: "49288C"), lineWidth: 1)
-                        .frame(width: 60, height: 60)
+                        .glassCircle(tint: Color(hex: "49288C"), interactive: true)
 
                     // Icon
                     Image(systemName: iconName)
@@ -189,12 +186,6 @@ struct LibraryIconButton: View {
                             .transition(.opacity)
                     }
                 }
-                .shadow(
-                    color: Color.black.opacity(0.25),
-                    radius: 6,
-                    x: 0,
-                    y: 3
-                )
                 .scaleEffect(isPressed ? 0.95 : 1.0)
 
                 // Label text

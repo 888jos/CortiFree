@@ -77,10 +77,14 @@ struct CategoriesGridView: View {
                         HapticManager.light()
                         dismiss()
                     }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.white.opacity(0.6))
+                        Image(systemName: "xmark")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.85))
+                            .frame(width: 40, height: 40)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
 
                     Spacer()
                 }
@@ -104,12 +108,12 @@ struct CategoriesGridView: View {
                         .frame(width: 4, height: 32)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(NSLocalizedString("learning.title", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "learning.title"))
                             .font(Font.Poppins.custom(.bold, size: 32))
                             .tracking(0.5)
                             .foregroundColor(.white)
 
-                        Text(NSLocalizedString("learning.subtitle", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "learning.subtitle"))
                             .font(.custom("Poppins-Regular", size: 14))
                             .tracking(0.3)
                             .foregroundColor(.white.opacity(0.65))
@@ -201,7 +205,7 @@ struct CategoryCardView: View {
                         .tracking(0.4)
                         .foregroundColor(.white)
 
-                    Text("\(category.cardCount) \(NSLocalizedString("learning.articles", comment: ""))")
+                    Text("\(category.cardCount) \(LanguageManager.shared.localizedString(for: "learning.articles"))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -222,40 +226,8 @@ struct CategoryCardView: View {
                     )
             }
             .padding(20)
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.10),
-                                    Color.white.opacity(0.04)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    category.color.opacity(0.4),
-                                    category.color.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                        .shadow(
-                            color: category.color.opacity(0.2),
-                            radius: 12,
-                            x: 0,
-                            y: 4
-                        )
-                }
-            )
+            .glassCard(cornerRadius: 24, interactive: true)
+            .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
         .scaleEffect(isPressed ? 0.96 : 1.0)
         .brightness(isPressed ? 0.05 : 0)
@@ -292,11 +264,10 @@ struct CategoryCardsView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(width: 40, height: 40)
-                        .background(
-                            Circle()
-                                .fill(Color.white.opacity(0.1))
-                        )
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(category.localizedName)
@@ -304,7 +275,7 @@ struct CategoryCardsView: View {
                         .tracking(0.5)
                         .foregroundColor(.white)
 
-                    Text("\(filteredCards.count) \(NSLocalizedString("learning.articles", comment: ""))")
+                    Text("\(filteredCards.count) \(LanguageManager.shared.localizedString(for: "learning.articles"))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.65))
                 }
@@ -413,54 +384,8 @@ struct LearningCardView: View {
                     )
             }
             .padding(18)
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.10),
-                                    Color.white.opacity(0.04)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    card.categoryColor.opacity(0.4),
-                                    card.categoryColor.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                        .shadow(
-                            color: card.categoryColor.opacity(0.2),
-                            radius: 12,
-                            x: 0,
-                            y: 4
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.15),
-                                    Color.clear
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
-                            lineWidth: 1
-                        )
-                        .padding(1)
-                }
-            )
+            .glassCard(cornerRadius: 20, interactive: true)
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
         .scaleEffect(isPressed ? 0.96 : 1.0)
         .brightness(isPressed ? 0.05 : 0)
@@ -507,11 +432,10 @@ struct LearningCardDetailView: View {
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.white)
                                 .frame(width: 40, height: 40)
-                                .background(
-                                    Circle()
-                                        .fill(Color.white.opacity(0.1))
-                                )
+                                .contentShape(Circle())
                         }
+                        .buttonStyle(.plain)
+                        .glassCircle(interactive: true)
 
                         Spacer()
                     }
@@ -576,23 +500,7 @@ struct LearningCardDetailView: View {
                             .foregroundColor(card.categoryColor)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 7)
-                            .background(
-                                Capsule()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [
-                                                card.categoryColor.opacity(0.25),
-                                                card.categoryColor.opacity(0.12)
-                                            ],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(card.categoryColor.opacity(0.3), lineWidth: 1)
-                                    )
-                            )
+                            .glassCapsule(tint: card.categoryColor)
                     }
                     .padding(.bottom, 24)
 
@@ -664,34 +572,7 @@ struct ContentSectionView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.08),
-                                Color.white.opacity(0.03)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                color.opacity(0.3),
-                                color.opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-        )
+        .glassCard(cornerRadius: 22)
     }
 }
 
@@ -705,7 +586,7 @@ struct LearningCategory: Identifiable {
     let cardCount: Int
 
     var localizedName: String {
-        return NSLocalizedString("learning.category.\(name.lowercased())", comment: "")
+        return LanguageManager.shared.localizedString(for: "learning.category.\(name.lowercased())")
     }
 
     static let allCategories: [LearningCategory] = [
@@ -778,141 +659,141 @@ struct LearningCard: Identifiable {
         // SCIENCE CATEGORY
         LearningCard(
             icon: "brain.head.profile",
-            title: NSLocalizedString("learning.card.cortisol.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.cortisol.title"),
             category: "Science",
-            shortDescription: NSLocalizedString("learning.card.cortisol.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.cortisol.description"),
             sections: [
                 ContentSection(
                     icon: "info.circle.fill",
-                    title: NSLocalizedString("learning.card.cortisol.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cortisol.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section1.content")
                 ),
                 ContentSection(
                     icon: "sparkles",
-                    title: NSLocalizedString("learning.card.cortisol.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cortisol.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section2.content")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: NSLocalizedString("learning.card.cortisol.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cortisol.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section3.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.cortisol.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cortisol.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section4.content")
                 ),
                 ContentSection(
                     icon: "target",
-                    title: NSLocalizedString("learning.card.cortisol.section5.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cortisol.section5.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section5.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cortisol.section5.content")
                 )
             ]
         ),
         LearningCard(
             icon: "figure.mind.and.body",
-            title: NSLocalizedString("learning.card.meditation_science.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.title"),
             category: "Science",
-            shortDescription: NSLocalizedString("learning.card.meditation_science.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.description"),
             sections: [
                 ContentSection(
                     icon: "flask.fill",
-                    title: NSLocalizedString("learning.card.meditation_science.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.meditation_science.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.section1.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.meditation_science.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.meditation_science.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.section2.content")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: NSLocalizedString("learning.card.meditation_science.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.meditation_science.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.meditation_science.section3.content")
                 )
             ]
         ),
         LearningCard(
             icon: "book.fill",
-            title: NSLocalizedString("learning.card.66days.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.66days.title"),
             category: "Science",
-            shortDescription: NSLocalizedString("learning.card.66days.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.66days.description"),
             sections: [
                 ContentSection(
                     icon: "flask.fill",
-                    title: NSLocalizedString("learning.card.66days.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.66days.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.66days.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.66days.section1.content")
                 ),
                 ContentSection(
                     icon: "chart.line.uptrend.xyaxis",
-                    title: NSLocalizedString("learning.card.66days.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.66days.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.66days.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.66days.section2.content")
                 ),
                 ContentSection(
                     icon: "figure.strengthtraining.traditional",
-                    title: NSLocalizedString("learning.card.66days.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.66days.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.66days.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.66days.section3.content")
                 ),
                 ContentSection(
                     icon: "target",
-                    title: NSLocalizedString("learning.card.66days.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.66days.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.66days.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.66days.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "brain",
-            title: NSLocalizedString("learning.card.neuroplasticity.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.title"),
             category: "Science",
-            shortDescription: NSLocalizedString("learning.card.neuroplasticity.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.description"),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: NSLocalizedString("learning.card.neuroplasticity.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.neuroplasticity.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section1.content")
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: NSLocalizedString("learning.card.neuroplasticity.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.neuroplasticity.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section2.content")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: NSLocalizedString("learning.card.neuroplasticity.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.neuroplasticity.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section3.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.neuroplasticity.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.neuroplasticity.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.neuroplasticity.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "moon.zzz.fill",
-            title: NSLocalizedString("learning.card.sleep_cycles.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.title"),
             category: "Science",
-            shortDescription: NSLocalizedString("learning.card.sleep_cycles.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.description"),
             sections: [
                 ContentSection(
                     icon: "moon.fill",
-                    title: NSLocalizedString("learning.card.sleep_cycles.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cycles.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section1.content")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: NSLocalizedString("learning.card.sleep_cycles.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cycles.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section2.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.sleep_cycles.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cycles.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section3.content")
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: NSLocalizedString("learning.card.sleep_cycles.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cycles.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cycles.section4.content")
                 )
             ]
         ),
@@ -920,52 +801,52 @@ struct LearningCard: Identifiable {
         // SANTÉ CATEGORY
         LearningCard(
             icon: "heart.text.square.fill",
-            title: NSLocalizedString("learning.card.stress_body.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.stress_body.title"),
             category: "Santé",
-            shortDescription: NSLocalizedString("learning.card.stress_body.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.stress_body.description"),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: NSLocalizedString("learning.card.stress_body.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.stress_body.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section1.content")
                 ),
                 ContentSection(
                     icon: "heart.fill",
-                    title: NSLocalizedString("learning.card.stress_body.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.stress_body.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section2.content")
                 ),
                 ContentSection(
                     icon: "figure.strengthtraining.traditional",
-                    title: NSLocalizedString("learning.card.stress_body.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.stress_body.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section3.content")
                 ),
                 ContentSection(
                     icon: "bolt.fill",
-                    title: NSLocalizedString("learning.card.stress_body.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.stress_body.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.stress_body.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "fork.knife",
-            title: NSLocalizedString("learning.card.food.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.food.title"),
             category: "Santé",
-            shortDescription: NSLocalizedString("learning.card.food.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.food.description"),
             sections: [
                 ContentSection(
                     icon: "checkmark.circle.fill",
-                    title: NSLocalizedString("learning.card.food.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.food.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.food.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.food.section1.content")
                 ),
                 ContentSection(
                     icon: "xmark.circle.fill",
-                    title: NSLocalizedString("learning.card.food.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.food.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.food.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.food.section2.content")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: NSLocalizedString("learning.card.food.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.food.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.food.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.food.section3.content")
                 )
             ]
         ),
@@ -973,37 +854,37 @@ struct LearningCard: Identifiable {
         // TECHNIQUES CATEGORY
         LearningCard(
             icon: "wind",
-            title: NSLocalizedString("learning.card.breathing.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.breathing.title"),
             category: "Techniques",
-            shortDescription: NSLocalizedString("learning.card.breathing.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.breathing.description"),
             sections: [
                 ContentSection(
                     icon: "star.fill",
-                    title: NSLocalizedString("learning.card.breathing.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.breathing.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.breathing.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.breathing.section1.content")
                 ),
                 ContentSection(
                     icon: "figure.mind.and.body",
-                    title: NSLocalizedString("learning.card.breathing.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.breathing.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.breathing.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.breathing.section2.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.breathing.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.breathing.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.breathing.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.breathing.section3.content")
                 )
             ]
         ),
         LearningCard(
             icon: "leaf.fill",
-            title: NSLocalizedString("learning.card.nature.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.nature.title"),
             category: "Techniques",
-            shortDescription: NSLocalizedString("learning.card.nature.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.nature.description"),
             sections: [
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.nature.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.nature.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.nature.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.nature.section1.content")
                 ),
                 ContentSection(
                     icon: "tree.fill",
@@ -1016,79 +897,79 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "sparkles",
-                    title: NSLocalizedString("learning.card.nature.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.nature.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.nature.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.nature.section3.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.nature.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.nature.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.nature.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.nature.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "waveform.path.ecg",
-            title: NSLocalizedString("learning.card.cardiac_coherence.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.title"),
             category: "Techniques",
-            shortDescription: NSLocalizedString("learning.card.cardiac_coherence.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.description"),
             sections: [
                 ContentSection(
                     icon: "heart.fill",
-                    title: NSLocalizedString("learning.card.cardiac_coherence.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cardiac_coherence.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section1.content")
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: NSLocalizedString("learning.card.cardiac_coherence.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cardiac_coherence.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section2.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.cardiac_coherence.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cardiac_coherence.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section3.content")
                 ),
                 ContentSection(
                     icon: "person.fill",
-                    title: NSLocalizedString("learning.card.cardiac_coherence.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cardiac_coherence.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section4.content")
                 ),
                 ContentSection(
                     icon: "checkmark.circle.fill",
-                    title: NSLocalizedString("learning.card.cardiac_coherence.section5.title", comment: ""),
-                    content: NSLocalizedString("learning.card.cardiac_coherence.section5.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section5.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.cardiac_coherence.section5.content")
                 )
             ]
         ),
         LearningCard(
             icon: "figure.yoga",
-            title: NSLocalizedString("learning.card.yoga.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.yoga.title"),
             category: "Techniques",
-            shortDescription: NSLocalizedString("learning.card.yoga.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.yoga.description"),
             sections: [
                 ContentSection(
                     icon: "figure.mind.and.body",
-                    title: NSLocalizedString("learning.card.yoga.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.yoga.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.yoga.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.yoga.section1.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.yoga.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.yoga.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.yoga.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.yoga.section2.content")
                 ),
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: NSLocalizedString("learning.card.yoga.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.yoga.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.yoga.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.yoga.section3.content")
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: NSLocalizedString("learning.card.yoga.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.yoga.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.yoga.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.yoga.section4.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.yoga.section5.title", comment: ""),
-                    content: NSLocalizedString("learning.card.yoga.section5.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.yoga.section5.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.yoga.section5.content")
                 )
             ]
         ),
@@ -1096,97 +977,97 @@ struct LearningCard: Identifiable {
         // HABITUDES CATEGORY
         LearningCard(
             icon: "bed.double.fill",
-            title: NSLocalizedString("learning.card.sleep_cortisol.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.title"),
             category: "Habitudes",
-            shortDescription: NSLocalizedString("learning.card.sleep_cortisol.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.description"),
             sections: [
                 ContentSection(
                     icon: "sun.max.fill",
-                    title: NSLocalizedString("learning.card.sleep_cortisol.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cortisol.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.section1.content")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: NSLocalizedString("learning.card.sleep_cortisol.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cortisol.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.section2.content")
                 ),
                 ContentSection(
                     icon: "checkmark.circle.fill",
-                    title: NSLocalizedString("learning.card.sleep_cortisol.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cortisol.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.section3.content")
                 ),
                 ContentSection(
                     icon: "moon.zzz.fill",
-                    title: NSLocalizedString("learning.card.breathing.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.sleep_cortisol.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.breathing.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.sleep_cortisol.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "drop.fill",
-            title: NSLocalizedString("learning.card.hydration.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.hydration.title"),
             category: "Habitudes",
-            shortDescription: NSLocalizedString("learning.card.hydration.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.hydration.description"),
             sections: [
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: NSLocalizedString("learning.card.hydration.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.hydration.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.hydration.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.hydration.section1.content")
                 ),
                 ContentSection(
                     icon: "sparkles",
-                    title: NSLocalizedString("learning.card.hydration.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.hydration.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.hydration.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.hydration.section2.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.hydration.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.hydration.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.hydration.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.hydration.section3.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.hydration.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.hydration.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.hydration.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.hydration.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "figure.run",
-            title: NSLocalizedString("learning.card.exercise.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.exercise.title"),
             category: "Habitudes",
-            shortDescription: NSLocalizedString("learning.card.exercise.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.exercise.description"),
             sections: [
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.yoga.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.yoga.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.yoga.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.yoga.section2.content")
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: NSLocalizedString("learning.card.exercise.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.exercise.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.exercise.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.exercise.section2.content")
                 ),
                 ContentSection(
                     icon: "clock.fill",
-                    title: NSLocalizedString("learning.card.exercise.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.exercise.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.exercise.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.exercise.section3.content")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: NSLocalizedString("learning.card.exercise.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.exercise.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.exercise.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.exercise.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "person.2.fill",
-            title: NSLocalizedString("learning.card.social.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.social.title"),
             category: "Habitudes",
-            shortDescription: NSLocalizedString("learning.card.social.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.social.description"),
             sections: [
                 ContentSection(
                     icon: "heart.circle.fill",
-                    title: NSLocalizedString("learning.card.social.section1.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "learning.card.social.section1.title"),
                     content: """
                     Les connexions sociales de qualité sont essentielles pour gérer le stress :
 
@@ -1197,51 +1078,51 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "person.2.fill",
-                    title: NSLocalizedString("learning.card.social.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.social.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.social.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.social.section2.content")
                 ),
                 ContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: NSLocalizedString("learning.card.social.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.social.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.social.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.social.section3.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.breathing.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.social.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.breathing.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.social.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "sun.max.fill",
-            title: NSLocalizedString("learning.card.light.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.light.title"),
             category: "Habitudes",
-            shortDescription: NSLocalizedString("learning.card.light.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.light.description"),
             sections: [
                 ContentSection(
                     icon: "sun.max.fill",
-                    title: NSLocalizedString("learning.card.light.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.light.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.light.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.light.section1.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.light.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.light.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.light.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.light.section2.content")
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: NSLocalizedString("learning.card.nature.section1.title", comment: ""),
-                    content: NSLocalizedString("learning.card.nature.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.nature.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.nature.section1.content")
                 ),
                 ContentSection(
                     icon: "moon.fill",
-                    title: NSLocalizedString("learning.card.light.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.light.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.light.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.light.section4.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.light.section5.title", comment: ""),
-                    content: NSLocalizedString("learning.card.light.section5.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.light.section5.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.light.section5.content")
                 )
             ]
         ),
@@ -1249,13 +1130,13 @@ struct LearningCard: Identifiable {
         // PSYCHOLOGIE CATEGORY
         LearningCard(
             icon: "quote.bubble.fill",
-            title: NSLocalizedString("learning.card.negative_thoughts.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.title"),
             category: "Psychologie",
-            shortDescription: NSLocalizedString("learning.card.negative_thoughts.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.description"),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: NSLocalizedString("learning.card.negative_thoughts.section1.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.section1.title"),
                     content: """
                     Tes pensées influencent directement ton niveau de stress et de cortisol. Apprendre à identifier et modifier les pensées automatiques négatives est crucial.
 
@@ -1283,30 +1164,30 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "pencil.and.list.clipboard",
-                    title: NSLocalizedString("learning.card.negative_thoughts.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.negative_thoughts.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.section2.content")
                 ),
                 ContentSection(
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("learning.card.negative_thoughts.section3.title", comment: ""),
-                    content: NSLocalizedString("learning.card.negative_thoughts.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.section3.content")
                 ),
                 ContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("learning.card.negative_thoughts.section4.title", comment: ""),
-                    content: NSLocalizedString("learning.card.negative_thoughts.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.negative_thoughts.section4.content")
                 )
             ]
         ),
         LearningCard(
             icon: "sparkles",
-            title: NSLocalizedString("learning.card.gratitude.title", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "learning.card.gratitude.title"),
             category: "Psychologie",
-            shortDescription: NSLocalizedString("learning.card.gratitude.description", comment: ""),
+            shortDescription: LanguageManager.shared.localizedString(for: "learning.card.gratitude.description"),
             sections: [
                 ContentSection(
                     icon: "brain.head.profile",
-                    title: NSLocalizedString("learning.card.yoga.section4.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "learning.card.yoga.section4.title"),
                     content: """
                     Pratiquer la gratitude n'est pas juste du "positive thinking" : c'est une technique scientifiquement validée qui modifie ton cerveau et ton niveau de stress.
 
@@ -1318,12 +1199,12 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "flask.fill",
-                    title: NSLocalizedString("learning.card.gratitude.section2.title", comment: ""),
-                    content: NSLocalizedString("learning.card.gratitude.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section2.content")
                 ),
                 ContentSection(
                     icon: "pencil.and.list.clipboard",
-                    title: NSLocalizedString("learning.card.gratitude.section3.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section3.title"),
                     content: """
                     Méthode des 3 gratitudes (5 min/jour) :
                     1. Note 3 choses pour lesquelles tu es reconnaissant
@@ -1338,7 +1219,7 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "star.fill",
-                    title: NSLocalizedString("learning.card.gratitude.section4.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section4.title"),
                     content: """
                     Après 4 semaines :
                     • Changements mesurables dans le cerveau
@@ -1353,13 +1234,13 @@ struct LearningCard: Identifiable {
                 ),
                 ContentSection(
                     icon: "target",
-                    title: NSLocalizedString("learning.card.gratitude.section5.title", comment: ""),
-                    content: NSLocalizedString("learning.card.gratitude.section5.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section5.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section5.content")
                 ),
                 ContentSection(
                     icon: "info.circle.fill",
-                    title: NSLocalizedString("learning.card.gratitude.section6.title", comment: ""),
-                    content: NSLocalizedString("learning.card.gratitude.section6.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section6.title"),
+                    content: LanguageManager.shared.localizedString(for: "learning.card.gratitude.section6.content")
                 )
             ]
         )

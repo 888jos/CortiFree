@@ -22,19 +22,16 @@ struct HabitTaskCard: View {
     @State private var isPressed = false
     @State private var showExerciseView = false
 
-    private var isFrench: Bool {
-        LanguageManager.shared.currentLanguage == .french
-    }
-
-    // Translate frequency text based on locale
     private var localizedFrequency: String {
-        if isFrench { return frequencyText }
-        // Translate common French frequencies to English
         switch frequencyText.lowercased() {
-        case "quotidien": return "Daily"
-        case "3x/sem", "3x/semaine": return "3x/week"
-        case "2x/sem", "2x/semaine": return "2x/week"
-        case "1x/sem", "1x/semaine": return "1x/week"
+        case "quotidien", "daily", "todos los días", "jeden tag":
+            return LanguageManager.shared.localizedString(for: "frequency.label.daily")
+        case "3x/sem", "3x/semaine", "3x/week", "3x por semana", "3x pro woche":
+            return LanguageManager.shared.localizedString(for: "frequency.label.3x_week")
+        case "2x/sem", "2x/semaine", "2x/week", "2x por semana", "2x pro woche":
+            return LanguageManager.shared.localizedString(for: "frequency.label.2x_week")
+        case "1x/sem", "1x/semaine", "1x/week", "1x por semana", "1x pro woche":
+            return LanguageManager.shared.localizedString(for: "frequency.label.1x_week")
         default: return frequencyText
         }
     }
@@ -120,10 +117,7 @@ struct HabitTaskCard: View {
                         .foregroundColor(.white.opacity(0.9))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(Color.black.opacity(0.35))
-                        )
+                        .glassCapsule(tint: .black)
                     }
                     .padding(.top, 12)
                     .padding(.horizontal, 12)
@@ -179,7 +173,7 @@ struct HabitTaskCard: View {
                                         .frame(width: 3, height: 12)
                                 }
 
-                                Text(isFrench ? "Difficulté" : "Difficulty")
+                                Text(LanguageManager.shared.localizedString(for: "inline.taskcard.00"))
                                     .font(.custom("Poppins-Regular", size: 13))
                                     .foregroundColor(.white.opacity(0.7))
                             }
@@ -208,15 +202,11 @@ struct HabitTaskCard: View {
                                     Text(getShortcutText())
                                         .font(.custom("Poppins-SemiBold", size: 13))
                                 }
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(Color.white)
-                                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 4)
-                                )
                             }
+                            .buttonStyle(.glassSecondary)
                             .padding(.trailing, 12)
                             .padding(.bottom, 12)
                         }
@@ -224,12 +214,16 @@ struct HabitTaskCard: View {
                 }
             }
             .frame(width: 345, height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius))
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius)
-                    .stroke(Color.white, lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppConstants.Layout.cornerRadius, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(colors: [.white.opacity(0.45), .white.opacity(0.12)],
+                                       startPoint: .topLeading, endPoint: .bottomTrailing),
+                        lineWidth: 1
+                    )
             )
-            .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.25), radius: 14, x: 0, y: 6)
             .scaleEffect(isPressed ? 0.97 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())
@@ -296,13 +290,13 @@ struct HabitTaskCard: View {
         let habitId = getHabitId(for: imageName)
         switch habitId {
         case "meditation":
-            return isFrench ? "Méditer" : "Meditate"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.01")
         case "breathing":
-            return isFrench ? "Respirer" : "Breathe"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.02")
         case "journal":
-            return isFrench ? "Écrire" : "Write"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.03")
         default:
-            return isFrench ? "Ouvrir" : "Open"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.04")
         }
     }
 
@@ -336,13 +330,13 @@ struct HabitTaskCard: View {
         let habitId = getHabitId(for: imageName)
         switch habitId {
         case "sleep":
-            return isFrench ? "Sommeil" : "Sleep"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.05")
         case "breathing":
-            return isFrench ? "Respiration" : "Breathing"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.06")
         case "meditation":
-            return isFrench ? "Méditation" : "Meditation"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.07")
         case "water":
-            return isFrench ? "Hydratation" : "Hydration"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.08")
         case "sport":
             return "Sport"
         case "nature":
@@ -352,7 +346,7 @@ struct HabitTaskCard: View {
         case "journal":
             return "Journal"
         default:
-            return isFrench ? "Habitude" : "Habit"
+            return LanguageManager.shared.localizedString(for: "inline.taskcard.09")
         }
     }
 }

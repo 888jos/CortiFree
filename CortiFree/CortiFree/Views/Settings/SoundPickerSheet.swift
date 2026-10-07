@@ -14,12 +14,12 @@ struct SoundPickerSheet: View {
 
     var sounds: [String] {
         [
-            NSLocalizedString("settings.forest_rain", comment: ""),
-            NSLocalizedString("settings.ocean", comment: ""),
-            NSLocalizedString("settings.fireplace", comment: ""),
-            NSLocalizedString("settings.gentle_wind", comment: ""),
-            NSLocalizedString("settings.river", comment: ""),
-            NSLocalizedString("settings.morning_birds", comment: "")
+            LanguageManager.shared.localizedString(for: "settings.forest_rain"),
+            LanguageManager.shared.localizedString(for: "settings.ocean"),
+            LanguageManager.shared.localizedString(for: "settings.fireplace"),
+            LanguageManager.shared.localizedString(for: "settings.gentle_wind"),
+            LanguageManager.shared.localizedString(for: "settings.river"),
+            LanguageManager.shared.localizedString(for: "settings.morning_birds")
         ]
     }
 
@@ -40,16 +40,18 @@ struct SoundPickerSheet: View {
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                            .frame(width: 32, height: 32)
-                            .background(Circle().fill(Color.white.opacity(0.1)))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.85))
+                            .frame(width: 36, height: 36)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
 
-                Text(NSLocalizedString("settings.relaxing_sounds", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "settings.relaxing_sounds"))
                     .font(.custom("Poppins-Bold", size: 24))
                     .foregroundColor(.white)
                     .padding(.bottom, 8)
@@ -74,11 +76,13 @@ struct SoundPickerSheet: View {
                                 }
                             }
                             .padding(16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(hex: "131146"))
+                            .glassCard(
+                                cornerRadius: 18,
+                                tint: selectedSound == sound ? Color.appTheme : nil,
+                                interactive: true
                             )
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, 20)

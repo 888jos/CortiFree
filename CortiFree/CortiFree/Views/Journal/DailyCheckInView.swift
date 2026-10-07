@@ -14,7 +14,9 @@ struct DailyCheckInView: View {
 
     let targetDate: Date
 
-    private let accent = Color(hex: "66D9C8")
+    // Keep the daily check-in aligned with CortiFree's existing violet theme.
+    // This replaces the isolated turquoise accent previously used here.
+    private let accent = Color.appTheme
 
     var body: some View {
         ZStack {
@@ -47,9 +49,12 @@ struct DailyCheckInView: View {
             } label: {
                 Text("daily_checkin.skip".localized)
                     .font(.custom("Poppins-Medium", size: 12))
-                    .foregroundColor(.white.opacity(0.62))
-                    .frame(height: 44)
+                    .foregroundColor(.white.opacity(0.75))
+                    .padding(.horizontal, 14)
+                    .frame(height: 36)
             }
+            .buttonStyle(.glassSecondary)
+            .frame(height: 44)
             Spacer()
             Text(targetDate.formatted(date: .abbreviated, time: .omitted))
                 .font(.custom("Poppins-Medium", size: 12))
@@ -72,11 +77,9 @@ struct DailyCheckInView: View {
 
     private var moodSlide: some View {
         checkInSlide(
-            eyebrow: "daily_checkin.eyebrow".localized,
-            title: "daily_checkin.mood_title".localized,
-            subtitle: "daily_checkin.mood_subtitle".localized,
             mascotMessage: "daily_checkin.mascot_mood".localized
         ) {
+            GlassGroup(spacing: 10) {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3), spacing: 12) {
                 ForEach(Mood.allCases, id: \.self) { value in
                     Button {
@@ -92,26 +95,21 @@ struct DailyCheckInView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 82)
-                        .background(
-                            mood == value ? accent.opacity(0.22) : Color(hex: "17182E").opacity(0.86),
-                            in: RoundedRectangle(cornerRadius: 8)
-                        )
+                        .glassCard(cornerRadius: 16, tint: mood == value ? accent : nil, interactive: true)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(mood == value ? accent : .white.opacity(0.08), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .strokeBorder(mood == value ? accent : .clear, lineWidth: 1.5)
                         }
                     }
                     .buttonStyle(.plain)
                 }
+            }
             }
         }
     }
 
     private var recoverySlide: some View {
         checkInSlide(
-            eyebrow: "daily_checkin.eyebrow".localized,
-            title: "daily_checkin.recovery_title".localized,
-            subtitle: "daily_checkin.recovery_subtitle".localized,
             mascotMessage: "daily_checkin.mascot_recovery".localized
         ) {
             VStack(spacing: 22) {
@@ -124,9 +122,6 @@ struct DailyCheckInView: View {
 
     private var reflectionSlide: some View {
         checkInSlide(
-            eyebrow: "daily_checkin.journal_eyebrow".localized,
-            title: "daily_checkin.reflection_title".localized,
-            subtitle: "daily_checkin.reflection_subtitle".localized,
             mascotMessage: "daily_checkin.mascot_reflection".localized
         ) {
             TextEditor(text: $note)
@@ -135,7 +130,7 @@ struct DailyCheckInView: View {
                 .scrollContentBackground(.hidden)
                 .padding(12)
                 .frame(height: 170)
-                .background(Color(hex: "17182E").opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
+                .glassCard(cornerRadius: 18)
                 .overlay(alignment: .topLeading) {
                     if note.isEmpty {
                         Text("daily_checkin.reflection_prompt".localized)
@@ -149,30 +144,15 @@ struct DailyCheckInView: View {
     }
 
     private func checkInSlide<Content: View>(
-        eyebrow: String,
-        title: String,
-        subtitle: String,
         mascotMessage: String,
         @ViewBuilder content: () -> Content
     ) -> some View {
         ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 16) {
                 OnboardingMascotDialogueView(message: mascotMessage)
                     .frame(height: 122)
                     .clipped()
 
-                VStack(alignment: .leading, spacing: 7) {
-                    Text(eyebrow.uppercased())
-                        .font(.custom("Poppins-SemiBold", size: 10))
-                        .foregroundColor(accent)
-                    Text(title)
-                        .font(.custom("Poppins-Bold", size: 25))
-                        .foregroundColor(.white)
-                    Text(subtitle)
-                        .font(.custom("Poppins-Regular", size: 13))
-                        .foregroundColor(.white.opacity(0.62))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
                 content()
                 if let errorMessage {
                     Text(errorMessage)
@@ -189,6 +169,7 @@ struct DailyCheckInView: View {
             Label(title, systemImage: icon)
                 .font(.custom("Poppins-SemiBold", size: 13))
                 .foregroundColor(.white)
+            GlassGroup(spacing: 8) {
             HStack(spacing: 8) {
                 ForEach(1...5, id: \.self) { score in
                     Button {
@@ -201,12 +182,14 @@ struct DailyCheckInView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 38)
                             .background(
-                                value.wrappedValue == score ? accent : .white.opacity(0.08),
-                                in: RoundedRectangle(cornerRadius: 6)
+                                value.wrappedValue == score ? accent : .clear,
+                                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                             )
+                            .glassCard(cornerRadius: 12, interactive: true)
                     }
                     .buttonStyle(.plain)
                 }
+            }
             }
             HStack {
                 Text(reversed ? "daily_checkin.high".localized : "daily_checkin.low".localized)
@@ -228,20 +211,17 @@ struct DailyCheckInView: View {
         } label: {
             Group {
                 if isSaving {
-                    ProgressView().tint(Color(hex: "071B22"))
+                    ProgressView().tint(.white)
                 } else {
                     Text(page == 2 ? "daily_checkin.save".localized : "common.continue".localized)
                         .font(.custom("Poppins-SemiBold", size: 14))
                 }
             }
-            .foregroundColor(Color(hex: "071B22"))
             .frame(maxWidth: .infinity)
             .frame(height: 50)
-            .background(accent, in: RoundedRectangle(cornerRadius: 8))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.glassPrimary(tint: accent))
         .disabled(isSaving || (page == 0 && mood == nil))
-        .opacity(page == 0 && mood == nil ? 0.45 : 1)
     }
 
     private func save() {
@@ -260,7 +240,7 @@ struct DailyCheckInView: View {
                     note: note,
                     for: targetDate
                 )
-                MixpanelManager.shared.trackDailyCheckInCompleted(
+                AnalyticsManager.shared.trackDailyCheckInCompleted(
                     mood: mood.rawValue,
                     stress: stress,
                     sleep: sleep,

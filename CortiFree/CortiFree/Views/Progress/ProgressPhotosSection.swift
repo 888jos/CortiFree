@@ -15,11 +15,16 @@ struct ProgressPhotosSection: View {
                     .foregroundColor(.white)
                 Spacer()
                 if !store.photos.isEmpty {
-                    Button("progress.photos.see_all".localized) {
+                    Button {
                         showGallery = true
+                    } label: {
+                        Text("progress.photos.see_all".localized)
+                            .font(.faroSemiBold(12))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
                     }
-                    .font(.faroSemiBold(12))
-                    .foregroundColor(.white)
+                    .buttonStyle(.glassSecondary)
                 }
             }
 
@@ -35,11 +40,10 @@ struct ProgressPhotosSection: View {
                         }
                         .foregroundColor(.white)
                         .frame(width: 118, height: 138)
-                        .background(Color(hex: "49288C").opacity(0.30))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .glassCard(cornerRadius: 18, tint: Color(hex: "49288C"), interactive: true)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(.white.opacity(0.55), style: StrokeStyle(lineWidth: 1, dash: [6, 5]))
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .strokeBorder(.white.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [6, 5]))
                         }
                     }
 
@@ -59,10 +63,10 @@ struct ProgressPhotosSection: View {
                                         .foregroundColor(.white)
                                         .padding(.horizontal, 7)
                                         .padding(.vertical, 5)
-                                        .background(.black.opacity(0.48), in: RoundedRectangle(cornerRadius: 5))
+                                        .glassCapsule()
                                         .padding(7)
                                 }
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                             }
                             .buttonStyle(.plain)
                         }
@@ -107,10 +111,13 @@ private struct ProgressPhotoGalleryView: View {
                 HStack {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
                     Spacer()
                     Text("progress.photos.title".localized)
                         .font(.faroSemiBold(18))
@@ -131,7 +138,7 @@ private struct ProgressPhotoGalleryView: View {
                                         .frame(maxWidth: .infinity)
                                         .aspectRatio(0.82, contentMode: .fit)
                                         .clipped()
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
                                     Button(role: .destructive) {
                                         store.delete(photo)
@@ -139,9 +146,11 @@ private struct ProgressPhotoGalleryView: View {
                                         Image(systemName: "trash")
                                             .font(.system(size: 13, weight: .semibold))
                                             .foregroundColor(.white)
-                                            .padding(9)
-                                            .background(.black.opacity(0.52), in: RoundedRectangle(cornerRadius: 6))
+                                            .frame(width: 34, height: 34)
+                                            .contentShape(Circle())
                                     }
+                                    .buttonStyle(.plain)
+                                    .glassCircle(tint: .black, interactive: true)
                                     .padding(7)
                                 }
                             }

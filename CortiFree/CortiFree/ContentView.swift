@@ -11,11 +11,16 @@ struct ContentView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var selectedTab: Tab = .home
     @ObservedObject private var soundPlayer = SoundPlayer.shared
+    @ObservedObject private var sessionPlayer = GuidedSessionPlayer.shared
     @ObservedObject private var planetSettings = PlanetSettings.shared
     @State private var isScrolling = false
     @State private var scrollTimer: Timer?
     @State private var isAssistantPresented = false
     @State private var assistantPulse = false
+
+    private var isMiniPlayerVisible: Bool {
+        soundPlayer.currentExercise != nil || sessionPlayer.currentSession != nil
+    }
 
     enum Tab {
         case home
@@ -61,14 +66,15 @@ struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Open CortiFree Assistant")
-                    // Keep the floating assistant fully above the navigation bar.
-                    .offset(x: -10, y: -104)
+                    // Keep the floating assistant above the tab bar, and above the mini player when one is showing.
+                    .offset(x: -10, y: isMiniPlayerVisible ? -176 : -104)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.85), value: isMiniPlayerVisible)
                 }
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
 
-            // Mini Player (if playing) - positioned above TabBar
-            if soundPlayer.currentExercise != nil {
+            // Mini Player (guided session or ambient sound) - positioned above TabBar
+            if isMiniPlayerVisible {
                 VStack(spacing: 8) {
                     Spacer()
                     MiniPlayer()
@@ -79,7 +85,12 @@ struct ContentView: View {
             }
 
         }
+        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: sessionPlayer.currentSession?.id)
         .ignoresSafeArea(.keyboard)
+        .fullScreenCover(isPresented: $sessionPlayer.isFullPlayerPresented) {
+            NowPlayingView()
+                .presentationBackground(.clear)
+        }
         .sheet(isPresented: $isAssistantPresented) {
             AssistantChatView()
                 .presentationDetents([.large])
@@ -109,6 +120,8 @@ struct ContentView: View {
 
 struct CustomTabBar: View {
     @Binding var selectedTab: ContentView.Tab
+    // Refresh tab titles immediately after a language change in Settings
+    @ObservedObject private var languageManager = LanguageManager.shared
 
     @ViewBuilder
     var body: some View {
@@ -136,7 +149,7 @@ struct CustomTabBar: View {
         HStack(spacing: 0) {
             TabBarButton(
                 icon: "house.fill",
-                title: NSLocalizedString("tab.home", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "tab.home"),
                 isSelected: selectedTab == .home
             ) {
                 if selectedTab != .home {
@@ -146,7 +159,7 @@ struct CustomTabBar: View {
 
             TabBarButton(
                 icon: "list.bullet.clipboard.fill",
-                title: NSLocalizedString("tab.plan", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "tab.plan"),
                 isSelected: selectedTab == .tasks
             ) {
                 if selectedTab != .tasks {
@@ -156,7 +169,7 @@ struct CustomTabBar: View {
 
             TabBarButton(
                 icon: "chart.line.uptrend.xyaxis",
-                title: NSLocalizedString("tab.progress", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "tab.progress"),
                 isSelected: selectedTab == .progress
             ) {
                 if selectedTab != .progress {
@@ -166,7 +179,7 @@ struct CustomTabBar: View {
 
             TabBarButton(
                 icon: "books.vertical.fill",
-                title: NSLocalizedString("tab.library", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "tab.library"),
                 isSelected: selectedTab == .library
             ) {
                 if selectedTab != .library {
@@ -176,7 +189,7 @@ struct CustomTabBar: View {
 
             TabBarButton(
                 icon: "person.fill",
-                title: NSLocalizedString("tab.profile", comment: ""),
+                title: LanguageManager.shared.localizedString(for: "tab.profile"),
                 isSelected: selectedTab == .profile
             ) {
                 if selectedTab != .profile {

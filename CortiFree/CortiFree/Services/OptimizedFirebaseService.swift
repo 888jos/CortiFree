@@ -82,14 +82,6 @@ class OptimizedFirebaseService {
                 "hasPhysicalLimitations": false, // Removed from quiz
                 "preferredTimeOfDay": "morning", // Default value
                 "primaryGoal": result.primaryGoal
-            ],
-            "domainScores": [
-                "serenity": result.serenityScore,
-                "sleep": result.sleepScore,
-                "energy": result.energyScore,
-                "focus": result.focusScore,
-                "habits": result.habitsScore,
-                "global": result.globalScore
             ]
         ]
     }

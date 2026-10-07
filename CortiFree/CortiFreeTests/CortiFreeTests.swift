@@ -124,36 +124,6 @@ struct CortiFreeTests {
         #expect(sessions.contains { $0.category == .breathing && $0.durationSeconds == 75 })
     }
 
-    @Test func userDomainScoresReadIntegerFirestoreValues() {
-        let scores = UserDomainScores.from([
-            "serenity": 32,
-            "sleep": 44,
-            "energy": 51,
-            "focus": 39,
-            "balance": 34
-        ])
-
-        #expect(scores.serenity == 32)
-        #expect(scores.sleep == 44)
-        #expect(scores.energy == 51)
-        #expect(scores.focus == 39)
-        #expect(scores.balance == 34)
-        #expect(scores.global == 40)
-    }
-
-    @Test func userDomainScoresReadLegacyHabitsDomain() {
-        let scores = UserDomainScores.from([
-            "serenity": 20,
-            "sleep": 30,
-            "energy": 40,
-            "focus": 50,
-            "habits": 60
-        ])
-
-        #expect(scores.balance == 60)
-        #expect(scores.global == 40)
-    }
-
     @Test func progressStreakResetsAfterMoreThanOneInactiveDay() {
         let calendar = utcCalendar
         let start = date(2026, 8, 1, calendar: calendar)
@@ -193,10 +163,7 @@ struct CortiFreeTests {
             bestStreak: 1,
             activities: [],
             domainTrends: [],
-            topActivity: nil,
-            baselineScore: nil,
-            currentScore: nil,
-            scoreHistory: []
+            topActivity: nil
         )
 
         #expect(dashboard.activeDayCount(in: .week, relativeTo: now, calendar: calendar) == 3)

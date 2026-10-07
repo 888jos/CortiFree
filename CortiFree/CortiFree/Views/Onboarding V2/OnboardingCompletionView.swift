@@ -50,11 +50,12 @@ struct OnboardingCompletionView: View {
                 // Not used - no restore functionality
             },
             habitsQuizResult: habitsQuizResult,
-            selectedSymptoms: selectedSymptoms
+            selectedSymptoms: selectedSymptoms,
+            requiresPurchaseToComplete: true
         )
         .onAppear {
             // Track completion screen viewed
-            MixpanelManager.shared.trackOnboardingCompletionViewed(
+            AnalyticsManager.shared.trackOnboardingCompletionViewed(
                 quizAnswersCount: habitsQuizResult?.answers.count ?? 0,
                 hasQuizData: habitsQuizResult != nil
             )
@@ -71,9 +72,8 @@ struct OnboardingCompletionView: View {
         // Get quiz result data if available
         guard let result = habitsQuizResult else {
             // No quiz data - track basic completion
-            MixpanelManager.shared.trackOnboardingCompleted(
+            AnalyticsManager.shared.trackOnboardingCompleted(
                 totalTime: nil,
-                quizGlobalScore: nil,
                 selectedGoalsCount: nil,
                 notificationsEnabled: nil,
                 userId: Auth.auth().currentUser?.uid,
@@ -103,9 +103,8 @@ struct OnboardingCompletionView: View {
         }()
 
         // Track complete onboarding with all data
-        MixpanelManager.shared.trackOnboardingCompleted(
+        AnalyticsManager.shared.trackOnboardingCompleted(
             totalTime: totalTime,
-            quizGlobalScore: result.globalScore,
             selectedGoalsCount: 1, // Derived from quiz
             notificationsEnabled: notificationsEnabled,
             userId: currentUser?.uid,
@@ -116,15 +115,14 @@ struct OnboardingCompletionView: View {
 
         // Set user profile if authenticated
         if let userId = currentUser?.uid {
-            MixpanelManager.shared.identify(userId: userId)
+            AnalyticsManager.shared.identify(userId: userId)
 
             // Set user profile with quiz data
-            MixpanelManager.shared.setUserProfile(
+            AnalyticsManager.shared.setUserProfile(
                 firstName: firstName,
                 email: currentUser?.email,
                 age: nil,
                 gender: nil,
-                globalScore: result.globalScore,
                 primaryGoal: result.primaryGoal
             )
         }

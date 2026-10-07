@@ -17,7 +17,7 @@ struct AntiStressSituationView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                GalaxyBackgroundView(intensity: 1.0, isAnimated: false)
+                GalaxyBackgroundView(intensity: 0.75, isAnimated: false)
 
                 GeometryReader { geometry in
                     let horizontalPadding: CGFloat = 24
@@ -32,7 +32,7 @@ struct AntiStressSituationView: View {
                     VStack(spacing: verticalSpacing) {
                         // Header
                         VStack(spacing: 12) {
-                            Text(NSLocalizedString("antistress.situation.title", comment: ""))
+                            Text(LanguageManager.shared.localizedString(for: "antistress.situation.title"))
                                 .font(.faroSemiBold(24))
                                 .foregroundStyle(
                                     LinearGradient(
@@ -43,7 +43,7 @@ struct AntiStressSituationView: View {
                                 )
                                 .multilineTextAlignment(.center)
 
-                            Text(NSLocalizedString("antistress.situation.subtitle", comment: ""))
+                            Text(LanguageManager.shared.localizedString(for: "antistress.situation.subtitle"))
                                 .font(.custom("Poppins-Regular", size: 14))
                                 .foregroundColor(.white.opacity(0.7))
                                 .multilineTextAlignment(.center)
@@ -160,21 +160,24 @@ struct SituationCard: View {
             }
             .frame(maxWidth: .infinity)
             .aspectRatio(1.0, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(
-                        isSelected ? Color.white : Color.white.opacity(0.3),
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(
+                        isSelected
+                            ? AnyShapeStyle(Color.white)
+                            : AnyShapeStyle(LinearGradient(colors: [.white.opacity(0.4), .white.opacity(0.1)],
+                                                           startPoint: .topLeading, endPoint: .bottomTrailing)),
                         lineWidth: isSelected ? 2 : 1
                     )
             )
             .shadow(
                 color: isSelected ?
-                    Color.white.opacity(0.3) :
-                    Color.black.opacity(0.2),
-                radius: isSelected ? 8 : 4,
+                    Color.white.opacity(0.25) :
+                    Color.black.opacity(0.25),
+                radius: isSelected ? 10 : 12,
                 x: 0,
-                y: isSelected ? 4 : 2
+                y: isSelected ? 4 : 6
             )
         }
         .buttonStyle(PlainButtonStyle())

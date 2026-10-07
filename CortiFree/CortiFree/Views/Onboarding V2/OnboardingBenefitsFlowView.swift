@@ -2,7 +2,7 @@
 //  OnboardingBenefitsFlowView.swift
 //  CortiFree
 //
-//  Five-screen feature tour shown between the custom pre-paywall and Superwall.
+//  Four-screen feature tour shown between the custom pre-paywall and Superwall.
 //
 
 import SwiftUI
@@ -15,29 +15,24 @@ struct OnboardingBenefitsFlowView: View {
 
     private let pages: [BenefitsPage] = [
         BenefitsPage(
-            imageName: "benefit_library",
-            title: "Everything you need\nin one calm space",
-            subtitle: "Explore breathing, meditation, journaling, and sounds designed to help your body slow down."
-        ),
-        BenefitsPage(
             imageName: "benefit_plan",
-            title: "A daily plan\nbuilt for you",
-            subtitle: "Simple routines turn small moments into a rhythm you can come back to every day."
+            titleKey: "onboarding_v2.benefits.plan_title",
+            subtitleKey: "onboarding_v2.benefits.plan_subtitle"
         ),
         BenefitsPage(
-            imageName: "benefit_breathing",
-            title: "Reset your system\nin a few minutes",
-            subtitle: "Follow guided exercises that help you create a real pause when stress starts to rise."
+            imageName: "benefit_library",
+            titleKey: "onboarding_v2.benefits.library_title",
+            subtitleKey: "onboarding_v2.benefits.library_subtitle"
+        ),
+        BenefitsPage(
+            imageName: "benefit_progress",
+            titleKey: "onboarding_v2.benefits.progress_title",
+            subtitleKey: "onboarding_v2.benefits.progress_subtitle"
         ),
         BenefitsPage(
             imageName: "benefit_achievements",
-            title: "Make your progress\nfeel real",
-            subtitle: "See your streaks, unlock milestones, and notice the consistency you are building."
-        ),
-        BenefitsPage(
-            imageName: "benefit_home",
-            title: "Feel better\none day at a time",
-            subtitle: "Your next step is ready whenever you are. Start with a plan that fits real life."
+            titleKey: "onboarding_v2.benefits.achievements_title",
+            subtitleKey: "onboarding_v2.benefits.achievements_subtitle"
         )
     ]
 
@@ -82,7 +77,7 @@ struct OnboardingBenefitsFlowView: View {
                     .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(selectedPage == 0 ? "Back" : "Previous page")
+            .accessibilityLabel((selectedPage == 0 ? "common.back" : "common.previous_page").localized)
 
             Spacer()
         }
@@ -102,7 +97,7 @@ struct OnboardingBenefitsFlowView: View {
             }
         } label: {
             HStack(spacing: 10) {
-                Text(selectedPage == pages.count - 1 ? "Continue to your plan" : "Continue")
+                Text((selectedPage == pages.count - 1 ? "onboarding_v2.benefits.continue_plan" : "common.continue").localized)
                     .font(.poppinsSemiBold(17))
 
                 Image(systemName: "arrow.right")
@@ -111,18 +106,8 @@ struct OnboardingBenefitsFlowView: View {
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .frame(height: 56)
-            .background(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(hex: "8B5CF6"), Color(hex: "B794F6")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-            )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.glassPrimary)
         .padding(.horizontal, 24)
         .padding(.top, 8)
         .padding(.bottom, 32)
@@ -131,10 +116,11 @@ struct OnboardingBenefitsFlowView: View {
 
 private struct BenefitsPageView: View {
     let page: BenefitsPage
+    private let screenshotAspectRatio = CGFloat(1179.0 / 2556.0)
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(page.title)
+            Text(page.titleKey.localized)
                 .font(.faroBold(28))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
@@ -142,20 +128,42 @@ private struct BenefitsPageView: View {
                 .padding(.horizontal, 24)
                 .padding(.top, 14)
 
-            Spacer(minLength: 20)
+            Text(page.subtitleKey.localized)
+                .font(.poppinsRegular(13))
+                .foregroundStyle(.white.opacity(0.66))
+                .multilineTextAlignment(.center)
+                .lineSpacing(3)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 32)
+                .padding(.top, 10)
 
-            Image(page.imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 248, maxHeight: 500)
-                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            GeometryReader { geometry in
+                let phoneHeight = min(geometry.size.height - 24, 500)
+                let phoneWidth = phoneHeight * screenshotAspectRatio
+                let phoneShape = RoundedRectangle(
+                    cornerRadius: max(18, phoneWidth * 0.105),
+                    style: .continuous
+                )
+
+                ZStack {
+                    Color.black
+
+                    Image(page.imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: phoneWidth, height: phoneHeight)
+                        .clipped()
+                }
+                .frame(width: phoneWidth, height: phoneHeight)
+                .clipShape(phoneShape)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .stroke(.white, lineWidth: 2)
+                    phoneShape
+                        .strokeBorder(.white.opacity(0.96), lineWidth: 2.25)
                 }
                 .shadow(color: Color(hex: "B794F6").opacity(0.24), radius: 24, y: 12)
-
-            Spacer(minLength: 20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            }
+            .padding(.top, 14)
         }
         .padding(.horizontal, 20)
     }
@@ -163,8 +171,8 @@ private struct BenefitsPageView: View {
 
 private struct BenefitsPage {
     let imageName: String
-    let title: String
-    let subtitle: String
+    let titleKey: String
+    let subtitleKey: String
 }
 
 #Preview {

@@ -54,6 +54,7 @@ final class AmplitudeManager {
     }
 
     func reset() {
-        amplitude?.setUserId(userId: nil)
+        // Clears userId and rotates deviceId so the next account isn't linked to this one.
+        amplitude?.reset()
     }
 }

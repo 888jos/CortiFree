@@ -144,6 +144,8 @@ struct PullToRefreshIndicator: View {
                                 .animation(.easeInOut, value: progress)
                         }
                     }
+                    .frame(width: 52, height: 52)
+                    .glassCircle()
                     .scaleEffect(0.8 + (progress * 0.2))
 
                     if pullDistance > threshold && !isRefreshing {

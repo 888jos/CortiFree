@@ -14,9 +14,7 @@ import SwiftUI
 
 private enum HabitsQuizIntermission {
     case breathingIntro
-    case facialScan
     case cortiFreeComparison
-    case notifications
 }
 
 struct HabitsQuizView: View {
@@ -84,7 +82,7 @@ struct HabitsQuizView: View {
             // Track quiz started
             quizStartTime = Date()
             questionStartTime = Date()
-            MixpanelManager.shared.trackOnboardingHabitsQuizViewed()
+            AnalyticsManager.shared.trackOnboardingHabitsQuizViewed()
             trackQuestionViewed(0)
         }
         .onChange(of: currentQuestionIndex) { _, newValue in
@@ -102,29 +100,12 @@ struct HabitsQuizView: View {
                 onContinue: continueAfterIntermission,
                 onBack: returnToCurrentQuestion
             )
-        case .facialScan:
-            GlowScanFlowView(
-                context: GlowOnboardingContext(
-                    primaryGoal: "balance",
-                    appearanceConcern: appearanceConcern(for: answers[8]),
-                    symptoms: [],
-                    reasons: [],
-                    domainScore: HabitsQuizResult(answers: answers).cortiFreeScore
-                ),
-                onComplete: continueAfterIntermission,
-                onExit: continueAfterIntermission
-            )
         case .cortiFreeComparison:
             CortiFreeComparisonView(
                 previousAppExperience: answers[9],
                 onBack: returnToCurrentQuestion,
                 onContinue: continueAfterIntermission
             )
-        case .notifications:
-            NotificationPermissionsView(onContinue: {
-                activeIntermission = nil
-                calculateAndComplete()
-            })
         }
     }
 
@@ -144,7 +125,7 @@ struct HabitsQuizView: View {
 
     private func trackQuestionViewed(_ index: Int) {
         let question = getQuestion(at: index)
-        MixpanelManager.shared.trackOnboardingQuizQuestionViewed(
+        AnalyticsManager.shared.trackOnboardingQuizQuestionViewed(
             questionNumber: index + 1,
             questionText: question.text
         )
@@ -160,7 +141,7 @@ struct HabitsQuizView: View {
                 HapticManager.light()
                 if currentQuestionIndex > 0 {
                     // Track back button click
-                    MixpanelManager.shared.trackOnboardingQuizBackClicked(
+                    AnalyticsManager.shared.trackOnboardingQuizBackClicked(
                         fromQuestionNumber: currentQuestionIndex + 1
                     )
 
@@ -248,7 +229,7 @@ struct HabitsQuizView: View {
                         let question = getQuestion(at: currentQuestionIndex)
                         let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
 
-                        MixpanelManager.shared.trackOnboardingQuizQuestionAnswered(
+                        AnalyticsManager.shared.trackOnboardingQuizQuestionAnswered(
                             questionNumber: currentQuestionIndex + 1,
                             questionText: question.text,
                             answerIndex: index,
@@ -263,12 +244,8 @@ struct HabitsQuizView: View {
                             switch currentQuestionIndex {
                             case 2:
                                 intermission = .breathingIntro
-                            case 8:
-                                intermission = .facialScan
                             case 9:
                                 intermission = .cortiFreeComparison
-                            case 11:
-                                intermission = .notifications
                             default:
                                 intermission = nil
                             }
@@ -289,11 +266,6 @@ struct HabitsQuizView: View {
         .disabled(isTransitioning)
         .padding(.horizontal, 34)
         .padding(.bottom, 40)
-    }
-
-    private func appearanceConcern(for answerIndex: Int) -> String {
-        let concerns = ["Feeling good in my skin", "A few imperfections", "Visible fatigue", "Dark circles and dull complexion"]
-        return concerns[safe: answerIndex] ?? concerns[0]
     }
 
     // MARK: - Navigation
@@ -327,16 +299,9 @@ struct HabitsQuizView: View {
         // Calculate total time spent on quiz
         let totalTime = quizStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
 
-        // Track quiz completion with scores and marketing data
-        MixpanelManager.shared.trackOnboardingHabitsQuizCompleted(
+        // Track quiz completion with marketing data
+        AnalyticsManager.shared.trackOnboardingHabitsQuizCompleted(
             totalTime: totalTime,
-            serenityScore: result.serenityScore,
-            sleepScore: result.sleepScore,
-            energyScore: result.energyScore,
-            focusScore: result.focusScore,
-            habitsScore: result.habitsScore,
-            balanceScore: result.balanceScore,
-            globalScore: result.globalScore,
             appearanceConcern: result.appearanceConcern,
             baselineWakeTime: nil,
             baselineSleepDuration: nil,
@@ -349,7 +314,7 @@ struct HabitsQuizView: View {
         )
 
         // Track additional marketing data
-        MixpanelManager.shared.trackOnboardingMarketingData(
+        AnalyticsManager.shared.trackOnboardingMarketingData(
             acquisitionChannel: "Unknown", // Acquisition now tracked in Overall quiz
             previousAppExperience: result.previousAppExperience
         )
@@ -574,16 +539,11 @@ struct HabitsAnswerButton: View {
             }
             .padding(.horizontal, 16)
             .frame(height: 54)
-            .background(
-                RoundedRectangle(cornerRadius: 40)
-                    .fill(isSelected ? Color(hex: "B794F6") : Color(hex: "131146").opacity(0.8))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 40)
-                            .stroke(
-                                isSelected ? Color(hex: "D4B4FF") : Color(hex: "1B1864"),
-                                lineWidth: 2
-                            )
-                    )
+            .glassCard(cornerRadius: 27, tint: isSelected ? Color(hex: "B794F6") : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 27, style: .continuous)
+                    .strokeBorder(Color(hex: "D4B4FF"), lineWidth: 2)
+                    .opacity(isSelected ? 1 : 0)
             )
         }
         .buttonStyle(PlainButtonStyle())
@@ -632,17 +592,6 @@ struct HabitsQuizResult {
     /// Score global (moyenne des 4 domaines)
     var globalScore: Int {
         (stressScore + sleepScore + energyScore + focusScore) / 4
-    }
-
-    /// Unified pre-scan score. Balance is derived from serenity and focus,
-    /// so it receives a smaller weight to avoid counting those domains twice.
-    var cortiFreeScore: Int {
-        let weighted = Double(stressScore) * 0.22
-            + Double(sleepScore) * 0.22
-            + Double(energyScore) * 0.22
-            + Double(focusScore) * 0.22
-            + Double(balanceScore) * 0.12
-        return Int(weighted.rounded())
     }
 
     /// Score d'équilibre (stress + focus)

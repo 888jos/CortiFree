@@ -26,11 +26,11 @@ struct AchievementsView: View {
             VStack(spacing: 0) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Achievements")
+                        Text("achievements.title".localized)
                             .font(.faroBold(28))
                             .foregroundColor(.white)
 
-                        Text("\(achievementService.unlockedCount)/\(achievementService.totalCount) Unlocked")
+                        Text(String(format: "achievements.unlocked_count".localized, achievementService.unlockedCount, achievementService.totalCount))
                             .font(.faroRegular(13))
                             .foregroundColor(.white.opacity(0.62))
                     }
@@ -42,11 +42,13 @@ struct AchievementsView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
@@ -56,7 +58,7 @@ struct AchievementsView: View {
                     VStack(alignment: .leading, spacing: 24) {
                         summaryCard
 
-                        Text("Streaks")
+                        Text("achievements.streaks".localized)
                             .font(.faroSemiBold(19))
                             .foregroundColor(.white)
 
@@ -69,13 +71,13 @@ struct AchievementsView: View {
                                     achievement: achievement,
                                     size: .gallery,
                                     onTap: { selectedAchievement = achievement },
-                                    usesEnglishLabels: true
+                                    usesEnglishLabels: false
                                 )
                                 .frame(maxWidth: .infinity)
                             }
                         }
 
-                        Text("Habits")
+                        Text("achievements.habits".localized)
                             .font(.faroSemiBold(19))
                             .foregroundColor(.white)
                             .padding(.top, 8)
@@ -106,13 +108,8 @@ struct AchievementsView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 46)
-                            .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(.white.opacity(0.16), lineWidth: 1)
-                            }
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.glassSecondary(cornerRadius: 14))
                         #endif
                     }
                     .padding(.horizontal, 20)
@@ -126,8 +123,7 @@ struct AchievementsView: View {
         .sheet(item: $selectedHabitBadge) { badge in
             BadgeDetailSheet(
                 badge: badge,
-                currentProgress: habitBadgeService.badges(for: badge.habitId).map(\.progress).max() ?? badge.progress,
-                usesEnglishLabels: true
+                currentProgress: habitBadgeService.badges(for: badge.habitId).map(\.progress).max() ?? badge.progress
             )
         }
         .task {
@@ -159,9 +155,7 @@ struct AchievementsView: View {
             )
         }
         .padding(.vertical, 18)
-        .background(Color(hex: "49288C").opacity(0.30))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.08), lineWidth: 1))
+        .glassCard(cornerRadius: 22, tint: Color(hex: "49288C"))
     }
 
     private func summaryValue(_ value: String, label: String) -> some View {
@@ -186,7 +180,7 @@ struct AchievementsView: View {
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-            Label(HabitBadge.englishHabitDisplayName(habitId), systemImage: HabitBadge.habitIcon(habitId))
+                Label(HabitBadge.habitDisplayName(habitId), systemImage: HabitBadge.habitIcon(habitId))
                     .font(.faroSemiBold(14))
                     .foregroundColor(.white)
 
@@ -208,7 +202,8 @@ struct AchievementsView: View {
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(16)
+        .glassCard(cornerRadius: 22)
     }
 
     private var totalUnlockedCount: Int {
@@ -271,10 +266,7 @@ struct CategoryFilterButton: View {
                 .foregroundColor(isSelected ? .white : .white.opacity(0.6))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(isSelected ? color : Color.white.opacity(0.1))
-                )
+                .glassCapsule(tint: isSelected ? color : nil, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -298,11 +290,13 @@ struct AchievementDetailView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 10)
@@ -312,19 +306,19 @@ struct AchievementDetailView: View {
                 badgeVisual
                     .frame(width: 190, height: 190)
 
-                Text(achievement.isUnlocked ? "Achievement Unlocked!" : "Not started yet")
+                Text(achievement.isUnlocked ? "achievement.unlocked".localized : "achievements.not_started".localized)
                     .font(.faroSemiBold(12))
                     .foregroundColor(.white.opacity(0.58))
                     .textCase(.uppercase)
                     .padding(.top, 28)
 
-                Text(achievement.englishTitle)
+                Text(achievement.title)
                     .font(.faroBold(30))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.top, 10)
 
-                Text(achievement.englishDescription)
+                Text(achievement.description)
                     .font(.faroRegular(15))
                     .foregroundColor(.white.opacity(0.72))
                     .multilineTextAlignment(.center)
@@ -333,7 +327,7 @@ struct AchievementDetailView: View {
 
                 if achievement.isUnlocked, let unlockedAt = achievement.unlockedAt {
                     Label(
-                        "Unlocked on \(formatDate(unlockedAt))",
+                        String(format: "achievements.unlocked_date".localized, formatDate(unlockedAt)),
                         systemImage: "checkmark.circle.fill"
                     )
                     .font(.faroRegular(13))
@@ -341,7 +335,7 @@ struct AchievementDetailView: View {
                     .padding(.top, 18)
                 } else {
                     VStack(spacing: 9) {
-                        Text("Progress: \(achievement.progress)/\(achievement.requirement)")
+                        Text(String(format: "achievements.progress".localized, achievement.progress, achievement.requirement))
                             .font(.faroSemiBold(13))
                             .foregroundColor(.white)
 

@@ -3,6 +3,6 @@
     "source": "functions"
   },
   "firestore": {
-    "rules": "CortiFree/FIRESTORE_RULES.txt"
+    "rules": "firestore.rules"
   }
 }

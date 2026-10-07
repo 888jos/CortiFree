@@ -268,21 +268,7 @@ class TasksViewModel: ObservableObject {
 
             // Update local state
             if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-                let wasCompleted = tasks[index].completed
                 tasks[index].completed.toggle()
-
-                // XP system removed - using scoring system instead
-
-                // Apply or remove habit impact on domain scores
-                if let habitId = task.habitId, !habitId.isEmpty {
-                    if !wasCompleted && tasks[index].completed {
-                        // Task completed: apply impact
-                        _ = try await ImpactScoringService.shared.applyTaskImpact(habitId: habitId)
-                    } else if wasCompleted && !tasks[index].completed {
-                        // Task uncompleted: remove impact
-                        _ = try await ImpactScoringService.shared.removeTaskImpact(habitId: habitId)
-                    }
-                }
 
                 // Check if all tasks completed
                 if completionPercentage == 1.0 {

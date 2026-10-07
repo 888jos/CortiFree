@@ -22,13 +22,13 @@ struct ExerciseRecommendationView: View {
     var body: some View {
         ZStack {
             // Galaxy background
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.75)
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 28) {
                     // Header
                     VStack(spacing: 12) {
-                        Text(NSLocalizedString("antistress.recommendation.title", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "antistress.recommendation.title"))
                             .font(.faroSemiBold(26))
                             .foregroundStyle(
                                 LinearGradient(
@@ -39,7 +39,7 @@ struct ExerciseRecommendationView: View {
                             )
                             .multilineTextAlignment(.center)
 
-                        Text(NSLocalizedString("antistress.recommendation.subtitle", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "antistress.recommendation.subtitle"))
                             .font(.custom("Poppins-Regular", size: 15))
                             .foregroundColor(.white.opacity(0.7))
                             .multilineTextAlignment(.center)

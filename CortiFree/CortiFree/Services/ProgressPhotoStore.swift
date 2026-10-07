@@ -46,6 +46,12 @@ final class ProgressPhotoStore: ObservableObject {
         try? persist()
     }
 
+    /// Removes every progress photo (used by account deletion).
+    func deleteAll() {
+        try? fileManager.removeItem(at: photosDirectory)
+        photos.removeAll()
+    }
+
     private var photosDirectory: URL {
         let base = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return base.appendingPathComponent("ProgressPhotos", isDirectory: true)

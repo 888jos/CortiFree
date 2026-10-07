@@ -83,7 +83,7 @@ struct ScientificPlanView: View {
 
                     if let startTime = screenViewTime {
                         let timeSpent = Date().timeIntervalSince(startTime)
-                        MixpanelManager.shared.trackOnboardingScientificPlanContinue(timeSpent: timeSpent)
+                        AnalyticsManager.shared.trackOnboardingScientificPlanContinue(timeSpent: timeSpent)
                     }
 
                     onContinue()
@@ -99,17 +99,8 @@ struct ScientificPlanView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 28)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "B794F6"), Color(hex: "D4B4FF")],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
                 }
+                .buttonStyle(.glassPrimary)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
@@ -117,7 +108,7 @@ struct ScientificPlanView: View {
         .ignoresSafeArea()
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingScientificPlanViewed()
+            AnalyticsManager.shared.trackOnboardingScientificPlanViewed()
         }
     }
 }
@@ -149,20 +140,10 @@ struct ScientificQuoteCard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(16)
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color(hex: "B794F6").opacity(0.3),
-                        Color(hex: "B794F6").opacity(0.05)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
 
             // Divider
             Rectangle()
-                .fill(Color.white.opacity(0.3))
+                .fill(Color.white.opacity(0.15))
                 .frame(height: 1)
 
             // Source section with second gradient
@@ -172,22 +153,8 @@ struct ScientificQuoteCard: View {
                 .lineSpacing(3)
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: "B794F6").opacity(0.3),
-                            Color(hex: "B794F6").opacity(0.05)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
         }
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-        )
+        .glassCard(cornerRadius: 16, tint: Color(hex: "B794F6"))
     }
 
     private var attributedQuote: AttributedString {

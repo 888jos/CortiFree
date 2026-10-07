@@ -90,21 +90,14 @@ struct AntiStressBodyScanDetailView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.15))
-                            .frame(width: 40, height: 40)
-                            .blur(radius: 8)
-
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
-
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
@@ -112,20 +105,13 @@ struct AntiStressBodyScanDetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "figure.stand")
                         .font(.system(size: 12))
-                    Text(NSLocalizedString("antistress.body_scan.category_badge", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.body_scan.category_badge"))
                         .font(.custom("Poppins-Bold", size: 11))
                 }
                 .foregroundColor(Color.appTheme)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(Color.appTheme.opacity(0.2))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.appTheme.opacity(0.5), lineWidth: 1)
-                        )
-                )
+                .glassCapsule(tint: Color.appTheme)
             }
             .padding(.horizontal, 24)
             .padding(.top, 20)
@@ -137,12 +123,12 @@ struct AntiStressBodyScanDetailView: View {
     private var compactTitleSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Title
-            Text(NSLocalizedString("antistress.body_scan.title", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "antistress.body_scan.title"))
                 .font(.faroBold(28))
                 .foregroundColor(.white)
 
             // Description courte
-            Text(NSLocalizedString("antistress.body_scan.subtitle", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "antistress.body_scan.subtitle"))
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(.white.opacity(0.8))
                 .lineSpacing(4)
@@ -166,7 +152,7 @@ struct AntiStressBodyScanDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("antistress.how_it_works", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.how_it_works"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -180,7 +166,7 @@ struct AntiStressBodyScanDetailView: View {
 
                 // Description - Expandable
                 if showHowItWorks {
-                    Text(NSLocalizedString("antistress.body_scan.how_it_works_text", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.body_scan.how_it_works_text"))
                         .font(.custom("Poppins-Regular", size: 15))
                         .foregroundColor(Color(hex: "E5E5E5"))
                         .lineSpacing(8)
@@ -189,34 +175,8 @@ struct AntiStressBodyScanDetailView: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -236,7 +196,7 @@ struct AntiStressBodyScanDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("antistress.scientific_evidence", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.scientific_evidence"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -288,48 +248,22 @@ struct AntiStressBodyScanDetailView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
 
     private var scientificEvidences: [String] {
         return [
-            NSLocalizedString("antistress.body_scan.evidence_1", comment: ""),
-            NSLocalizedString("antistress.body_scan.evidence_2", comment: ""),
-            NSLocalizedString("antistress.body_scan.evidence_3", comment: "")
+            LanguageManager.shared.localizedString(for: "antistress.body_scan.evidence_1"),
+            LanguageManager.shared.localizedString(for: "antistress.body_scan.evidence_2"),
+            LanguageManager.shared.localizedString(for: "antistress.body_scan.evidence_3")
         ]
     }
 
     private var scientificSources: [String] {
-        return [NSLocalizedString("antistress.body_scan.source", comment: "")]
+        return [LanguageManager.shared.localizedString(for: "antistress.body_scan.source")]
     }
 
     // MARK: - Benefits Section
@@ -341,7 +275,7 @@ struct AntiStressBodyScanDetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text(NSLocalizedString("antistress.benefits", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "antistress.benefits"))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }
@@ -359,10 +293,10 @@ struct AntiStressBodyScanDetailView: View {
 
     private var benefits: [String] {
         return [
-            NSLocalizedString("antistress.body_scan.benefit_1", comment: ""),
-            NSLocalizedString("antistress.body_scan.benefit_2", comment: ""),
-            NSLocalizedString("antistress.body_scan.benefit_3", comment: ""),
-            NSLocalizedString("antistress.body_scan.benefit_4", comment: "")
+            LanguageManager.shared.localizedString(for: "antistress.body_scan.benefit_1"),
+            LanguageManager.shared.localizedString(for: "antistress.body_scan.benefit_2"),
+            LanguageManager.shared.localizedString(for: "antistress.body_scan.benefit_3"),
+            LanguageManager.shared.localizedString(for: "antistress.body_scan.benefit_4")
         ]
     }
 
@@ -402,45 +336,15 @@ struct AntiStressBodyScanDetailView: View {
                 Image(systemName: "play.circle.fill")
                     .font(.system(size: 24))
 
-                Text(NSLocalizedString("antistress.start_button", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "antistress.start_button"))
                     .font(.custom("Poppins-Bold", size: 18))
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .frame(height: 64)
-            .background(
-                ZStack {
-                    // Shadow layer
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .blur(radius: 20)
-                        .offset(y: 8)
-
-                    // Main button
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                }
-            )
+            .contentShape(Capsule())
         }
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(.glassPrimary(tint: Color.appTheme))
     }
 }
 

@@ -66,7 +66,7 @@ struct JournalHistoryView: View {
                 // Undo Toast
                 if showUndoToast {
                     UndoToast(
-                        message: NSLocalizedString("journal_history.entry_deleted", comment: ""),
+                        message: LanguageManager.shared.localizedString(for: "journal_history.entry_deleted"),
                         duration: 5.0,
                         undoAction: restoreEntry
                     )
@@ -88,19 +88,23 @@ struct JournalHistoryView: View {
                 HapticManager.light()
                 dismiss()
             }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 28))
-                    .foregroundColor(.white.opacity(0.6))
+                Image(systemName: "xmark")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.85))
+                    .frame(width: 40, height: 40)
+                    .contentShape(Circle())
             }
+            .buttonStyle(.plain)
+            .glassCircle(interactive: true)
 
             Spacer()
 
             VStack(spacing: 4) {
-                Text(NSLocalizedString("journal_history.title", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "journal_history.title"))
                     .font(Font.Poppins.custom(.bold, size: 20))
                     .foregroundColor(.white)
 
-                Text(viewModel.allEntries.count == 1 ? String(format: NSLocalizedString("journal_history.entries_count", comment: ""), viewModel.allEntries.count) : String(format: NSLocalizedString("journal_history.entries_count_plural", comment: ""), viewModel.allEntries.count))
+                Text(viewModel.allEntries.count == 1 ? String(format: LanguageManager.shared.localizedString(for: "journal_history.entries_count"), viewModel.allEntries.count) : String(format: LanguageManager.shared.localizedString(for: "journal_history.entries_count_plural"), viewModel.allEntries.count))
                     .font(.custom("Poppins-Regular", size: 12))
                     .foregroundColor(.white.opacity(0.6))
             }
@@ -109,7 +113,7 @@ struct JournalHistoryView: View {
 
             // Placeholder for symmetry
             Color.clear
-                .frame(width: 28, height: 28)
+                .frame(width: 40, height: 40)
         }
         .padding(.horizontal, 24)
         .padding(.top, 20)
@@ -174,10 +178,10 @@ struct JournalHistoryView: View {
         HapticManager.light()
 
         let shareText = """
-        \(NSLocalizedString("journal_history.share_text_prefix", comment: ""))\(entry.createdAt.formatted(date: .long, time: .omitted))
+        \(LanguageManager.shared.localizedString(for: "journal_history.share_text_prefix"))\(entry.createdAt.formatted(date: .long, time: .omitted))
 
         \(entry.content)
-        \(NSLocalizedString("journal_history.share_text_suffix", comment: ""))
+        \(LanguageManager.shared.localizedString(for: "journal_history.share_text_suffix"))
         """
 
         let activityController = UIActivityViewController(
@@ -201,11 +205,11 @@ struct JournalHistoryView: View {
                 .font(.system(size: 60))
                 .foregroundColor(Color(hex: "B794F6").opacity(0.5))
 
-            Text(NSLocalizedString("journal_history.empty_title", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "journal_history.empty_title"))
                 .font(.custom("Poppins-SemiBold", size: 18))
                 .foregroundColor(.white)
 
-            Text(NSLocalizedString("journal_history.empty_subtitle", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "journal_history.empty_subtitle"))
                 .font(.custom("Poppins-Regular", size: 14))
                 .foregroundColor(.white.opacity(0.6))
                 .multilineTextAlignment(.center)
@@ -287,7 +291,7 @@ struct TimelineEntryCard: View {
                         .resizable()
                         .scaledToFill()
                         .frame(height: 120)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
 
                 // Content
@@ -305,7 +309,7 @@ struct TimelineEntryCard: View {
                                 isExpanded.toggle()
                             }
                         }) {
-                            Text(isExpanded ? NSLocalizedString("journal_history.see_less", comment: "") : NSLocalizedString("journal_history.see_more", comment: ""))
+                            Text(isExpanded ? LanguageManager.shared.localizedString(for: "journal_history.see_less") : LanguageManager.shared.localizedString(for: "journal_history.see_more"))
                                 .font(.custom("Poppins-Medium", size: 12))
                                 .foregroundColor(Color(hex: "B794F6"))
                         }
@@ -314,21 +318,22 @@ struct TimelineEntryCard: View {
                     Spacer()
 
                     if let wordCount = entry.wordCount {
-                        Text(String(format: NSLocalizedString("journal_history.words_count", comment: ""), wordCount))
+                        Text(String(format: LanguageManager.shared.localizedString(for: "journal_history.words_count"), wordCount))
                             .font(.custom("Poppins-Regular", size: 11))
                             .foregroundColor(.white.opacity(0.5))
                     }
                 }
             }
-            .padding(.vertical, 12)
-            .padding(.bottom, 24)
+            .padding(16)
+            .glassCard(cornerRadius: 20)
+            .padding(.bottom, 20)
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 HapticManager.medium()
                 onDelete()
             } label: {
-                Label(NSLocalizedString("journal_history.delete", comment: ""), systemImage: "trash")
+                Label(LanguageManager.shared.localizedString(for: "journal_history.delete"), systemImage: "trash")
             }
         }
         .swipeActions(edge: .leading) {
@@ -336,7 +341,7 @@ struct TimelineEntryCard: View {
                 HapticManager.light()
                 onShare()
             } label: {
-                Label(NSLocalizedString("journal_history.share", comment: ""), systemImage: "square.and.arrow.up")
+                Label(LanguageManager.shared.localizedString(for: "journal_history.share"), systemImage: "square.and.arrow.up")
             }
             .tint(.blue)
         }

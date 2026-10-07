@@ -15,14 +15,11 @@
 		804F1D8A2F4CF13600374D9D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804F1D892F4CF13600374D9D /* SwiftUI.framework */; };
 		804F1D9B2F4CF13700374D9D /* CortiFreeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		805099B72F4BC34E002841B9 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 805099B62F4BC34E002841B9 /* PostHog */; };
-		80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 80A000022F4BC34E002841B9 /* AmplitudeSwift */; };
 		80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4B2F1701B9000C459F /* RevenueCat */; };
-		80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4D2F1701B9000C459F /* RevenueCatUI */; };
-		8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8077CC292ECF8AF400742806 /* Mixpanel */; };
 		8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9902EA8CBCA007C9606 /* FirebaseAuth */; };
 		8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9922EA8CBCA007C9606 /* FirebaseFirestore */; };
+		80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 80A000022F4BC34E002841B9 /* AmplitudeSwift */; };
 		80E85E8D2F3762E300E18C4B /* CortiFree.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 80E85E8C2F3762E300E18C4B /* CortiFree.storekit */; };
-		80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600CD2E85D5BF008F58FB /* FirebaseAnalytics */; };
 		80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600D62E85EAA9008F58FB /* SuperwallKit */; };
 /* End PBXBuildFile section */
 
@@ -136,11 +133,8 @@
 			files = (
 				803AC4DE2F40CED0007B3B5A /* TikTokBusinessSDK in Frameworks */,
 				8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */,
-				80622A4E2F1701B9000C459F /* RevenueCatUI in Frameworks */,
-				80F600CE2E85D5BF008F58FB /* FirebaseAnalytics in Frameworks */,
 				80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */,
 				8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */,
-				8077CC2A2ECF8AF400742806 /* Mixpanel in Frameworks */,
 				805099B72F4BC34E002841B9 /* PostHog in Frameworks */,
 				80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */,
 				80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */,
@@ -244,16 +238,13 @@
 			);
 			name = CortiFree;
 			packageProductDependencies = (
-				80F600CD2E85D5BF008F58FB /* FirebaseAnalytics */,
 				80F600D62E85EAA9008F58FB /* SuperwallKit */,
 				8097F9902EA8CBCA007C9606 /* FirebaseAuth */,
 				8097F9922EA8CBCA007C9606 /* FirebaseFirestore */,
 				802C49B02EBBB2340084B356 /* Lottie */,
-				8077CC292ECF8AF400742806 /* Mixpanel */,
 				8021AEC92ED91A0100541E54 /* GoogleSignIn */,
 				8021AECB2ED91A0100541E54 /* GoogleSignInSwift */,
 				80622A4B2F1701B9000C459F /* RevenueCat */,
-				80622A4D2F1701B9000C459F /* RevenueCatUI */,
 				803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */,
 				805099B62F4BC34E002841B9 /* PostHog */,
 				80A000022F4BC34E002841B9 /* AmplitudeSwift */,
@@ -335,8 +326,12 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				es,
+				de,
 				Base,
 				fr,
+				ja,
+				ko,
 			);
 			mainGroup = 80F600972E85D4A0008F58FB;
 			minimizedProjectReferenceProxies = 1;
@@ -344,7 +339,6 @@
 				80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				80F600D52E85EAA9008F58FB /* XCRemoteSwiftPackageReference "Superwall-iOS" */,
 				802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */,
-				8077CC282ECF8AF400742806 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 				8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				803AC4DC2F40CED0007B3B5A /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */,
@@ -454,7 +448,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
@@ -487,7 +481,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
@@ -634,14 +628,14 @@
 		80F600C22E85D4A0008F58FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				AMPLITUDE_API_KEY = cea46c8db502b00ad059927287d88b08;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = RSC662VDU8;
-				AMPLITUDE_API_KEY = "cea46c8db502b00ad059927287d88b08";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -652,8 +646,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0;
-				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
+				MARKETING_VERSION = 3.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -664,21 +657,21 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				SuperwallAPIKey = pk_JPmmC0H5be4yqTnw24VTm;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
 		80F600C32E85D4A0008F58FB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				AMPLITUDE_API_KEY = cea46c8db502b00ad059927287d88b08;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = RSC662VDU8;
-				AMPLITUDE_API_KEY = "cea46c8db502b00ad059927287d88b08";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -689,8 +682,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0;
-				MixpanelToken = 54821f0aa53aa5ce3804237815f94332;
+				MARKETING_VERSION = 3.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -701,7 +693,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				SuperwallAPIKey = pk_JPmmC0H5be4yqTnw24VTm;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -864,14 +856,6 @@
 				minimumVersion = 3.41.2;
 			};
 		};
-		80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/amplitude/Amplitude-Swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.18.0;
-			};
-		};
 		80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
@@ -880,12 +864,12 @@
 				minimumVersion = 5.54.0;
 			};
 		};
-		8077CC282ECF8AF400742806 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
+		80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mixpanel/mixpanel-swift";
+			repositoryURL = "https://github.com/amplitude/Amplitude-Swift";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.0;
 			};
 		};
 		80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -932,25 +916,10 @@
 			package = 805099B52F4BC34E002841B9 /* XCRemoteSwiftPackageReference "posthog-ios" */;
 			productName = PostHog;
 		};
-		80A000022F4BC34E002841B9 /* AmplitudeSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */;
-			productName = AmplitudeSwift;
-		};
 		80622A4B2F1701B9000C459F /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
 			productName = RevenueCat;
-		};
-		80622A4D2F1701B9000C459F /* RevenueCatUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
-			productName = RevenueCatUI;
-		};
-		8077CC292ECF8AF400742806 /* Mixpanel */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8077CC282ECF8AF400742806 /* XCRemoteSwiftPackageReference "mixpanel-swift" */;
-			productName = Mixpanel;
 		};
 		8097F9902EA8CBCA007C9606 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -962,10 +931,10 @@
 			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
 		};
-		80F600CD2E85D5BF008F58FB /* FirebaseAnalytics */ = {
+		80A000022F4BC34E002841B9 /* AmplitudeSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
+			package = 80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */;
+			productName = AmplitudeSwift;
 		};
 		80F600D62E85EAA9008F58FB /* SuperwallKit */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -51,7 +51,7 @@ struct DailyProgramView: View {
             .padding(.bottom, 100)
         }
         .background(
-            GalaxyBackgroundView(intensity: 0.8)
+            GalaxyBackgroundView(intensity: 0.7)
                 .ignoresSafeArea()
         )
         .sheet(isPresented: $showCheckpointCelebration) {
@@ -66,21 +66,12 @@ struct DailyProgramView: View {
             // Day number badge
             HStack {
                 Spacer()
-                Text("JOUR \(dailyProgram.day)")
+                Text(String(format: "daily_program.day".localized, dailyProgram.day))
                     .font(.custom("Poppins-Bold", size: 14))
                     .foregroundColor(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    .background(
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color.appTheme, Color.appThemeSecondary],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
+                    .glassCapsule(tint: Color.appTheme)
                 Spacer()
             }
 
@@ -94,6 +85,7 @@ struct DailyProgramView: View {
     }
 
     private var metadataSection: some View {
+        GlassGroup(spacing: 16) {
         HStack(spacing: 16) {
             // Time of day
             HStack(spacing: 8) {
@@ -107,10 +99,7 @@ struct DailyProgramView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .background(
-                Capsule()
-                    .fill(Color.white.opacity(0.1))
-            )
+            .glassCapsule()
 
             // Theme
             HStack(spacing: 8) {
@@ -124,10 +113,8 @@ struct DailyProgramView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .background(
-                Capsule()
-                    .fill(Color.white.opacity(0.1))
-            )
+            .glassCapsule()
+        }
         }
     }
 
@@ -150,28 +137,12 @@ struct DailyProgramView: View {
                 .italic()
         }
         .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.appTheme.opacity(0.15),
-                            Color.appThemeSecondary.opacity(0.10)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.appTheme.opacity(0.3), lineWidth: 1)
-                )
-        )
+        .glassCard(cornerRadius: 20, tint: Color.appTheme)
     }
 
     private var exercisesSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Exercices du jour")
+            Text("daily_program.exercises_title".localized)
                 .font(.custom("Poppins-SemiBold", size: 18))
                 .foregroundColor(.white)
 
@@ -235,29 +206,14 @@ struct DailyProgramView: View {
             .padding(.vertical, 12)
             .background(
                 Capsule()
-                    .fill(Color(hex: "FFD700").opacity(0.2))
+                    .fill(Color(hex: "FFD700").opacity(0.15))
             )
         }
         .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: checkpoint.badgeColor).opacity(0.2),
-                            Color(hex: checkpoint.badgeColor).opacity(0.1)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            Color(hex: checkpoint.badgeColor).opacity(0.5),
-                            lineWidth: 2
-                        )
-                )
+        .glassCard(cornerRadius: 22, tint: Color(hex: checkpoint.badgeColor))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(Color(hex: checkpoint.badgeColor).opacity(0.4), lineWidth: 1)
         )
     }
 
@@ -325,7 +281,7 @@ struct ExerciseCard: View {
                     .frame(width: 40, height: 40)
                     .background(
                         Circle()
-                            .fill(Color.appTheme.opacity(0.15))
+                            .fill(Color.appTheme.opacity(0.12))
                     )
 
                 // Exercise info
@@ -372,23 +328,12 @@ struct ExerciseCard: View {
                     .foregroundColor(.white.opacity(0.4))
             }
             .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        isCompleted ?
-                            Color.appTheme.opacity(0.15) :
-                            Color.white.opacity(0.05)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                isCompleted ?
-                                    Color.appTheme.opacity(0.4) :
-                                    Color.white.opacity(0.1),
-                                lineWidth: 1
-                            )
-                    )
+            .glassCard(cornerRadius: 18, tint: isCompleted ? Color.appTheme : nil, interactive: true)
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(Color.appTheme.opacity(isCompleted ? 0.4 : 0), lineWidth: 1)
             )
+            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -420,14 +365,7 @@ struct StatBadge: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(color.opacity(0.3), lineWidth: 1)
-                )
-        )
+        .glassCard(cornerRadius: 16)
     }
 }
 
@@ -488,13 +426,10 @@ struct CheckpointCelebrationView: View {
                 }
                 .padding(.vertical, 24)
                 .padding(.horizontal, 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(hex: "FFD700").opacity(0.15))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color(hex: "FFD700").opacity(0.5), lineWidth: 2)
-                        )
+                .glassCard(cornerRadius: 22, tint: Color(hex: "FFD700"))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .strokeBorder(Color(hex: "FFD700").opacity(0.4), lineWidth: 1)
                 )
                 .opacity(animateIn ? 1.0 : 0.0)
                 .scaleEffect(animateIn ? 1.0 : 0.8)
@@ -510,18 +445,9 @@ struct CheckpointCelebrationView: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: checkpoint.badgeColor),
-                                    Color(hex: checkpoint.badgeColor).opacity(0.7)
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .cornerRadius(16)
+                        .contentShape(Capsule())
                 }
+                .buttonStyle(.glassPrimary(tint: Color(hex: checkpoint.badgeColor)))
                 .padding(.horizontal, 40)
                 .opacity(animateIn ? 1.0 : 0.0)
                 .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.5), value: animateIn)

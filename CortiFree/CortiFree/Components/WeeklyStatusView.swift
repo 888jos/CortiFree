@@ -49,19 +49,21 @@ struct WeeklyStatusView: View {
     }
 
     var body: some View {
-        HStack(spacing: -2) {
-            ForEach(Array(weekDays.enumerated()), id: \.element.id) { index, day in
-                DayCircleView(
-                    day: day,
-                    isAnimating: animatingDayId == day.id,
-                    onTap: {
-                        handleDayTap(day)
-                    }
-                )
-                .frame(maxWidth: .infinity)
+        GlassGroup(spacing: 6) {
+            HStack(spacing: -2) {
+                ForEach(Array(weekDays.enumerated()), id: \.element.id) { index, day in
+                    DayCircleView(
+                        day: day,
+                        isAnimating: animatingDayId == day.id,
+                        onTap: {
+                            handleDayTap(day)
+                        }
+                    )
+                    .frame(maxWidth: .infinity)
+                }
             }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Day Tap Handler
@@ -100,9 +102,9 @@ struct DayCircleView: View {
                 // Circle with status
                 ZStack {
                     // Base circle
-                    Circle()
-                        .fill(Color(hex: "49288C"))
+                    Color.clear
                         .frame(width: 40, height: 40)
+                        .glassCircle(tint: day.status == .completed ? Color.appTheme : Color(hex: "49288C"), interactive: true)
 
                     // Gradient border for completed state
                     if day.status == .completed {
@@ -147,12 +149,6 @@ struct DayCircleView: View {
                     .transition(.scale.combined(with: .opacity))
                 }
                 .scaleEffect(isAnimating ? 1.05 : 1.0)
-                .shadow(
-                    color: Color.black.opacity(0.2),
-                    radius: 4,
-                    x: 0,
-                    y: 2
-                )
 
                 // Day label
                 Text(day.label)

@@ -53,49 +53,49 @@ extension View {
 
 struct AccessibilityLabels {
     // Navigation
-    static var back: String { NSLocalizedString("accessibility.back", comment: "Go back") }
-    static var close: String { NSLocalizedString("accessibility.close", comment: "Close") }
-    static var menu: String { NSLocalizedString("accessibility.menu", comment: "Menu") }
-    static var settings: String { NSLocalizedString("accessibility.settings", comment: "Settings") }
-    static var profile: String { NSLocalizedString("accessibility.profile", comment: "Profile") }
+    static var back: String { LanguageManager.shared.localizedString(for: "accessibility.back") }
+    static var close: String { LanguageManager.shared.localizedString(for: "accessibility.close") }
+    static var menu: String { LanguageManager.shared.localizedString(for: "accessibility.menu") }
+    static var settings: String { LanguageManager.shared.localizedString(for: "accessibility.settings") }
+    static var profile: String { LanguageManager.shared.localizedString(for: "accessibility.profile") }
 
     // Actions
-    static var play: String { NSLocalizedString("accessibility.play", comment: "Play") }
-    static var pause: String { NSLocalizedString("accessibility.pause", comment: "Pause") }
-    static var stop: String { NSLocalizedString("accessibility.stop", comment: "Stop") }
-    static var refresh: String { NSLocalizedString("accessibility.refresh", comment: "Refresh") }
-    static var retry: String { NSLocalizedString("accessibility.retry", comment: "Retry") }
+    static var play: String { LanguageManager.shared.localizedString(for: "accessibility.play") }
+    static var pause: String { LanguageManager.shared.localizedString(for: "accessibility.pause") }
+    static var stop: String { LanguageManager.shared.localizedString(for: "accessibility.stop") }
+    static var refresh: String { LanguageManager.shared.localizedString(for: "accessibility.refresh") }
+    static var retry: String { LanguageManager.shared.localizedString(for: "accessibility.retry") }
 
     // Tasks
     static func taskComplete(_ name: String) -> String {
-        String(format: NSLocalizedString("accessibility.task_complete", comment: "Mark %@ as complete"), name)
+        String(format: LanguageManager.shared.localizedString(for: "accessibility.task_complete"), name)
     }
 
     static func taskProgress(_ completed: Int, _ total: Int) -> String {
-        String(format: NSLocalizedString("accessibility.task_progress", comment: "%d of %d tasks completed"), completed, total)
+        String(format: LanguageManager.shared.localizedString(for: "accessibility.task_progress"), completed, total)
     }
 
     // Streaks
     static func currentStreak(_ days: Int) -> String {
         let format = days == 1
-            ? NSLocalizedString("accessibility.streak_day", comment: "%d day streak")
-            : NSLocalizedString("accessibility.streak_days", comment: "%d days streak")
+            ? LanguageManager.shared.localizedString(for: "accessibility.streak_day")
+            : LanguageManager.shared.localizedString(for: "accessibility.streak_days")
         return String(format: format, days)
     }
 
     // Progress
     static func progressPercent(_ value: Int) -> String {
-        String(format: NSLocalizedString("accessibility.progress_percent", comment: "%d percent progress"), value)
+        String(format: LanguageManager.shared.localizedString(for: "accessibility.progress_percent"), value)
     }
 
     // Breathing
-    static var breatheIn: String { NSLocalizedString("accessibility.breathe_in", comment: "Breathe in") }
-    static var breatheOut: String { NSLocalizedString("accessibility.breathe_out", comment: "Breathe out") }
-    static var hold: String { NSLocalizedString("accessibility.hold", comment: "Hold") }
+    static var breatheIn: String { LanguageManager.shared.localizedString(for: "accessibility.breathe_in") }
+    static var breatheOut: String { LanguageManager.shared.localizedString(for: "accessibility.breathe_out") }
+    static var hold: String { LanguageManager.shared.localizedString(for: "accessibility.hold") }
 
     // Subscription
-    static var subscribePremium: String { NSLocalizedString("accessibility.subscribe_premium", comment: "Subscribe to premium") }
-    static var restorePurchases: String { NSLocalizedString("accessibility.restore_purchases", comment: "Restore purchases") }
+    static var subscribePremium: String { LanguageManager.shared.localizedString(for: "accessibility.subscribe_premium") }
+    static var restorePurchases: String { LanguageManager.shared.localizedString(for: "accessibility.restore_purchases") }
 }
 
 // MARK: - Accessible Button Style

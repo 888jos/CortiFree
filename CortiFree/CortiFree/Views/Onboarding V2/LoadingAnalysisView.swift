@@ -42,43 +42,29 @@ struct LoadingAnalysisView: View {
             ]
         }
 
-        let isFrench = languageManager.currentLanguage == .french
-        let goal = localizedGoal(result.primaryGoal, isFrench: isFrench)
+        let goal = localizedGoal(result.primaryGoal)
         let time = result.availableTime
         let symptomCount = selectedSymptoms.count
-
-        if isFrench {
-            return [
-                "Nous repérons les points qui pèsent le plus sur ton quotidien.",
-                "Ton objectif prioritaire : \(goal.lowercased()).",
-                "Nous ajustons le rythme à tes \(time) minutes disponibles par jour.",
-                symptomCount > 0
-                    ? "Nous intégrons les \(symptomCount) signaux que tu as sélectionnés."
-                    : "Nous gardons ton parcours simple et progressif.",
-                "Nous choisissons des exercices adaptés à ton niveau actuel.",
-                "Ton parcours personnalisé est prêt."
-            ]
-        }
-
+        let locale = languageManager.currentLanguage.locale
         return [
-            "We are identifying what weighs most on your daily routine.",
-            "Your priority: \(goal.lowercased()).",
-            "We are matching the pace to your \(time) minutes per day.",
+            languageManager.localizedString(for: "loading.analysis.line1"),
+            String(format: languageManager.localizedString(for: "loading.analysis.priority"), locale: locale, arguments: [goal.lowercased()]),
+            String(format: languageManager.localizedString(for: "loading.analysis.pace"), locale: locale, arguments: [time]),
             symptomCount > 0
-                ? "We are including the \(symptomCount) signals you selected."
-                : "We are keeping your path simple and progressive.",
-            "We are choosing exercises for your current level.",
-            "Your personalized path is ready."
+                ? String(format: languageManager.localizedString(for: "loading.analysis.symptoms"), locale: locale, arguments: [symptomCount])
+                : languageManager.localizedString(for: "loading.analysis.simple"),
+            languageManager.localizedString(for: "loading.analysis.exercises"),
+            languageManager.localizedString(for: "loading.analysis.ready")
         ]
     }
 
-    private func localizedGoal(_ goal: String, isFrench: Bool) -> String {
+    private func localizedGoal(_ goal: String) -> String {
         switch goal {
-        case "sleep": return isFrench ? "le sommeil" : "sleep"
-        case "stress": return isFrench ? "le calme" : "calm"
-        case "energy": return isFrench ? "l’énergie" : "energy"
-        case "focus": return isFrench ? "la concentration" : "focus"
-        default: return isFrench ? "l’équilibre" : "balance"
+        case "sleep": return LanguageManager.shared.localizedString(for: "inline.loadinganalysisview.00")
+        case "stress": return LanguageManager.shared.localizedString(for: "inline.loadinganalysisview.01")
+        case "energy": return LanguageManager.shared.localizedString(for: "inline.loadinganalysisview.02")
+        case "focus": return LanguageManager.shared.localizedString(for: "inline.loadinganalysisview.03")
+        default: return LanguageManager.shared.localizedString(for: "inline.loadinganalysisview.04")
         }
     }
 
@@ -146,7 +132,7 @@ struct LoadingAnalysisView: View {
 
                         if let startTime = screenViewTime {
                             let timeSpent = Date().timeIntervalSince(startTime)
-                            MixpanelManager.shared.trackOnboardingLoadingAnalysisComplete(timeSpent: timeSpent)
+                            AnalyticsManager.shared.trackOnboardingLoadingAnalysisComplete(timeSpent: timeSpent)
                         }
 
                         onComplete()
@@ -154,17 +140,16 @@ struct LoadingAnalysisView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
 
                             Text("onboarding_v2.loading.see_plan".localized)
                                 .font(.custom("Poppins-SemiBold", size: 16))
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 42))
                     }
+                    .buttonStyle(.glassPrimary)
                     .padding(.horizontal, 34)
                     .padding(.bottom, 60)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -174,7 +159,7 @@ struct LoadingAnalysisView: View {
         }
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingLoadingAnalysisViewed()
+            AnalyticsManager.shared.trackOnboardingLoadingAnalysisViewed()
             startProgressAnimation()
         }
     }

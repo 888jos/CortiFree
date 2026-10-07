@@ -142,6 +142,49 @@ def amplitude_funnel(start, end):
     }
 
 
+def amplitude_daily(event_name, start, end):
+    if event_name not in EVENT_NAMES:
+        raise ValueError("Unsupported event")
+    env = load_local_env()
+    api_key = config_value("AMPLITUDE_API_KEY", env) or DEFAULT_API_KEY
+    secret = config_value("AMPLITUDE_SECRET_KEY", env)
+    if not secret:
+        raise RuntimeError("AMPLITUDE_SECRET_KEY is not configured")
+    base_url = config_value("AMPLITUDE_API_BASE_URL", env) or "https://amplitude.com"
+    credentials = base64.b64encode(f"{api_key}:{secret}".encode()).decode()
+    params = urlencode({
+        "e": json.dumps({"event_type": f"ce:{event_name}"}, separators=(",", ":")),
+        "start": start,
+        "end": end,
+        "m": "uniques",
+        "n": "any",
+        "i": 1,
+    })
+    request = Request(
+        f"{base_url.rstrip('/')}/api/2/events/segmentation?{params}",
+        headers={"Authorization": f"Basic {credentials}", "Accept": "application/json"},
+    )
+    try:
+        with urlopen(request, timeout=30, context=TLS_CONTEXT) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except HTTPError as error:
+        if error.code == 400:
+            return {"source": "amplitude", "daily": {}}
+        raise
+    data = result.get("data", {})
+    labels = data.get("xValues") or []
+    series = data.get("series") or []
+    values = series[0] if series else []
+    daily = {}
+    for label, value in zip(labels, values):
+        try:
+            key = datetime.fromtimestamp(int(label) / 1000, timezone.utc).strftime("%Y-%m-%d")
+        except (TypeError, ValueError, OSError):
+            key = str(label)[:10]
+        daily[key] = int(value or 0)
+    return {"source": "amplitude", "daily": daily}
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
@@ -157,6 +200,27 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/api/amplitude/daily":
+            query = parse_qs(parsed.query)
+            now = datetime.now(timezone.utc)
+            start_dt = date_param(query.get("start", [None])[0], now.replace(hour=0, minute=0, second=0, microsecond=0))
+            end_dt = date_param(query.get("end", [None])[0], now)
+            event_name = query.get("event", [""])[0]
+            if end_dt < start_dt:
+                self.send_json(400, {"error": "end must be after start"})
+                return
+            try:
+                result = amplitude_daily(event_name, start_dt.strftime("%Y%m%d"), end_dt.strftime("%Y%m%d"))
+                self.send_json(200, result)
+            except HTTPError as error:
+                self.send_json(error.code, {"error": f"Amplitude request failed ({error.code})"})
+            except (URLError, TimeoutError, json.JSONDecodeError) as error:
+                self.send_json(502, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
+            except ValueError as error:
+                self.send_json(400, {"error": str(error)})
+            except Exception as error:
+                self.send_json(500, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
+            return
         if parsed.path == "/api/amplitude/funnel":
             query = parse_qs(parsed.query)
             now = datetime.now(timezone.utc)
@@ -173,7 +237,7 @@ class Handler(SimpleHTTPRequestHandler):
             except (URLError, TimeoutError, json.JSONDecodeError) as error:
                 self.send_json(502, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
             except Exception as error:
-                self.send_json(500, {"error": str(error)})
+                self.send_json(500, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
             return
         super().do_GET()
 

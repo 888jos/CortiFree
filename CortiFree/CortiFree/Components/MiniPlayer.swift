@@ -3,11 +3,157 @@
 //  CortiFree
 //
 //  Created by Claude on 22/10/2025.
+//  Docked mini player: guided audio sessions (GuidedSessionPlayer) or ambient sounds (SoundPlayer).
+//  Only one of them plays at a time.
 //
 
 import SwiftUI
 
 struct MiniPlayer: View {
+    @ObservedObject private var sessionPlayer = GuidedSessionPlayer.shared
+    @ObservedObject private var soundPlayer = SoundPlayer.shared
+
+    var body: some View {
+        if sessionPlayer.currentSession != nil {
+            SessionMiniPlayer()
+        } else if soundPlayer.currentExercise != nil {
+            SoundMiniPlayer()
+        }
+    }
+}
+
+// MARK: - Guided session mini player
+
+struct SessionMiniPlayer: View {
+    /// Custom "open full player" action (for modal contexts). Default: global player in ContentView.
+    var onOpen: (() -> Void)? = nil
+    @ObservedObject private var player = GuidedSessionPlayer.shared
+    @ObservedObject private var clock = GuidedSessionPlayer.shared.clock
+
+    var body: some View {
+        if let session = player.currentSession {
+            HStack(spacing: 12) {
+                SessionArtworkView(session: session, cornerRadius: 10)
+                    .frame(width: 46, height: 46)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(session.localizedTitle)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    Text(statusText(session))
+                        .font(.system(size: 12, weight: .medium).monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.6))
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Button {
+                    HapticManager.light()
+                    player.togglePlayPause()
+                } label: {
+                    Group {
+                        if player.isPreparing {
+                            ProgressView().tint(.white)
+                        } else {
+                            Image(systemName: player.didFinish ? "arrow.counterclockwise" : (player.isPlaying ? "pause.fill" : "play.fill"))
+                                .font(.system(size: 20, weight: .semibold))
+                                .contentTransition(.symbolEffect(.replace))
+                        }
+                    }
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(player.isPlaying ? LanguageManager.shared.localizedString(for: "audio.pause") : LanguageManager.shared.localizedString(for: "audio.play"))
+
+                Button {
+                    HapticManager.light()
+                    player.stop()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .frame(width: 28, height: 40)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(LanguageManager.shared.localizedString(for: "audio.stop_session"))
+            }
+            .padding(.leading, 10)
+            .padding(.trailing, 10)
+            .padding(.vertical, 10)
+            .frame(height: 66)
+            .overlay(alignment: .bottom) {
+                // Progress line
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Color.white.opacity(0.15))
+                        Capsule()
+                            .fill(LinearGradient(colors: [Color.appTheme, .white], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: geo.size.width * CGFloat(progress))
+                    }
+                }
+                .frame(height: 2.5)
+                .padding(.horizontal, 18)
+                .padding(.bottom, 4)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                HapticManager.light()
+                if let onOpen { onOpen() } else { player.isFullPlayerPresented = true }
+            }
+            .miniPlayerBackground()
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .accessibilityElement(children: .contain)
+        }
+    }
+
+    private var progress: Double {
+        if player.isPreparing { return clock.preparationProgress }
+        let total = player.displayDuration
+        guard total > 0 else { return 0 }
+        return min(1, clock.currentTime / total)
+    }
+
+    private func statusText(_ session: GuidedSession) -> String {
+        if player.isPreparing {
+            return LanguageManager.shared.localizedString(for: "audio.preparing") + " \(Int(clock.preparationProgress * 100))%"
+        }
+        if player.didFinish { return LanguageManager.shared.localizedString(for: "audio.completed") }
+        let remaining = max(0, player.displayDuration - clock.currentTime)
+        return "\(session.category.title.localized) · -\(PlayerFormat.time(remaining))"
+    }
+}
+
+// MARK: - Shared background
+
+extension View {
+    @ViewBuilder
+    func miniPlayerBackground() -> some View {
+        if #available(iOS 26, *) {
+            self
+                .glassEffect(.regular.tint(Color(hex: "17182E").opacity(0.7)).interactive(), in: .rect(cornerRadius: 22))
+                .environment(\.colorScheme, .dark)
+        } else {
+            self
+                .background(
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .fill(Color(hex: "1A1B3A").opacity(0.92))
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                        .shadow(color: .black.opacity(0.3), radius: 10, y: -5)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                )
+        }
+    }
+}
+
+// MARK: - Ambient sound mini player
+
+/// Mini player for ambient sounds (SoundPlayer), unchanged behaviour.
+struct SoundMiniPlayer: View {
     @ObservedObject var soundPlayer = SoundPlayer.shared
     @State private var showDurationPicker = false
 
@@ -93,11 +239,7 @@ struct MiniPlayer: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .frame(height: 72)
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color(hex: "1A1B3A"))
-                    .shadow(color: .black.opacity(0.3), radius: 10, y: -5)
-            )
+            .miniPlayerBackground()
             .transition(.move(edge: .bottom).combined(with: .opacity))
             .animation(.spring(response: 0.4, dampingFraction: 0.8), value: soundPlayer.currentExercise?.id)
             .sheet(isPresented: $showDurationPicker) {
@@ -144,12 +286,12 @@ struct DurationPickerSheet: View {
 
     var durations: [(title: String, minutes: TimeInterval?)] {
         [
-            (NSLocalizedString("duration.infinite", comment: ""), nil),
-            (NSLocalizedString("duration.5min", comment: ""), 5 * 60),
-            (NSLocalizedString("duration.10min", comment: ""), 10 * 60),
-            (NSLocalizedString("duration.15min", comment: ""), 15 * 60),
-            (NSLocalizedString("duration.30min", comment: ""), 30 * 60),
-            (NSLocalizedString("duration.1hour", comment: ""), 60 * 60)
+            (LanguageManager.shared.localizedString(for: "duration.infinite"), nil),
+            (LanguageManager.shared.localizedString(for: "duration.5min"), 5 * 60),
+            (LanguageManager.shared.localizedString(for: "duration.10min"), 10 * 60),
+            (LanguageManager.shared.localizedString(for: "duration.15min"), 15 * 60),
+            (LanguageManager.shared.localizedString(for: "duration.30min"), 30 * 60),
+            (LanguageManager.shared.localizedString(for: "duration.1hour"), 60 * 60)
         ]
     }
 
@@ -171,7 +313,7 @@ struct DurationPickerSheet: View {
                 // Header
                 HStack {
                     Spacer()
-                    Text(NSLocalizedString("duration.title", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "duration.title"))
                         .font(.custom("Poppins-SemiBold", size: 22))
                         .foregroundColor(.white)
                     Spacer()
@@ -179,7 +321,7 @@ struct DurationPickerSheet: View {
                 .padding(.top, 32)
                 .padding(.bottom, 8)
 
-                Text(NSLocalizedString("duration.subtitle", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "duration.subtitle"))
                     .font(.custom("Poppins-Regular", size: 14))
                     .foregroundColor(.white.opacity(0.7))
                     .multilineTextAlignment(.center)

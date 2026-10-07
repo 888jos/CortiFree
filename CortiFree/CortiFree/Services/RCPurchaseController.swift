@@ -61,7 +61,7 @@ final class RCPurchaseController: PurchaseController {
                 let customerInfoForTracking = RevenueCatManager.shared.customerInfo
                 let isTrial = customerInfoForTracking?.entitlements["pro"]?.periodType == .trial
                 await MainActor.run {
-                    MixpanelManager.shared.trackPurchase(
+                    AnalyticsManager.shared.trackPurchase(
                         productId: productId,
                         price: price,
                         currency: currency,

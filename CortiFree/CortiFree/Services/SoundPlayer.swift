@@ -29,6 +29,22 @@ class SoundPlayer: ObservableObject {
         setupAudioSession()
         setupRemoteTransportControls()
         setupNotifications()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refreshLocalizedExercise),
+            name: LanguageManager.languageDidChangeNotification,
+            object: nil
+        )
+    }
+
+    @objc private func refreshLocalizedExercise() {
+        guard let currentExercise,
+              let localizedExercise = Exercise.sounds.first(where: { $0.id == currentExercise.id }) else {
+            return
+        }
+
+        self.currentExercise = localizedExercise
+        updateNowPlayingInfo()
     }
 
     // MARK: - Audio Session
@@ -51,30 +67,33 @@ class SoundPlayer: ObservableObject {
     private func setupRemoteTransportControls() {
         let commandCenter = MPRemoteCommandCenter.shared()
 
+        // GuidedSessionPlayer registers its own targets: each player only reacts
+        // when it owns the current playback.
         commandCenter.playCommand.addTarget { [weak self] _ in
-            self?.resume()
+            guard let self, self.currentExercise != nil else { return .noActionableNowPlayingItem }
+            self.resume()
             return .success
         }
         commandCenter.pauseCommand.addTarget { [weak self] _ in
-            self?.pause()
+            guard let self, self.currentExercise != nil else { return .noActionableNowPlayingItem }
+            self.pause()
             return .success
         }
         commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
-            guard let self else { return .commandFailed }
+            guard let self, self.currentExercise != nil else { return .noActionableNowPlayingItem }
             if self.isPlaying { self.pause() } else { self.resume() }
             return .success
         }
         commandCenter.stopCommand.addTarget { [weak self] _ in
-            self?.stop()
+            guard let self, self.currentExercise != nil else { return .noActionableNowPlayingItem }
+            self.stop()
             return .success
         }
     }
 
     private func updateNowPlayingInfo() {
-        guard let exercise = currentExercise else {
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
-            return
-        }
+        // Nothing to publish (the guided session player may own Now Playing).
+        guard let exercise = currentExercise else { return }
 
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: exercise.title,
@@ -110,7 +129,7 @@ class SoundPlayer: ObservableObject {
     }
 
     @objc private func handleAudioInterruption(_ notification: Notification) {
-        guard let info = notification.userInfo,
+        guard currentExercise != nil, let info = notification.userInfo,
               let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
 
@@ -144,14 +163,15 @@ class SoundPlayer: ObservableObject {
     }
 
     @objc private func handleRouteChange(_ notification: Notification) {
-        guard let info = notification.userInfo,
+        guard currentExercise != nil, let info = notification.userInfo,
               let reasonValue = info[AVAudioSessionRouteChangeReasonKey] as? UInt,
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else { return }
 
         // Pause si les écouteurs sont débranchés (comportement standard iOS)
         if reason == .oldDeviceUnavailable {
             DispatchQueue.main.async { [weak self] in
-                self?.pause()
+                guard let self, self.currentExercise != nil, self.isPlaying else { return }
+                self.pause()
             }
         }
     }
@@ -172,6 +192,9 @@ class SoundPlayer: ObservableObject {
         // Stop current if playing
         stop()
 
+        // Only one thing plays at a time: stop any guided audio session.
+        stopGuidedSession()
+
         currentExercise = exercise
 
         guard let audioFileName = exercise.audioFileName else {
@@ -191,6 +214,8 @@ class SoundPlayer: ObservableObject {
 
         do {
             // Réactiver la session au cas où elle aurait été désactivée
+            // (le lecteur de séances guidées utilise le mode .spokenAudio)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
             try AVAudioSession.sharedInstance().setActive(true)
 
             audioPlayer = try AVAudioPlayer(contentsOf: url)
@@ -212,6 +237,7 @@ class SoundPlayer: ObservableObject {
     }
 
     func pause() {
+        guard currentExercise != nil else { return }
         audioPlayer?.pause()
         isPlaying = false
         UIApplication.shared.isIdleTimerDisabled = false
@@ -229,6 +255,7 @@ class SoundPlayer: ObservableObject {
     }
 
     func resume() {
+        guard currentExercise != nil, audioPlayer != nil else { return }
         // Réactiver la session si nécessaire
         try? AVAudioSession.sharedInstance().setActive(true)
 
@@ -257,9 +284,9 @@ class SoundPlayer: ObservableObject {
         playStartTime = nil
         selectedDuration = nil
         stopTimer()
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
 
         if let finishedExercise {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             ExerciseSessionRecorder.shared.record(
                 exerciseID: finishedExercise.id,
                 category: progressCategory(for: finishedExercise.type),
@@ -274,6 +301,20 @@ class SoundPlayer: ObservableObject {
         case .breathing: return .breathing
         case .meditation: return .meditation
         case .sound: return .sounds
+        }
+    }
+
+    private func stopGuidedSession() {
+        if Thread.isMainThread {
+            MainActor.assumeIsolated {
+                if GuidedSessionPlayer.shared.isActive { GuidedSessionPlayer.shared.stop() }
+            }
+        } else {
+            DispatchQueue.main.sync {
+                MainActor.assumeIsolated {
+                    if GuidedSessionPlayer.shared.isActive { GuidedSessionPlayer.shared.stop() }
+                }
+            }
         }
     }
 

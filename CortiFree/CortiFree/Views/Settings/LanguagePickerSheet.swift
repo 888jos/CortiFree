@@ -13,10 +13,9 @@ struct LanguagePickerSheet: View {
     var onLanguageChange: ((String) -> Void)?
     @Environment(\.dismiss) private var dismiss
 
-    let languages = [
-        ("fr", "Français", "🇫🇷"),
-        ("en", "English", "🇬🇧")
-    ]
+    private var languages: [(String, String, String)] {
+        LanguageManager.Language.allCases.map { ($0.rawValue, $0.displayName, $0.flag) }
+    }
 
     var body: some View {
         ZStack {
@@ -33,21 +32,23 @@ struct LanguagePickerSheet: View {
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                            .frame(width: 32, height: 32)
-                            .background(Circle().fill(Color.white.opacity(0.1)))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.85))
+                            .frame(width: 36, height: 36)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
 
                 VStack(spacing: 8) {
-                    Text(NSLocalizedString("settings.choose_language", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "settings.choose_language"))
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
 
-                    Text(NSLocalizedString("settings.language_subtitle", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "settings.language_subtitle"))
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -85,21 +86,18 @@ struct LanguagePickerSheet: View {
                                 }
                             }
                             .padding(20)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(
+                            .glassCard(
+                                cornerRadius: 20,
+                                tint: selectedLanguage == language.0 ? Color.appTheme : nil,
+                                interactive: true
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .strokeBorder(
                                         selectedLanguage == language.0 ?
-                                        Color.appTheme.opacity(0.15) :
-                                        Color(hex: "131146")
-                                    )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(
-                                                selectedLanguage == language.0 ?
-                                                Color.appTheme.opacity(0.5) :
-                                                Color.clear,
-                                                lineWidth: 2
-                                            )
+                                        Color.appTheme.opacity(0.6) :
+                                        Color.clear,
+                                        lineWidth: 1.5
                                     )
                             )
                         }
@@ -108,7 +106,7 @@ struct LanguagePickerSheet: View {
                 }
                 .padding(.horizontal, 20)
 
-                Text(NSLocalizedString("settings.language_restart_note", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "settings.language_restart_note"))
                     .font(.custom("Poppins-Regular", size: 12))
                     .foregroundColor(.white.opacity(0.5))
                     .multilineTextAlignment(.center)

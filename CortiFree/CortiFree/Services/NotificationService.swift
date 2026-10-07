@@ -6,14 +6,11 @@ class NotificationService {
 
     private init() {}
 
-    private var isFrench: Bool {
-        LanguageManager.shared.currentLanguage == .french
-    }
-
     // MARK: - DAILY NOTIFICATIONS (2 types)
 
     /// Schedule daily notifications for user engagement
     func scheduleDailyNotifications() {
+        guard !userDisabledNotifications else { return }
         guard hasNotificationPermission() else {
             print("⚠️ No notification permission - skipping daily notifications")
             return
@@ -22,10 +19,8 @@ class NotificationService {
         // Morning notification (9h)
         scheduleDailyNotification(
             id: "daily_morning_meditation",
-            title: isFrench ? "Bonjour ☀️" : "Good morning ☀️",
-            body: isFrench
-                ? "5 min de respiration pour bien démarrer ta journée"
-                : "5 min of breathing to start your day right",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.00"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.01"),
             hour: 9,
             minute: 0
         )
@@ -33,16 +28,14 @@ class NotificationService {
         // Evening notification (19h)
         scheduleDailyNotification(
             id: "daily_evening_journal",
-            title: isFrench ? "Journal du soir 📝" : "Evening Journal 📝",
-            body: isFrench
-                ? "Comment s'est passée ta journée ? Prends 2 min pour écrire"
-                : "How was your day? Take 2 min to write it down",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.02"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.03"),
             hour: 19,
             minute: 0
         )
 
         // Track scheduled
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "daily_notifications_scheduled",
             properties: [
                 "morning_hour": 9,
@@ -55,7 +48,7 @@ class NotificationService {
 
     /// Schedule streak danger notification if user hasn't done anything today
     func scheduleStreakDangerNotification() {
-        guard hasNotificationPermission() else { return }
+        guard !userDisabledNotifications, hasNotificationPermission() else { return }
 
         // Cancel previous streak danger notification if exists
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["streak_danger"])
@@ -63,16 +56,14 @@ class NotificationService {
         // Schedule for 20h today
         scheduleDailyNotification(
             id: "streak_danger",
-            title: isFrench ? "Ta série est en danger ⚠️" : "Your streak is in danger ⚠️",
-            body: isFrench
-                ? "1 seule tâche pour garder ta progression 🔥"
-                : "Complete 1 task to keep your progress 🔥",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.04"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.05"),
             hour: 20,
             minute: 0,
             repeats: false // One-time notification
         )
 
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "streak_danger_notification_scheduled",
             properties: [:]
         )
@@ -91,7 +82,7 @@ class NotificationService {
 
     /// Schedule milestone notification for streak achievements
     func scheduleMilestoneNotification(streakDays: Int) {
-        guard hasNotificationPermission() else { return }
+        guard !userDisabledNotifications, hasNotificationPermission() else { return }
 
         let (title, body, emoji) = getMilestoneContent(for: streakDays)
 
@@ -114,7 +105,7 @@ class NotificationService {
             } else {
                 print("✅ Milestone notification sent: \(streakDays) days streak")
 
-                MixpanelManager.shared.track(
+                AnalyticsManager.shared.track(
                     event: "milestone_notification_sent",
                     properties: [
                         "streak_days": streakDays,
@@ -128,10 +119,13 @@ class NotificationService {
 
     /// Schedule badge unlock notification
     func scheduleBadgeUnlockedNotification(badgeName: String, badgeIcon: String, points: Int) {
-        guard hasNotificationPermission() else { return }
+        guard !userDisabledNotifications, hasNotificationPermission() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = isFrench ? "Badge débloqué ! \(badgeIcon)" : "Badge Unlocked! \(badgeIcon)"
+        content.title = String(
+            format: LanguageManager.shared.localizedString(for: "notification.badge_unlocked"),
+            badgeIcon
+        )
         content.body = "\(badgeName) • +\(points) points"
         content.sound = .default
         content.badge = 1
@@ -148,7 +142,7 @@ class NotificationService {
             } else {
                 print("✅ Badge notification sent: \(badgeName)")
 
-                MixpanelManager.shared.track(
+                AnalyticsManager.shared.track(
                     event: "badge_notification_sent",
                     properties: [
                         "badge_name": badgeName,
@@ -171,7 +165,7 @@ class NotificationService {
 
         print("✅ Trial notifications cancelled")
 
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "trial_notifications_cancelled",
             properties: [:]
         )
@@ -202,7 +196,7 @@ class NotificationService {
 
         print("✅ All notifications cancelled")
 
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "all_notifications_cancelled",
             properties: [:]
         )
@@ -255,12 +249,32 @@ class NotificationService {
         let semaphore = DispatchSemaphore(value: 0)
 
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            hasPermission = settings.authorizationStatus == .authorized
+            hasPermission = [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus)
             semaphore.signal()
         }
 
         semaphore.wait()
         return hasPermission
+    }
+
+    /// True when the user turned the "Notifications" toggle off in Settings.
+    var userDisabledNotifications: Bool {
+        (UserDefaults.standard.object(forKey: "notificationsEnabled") as? Bool) == false
+    }
+
+    /// Re-schedules (idempotent, same identifiers) or cancels the daily reminders so
+    /// they match the Settings toggle and the real system permission.
+    func syncDailyNotificationsWithPreference() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let authorized = [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus)
+            if authorized && !self.userDisabledNotifications {
+                // Hop off the callback queue: scheduleDailyNotifications() waits on another settings callback.
+                DispatchQueue.global(qos: .utility).async { self.scheduleDailyNotifications() }
+            } else {
+                self.cancelDailyNotifications()
+                self.cancelStreakDangerNotification()
+            }
+        }
     }
 
     /// Request notification permission (if not already granted)
@@ -272,7 +286,7 @@ class NotificationService {
 
             print(granted ? "✅ Notification permission granted" : "⚠️ Notification permission denied")
 
-            MixpanelManager.shared.track(
+            AnalyticsManager.shared.track(
                 event: "notification_permission_requested",
                 properties: [
                     "granted": granted,
@@ -332,8 +346,10 @@ class NotificationService {
         content.sound = .default
         content.badge = 1
 
-        var dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: Date())
-        dateComponents.day! += daysFromNow
+        // Add days via Calendar so month/year rollover yields a real date (e.g. Jan 30 + 7 → Feb 6).
+        let calendar = Calendar.current
+        let targetDay = calendar.date(byAdding: .day, value: daysFromNow, to: Date()) ?? Date()
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: targetDay)
         dateComponents.hour = hour
         dateComponents.minute = minute
 
@@ -386,7 +402,7 @@ class NotificationService {
         }
 
         // Track scheduling
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "reengagement_notifications_scheduled",
             properties: [
                 "last_checkpoint": lastCheckpoint,
@@ -403,10 +419,8 @@ class NotificationService {
         // 2 hours after quitting — curiosity gap
         scheduleNotificationFromNow(
             id: "reengagement_checkpoint_2h",
-            title: isFrench ? "Ton plan est presque prêt" : "Your plan is almost ready",
-            body: isFrench
-                ? "Il te reste 2 min pour découvrir ton profil de stress personnalisé"
-                : "2 min left to discover your personalized stress profile",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.06"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.07"),
             daysFromNow: 0,
             hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(2 * 3600)),
             minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(2 * 3600))
@@ -415,10 +429,8 @@ class NotificationService {
         // 24 hours — emotional pull
         scheduleNotificationFromNow(
             id: "reengagement_checkpoint_24h",
-            title: isFrench ? "Tu mérites de dormir mieux ce soir" : "You deserve to sleep better tonight",
-            body: isFrench
-                ? "Ton parcours de 66 jours t'attend — commence maintenant"
-                : "Your 66-day journey is waiting — start now",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.08"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.09"),
             daysFromNow: 1,
             hour: 10,
             minute: 0
@@ -427,10 +439,8 @@ class NotificationService {
         // 48 hours — urgency + loss aversion
         scheduleNotificationFromNow(
             id: "reengagement_checkpoint_48h",
-            title: isFrench ? "Chaque jour sans agir, le stress s'installe" : "Every day without action, stress builds up",
-            body: isFrench
-                ? "Reprends là où tu t'es arrêté(e) — 66 jours pour tout changer"
-                : "Pick up where you left off — 66 days to change everything",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.10"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.11"),
             daysFromNow: 2,
             hour: 18,
             minute: 0
@@ -451,10 +461,8 @@ class NotificationService {
         // 1 hour — remind of value, zero risk
         scheduleNotificationFromNow(
             id: "reengagement_paywall_1h",
-            title: isFrench ? "Essai gratuit de 3 jours 🎁" : "3-day free trial 🎁",
-            body: isFrench
-                ? "Aucun engagement — annule quand tu veux. Ton corps te remerciera."
-                : "No commitment — cancel anytime. Your body will thank you.",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.12"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.13"),
             daysFromNow: 0,
             hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(3600)),
             minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(3600))
@@ -463,10 +471,8 @@ class NotificationService {
         // 6 hours — future self visualization
         scheduleNotificationFromNow(
             id: "reengagement_paywall_6h",
-            title: isFrench ? "Imagine-toi dans 66 jours" : "Imagine yourself in 66 days",
-            body: isFrench
-                ? "Plus calme. Mieux reposé(e). Plus concentré(e). C'est possible."
-                : "Calmer. Better rested. More focused. It's possible.",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.14"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.15"),
             daysFromNow: 0,
             hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(6 * 3600)),
             minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(6 * 3600))
@@ -475,10 +481,8 @@ class NotificationService {
         // 24 hours — personal + scientific credibility
         scheduleNotificationFromNow(
             id: "reengagement_paywall_24h",
-            title: isFrench ? "Le cortisol ne se régule pas tout seul" : "Cortisol doesn't regulate itself",
-            body: isFrench
-                ? "Un programme basé sur les neurosciences, fait pour toi. Essaie gratuitement."
-                : "A neuroscience-based program, made for you. Try it free.",
+            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.16"),
+            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.17"),
             daysFromNow: 1,
             hour: 11,
             minute: 0
@@ -494,10 +498,8 @@ class NotificationService {
             // 12 hours — gentle reminder
             scheduleNotificationFromNow(
                 id: "reengagement_auth_12h",
-                title: isFrench ? "Ton compte t'attend" : "Your account is waiting",
-                body: isFrench
-                    ? "2 min pour finaliser ton profil et accéder à ton plan personnalisé"
-                    : "2 min to finish your profile and access your personalized plan",
+                title: LanguageManager.shared.localizedString(for: "inline.notificationservice.18"),
+                body: LanguageManager.shared.localizedString(for: "inline.notificationservice.19"),
                 daysFromNow: 0,
                 hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(12 * 3600)),
                 minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(12 * 3600))
@@ -506,10 +508,8 @@ class NotificationService {
             // 48 hours — emotional
             scheduleNotificationFromNow(
                 id: "reengagement_auth_48h",
-                title: isFrench ? "Le stress ne prend pas de pause" : "Stress doesn't take a break",
-                body: isFrench
-                    ? "Mais toi, tu peux apprendre à le gérer. Ton programme est prêt."
-                    : "But you can learn to manage it. Your program is ready.",
+                title: LanguageManager.shared.localizedString(for: "inline.notificationservice.20"),
+                body: LanguageManager.shared.localizedString(for: "inline.notificationservice.21"),
                 daysFromNow: 2,
                 hour: 14,
                 minute: 0
@@ -518,10 +518,8 @@ class NotificationService {
             // 7 days — last chance
             scheduleNotificationFromNow(
                 id: "reengagement_auth_7d",
-                title: isFrench ? "On garde ta place 🎯" : "We're holding your spot 🎯",
-                body: isFrench
-                    ? "Ton plan de reset du cortisol en 66 jours est toujours disponible"
-                    : "Your 66-day cortisol reset plan is still available",
+                title: LanguageManager.shared.localizedString(for: "inline.notificationservice.22"),
+                body: LanguageManager.shared.localizedString(for: "inline.notificationservice.23"),
                 daysFromNow: 7,
                 hour: 10,
                 minute: 0
@@ -549,7 +547,7 @@ class NotificationService {
 
         print("✅ Re-engagement notifications cancelled")
 
-        MixpanelManager.shared.track(
+        AnalyticsManager.shared.track(
             event: "reengagement_notifications_cancelled",
             properties: [:]
         )
@@ -562,38 +560,41 @@ class NotificationService {
         switch streakDays {
         case 3:
             return (
-                isFrench ? "3 jours d'affilée ! 🔥" : "3 days in a row! 🔥",
-                isFrench ? "L'habitude se construit. Continue comme ça !" : "You're building the habit! Keep it up",
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.24"),
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.25"),
                 "🔥"
             )
         case 7:
             return (
-                isFrench ? "1 semaine complète ! 🎉" : "1 full week! 🎉",
-                isFrench ? "Ton système nerveux commence à se réguler" : "Your nervous system is starting to regulate",
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.26"),
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.27"),
                 "🎉"
             )
         case 14:
             return (
-                isFrench ? "2 semaines de série ! ⭐" : "2-week streak! ⭐",
-                isFrench ? "L'habitude commence à s'ancrer — continue !" : "The habit is starting to stick — keep going!",
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.28"),
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.29"),
                 "⭐"
             )
         case 30:
             return (
-                isFrench ? "30 jours consécutifs ! 🚀" : "30 days straight! 🚀",
-                isFrench ? "Tu es à mi-chemin des 66 jours. Champion(ne) !" : "You're halfway to 66 days. Champion!",
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.30"),
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.31"),
                 "🚀"
             )
         case 66:
             return (
-                isFrench ? "66 JOURS ! TU L'AS FAIT ! 🏆" : "66 DAYS! YOU DID IT! 🏆",
-                isFrench ? "L'habitude est ancrée ! Tu es un(e) champion(ne) du bien-être" : "The habit is ingrained! You're a wellness champion",
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.32"),
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.33"),
                 "🏆"
             )
         default:
             return (
-                isFrench ? "\(streakDays) jours d'affilée ! 🔥" : "\(streakDays) days in a row! 🔥",
-                isFrench ? "Continue vers les 66 jours !" : "Keep progressing towards 66 days!",
+                String(
+                    format: LanguageManager.shared.localizedString(for: "notification.streak_message"),
+                    streakDays
+                ),
+                LanguageManager.shared.localizedString(for: "inline.notificationservice.34"),
                 "🔥"
             )
         }

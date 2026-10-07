@@ -16,12 +16,11 @@ struct CustomPaywallView: View {
     let onRestore: () -> Void
     var habitsQuizResult: HabitsQuizResult?
     var selectedSymptoms: Set<String> = []
+    /// The onboarding paywall must not be dismissible into Home without an entitlement.
+    /// Paywalls opened from Home keep the default dismissible behavior.
+    var requiresPurchaseToComplete: Bool = false
 
     // REMOVED: RevenueCat is no longer used, Superwall handles everything
-
-    // User data from onboarding
-    var baselineScores: [Double] = [0.4, 0.35, 0.45, 0.5, 0.4] // Sérénité, Sommeil, Énergie, Focus, Équilibre
-    var potentialScores: [Double] = [0.85, 0.80, 0.90, 0.88, 0.82]
 
     @State private var selectedPlan: PaywallPlan = .yearly
     @State private var userName: String = ""
@@ -235,10 +234,17 @@ struct CustomPaywallView: View {
                     presentSuperwallPaywall()
                 }
             }
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
     }
 
     private func presentSuperwallPaywall() {
+                AnalyticsManager.shared.track(event: "onboarding_superwall_placement_triggered", properties: [
+                    "placement": SuperwallPlacement.onboarding,
+                    "source": "continue_to_your_plan"
+                ])
                 let handler = PaywallPresentationHandler()
                 handler.onPresent { _ in
                     UserDefaults.standard.set(true, forKey: "hasSeenPaywall")
@@ -300,7 +306,11 @@ struct CustomPaywallView: View {
             Spacer()
             Button(action: {
                 HapticManager.light()
-                onComplete()
+                if requiresPurchaseToComplete {
+                    presentSuperwallPaywall()
+                } else {
+                    onComplete()
+                }
             }) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 28))
@@ -449,12 +459,6 @@ struct CustomPaywallView: View {
             .prefix(needed)
 
         return symptomFixes + Array(fillers)
-    }
-
-    private func issueBarColor(score: Int) -> Color {
-        if score > 70 { return Color(hex: "FF8A80") }
-        if score > 40 { return Color(hex: "FFB74D") }
-        return Color(hex: "FFF176")
     }
 
     private var personalizedInsightSection: some View {
@@ -752,7 +756,7 @@ struct CustomPaywallView: View {
 
     private var floatingCTASection: some View {
         VStack(spacing: 8) {
-            // Main CTA button - Opens NativePaywallView
+            // Main CTA button - Presents the Superwall paywall
             Button(action: {
                 HapticManager.medium()
                 showStartProgramScreen = true
@@ -913,7 +917,7 @@ struct PaywallFeatureListRow: View {
                         .foregroundColor(.white)
 
                     if isNew {
-                        Text("NEW")
+                        Text("paywall_custom.new_badge".localized)
                             .font(.custom("Poppins-Bold", size: 9))
                             .foregroundColor(Color(hex: "8B5CF6"))
                             .padding(.horizontal, 6)
@@ -994,15 +998,15 @@ struct PaywallRadarLabels: View {
             HStack(spacing: 3) {
                 Image(systemName: "target")
                     .font(.system(size: iconSize))
-                Text("Focus")
+                Text("paywall_custom.radar_label_focus".localized)
                     .font(.custom("Poppins-SemiBold", size: fontSize))
             }
             .foregroundColor(.white)
             .offset(x: -sideOffset, y: verticalOffset)
 
-            // Équilibre - Top left
+            // Glow - Top left
             HStack(spacing: 3) {
-                Image(systemName: "heart.fill")
+                Image(systemName: "sparkles")
                     .font(.system(size: iconSize))
                 Text("paywall_custom.radar_label_balance".localized)
                     .font(.custom("Poppins-SemiBold", size: fontSize))
@@ -1081,5 +1085,4 @@ struct PaywallFeatureBullet: View {
     }
 }
 
-// All legacy Superwall paywall code has been removed.
-// The app now uses NativePaywallView (StoreKit 2) for all paywall functionality.
+// Paywalls are presented through Superwall (RevenueCat handles purchases via RCPurchaseController).

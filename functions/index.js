@@ -1,6 +1,10 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
+const { initializeApp } = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
+
+initializeApp();
 
 const deepSeekApiKey = defineSecret("DEEPSEEK_API_KEY");
 
@@ -19,6 +23,19 @@ exports.deepSeekChat = onRequest(
   async (request, response) => {
     if (request.method !== "POST") {
       response.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+
+    // Only signed-in CortiFree users may spend DeepSeek credit.
+    const idToken = (request.get("Authorization") || "").match(/^Bearer (.+)$/)?.[1];
+    if (!idToken) {
+      response.status(401).json({ error: "Authentication required" });
+      return;
+    }
+    try {
+      await getAuth().verifyIdToken(idToken);
+    } catch (error) {
+      response.status(401).json({ error: "Invalid credentials" });
       return;
     }
 

@@ -3,7 +3,7 @@
 //  CortiFree
 //
 //  Created by Claude on 01/12/2025.
-//  Manages app language selection (FR/EN) with persistence
+//  Manages app language selection with persistence
 //
 
 import SwiftUI
@@ -21,12 +21,13 @@ class LanguageManager: ObservableObject {
     @Published var currentLanguage: Language = .french {
         didSet {
             guard oldValue != currentLanguage else { return }
+            updateBundle()
             UserDefaults.standard.set(currentLanguage.rawValue, forKey: "selectedLanguage")
             UserDefaults.standard.set([currentLanguage.rawValue], forKey: "AppleLanguages")
             UserDefaults.standard.synchronize()
 
             // Sync Superwall paywall language immediately
-            Superwall.shared.localeIdentifier = currentLanguage == .french ? "fr_FR" : "en_US"
+            Superwall.shared.localeIdentifier = currentLanguage.superwallLocaleIdentifier
 
             // Post notification
             NotificationCenter.default.post(name: Self.languageDidChangeNotification, object: nil)
@@ -39,11 +40,19 @@ class LanguageManager: ObservableObject {
     enum Language: String, CaseIterable {
         case french = "fr"
         case english = "en"
+        case spanish = "es"
+        case german = "de"
+        case japanese = "ja"
+        case korean = "ko"
 
         var flag: String {
             switch self {
             case .french: return "🇫🇷"
             case .english: return "🇬🇧"
+            case .spanish: return "🇪🇸"
+            case .german: return "🇩🇪"
+            case .japanese: return "🇯🇵"
+            case .korean: return "🇰🇷"
             }
         }
 
@@ -51,6 +60,10 @@ class LanguageManager: ObservableObject {
             switch self {
             case .french: return "FRA"
             case .english: return "ENG"
+            case .spanish: return "ESP"
+            case .german: return "DEU"
+            case .japanese: return "JPN"
+            case .korean: return "KOR"
             }
         }
 
@@ -58,6 +71,10 @@ class LanguageManager: ObservableObject {
             switch self {
             case .french: return Locale(identifier: "fr_FR")
             case .english: return Locale(identifier: "en_US")
+            case .spanish: return Locale(identifier: "es_ES")
+            case .german: return Locale(identifier: "de_DE")
+            case .japanese: return Locale(identifier: "ja_JP")
+            case .korean: return Locale(identifier: "ko_KR")
             }
         }
 
@@ -65,6 +82,21 @@ class LanguageManager: ObservableObject {
             switch self {
             case .french: return "Français"
             case .english: return "English"
+            case .spanish: return "Español"
+            case .german: return "Deutsch"
+            case .japanese: return "日本語"
+            case .korean: return "한국어"
+            }
+        }
+
+        var superwallLocaleIdentifier: String {
+            switch self {
+            case .french: return "fr_FR"
+            case .english: return "en_US"
+            case .spanish: return "es_ES"
+            case .german: return "de_DE"
+            case .japanese: return "ja_JP"
+            case .korean: return "ko_KR"
             }
         }
     }
@@ -80,7 +112,7 @@ class LanguageManager: ObservableObject {
         } else {
             // Auto-detect from system
             let systemLang = Locale.preferredLanguages.first ?? "en"
-            currentLanguage = systemLang.hasPrefix("fr") ? .french : .english
+            currentLanguage = Language(rawValue: String(systemLang.prefix(2))) ?? .english
         }
         updateBundle()
     }
@@ -95,23 +127,30 @@ class LanguageManager: ObservableObject {
     }
 
     func toggle() {
-        currentLanguage = currentLanguage == .french ? .english : .french
-        updateBundle()
+        let languages = Language.allCases
+        let currentIndex = languages.firstIndex(of: currentLanguage) ?? 0
+        currentLanguage = languages[(currentIndex + 1) % languages.count]
     }
 
     func setLanguage(_ language: Language) {
         currentLanguage = language
-        updateBundle()
     }
 
     // Get localized string for current language
     func localizedString(for key: String) -> String {
-        return NSLocalizedString(key, bundle: bundle, comment: "")
+        let translated = bundle.localizedString(forKey: key, value: nil, table: nil)
+        return translated == key ? englishBundle.localizedString(forKey: key, value: key, table: nil) : translated
     }
 
     /// Localized string with dynamic bundle (forces correct language)
     func localized(_ key: String) -> String {
-        return bundle.localizedString(forKey: key, value: nil, table: nil)
+        let translated = bundle.localizedString(forKey: key, value: nil, table: nil)
+        return translated == key ? englishBundle.localizedString(forKey: key, value: key, table: nil) : translated
     }
-}
 
+    private lazy var englishBundle: Bundle = {
+        guard let path = Bundle.main.path(forResource: "en", ofType: "lproj"),
+              let bundle = Bundle(path: path) else { return .main }
+        return bundle
+    }()
+}

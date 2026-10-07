@@ -16,7 +16,7 @@ struct FirstLaunchWelcomeView: View {
     @State private var hasContinued = false
     var body: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.8)
                 .ignoresSafeArea()
 
             Color.black.opacity(0.45)
@@ -49,7 +49,7 @@ struct FirstLaunchWelcomeView: View {
 
                     IntroSparkle(color: Color(hex: "FFB7E8"), size: 18, delay: 0.0)
                         .offset(x: -150, y: -42)
-                    IntroSparkle(color: Color(hex: "E9B6FF"), size: 12, delay: 0.35)
+                    IntroSparkle(color: Color(hex: "D4B4FF"), size: 12, delay: 0.35)
                         .offset(x: 151, y: -28)
                     IntroSparkle(color: Color(hex: "FF8EDB"), size: 10, delay: 0.7)
                         .offset(x: 137, y: 48)
@@ -65,13 +65,11 @@ struct FirstLaunchWelcomeView: View {
                     Button(action: continueToQuiz) {
                         Text("first_launch.cta_button".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(Color(hex: "1A1A4E"))
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 40))
+                            .contentShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.glassPrimary)
                     .padding(.horizontal, 34)
 
                     Text("first_launch.cta_sub".localized)
@@ -83,7 +81,7 @@ struct FirstLaunchWelcomeView: View {
         }
         .onAppear {
             screenViewTime = Date()
-            MixpanelManager.shared.trackOnboardingWelcomeViewed()
+            AnalyticsManager.shared.trackOnboardingWelcomeViewed()
         }
     }
 
@@ -101,7 +99,7 @@ struct FirstLaunchWelcomeView: View {
         onContinue()
         Task { @MainActor in
             await Task.yield()
-            MixpanelManager.shared.trackOnboardingWelcomeContinue(timeSpent: timeSpent)
+            AnalyticsManager.shared.trackOnboardingWelcomeContinue(timeSpent: timeSpent)
         }
     }
 

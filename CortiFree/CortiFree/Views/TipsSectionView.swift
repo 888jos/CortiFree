@@ -77,10 +77,14 @@ struct TipsCategoriesGridView: View {
                         HapticManager.light()
                         dismiss()
                     }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.white.opacity(0.6))
+                        Image(systemName: "xmark")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.85))
+                            .frame(width: 40, height: 40)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
 
                     Spacer()
                 }
@@ -104,12 +108,12 @@ struct TipsCategoriesGridView: View {
                         .frame(width: 4, height: 32)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(NSLocalizedString("tips.title", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "tips.title"))
                             .font(Font.Poppins.custom(.bold, size: 32))
                             .tracking(0.5)
                             .foregroundColor(.white)
 
-                        Text(NSLocalizedString("tips.subtitle", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "tips.subtitle"))
                             .font(.custom("Poppins-Regular", size: 14))
                             .tracking(0.3)
                             .foregroundColor(.white.opacity(0.65))
@@ -201,7 +205,7 @@ struct TipsCategoryCardView: View {
                         .tracking(0.4)
                         .foregroundColor(.white)
 
-                    Text("\(category.cardCount) \(category.cardCount > 1 ? NSLocalizedString("tips.count.plural", comment: "") : NSLocalizedString("tips.count.singular", comment: ""))")
+                    Text("\(category.cardCount) \(category.cardCount > 1 ? LanguageManager.shared.localizedString(for: "tips.count.plural") : LanguageManager.shared.localizedString(for: "tips.count.singular"))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -222,40 +226,8 @@ struct TipsCategoryCardView: View {
                     )
             }
             .padding(20)
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.10),
-                                    Color.white.opacity(0.04)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    category.color.opacity(0.4),
-                                    category.color.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                        .shadow(
-                            color: category.color.opacity(0.2),
-                            radius: 12,
-                            x: 0,
-                            y: 4
-                        )
-                }
-            )
+            .glassCard(cornerRadius: 24, interactive: true)
+            .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
         .scaleEffect(isPressed ? 0.96 : 1.0)
         .brightness(isPressed ? 0.05 : 0)
@@ -292,11 +264,10 @@ struct TipsCategoryCardsView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(width: 40, height: 40)
-                        .background(
-                            Circle()
-                                .fill(Color.white.opacity(0.1))
-                        )
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(category.name)
@@ -304,7 +275,7 @@ struct TipsCategoryCardsView: View {
                         .tracking(0.5)
                         .foregroundColor(.white)
 
-                    Text("\(filteredCards.count) \(filteredCards.count > 1 ? NSLocalizedString("tips.count.plural", comment: "") : NSLocalizedString("tips.count.singular", comment: ""))")
+                    Text("\(filteredCards.count) \(filteredCards.count > 1 ? LanguageManager.shared.localizedString(for: "tips.count.plural") : LanguageManager.shared.localizedString(for: "tips.count.singular"))")
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.65))
                 }
@@ -413,54 +384,8 @@ struct TipCardView: View {
                     )
             }
             .padding(18)
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.10),
-                                    Color.white.opacity(0.04)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    card.categoryColor.opacity(0.4),
-                                    card.categoryColor.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                        .shadow(
-                            color: card.categoryColor.opacity(0.2),
-                            radius: 12,
-                            x: 0,
-                            y: 4
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.15),
-                                    Color.clear
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
-                            lineWidth: 1
-                        )
-                        .padding(1)
-                }
-            )
+            .glassCard(cornerRadius: 20, interactive: true)
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
         .scaleEffect(isPressed ? 0.96 : 1.0)
         .brightness(isPressed ? 0.05 : 0)
@@ -507,11 +432,10 @@ struct TipCardDetailView: View {
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.white)
                                 .frame(width: 40, height: 40)
-                                .background(
-                                    Circle()
-                                        .fill(Color.white.opacity(0.1))
-                                )
+                                .contentShape(Circle())
                         }
+                        .buttonStyle(.plain)
+                        .glassCircle(interactive: true)
 
                         Spacer()
                     }
@@ -576,23 +500,7 @@ struct TipCardDetailView: View {
                             .foregroundColor(card.categoryColor)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 7)
-                            .background(
-                                Capsule()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [
-                                                card.categoryColor.opacity(0.25),
-                                                card.categoryColor.opacity(0.12)
-                                            ],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(card.categoryColor.opacity(0.3), lineWidth: 1)
-                                    )
-                            )
+                            .glassCapsule(tint: card.categoryColor)
                     }
                     .padding(.bottom, 24)
 
@@ -664,34 +572,7 @@ struct TipContentSectionView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.08),
-                                Color.white.opacity(0.03)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                color.opacity(0.3),
-                                color.opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-        )
+        .glassCard(cornerRadius: 22)
     }
 }
 
@@ -706,61 +587,61 @@ struct TipsCategory: Identifiable {
 
     static let allCategories: [TipsCategory] = [
         TipsCategory(
-            name: NSLocalizedString("tips.category.routine", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.routine"),
             icon: "alarm.fill",
             color: Color(hex: "F59E0B"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.sommeil", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.sommeil"),
             icon: "moon.stars.fill",
             color: Color(hex: "8B5CF6"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.travail", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.travail"),
             icon: "laptopcomputer",
             color: Color(hex: "3B82F6"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.nutrition", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.nutrition"),
             icon: "fork.knife",
             color: Color(hex: "10B981"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.emotions", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.emotions"),
             icon: "heart.fill",
             color: Color(hex: "EC4899"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.mindfulness", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.mindfulness"),
             icon: "figure.mind.and.body",
             color: Color(hex: "06B6D4"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.relations", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.relations"),
             icon: "person.2.fill",
             color: Color(hex: "F43F5E"),
             cardCount: 2
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.productivite", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.productivite"),
             icon: "chart.line.uptrend.xyaxis",
             color: Color(hex: "6366F1"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.environnement", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.environnement"),
             icon: "house.fill",
             color: Color(hex: "22C55E"),
             cardCount: 1
         ),
         TipsCategory(
-            name: NSLocalizedString("tips.category.urgence", comment: ""),
+            name: LanguageManager.shared.localizedString(for: "tips.category.urgence"),
             icon: "exclamationmark.triangle.fill",
             color: Color(hex: "EF4444"),
             cardCount: 1
@@ -814,29 +695,29 @@ struct TipCard: Identifiable {
         // ROUTINE CATEGORY
         TipCard(
             icon: "alarm.fill",
-            title: NSLocalizedString("tips.card.morning_routine.title", comment: ""),
-            category: NSLocalizedString("tips.category.routine", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.morning_routine.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.routine"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.short_description"),
             sections: [
                 TipContentSection(
                     icon: "info.circle.fill",
-                    title: NSLocalizedString("tips.card.morning_routine.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.morning_routine.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section1.content")
                 ),
                 TipContentSection(
                     icon: "sun.max.fill",
-                    title: NSLocalizedString("tips.card.morning_routine.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.morning_routine.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section2.content")
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: NSLocalizedString("tips.card.morning_routine.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.morning_routine.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section3.content")
                 ),
                 TipContentSection(
                     icon: "lightbulb.fill",
-                    title: NSLocalizedString("tips.card.morning_routine.section4.title", comment: ""),
-                    content: NSLocalizedString("tips.card.morning_routine.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.morning_routine.section4.content")
                 )
             ]
         ),
@@ -844,19 +725,19 @@ struct TipCard: Identifiable {
         // SOMMEIL CATEGORY
         TipCard(
             icon: "moon.stars.fill",
-            title: NSLocalizedString("tips.card.sleep_ritual.title", comment: ""),
-            category: NSLocalizedString("tips.category.sommeil", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.sleep_ritual.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.sleep_ritual.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.sommeil"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.sleep_ritual.short_description"),
             sections: [
                 TipContentSection(
                     icon: "moon.fill",
-                    title: NSLocalizedString("tips.card.sleep_ritual.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.sleep_ritual.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.sleep_ritual.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.sleep_ritual.section1.content")
                 ),
                 TipContentSection(
                     icon: "star.fill",
-                    title: NSLocalizedString("tips.card.sleep_ritual.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.sleep_ritual.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.sleep_ritual.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.sleep_ritual.section2.content")
                 )
             ]
         ),
@@ -864,29 +745,29 @@ struct TipCard: Identifiable {
         // TRAVAIL CATEGORY
         TipCard(
             icon: "laptopcomputer",
-            title: NSLocalizedString("tips.card.work_stress.title", comment: ""),
-            category: NSLocalizedString("tips.category.travail", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.work_stress.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.work_stress.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.travail"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.work_stress.short_description"),
             sections: [
                 TipContentSection(
                     icon: "clock.fill",
-                    title: NSLocalizedString("tips.card.work_stress.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.work_stress.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section1.content")
                 ),
                 TipContentSection(
                     icon: "list.bullet.clipboard.fill",
-                    title: NSLocalizedString("tips.card.work_stress.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.work_stress.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section2.content")
                 ),
                 TipContentSection(
                     icon: "bell.slash.fill",
-                    title: NSLocalizedString("tips.card.work_stress.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.work_stress.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section3.content")
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: NSLocalizedString("tips.card.work_stress.section4.title", comment: ""),
-                    content: NSLocalizedString("tips.card.work_stress.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.work_stress.section4.content")
                 )
             ]
         ),
@@ -894,29 +775,29 @@ struct TipCard: Identifiable {
         // NUTRITION CATEGORY
         TipCard(
             icon: "fork.knife",
-            title: NSLocalizedString("tips.card.nutrition.title", comment: ""),
-            category: NSLocalizedString("tips.category.nutrition", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.nutrition.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.nutrition.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.nutrition"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.nutrition.short_description"),
             sections: [
                 TipContentSection(
                     icon: "sun.max.fill",
-                    title: NSLocalizedString("tips.card.nutrition.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.nutrition.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section1.content")
                 ),
                 TipContentSection(
                     icon: "leaf.circle.fill",
-                    title: NSLocalizedString("tips.card.nutrition.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.nutrition.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section2.content")
                 ),
                 TipContentSection(
                     icon: "drop.fill",
-                    title: NSLocalizedString("tips.card.nutrition.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.nutrition.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section3.content")
                 ),
                 TipContentSection(
                     icon: "moon.fill",
-                    title: NSLocalizedString("tips.card.nutrition.section4.title", comment: ""),
-                    content: NSLocalizedString("tips.card.nutrition.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.nutrition.section4.content")
                 )
             ]
         ),
@@ -924,29 +805,29 @@ struct TipCard: Identifiable {
         // ÉMOTIONS CATEGORY
         TipCard(
             icon: "heart.fill",
-            title: NSLocalizedString("tips.card.emotions.title", comment: ""),
-            category: NSLocalizedString("tips.category.emotions", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.emotions.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.emotions.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.emotions"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.emotions.short_description"),
             sections: [
                 TipContentSection(
                     icon: "wind",
-                    title: NSLocalizedString("tips.card.emotions.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emotions.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emotions.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emotions.section1.content")
                 ),
                 TipContentSection(
                     icon: "hand.raised.fill",
-                    title: NSLocalizedString("tips.card.emotions.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emotions.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emotions.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emotions.section2.content")
                 ),
                 TipContentSection(
                     icon: "pencil.and.list.clipboard",
-                    title: NSLocalizedString("tips.card.emotions.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emotions.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emotions.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emotions.section3.content")
                 ),
                 TipContentSection(
                     icon: "figure.walk",
-                    title: NSLocalizedString("tips.card.emotions.section4.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emotions.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emotions.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emotions.section4.content")
                 )
             ]
         ),
@@ -954,29 +835,29 @@ struct TipCard: Identifiable {
         // MINDFULNESS CATEGORY
         TipCard(
             icon: "figure.mind.and.body",
-            title: NSLocalizedString("tips.card.mindfulness.title", comment: ""),
-            category: NSLocalizedString("tips.category.mindfulness", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.mindfulness.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.mindfulness"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.short_description"),
             sections: [
                 TipContentSection(
                     icon: "cup.and.saucer.fill",
-                    title: NSLocalizedString("tips.card.mindfulness.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.mindfulness.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section1.content")
                 ),
                 TipContentSection(
                     icon: "figure.walk",
-                    title: NSLocalizedString("tips.card.mindfulness.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.mindfulness.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section2.content")
                 ),
                 TipContentSection(
                     icon: "shower.fill",
-                    title: NSLocalizedString("tips.card.mindfulness.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.mindfulness.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section3.content")
                 ),
                 TipContentSection(
                     icon: "fork.knife",
-                    title: NSLocalizedString("tips.card.mindfulness.section4.title", comment: ""),
-                    content: NSLocalizedString("tips.card.mindfulness.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.mindfulness.section4.content")
                 )
             ]
         ),
@@ -984,13 +865,13 @@ struct TipCard: Identifiable {
         // RELATIONS CATEGORY (2 cards)
         TipCard(
             icon: "person.2.fill",
-            title: NSLocalizedString("tips.card.nvc.title", comment: ""),
-            category: NSLocalizedString("tips.category.relations", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.nvc.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.nvc.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.relations"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.nvc.short_description"),
             sections: [
                 TipContentSection(
                     icon: "list.bullet.clipboard.fill",
-                    title: NSLocalizedString("tips.card.nvc.section1.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "tips.card.nvc.section1.title"),
                     content: """
                     1. OBSERVATION (fait objectif)
                     \"Quand tu arrives en retard aux rendez-vous...\"
@@ -1010,7 +891,7 @@ struct TipCard: Identifiable {
                 ),
                 TipContentSection(
                     icon: "ear.fill",
-                    title: NSLocalizedString("tips.card.nvc.section2.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "tips.card.nvc.section2.title"),
                     content: """
                     Quand quelqu'un te parle :
 
@@ -1025,7 +906,7 @@ struct TipCard: Identifiable {
                 ),
                 TipContentSection(
                     icon: "exclamationmark.triangle.fill",
-                    title: NSLocalizedString("tips.card.nvc.section3.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "tips.card.nvc.section3.title"),
                     content: """
                     • Respire profondément avant de répondre
                     • Cherche la part de vérité (même petite)
@@ -1042,18 +923,18 @@ struct TipCard: Identifiable {
         ),
         TipCard(
             icon: "heart.circle.fill",
-            title: NSLocalizedString("tips.card.positive_relations.title", comment: ""),
-            category: NSLocalizedString("tips.category.relations", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.positive_relations.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.relations"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.short_description"),
             sections: [
                 TipContentSection(
                     icon: "calendar",
-                    title: NSLocalizedString("tips.card.positive_relations.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.positive_relations.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.section1.content")
                 ),
                 TipContentSection(
                     icon: "heart.fill",
-                    title: NSLocalizedString("tips.card.positive_relations.section2.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.section2.title"),
                     content: """
                     1 fois/jour minimum, dis à quelqu'un :
 
@@ -1068,12 +949,12 @@ struct TipCard: Identifiable {
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: NSLocalizedString("tips.card.positive_relations.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.positive_relations.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.section3.content")
                 ),
                 TipContentSection(
                     icon: "figure.2.and.child.holdinghands",
-                    title: NSLocalizedString("tips.card.positive_relations.section4.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "tips.card.positive_relations.section4.title"),
                     content: """
                     Demander de l'aide ≠ faiblesse :
 
@@ -1091,28 +972,28 @@ struct TipCard: Identifiable {
         // PRODUCTIVITÉ CATEGORY
         TipCard(
             icon: "chart.line.uptrend.xyaxis",
-            title: NSLocalizedString("tips.card.productivity.title", comment: ""),
-            category: NSLocalizedString("tips.category.productivite", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.productivity.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.productivity.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.productivite"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.productivity.short_description"),
             sections: [
                 TipContentSection(
                     icon: "clock.fill",
-                    title: NSLocalizedString("tips.card.productivity.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.productivity.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.productivity.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.productivity.section1.content")
                 ),
                 TipContentSection(
                     icon: "brain.head.profile",
-                    title: NSLocalizedString("tips.card.productivity.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.productivity.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.productivity.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.productivity.section2.content")
                 ),
                 TipContentSection(
                     icon: "checkmark.circle.fill",
-                    title: NSLocalizedString("tips.card.productivity.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.productivity.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.productivity.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.productivity.section3.content")
                 ),
                 TipContentSection(
                     icon: "xmark.circle.fill",
-                    title: NSLocalizedString("tips.card.productivity.section4.title", comment: ""),
+                    title: LanguageManager.shared.localizedString(for: "tips.card.productivity.section4.title"),
                     content: """
                     Perfectionnisme = Source majeure de stress.
 
@@ -1131,34 +1012,34 @@ struct TipCard: Identifiable {
         // ENVIRONNEMENT CATEGORY
         TipCard(
             icon: "house.fill",
-            title: NSLocalizedString("tips.card.environment.title", comment: ""),
-            category: NSLocalizedString("tips.category.environnement", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.environment.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.environment.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.environnement"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.environment.short_description"),
             sections: [
                 TipContentSection(
                     icon: "sparkles",
-                    title: NSLocalizedString("tips.card.environment.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.environment.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.environment.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.environment.section1.content")
                 ),
                 TipContentSection(
                     icon: "leaf.fill",
-                    title: NSLocalizedString("tips.card.environment.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.environment.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.environment.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.environment.section2.content")
                 ),
                 TipContentSection(
                     icon: "sun.max.fill",
-                    title: NSLocalizedString("tips.card.environment.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.environment.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.environment.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.environment.section3.content")
                 ),
                 TipContentSection(
                     icon: "speaker.wave.3.fill",
-                    title: NSLocalizedString("tips.card.environment.section4.title", comment: ""),
-                    content: NSLocalizedString("tips.card.environment.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.environment.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.environment.section4.content")
                 ),
                 TipContentSection(
                     icon: "thermometer.medium",
-                    title: NSLocalizedString("tips.card.environment.section5.title", comment: ""),
-                    content: NSLocalizedString("tips.card.environment.section5.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.environment.section5.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.environment.section5.content")
                 )
             ]
         ),
@@ -1166,34 +1047,34 @@ struct TipCard: Identifiable {
         // URGENCE CATEGORY
         TipCard(
             icon: "exclamationmark.triangle.fill",
-            title: NSLocalizedString("tips.card.emergency_kit.title", comment: ""),
-            category: NSLocalizedString("tips.category.urgence", comment: ""),
-            shortDescription: NSLocalizedString("tips.card.emergency_kit.short_description", comment: ""),
+            title: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.title"),
+            category: LanguageManager.shared.localizedString(for: "tips.category.urgence"),
+            shortDescription: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.short_description"),
             sections: [
                 TipContentSection(
                     icon: "exclamationmark.circle.fill",
-                    title: NSLocalizedString("tips.card.emergency_kit.section1.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emergency_kit.section1.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section1.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section1.content")
                 ),
                 TipContentSection(
                     icon: "figure.run",
-                    title: NSLocalizedString("tips.card.emergency_kit.section2.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emergency_kit.section2.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section2.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section2.content")
                 ),
                 TipContentSection(
                     icon: "phone.fill",
-                    title: NSLocalizedString("tips.card.emergency_kit.section3.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emergency_kit.section3.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section3.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section3.content")
                 ),
                 TipContentSection(
                     icon: "heart.fill",
-                    title: NSLocalizedString("tips.card.emergency_kit.section4.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emergency_kit.section4.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section4.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section4.content")
                 ),
                 TipContentSection(
                     icon: "checkmark.circle.fill",
-                    title: NSLocalizedString("tips.card.emergency_kit.section5.title", comment: ""),
-                    content: NSLocalizedString("tips.card.emergency_kit.section5.content", comment: "")
+                    title: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section5.title"),
+                    content: LanguageManager.shared.localizedString(for: "tips.card.emergency_kit.section5.content")
                 )
             ]
         )

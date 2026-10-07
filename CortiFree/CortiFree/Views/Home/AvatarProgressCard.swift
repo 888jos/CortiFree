@@ -116,12 +116,16 @@ struct AvatarProgressCard: View {
             .padding(.bottom, 8)
         }
         .frame(width: 216, height: 320)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.white, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(colors: [.white.opacity(0.55), .white.opacity(0.12)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing),
+                    lineWidth: 1
+                )
         )
-        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+        .shadow(color: .black.opacity(0.3), radius: 16, x: 0, y: 8)
     }
 
     // MARK: - Back Card (Verso) - Redesigned
@@ -134,7 +138,7 @@ struct AvatarProgressCard: View {
                     .font(.system(size: 14))
                     .foregroundColor(Color(hex: "B794F6"))
 
-                Text(NSLocalizedString("avatar.my_progress", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "avatar.my_progress"))
                     .font(.custom("Poppins-Medium", size: 13))
                     .foregroundColor(.white.opacity(0.8))
 
@@ -170,7 +174,7 @@ struct AvatarProgressCard: View {
                         )
                     )
 
-                Text(NSLocalizedString("avatar.days", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "avatar.days"))
                     .font(.custom("Poppins-Regular", size: 14))
                     .foregroundColor(.white.opacity(0.6))
             }
@@ -212,7 +216,7 @@ struct AvatarProgressCard: View {
                                 .font(.custom("Poppins-SemiBold", size: 13))
                                 .foregroundColor(.white)
 
-                            Text(String(format: NSLocalizedString("avatar.next_badge", comment: ""), badgeInfo.daysLeft, badgeInfo.daysLeft > 1 ? NSLocalizedString("avatar.next_badge.plural", comment: "") : NSLocalizedString("avatar.next_badge.singular", comment: "")))
+                            Text(String(format: LanguageManager.shared.localizedString(for: "avatar.next_badge"), badgeInfo.daysLeft, badgeInfo.daysLeft > 1 ? LanguageManager.shared.localizedString(for: "avatar.next_badge.plural") : LanguageManager.shared.localizedString(for: "avatar.next_badge.singular")))
                                 .font(.custom("Poppins-Regular", size: 11))
                                 .foregroundColor(Color(hex: "B794F6"))
                         }
@@ -237,22 +241,7 @@ struct AvatarProgressCard: View {
             Spacer().frame(height: 20)
         }
         .frame(width: 216, height: 320)
-        .background(
-            LinearGradient(
-                colors: [
-                    Color(hex: "1A1B3A"),
-                    Color(hex: "0D0E1F")
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.white, lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+        .glassCard(cornerRadius: 14, tint: Color(hex: "B794F6"))
     }
 
     private func dayColor(for day: Int) -> Color {
@@ -369,32 +358,32 @@ struct AvatarProgressCard: View {
     private var motivationalMessage: String {
         let percentage = progressPercentage
         if percentage < 10 {
-            return NSLocalizedString("avatar.motivation.0_10", comment: "")
+            return LanguageManager.shared.localizedString(for: "avatar.motivation.0_10")
         } else if percentage < 25 {
-            return NSLocalizedString("avatar.motivation.10_25", comment: "")
+            return LanguageManager.shared.localizedString(for: "avatar.motivation.10_25")
         } else if percentage < 50 {
-            return String(format: NSLocalizedString("avatar.motivation.25_50", comment: ""), percentage)
+            return String(format: LanguageManager.shared.localizedString(for: "avatar.motivation.25_50"), percentage)
         } else if percentage < 75 {
-            return NSLocalizedString("avatar.motivation.50_75", comment: "")
+            return LanguageManager.shared.localizedString(for: "avatar.motivation.50_75")
         } else if percentage < 100 {
-            return NSLocalizedString("avatar.motivation.75_100", comment: "")
+            return LanguageManager.shared.localizedString(for: "avatar.motivation.75_100")
         } else {
-            return NSLocalizedString("avatar.motivation.100", comment: "")
+            return LanguageManager.shared.localizedString(for: "avatar.motivation.100")
         }
     }
 
     private var nextBadgeInfo: (title: String, daysLeft: Int)? {
         let milestones = [3, 7, 14, 21, 30, 40, 50, 60, 66]
         let badgeTitles = [
-            NSLocalizedString("avatar.badge.beginner", comment: ""),
-            NSLocalizedString("avatar.badge.motivated", comment: ""),
-            NSLocalizedString("avatar.badge.determined", comment: ""),
-            NSLocalizedString("avatar.badge.engaged", comment: ""),
-            NSLocalizedString("avatar.badge.assiduous", comment: ""),
-            NSLocalizedString("avatar.badge.champion", comment: ""),
-            NSLocalizedString("avatar.badge.invincible", comment: ""),
-            NSLocalizedString("avatar.badge.legend", comment: ""),
-            NSLocalizedString("avatar.badge.master", comment: "")
+            LanguageManager.shared.localizedString(for: "avatar.badge.beginner"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.motivated"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.determined"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.engaged"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.assiduous"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.champion"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.invincible"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.legend"),
+            LanguageManager.shared.localizedString(for: "avatar.badge.master")
         ]
 
         for (index, milestone) in milestones.enumerated() {
@@ -449,7 +438,7 @@ struct BadgesListView: View {
     var body: some View {
         ZStack {
             // Galaxy background
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.75)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -460,14 +449,17 @@ struct BadgesListView: View {
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .glassCircle(interactive: true)
 
                     Spacer()
 
-                    Text(NSLocalizedString("avatar.badges_title", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "avatar.badges_title"))
                         .font(.custom("Poppins-Bold", size: 20))
                         .foregroundColor(.white)
 
@@ -485,11 +477,11 @@ struct BadgesListView: View {
                         VStack(spacing: 12) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(NSLocalizedString("avatar.badges_title", comment: ""))
+                                    Text(LanguageManager.shared.localizedString(for: "avatar.badges_title"))
                                         .font(Font.Poppins.custom(.bold, size: 24))
                                         .foregroundColor(.white)
 
-                                    Text(String(format: NSLocalizedString("avatar.badges_unlocked", comment: ""), totalUnlockedBadges, totalBadges))
+                                    Text(String(format: LanguageManager.shared.localizedString(for: "avatar.badges_unlocked"), totalUnlockedBadges, totalBadges))
                                         .font(.custom("Poppins-Regular", size: 14))
                                         .foregroundColor(.white.opacity(0.7))
                                 }
@@ -517,11 +509,13 @@ struct BadgesListView: View {
                             }
                             .frame(height: 8)
 
-                            Text(String(format: NSLocalizedString("avatar.badges_complete", comment: ""), Int(globalBadgePercentage * 100)))
+                            Text(String(format: LanguageManager.shared.localizedString(for: "avatar.badges_complete"), Int(globalBadgePercentage * 100)))
                                 .font(.custom("Poppins-Regular", size: 12))
                                 .foregroundColor(.white.opacity(0.6))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        .padding(20)
+                        .glassCard()
 
                         // SECTION 1: Streak Achievements (3x3 grid)
                         VStack(spacing: 16) {
@@ -531,7 +525,7 @@ struct BadgesListView: View {
                                     .font(.system(size: 20))
                                     .foregroundColor(Color(hex: "FF8800"))
 
-                                Text(NSLocalizedString("avatar.streaks_section", comment: ""))
+                                Text(LanguageManager.shared.localizedString(for: "avatar.streaks_section"))
                                     .font(.custom("Poppins-Bold", size: 16))
                                     .foregroundColor(.white)
 
@@ -573,7 +567,7 @@ struct BadgesListView: View {
                                     .font(.system(size: 20))
                                     .foregroundColor(Color(hex: "B794F6"))
 
-                                Text(NSLocalizedString("avatar.habits_section", comment: ""))
+                                Text(LanguageManager.shared.localizedString(for: "avatar.habits_section"))
                                     .font(.custom("Poppins-Bold", size: 16))
                                     .foregroundColor(.white)
 

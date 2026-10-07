@@ -21,7 +21,12 @@ struct LanguageSelectorButton: View {
             Text("\(languageManager.currentLanguage.flag) \(languageManager.currentLanguage.code)")
                 .font(.custom("Poppins-Medium", size: 10))
                 .foregroundColor(.white)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .contentShape(Capsule())
         }
+        .buttonStyle(.plain)
+        .glassCapsule(interactive: true)
     }
 }
 

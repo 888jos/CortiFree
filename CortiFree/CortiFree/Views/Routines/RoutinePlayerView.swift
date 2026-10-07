@@ -35,7 +35,7 @@ struct RoutinePlayerView: View {
 
     var body: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 1.0)
+            GalaxyBackgroundView(intensity: 0.75)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -113,16 +113,14 @@ struct RoutinePlayerView: View {
                     }
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.9))
-                            .frame(width: 44, height: 44)
-
-                        Image(systemName: "xmark")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "xmark")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
@@ -137,10 +135,7 @@ struct RoutinePlayerView: View {
                 .foregroundColor(Color(hex: routine.color))
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(Color(hex: routine.color).opacity(0.15))
-                )
+                .glassCapsule(tint: Color(hex: routine.color))
 
                 Spacer()
 
@@ -211,7 +206,7 @@ struct RoutinePlayerView: View {
             VStack(spacing: 16) {
                 // Step label
                 HStack(spacing: 12) {
-                    Text("\(NSLocalizedString("routines.step", comment: "")) \(currentStepIndex + 1)")
+                    Text("\(LanguageManager.shared.localizedString(for: "routines.step")) \(currentStepIndex + 1)")
                         .font(.custom("Poppins-Bold", size: 14))
                         .tracking(2)
                         .foregroundColor(Color(hex: routine.color))
@@ -254,10 +249,7 @@ struct RoutinePlayerView: View {
         .foregroundColor(.white.opacity(0.9))
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
-        .background(
-            Capsule()
-                .fill(Color(hex: routine.color).opacity(0.25))
-        )
+        .glassCapsule(tint: Color(hex: routine.color))
     }
 
     private var stepTypeIcon: String {
@@ -272,11 +264,11 @@ struct RoutinePlayerView: View {
 
     private var stepTypeText: String {
         switch currentStep.type {
-        case .breathing: return NSLocalizedString("routines.type.breathing", comment: "")
-        case .meditation: return NSLocalizedString("routines.type.meditation", comment: "")
-        case .sound: return NSLocalizedString("routines.type.sound", comment: "")
-        case .journaling: return NSLocalizedString("routines.type.journal", comment: "")
-        case .pause: return NSLocalizedString("routines.type.pause", comment: "")
+        case .breathing: return LanguageManager.shared.localizedString(for: "routines.type.breathing")
+        case .meditation: return LanguageManager.shared.localizedString(for: "routines.type.meditation")
+        case .sound: return LanguageManager.shared.localizedString(for: "routines.type.sound")
+        case .journaling: return LanguageManager.shared.localizedString(for: "routines.type.journal")
+        case .pause: return LanguageManager.shared.localizedString(for: "routines.type.pause")
         }
     }
 
@@ -291,6 +283,7 @@ struct RoutinePlayerView: View {
 
     // MARK: - Player Controls
     private var playerControls: some View {
+        GlassGroup(spacing: 12) {
         HStack(spacing: 12) {
             // Previous button (only if not first step)
             if currentStepIndex > 0 {
@@ -299,10 +292,8 @@ struct RoutinePlayerView: View {
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white.opacity(0.8))
                         .frame(width: 56, height: 56)
-                        .background(
-                            Circle()
-                                .fill(Color.white.opacity(0.1))
-                        )
+                        .contentShape(Circle())
+                        .glassCircle(interactive: true)
                 }
                 .buttonStyle(ScaleButtonStyle())
             }
@@ -314,24 +305,15 @@ struct RoutinePlayerView: View {
                         Image(systemName: "play.fill")
                             .font(.system(size: 16, weight: .semibold))
 
-                        Text(NSLocalizedString("routines.launch.start", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "routines.launch.start"))
                             .font(.custom("Poppins-Bold", size: 16))
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 28)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: routine.color), Color(hex: routine.color).opacity(0.7)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
+                    .contentShape(Capsule())
                 }
-                .buttonStyle(ScaleButtonStyle())
+                .buttonStyle(.glassPrimary(tint: Color(hex: routine.color)))
             }
 
             // Next/Complete button (circle with chevron or checkmark)
@@ -345,26 +327,26 @@ struct RoutinePlayerView: View {
                 ZStack {
                     if currentStepIndex < routine.steps.count - 1 {
                         // Next step - circle with chevron
-                        Circle()
-                            .fill(hasLaunchableExercise ? Color.white.opacity(0.15) : Color(hex: routine.color))
-                            .frame(width: 56, height: 56)
-
                         Image(systemName: "chevron.right")
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .contentShape(Circle())
+                            .glassCircle(tint: hasLaunchableExercise ? nil : Color(hex: routine.color),
+                                         interactive: true)
                     } else {
                         // Complete - circle with checkmark
-                        Circle()
-                            .fill(Color(hex: routine.color))
-                            .frame(width: 56, height: 56)
-
                         Image(systemName: "checkmark")
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .contentShape(Circle())
+                            .glassCircle(tint: Color(hex: routine.color), interactive: true)
                     }
                 }
             }
             .buttonStyle(ScaleButtonStyle())
+        }
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
@@ -506,7 +488,7 @@ struct RoutineCompletionOverlay: View {
                 }
 
                 VStack(spacing: 8) {
-                    Text(NSLocalizedString("routines.completed.title", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "routines.completed.title"))
                         .font(.faroBold(28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -522,7 +504,7 @@ struct RoutineCompletionOverlay: View {
                         Text(routine.formattedDuration)
                             .font(.faroBold(20))
                             .foregroundColor(.white)
-                        Text(NSLocalizedString("routines.completed.duration", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "routines.completed.duration"))
                             .font(.custom("Poppins-Regular", size: 12))
                             .foregroundColor(.white.opacity(0.6))
                     }
@@ -535,37 +517,25 @@ struct RoutineCompletionOverlay: View {
                         Text("\(routine.steps.count)")
                             .font(.faroBold(20))
                             .foregroundColor(.white)
-                        Text(NSLocalizedString("routines.completed.steps", comment: ""))
+                        Text(LanguageManager.shared.localizedString(for: "routines.completed.steps"))
                             .font(.custom("Poppins-Regular", size: 12))
                             .foregroundColor(.white.opacity(0.6))
                     }
                 }
                 .padding(.vertical, 16)
                 .padding(.horizontal, 32)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white.opacity(0.1))
-                )
+                .glassCard(cornerRadius: 18)
 
                 // Continue button
                 Button(action: onDismiss) {
-                    Text(NSLocalizedString("routines.completed.continue", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "routines.completed.continue"))
                         .font(.custom("Poppins-Bold", size: 18))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 60)
-                        .background(
-                            RoundedRectangle(cornerRadius: 30)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color(hex: routine.color), Color(hex: routine.color).opacity(0.7)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                        )
+                        .contentShape(Capsule())
                 }
-                .buttonStyle(ScaleButtonStyle())
+                .buttonStyle(.glassPrimary(tint: Color(hex: routine.color)))
                 .padding(.horizontal, 40)
                 .padding(.top, 8)
             }

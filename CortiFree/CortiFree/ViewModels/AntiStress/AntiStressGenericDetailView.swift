@@ -90,21 +90,14 @@ struct AntiStressGenericDetailView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.15))
-                            .frame(width: 40, height: 40)
-                            .blur(radius: 8)
-
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
-
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
@@ -118,14 +111,7 @@ struct AntiStressGenericDetailView: View {
                 .foregroundColor(Color.appTheme)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(Color.appTheme.opacity(0.2))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.appTheme.opacity(0.5), lineWidth: 1)
-                        )
-                )
+                .glassCapsule(tint: Color.appTheme)
             }
             .padding(.horizontal, 24)
             .padding(.top, 20)
@@ -168,7 +154,7 @@ struct AntiStressGenericDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("antistress.how_it_works", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.how_it_works"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -191,34 +177,8 @@ struct AntiStressGenericDetailView: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -238,7 +198,7 @@ struct AntiStressGenericDetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("antistress.scientific_evidence", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.scientific_evidence"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -290,34 +250,8 @@ struct AntiStressGenericDetailView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -331,7 +265,7 @@ struct AntiStressGenericDetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text(NSLocalizedString("antistress.benefits", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "antistress.benefits"))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }
@@ -383,45 +317,15 @@ struct AntiStressGenericDetailView: View {
                 Image(systemName: "play.circle.fill")
                     .font(.system(size: 24))
 
-                Text(NSLocalizedString("antistress.start_button", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "antistress.start_button"))
                     .font(.custom("Poppins-Bold", size: 18))
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .frame(height: 64)
-            .background(
-                ZStack {
-                    // Shadow layer
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .blur(radius: 20)
-                        .offset(y: 8)
-
-                    // Main button
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                }
-            )
+            .contentShape(Capsule())
         }
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(.glassPrimary(tint: Color.appTheme))
     }
 
     // MARK: - Exercise-specific content
@@ -444,34 +348,34 @@ struct AntiStressGenericDetailView: View {
     private var categoryText: String {
         switch exerciseType {
         case .slowWalk, .consciousStretching:
-            return NSLocalizedString("antistress.category.movement", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.category.movement")
         case .audioRelaxation, .whiteNoise:
-            return NSLocalizedString("antistress.category.audio", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.category.audio")
         case .positiveMantra:
-            return NSLocalizedString("antistress.category.mental", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.category.mental")
         case .visualMicroBreak:
-            return NSLocalizedString("antistress.category.visual", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.category.visual")
         default:
-            return NSLocalizedString("antistress.category.exercise", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.category.exercise")
         }
     }
 
     private var exerciseDescription: String {
         switch exerciseType {
         case .slowWalk:
-            return NSLocalizedString("antistress.slow_walk.subtitle", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.slow_walk.subtitle")
         case .consciousStretching:
-            return NSLocalizedString("antistress.conscious_stretching.subtitle", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.conscious_stretching.subtitle")
         case .audioRelaxation:
-            return NSLocalizedString("antistress.audio_relaxation.subtitle", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.audio_relaxation.subtitle")
         case .whiteNoise:
-            return NSLocalizedString("antistress.white_noise.subtitle", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.white_noise.subtitle")
         case .positiveMantra:
-            return NSLocalizedString("antistress.positive_mantra.subtitle", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.positive_mantra.subtitle")
         case .visualMicroBreak:
-            return NSLocalizedString("antistress.visual_micro_break.subtitle", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.visual_micro_break.subtitle")
         default:
-            return NSLocalizedString("antistress.default.subtitle", comment: "")
+            return LanguageManager.shared.localizedString(for: "antistress.default.subtitle")
         }
     }
 

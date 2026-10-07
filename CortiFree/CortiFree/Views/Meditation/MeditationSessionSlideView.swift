@@ -3,23 +3,17 @@
 //  CortiFree
 //
 //  Created by Claude on 23/10/2025.
-//  Vue de session guidée avec slides pour les méditations - WRAPPER pour UnifiedInstructionSlideView
+//  Former step-by-step slides: now starts the matching guided audio session and shows
+//  the full-screen player (used by RoutinePlayerView).
 //
 
 import SwiftUI
 
 struct MeditationSessionSlideView: View {
     let support: MeditationSupport
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        UnifiedInstructionSlideView(
-            steps: support.toUnifiedInstructionSteps(),
-            exerciseTitle: support.title,
-            onComplete: {
-                // Complete callback - pour tracker la complétion de méditation si besoin
-            }
-        )
+        GuidedSessionAutoPlayView(session: GuidedSessionCatalog.session(forLegacyID: support.meditationId))
     }
 }
 

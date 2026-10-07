@@ -93,21 +93,14 @@ struct AntiStressAnchoring54321DetailView: View {
                     HapticManager.light()
                     dismiss()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.15))
-                            .frame(width: 40, height: 40)
-                            .blur(radius: 8)
-
-                        Circle()
-                            .fill(Color(hex: "1A1B3A").opacity(0.8))
-                            .frame(width: 40, height: 40)
-
-                        Image(systemName: "chevron.left")
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .glassCircle(interactive: true)
 
                 Spacer()
 
@@ -115,20 +108,13 @@ struct AntiStressAnchoring54321DetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "123.rectangle.fill")
                         .font(.system(size: 12))
-                    Text(NSLocalizedString("antistress.anchoring_54321.category_badge", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.category_badge"))
                         .font(.custom("Poppins-Bold", size: 11))
                 }
                 .foregroundColor(Color.appTheme)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(Color.appTheme.opacity(0.2))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.appTheme.opacity(0.5), lineWidth: 1)
-                        )
-                )
+                .glassCapsule(tint: Color.appTheme)
             }
             .padding(.horizontal, 24)
             .padding(.top, 20)
@@ -140,12 +126,12 @@ struct AntiStressAnchoring54321DetailView: View {
     private var compactTitleSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Title
-            Text(NSLocalizedString("antistress.anchoring_54321.title", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.title"))
                 .font(.faroBold(28))
                 .foregroundColor(.white)
 
             // Description courte
-            Text(NSLocalizedString("antistress.anchoring_54321.subtitle", comment: ""))
+            Text(LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.subtitle"))
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(.white.opacity(0.8))
                 .lineSpacing(4)
@@ -169,7 +155,7 @@ struct AntiStressAnchoring54321DetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("antistress.how_it_works", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.how_it_works"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -183,7 +169,7 @@ struct AntiStressAnchoring54321DetailView: View {
 
                 // Description - Expandable
                 if showHowItWorks {
-                    Text(NSLocalizedString("antistress.anchoring_54321.how_it_works_text", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.how_it_works_text"))
                         .font(.custom("Poppins-Regular", size: 15))
                         .foregroundColor(Color(hex: "E5E5E5"))
                         .lineSpacing(8)
@@ -192,34 +178,8 @@ struct AntiStressAnchoring54321DetailView: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -233,7 +193,7 @@ struct AntiStressAnchoring54321DetailView: View {
                     .font(.system(size: 20))
                     .foregroundColor(Color.appTheme)
 
-                Text(NSLocalizedString("antistress.benefits", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "antistress.benefits"))
                     .font(.custom("Poppins-SemiBold", size: 18))
                     .foregroundColor(.white)
             }
@@ -251,10 +211,10 @@ struct AntiStressAnchoring54321DetailView: View {
 
     private var benefits: [String] {
         return [
-            NSLocalizedString("antistress.anchoring_54321.benefit_1", comment: ""),
-            NSLocalizedString("antistress.anchoring_54321.benefit_2", comment: ""),
-            NSLocalizedString("antistress.anchoring_54321.benefit_3", comment: ""),
-            NSLocalizedString("antistress.anchoring_54321.benefit_4", comment: "")
+            LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.benefit_1"),
+            LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.benefit_2"),
+            LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.benefit_3"),
+            LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.benefit_4")
         ]
     }
 
@@ -273,7 +233,7 @@ struct AntiStressAnchoring54321DetailView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.appTheme)
 
-                    Text(NSLocalizedString("antistress.scientific_evidence", comment: ""))
+                    Text(LanguageManager.shared.localizedString(for: "antistress.scientific_evidence"))
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
 
@@ -325,48 +285,22 @@ struct AntiStressAnchoring54321DetailView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "1A1B3A").opacity(0.8),
-                                    Color(hex: "2A2B5A").opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme.opacity(0.3),
-                                    Color.appThemeSecondary.opacity(0.3)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-            )
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .glassCard(cornerRadius: 20, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }
 
     private var scientificEvidences: [String] {
         return [
-            NSLocalizedString("antistress.anchoring_54321.evidence_1", comment: ""),
-            NSLocalizedString("antistress.anchoring_54321.evidence_2", comment: ""),
-            NSLocalizedString("antistress.anchoring_54321.evidence_3", comment: "")
+            LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.evidence_1"),
+            LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.evidence_2"),
+            LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.evidence_3")
         ]
     }
 
     private var scientificSources: [String] {
-        return [NSLocalizedString("antistress.anchoring_54321.source", comment: "")]
+        return [LanguageManager.shared.localizedString(for: "antistress.anchoring_54321.source")]
     }
 
     // MARK: - FIXED BOTTOM SECTION (Button only)
@@ -405,45 +339,15 @@ struct AntiStressAnchoring54321DetailView: View {
                 Image(systemName: "play.circle.fill")
                     .font(.system(size: 24))
 
-                Text(NSLocalizedString("antistress.start_button", comment: ""))
+                Text(LanguageManager.shared.localizedString(for: "antistress.start_button"))
                     .font(.custom("Poppins-Bold", size: 18))
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .frame(height: 64)
-            .background(
-                ZStack {
-                    // Shadow layer
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .blur(radius: 20)
-                        .offset(y: 8)
-
-                    // Main button
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.appTheme,
-                                    Color.appThemeSecondary
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                }
-            )
+            .contentShape(Capsule())
         }
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(.glassPrimary(tint: Color.appTheme))
     }
 }
 

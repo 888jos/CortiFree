@@ -1,0 +1,7 @@
+"CFBundleDisplayName" = "CortiFree";
+"NSCameraUsageDescription" = "CortiFreeはGlow Scanと視覚的なウェルビーイング分析のためにカメラを使用します。";
+"NSPhotoLibraryUsageDescription" = "進捗の写真を保存・共有するため、写真ライブラリへのアクセスが必要です。";
+"NSPhotoLibraryAddUsageDescription" = "画像を写真ライブラリに保存する許可が必要です。";
+"NSMicrophoneUsageDescription" = "ガイド付き瞑想と呼吸エクササイズのためにマイクを使用します。";
+"NSLocationWhenInUseUsageDescription" = "お住まいの地域に合った自然アクティビティを提案するために位置情報を使用します。";
+"NSMotionUsageDescription" = "運動を記録し、より良いエクササイズを提案するためにモーションデータを使用します。";

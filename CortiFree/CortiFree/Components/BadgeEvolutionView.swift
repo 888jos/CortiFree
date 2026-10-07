@@ -73,13 +73,13 @@ struct BadgeEvolutionView: View {
 
                 // Title
                 VStack(spacing: 8) {
-                    Text("Badge Unlocked!")
+                    Text("achievement.badge_unlocked".localized)
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
                         .opacity(showTitle ? 1 : 0)
                         .offset(y: showTitle ? 0 : 20)
 
-                    Text("\(HabitBadge.englishHabitDisplayName(badge.habitId)) - \(badge.level.englishDisplayName)")
+                    Text("\(HabitBadge.habitDisplayName(badge.habitId)) - \(badge.level.displayName)")
                         .font(.custom("Poppins-SemiBold", size: 20))
                         .foregroundColor(Color(hex: badge.level.color))
                         .opacity(showTitle ? 1 : 0)
@@ -87,7 +87,7 @@ struct BadgeEvolutionView: View {
                 }
 
                 // Description
-                Text("You completed \(badge.requirement) \(HabitBadge.englishHabitDisplayName(badge.habitId)) tasks")
+                Text(String(format: "achievement.tasks_completed".localized, badge.requirement, HabitBadge.habitDisplayName(badge.habitId)))
                     .font(.custom("Poppins-Regular", size: 16))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
@@ -113,26 +113,14 @@ struct BadgeEvolutionView: View {
                         isPresented = false
                     }
                 }) {
-                    Text("Continue")
+                    Text("common.continue".localized)
                         .font(.custom("Poppins-SemiBold", size: 18))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            Color(hex: badge.level.color),
-                                            Color(hex: badge.level.color).opacity(0.8)
-                                        ],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .shadow(color: Color(hex: badge.level.color).opacity(0.5), radius: 15, x: 0, y: 8)
-                        )
+                        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 }
+                .buttonStyle(.glassPrimary(tint: Color(hex: badge.level.color), cornerRadius: 20))
                 .padding(.horizontal, 40)
                 .padding(.bottom, 40)
                 .opacity(showDescription ? 1 : 0)
