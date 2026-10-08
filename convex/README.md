@@ -20,9 +20,9 @@ production terminée et vérifiée.
 Variables d'environnement (dev **et** prod) : `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL`,
 `APPLE_BUNDLE_ID`, `GOOGLE_CLIENT_IDS`, `DEEPSEEK_API_KEY`, `APPLE_TEAM_ID`, `APPLE_KEY_ID`
 (`NQL8HJ633Q`), `APPLE_PRIVATE_KEY`, `RESEND_API_KEY` (clé Resend « sending only » limitée à
-`driftstudio.app`) et `AUTH_EMAIL_FROM` (`CortiFree <noreply@driftstudio.app>`) sont en place
-(clés JWT distinctes par déploiement). Reste à définir sur les deux : `ONESIGNAL_REST_API_KEY`
-(relances d'essai, `recovery.ts`).
+`driftstudio.app`), `AUTH_EMAIL_FROM` (`CortiFree <noreply@driftstudio.app>`) sont en place
+et `ONESIGNAL_REST_API_KEY` (relances d'essai, `recovery.ts` ; `ONESIGNAL_APP_ID` a une valeur
+par défaut) sont en place (clés JWT distinctes par déploiement). Rien ne manque.
 
 ---
 
