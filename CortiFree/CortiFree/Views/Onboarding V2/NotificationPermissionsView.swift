@@ -11,7 +11,8 @@ struct NotificationPermissionsView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var isRequestingPermission = false
     @State private var reminderTime = NotificationService.shared.morningReminderDate
-    @State private var acceptsOffers = true
+    // Unchecked by default: pre-ticked consent is not valid for marketing emails (GDPR).
+    @State private var acceptsOffers = false
 
     var body: some View {
         ZStack {

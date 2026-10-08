@@ -245,7 +245,7 @@ final class RecoveryScheduler {
 
     /// Consent to promotional notifications (offers), given on the notification screen.
     var offersOptIn: Bool {
-        get { defaults.object(forKey: Key.offersOptIn) as? Bool ?? true }
+        get { defaults.object(forKey: Key.offersOptIn) as? Bool ?? false }
         set {
             defaults.set(newValue, forKey: Key.offersOptIn)
             AmplitudeManager.shared.setUserProperties(["recovery_offers_opt_in": newValue])
