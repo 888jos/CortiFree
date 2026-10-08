@@ -43,8 +43,10 @@ cutover tracks. No Firebase resource should be removed as part of data import.
   through its local server proxy and makes no Firestore requests. It deliberately
   shows account, revenue, subscription, habit, and retention figures as
   unavailable where those values are not present in the Amplitude event stream.
-- `convex/schema.ts` is a development-only landing area; it is not yet serving
-  the iOS app or production users. Firebase Auth/Firestore must remain enabled.
+- The iOS app now talks only to Convex (Debug → dev `reliable-oyster-468`,
+  Release → prod `compassionate-jackal-621`); the Firebase SDK is no longer linked.
+  Existing users' Firestore data is not imported yet, so Firebase Auth/Firestore
+  must stay enabled (read-only source) until the export/import below is done.
 - No production Firestore/Auth export or import has been run. The local Firebase
   CLI/ADC authorization and a cost estimate are still prerequisites.
 - The exporter reads every matching document once (plus Auth account listing),

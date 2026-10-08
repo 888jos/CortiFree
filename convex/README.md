@@ -10,14 +10,18 @@ l'exporteur ponctuel des anciennes données, à supprimer une fois la migration 
 production terminée et vérifiée.
 
 - Déploiement dev : `dev:reliable-oyster-468` (`https://reliable-oyster-468.convex.cloud`,
-  HTTP : `https://reliable-oyster-468.convex.site`)
+  HTTP : `https://reliable-oyster-468.convex.site`) — utilisé par la config **Debug** de l'app.
+- Déploiement prod : `prod:compassionate-jackal-621` (`https://compassionate-jackal-621.convex.cloud`,
+  HTTP : `https://compassionate-jackal-621.convex.site`) — utilisé par la config **Release**.
+  L'URL vient du build setting `CONVEX_URL` (cible CortiFree) via `Info.plist`.
 - `npm run convex:codegen` · `npm run typecheck:convex` · `npm run test:convex` (convex-test)
-- `npx convex dev --once` pousse le schéma et les fonctions vers le déploiement dev.
+- `npx convex dev --once` pousse vers le dev ; `npx convex deploy` pousse vers la prod.
 
-> **Bloquant au 08/10/2026** : l'équipe `driftstudio` est désactivée (« exceeded Free plan
-> limits »). Les pushes passent, mais **aucune fonction ne s'exécute** (« your deployments
-> have been disabled »). Il faut réactiver le projet ou passer en Pro dans le dashboard.
-> En attendant, la logique est vérifiée en local par `npm run test:convex`.
+Variables d'environnement (dev **et** prod) : `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL`,
+`APPLE_BUNDLE_ID`, `GOOGLE_CLIENT_IDS` sont en place (clés JWT distinctes par déploiement).
+Restent à définir sur les deux : `DEEPSEEK_API_KEY` (Milo), `RESEND_API_KEY` + `AUTH_EMAIL_FROM`
+(email de réinitialisation), `APPLE_TEAM_ID` + `APPLE_KEY_ID` + `APPLE_PRIVATE_KEY`
+(révocation Sign in with Apple à la suppression de compte).
 
 ---
 
