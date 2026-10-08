@@ -18,10 +18,11 @@ production terminée et vérifiée.
 - `npx convex dev --once` pousse vers le dev ; `npx convex deploy` pousse vers la prod.
 
 Variables d'environnement (dev **et** prod) : `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL`,
-`APPLE_BUNDLE_ID`, `GOOGLE_CLIENT_IDS` sont en place (clés JWT distinctes par déploiement).
-Restent à définir sur les deux : `DEEPSEEK_API_KEY` (Milo), `RESEND_API_KEY` + `AUTH_EMAIL_FROM`
-(email de réinitialisation), `APPLE_TEAM_ID` + `APPLE_KEY_ID` + `APPLE_PRIVATE_KEY`
-(révocation Sign in with Apple à la suppression de compte).
+`APPLE_BUNDLE_ID`, `GOOGLE_CLIENT_IDS`, `DEEPSEEK_API_KEY`, `APPLE_TEAM_ID`, `APPLE_KEY_ID`
+(`NQL8HJ633Q`), `APPLE_PRIVATE_KEY` sont en place (clés JWT distinctes par déploiement).
+Restent à définir sur les deux : `RESEND_API_KEY` + `AUTH_EMAIL_FROM` (codes de
+réinitialisation et de vérification d'email) et `ONESIGNAL_REST_API_KEY` (relances d'essai,
+`recovery.ts`).
 
 ---
 
