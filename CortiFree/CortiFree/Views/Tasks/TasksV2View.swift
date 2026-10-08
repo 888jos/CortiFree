@@ -597,8 +597,21 @@ struct TasksV2View: View {
             imageName: info.imageName,
             totalCompletions: tracking?.totalCompletions ?? 0,
             last7Days: tracking?.last7Days ?? Array(repeating: false, count: 7),
-            completedDays: tracking?.completedDays ?? []
+            completedDays: tracking?.completedDays ?? [],
+            planDays: habitPlanDays(for: item)
         )
+    }
+
+    private func habitPlanDays(for item: PlanItem) -> [HabitPlanDay] {
+        (1...PersonalPlan.length).map { number in
+            guard let scheduled = plan?.day(number)?.items.first(where: { $0.kind == .habit && $0.refID == item.refID }) else {
+                return .off
+            }
+            let done = status(scheduled, planDay: number) == .done
+            if number < todayIndex { return done ? .done : .missed }
+            if number == todayIndex { return done ? .done : .today }
+            return .upcoming
+        }
     }
 
     private func toggleDone(_ item: PlanItem) {

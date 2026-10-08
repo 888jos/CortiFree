@@ -169,11 +169,6 @@ struct HabitVariantConfig {
     static var sportVariants: [HabitVariantInfo] {
         [
             HabitVariantInfo(
-                imageName: "habit_sport_boxe",
-                title: LanguageManager.shared.localizedString(for: "habit.sport_boxing"),
-                frequency: "frequency.3x_week"
-            ),
-            HabitVariantInfo(
                 imageName: "habit_sport_corde",
                 title: LanguageManager.shared.localizedString(for: "habit.sport_jump_rope"),
                 frequency: "frequency.3x_week"

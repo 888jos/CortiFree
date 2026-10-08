@@ -3,7 +3,7 @@
 //  CortiFree
 //
 //  Created by Claude on 14/11/2025.
-//  Vue détaillée d'une tâche d'habitude avec impact sur les scores CortiFree
+//  Vue détaillée d'une tâche d'habitude : progression et validation
 //
 
 import SwiftUI
@@ -14,7 +14,6 @@ struct HabitTaskDetailView: View {
     let onSkip: () -> Void
     var isCurrentDay: Bool = true // Defaults to true for backwards compatibility
     @Environment(\.dismiss) private var dismiss
-    @State private var animateProgress: Bool = false
 
     var body: some View {
         ZStack {
@@ -75,26 +74,23 @@ struct HabitTaskDetailView: View {
                             .padding(.horizontal, 32)
                             .padding(.top, 8)
 
-                        // Progress section - width matches hexagon labels span
+                        // Plan progress: one square per plan day, one row per week
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(alignment: .top) {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(LanguageManager.shared.localizedString(for: "task.detail.progression_66_days"))
+                                    Text(LanguageManager.shared.localizedString(for: "task.detail.progression_plan"))
                                         .font(.custom("Poppins-SemiBold", size: 16))
                                         .foregroundColor(.white)
 
-                                    let occurrenceDays = getExpectedOccurrenceDays()
-
-                                    Text("\(occurrenceDays.count) \(LanguageManager.shared.localizedString(for: "task.detail.occurrences"))")
+                                    Text("\(scheduledCount) \(LanguageManager.shared.localizedString(for: "task.detail.occurrences"))")
                                         .font(.custom("Poppins-Regular", size: 11))
                                         .foregroundColor(Color(hex: "B794F6"))
                                 }
 
                                 Spacer()
 
-                                // Total completions - Top right in rectangle
                                 HStack(spacing: 4) {
-                                    Text("\(task.completedDays.count)")
+                                    Text("\(doneCount)")
                                         .font(Font.Poppins.custom(.bold, size: 14))
                                         .foregroundColor(.white)
 
@@ -110,126 +106,19 @@ struct HabitTaskDetailView: View {
                                 )
                             }
 
-                            // Grid of squares - aligned to leading
-                            let occurrenceDays = getExpectedOccurrenceDays()
-
                             LazyVGrid(
-                                columns: Array(repeating: GridItem(.fixed(12), spacing: 3), count: 12),
-                                alignment: .leading,
-                                spacing: 3
+                                columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 7),
+                                spacing: 6
                             ) {
-                                ForEach(occurrenceDays, id: \.self) { day in
-                                    RoundedRectangle(cornerRadius: 2)
+                                ForEach(Array(task.planDays.enumerated()), id: \.offset) { _, day in
+                                    RoundedRectangle(cornerRadius: 4)
                                         .fill(squareColor(for: day))
-                                        .frame(width: 12, height: 12)
+                                        .aspectRatio(1, contentMode: .fit)
                                 }
                             }
                         }
-                        .frame(width: 240) // Width from heart icon to end of Sérénité
+                        .frame(width: 240)
                         .padding(.horizontal, 24)
-
-                        // Impact section title - centered
-                        VStack(spacing: 4) {
-                            Text(LanguageManager.shared.localizedString(for: "task.detail.habit_improves"))
-                                .font(.custom("Poppins-SemiBold", size: 16))
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 8)
-
-                        // Radar chart for 6 CortiFree domains (reduced x0.75)
-                        ZStack {
-                            // Background hexagon grid
-                            HexagonRadarGrid()
-                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                .frame(width: 178, height: 178)
-
-                            // Filled hexagon based on impact
-                            HexagonRadarFill(progress: getImpactProgress())
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            Color(hex: "B794F6").opacity(0.7),
-                                            Color(hex: "B794F6").opacity(0.4)
-                                        ],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                )
-                                .frame(width: 178, height: 178)
-
-                            // Stroke around the filled hexagon - positioned outside
-                            HexagonRadarFill(progress: getImpactProgress())
-                                .stroke(
-                                    Color(hex: "B794F6").opacity(0.5),
-                                    style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
-                                )
-                                .frame(width: 178, height: 178)
-
-                            // Labels at hexagon vertices (adjusted for x0.75 reduction)
-                            ZStack {
-                                // Global - Top
-                                HStack(spacing: 4) {
-                                    Image(systemName: "star.fill")
-                                        .font(.system(size: 11))
-                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.global"))
-                                        .font(.custom("Poppins-SemiBold", size: 11))
-                                }
-                                .foregroundColor(.white)
-                                .offset(x: 0, y: -107)
-
-                                // Sérénité - Top right
-                                HStack(spacing: 4) {
-                                    Image(systemName: "leaf.fill")
-                                        .font(.system(size: 11))
-                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.serenity"))
-                                        .font(.custom("Poppins-SemiBold", size: 11))
-                                }
-                                .foregroundColor(.white)
-                                .offset(x: 95, y: -52)
-
-                                // Sommeil - Bottom right
-                                HStack(spacing: 4) {
-                                    Image(systemName: "moon.fill")
-                                        .font(.system(size: 11))
-                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.sleep"))
-                                        .font(.custom("Poppins-SemiBold", size: 11))
-                                }
-                                .foregroundColor(.white)
-                                .offset(x: 95, y: 52)
-
-                                // Énergie - Bottom
-                                HStack(spacing: 4) {
-                                    Image(systemName: "bolt.fill")
-                                        .font(.system(size: 11))
-                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.energy"))
-                                        .font(.custom("Poppins-SemiBold", size: 11))
-                                }
-                                .foregroundColor(.white)
-                                .offset(x: 0, y: 107)
-
-                                // Focus - Bottom left
-                                HStack(spacing: 4) {
-                                    Image(systemName: "target")
-                                        .font(.system(size: 11))
-                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.focus"))
-                                        .font(.custom("Poppins-SemiBold", size: 11))
-                                }
-                                .foregroundColor(.white)
-                                .offset(x: -95, y: 52)
-
-                                // Glow - Top left
-                                HStack(spacing: 4) {
-                                    Image(systemName: "sparkles")
-                                        .font(.system(size: 11))
-                                    Text(LanguageManager.shared.localizedString(for: "task.detail.domain.glow"))
-                                        .font(.custom("Poppins-SemiBold", size: 11))
-                                }
-                                .foregroundColor(.white)
-                                .offset(x: -95, y: -52)
-                            }
-                        }
-                        .padding(.vertical, 32)
 
                         // Bottom spacing for buttons
                         Spacer(minLength: 120)
@@ -295,146 +184,18 @@ struct HabitTaskDetailView: View {
             }
         }
         .navigationBarHidden(true)
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                withAnimation(.easeOut(duration: 0.6)) {
-                    animateProgress = true
-                }
-            }
-        }
     }
 
-    // Helper function to calculate expected occurrence days based on frequency
-    private func getExpectedOccurrenceDays() -> [Int] {
-        var days: [Int] = []
-        let habitId = getHabitId(for: task.imageName)
+    private var scheduledCount: Int { task.planDays.filter { $0 != .off }.count }
+    private var doneCount: Int { task.planDays.filter { $0 == .done }.count }
 
-        for day in 1...66 {
-            let week = WeeklyHabitProgression.currentWeek(for: day)
-            let dayOfWeek = (day - 1) % 7 // 0 = Monday, 6 = Sunday
-
-            // Get frequency for this week from progression
-            let progression = getProgressionForHabit(habitId, week: week)
-
-            // Check if habit should be done this day
-            if shouldShowTask(dayOfWeek: dayOfWeek, frequencyPerWeek: progression) {
-                days.append(day)
-            }
+    private func squareColor(for day: HabitPlanDay) -> Color {
+        switch day {
+        case .done: return Color(hex: "B794F6")
+        case .today: return Color(hex: "B794F6").opacity(0.5)
+        case .missed, .upcoming: return Color.white.opacity(0.2)
+        case .off: return Color.white.opacity(0.05)
         }
-        return days
-    }
-
-    // Helper to get progression for a specific habit and week
-    private func getProgressionForHabit(_ habitId: String, week: Int) -> Int {
-        switch habitId {
-        case "sleep":
-            return WeeklyHabitProgression.sleepProgression(week: week).frequencyPerWeek
-        case "water":
-            return WeeklyHabitProgression.waterProgression(week: week).frequencyPerWeek
-        case "journal":
-            return WeeklyHabitProgression.journalProgression(week: week).frequencyPerWeek
-        case "breathing":
-            return WeeklyHabitProgression.breathingProgression(week: week).frequencyPerWeek
-        case "meditation":
-            return WeeklyHabitProgression.meditationProgression(week: week).frequencyPerWeek
-        case "sport":
-            return WeeklyHabitProgression.sportProgression(week: week).frequencyPerWeek
-        case "nature":
-            return WeeklyHabitProgression.natureProgression(week: week).frequencyPerWeek
-        case "social":
-            return WeeklyHabitProgression.socialProgression(week: week).frequencyPerWeek
-        default:
-            return 7
-        }
-    }
-
-    // Helper to check if task should show on a specific day based on frequency
-    private func shouldShowTask(dayOfWeek: Int, frequencyPerWeek: Int) -> Bool {
-        switch frequencyPerWeek {
-        case 7: return true // Every day
-        case 6: return dayOfWeek != 0 // All except Monday
-        case 5: return ![6, 3].contains(dayOfWeek) // All except Sunday and Thursday
-        case 4: return ![2, 5].contains(dayOfWeek) // All except Wednesday and Saturday
-        case 3: return [0, 2, 5].contains(dayOfWeek) // Monday, Wednesday, Saturday
-        case 2: return [1, 4].contains(dayOfWeek) // Tuesday, Friday
-        case 1: return dayOfWeek == 2 // Wednesday only
-        default: return false
-        }
-    }
-
-    // Helper to determine grid columns based on number of squares
-    private func getGridColumns(for count: Int) -> Int {
-        if count <= 40 {
-            return 8 // Like AvatarProgressCard
-        } else if count <= 80 {
-            return 10
-        } else {
-            return 12 // For habits like Sleep with 66 squares
-        }
-    }
-
-    // Helper to get square color based on completion status
-    private func squareColor(for day: Int) -> Color {
-        let currentDay = UserDefaults.standard.integer(forKey: "currentDay")
-
-        // Get the occurrence days for this habit to verify day is valid
-        let occurrenceDays = getExpectedOccurrenceDays()
-        guard occurrenceDays.contains(day) else {
-            return Color.white.opacity(0.2)
-        }
-
-        // Check if this program day has been completed
-        if task.completedDays.contains(day) {
-            return Color(hex: "B794F6") // Validated - violet 100%
-        } else if day == currentDay {
-            return Color(hex: "B794F6").opacity(0.5) // Current day not validated - violet 50%
-        } else {
-            return Color.white.opacity(0.2) // Not validated or future day - white 20%
-        }
-    }
-
-    // Relative emphasis of each habit on the radar chart.
-    // Order: [Global, Sérénité, Sommeil, Énergie, Focus, Glow]
-    private func getImpactProgress() -> [Double] {
-        let habitId = getHabitId(for: task.imageName)
-
-        // [Sérénité, Sommeil, Énergie, Focus, Glow], normalized to the strongest area
-        let domains: [Double]
-        switch habitId {
-        case "meditation", "breathing", "social": domains = [1, 0, 0, 0, 0]
-        case "nature": domains = [1, 0, 0, 0, 0.1]
-        case "journal": domains = [0, 0, 0, 1, 0]
-        case "sport": domains = [0, 0, 1, 0, 0.35]
-        case "water": domains = [0, 0, 1, 0, 0.25]
-        case "sleep": domains = [0, 1, 0, 0, 0.2]
-        default: domains = [0, 0, 0, 0, 0]
-        }
-
-        // Global is the average of all areas
-        let global = domains.reduce(0, +) / Double(domains.count)
-        return [global] + domains
-    }
-
-    // Helper to map image name to habit ID
-    private func getHabitId(for imageName: String) -> String {
-        if imageName.contains("sleep") || imageName.contains("sommeil") {
-            return "sleep"
-        } else if imageName.contains("breathe") || imageName.contains("respir") {
-            return "breathing"
-        } else if imageName.contains("meditate") || imageName.contains("médita") {
-            return "meditation"
-        } else if imageName.contains("water") || imageName.contains("eau") {
-            return "water"
-        } else if imageName.contains("sport") || imageName.contains("exercice") {
-            return "sport"
-        } else if imageName.contains("nature") {
-            return "nature"
-        } else if imageName.contains("social") || imageName.contains("ami") {
-            return "social"
-        } else if imageName.contains("journal") {
-            return "journal"
-        }
-        return "unknown"
     }
 }
 
@@ -452,6 +213,16 @@ struct HabitTask: Identifiable {
     let totalCompletions: Int
     let last7Days: [Bool] // true if completed that day
     let completedDays: [Int] // Program days completed (1-66+)
+    /// One entry per plan day (1...28) for the progress grid.
+    var planDays: [HabitPlanDay] = []
+}
+
+enum HabitPlanDay: Equatable {
+    case off       // habit not scheduled that day
+    case done
+    case today     // scheduled today, not done yet
+    case missed
+    case upcoming
 }
 
 // MARK: - Preview
@@ -467,7 +238,8 @@ struct HabitTask: Identifiable {
         imageName: "habit_water",
         totalCompletions: 24,
         last7Days: [true, true, false, true, true, true, true],
-        completedDays: [1, 2, 4, 5, 6, 7]
+        completedDays: [1, 2, 4, 5, 6, 7],
+        planDays: (1...28).map { $0 % 3 == 0 ? .off : ($0 < 10 ? .done : ($0 == 10 ? .today : .upcoming)) }
     )
 
     HabitTaskDetailView(

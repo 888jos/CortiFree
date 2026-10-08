@@ -2926,7 +2926,7 @@
 
 // MARK: - Task Detail View
 "task.detail.days" = "일";
-"task.detail.progression_66_days" = "66일 진행 상황";
+"task.detail.progression_plan" = "28일 진행 상황";
 "task.detail.occurrences" = "회";
 "task.detail.this_month" = "이번 달";
 "task.detail.habit_improves" = "이 습관이 향상시키는 것";

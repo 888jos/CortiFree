@@ -2926,7 +2926,7 @@
 
 // MARK: - Task Detail View
 "task.detail.days" = "days";
-"task.detail.progression_66_days" = "66-day progression";
+"task.detail.progression_plan" = "28-day progression";
 "task.detail.occurrences" = "occurrences";
 "task.detail.this_month" = "this month";
 "task.detail.habit_improves" = "This habit improves";

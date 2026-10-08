@@ -26,7 +26,6 @@ struct HabitVariant {
                 "habit_nature_velo"
             ],
             "habit_sport": [
-                "habit_sport_boxe",
                 "habit_sport_corde",
                 "habit_sport_dance",
                 "habit_sport_etirements",
@@ -65,7 +64,6 @@ struct HabitVariant {
                 "habit_nature_velo"
             ],
             "habit_sport": [
-                "habit_sport_boxe",
                 "habit_sport_corde",
                 "habit_sport_dance",
                 "habit_sport_etirements",

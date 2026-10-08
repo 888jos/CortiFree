@@ -510,7 +510,7 @@ enum PersonalPlanGenerator {
             switch id {
             case "sport":
                 // Gentle plans favour soft activities: dance, stretching, swimming.
-                let allowed = analysis.gentle || analysis.palpitations || analysis.senior ? [3, 2, 4] : [3, 6, 2, 5, 4, 1, 0]
+                let allowed = analysis.gentle || analysis.palpitations || analysis.senior ? [2, 1, 3] : [2, 5, 1, 4, 3, 0]
                 variant = allowed[uses % allowed.count]
             case "nature": variant = uses % 3
             case "social": variant = uses % 6

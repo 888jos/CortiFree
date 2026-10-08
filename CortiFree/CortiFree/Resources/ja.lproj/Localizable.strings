@@ -2926,7 +2926,7 @@
 
 // MARK: - Task Detail View
 "task.detail.days" = "日";
-"task.detail.progression_66_days" = "66日間の進捗";
+"task.detail.progression_plan" = "28日間の進捗";
 "task.detail.occurrences" = "回";
 "task.detail.this_month" = "今月";
 "task.detail.habit_improves" = "この習慣が高めるもの";
