@@ -10,6 +10,7 @@ import SwiftUI
 
 struct FirstLaunchWelcomeView: View {
     let onContinue: () -> Void
+    var onSignIn: (() -> Void)? = nil
 
     @State private var screenViewTime: Date?
 
@@ -75,8 +76,22 @@ struct FirstLaunchWelcomeView: View {
                     Text("first_launch.cta_sub".localized)
                         .font(.custom("Poppins-Regular", size: 12))
                         .foregroundColor(.white.opacity(0.35))
+
+                    if let onSignIn {
+                        Button {
+                            HapticManager.light()
+                            onSignIn()
+                        } label: {
+                            Text("first_launch.have_account".localized)
+                                .font(.custom("Poppins-Medium", size: 14))
+                                .foregroundColor(.white.opacity(0.8))
+                                .underline()
+                                .frame(minHeight: 44)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .padding(.bottom, 52)
+                .padding(.bottom, 32)
             }
         }
         .onAppear {

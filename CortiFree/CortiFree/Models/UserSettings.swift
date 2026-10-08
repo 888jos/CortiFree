@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 struct UserSettings: Codable {
     // MARK: - Program Settings
@@ -31,8 +30,11 @@ struct UserSettings: Codable {
 
     /// Calcule le jour actuel du programme (1-66+)
     var currentProgramDay: Int {
+        // Calendar days between local midnights, like PersonalPlan.dayIndex, so the program day and
+        // the plan day always switch together (also for start dates that aren't at midnight).
         let calendar = Calendar.current
-        let days = calendar.dateComponents([.day], from: programStartDate, to: Date()).day ?? 0
+        let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: programStartDate),
+                                           to: calendar.startOfDay(for: Date())).day ?? 0
         return max(1, days + 1) // Jour 1 = jour de début
     }
 
@@ -100,7 +102,7 @@ struct UserSettings: Codable {
     }
 
     static func from(document: DocumentSnapshot) -> UserSettings? {
-        guard let data = document.data() else { return nil }
+        let data = document.data()
 
         let programStartDate = (data["programStartDate"] as? Timestamp)?.dateValue() ?? Date()
         let wakeUpTime = data["wakeUpTime"] as? String ?? "07:00"
@@ -194,7 +196,7 @@ struct HabitTracking: Codable {
     }
 
     static func from(document: DocumentSnapshot) -> HabitTracking? {
-        guard let data = document.data() else { return nil }
+        let data = document.data()
 
         guard let habitId = data["habitId"] as? String,
               let habitTitle = data["habitTitle"] as? String else { return nil }

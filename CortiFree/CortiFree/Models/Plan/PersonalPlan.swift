@@ -136,6 +136,39 @@ struct PlanProfile: Codable, Equatable {
     var isEmpty: Bool { reasonCodes.isEmpty && quizAnswers == nil && symptomIDs.isEmpty && durationCode == nil && improvementGoal == nil }
 }
 
+// MARK: - Edits
+
+/// Who changed the plan after it was generated.
+enum PlanEditSource: String, Codable {
+    case user        // edited in the Plan tab
+    case assistant   // proposed by Milo and accepted by the user
+    case adaptation  // automatic adjustment (feedback, anxiety check)
+}
+
+enum PlanEditKind: String, Codable {
+    case swap, remove, add, goalChange, regenerate
+}
+
+/// One change applied to the plan, kept so the plan's history stays explainable
+/// ("Milo replaced X by Y on day 4 because…").
+struct PlanEdit: Codable, Identifiable, Hashable {
+    var id = UUID()
+    let date: Date
+    let source: PlanEditSource
+    let kind: PlanEditKind
+    let dayNumber: Int
+    let itemID: String?
+    let fromRefID: String?
+    let toRefID: String?
+    let reason: String?
+}
+
+/// Choices that survive regeneration (goal change, new cycle).
+struct PlanPreferences: Codable, Equatable {
+    /// Content ids (breathing keys, session ids, habit ids) the user doesn't want proposed again.
+    var excludedRefIDs: Set<String> = []
+}
+
 // MARK: - Plan
 
 struct PersonalPlan: Codable, Equatable {
@@ -152,17 +185,25 @@ struct PersonalPlan: Codable, Equatable {
     let startDate: Date
     /// 1 for the first plan, +1 for each follow-up cycle.
     let cycle: Int
-    let days: [PlanDay]
+    var days: [PlanDay]
     let profile: PlanProfile
     /// Plain-language explanation codes (see PlanInsight).
     let insights: [String]
     let generatedAt: Date
     /// True when the user picked the goal manually.
     let goalChosenByUser: Bool
+    /// Changes applied after generation (optional: older stored plans have none).
+    var edits: [PlanEdit]?
+    var preferences: PlanPreferences?
+    /// Last edit date (nil = never edited).
+    var updatedAt: Date?
 
     static func == (lhs: PersonalPlan, rhs: PersonalPlan) -> Bool {
-        lhs.startDate == rhs.startDate && lhs.goal == rhs.goal && lhs.cycle == rhs.cycle && lhs.generatedAt == rhs.generatedAt
+        lhs.startDate == rhs.startDate && lhs.goal == rhs.goal && lhs.cycle == rhs.cycle
+            && lhs.generatedAt == rhs.generatedAt && lhs.updatedAt == rhs.updatedAt
     }
+
+    var excludedRefIDs: Set<String> { preferences?.excludedRefIDs ?? [] }
 
     /// Day index (1-based, not clamped) for a given date.
     func dayIndex(on date: Date = Date()) -> Int {

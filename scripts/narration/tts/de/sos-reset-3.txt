@@ -1,0 +1,64 @@
+# sos-reset-3 · Schneller Reset (DE)
+[pause 1.5s]
+[warm, calm, gentle] Gut, dass du auf Pause gedrückt hast. Die nächsten drei Minuten gehören nur dir.
+[pause 2s]
+[soft, unhurried] Fangen wir bei deinen Füßen an. Stell sie flach auf den Boden... Spürst du deine Fersen?
+[pause 2s]
+Gut. Lass jetzt deinen Rücken ein wenig länger werden, als würde ein Faden deinen Scheitel sanft nach oben ziehen.
+[pause 2s]
+
+[warm] Ich zeige dir etwas ganz Einfaches. Es heißt der doppelte Seufzer.
+Dein Körper kennt ihn schon. Er macht ihn ganz von allein, nach einem heftigen Weinen oder kurz vor dem Einschlafen.
+[pause 1.5s]
+[calm, clear] Du atmest zweimal durch die Nase ein. Ein großer Atemzug... und oben drauf noch ein kleiner.
+Dann atmest du durch den Mund aus, langsam, bis ganz zum Ende. Genau dieses lange Ausatmen hilft deinem Körper, loszulassen.
+[pause 1s]
+[gentle] Wenn dir irgendwann schwindelig wird, kehr einfach zu deinem gewohnten Atem zurück.
+[pause 2s]
+
+[soft] Machen wir es zusammen. Atme durch die Nase ein...
+[pause 2s]
+und noch ein bisschen mehr, ganz oben.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Jetzt atme durch den Mund aus... langsam... bis ganz zum Ende.
+[pause 6s]
+[soft, warm] Genau so. Achte auf deine Schultern. Vielleicht haben sie schon angefangen zu sinken.
+[pause 2s]
+
+[soft] Noch einmal. Ein großer Atemzug ein...
+[pause 2s]
+und noch ein bisschen mehr.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Und lass alles los. Deine Schultern gleiten nach unten, weg von den Ohren...
+[pause 6s]
+[gentle, reassuring] Vielleicht spürst du eine leichte Wärme oder ein Kribbeln in den Händen. Das ist oft ein Zeichen, dass dein Körper sich entspannt.
+[pause 2s]
+
+[soft] Ein letztes Mal. Atme ein...
+[pause 2s]
+und noch ein bisschen mehr.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Und lass es hinaus, lang und langsam. Nimm dir alle Zeit, die du brauchst.
+[pause 6s]
+[soft] Gut.
+[pause 2s]
+
+[calm, intimate] Jetzt dein Kiefer. Ist er gerade angespannt?
+[pause 2s]
+Dort versteckt sich der Stress oft. Lass deine Zähne ein wenig auseinandergehen. Deine Zunge ruht, ganz weich.
+[pause 2s]
+Und der Raum zwischen deinen Augenbrauen... lass ihn weiter werden.
+[pause 2s]
+[softer, slower] Lass den Atem jetzt machen, was er will. Du lenkst ihn nicht mehr.
+[pause 2s]
+Spür einfach, was dich trägt. Deine Füße auf dem Boden. Der Sitz unter dir. Du musst nicht alles allein tragen. Lass den Boden einen Teil davon übernehmen.
+[pause 6s]
+
+[warm, gentle] Vielleicht hat sich etwas verändert. Ein bisschen mehr Raum in der Brust. Oder vielleicht auch nicht, und das ist auch in Ordnung. Du hast dir drei Minuten genommen, und das zählt.
+[pause 2s]
+[warm, calm] Nimm diesen doppelten Seufzer mit. Du kannst ihn überall machen, in einer Besprechung, auf der Straße. Niemand muss es merken.
+[pause 2s]
+[calm, grounded] Komm jetzt zurück in deinen Tag. Nicht zu allem, was noch zu tun ist. Nur zum nächsten Schritt.
+[pause 1.5s]
+[soft, warm, slowing down] Dann zum übernächsten. Ein Schritt nach dem anderen.
+[pause 4s]

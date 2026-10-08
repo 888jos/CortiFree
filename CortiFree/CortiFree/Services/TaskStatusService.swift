@@ -1,207 +1,59 @@
-//
-//  TaskStatusService.swift
-//  CortiFree
-//
-//  Service pour sauvegarder et charger les statuts des tâches
-//
-
 import Foundation
-import FirebaseAuth
-import FirebaseFirestore
 
-class TaskStatusService {
+@MainActor
+final class TaskStatusService {
     static let shared = TaskStatusService()
-    static let habitTotals: [String: Int] = [
-        "meditation": 47,
-        "breathing": 47,
-        "journal": 66,
-        "sport": 28,
-        "water": 66,
-        "nature": 28,
-        "social": 28,
-        "sleep": 132
-    ]
-    private let db = Firestore.firestore()
-
+    static let habitTotals = ["meditation": 47, "breathing": 47, "journal": 66, "sport": 28,
+                              "water": 66, "nature": 28, "social": 28, "sleep": 132]
     private init() {}
 
-    // MARK: - Save Task Status
-
-    /// Sauvegarde le statut d'une tâche pour un jour donné
     func saveTaskStatus(day: Int, taskTitle: String, status: String) async throws {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "TaskStatusService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
-
-        let dayKey = "day_\(day)"
-
-        try await db.collection("users").document(userId)
-            .collection("task_statuses").document(dayKey)
-            .setData([
-                taskTitle: status,
-                "lastUpdated": Timestamp()
-            ], merge: true)
+        let _: JSONValue = try await ConvexBackend.shared.call(.mutation, path: "tasks:setStatus", args: [
+            "programDay": day, "key": taskTitle, "status": status,
+        ])
     }
 
-    // MARK: - Load Task Statuses
-
-    /// Charge tous les statuts de tâches pour tous les jours
     func loadAllTaskStatuses() async throws -> [String: [String: String]] {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "TaskStatusService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
-
-        let snapshot = try await db.collection("users").document(userId)
-            .collection("task_statuses")
-            .getDocuments()
-
-        var statuses: [String: [String: String]] = [:]
-
-        for document in snapshot.documents {
-            let dayKey = document.documentID
-            var dayStatuses: [String: String] = [:]
-
-            for (key, value) in document.data() {
-                if key != "lastUpdated", let statusString = value as? String {
-                    dayStatuses[key] = statusString
-                }
-            }
-
-            statuses[dayKey] = dayStatuses
-        }
-
-        return statuses
+        let rows: [StatusRow] = try await ConvexBackend.shared.call(.query, path: "tasks:listStatuses")
+        return Dictionary(uniqueKeysWithValues: rows.map { ("day_\($0.programDay)", $0.statuses) })
     }
 
-    // MARK: - Delete Task Status
-
-    /// Supprime le statut d'une tâche (quand on passe de done à todo par exemple)
     func deleteTaskStatus(day: Int, taskTitle: String) async throws {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "TaskStatusService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
-
-        let dayKey = "day_\(day)"
-
-        try await db.collection("users").document(userId)
-            .collection("task_statuses").document(dayKey)
-            .updateData([
-                taskTitle: FieldValue.delete()
-            ])
+        let _: JSONValue = try await ConvexBackend.shared.call(.mutation, path: "tasks:clearStatus", args: [
+            "programDay": day, "key": taskTitle,
+        ])
     }
 
-    // MARK: - Habit Progress Statistics
-
-    /// Calcule les statistiques de progression par habitude
     func calculateHabitProgress() async throws -> [String: (completed: Int, total: Int)] {
-        // Keep Profile and Achievements useful while offline or before Firebase sync completes.
         let statuses = (try? await loadAllTaskStatuses()) ?? [:]
-
-        print("📊 TaskStatusService: Loaded \(statuses.count) days with task statuses")
-
-        // Dictionnaire pour compter les tâches par habitude
-        var habitStats = Dictionary(uniqueKeysWithValues: Self.habitTotals.map { habitId, total in
-            (habitId, (completed: 0, total: total))
-        })
-
-        // Parcourir tous les statuts et compter les tâches complétées
-        var totalTasksDone = 0
-        for (_, dayTasks) in statuses {
-            for (taskTitle, status) in dayTasks {
-                guard status == "done" else { continue }
-                totalTasksDone += 1
-
-                // Déterminer l'habitude à partir du titre de la tâche
-                let habitId = getHabitIdFromTaskTitle(taskTitle)
-
-                if var stats = habitStats[habitId] {
-                    stats.completed += 1
-                    habitStats[habitId] = stats
-                    print("📊 Task '\(taskTitle)' → \(habitId) (total: \(stats.completed))")
-                } else {
-                    print("⚠️ Unknown habit for task '\(taskTitle)' → \(habitId)")
-                }
+        var result = Dictionary(uniqueKeysWithValues: Self.habitTotals.map { ($0.key, (completed: 0, total: $0.value)) })
+        for tasks in statuses.values {
+            for (title, status) in tasks where status == "done" {
+                let habit = habitId(from: title)
+                if var value = result[habit] { value.completed += 1; result[habit] = value }
             }
         }
-
-        let userId = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
-        var localCounts: [String: Int] = [:]
-        for completion in LocalProgressStore.load(for: userId) {
-            localCounts[completion.habitID, default: 0] += 1
+        let userId = UnifiedFirebaseService.shared.auth.currentUser?.uid ?? UserPersistence.localUserID
+        var local: [String: Int] = [:]
+        LocalProgressStore.load(for: userId).forEach { local[$0.habitID, default: 0] += 1 }
+        for (habit, count) in local where result[habit] != nil {
+            result[habit]!.completed = max(result[habit]!.completed, count)
         }
-
-        for (habitId, localCount) in localCounts {
-            guard var stats = habitStats[habitId] else { continue }
-            stats.completed = max(stats.completed, localCount)
-            habitStats[habitId] = stats
-        }
-
-        print("📊 Total tasks done: \(totalTasksDone)")
-        for (habitId, stats) in habitStats {
-            if stats.completed > 0 {
-                print("📊 \(habitId): \(stats.completed)/\(stats.total)")
-            }
-        }
-
-        return habitStats
+        return result
     }
 
-    /// Map task title to habit ID
-    private func getHabitIdFromTaskTitle(_ taskTitle: String) -> String {
-        let lowercased = taskTitle.lowercased()
-
-        // Sleep: lever, coucher, sommeil, routine
-        if lowercased.contains("lever") || lowercased.contains("coucher") ||
-           lowercased.contains("sommeil") || lowercased.contains("sleep") ||
-           lowercased.contains("routine") {
-            return "sleep"
-        }
-
-        // Breathing: respirer, respiration, breath
-        else if lowercased.contains("respir") || lowercased.contains("breath") {
-            return "breathing"
-        }
-
-        // Meditation: méditer, méditation, meditation
-        else if lowercased.contains("médit") || lowercased.contains("medit") {
-            return "meditation"
-        }
-
-        // Water: eau, water, boire, hydrat
-        else if lowercased.contains("eau") || lowercased.contains("water") ||
-                lowercased.contains("boire") || lowercased.contains("hydrat") {
-            return "water"
-        }
-
-        // Sport: sport, exercice, nager, conquérir, défier, sauter, course, vélo
-        else if lowercased.contains("sport") || lowercased.contains("exercice") ||
-                lowercased.contains("nager") || lowercased.contains("conquérir") ||
-                lowercased.contains("défier") || lowercased.contains("défis") ||
-                lowercased.contains("sauter") || lowercased.contains("course") ||
-                lowercased.contains("vélo") || lowercased.contains("sommet") {
-            return "sport"
-        }
-
-        // Nature: nature, marche, balade, plein air
-        else if lowercased.contains("nature") || lowercased.contains("marche") ||
-                lowercased.contains("balade") || lowercased.contains("plein air") {
-            return "nature"
-        }
-
-        // Social: social, ami, renouer, liens, appel, rencontre, moment, convivial
-        else if lowercased.contains("social") || lowercased.contains("ami") ||
-                lowercased.contains("renouer") || lowercased.contains("lien") ||
-                lowercased.contains("appel") || lowercased.contains("rencontre") ||
-                lowercased.contains("moment") || lowercased.contains("convivial") {
-            return "social"
-        }
-
-        // Journal: journal, écrire, pensées, noter
-        else if lowercased.contains("journal") || lowercased.contains("écrire") ||
-                lowercased.contains("pensée") || lowercased.contains("noter") {
-            return "journal"
-        }
-
+    private func habitId(from title: String) -> String {
+        let value = title.lowercased()
+        if ["lever", "coucher", "sommeil", "sleep", "routine"].contains(where: value.contains) { return "sleep" }
+        if ["respir", "breath"].contains(where: value.contains) { return "breathing" }
+        if ["médit", "medit"].contains(where: value.contains) { return "meditation" }
+        if ["eau", "water", "boire", "hydrat"].contains(where: value.contains) { return "water" }
+        if ["sport", "exercice", "nager", "course", "vélo", "sommet", "sauter"].contains(where: value.contains) { return "sport" }
+        if ["nature", "marche", "balade", "plein air"].contains(where: value.contains) { return "nature" }
+        if ["social", "ami", "lien", "appel", "rencontre", "convivial"].contains(where: value.contains) { return "social" }
+        if ["journal", "écrire", "pensée", "noter"].contains(where: value.contains) { return "journal" }
         return "unknown"
     }
 }
+
+private struct StatusRow: Decodable { let programDay: Int; let statuses: [String: String] }

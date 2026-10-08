@@ -1,0 +1,64 @@
+# sos-reset-3 · Reset express (FR)
+[pause 1.5s]
+[warm, calm, gentle] Tu as bien fait d'appuyer sur pause. Les trois prochaines minutes sont juste pour toi.
+[pause 2s]
+[soft, unhurried] On commence par tes pieds. Pose-les bien à plat sur le sol... Tu sens tes talons ?
+[pause 2s]
+Bien. Maintenant, laisse ton dos s'allonger un peu, comme si un fil soulevait doucement le sommet de ta tête.
+[pause 2s]
+
+[warm] Je vais te montrer quelque chose de très simple. Ça s'appelle le double soupir.
+Ton corps le connaît déjà. Il le fait tout seul, après un gros chagrin, ou juste avant de s'endormir.
+[pause 1.5s]
+[calm, clear] Tu inspires deux fois par le nez. Une grande inspiration... puis une petite, par-dessus.
+Ensuite, tu souffles par la bouche, lentement, jusqu'au bout. C'est cette longue expiration qui aide ton corps à relâcher.
+[pause 1s]
+[gentle] Si la tête te tourne à un moment, reviens simplement à ta respiration normale.
+[pause 2s]
+
+[soft] On le fait ensemble. Inspire par le nez...
+[pause 2s]
+et encore un peu, tout en haut.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Maintenant, souffle par la bouche... lentement... jusqu'au bout.
+[pause 6s]
+[soft, warm] Voilà. Remarque tes épaules. Elles ont peut-être déjà commencé à descendre.
+[pause 2s]
+
+[soft] Encore une fois. Une grande inspiration...
+[pause 2s]
+et encore un peu.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Et laisse tout partir. Tes épaules glissent vers le bas, loin de tes oreilles...
+[pause 6s]
+[gentle, reassuring] Tu sens peut-être une légère chaleur, ou un picotement dans les mains. C'est souvent le signe que ton corps se détend.
+[pause 2s]
+
+[soft] Le dernier. Inspire...
+[pause 2s]
+et encore un peu.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Et relâche, longuement, lentement. Prends tout le temps qu'il te faut.
+[pause 6s]
+[soft] Bien.
+[pause 2s]
+
+[calm, intimate] Maintenant, ta mâchoire. Est-ce qu'elle est serrée, là, tout de suite ?
+[pause 2s]
+C'est souvent là que le stress se cache. Laisse tes dents se séparer, juste un peu. Ta langue au repos, toute molle.
+[pause 2s]
+Et l'espace entre tes sourcils... laisse-le s'élargir.
+[pause 2s]
+[softer, slower] Maintenant, laisse ton souffle faire ce qu'il veut. Tu ne le diriges plus.
+[pause 2s]
+Sens simplement ce qui te porte. Tes pieds sur le sol. Le siège sous toi. Tu n'as pas à tout porter. Laisse le sol en prendre une partie.
+[pause 6s]
+
+[warm, gentle] Peut-être que quelque chose a bougé. Un peu plus de place dans la poitrine. Ou peut-être pas, et c'est très bien aussi. Tu as pris trois minutes pour toi, et ça compte.
+[pause 2s]
+[warm, calm] Garde ce double soupir avec toi. Tu peux le faire n'importe où, en réunion, dans la rue. Personne n'a besoin de le remarquer.
+[pause 2s]
+[calm, grounded] Maintenant, reviens à ta journée. Pas à tout ce qu'il reste à faire. Juste au prochain pas.
+[pause 1.5s]
+[soft, warm, slowing down] Puis au suivant. Un pas après l'autre.
+[pause 4s]

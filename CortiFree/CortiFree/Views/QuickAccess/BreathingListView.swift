@@ -178,14 +178,9 @@ struct BreathingCatalogCard: View {
                 onOpen()
             } label: {
                 HStack(spacing: 14) {
-                    Image(systemName: pattern.symbol)
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(pattern.accentColor)
+                    LibraryImage(name: PlanArtwork.breathingImage(pattern.category))
                         .frame(width: 48, height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 15, style: .continuous)
-                                .fill(pattern.accentColor.opacity(0.16))
-                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(pattern.localizedTitle)

@@ -77,8 +77,7 @@ final class BreathingAmbiencePlayer {
     func start(_ ambience: AudioAmbience?, volume: Double) {
         stop(fade: false)
         guard let url = ambience?.url, let player = try? AVAudioPlayer(contentsOf: url) else { return }
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
-        try? AVAudioSession.sharedInstance().setActive(true)
+        AudioFocus.acquire(.breathingAmbience) // mixes with the user's music
         player.numberOfLoops = -1
         player.volume = 0
         player.play()
@@ -98,9 +97,13 @@ final class BreathingAmbiencePlayer {
         self.player = nil
         if fade {
             player.setVolume(0, fadeDuration: 1.5)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { player.stop() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in
+                player.stop()
+                if self?.player == nil { AudioFocus.release(.breathingAmbience) }
+            }
         } else {
             player.stop()
+            AudioFocus.release(.breathingAmbience)
         }
     }
 }

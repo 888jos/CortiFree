@@ -1,0 +1,154 @@
+# sleep-countdown-10 · Compte à rebours vers le sommeil (FR)
+[pause 1.5s]
+[soft, calm, unhurried] Ce soir, on va compter. Pas des moutons. Des souffles.
+De cinquante jusqu'à un, en descendant, un nombre à chaque expiration.
+C'est une tâche toute simple, presque ennuyeuse. Et c'est exactement ce qu'il faut à un esprit qui a encore envie de travailler.
+On lui donne un petit travail. Assez pour l'occuper. Pas assez pour le réveiller.
+Un peu comme on donne un hochet à un enfant qui ne veut pas encore dormir. Il le tient, il le regarde, et sans s'en rendre compte, ses yeux commencent à se fermer.
+[pause 2s]
+
+[soft] Avant de commencer, installe-toi pour la nuit.
+Allonge-toi dans la position où tu t'endors d'habitude. Remonte la couette jusqu'où tu l'aimes. Trouve le creux de l'oreiller, celui qui connaît déjà la forme de ta tête.
+Laisse tes bras se poser là où ils sont bien. Si quelque chose te gêne, un pli du drap, une mèche de cheveux, une jambe un peu tordue, prends un moment pour l'arranger maintenant.
+Ensuite, tu n'auras plus besoin de bouger. Le lit va s'occuper du reste.
+[pause 4s]
+
+[gentle, reassuring] Il y a une règle, une seule. Si tu perds le fil, ce n'est pas grave du tout.
+Si tu ne sais plus si tu en étais à trente-deux ou à vingt-huit, choisis le nombre que tu veux et repars de là.
+Si ton souffle ne tombe pas pile avec ma voix, ça ne compte pas non plus. Ton souffle a raison. Suis-le, et laisse ma voix suivre derrière, comme un bruit doux en fond.
+Et si tu t'endors avant la fin, c'est parfait. Peu de gens arrivent tout en bas.
+Ce n'est pas un concours. Personne ne vérifie. Il n'y a pas de bonne façon de compter, seulement la tienne.
+[pause 2s]
+
+[soft, slow] Pour commencer, trois respirations, un peu plus lentes que d'habitude.
+Inspire doucement par le nez, en sentant l'air frais qui entre...
+[pause 3s]
+et laisse l'air ressortir longtemps, tiède maintenant, par le nez ou par la bouche.
+[pause 6s]
+Encore. Inspire, en sentant ton ventre qui se soulève sous la couette...
+[pause 3s]
+et expire, en le sentant redescendre, tout doucement, comme un ballon qui se vide lentement.
+[pause 6s]
+Une dernière fois. Inspire...
+[pause 3s]
+et expire, en laissant tout le poids de ton corps tomber dans le matelas.
+[pause 6s]
+[soft, soothing] Maintenant, laisse ton souffle reprendre son rythme naturel. Ne le pilote plus. Il sait faire. Il le fait chaque nuit sans toi.
+À chaque expiration, je vais dire un nombre. Tu peux le répéter dans ta tête avec moi, comme un écho.
+Et entre les nombres, je t'inviterai à relâcher une petite partie de ton corps.
+On y va.
+[pause 3s]
+
+[slow, soothing] Cinquante. L'air sort, et tes épaules descendent un peu, loin des oreilles.
+[pause 3s]
+Quarante-neuf. Ton front se lisse, comme un drap qu'on aplatit de la main. L'espace entre tes sourcils s'élargit.
+[pause 3s]
+Quarante-huit. Ta mâchoire se desserre. Tes dents se séparent. Ta langue se pose, molle et lourde, au fond de ta bouche.
+[pause 3s]
+Quarante-sept. Tes mains s'ouvrent, tout doucement, les doigts un peu écartés. Elles n'ont plus rien à tenir.
+[pause 3s]
+Quarante-six. Ta nuque se pose dans l'oreiller, et l'oreiller prend tout le poids de ta tête.
+[pause 3s]
+Quarante-cinq. Ta poitrine s'adoucit. Elle n'a plus besoin de se tenir. Elle se soulève à peine.
+[pause 3s]
+Quarante-quatre. Ton ventre est souple. Il monte et descend tout seul, comme une vague lente qui remonte sur le sable.
+[pause 3s]
+Quarante-trois. Ton dos s'étale sur le matelas, une vertèbre après l'autre, du haut jusqu'en bas.
+[pause 3s]
+Quarante-deux. Tes hanches s'enfoncent un peu plus. Tes cuisses deviennent lourdes, chaudes et immobiles.
+[pause 3s]
+Quarante et un. Tes mollets, tes chevilles, tes pieds lâchent prise, tout au bout du lit. Même tes orteils se reposent maintenant.
+[pause 3s]
+Quarante. Tout ton corps se repose. De la tête aux pieds, il n'y a plus rien à porter.
+[pause 5s]
+
+[softer, slower] Maintenant, on va laisser un peu plus d'espace.
+Je ne dirai plus qu'un nombre sur deux. Celui du milieu, tu le comptes tout seul, à l'expiration suivante.
+Pendant ce temps, ma voix restera là, très basse, à te dire des choses douces. Tu peux l'écouter, ou la laisser passer.
+Pas besoin d'être précis. Si tu sautes un nombre, ou si tu comptes deux fois le même, laisse faire. Les nombres sont là pour te porter, pas pour te surveiller.
+[pause 3s]
+Trente-neuf.
+[pause 5s]
+À la prochaine respiration, tu compteras trente-huit tout seul. Ou peut-être pas. Ça ne change absolument rien.
+[pause 4s]
+Trente-sept. Imagine que chaque nombre est une marche, et que tu descends un escalier couvert d'un tapis épais et moelleux.
+Tes pieds ne font aucun bruit. La rampe est lisse et tiède sous ta main. Tu descends sans te presser, une marche à chaque souffle.
+[pause 5s]
+Trente-cinq. À chaque marche, il fait un peu plus sombre, un peu plus doux, un peu plus chaud.
+Comme si tu descendais vers une chambre où quelqu'un a déjà allumé une petite lampe et tiré les rideaux. Le lit est fait. Les draps sont frais et propres.
+[pause 5s]
+Trente-trois. Ton corps est lourd comme un sac de sable posé sur le sol. Une fois posé, il ne bouge plus. Il prend simplement la forme de ce qui est sous lui.
+[pause 5s]
+Trente et un. Ta tête s'enfonce dans l'oreiller, comme dans de la neige fraîche. Silencieuse. Douce. Tout autour de toi, le monde se tait.
+[pause 5s]
+Vingt-neuf. Si des pensées passent, laisse-les passer. Elles peuvent faire du bruit au loin, comme une rue derrière une fenêtre fermée. Tu n'as qu'un nombre à tenir, rien de plus.
+[pause 5s]
+Vingt-sept. Tes paupières sont lourdes. Elles se posent comme deux petits rideaux tirés pour la nuit. Derrière, tout est sombre et doux.
+[pause 5s]
+Vingt-cinq.
+[pause 4s]
+La moitié du chemin. Remarque comme ton souffle est plus lent qu'au début. Tu n'as rien fait pour ça. Il a ralenti tout seul, nombre après nombre.
+[pause 4s]
+
+[quieter, slower] À partir d'ici, tu continues tout seul.
+Ma voix ne te donnera plus que quelques repères de temps en temps. Entre les deux, compte à ton rythme, chaque fois que l'air sort.
+Si tu perds le fil, reprends n'importe où. Le nombre n'a pas d'importance. Ce qui compte, c'est le souffle qui descend, et toi qui descends avec lui.
+[pause 4s]
+[storytelling, soft] Pendant que tu comptes, imagine une pierre lisse qui coule lentement au fond d'un lac. Elle descend, en silence, dans une eau calme et tiède.
+Elle n'a rien à faire pour couler. Elle se laisse simplement porter vers le bas, de plus en plus loin de la surface.
+Là-haut, il y a la journée, le bruit, les écrans. Ici, il n'y a plus qu'une lumière qui s'éteint doucement, couche après couche, du bleu pâle au bleu profond.
+[pause 4s]
+Ton corps est comme cette pierre. Lourd, lisse, immobile.
+Tu t'enfonces à chaque souffle, un peu plus dans le matelas.
+Au fond du lac, il y a un sable fin, et la pierre s'y pose sans un bruit. Elle est arrivée. Elle peut rester là toute la nuit.
+[pause 6s]
+Vingt, à peu près. Ou ailleurs. Ça n'a pas d'importance.
+[pause 3s]
+Tes bras sont si lourds que tu pourrais oublier où ils sont. Ils sont tièdes, comme posés dans une flaque de soleil.
+Tes jambes aussi. Elles fondent dans les draps, comme si elles faisaient partie du lit.
+Et cette lourdeur monte lentement, des pieds aux genoux, des genoux au ventre, du ventre à la poitrine. Une chaleur tranquille, qui prend tout son temps.
+[pause 5s]
+Imagine maintenant un grand immeuble, le soir. Toutes les fenêtres sont allumées.
+Et une à une, étage après étage, les lumières s'éteignent. Doucement. Sans ordre particulier.
+Chaque fenêtre qui s'éteint, c'est une pensée qui va se coucher.
+[pause 3s]
+Le bureau du troisième étage. La cuisine du cinquième. Une chambre tout en haut. L'immeuble devient sombre et silencieux, comme toi.
+[pause 6s]
+
+[almost whispering, slower] Quinze, peut-être.
+[pause 3s]
+Les nombres deviennent flous. Ils s'espacent. Certains disparaissent.
+C'est normal. C'est même le signe que tu glisses.
+Si tu comptes encore, compte plus lentement. Si tu as arrêté, pas besoin de recommencer.
+[pause 5s]
+Dehors, peut-être, quelques flocons tombent dans la nuit. Ils se posent sur les toits, sur les voitures, sur les branches. Sans un bruit. Chacun à son tour.
+[pause 4s]
+Pense à un sablier. Le sable tombe, grain après grain. En bas, il forme un petit tas doux et immobile.
+Ton souffle est comme ce sable. Il s'écoule, lentement, et il se pose.
+[pause 6s]
+Douze, ou treize. Ta respiration est devenue si légère que tu la sens à peine, juste un petit va-et-vient au bord des narines.
+[pause 3s]
+Ta mâchoire est relâchée. Tes joues sont relâchées. Tout ton visage s'est adouci, comme le visage de quelqu'un qui dort déjà.
+Tes mains reposent, lourdes et tièdes, sur le drap. Tu ne saurais plus très bien dire où s'arrêtent tes doigts et où commence le tissu.
+[pause 5s]
+Le nombre suivant peut venir. Ou pas. Ton souffle continue simplement, patient et régulier, sans que tu aies à t'en occuper.
+Il n'y a plus rien à retenir. Ni les nombres, ni la journée, ni demain.
+Juste le souffle qui entre...
+[pause 3s]
+et qui sort.
+[pause 6s]
+[soft, calm] Si tes nuits sont souvent difficiles, pense à en parler un jour à un professionnel de santé. Pour l'instant, laisse les nombres te porter.
+[pause 5s]
+[almost whispering] Dix...
+[pause 5s]
+Tes épaules sont lourdes. Tes mains sont lourdes.
+Ta tête se repose. Tout ton dos se repose.
+[pause 6s]
+Lourd... chaud... lent...
+[pause 4s]
+Le lit te porte. La nuit t'enveloppe.
+[pause 5s]
+Rien à faire... rien à tenir...
+[pause 5s]
+Continue de compter... ou laisse tout aller...
+[pause 10s]

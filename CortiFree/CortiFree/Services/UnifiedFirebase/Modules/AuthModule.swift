@@ -1,213 +1,72 @@
-//
-//  AuthModule.swift
-//  CortiFree
-//
-//  Created by Claude on 24/11/2025.
-//  Unified authentication module - merges AuthService and AuthManager
-//
-
 import Foundation
-@preconcurrency import FirebaseAuth
-import FirebaseFirestore
 
 @MainActor
-class AuthModule: ObservableObject {
-    private let auth = Auth.auth()
-    private let db = Firestore.firestore()
+final class AuthModule: ObservableObject {
+    @Published private(set) var currentUser: ConvexUser?
+    @Published private(set) var isAuthenticated = false
 
-    @Published var currentUser: FirebaseAuth.User?
-    @Published var isAuthenticated = false
+    private let backend = ConvexBackend.shared
 
-    init() {
-        // Check if user is already signed in
-        if let user = auth.currentUser {
-            self.currentUser = user
-            self.isAuthenticated = true
-        }
+    init() { Task { await restoreSession() } }
+
+    var currentUserId: String? { currentUser?.uid }
+
+    func restoreSession() async {
+        do { apply(try await backend.restoreSession()) }
+        catch { currentUser = nil; isAuthenticated = false }
     }
 
-    // MARK: - State Properties
-
-    var currentUserId: String? {
-        currentUser?.uid
-    }
-
-    // MARK: - Authentication Methods
-
-    /// Sign up with email, password, and display name
-    /// Creates both Firebase Auth user and Firestore profile
-    /// Integrates with analytics for analytics
-    func signUp(email: String, password: String, displayName: String) async throws -> FirebaseAuth.User {
+    func signUp(email: String, password: String, displayName: String) async throws -> ConvexUser {
         do {
-            // Create Firebase Auth user
-            let authResult = try await auth.createUser(withEmail: email, password: password)
-            let user = authResult.user
-
-            // Update display name
-            let changeRequest = user.createProfileChangeRequest()
-            changeRequest.displayName = displayName
-            try await changeRequest.commitChanges()
-
-            // Create Firestore profile
-            let userData: [String: Any] = [
-                "uid": user.uid,
-                "email": email,
-                "displayName": displayName,
-                "createdAt": Timestamp(date: Date()),
-                "lastLoginAt": Timestamp(date: Date()),
-                "xp": 0,
-                "level": 1,
-                "currentStreak": 0,
-                "longestStreak": 0
-            ]
-
-            try await db.collection("users").document(user.uid).setData(userData)
-
-            // Set analytics profile
+            let user = try await backend.signUp(email: email, password: password, firstName: displayName)
+            apply(user)
             AnalyticsManager.shared.identify(userId: user.uid)
             AnalyticsManager.shared.trackOnboardingWelcomeViewed()
-
-            // Update state
-            self.currentUser = user
-            self.isAuthenticated = true
-
-            print("✅ [AuthModule] Sign up successful: \(email)")
             return user
-
-        } catch {
-            let coreError = CoreError.from(error)
-            print("❌ [AuthModule] Sign up failed: \(coreError)")
-            throw coreError
-        }
+        } catch { throw CoreError.from(error) }
     }
 
-    /// Sign in with email and password
-    /// Updates last login timestamp and tracks session in analytics
-    func signIn(email: String, password: String) async throws -> FirebaseAuth.User {
+    func signIn(email: String, password: String) async throws -> ConvexUser {
         do {
-            let authResult = try await auth.signIn(withEmail: email, password: password)
-            let user = authResult.user
-
-            // Update last login timestamp
-            try await db.collection("users")
-                .document(user.uid)
-                .updateData(["lastLoginAt": Timestamp(date: Date())])
-
-            // Track session in analytics
+            let user = try await backend.signIn(email: email, password: password)
+            apply(user)
             AnalyticsManager.shared.trackSessionStarted()
-
-            // Update state
-            self.currentUser = user
-            self.isAuthenticated = true
-
-            print("✅ [AuthModule] Sign in successful: \(email)")
             return user
-
-        } catch {
-            let coreError = CoreError.from(error)
-            print("❌ [AuthModule] Sign in failed: \(coreError)")
-            throw coreError
-        }
+        } catch { throw CoreError.from(error) }
     }
 
-    /// Sign out current user
+    func signInWithApple(identityToken: String, rawNonce: String, firstName: String?) async throws -> ConvexUser {
+        let user = try await backend.signInWithApple(identityToken: identityToken, rawNonce: rawNonce, firstName: firstName)
+        apply(user)
+        return user
+    }
+
+    func signInWithGoogle(idToken: String, firstName: String?) async throws -> ConvexUser {
+        let user = try await backend.signInWithGoogle(idToken: idToken, firstName: firstName)
+        apply(user)
+        return user
+    }
+
     func signOut() async throws {
-        do {
-            try auth.signOut()
-
-            // Update state
-            self.currentUser = nil
-            self.isAuthenticated = false
-
-            print("✅ [AuthModule] User signed out")
-
-        } catch {
-            let coreError = CoreError.from(error)
-            print("❌ [AuthModule] Sign out failed: \(coreError)")
-            throw coreError
-        }
+        await backend.signOut()
+        currentUser = nil
+        isAuthenticated = false
     }
 
-    /// Send password reset email
-    func resetPassword(email: String) async throws {
-        do {
-            try await auth.sendPasswordReset(withEmail: email)
-            print("✅ [AuthModule] Password reset email sent to: \(email)")
+    func resetPassword(email: String) async throws { try await backend.requestPasswordReset(email: email) }
 
-        } catch {
-            let coreError = CoreError.from(error)
-            print("❌ [AuthModule] Password reset failed: \(coreError)")
-            throw coreError
-        }
-    }
-
-    /// Update user profile (display name)
     func updateUserProfile(displayName: String? = nil) async throws {
-        guard let user = currentUser else {
-            throw CoreError.userNotFound
-        }
-
-        do {
-            let changeRequest = user.createProfileChangeRequest()
-
-            if let displayName = displayName {
-                changeRequest.displayName = displayName
-            }
-
-            try await changeRequest.commitChanges()
-
-            // Refresh currentUser reference
-            self.currentUser = auth.currentUser
-
-            print("✅ [AuthModule] Profile updated")
-
-        } catch {
-            let coreError = CoreError.from(error)
-            print("❌ [AuthModule] Profile update failed: \(coreError)")
-            throw coreError
-        }
+        var args: [String: Any] = [:]
+        if let displayName { args["displayName"] = displayName }
+        let _: JSONValue = try await backend.call(.mutation, path: "profile:updateProfile", args: args)
+        apply(try await backend.loadCurrentUser())
     }
 
-    /// Delete user account
-    /// Removes Firestore data and Firebase Auth account
-    func deleteAccount() async throws {
-        guard let user = currentUser else {
-            throw CoreError.userNotFound
-        }
-
-        do {
-            // Delete Firestore user data
-            try await db.collection("users").document(user.uid).delete()
-
-            // Delete Firebase Auth account
-            try await user.delete()
-
-            // Update state
-            self.currentUser = nil
-            self.isAuthenticated = false
-
-            print("✅ [AuthModule] Account deleted")
-
-        } catch {
-            let coreError = CoreError.from(error)
-            print("❌ [AuthModule] Account deletion failed: \(coreError)")
-            throw coreError
-        }
+    func deleteAccount(appleAuthorizationCode: String? = nil) async throws {
+        try await backend.deleteAccount(appleAuthorizationCode: appleAuthorizationCode)
+        currentUser = nil
+        isAuthenticated = false
     }
 
-    // MARK: - Social Authentication (Future)
-
-    /// Sign in with Apple (to be implemented)
-    func signInWithApple() async throws -> FirebaseAuth.User {
-        // TODO: Implement Sign in with Apple
-        print("⚠️ [AuthModule] Apple Sign In - To be implemented")
-        throw CoreError.operationNotAllowed(reason: "Apple Sign In not yet implemented")
-    }
-
-    /// Sign in with Google (to be implemented)
-    func signInWithGoogle() async throws -> FirebaseAuth.User {
-        // TODO: Implement Google Sign In
-        print("⚠️ [AuthModule] Google Sign In - To be implemented")
-        throw CoreError.operationNotAllowed(reason: "Google Sign In not yet implemented")
-    }
+    private func apply(_ user: ConvexUser) { currentUser = user; isAuthenticated = true }
 }

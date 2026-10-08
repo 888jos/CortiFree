@@ -217,25 +217,10 @@ struct LoadingAnalysisView: View {
                 displayedProgress = min(newProgress, endProgress)
             }
 
-            // Vibration continue qui s'amplifie progressivement
-            // Calculer l'intervalle de vibration basé sur la progression (0-100%)
-            let globalProgress = Double(displayedProgress) / 100.0
-
-            // Intervalle de vibration qui diminue avec la progression (vibration plus fréquente = plus intense)
-            // 0%: vibration toutes les 25 frames (~1 seconde)
-            // 50%: vibration toutes les 15 frames (~0.6 seconde)
-            // 100%: vibration toutes les 5 frames (~0.2 seconde)
-            let vibrationInterval = Int(25 - (globalProgress * 20)) // De 25 à 5
-
-            if hapticCounter % vibrationInterval == 0 {
-                // Intensité de la vibration basée sur la progression
-                if globalProgress < 0.33 {
-                    HapticManager.light()
-                } else if globalProgress < 0.66 {
-                    HapticManager.medium()
-                } else {
-                    HapticManager.heavy()
-                }
+            // One light tap per phase change (~every 17 %) instead of an accelerating burst.
+            if displayedProgress > 0, displayedProgress % 17 == 0, hapticCounter > 1 {
+                hapticCounter = 0
+                HapticManager.light()
             }
 
             // Complete phase when done

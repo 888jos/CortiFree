@@ -1,7 +1,5 @@
 import SwiftUI
 import SafariServices
-import FirebaseAuth
-import FirebaseFirestore
 import StoreKit
 import RevenueCat
 import UserNotifications
@@ -13,9 +11,11 @@ struct SettingsView: View {
     @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var revenueCatManager = RevenueCatManager.shared
     @ObservedObject private var languageManager = LanguageManager.shared
+    @ObservedObject private var health = HealthKitService.shared
 
     // ViewModel for settings management
     @StateObject private var viewModel = SettingsViewModel()
+    @AppStorage(MiloConsent.storageKey) private var miloConsentStore = ""
 
     // UI State only
     @State private var showLanguagePicker: Bool = false
@@ -109,6 +109,8 @@ struct SettingsView: View {
         } message: {
             Text(LanguageManager.shared.localizedString(for: "settings.alert.language_restart.message"))
         }
+        // Debug-only actions (resetUserDefaults / clearAllData exist only in DEBUG builds).
+        #if DEBUG
         .alert(LanguageManager.shared.localizedString(for: "settings.alert.reset_defaults.title"), isPresented: $showResetUserDefaultsAlert) {
             Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
             Button(LanguageManager.shared.localizedString(for: "settings.alert.reset_defaults.button"), role: .destructive) {
@@ -125,6 +127,7 @@ struct SettingsView: View {
         } message: {
             Text(LanguageManager.shared.localizedString(for: "settings.alert.clear_data.message"))
         }
+        #endif
         .alert(
             LanguageManager.shared.localizedString(for: "inline.settingsview.language.00"),
             isPresented: $showReauthAlert
@@ -205,10 +208,10 @@ struct SettingsView: View {
         .manageSubscriptionsSheet(isPresented: $showCustomerCenter)
         .fullScreenCover(isPresented: $showLogin) {
             AuthenticationView(
-                onComplete: {
+                onBack: {
                     showLogin = false
                 },
-                onSkip: {
+                onComplete: {
                     showLogin = false
                 }
             )
@@ -392,8 +395,36 @@ struct SettingsView: View {
 
                 // Syncs the preferences to the user's Firestore account (not iCloud)
                 settingsToggleRow(icon: "arrow.triangle.2.circlepath.icloud", title: LanguageManager.shared.localizedString(for: "settings.privacy.cloud_sync"), subtitle: LanguageManager.shared.localizedString(for: "settings.privacy.cloud_sync_subtitle"), isOn: $viewModel.syncEnabled)
+
+                if authViewModel.isAuthenticated, let uid = Auth.auth().currentUser?.uid {
+                    Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+                    // Consent to send Milo messages to the AI provider (asked before the first message).
+                    settingsToggleRow(icon: "bubble.left.and.text.bubble.right.fill", title: LanguageManager.shared.localizedString(for: "settings.privacy.milo"), subtitle: LanguageManager.shared.localizedString(for: "settings.privacy.milo_subtitle"), isOn: Binding(
+                        get: { MiloConsent.isGranted(in: miloConsentStore, uid: uid) },
+                        set: { miloConsentStore = $0 ? MiloConsent.granting(uid, in: miloConsentStore) : MiloConsent.revoking(uid, in: miloConsentStore) }
+                    ))
+                }
+
+                if health.isAvailable {
+                    Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+                    // Health data stays on the device (HealthKit only).
+                    settingsToggleRow(icon: "heart.fill", title: LanguageManager.shared.localizedString(for: "settings.health.title"), subtitle: LanguageManager.shared.localizedString(for: "settings.health.subtitle"), isOn: healthBinding)
+                }
             }
         }
+    }
+
+    private var healthBinding: Binding<Bool> {
+        Binding(
+            get: { health.isEnabled },
+            set: { enabled in
+                if enabled {
+                    Task { await health.enable() }
+                } else {
+                    health.disable()
+                }
+            }
+        )
     }
 
     // MARK: - About & Support Section
@@ -816,9 +847,7 @@ struct SettingsView: View {
     private func submitBugReport() {
         guard !isSubmittingBugReport else { return }
 
-        // firestore.rules: bug_reports create requires userId == request.auth.uid,
-        // so signed-out users send the report by email instead.
-        guard let user = Auth.auth().currentUser else {
+        guard Auth.auth().currentUser != nil else {
             sendBugReportByEmail()
             return
         }
@@ -828,25 +857,23 @@ struct SettingsView: View {
         let description = bugReportText
 
         Task {
-            var reportData: [String: Any] = [
-                "userId": user.uid,
-                "userEmail": user.email ?? "unknown",
-                "description": description,
-                "appVersion": appVersionString,
-                "iosVersion": UIDevice.current.systemVersion,
-                "deviceModel": UIDevice.current.model,
-                "language": LanguageManager.shared.currentLanguage.rawValue,
-                "createdAt": FieldValue.serverTimestamp(),
-                "status": "new"
-            ]
-
-            // Screenshot resized to stay under the Firestore 1 MB document limit
-            if let screenshot, let data = ProfilePhotoStorage.compressedJPEG(from: screenshot, maxDimension: 800) {
-                reportData["screenshotBase64"] = data.base64EncodedString()
-            }
-
             do {
-                try await Firestore.firestore().collection("bug_reports").addDocument(data: reportData)
+                var reportData: [String: Any] = [
+                    "description": description,
+                    "appVersion": appVersionString,
+                    "iosVersion": UIDevice.current.systemVersion,
+                    "deviceModel": UIDevice.current.model,
+                    "language": LanguageManager.shared.currentLanguage.rawValue
+                ]
+                if let screenshot, let data = ProfilePhotoStorage.compressedJPEG(from: screenshot, maxDimension: 800) {
+                    let uploadURL: String = try await ConvexBackend.shared.call(
+                        .mutation, path: "feedback:generateScreenshotUploadUrl"
+                    )
+                    reportData["screenshotStorageId"] = try await ConvexBackend.shared.upload(data, to: uploadURL)
+                }
+                let _: JSONValue = try await ConvexBackend.shared.call(
+                    .mutation, path: "feedback:submitBugReport", args: reportData
+                )
                 HapticManager.success()
                 bugReportText = ""
                 bugReportScreenshot = nil

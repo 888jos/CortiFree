@@ -13,6 +13,8 @@ struct BreathingDetailFlowView: View {
     let pattern: BreathingPattern
     let duration: TimeInterval
     let onComplete: () -> Void
+    /// False when the caller records the completion itself (plan items), to avoid counting it twice.
+    let recordsSession: Bool
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -35,9 +37,15 @@ struct BreathingDetailFlowView: View {
 
     private let timeline: BreathingTimeline
 
-    init(pattern: BreathingPattern, duration: TimeInterval = 180, onComplete: @escaping () -> Void = {}) {
+    init(
+        pattern: BreathingPattern,
+        duration: TimeInterval = 180,
+        recordsSession: Bool = true,
+        onComplete: @escaping () -> Void = {}
+    ) {
         self.pattern = pattern
         self.duration = duration
+        self.recordsSession = recordsSession
         self.onComplete = onComplete
         self.timeline = BreathingTimeline(pattern: pattern)
     }
@@ -165,7 +173,7 @@ struct BreathingDetailFlowView: View {
         voiceOverManager.stop()
         ambiencePlayer.stop()
         HapticManager.success()
-        if !didRecordCompletion && breathedSeconds >= min(30, plannedTotal - 0.5) {
+        if recordsSession && !didRecordCompletion && breathedSeconds >= min(30, plannedTotal - 0.5) {
             didRecordCompletion = true
             ExerciseSessionRecorder.shared.record(
                 exerciseID: pattern.name,

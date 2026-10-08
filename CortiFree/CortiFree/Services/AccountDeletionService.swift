@@ -3,16 +3,13 @@
 //  CortiFree
 //
 //  In-app account deletion (App Store Review Guideline 5.1.1(v)).
-//  Deletes users/{uid} (and every known subcollection), top-level docs owned
-//  by the user, the Firebase Auth user, third-party identities and local state.
+//  Deletes Convex data, authentication rows, third-party identities and local state.
 //
 
 import Foundation
 import UIKit
 import AuthenticationServices
 import CryptoKit
-import FirebaseAuth
-import FirebaseFirestore
 import SuperwallKit
 import UserNotifications
 
@@ -41,140 +38,50 @@ final class AccountDeletionService {
         case unsupported
     }
 
-    private let db = Firestore.firestore()
     private var appleReauthenticator: AppleReauthenticator?
-
-    /// Subcollections of users/{uid} written by the app (see firestore.rules).
-    private let userSubcollections = [
-        "settings", "baseline", "habit_tracking", "journalEntries", "completed_tasks",
-        "tasks", "daily_moods", "task_statuses", "stats", "routine_progress",
-        "habit_goals", "habit_badges", "exercises_done", "dailyPrograms",
-        "personalized_plan", "daily_checkins", "custom_tasks", "ai_insights",
-        "achievements", "onboarding_responses", "feedback", "daily_progress"
-    ]
+    private var appleAuthorizationCode: String?
 
     private init() {}
 
     // MARK: - Re-authentication
 
-    /// Which re-authentication (if any) is needed before deleting the account.
-    /// Firebase requires a sign-in younger than ~5 minutes for `user.delete()`;
-    /// asking up front avoids deleting the data and then failing on the Auth user.
-    func reauthMethod(for user: FirebaseAuth.User) -> ReauthMethod {
+    func reauthMethod(for user: ConvexUser) -> ReauthMethod {
         let providers = user.providerData.map(\.providerID)
-        // Apple: always re-authenticate so the Sign in with Apple token can be revoked.
         if providers.contains("apple.com") { return .apple }
-
-        let isRecent = user.metadata.lastSignInDate.map { Date().timeIntervalSince($0) < 4 * 60 } ?? false
-        if isRecent { return .none }
-        if providers.contains("password") { return .password }
-        return .unsupported
+        return .none
     }
 
     func reauthenticateWithPassword(password: String) async throws {
-        guard let user = Auth.auth().currentUser else { throw DeletionError.notSignedIn }
+        guard let user = UnifiedFirebaseService.shared.auth.currentUser else { throw DeletionError.notSignedIn }
         guard let email = user.email else { throw DeletionError.requiresRecentLogin }
-        let credential = EmailAuthProvider.credential(withEmail: email, password: password)
-        try await user.reauthenticate(with: credential)
+        _ = try await UnifiedFirebaseService.shared.auth.signIn(email: email, password: password)
     }
 
     func reauthenticateWithApple() async throws {
-        guard let user = Auth.auth().currentUser else { throw DeletionError.notSignedIn }
+        guard UnifiedFirebaseService.shared.auth.currentUser != nil else { throw DeletionError.notSignedIn }
         let reauthenticator = AppleReauthenticator()
         appleReauthenticator = reauthenticator
         defer { appleReauthenticator = nil }
 
         let result = try await reauthenticator.start()
-        let credential = OAuthProvider.appleCredential(
-            withIDToken: result.idToken,
+        _ = try await UnifiedFirebaseService.shared.auth.signInWithApple(
+            identityToken: result.idToken,
             rawNonce: result.rawNonce,
-            fullName: nil
+            firstName: nil
         )
-        try await user.reauthenticate(with: credential)
-
-        // Required by Apple when deleting a Sign in with Apple account.
-        // Needs the Apple provider (Services ID + key) configured in the Firebase console.
-        if let code = result.authorizationCode {
-            do {
-                try await Auth.auth().revokeToken(withAuthorizationCode: code)
-            } catch {
-                #if DEBUG
-                print("⚠️ Apple token revocation failed: \(error)")
-                #endif
-            }
-        }
+        appleAuthorizationCode = result.authorizationCode
     }
 
     // MARK: - Deletion
 
-    /// Deletes Firestore data, then the Firebase Auth user, then local/third-party state.
     func deleteAccount() async throws {
-        guard let user = Auth.auth().currentUser else { throw DeletionError.notSignedIn }
-        let uid = user.uid
-
-        try await deleteUserData(uid: uid)
-
-        do {
-            try await user.delete()
-        } catch let error as NSError where error.code == AuthErrorCode.requiresRecentLogin.rawValue {
-            throw DeletionError.requiresRecentLogin
-        }
+        guard UnifiedFirebaseService.shared.auth.currentUser != nil else { throw DeletionError.notSignedIn }
+        try await UnifiedFirebaseService.shared.auth.deleteAccount(appleAuthorizationCode: appleAuthorizationCode)
+        appleAuthorizationCode = nil
 
         await RevenueCatManager.shared.logout()
         Self.resetThirdPartyIdentities()
         Self.clearLocalState()
-    }
-
-    private func deleteUserData(uid: String) async throws {
-        let userRef = db.collection("users").document(uid)
-
-        // Nested subcollections first (parents can be "phantom" docs that never list).
-        try await deleteCollection(userRef.collection("baseline").document("collection").collection("days"))
-
-        var habitIds = Set(TaskStatusService.habitTotals.keys)
-        if let habitDocs = try? await userRef.collection("habit_tracking").getDocuments() {
-            habitDocs.documents.forEach { habitIds.insert($0.documentID) }
-        }
-        for habitId in habitIds {
-            try await deleteCollection(
-                userRef.collection("habit_tracking").document(habitId).collection("daily_completion")
-            )
-        }
-
-        var routineIds = Set<String>()
-        if let routineId = UserPersistence.selectedRoutineId { routineIds.insert(routineId) }
-        if let routineDocs = try? await userRef.collection("routine_progress").getDocuments() {
-            routineDocs.documents.forEach { routineIds.insert($0.documentID) }
-        }
-        for routineId in routineIds {
-            try await deleteCollection(
-                userRef.collection("routine_progress").document(routineId).collection("daily_progress")
-            )
-        }
-
-        for name in userSubcollections {
-            try await deleteCollection(userRef.collection(name))
-        }
-
-        // Top-level documents keyed by userId.
-        try await deleteQuery(db.collection("dailyTodos").whereField("userId", isEqualTo: uid))
-
-        try await userRef.delete()
-    }
-
-    private func deleteCollection(_ collection: CollectionReference) async throws {
-        try await deleteQuery(collection)
-    }
-
-    private func deleteQuery(_ query: Query) async throws {
-        while true {
-            let snapshot = try await query.limit(to: 400).getDocuments()
-            guard !snapshot.documents.isEmpty else { return }
-            let batch = db.batch()
-            snapshot.documents.forEach { batch.deleteDocument($0.reference) }
-            try await batch.commit()
-            if snapshot.documents.count < 400 { return }
-        }
     }
 
     // MARK: - Local / third-party cleanup
@@ -185,6 +92,22 @@ final class AccountDeletionService {
         PostHogManager.shared.reset()
         TikTokManager.shared.logout()
         Superwall.shared.reset()
+    }
+
+    /// Sign-out: forgets device-level values that belong to the signed-out account (streak, program
+    /// start, cached dashboard, check-in, onboarding answers, Health opt-in, widget), so the next
+    /// account starts clean. Per-uid caches (plan, completions, anxiety checks) are already keyed by uid.
+    @MainActor
+    static func clearAccountScopedState() {
+        let defaults = UserDefaults.standard
+        [
+            "streakDays", "bestStreak", "UserSettings", "programStartDate", "currentWeek", "currentDay",
+            "progressDashboardCacheV2.lifetime",
+            "daily_check_in_last_prompted_day", "daily_check_in_last_completed_day",
+            "personalPlan.onboardingProfile.v1", "plan.shortModeDay"
+        ].forEach { defaults.removeObject(forKey: $0) }
+        if HealthKitService.shared.isEnabled { HealthKitService.shared.disable() }
+        WidgetDataStore.sharedDefaults?.removePersistentDomain(forName: WidgetDataStore.appGroupID)
     }
 
     /// Removes every locally stored piece of user data, keeping only the UI language.

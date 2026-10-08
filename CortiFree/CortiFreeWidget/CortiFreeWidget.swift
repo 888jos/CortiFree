@@ -327,7 +327,7 @@ private struct DayLabel: View {
             Text(NSLocalizedString("widget.day", comment: ""))
                 .font(.fSB(size))
                 .foregroundColor(labelColor.opacity(0.55))
-            if day <= 66 {
+            if day <= 28 {
                 HStack(alignment: .lastTextBaseline, spacing: 1) {
                     Text("\(day)")
                         .font(.fB(size))

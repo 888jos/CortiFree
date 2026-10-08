@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 struct UserStats: Codable {
     var streak: Int

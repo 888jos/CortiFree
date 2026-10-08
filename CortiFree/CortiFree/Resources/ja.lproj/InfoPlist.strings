@@ -5,3 +5,9 @@
 "NSMicrophoneUsageDescription" = "ガイド付き瞑想と呼吸エクササイズのためにマイクを使用します。";
 "NSLocationWhenInUseUsageDescription" = "お住まいの地域に合った自然アクティビティを提案するために位置情報を使用します。";
 "NSMotionUsageDescription" = "運動を記録し、より良いエクササイズを提案するためにモーションデータを使用します。";
+"NSHealthShareUsageDescription" = "CortiFreeはプランをパーソナライズするために、不安の質問票（GAD-7）と気分を読み取ります。データはiPhone内にとどまります。";
+"NSHealthUpdateUsageDescription" = "CortiFreeは不安チェック、毎日の気分、マインドフル時間をAppleヘルスケアに保存します。";
+
+// MARK: - Tracking
+"NSUserTrackingUsageDescription" = "CortiFreeは、体験をパーソナライズし、広告の効果を測定するためにこの識別子を使用します。";
+"NSHumanReadableCopyright" = "© 2025 CortiFree. 無断転載を禁じます。";

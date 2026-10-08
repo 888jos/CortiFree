@@ -19,18 +19,13 @@ class VoiceOverManager: NSObject, ObservableObject {
     private override init() {
         super.init()
         synthesizer.delegate = self
-        configureAudioSession()
     }
 
-    // MARK: - Configuration
-
-    private func configureAudioSession() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("❌ VoiceOver: Failed to configure audio session - \(error)")
-        }
+    // The audio session is only taken while a cue is spoken (ducking the user's music),
+    // then released so the music comes back to full volume (see AudioFocus).
+    private func releaseAudioFocusIfIdle() {
+        guard !synthesizer.isSpeaking else { return }
+        AudioFocus.release(.voiceCues)
     }
 
     // MARK: - Public Methods
@@ -51,6 +46,7 @@ class VoiceOverManager: NSObject, ObservableObject {
         utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
 
+        AudioFocus.acquire(.voiceCues)
         synthesizer.speak(utterance)
     }
 
@@ -106,12 +102,14 @@ extension VoiceOverManager: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         DispatchQueue.main.async {
             self.isSpeaking = false
+            self.releaseAudioFocusIfIdle()
         }
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
         DispatchQueue.main.async {
             self.isSpeaking = false
+            self.releaseAudioFocusIfIdle()
         }
     }
 }

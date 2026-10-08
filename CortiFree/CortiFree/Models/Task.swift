@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 enum TaskCategory: String, Codable, CaseIterable {
     case morning = "morning"

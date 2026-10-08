@@ -3,11 +3,10 @@
 //  CortiFree
 //
 //  Created by Claude on 10/11/2025.
-//  Manages task database (local JSON) + user progress (Firestore)
+//  Manages the bundled task database.
 //
 
 import Foundation
-import FirebaseFirestore
 import Combine
 
 class TaskManager: ObservableObject {
@@ -160,64 +159,6 @@ class TaskManager: ObservableObject {
             $0.description.lowercased().contains(lowercaseQuery) ||
             $0.tags.contains(where: { $0.lowercased().contains(lowercaseQuery) })
         }
-    }
-
-    // MARK: - Firestore Integration (User Progress)
-
-    private let db = Firestore.firestore()
-
-    // Fetch today's program for user
-    func fetchTodayProgram(userId: String, routineId: String, dayNumber: Int) async throws -> UserDailyProgram? {
-        let query = db.collection("users")
-            .document(userId)
-            .collection("dailyPrograms")
-            .whereField("routineId", isEqualTo: routineId)
-            .whereField("dayNumber", isEqualTo: dayNumber)
-            .limit(to: 1)
-
-        let snapshot = try await query.getDocuments()
-        guard let document = snapshot.documents.first else { return nil }
-
-        var program = try document.data(as: UserDailyProgram.self)
-        program.id = document.documentID
-        return program
-    }
-
-    // Mark task as completed
-    func completeTask(userId: String, programId: String, taskId: String) async throws {
-        let programRef = db.collection("users")
-            .document(userId)
-            .collection("dailyPrograms")
-            .document(programId)
-
-        try await programRef.updateData([
-            "completedTaskIds": FieldValue.arrayUnion([taskId])
-        ])
-
-        #if DEBUG
-        print("✅ Task \(taskId) marked as completed")
-        #endif
-    }
-
-    // Create daily program for user
-    func createDailyProgram(userId: String, routineId: String, dayNumber: Int, taskIds: [String]) async throws -> String {
-        let program = UserDailyProgram(
-            userId: userId,
-            routineId: routineId,
-            dayNumber: dayNumber,
-            taskIds: taskIds,
-            date: Date()
-        )
-
-        let docRef = try db.collection("users")
-            .document(userId)
-            .collection("dailyPrograms")
-            .addDocument(from: program)
-
-        #if DEBUG
-        print("✅ Created daily program: \(docRef.documentID)")
-        #endif
-        return docRef.documentID
     }
 
     // MARK: - Helper: Get Recommended Tasks

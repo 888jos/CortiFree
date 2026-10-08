@@ -42,6 +42,7 @@ enum PlanInsightText {
         case "evening": return "moon.stars.fill"
         case "racing_mind": return "cloud.fill"
         case "isolation": return "person.2.fill"
+        case "anxiety_check": return "waveform.path.ecg"
         case "anchor": return PlanItem.habitSymbol(arg ?? "")
         case "progression": return "chart.line.uptrend.xyaxis"
         default: return "checkmark.seal"

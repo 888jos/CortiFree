@@ -8,7 +8,6 @@
 
 import Foundation
 import SwiftUI
-import FirebaseAuth
 
 @MainActor
 class DailyTodoViewModel: ObservableObject {

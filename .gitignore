@@ -88,6 +88,9 @@ migration/private/
 
 # Local build artifacts
 .build-dd/
+.build-check/
+.swiftpm-cache/
 .build-log.txt
 .build.sh
 .build.lock
+.env*.bak*

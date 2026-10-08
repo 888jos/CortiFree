@@ -1,0 +1,64 @@
+# sos-reset-3 · Reinicio exprés (ES)
+[pause 1.5s]
+[warm, calm, gentle] Has hecho bien en darle a pausa. Los próximos tres minutos son solo para ti.
+[pause 2s]
+[soft, unhurried] Empecemos por los pies. Apóyalos en el suelo... ¿Sientes los talones?
+[pause 2s]
+Bien. Ahora deja que tu espalda se alargue un poco, como si un hilo tirara suavemente de la coronilla hacia arriba.
+[pause 2s]
+
+[warm] Voy a enseñarte algo muy sencillo. Se llama el doble suspiro.
+Tu cuerpo ya lo conoce. Lo hace solo, después de un buen llanto, o justo antes de dormirte.
+[pause 1.5s]
+[calm, clear] Inhalas dos veces por la nariz. Una inhalación grande... y luego una pequeña encima.
+Después exhalas por la boca, despacio, hasta el final. Esa exhalación larga es la que ayuda a tu cuerpo a soltar.
+[pause 1s]
+[gentle] Si en algún momento te mareas, vuelve simplemente a tu respiración habitual.
+[pause 2s]
+
+[soft] Hagámoslo juntos. Inhala por la nariz...
+[pause 2s]
+y un poco más, arriba del todo.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Ahora exhala por la boca... despacio... hasta el final.
+[pause 6s]
+[soft, warm] Eso es. Fíjate en tus hombros. Quizá ya hayan empezado a bajar.
+[pause 2s]
+
+[soft] Otra vez. Una gran inhalación...
+[pause 2s]
+y un poco más.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Y suéltalo todo. Tus hombros se deslizan hacia abajo, lejos de las orejas...
+[pause 6s]
+[gentle, reassuring] Quizá notes un ligero calor, o un hormigueo en las manos. A menudo es señal de que tu cuerpo se está relajando.
+[pause 2s]
+
+[soft] El último. Inhala...
+[pause 2s]
+y un poco más.
+[pause 1.5s]
+[slow, soothing, almost a sigh] Y suéltalo, largo y lento. Tómate todo el tiempo que necesites.
+[pause 6s]
+[soft] Bien.
+[pause 2s]
+
+[calm, intimate] Ahora, la mandíbula. ¿Está apretada ahora mismo?
+[pause 2s]
+A menudo es ahí donde se esconde el estrés. Deja que los dientes se separen, solo un poco. La lengua en reposo, completamente blanda.
+[pause 2s]
+Y el espacio entre las cejas... deja que se ensanche.
+[pause 2s]
+[softer, slower] Ahora deja que la respiración haga lo que quiera. Ya no la diriges.
+[pause 2s]
+Solo siente lo que te sostiene. Los pies en el suelo. El asiento debajo de ti. No tienes que cargar con todo. Deja que el suelo se lleve una parte.
+[pause 6s]
+
+[warm, gentle] Quizá algo haya cambiado. Un poco más de espacio en el pecho. O quizá no, y eso también está bien. Te has tomado tres minutos para ti, y eso cuenta.
+[pause 2s]
+[warm, calm] Guarda este doble suspiro contigo. Puedes hacerlo en cualquier lugar, en una reunión, en la calle. Nadie tiene por qué notarlo.
+[pause 2s]
+[calm, grounded] Ahora, vuelve a tu día. No a todo lo que queda por hacer. Solo al siguiente paso.
+[pause 1.5s]
+[soft, warm, slowing down] Y luego al siguiente. Un paso tras otro.
+[pause 4s]

@@ -1,273 +1,668 @@
 import SwiftUI
 import Foundation
 
+/// Milo, the in-app companion: a calm welcome with time-of-day suggestions written as
+/// full sentences, plain-text replies, and one exercise card when a reply calls for it.
 struct AssistantChatView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var messages: [DeepSeekChatMessage]
+    @ObservedObject private var soundPlayer = SoundPlayer.shared
+    @ObservedObject private var store = MiloStore.shared
+    @ObservedObject private var importCenter = MiloImportCenter.shared
+    @State private var conversationID = UUID()
+    @State private var menuPath: [MiloRoute] = []
+    @State private var messages: [DeepSeekChatMessage] = []
     @State private var draft = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var selectedRecommendation: AssistantRecommendation?
-    @State private var recommendationsByMessage: [Int: [AssistantRecommendation]] = [:]
+    @State private var cardsByMessage: [Int: AssistantRecommendation] = [:]
+    @State private var openedBreathing: BreathingPattern?
+    @State private var runningBreathing: BreathingPattern?
+    /// Intent of the suggestion the user tapped, so the card matches it in every language.
+    @State private var pendingIntent: MiloIntent?
     @AppStorage("assistant.daily.date") private var assistantDailyDate = ""
     @AppStorage("assistant.daily.usage") private var assistantDailyUsage = 0
     @AppStorage("assistant.recommendation.rotation") private var recommendationRotation = 0
+    @AppStorage(MiloConsent.storageKey) private var consentStore = ""
+    @State private var showConsent = false
+    @State private var pendingConsentText: String?
+    /// « Bring your story to Milo » sheet, with the document shared from another app if any.
+    @State private var importRequest: MiloImportRequest?
+    @State private var pendingImportAfterConsent: MiloImportRequest?
+    @FocusState private var composerFocused: Bool
 
     private let dailyLimit = 12
+    private let moment = MiloMoment.current
 
-    private let systemPrompt = """
-    You are Milo, the CortiFree assistant. Help with wellbeing and general everyday questions; do not reject a safe request just because it is outside wellbeing. When useful, connect general advice to stress, breathing, meditation, sleep, focus, habits, journaling, or the user's CortiFree plan. Recommend only exercises and content that actually exist in CortiFree, and never pretend to see data that was not provided. Be concise, warm, and clear; use at most three short sentences and avoid markdown. For health topics, offer general information, not a diagnosis, treatment decision, or medication dosage; be clear about uncertainty and suggest a qualified professional for personal medical concerns. Never claim a face scan measures cortisol or diagnoses a condition. If the user may be in immediate danger, expresses intent to self-harm, or reports emergency symptoms such as chest pain or severe trouble breathing, respond empathetically and direct them to local emergency services or an appropriate crisis service. Do not provide instructions that facilitate self-harm, violence, or dangerous wrongdoing; offer a safer alternative. Ask a brief clarifying question when needed, and avoid requesting sensitive personal information.
+    private var systemPrompt: String {
+        let length = store.replyLength == .detailed
+            ? "Keep replies to four or five sentences of plain prose"
+            : "Keep replies to two or three short sentences of plain prose"
+        return Self.basePrompt.replacingOccurrences(of: "{LENGTH}", with: length)
+    }
+
+    private static let basePrompt = """
+    You are Milo, the calm companion inside the CortiFree app. Talk like a thoughtful friend who knows breathing, meditation and sleep well, not like a chatbot or a customer-service assistant. Always reply in the user's language. {LENGTH}: no lists, no markdown, no emojis, no headings. Never open with filler such as "Great question", "I understand", "Absolutely", "I'm here for you" or a restatement of the request. Acknowledge what the user feels in a few words, then give one concrete, specific thing to do. Ask at most one question, and only when it genuinely helps. Fit the advice to the user's local time given in the context. Help with general everyday questions too; do not reject a safe request just because it is outside wellbeing. Never invent exercises or pretend to see data that was not provided; the app shows exercise cards itself. For health topics, offer general information, not a diagnosis, treatment decision, or medication dosage; be clear about uncertainty and suggest a qualified professional for personal medical concerns. Never claim the app measures cortisol or diagnoses a condition. If the user may be in immediate danger, expresses intent to self-harm, or reports emergency symptoms such as chest pain or severe trouble breathing, respond empathetically and direct them to local emergency services or an appropriate crisis service. Do not provide instructions that facilitate self-harm, violence, or dangerous wrongdoing; offer a safer alternative. Avoid requesting sensitive personal information.
     """
 
-    init() {
-        _messages = State(initialValue: Self.openingMessages(for: Date()))
-    }
-
-    private static func openingMessages(for date: Date) -> [DeepSeekChatMessage] {
-        let hour = Calendar.current.component(.hour, from: date)
-        if hour < 12 {
-            return [
-                DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.morning.1")),
-                DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.morning.2")),
-                DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.morning.3"))
-            ]
-        } else if hour < 18 {
-            return [
-                DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.afternoon.1")),
-                DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.afternoon.2"))
-            ]
-        }
-        return [
-            DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.evening.1")),
-            DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.evening.2")),
-            DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.opening.evening.3"))
-        ]
-    }
+    private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
     var body: some View {
+        // Details pages are pushed (slide in from the right), not stacked as another sheet.
+        NavigationStack(path: $menuPath) {
+            chat
+                .toolbar(.hidden, for: .navigationBar)
+                .navigationDestination(for: MiloRoute.self) { route in
+                    switch route {
+                    case .menu:
+                        MiloMenuView(
+                            hasConversation: !messages.isEmpty,
+                            remainingMessages: max(0, dailyLimit - assistantDailyUsage),
+                            onNewConversation: newConversation,
+                            onDeleteCurrent: deleteCurrentConversation,
+                            close: { menuPath = [] }
+                        )
+                    case .history:
+                        MiloHistoryView { conversation in
+                            open(conversation)
+                            menuPath = []
+                        }
+                    case .memory:
+                        MiloMemoryView()
+                    case .about:
+                        MiloAboutView()
+                    }
+                }
+        }
+        .tint(AudioPalette.accent)
+        .preferredColorScheme(.dark)
+    }
+
+    private var chat: some View {
         ZStack {
             GalaxyBackgroundView(intensity: 0.85)
+                .ignoresSafeArea()
 
             VStack(spacing: 0) {
                 header
-                messagesView
-                quickActions
+                conversation
                 composer
             }
         }
-        .preferredColorScheme(.dark)
-        .onAppear { refreshDailyQuotaIfNeeded() }
-        .sheet(item: $selectedRecommendation) { recommendation in
-            recommendationDestination(for: recommendation)
+        .onAppear {
+            refreshDailyQuotaIfNeeded()
+            store.reload()
+            consumeSharedDocument()
+        }
+        .onChange(of: importCenter.pendingDocument) { _, _ in consumeSharedDocument() }
+        .onChange(of: importCenter.pendingError) { _, error in
+            guard let error else { return }
+            errorMessage = error
+            importCenter.pendingError = nil
+        }
+        .sheet(item: $importRequest) { request in
+            MiloImportView(
+                initialDocument: request.document,
+                isQuotaReached: assistantDailyUsage >= dailyLimit,
+                onAnalyzed: {
+                    refreshDailyQuotaIfNeeded()
+                    assistantDailyUsage += 1
+                },
+                onFinish: insightKept
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+
+        .sheet(item: $openedBreathing) { BreathingExerciseDetailView(pattern: $0) }
+        .fullScreenCover(item: $runningBreathing) { pattern in
+            BreathingDetailFlowView(pattern: pattern, duration: TimeInterval(pattern.defaultMinutes * 60)) {
+                runningBreathing = nil
+            }
+        }
+        .sheet(isPresented: $showConsent, onDismiss: {
+            pendingConsentText = nil
+            // Open the import only once the consent sheet is gone (one sheet at a time).
+            if let request = pendingImportAfterConsent, MiloConsent.isGranted(in: consentStore, uid: UnifiedFirebaseService.shared.auth.currentUserId) {
+                importRequest = request
+            }
+            pendingImportAfterConsent = nil
+        }) {
+            MiloConsentSheet(
+                onAccept: acceptConsent,
+                onDecline: { showConsent = false }
+            )
+            .presentationDetents([.large])
         }
     }
+
+    // MARK: - Header
 
     private var header: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             Button { dismiss() } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 42, height: 42)
+                    .frame(width: 40, height: 40)
+                    .cfGlassCircle()
             }
-            .accessibilityLabel(LanguageManager.shared.localizedString(for: "assistant.close"))
+            .buttonStyle(.plain)
+            .accessibilityLabel(t("assistant.close"))
 
-            Image("cortifree_assistant_avatar")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 38, height: 38)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Milo")
-                    .font(.custom("Poppins-SemiBold", size: 17))
-                    .foregroundStyle(.white)
-            }
             Spacer()
+
+            if !messages.isEmpty {
+                HStack(spacing: 8) {
+                    avatar(size: 28)
+                    Text(verbatim: "Milo")
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
+                .transition(.opacity)
+            }
+
+            Spacer()
+
+            Button {
+                HapticManager.light()
+                menuPath = [.menu]
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .cfGlassCircle()
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(t("milo.menu.open"))
         }
-        .padding(.horizontal, 14)
+        .overlay(alignment: .bottom) {
+            if store.isTemporary {
+                Label(t("milo.menu.temporary"), systemImage: "lock.fill")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(AudioPalette.accent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(AudioPalette.accent.opacity(0.14), in: Capsule())
+                    .offset(y: 22)
+            }
+        }
+        .padding(.horizontal, 16)
         .padding(.top, 12)
-        .padding(.bottom, 10)
+        .padding(.bottom, 6)
+        .animation(.easeOut(duration: 0.2), value: messages.isEmpty)
     }
 
-    private var messagesView: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 12) {
-                    ForEach(Array(messages.enumerated()), id: \.offset) { index, message in
-                        VStack(alignment: .leading, spacing: 8) {
-                            messageBubble(message)
+    private func avatar(size: CGFloat) -> some View {
+        Image("cortifree_assistant_avatar")
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+    }
 
-                            if let recommendation = recommendationsByMessage[index]?.first {
-                                recommendationButton(recommendation)
+    // MARK: - Conversation
+
+    private var conversation: some View {
+        ScrollViewReader { proxy in
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
+                    if messages.isEmpty {
+                        welcome
+                    }
+                    ForEach(Array(messages.enumerated()), id: \.offset) { index, message in
+                        VStack(alignment: .leading, spacing: 12) {
+                            if message.role == "user" {
+                                userMessage(message.content)
+                            } else {
+                                miloMessage(message.content, showsAvatar: index == 0 || messages[index - 1].role == "user")
+                            }
+                            if let card = cardsByMessage[index] {
+                                recommendationCard(card)
+                                    .padding(.leading, 38)
                             }
                         }
                         .id(index)
                     }
                     if isLoading {
-                        HStack(spacing: 8) {
-                            ProgressView().tint(.white)
-                            Text(LanguageManager.shared.localizedString(for: "assistant.thinking"))
-                                .font(.custom("Poppins-Regular", size: 13))
-                                .foregroundStyle(.white.opacity(0.7))
+                        HStack(alignment: .center, spacing: 10) {
+                            avatar(size: 28)
+                            TypingDots()
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
+                        .id("typing")
                     }
                 }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 14)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
             }
             .scrollDismissesKeyboard(.interactively)
             .onChange(of: messages.count) { _, count in
-                withAnimation { proxy.scrollTo(count - 1, anchor: .bottom) }
+                withAnimation { proxy.scrollTo(count - 1, anchor: .top) }
+            }
+            .onChange(of: isLoading) { _, loading in
+                if loading { withAnimation { proxy.scrollTo("typing", anchor: .bottom) } }
             }
         }
     }
 
-    private func messageBubble(_ message: DeepSeekChatMessage) -> some View {
-        HStack {
-            if message.role == "user" { Spacer(minLength: 42) }
-            Text(message.content)
-                .font(.custom("Poppins-Regular", size: 15))
-                .foregroundStyle(.white)
+    private var welcome: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: 10) {
+                avatar(size: 64)
+                Text(t(moment.greetingKey))
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                Text(t("assistant.welcome.subtitle"))
+                    .font(.system(size: 16))
+                    .foregroundStyle(AudioPalette.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.top, 12)
+
+            VStack(spacing: 10) {
+                ForEach(moment.suggestions) { suggestion in
+                    suggestionRow(suggestion)
+                }
+            }
+
+            importBanner
+        }
+        .padding(.bottom, 8)
+    }
+
+    /// Entry point to « Bring your story to Milo » (chat with another AI, Health PDF…).
+    private var importBanner: some View {
+        Button {
+            HapticManager.light()
+            openImport()
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: store.insight == nil ? "sparkles" : "checkmark.seal.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(AudioPalette.backgroundDeep)
+                    .frame(width: 40, height: 40)
+                    .background(AudioPalette.accent, in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(t(store.insight == nil ? "milo.import.banner.title" : "milo.import.banner.title_known"))
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.leading)
+                    Text(t("milo.import.banner.subtitle"))
+                        .font(.system(size: 13))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(AudioPalette.secondaryText)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(colors: [AudioPalette.accent.opacity(0.22), AudioPalette.accent.opacity(0.06)],
+                               startPoint: .topLeading, endPoint: .bottomTrailing),
+                in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+            )
+            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(AudioPalette.accent.opacity(0.4)))
+        }
+        .buttonStyle(PressableCardStyle())
+        .disabled(isLoading)
+    }
+
+    private func suggestionRow(_ suggestion: MiloSuggestion) -> some View {
+        Button {
+            HapticManager.light()
+            pendingIntent = suggestion.intent
+            draft = t(suggestion.textKey)
+            send()
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: suggestion.icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(AudioPalette.accent)
+                    .frame(width: 36, height: 36)
+                    .background(AudioPalette.accent.opacity(0.14), in: Circle())
+                Text(t(suggestion.textKey))
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(AudioPalette.secondaryText)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cfGlass(cornerRadius: 18, interactive: true)
+        }
+        .buttonStyle(PressableCardStyle())
+        .disabled(isLoading)
+    }
+
+    private func miloMessage(_ text: String, showsAvatar: Bool) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Group {
+                if showsAvatar { avatar(size: 28) } else { Color.clear }
+            }
+            .frame(width: 28, height: 28)
+            Text(text)
+                .font(.system(size: 16))
+                .lineSpacing(4)
+                .foregroundStyle(.white.opacity(0.94))
                 .textSelection(.enabled)
-                .padding(.horizontal, 15)
-                .padding(.vertical, 12)
-                .background(
-                    message.role == "user" ? Color.appTheme.opacity(0.88) : Color.white.opacity(0.12),
-                    in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-                )
-            if message.role != "user" { Spacer(minLength: 42) }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 3)
         }
     }
+
+    private func userMessage(_ text: String) -> some View {
+        HStack {
+            Spacer(minLength: 56)
+            Text(text)
+                .font(.system(size: 15))
+                .foregroundStyle(.white)
+                .textSelection(.enabled)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        }
+    }
+
+    // MARK: - Composer
 
     private var composer: some View {
         VStack(spacing: 8) {
             if let errorMessage {
                 Text(errorMessage)
-                    .font(.custom("Poppins-Regular", size: 12))
+                    .font(.system(size: 12))
                     .foregroundStyle(.white.opacity(0.72))
                     .multilineTextAlignment(.center)
             }
 
-            HStack(spacing: 10) {
-                TextField(LanguageManager.shared.localizedString(for: "assistant.composer.placeholder"), text: $draft, axis: .vertical)
-                    .font(.custom("Poppins-Regular", size: 14))
+            HStack(alignment: .bottom, spacing: 4) {
+                Button {
+                    HapticManager.light()
+                    openImport()
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .frame(width: 34, height: 34)
+                        .background(Color.white.opacity(0.10), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isLoading)
+                .padding(5)
+                .accessibilityLabel(t("milo.import.title"))
+
+                TextField(t("assistant.composer.placeholder"), text: $draft, axis: .vertical)
+                    .font(.system(size: 16))
                     .foregroundStyle(.white)
-                    .lineLimit(1...4)
-                    .padding(.horizontal, 14)
+                    .lineLimit(1...5)
+                    .focused($composerFocused)
                     .padding(.vertical, 11)
-                    .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 
                 Button(action: send) {
                     Image(systemName: "arrow.up")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 42, height: 42)
-                        .background(Color.appTheme, in: Circle())
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(canSend ? AudioPalette.backgroundDeep : .white.opacity(0.5))
+                        .frame(width: 34, height: 34)
+                        .background(canSend ? AudioPalette.accent : Color.white.opacity(0.12), in: Circle())
                 }
-                .disabled(isLoading || draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .opacity(isLoading || draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.45 : 1)
-                .accessibilityLabel(LanguageManager.shared.localizedString(for: "assistant.send"))
+                .buttonStyle(.plain)
+                .disabled(!canSend)
+                .padding(5)
+                .accessibilityLabel(t("assistant.send"))
             }
+            .cfGlass(cornerRadius: 22)
         }
         .padding(.horizontal, 16)
-        .padding(.top, 10)
-        .padding(.bottom, 14)
-        .background(.ultraThinMaterial)
+        .padding(.top, 6)
+        .padding(.bottom, 12)
+        .animation(.easeOut(duration: 0.15), value: canSend)
     }
 
-    private var quickActions: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                quickAction("assistant.quick.breathing.title", message: "assistant.quick.breathing.message")
-                quickAction("assistant.quick.sleep.title", message: "assistant.quick.sleep.message")
-                quickAction("assistant.quick.focus.title", message: "assistant.quick.focus.message")
-                quickAction("assistant.quick.journal.title", message: "assistant.quick.journal.message")
-            }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 8)
-        }
+    private var canSend: Bool {
+        !isLoading && !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private func quickAction(_ titleKey: String, message messageKey: String) -> some View {
-        Button {
-            draft = LanguageManager.shared.localizedString(for: messageKey)
-        } label: {
-            Text(LanguageManager.shared.localizedString(for: titleKey))
-                .font(.custom("Poppins-Medium", size: 12))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.white.opacity(0.12), in: Capsule())
-                .overlay(Capsule().stroke(Color.white.opacity(0.18), lineWidth: 1))
-        }
-        .buttonStyle(.plain)
-    }
+    // MARK: - Sending
 
     private func send() {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        let intent = pendingIntent
+        pendingIntent = nil
         guard !text.isEmpty, !isLoading else { return }
 
         refreshDailyQuotaIfNeeded()
+        errorMessage = nil
+
+        // Crisis replies stay local: they never need sign-in, consent or the network.
+        if isEmergency(text) {
+            draft = ""
+            messages.append(DeepSeekChatMessage(role: "user", content: text))
+            messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.emergency")))
+            store.save(id: conversationID, messages: messages)
+            return
+        }
+
+        guard let uid = UnifiedFirebaseService.shared.auth.currentUserId else {
+            draft = ""
+            messages.append(DeepSeekChatMessage(role: "user", content: text))
+            messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.signin.required")))
+            return
+        }
+
+        guard MiloConsent.isGranted(in: consentStore, uid: uid) else {
+            pendingConsentText = text
+            pendingIntent = intent
+            showConsent = true
+            return
+        }
 
         draft = ""
-        errorMessage = nil
+        composerFocused = false
         messages.append(DeepSeekChatMessage(role: "user", content: text))
 
-        if isEmergency(text) {
-            messages.append(DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.emergency")))
-            return
-        }
-
         guard assistantDailyUsage < dailyLimit else {
-            messages.append(DeepSeekChatMessage(role: "assistant", content: LanguageManager.shared.localizedString(for: "assistant.quota.reached")))
+            messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.quota.reached")))
             return
         }
 
-        assistantDailyUsage += 1
-
+        // Pick the card first so Milo's reply can introduce it instead of naming something else.
+        let card = store.showsExerciseCards ? recommendation(for: text, intent: intent) : nil
+        let currentID = conversationID
         isLoading = true
 
         Task {
             do {
                 let requestMessages = [
                     DeepSeekChatMessage(role: "system", content: systemPrompt),
-                    DeepSeekChatMessage(role: "system", content: appContext)
+                    DeepSeekChatMessage(role: "system", content: appContext),
+                    DeepSeekChatMessage(role: "system", content: cardContext(card))
                 ] + messages
                 let response = try await DeepSeekChatService.shared.reply(to: requestMessages)
                 await MainActor.run {
+                    // Only successful replies count; the server keeps the authoritative quota.
+                    refreshDailyQuotaIfNeeded()
+                    assistantDailyUsage += 1
+                    // The user may have started or opened another conversation meanwhile.
+                    guard currentID == conversationID else { isLoading = false; return }
                     let responseIndex = messages.count
                     messages.append(DeepSeekChatMessage(role: "assistant", content: cleanAssistantResponse(response)))
-                    let recommendations = recommendations(for: text)
-                    if !recommendations.isEmpty {
-                        recommendationsByMessage[responseIndex] = recommendations
-                    }
+                    if let card { cardsByMessage[responseIndex] = card }
+                    store.save(id: conversationID, messages: messages)
+                    isLoading = false
+                }
+            } catch DeepSeekChatError.quotaExceeded {
+                await MainActor.run {
+                    assistantDailyUsage = dailyLimit
+                    messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.quota.reached")))
                     isLoading = false
                 }
             } catch {
                 await MainActor.run {
-                    errorMessage = error.localizedDescription
+                    // Give the text back so the user can retry without retyping.
+                    if messages.last?.role == "user", messages.last?.content == text {
+                        messages.removeLast()
+                        if draft.isEmpty { draft = text }
+                    }
+                    errorMessage = (error as? DeepSeekChatError)?.errorDescription
+                        ?? t("assistant.error.unavailable")
                     isLoading = false
                 }
             }
         }
     }
 
+    private func acceptConsent() {
+        guard let uid = UnifiedFirebaseService.shared.auth.currentUserId else {
+            showConsent = false
+            return
+        }
+        consentStore = MiloConsent.granting(uid, in: consentStore)
+        let text = pendingConsentText
+        let intent = pendingIntent
+        showConsent = false
+        if let text {
+            draft = text
+            pendingIntent = intent
+            send()
+        }
+    }
+
     private var appContext: String {
-        PlanAssistantContext.current()
+        let time = Date().formatted(date: .omitted, time: .shortened)
+        var context = PlanAssistantContext.current() + "\nUser's local time: \(time)."
+        if let insight = store.insight {
+            context += "\n" + insight.contextLine
+        }
+        if !store.memory.isEmpty {
+            context += "\nWhat the user asked Milo to remember about them (use it naturally, never quote it back): \(store.memory)"
+        }
+        return context
+    }
+
+    // MARK: - Import
+
+    /// Sign-in and consent come first: the document is sent to the AI provider.
+    private func openImport(with document: MiloImportDocument? = nil) {
+        let request = MiloImportRequest(document: document)
+        guard let uid = UnifiedFirebaseService.shared.auth.currentUserId else {
+            messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.signin.required")))
+            return
+        }
+        guard MiloConsent.isGranted(in: consentStore, uid: uid) else {
+            pendingImportAfterConsent = request
+            showConsent = true
+            return
+        }
+        importRequest = request
+    }
+
+    private func consumeSharedDocument() {
+        guard let document = importCenter.pendingDocument else { return }
+        importCenter.pendingDocument = nil
+        openImport(with: document)
+    }
+
+    /// Milo opens a new conversation from what it learned, so the user can answer right away.
+    private func insightKept(_ insight: MiloInsight) {
+        if !messages.isEmpty { newConversation() }
+        var text = insight.summary
+        if !insight.firstStep.isEmpty { text += " " + insight.firstStep }
+        messages.append(DeepSeekChatMessage(role: "assistant", content: text))
+        // The card follows the first step Milo suggested, or the main theme, or the time of day.
+        guard store.showsExerciseCards else { return }
+        let step = insight.firstStep.lowercased()
+        let themes = insight.themes.joined(separator: " ").lowercased()
+        // A breathing exercise Milo named (« 4-7-8 », « box breathing »…) wins.
+        if let named = BreathingPattern.allPatterns.first(where: {
+            step.contains($0.name.lowercased()) || step.contains($0.localizedTitle.lowercased())
+        }) {
+            cardsByMessage[0] = AssistantRecommendation(kind: .breathing(named))
+            return
+        }
+        let fallback = MiloIntent.session(sessionCategory(for: themes) ?? moment.defaultCategory)
+        if let card = recommendation(for: step, intent: nil) ?? recommendation(for: step, intent: fallback) {
+            cardsByMessage[0] = card
+        }
+    }
+
+    // MARK: - Conversations
+
+    private func newConversation() {
+        conversationID = UUID()
+        messages = []
+        cardsByMessage = [:]
+        draft = ""
+        errorMessage = nil
+        isLoading = false
+        store.isTemporary = false
+    }
+
+    private func open(_ conversation: MiloConversation) {
+        conversationID = conversation.id
+        messages = conversation.messages
+        cardsByMessage = [:]
+        errorMessage = nil
+        isLoading = false
+        store.isTemporary = false
+    }
+
+    private func deleteCurrentConversation() {
+        store.delete(conversationID)
+        newConversation()
+    }
+
+    /// Tells the model which card the app shows under its reply, so both say the same thing.
+    private func cardContext(_ card: AssistantRecommendation?) -> String {
+        guard let card else {
+            return "No exercise card is shown under this reply. Do not name a specific CortiFree exercise unless the user asks for one."
+        }
+        return "The app shows this card right under your reply: \"\(card.title)\" (\(card.kindLabel), \(card.meta)). Point to it in one natural sentence as the thing to try now, without describing the card itself, and do not suggest any other exercise."
     }
 
     private func isEmergency(_ text: String) -> Bool {
         let normalized = text.lowercased()
-        let terms = [
-            "suicide", "suicid", "kill myself", "end my life", "self harm", "self-harm", "hurt myself", "can't breathe", "cannot breathe", "chest pain", "overdose",
-            "me tuer", "mettre fin à mes jours", "me faire du mal", "me blesser", "douleur thoracique", "douleur à la poitrine", "j'arrive pas à respirer", "difficulté à respirer", "surdose",
-            "matarme", "quitarme la vida", "hacerme daño", "hacerme dano", "dolor en el pecho", "no puedo respirar", "sobredosis",
-            "umbringen", "mir etwas antun", "selbstmord", "brustschmerzen", "ich kann nicht atmen", "atemnot", "überdosis", "ueberdosis"
-        ]
-        return terms.contains { normalized.contains($0) }
+            .replacingOccurrences(of: "’", with: "'")
+            .replacingOccurrences(of: "‘", with: "'")
+        return Self.emergencyTerms.contains { normalized.contains($0) }
     }
+
+    /// Lowercased phrases (straight apostrophes) for suicidal ideation, self-harm, overdose and acute symptoms.
+    private static let emergencyTerms: [String] = [
+        // English
+        "suicide", "suicid", "kill myself", "killing myself", "end my life", "end it all", "take my own life", "want to die", "wanna die",
+        "wish i was dead", "wish i were dead", "better off dead", "don't want to live", "dont want to live", "don't want to be alive",
+        "no reason to live", "self harm", "self-harm", "selfharm", "hurt myself", "harm myself", "cut myself", "cutting myself",
+        "overdose", "overdosing", "took too many pills", "chest pain", "pain in my chest", "heart attack",
+        "can't breathe", "cant breathe", "cannot breathe", "can't catch my breath", "struggling to breathe", "trouble breathing",
+        // French
+        "me tuer", "me suicider", "suicidaire", "mettre fin à mes jours", "mettre fin a mes jours", "envie d'en finir", "veux en finir", "vais en finir", "veux mourir", "envie de mourir",
+        "plus envie de vivre", "pas envie de vivre", "marre de vivre", "je préfère mourir", "me faire du mal", "me blesser", "me scarifier", "me mutiler",
+        "automutilation", "surdose", "trop de médicaments", "trop de cachets", "douleur thoracique", "douleur à la poitrine",
+        "mal à la poitrine", "crise cardiaque", "j'arrive pas à respirer", "j'arrive plus à respirer", "je n'arrive pas à respirer",
+        "je n'arrive plus à respirer", "je ne peux pas respirer", "difficulté à respirer", "du mal à respirer", "j'étouffe",
+        // German
+        "umbringen", "selbstmord", "suizid", "mir das leben nehmen", "will sterben", "möchte sterben", "nicht mehr leben", "keinen sinn mehr zu leben",
+        "mir etwas antun", "mich verletzen", "ritzen", "selbstverletzung", "überdosis", "ueberdosis", "zu viele tabletten",
+        "brustschmerzen", "schmerzen in der brust", "herzinfarkt", "schlaganfall", "kann nicht atmen", "kann nicht mehr atmen", "bekomme keine luft",
+        "kriege keine luft", "atemnot",
+        // Spanish
+        "matarme", "suicidarme", "quitarme la vida", "acabar con mi vida", "quiero morir", "quiero morirme", "no quiero vivir", "ganas de morir",
+        "no tengo ganas de vivir", "hacerme daño", "hacerme dano", "lastimarme", "cortarme", "autolesión", "autolesion", "sobredosis",
+        "demasiadas pastillas", "dolor en el pecho", "dolor de pecho", "infarto", "no puedo respirar", "me cuesta respirar", "me ahogo",
+        // Japanese
+        "死にたい", "自殺", "消えたい", "生きていたくない", "生きたくない", "命を絶", "自分を傷つけ", "自傷", "リストカット", "リスカ",
+        "過剰摂取", "オーバードーズ", "薬を飲みすぎ", "胸が痛", "胸の痛み", "心臓発作", "脳卒中", "息ができない", "呼吸ができない", "息が苦しい", "呼吸が苦しい",
+        // Korean
+        "죽고 싶", "죽고싶", "자살", "목숨을 끊", "살고 싶지 않", "살고싶지않", "사라지고 싶", "자해", "나를 해치", "손목을 긋",
+        "과다복용", "약을 너무 많이", "가슴이 아파", "가슴 통증", "흉통", "심장마비", "뇌졸중", "숨을 못 쉬", "숨을 쉴 수 없", "숨이 안 쉬어", "호흡곤란"
+    ]
 
     private func refreshDailyQuotaIfNeeded() {
         let today = Self.dateKeyFormatter.string(from: Date())
@@ -291,29 +686,48 @@ struct AssistantChatView: View {
         return String(lines.joined(separator: " ").prefix(520))
     }
 
-    private func recommendations(for text: String) -> [AssistantRecommendation] {
-        [nextRecommendation(for: text)]
-    }
+    // MARK: - Recommendation
 
-    private func nextRecommendation(for text: String) -> AssistantRecommendation {
-        let normalized = text.lowercased()
-        let breathing = BreathingPattern.allPatterns
-        let sounds = Exercise.sounds
+    /// The exercise card for a message: from the tapped suggestion, or from what the user wrote.
+    /// Returns nil for small talk, so not every reply ends with an exercise.
+    private func recommendation(for text: String, intent: MiloIntent?) -> AssistantRecommendation? {
         let index = recommendationRotation
+        let normalized = text.lowercased()
+        let resolved: MiloIntent
+        if let intent {
+            resolved = intent
+        } else if containsAny(normalized, ["sound", "son ", "sons", "music", "musique", "noise", "bruit", "geräusch", "sonido", "音", "소리"]) {
+            resolved = .sound
+        } else if containsAny(normalized, ["breath", "respir", "atem", "呼吸", "호흡"]) {
+            resolved = .breathing(slow: moment == .night || containsAny(normalized, ["sleep", "dormir", "sommeil", "schlaf", "睡眠", "잠"]))
+        } else if let category = sessionCategory(for: normalized) {
+            resolved = .session(category)
+        } else {
+            return nil
+        }
         recommendationRotation += 1
-        if containsAny(normalized, ["sound", "son", "music", "musique", "noise", "bruit"]), let item = sounds[safe: index % max(1, sounds.count)] {
-            return soundRecommendation(item.id)
-        }
-        let wantsBreathing = containsAny(normalized, ["breath", "respir", "atem", "呼吸", "호흡"])
-        if !wantsBreathing, let category = sessionCategory(for: normalized) {
-            let sessions = GuidedSessionCatalog.sessions(in: category).sorted { $0.durationMinutes < $1.durationMinutes }
-            if let session = sessions[safe: index % max(1, sessions.count)] {
-                return sessionRecommendation(session)
+
+        switch resolved {
+        case .sound:
+            let sounds = moment == .night ? Exercise.sounds.filter { ["rain", "ocean", "night", "whitenoise"].contains($0.id) } : Exercise.sounds
+            guard let sound = sounds[safe: index % max(1, sounds.count)] else { return nil }
+            return .init(kind: .sound(sound))
+        case .breathing(let slow):
+            let patterns = BreathingPattern.allPatterns
+            let pattern = slow
+                ? patterns.first { $0.name.lowercased().contains("slow") || $0.category == .sleep }
+                : patterns[safe: index % max(1, patterns.count)]
+            guard let pattern = pattern ?? patterns.first else { return nil }
+            return .init(kind: .breathing(pattern))
+        case .session(let category):
+            // Sessions not finished yet first, then the shortest, rotating between replies.
+            let sessions = GuidedSessionCatalog.sessions(in: category).sorted { lhs, rhs in
+                let l = GuidedSessionProgressStore.isCompleted(lhs.id), r = GuidedSessionProgressStore.isCompleted(rhs.id)
+                return l == r ? lhs.durationMinutes < rhs.durationMinutes : !l
             }
+            guard let session = sessions[safe: index % max(1, min(3, sessions.count))] else { return nil }
+            return .init(kind: .session(session))
         }
-        let sleepRequest = containsAny(normalized, ["sleep", "dormir", "sommeil"])
-        let breathingIndex = sleepRequest ? (breathing.firstIndex(where: { $0.name.lowercased().contains("slow") }) ?? index % max(1, breathing.count)) : index % max(1, breathing.count)
-        return breathingRecommendation(breathing[safe: breathingIndex] ?? breathing[0])
     }
 
     /// Guided-session category matching the request, or the plan goal for a generic meditation request.
@@ -321,21 +735,21 @@ struct AssistantChatView: View {
         let rules: [([String], AudioSessionCategory)] = [
             (["sleep", "dormir", "sommeil", "insomn", "schlaf", "睡眠", "잠"], .sleep),
             (["focus", "concentr", "fokus", "集中", "집중"], .focus),
-            (["anxi", "angoiss", "panic", "panique", "angst", "不安", "불안"], .anxiety),
+            (["anxi", "angoiss", "panic", "panique", "angst", "racing", "tourne en boucle", "不安", "불안"], .anxiety),
             (["morning", "matin", "energy", "énergie", "energie", "fatigue", "tired", "morgen"], .morning),
             (["work", "travail", "boulot", "bureau", "arbeit", "trabajo"], .workBreak),
-            (["body", "corps", "tension", "muscle", "dos", "nuque", "körper", "cuerpo"], .bodyRelax),
+            (["body", "corps", "tension", "tense", "muscle", "dos", "nuque", "körper", "cuerpo"], .bodyRelax),
             (["sad", "triste", "compassion", "lonely", "seul", "difficile", "traurig"], .selfCompassion),
             (["stress", "estrés", "ストレス", "스트레스"], .stressSOS)
         ]
         if let match = rules.first(where: { containsAny(text, $0.0) }) { return match.1 }
-        guard containsAny(text, ["meditat", "médit", "mindful", "pleine conscience", "journal", "séance", "session"]) else { return nil }
+        guard containsAny(text, ["meditat", "médit", "mindful", "pleine conscience", "séance", "session", "exercise", "exercice"]) else { return nil }
         switch PersonalPlanStore.shared.plan?.goal {
-        case .sleep: return .sleep
+        case .sleep: return moment == .night ? .sleep : .stressSOS
         case .energy: return .morning
         case .focus: return .focus
         case .emotional: return .selfCompassion
-        default: return .stressSOS
+        default: return moment.defaultCategory
         }
     }
 
@@ -343,70 +757,82 @@ struct AssistantChatView: View {
         terms.contains { text.contains($0) }
     }
 
-    private func breathingRecommendation(_ pattern: BreathingPattern) -> AssistantRecommendation {
-        AssistantRecommendation(id: "breathing-\(pattern.name)", title: pattern.displayName, subtitle: LanguageManager.shared.localizedString(for: "assistant.recommendation.breathing"), kind: .breathing(pattern))
-    }
+    // MARK: - Exercise card
 
-    private func sessionRecommendation(_ session: GuidedSession) -> AssistantRecommendation {
-        AssistantRecommendation(id: "session-\(session.id)", title: session.localizedTitle, subtitle: "\(session.durationMinutes) min · \(session.localizedSubtitle)", kind: .session(session))
-    }
-
-    private func soundRecommendation(_ id: String) -> AssistantRecommendation {
-        let exercise = Exercise.sounds.first(where: { $0.id == id })
-        return AssistantRecommendation(id: "sound-\(id)", title: exercise?.title ?? id.capitalized, subtitle: exercise?.description ?? LanguageManager.shared.localizedString(for: "assistant.recommendation.sound"), kind: .sound(id))
-    }
-
-    private func recommendationButton(_ recommendation: AssistantRecommendation) -> some View {
-        Button {
-            if case .sound(let id) = recommendation.kind,
-               let exercise = Exercise.sounds.first(where: { $0.id == id }) {
-                SoundPlayer.shared.play(exercise: exercise)
-            } else if case .session(let session) = recommendation.kind {
-                // The full player is presented from the root view: close the chat first.
-                dismiss()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    GuidedSessionPlayer.shared.play(session, presentFullPlayer: true)
-                }
-            } else {
-                selectedRecommendation = recommendation
-            }
-        } label: {
+    private func recommendationCard(_ card: AssistantRecommendation) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                Image("cortifree_assistant_avatar")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 42, height: 42)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-
+                cardArtwork(card)
+                    .frame(width: 64, height: 64)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(recommendation.title)
-                        .font(.custom("Poppins-SemiBold", size: 14))
+                    Text(card.kindLabel.uppercased())
+                        .font(.system(size: 11, weight: .semibold))
+                        .tracking(0.8)
+                        .foregroundStyle(AudioPalette.accent)
+                    Text(card.title)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
-                    Text(recommendation.subtitle)
-                        .font(.custom("Poppins-Regular", size: 12))
-                        .foregroundStyle(.white.opacity(0.68))
-                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                    Text(card.meta)
+                        .font(.system(size: 13))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                        .lineLimit(1)
+                        .monospacedDigit()
                 }
-
-                Spacer()
-                Image(systemName: "arrow.up.right")
-                    .foregroundStyle(Color.appTheme)
+                Spacer(minLength: 0)
             }
-            .padding(12)
-            .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if case .breathing(let pattern) = card.kind { openedBreathing = pattern }
+            }
+
+            Button {
+                HapticManager.light()
+                start(card)
+            } label: {
+                Label(startTitle(card), systemImage: isPlaying(card) ? "pause.fill" : "play.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AudioPalette.backgroundDeep)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(AudioPalette.accent, in: Capsule())
+            }
+            .buttonStyle(PressableCardStyle())
         }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.leading, 0)
+        .padding(14)
+        .cfGlass(cornerRadius: 22)
     }
 
     @ViewBuilder
-    private func recommendationDestination(for recommendation: AssistantRecommendation) -> some View {
-        switch recommendation.kind {
+    private func cardArtwork(_ card: AssistantRecommendation) -> some View {
+        switch card.kind {
+        case .session(let session): SessionArtworkView(session: session, cornerRadius: 14, showsSymbol: false)
+        case .breathing(let pattern): LibraryImage(name: PlanArtwork.breathingImage(pattern.category))
+        case .sound(let sound): LibraryImage(name: sound.soundImageName)
+        }
+    }
+
+    private func isPlaying(_ card: AssistantRecommendation) -> Bool {
+        if case .sound(let sound) = card.kind { return soundPlayer.currentExercise?.id == sound.id && soundPlayer.isPlaying }
+        return false
+    }
+
+    private func startTitle(_ card: AssistantRecommendation) -> String {
+        isPlaying(card) ? t("assistant.card.pause") : t("assistant.card.start")
+    }
+
+    private func start(_ card: AssistantRecommendation) {
+        switch card.kind {
+        case .sound(let sound):
+            soundPlayer.play(exercise: sound)
         case .breathing(let pattern):
-            BreathingExerciseDetailView(pattern: pattern)
-        case .session, .sound:
-            SoundsListView()
+            runningBreathing = pattern
+        case .session(let session):
+            // The full player is presented from the root view: close the chat first.
+            dismiss()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                GuidedSessionPlayer.shared.play(session, presentFullPlayer: true)
+            }
         }
     }
 
@@ -419,17 +845,153 @@ struct AssistantChatView: View {
     }()
 }
 
+// MARK: - Models
+
+private struct MiloImportRequest: Identifiable {
+    let id = UUID()
+    let document: MiloImportDocument?
+}
+
 private struct AssistantRecommendation: Identifiable {
     enum Kind {
         case breathing(BreathingPattern)
         case session(GuidedSession)
-        case sound(String)
+        case sound(Exercise)
     }
 
-    let id: String
-    let title: String
-    let subtitle: String
     let kind: Kind
+
+    var id: String {
+        switch kind {
+        case .breathing(let pattern): return "breathing-\(pattern.name)"
+        case .session(let session): return "session-\(session.id)"
+        case .sound(let sound): return "sound-\(sound.id)"
+        }
+    }
+
+    var title: String {
+        switch kind {
+        case .breathing(let pattern): return pattern.localizedTitle
+        case .session(let session): return session.localizedTitle
+        case .sound(let sound): return sound.title
+        }
+    }
+
+    var kindLabel: String {
+        let key: String
+        switch kind {
+        case .breathing: key = "assistant.card.kind.breathing"
+        case .session: key = "assistant.card.kind.meditation"
+        case .sound: key = "assistant.card.kind.sound"
+        }
+        return LanguageManager.shared.localizedString(for: key)
+    }
+
+    var meta: String {
+        switch kind {
+        case .breathing(let pattern): return "\(pattern.defaultMinutes) min · \(pattern.rhythmLabel)"
+        case .session(let session): return "\(session.durationMinutes) min · \(session.category.title.localized)"
+        case .sound: return LanguageManager.shared.localizedString(for: "library.downloads.sound_loop")
+        }
+    }
+}
+
+/// What a tapped suggestion asks for, independent of the language it is written in.
+enum MiloIntent: Equatable {
+    case session(AudioSessionCategory)
+    case breathing(slow: Bool)
+    case sound
+}
+
+private struct MiloSuggestion: Identifiable {
+    let textKey: String
+    let icon: String
+    let intent: MiloIntent
+    var id: String { textKey }
+}
+
+/// Part of the day: drives the greeting and which suggestions make sense right now
+/// (no « sleep better » at 2 pm).
+private enum MiloMoment: Equatable {
+    case morning, day, evening, night
+
+    static var current: MiloMoment {
+        switch Calendar.current.component(.hour, from: Date()) {
+        case 5..<11: return .morning
+        case 11..<18: return .day
+        case 18..<21: return .evening
+        default: return .night
+        }
+    }
+
+    var greetingKey: String {
+        switch self {
+        case .morning: return "assistant.greeting.morning"
+        case .day: return "assistant.greeting.day"
+        case .evening: return "assistant.greeting.evening"
+        case .night: return "assistant.greeting.night"
+        }
+    }
+
+    var defaultCategory: AudioSessionCategory {
+        switch self {
+        case .morning: return .morning
+        case .day: return .stressSOS
+        case .evening: return .bodyRelax
+        case .night: return .sleep
+        }
+    }
+
+    var suggestions: [MiloSuggestion] {
+        switch self {
+        case .morning:
+            return [
+                MiloSuggestion(textKey: "assistant.suggest.start_calm", icon: "sunrise.fill", intent: .session(.morning)),
+                MiloSuggestion(textKey: "assistant.suggest.woke_anxious", icon: "cloud.sun.fill", intent: .session(.anxiety)),
+                MiloSuggestion(textKey: "assistant.suggest.focus_today", icon: "scope", intent: .session(.focus))
+            ]
+        case .day:
+            return [
+                MiloSuggestion(textKey: "assistant.suggest.stressed_now", icon: "wind", intent: .breathing(slow: false)),
+                MiloSuggestion(textKey: "assistant.suggest.work_break", icon: "cup.and.saucer.fill", intent: .session(.workBreak)),
+                MiloSuggestion(textKey: "assistant.suggest.cant_focus", icon: "scope", intent: .session(.focus)),
+                MiloSuggestion(textKey: "assistant.suggest.body_tense", icon: "figure.mind.and.body", intent: .session(.bodyRelax))
+            ]
+        case .evening:
+            return [
+                MiloSuggestion(textKey: "assistant.suggest.unwind", icon: "sunset.fill", intent: .session(.bodyRelax)),
+                MiloSuggestion(textKey: "assistant.suggest.racing_mind", icon: "tornado", intent: .session(.anxiety)),
+                MiloSuggestion(textKey: "assistant.suggest.hard_day", icon: "heart.fill", intent: .session(.selfCompassion))
+            ]
+        case .night:
+            return [
+                MiloSuggestion(textKey: "assistant.suggest.sleep_better", icon: "moon.stars.fill", intent: .session(.sleep)),
+                MiloSuggestion(textKey: "assistant.suggest.cant_fall_asleep", icon: "bed.double.fill", intent: .breathing(slow: true)),
+                MiloSuggestion(textKey: "assistant.suggest.calm_sound", icon: "cloud.rain.fill", intent: .sound)
+            ]
+        }
+    }
+}
+
+/// Three softly pulsing dots while Milo writes.
+private struct TypingDots: View {
+    var body: some View {
+        TimelineView(.animation) { context in
+            let time = context.date.timeIntervalSinceReferenceDate
+            HStack(spacing: 5) {
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 7, height: 7)
+                        .opacity(0.3 + 0.6 * max(0, sin(time * 4 - Double(index) * 0.7)))
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color.white.opacity(0.10), in: Capsule())
+        }
+        .accessibilityLabel(LanguageManager.shared.localizedString(for: "assistant.thinking"))
+    }
 }
 
 #Preview {

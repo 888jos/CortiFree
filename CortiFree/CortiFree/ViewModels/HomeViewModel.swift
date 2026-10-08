@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import UIKit
-import FirebaseFirestore
 
 @MainActor
 class HomeViewModel: ObservableObject {

@@ -7,7 +7,7 @@
 "widget.program" = "PROGRAMA CORTIFREE";
 "widget.footer.almost" = "%d%% completado, la meta está cerca";
 "widget.lockscreen.description" = "Abra CortiFree desde la pantalla de bloqueo";
-"widget.day_of" = "/66";
+"widget.day_of" = "/28";
 "widget.footer.high" = "%d%% completado, ¡ya estás a mitad de camino!";
 "widget.footer.perfect" = "100%% hecho, día perfecto";
 "widget.empty" = "Sin tareas para hoy";

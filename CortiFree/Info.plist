@@ -6,6 +6,36 @@
 	<string>$(AMPLITUDE_API_KEY)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CONVEX_URL</key>
+	<string>$(CONVEX_URL)</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Text</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+				<string>net.daringfireball.markdown</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -46,12 +76,18 @@
 	<string>559047783915-cmbhjkc2ceuitt2p1o3pia84d56l2jvb.apps.googleusercontent.com</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAdvertisingAttributionReportEndpoint</key>
 	<string>https://api-adservices.apple.com/api/v1/</string>
 	<key>NSCameraUsageDescription</key>
 	<string>CortiFree uses the camera for an optional wellness photo preview.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>CortiFree reads your anxiety questionnaires (GAD-7) and your moods to personalize your plan. This data stays on your iPhone.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>CortiFree saves your anxiety check-ins, daily moods and mindful minutes to Apple Health.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>CortiFree utilise le micro pour les exercices de respiration guidée.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

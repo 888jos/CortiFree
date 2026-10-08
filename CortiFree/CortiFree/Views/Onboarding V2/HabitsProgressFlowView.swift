@@ -9,114 +9,34 @@
 import SwiftUI
 
 struct HabitsProgressFlowView: View {
+    /// Daily minutes chosen in the habits quiz; the weekly targets scale with it.
+    var availableMinutes: Int? = nil
+    var onBack: (() -> Void)? = nil
     let onComplete: () -> Void
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentHabitIndex: Int = 0
     @State private var currentWeek: Int = 1
-    @State private var shouldRenderChart = false
-    @State private var loadedHabits: Set<Int> = [] // Track which habits have been loaded
+    // Charts are drawn right away: there is nothing to load.
+    @State private var shouldRenderChart = true
+    @State private var loadedHabits: Set<Int> = Set(0..<8)
     @State private var screenViewTime: Date?
 
-    // Les habitudes avec leurs statistiques de progression
+    // Week-4 targets of the 28-day plan, scaled to the daily time chosen in the quiz.
     private var habitProgresses: [HabitProgress] {
-        [
+        OnboardingHabitTargets.targets(availableMinutes: availableMinutes).map { target in
             HabitProgress(
-                icon: "wind",
-                title: "onboarding_v2.habits_progress.breathing_title".localized,
+                icon: target.icon,
+                title: "onboarding_v2.habits_progress.\(target.id)_title".localized,
                 yAxisLabel: "",
-                yAxisValues: ["15 min", "30 min", "45 min", "1h"],
-                currentValue: "1h",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.breathing_stat".localized,
+                yAxisValues: target.yAxisValues,
+                currentValue: target.currentValue,
+                weekNumber: OnboardingHabitTargets.planWeeks,
+                statMessage: target.statMessage,
                 maxValue: 4.0,
                 currentProgress: 3.7,
-                curveStyle: 0
-            ),
-            HabitProgress(
-                icon: "figure.mind.and.body",
-                title: "onboarding_v2.habits_progress.meditation_title".localized,
-                yAxisLabel: "",
-                yAxisValues: ["20 min", "40 min", "1h", "1h20", "1h40"],
-                currentValue: "1h30",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.meditation_stat".localized,
-                maxValue: 4.0,
-                currentProgress: 3.7,
-                curveStyle: 1
-            ),
-            HabitProgress(
-                icon: "book.pages",
-                title: "onboarding_v2.habits_progress.journal_title".localized,
-                yAxisLabel: "",
-                yAxisValues: ["2x", "3x", "5x", "7x"],
-                currentValue: "7x",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.journal_stat".localized,
-                maxValue: 4.0,
-                currentProgress: 3.7,
-                curveStyle: 2
-            ),
-            HabitProgress(
-                icon: "figure.walk",
-                title: "onboarding_v2.habits_progress.sport_title".localized,
-                yAxisLabel: "",
-                yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
-                currentValue: "3h30",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.sport_stat".localized,
-                maxValue: 4.0,
-                currentProgress: 3.7,
-                curveStyle: 3
-            ),
-            HabitProgress(
-                icon: "drop.fill",
-                title: "onboarding_v2.habits_progress.water_title".localized,
-                yAxisLabel: "",
-                yAxisValues: ["1.5L", "2L", "2.5L", "3L"],
-                currentValue: "2,5L",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.water_stat".localized,
-                maxValue: 4.0,
-                currentProgress: 3.7,
-                curveStyle: 4
-            ),
-            HabitProgress(
-                icon: "tree.fill",
-                title: "onboarding_v2.habits_progress.nature_title".localized,
-                yAxisLabel: "",
-                yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
-                currentValue: "3h30",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.nature_stat".localized,
-                maxValue: 4.0,
-                currentProgress: 3.7,
-                curveStyle: 5
-            ),
-            HabitProgress(
-                icon: "moon.zzz.fill",
-                title: "onboarding_v2.habits_progress.sleep_title".localized,
-                yAxisLabel: "",
-                yAxisValues: ["6h", "6.5h", "7h", "7.5h", "8h"],
-                currentValue: "8h",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.sleep_stat".localized,
-                maxValue: 4.0,
-                currentProgress: 3.7,
-                curveStyle: 6
-            ),
-            HabitProgress(
-                icon: "person.2.fill",
-                title: "onboarding_v2.habits_progress.social_title".localized,
-                yAxisLabel: "",
-                yAxisValues: ["3x", "4x", "5x", "6x"],
-                currentValue: "4x",
-                weekNumber: 10,
-                statMessage: "onboarding_v2.habits_progress.social_stat".localized,
-                maxValue: 4.0,
-                currentProgress: 3.7,
-                curveStyle: 7
+                curveStyle: target.curveStyle
             )
-        ]
+        }
     }
 
     private var currentHabitProgress: HabitProgress {
@@ -174,15 +94,6 @@ struct HabitsProgressFlowView: View {
                             currentHabitIndex = index
                             currentWeek = 1  // Reset to week 1 when changing habit
 
-                            // Load this habit's chart if not already loaded
-                            if !loadedHabits.contains(index) {
-                                Task {
-                                    try? await Task.sleep(nanoseconds: 150_000_000) // 0.15s delay
-                                    withAnimation(.easeIn(duration: 0.2)) {
-                                        loadedHabits.insert(index)
-                                    }
-                                }
-                            }
                         }) {
                             Image(systemName: habitProgresses[index].icon)
                                 .font(.system(size: 17))
@@ -337,22 +248,12 @@ struct HabitsProgressFlowView: View {
                 .padding(.bottom, 40)
             }
         }
+        .onboardingBackButton(onBack)
         .task {
             // Track screen view
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingHabitsProgressViewed()
 
-            // Initial load: show UI first
-            try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 second
-            withAnimation(.easeIn(duration: 0.2)) {
-                shouldRenderChart = true
-            }
-
-            // Then load only the first habit's chart
-            try? await Task.sleep(nanoseconds: 150_000_000) // Additional 0.15s
-            withAnimation(.easeIn(duration: 0.2)) {
-                loadedHabits.insert(0) // Load first habit (Respirer consciemment)
-            }
         }
     }
 }
@@ -449,7 +350,7 @@ struct HabitProgressChart: View {
 
                     // CortiFree gradient fill - only up to currentWeek
                     GeometryReader { chartGeometry in
-                        let normalizedX = Double(currentWeek - 1) / 9.0  // Maps weeks 1-10 to 0.0-1.0
+                        let normalizedX = Double(currentWeek - 1) / Double(max(weekNumber - 1, 1))  // Maps weeks 1...weekNumber to 0.0-1.0
 
                         PartialGradientFill(
                             progress: normalizedProgress,
@@ -463,7 +364,7 @@ struct HabitProgressChart: View {
 
                     // Current value indicator and week line
                     GeometryReader { chartGeometry in
-                        let normalizedX = Double(currentWeek - 1) / 9.0  // Maps weeks 1-10 to 0.0-1.0
+                        let normalizedX = Double(currentWeek - 1) / Double(max(weekNumber - 1, 1))  // Maps weeks 1...weekNumber to 0.0-1.0
                         let topPadding: CGFloat = 20
                         let availableHeight = chartGeometry.size.height - topPadding
                         let curveX = chartGeometry.size.width * CGFloat(normalizedX)
@@ -509,8 +410,8 @@ struct HabitProgressChart: View {
                                 .onChanged { value in
                                     let newX = value.location.x
                                     let normalizedX = max(0.0, min(1.0, newX / chartGeometry.size.width))
-                                    let newWeek = Int(round(normalizedX * 9)) + 1  // Maps 0.0-1.0 to weeks 1-10
-                                    currentWeek = max(1, min(10, newWeek))
+                                    let newWeek = Int(round(normalizedX * Double(weekNumber - 1))) + 1  // Maps 0.0-1.0 to weeks 1...weekNumber
+                                    currentWeek = max(1, min(weekNumber, newWeek))
                                 }
                         )
 

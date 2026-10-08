@@ -126,6 +126,7 @@ final class GuidedSessionPlayer: ObservableObject {
     private var player: AVPlayer?
     private var timeObserver: Any?
     private var endObserver: NSObjectProtocol?
+    private var itemStatusObserver: NSKeyValueObservation?
     private var loadTask: Task<Void, Never>?
     private var ambiencePlayer: AVAudioPlayer?
     private var isAmbienceFadingOut = false
@@ -135,6 +136,8 @@ final class GuidedSessionPlayer: ObservableObject {
     private var listenedSeconds: TimeInterval = 0
     private var lastTickTime: TimeInterval?
     private var completionRecorded = false
+    /// False when the plan credits the session itself on finish (avoids a double count in Progress).
+    private var recordsSession = true
     private var lastResumeSave = Date.distantPast
 
     private var sleepTimerTask: Task<Void, Never>?
@@ -149,8 +152,9 @@ final class GuidedSessionPlayer: ObservableObject {
     // MARK: - Public API
 
     /// Starts (or resumes) a session. Stops any ambient sound playing in `SoundPlayer`.
-    func play(_ session: GuidedSession, presentFullPlayer: Bool = false) {
+    func play(_ session: GuidedSession, presentFullPlayer: Bool = false, recordsSession: Bool = true) {
         if presentFullPlayer { isFullPlayerPresented = true }
+        self.recordsSession = recordsSession
 
         if currentSession?.id == session.id, phase != .idle {
             if case .failed = phase {
@@ -161,10 +165,11 @@ final class GuidedSessionPlayer: ObservableObject {
             }
         }
 
-        stop(keepPresentation: true)
+        // Take the focus first so stopping the previous playback doesn't hand it back
+        // to the user's music app for a split second.
+        AudioFocus.acquire(.guidedSession)
+        stop(keepPresentation: true, releasingFocus: false)
         if SoundPlayer.shared.currentExercise != nil { SoundPlayer.shared.stop() }
-
-        activateAudioSession()
 
         currentSession = session
         phase = .preparing
@@ -178,8 +183,7 @@ final class GuidedSessionPlayer: ObservableObject {
         wantsPlayback = true
         nowPlayingArtwork = makeArtwork(for: session)
 
-        let narrationLanguage = GuidedSession.narrationLanguage()
-        script = NarrationLibrary.shared.script(for: session.id, language: narrationLanguage)
+        script = NarrationLibrary.shared.script(for: session.id, language: session.playbackLanguage)
 
         startAmbience(resolvedAmbience(for: session))
         GuidedSessionProgressStore.markPlayed(session.id)
@@ -219,7 +223,7 @@ final class GuidedSessionPlayer: ObservableObject {
             return
         }
         wantsPlayback = true
-        activateAudioSession()
+        AudioFocus.acquire(.guidedSession)
 
         if didFinish {
             didFinish = false
@@ -256,7 +260,7 @@ final class GuidedSessionPlayer: ObservableObject {
 
     /// Stops and unloads the session (mini player disappears).
     func stop() {
-        stop(keepPresentation: false)
+        stop(keepPresentation: false, releasingFocus: true)
     }
 
     func setAmbience(_ newAmbience: AudioAmbience?) {
@@ -296,7 +300,7 @@ final class GuidedSessionPlayer: ObservableObject {
 
     // MARK: - Loading
 
-    private func loadAudio(for session: GuidedSession) async {
+    private func loadAudio(for session: GuidedSession, isRetry: Bool = false) async {
         let url: URL
         if let recorded = session.recordedAudioURL() {
             usesSynthesizedVoice = false
@@ -313,21 +317,44 @@ final class GuidedSessionPlayer: ObservableObject {
                         self?.preparationProgress = value
                     }
                 }
-            } catch is CancellationError {
-                return
             } catch {
+                // Our own cancellation (stop / another session): nothing to report.
+                if Task.isCancelled { return }
                 guard currentSession?.id == session.id else { return }
-                phase = .failed(error.localizedDescription)
-                ambiencePlayer?.pause()
+                failPreparation(error.localizedDescription)
                 return
             }
         } else {
-            phase = .failed(LanguageManager.shared.localizedString(for: "audio.error.unavailable"))
+            failPreparation(LanguageManager.shared.localizedString(for: "audio.error.unavailable"))
             return
         }
 
         guard !Task.isCancelled, currentSession?.id == session.id else { return }
+
+        // A truncated / corrupt render would "play" as pure silence: check it first,
+        // drop it and render again once.
+        if url.isFileURL {
+            let asset = AVURLAsset(url: url)
+            let playable = (try? await asset.load(.isPlayable)) ?? false
+            let length = (try? await asset.load(.duration))?.seconds ?? 0
+            guard !Task.isCancelled, currentSession?.id == session.id else { return }
+            if !playable || !(length > 1) {
+                if usesSynthesizedVoice, !isRetry {
+                    NarrationRenderer.shared.discard(url)
+                    await loadAudio(for: session, isRetry: true)
+                } else {
+                    failPreparation(LanguageManager.shared.localizedString(for: "audio.error.unavailable"))
+                }
+                return
+            }
+        }
         await preparePlayer(url: url, session: session)
+    }
+
+    private func failPreparation(_ message: String) {
+        phase = .failed(message)
+        ambiencePlayer?.pause()
+        AudioFocus.release(.guidedSession)
     }
 
     private func preparePlayer(url: URL, session: GuidedSession) async {
@@ -342,6 +369,22 @@ final class GuidedSessionPlayer: ObservableObject {
             duration = loaded.seconds
         }
         guard currentSession?.id == session.id, player === newPlayer else { return }
+
+        // Playback errors after start (stream lost, unreadable file): report instead of
+        // leaving the user in front of a "playing" session with no sound.
+        itemStatusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
+            guard item.status == .failed else { return }
+            Task { @MainActor in
+                guard let self, self.player?.currentItem === item else { return }
+                if self.usesSynthesizedVoice { NarrationRenderer.shared.discard(url) }
+                self.player?.pause()
+                self.isPlaying = false
+                UIApplication.shared.isIdleTimerDisabled = false
+                self.failPreparation(item.error?.localizedDescription
+                    ?? LanguageManager.shared.localizedString(for: "audio.error.unavailable"))
+                self.updateNowPlaying()
+            }
+        }
 
         timeObserver = newPlayer.addPeriodicTimeObserver(
             forInterval: CMTime(seconds: 0.5, preferredTimescale: 600),
@@ -367,6 +410,9 @@ final class GuidedSessionPlayer: ObservableObject {
         phase = .ready
         preparationProgress = 1
         if wantsPlayback {
+            // The session may have been deactivated meanwhile (call, Siri, other app):
+            // play() on an inactive session is silent.
+            AudioFocus.acquire(.guidedSession)
             newPlayer.play()
             ambiencePlayer?.play()
             isPlaying = true
@@ -419,6 +465,8 @@ final class GuidedSessionPlayer: ObservableObject {
             guard let self, self.didFinish else { return }
             self.ambiencePlayer?.stop()
             self.ambiencePlayer = nil
+            // Session over: let the user's music app resume (taken again on replay).
+            AudioFocus.release(.guidedSession)
         }
 
         if sleepTimer == .endOfSession { setSleepTimer(.off) }
@@ -429,6 +477,7 @@ final class GuidedSessionPlayer: ObservableObject {
         guard let session = currentSession, !completionRecorded else { return }
         completionRecorded = true
         GuidedSessionProgressStore.markCompleted(session.id)
+        guard recordsSession else { return }
         let seconds = Int((duration > 0 ? duration : TimeInterval(session.durationMinutes * 60)).rounded())
         ExerciseSessionRecorder.shared.record(
             exerciseID: session.id,
@@ -457,7 +506,7 @@ final class GuidedSessionPlayer: ObservableObject {
 
     // MARK: - Stop
 
-    private func stop(keepPresentation: Bool) {
+    private func stop(keepPresentation: Bool, releasingFocus: Bool) {
         loadTask?.cancel()
         loadTask = nil
         saveResumePosition(force: true)
@@ -466,6 +515,7 @@ final class GuidedSessionPlayer: ObservableObject {
         timeObserver = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         endObserver = nil
+        itemStatusObserver = nil
         player?.pause()
         player = nil
 
@@ -490,6 +540,7 @@ final class GuidedSessionPlayer: ObservableObject {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             setSkipCommandsEnabled(false)
         }
+        if releasingFocus { AudioFocus.release(.guidedSession) }
     }
 
     // MARK: - Ambience
@@ -535,19 +586,7 @@ final class GuidedSessionPlayer: ObservableObject {
         ambiencePlayer?.volume = ambienceVolume
     }
 
-    // MARK: - Audio session
-
-    private func activateAudioSession() {
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(.playback, mode: .spokenAudio, options: [])
-            try session.setActive(true)
-        } catch {
-            #if DEBUG
-            print("GuidedSessionPlayer audio session error: \(error.localizedDescription)")
-            #endif
-        }
-    }
+    // MARK: - Audio session (see AudioFocus)
 
     private func setupNotifications() {
         NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)

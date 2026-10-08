@@ -48,11 +48,11 @@ struct ResetPasswordView: View {
                             .foregroundColor(Color.appTheme)
 
                         VStack(spacing: 12) {
-                            Text("Email envoyé !")
+                            Text("auth.reset.email_sent_title".localized)
                                 .font(.custom("Poppins-Bold", size: 28))
                                 .foregroundColor(.white)
 
-                            Text("Vérifiez votre boîte mail et suivez les instructions pour réinitialiser votre mot de passe.")
+                            Text("auth.reset.email_sent_message".localized)
                                 .font(.custom("Poppins-Regular", size: 16))
                                 .foregroundColor(Color.white.opacity(0.7))
                                 .multilineTextAlignment(.center)
@@ -60,7 +60,7 @@ struct ResetPasswordView: View {
                         }
 
                         Button(action: { dismiss() }) {
-                            Text("Fermer")
+                            Text("common.close".localized)
                                 .font(.custom("Poppins-SemiBold", size: 16))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -80,11 +80,11 @@ struct ResetPasswordView: View {
                                 .font(.system(size: 60))
                                 .foregroundColor(Color.appTheme)
 
-                            Text("Mot de passe oublié ?")
+                            Text("auth.forgot_password".localized)
                                 .font(.custom("Poppins-Bold", size: 26))
                                 .foregroundColor(.white)
 
-                            Text("Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe.")
+                            Text("auth.reset.instructions".localized)
                                 .font(.custom("Poppins-Regular", size: 15))
                                 .foregroundColor(Color.white.opacity(0.7))
                                 .multilineTextAlignment(.center)
@@ -93,7 +93,7 @@ struct ResetPasswordView: View {
 
                         // Email field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Email")
+                            Text("auth.email".localized)
                                 .font(.custom("Poppins-Medium", size: 14))
                                 .foregroundColor(.white)
 
@@ -108,7 +108,7 @@ struct ResetPasswordView: View {
                                     .textInputAutocapitalization(.never)
                                     .keyboardType(.emailAddress)
                                     .overlay(
-                                        Text(email.isEmpty ? "votre@email.com" : "")
+                                        Text(email.isEmpty ? "auth.email_placeholder".localized : "")
                                             .font(.custom("Poppins-Regular", size: 16))
                                             .foregroundColor(Color.white.opacity(0.4))
                                             .allowsHitTesting(false)
@@ -161,7 +161,7 @@ struct ResetPasswordView: View {
                                 } else {
                                     Image(systemName: "paperplane.fill")
                                         .font(.system(size: 18))
-                                    Text("Envoyer le lien")
+                                    Text("auth.reset.send_link".localized)
                                         .font(.custom("Poppins-SemiBold", size: 16))
                                 }
                             }

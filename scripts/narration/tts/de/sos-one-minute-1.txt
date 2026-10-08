@@ -1,0 +1,26 @@
+# sos-one-minute-1 · Eine Minute zum Durchatmen (DE)
+[pause 1.5s]
+[calm, clear] Halt einen Moment inne. Genau da, wo du bist, genau so, wie du bist.
+Im Stehen, im Sitzen, auf dem Flur... es geht überall. Du kannst die Augen offen lassen.
+[pause 1.5s]
+[soft] Atme sanft durch die Nase ein...
+[pause 4s]
+[slow] Und lass die Luft noch langsamer wieder hinaus, wie durch einen Strohhalm...
+[pause 6s]
+[clear] Jetzt schauen wir kurz nach innen. Drei Fragen, jeweils ein Wort.
+Dein Körper. Was fällt dir auf? Angespannt, heiß, müde... Nur ein Wort.
+[pause 2.5s]
+Dein Gefühl. Gereiztheit, Sorge, nicht viel? Ein Wort, ohne Urteil.
+[pause 2.5s]
+Dein Kopf. Womit ist er gerade beschäftigt? Noch ein Wort.
+[pause 3s]
+[warm] Es einfach zu benennen, schafft schon ein wenig Abstand.
+[soft] Noch ein langsamer Atemzug. Ein...
+[pause 4s]
+[slow] Und aus, ohne Eile, ganz bis zum Ende.
+[pause 6s]
+[calm, grounded] Und jetzt geht es weiter. Was ist das nächste kleine Ding, das ansteht? Nicht der ganze Tag. Nur der allernächste Schritt.
+Diesen Anruf annehmen. Diese Tür öffnen. Auf diese eine Nachricht antworten.
+[pause 2s]
+[warm, encouraging] Hast du ihn? Dann geh los, mit diesem ruhigeren Atem.
+[pause 4s]

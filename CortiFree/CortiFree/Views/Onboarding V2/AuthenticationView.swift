@@ -8,11 +8,7 @@
 
 import SwiftUI
 import AuthenticationServices
-import FirebaseAuth
-import FirebaseFirestore
 import Lottie
-import GoogleSignIn
-import GoogleSignInSwift
 import CryptoKit
 
 // MARK: - Nonce Generation for Sign in with Apple
@@ -63,6 +59,26 @@ private func sha256(_ input: String) -> String {
 }
 
 // Pre-computed star positions to avoid random in Canvas (fixes iPad freeze) - shared across all auth views
+/// Signs in with an Apple credential and links the account to RevenueCat.
+/// A returning user whose onboarding is already done goes straight to the app.
+@MainActor
+func completeAppleSignIn(credential: ASAuthorizationAppleIDCredential, nonce: String) async throws -> ConvexUser {
+    guard let tokenData = credential.identityToken,
+          let idToken = String(data: tokenData, encoding: .utf8) else {
+        throw URLError(.userAuthenticationRequired)
+    }
+    let firstName = credential.fullName?.givenName
+    let user = try await Auth.auth().signInWithApple(identityToken: idToken, rawNonce: nonce, firstName: firstName)
+    if let firstName, !firstName.isEmpty {
+        UserDefaults.standard.set(firstName, forKey: "userFirstName")
+    }
+    if user.onboardingCompleted {
+        UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
+    }
+    await RevenueCatManager.shared.identifyUser(userId: user.uid)
+    return user
+}
+
 private let authStarPositions: [(CGFloat, CGFloat, CGFloat)] = [
     (0.12, 0.15, 2.0), (0.25, 0.32, 1.5), (0.38, 0.08, 2.5), (0.45, 0.42, 1.8),
     (0.58, 0.22, 2.2), (0.65, 0.55, 1.6), (0.72, 0.18, 2.8), (0.82, 0.38, 1.4),
@@ -83,49 +99,32 @@ struct AuthenticationView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var showEmailAuth = false
-    @State private var showGoogleAuth = false
-    @State private var showAppleAuth = false
     @State private var isLoading = false
     @State private var errorMessage: String?
 
+    @State private var currentNonce: String?
+
+    var onBack: () -> Void = {}
     var onComplete: () -> Void
-    var onSkip: () -> Void
 
     var body: some View {
         ZStack {
-            // Galaxy background with planet
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(hex: "0A0A2E"),
-                    Color(hex: "1A1A4E")
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
-            // Stars - using pre-computed positions
-            GeometryReader { geometry in
-                ForEach(Array(authStarPositions.enumerated()), id: \.offset) { index, star in
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: star.2)
-                        .position(
-                            x: star.0 * geometry.size.width,
-                            y: star.1 * geometry.size.height
-                        )
-                }
-            }
-
-            // Planet silhouette at bottom
-            GeometryReader { geometry in
-                Ellipse()
-                    .fill(Color(hex: "050520"))
-                    .frame(width: geometry.size.width * 1.5, height: 600)
-                    .offset(x: -geometry.size.width * 0.25, y: geometry.size.height - 375)
-            }
+            GalaxyBackgroundView(intensity: 1.0)
+                .ignoresSafeArea()
 
             VStack(spacing: 0) {
+                HStack {
+                    Button(action: onBack) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 44, height: 44)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+
                 // Message at top
                 VStack(alignment: .leading, spacing: 12) {
                     Text("onboarding_v2.auth.title".localized)
@@ -142,7 +141,7 @@ struct AuthenticationView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 40)
-                .padding(.top, 60)
+                .padding(.top, 8)
 
                 Spacer()
 
@@ -153,54 +152,21 @@ struct AuthenticationView: View {
 
                 // Authentication buttons
                 VStack(spacing: 16) {
-                    // Continue with Apple
-                    Button(action: {
-                        HapticManager.light()
-                        showAppleAuth = true
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "apple.logo")
-                                .font(.system(size: 20))
-                                .foregroundColor(.white)
-
-                            Text("onboarding_v2.auth.apple_button".localized)
-                                .font(.custom("Poppins-Medium", size: 16))
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
+                    // Continue with Apple: the system sheet opens directly (one tap).
+                    SignInWithAppleButton(.continue) { request in
+                        let nonce = randomNonceString()
+                        currentNonce = nonce
+                        request.requestedScopes = [.fullName, .email]
+                        request.nonce = sha256(nonce)
+                    } onCompletion: { result in
+                        handleAppleSignIn(result)
                     }
+                    .signInWithAppleButtonStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 54)
+                    .clipShape(Capsule())
                     .padding(.horizontal, 32)
-
-                    // Google Sign-In is intentionally disabled for release.
-                    if false {
-                    Button(action: {
-                        HapticManager.light()
-                        showGoogleAuth = true
-                    }) {
-                        HStack(spacing: 12) {
-                            Image("GoogleLogoWhite")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 22, height: 22)
-
-                            Text("onboarding_v2.auth.google_button".localized)
-                                .font(.custom("Poppins-Medium", size: 16))
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white, lineWidth: 2)
-                        )
-                    }
-                    .padding(.horizontal, 32)
-                    }
+                    .disabled(isLoading)
 
                     // Continue with Email
                     Button(action: {
@@ -224,16 +190,6 @@ struct AuthenticationView: View {
                     .padding(.horizontal, 32)
                 }
 
-                Button(action: {
-                    HapticManager.light()
-                    onSkip()
-                }) {
-                    Text("onboarding_v2.auth.skip".localized)
-                        .font(.custom("Poppins-Medium", size: 16))
-                        .foregroundColor(.white.opacity(0.9))
-                        .underline()
-                }
-                .padding(.top, 20)
 
                 // Error message
                 if let errorMessage = errorMessage {
@@ -275,112 +231,39 @@ struct AuthenticationView: View {
             .onboardingDebugHomeButton()
             #endif
         }
-        .fullScreenCover(isPresented: $showGoogleAuth) {
-            GoogleAuthView(onComplete: {
-                showGoogleAuth = false
-
-                // Track auth completion
-                if let userId = Auth.auth().currentUser?.uid {
-                    AnalyticsManager.shared.trackOnboardingAuthenticationCompleted(
-                        authMethod: "google",
-                        userId: userId
-                    )
-                }
-
-                onComplete()
-            })
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
-        }
-        .fullScreenCover(isPresented: $showAppleAuth) {
-            AppleAuthView(onComplete: {
-                showAppleAuth = false
-
-                // Track auth completion
-                if let userId = Auth.auth().currentUser?.uid {
-                    AnalyticsManager.shared.trackOnboardingAuthenticationCompleted(
-                        authMethod: "apple",
-                        userId: userId
-                    )
-                }
-
-                onComplete()
-            })
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
-        }
         .onAppear {
             // Track authentication screen view
             AnalyticsManager.shared.trackOnboardingAuthenticationViewed(firstName: "")
         }
     }
 
-    // MARK: - Authentication Methods
-
     private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
         switch result {
         case .success(let authorization):
-            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                errorMessage = LanguageManager.shared.localizedString(for: "error.auth.apple_error")
+            guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+                  let nonce = currentNonce else {
+                errorMessage = "onboarding_v2.auth.apple_error".localized
                 return
             }
-
-            guard let appleIDToken = appleIDCredential.identityToken,
-                  let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                errorMessage = LanguageManager.shared.localizedString(for: "error.auth.token_error")
-                return
-            }
-
             isLoading = true
-
-            Task {
+            Task { @MainActor in
                 do {
-                    let credential = OAuthProvider.appleCredential(withIDToken: idTokenString,
-                                                                   rawNonce: nil,
-                                                                   fullName: appleIDCredential.fullName)
-
-                    let authResult = try await Auth.auth().signIn(with: credential)
-
-                    // Create user profile in Firestore if new user
-                    let userData: [String: Any] = [
-                        "uid": authResult.user.uid,
-                        "email": authResult.user.email ?? "",
-                        "username": appleIDCredential.fullName?.givenName ?? "Utilisateur",
-                        "createdAt": Timestamp(date: Date()),
-                        "xp": 0,
-                        "level": 1,
-                        "currentStreak": 0,
-                        "longestStreak": 0,
-                        "authProvider": "apple"
-                    ]
-
-                    try await Firestore.firestore()
-                        .collection("users")
-                        .document(authResult.user.uid)
-                        .setData(userData, merge: true)
-
-                    await MainActor.run {
-                        isLoading = false
-                        onComplete()
-                    }
+                    let user = try await completeAppleSignIn(credential: credential, nonce: nonce)
+                    isLoading = false
+                    HapticManager.success()
+                    AnalyticsManager.shared.trackOnboardingAuthenticationCompleted(authMethod: "apple", userId: user.uid)
+                    onComplete()
                 } catch {
-                    await MainActor.run {
-                        isLoading = false
-                        errorMessage = "Erreur: \(error.localizedDescription)"
-                    }
+                    isLoading = false
+                    errorMessage = "onboarding_v2.auth.apple_error".localized
                 }
             }
-
         case .failure(let error):
-            errorMessage = "Erreur Apple Sign In: \(error.localizedDescription)"
+            // No message when the user simply closes the Apple sheet.
+            if (error as NSError).code != ASAuthorizationError.canceled.rawValue {
+                errorMessage = "onboarding_v2.auth.apple_error".localized
+            }
         }
-    }
-
-    private func handleGoogleSignIn() {
-        // Google Sign In not implemented - fallback to email auth
-        showEmailAuth = true
     }
 }
 
@@ -397,7 +280,6 @@ struct EmailAuthView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showPassword = false
-    @State private var showGoogleAuth = false
     @State private var showAppleAuth = false
     @FocusState private var focusedField: Field?
 
@@ -406,6 +288,12 @@ struct EmailAuthView: View {
     }
 
     var onComplete: () -> Void
+
+    /// `startsWithSignIn` opens the form in "log in" mode (returning users from the welcome screen).
+    init(startsWithSignIn: Bool = false, onComplete: @escaping () -> Void) {
+        self.onComplete = onComplete
+        _isSignUp = State(initialValue: !startsWithSignIn)
+    }
 
     private var passwordsMatch: Bool {
         password == confirmPassword && !confirmPassword.isEmpty
@@ -680,29 +568,6 @@ struct EmailAuthView: View {
                                 )
                             }
 
-                            if false {
-                            Button(action: {
-                                HapticManager.light()
-                                showGoogleAuth = true
-                            }) {
-                                HStack(spacing: 8) {
-                                    Image("GoogleLogoWhite")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 18, height: 18)
-
-                                    Text("Google")
-                                        .font(.custom("Poppins-Medium", size: 14))
-                                        .foregroundColor(.white)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 48)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 24)
-                                        .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
-                                )
-                            }
-                            }
                         }
                         .padding(.horizontal, 32)
                     }
@@ -716,15 +581,6 @@ struct EmailAuthView: View {
         .fullScreenCover(isPresented: $showAppleAuth) {
             AppleAuthView(onComplete: {
                 showAppleAuth = false
-                onComplete()
-            })
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
-        }
-        .fullScreenCover(isPresented: $showGoogleAuth) {
-            GoogleAuthView(onComplete: {
-                showGoogleAuth = false
                 onComplete()
             })
             #if DEBUG
@@ -765,6 +621,10 @@ struct EmailAuthView: View {
                 } else {
                     let user = try await UnifiedFirebaseService.shared.auth.signIn(email: email, password: password)
                     await RevenueCatManager.shared.identifyUser(userId: user.uid)
+                    // A returning user whose onboarding is already done goes straight to the app.
+                    if user.onboardingCompleted {
+                        UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
+                    }
                 }
 
                 await MainActor.run {
@@ -774,302 +634,7 @@ struct EmailAuthView: View {
             } catch {
                 await MainActor.run {
                     isLoading = false
-                    errorMessage = "Erreur: \(error.localizedDescription)"
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Google Authentication View
-
-struct GoogleAuthView: View {
-    @Environment(\.dismiss) var dismiss
-    @ObservedObject var languageManager = LanguageManager.shared
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-    @State private var showEmailAuth = false
-    @State private var showAppleAuth = false
-
-    var onComplete: () -> Void
-
-    var body: some View {
-        ZStack {
-            // Background
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(hex: "0A0A2E"),
-                    Color(hex: "1A1A4E")
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
-            // Stars - using pre-computed positions
-            GeometryReader { geometry in
-                ForEach(Array(authStarPositions.enumerated()), id: \.offset) { index, star in
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: star.2)
-                        .position(
-                            x: star.0 * geometry.size.width,
-                            y: star.1 * geometry.size.height
-                        )
-                }
-            }
-
-            // Planet silhouette
-            GeometryReader { geometry in
-                Ellipse()
-                    .fill(Color(hex: "050520"))
-                    .frame(width: geometry.size.width * 1.5, height: 600)
-                    .offset(x: -geometry.size.width * 0.25, y: geometry.size.height - 375)
-            }
-
-            VStack(spacing: 32) {
-                // Close button at top
-                HStack {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 20))
-                            .foregroundColor(.white)
-                            .frame(width: 44, height: 44)
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 50)
-
-                Spacer()
-
-                // Google logo and title
-                VStack(spacing: 24) {
-                    Image("GoogleLogoWhite")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
-
-                    Text("onboarding_v2.auth.google_title".localized)
-                        .font(.faroBold(28))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-
-                    Text("onboarding_v2.auth.google_description".localized)
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.white.opacity(0.85))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
-                }
-
-                Spacer()
-
-                // Error message
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.red)
-                        .padding(.horizontal, 32)
-                }
-
-                // Sign in button
-                Button(action: handleGoogleSignIn) {
-                    if isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "0A0A2E")))
-                    } else {
-                        Text("onboarding_v2.auth.google_sign_in".localized)
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(Color(hex: "0A0A2E"))
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 54)
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 40))
-                .padding(.horizontal, 32)
-                .disabled(isLoading)
-
-                // Divider - Autre méthode
-                HStack(spacing: 16) {
-                    Rectangle()
-                        .fill(Color.white.opacity(0.3))
-                        .frame(height: 1)
-                    Text("onboarding_v2.auth.other_method".localized)
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white.opacity(0.6))
-                    Rectangle()
-                        .fill(Color.white.opacity(0.3))
-                        .frame(height: 1)
-                }
-                .padding(.horizontal, 32)
-                .padding(.top, 8)
-
-                // Other auth methods
-                HStack(spacing: 16) {
-                    // Apple
-                    Button(action: {
-                        HapticManager.light()
-                        showAppleAuth = true
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "apple.logo")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white)
-
-                            Text("Apple")
-                                .font(.custom("Poppins-Medium", size: 14))
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
-                        )
-                    }
-
-                    // Email
-                    Button(action: {
-                        HapticManager.light()
-                        showEmailAuth = true
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "envelope.fill")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white)
-
-                            Text("Email")
-                                .font(.custom("Poppins-Medium", size: 14))
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                        .contentShape(Capsule())
-                    }
-                    .buttonStyle(.glassSecondary)
-                }
-                .padding(.horizontal, 32)
-                .padding(.bottom, 50)
-            }
-        }
-        .fullScreenCover(isPresented: $showAppleAuth) {
-            AppleAuthView(onComplete: {
-                showAppleAuth = false
-                onComplete()
-            })
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
-        }
-        .fullScreenCover(isPresented: $showEmailAuth) {
-            EmailAuthView(onComplete: {
-                showEmailAuth = false
-                onComplete()
-            })
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
-        }
-    }
-
-    private func handleGoogleSignIn() {
-        isLoading = true
-        errorMessage = nil
-
-        // Get the root view controller
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootViewController = windowScene.windows.first?.rootViewController else {
-            errorMessage = "onboarding_v2.auth.google_launch_error".localized
-            isLoading = false
-            return
-        }
-
-        // Get the client ID from GoogleService-Info.plist
-        guard let clientID = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String else {
-            errorMessage = "onboarding_v2.auth.google_config_missing".localized
-            isLoading = false
-            return
-        }
-
-        // Configure Google Sign In
-        let config = GIDConfiguration(clientID: clientID)
-        GIDSignIn.sharedInstance.configuration = config
-
-        // Start Google Sign In flow
-        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { result, error in
-            if let error = error {
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                    self.errorMessage = "Erreur Google Sign In: \(error.localizedDescription)"
-                }
-                return
-            }
-
-            guard let user = result?.user,
-                  let idToken = user.idToken?.tokenString else {
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                    self.errorMessage = "onboarding_v2.auth.google_info_error".localized
-                }
-                return
-            }
-
-            // Create Firebase credential with Google tokens
-            let credential = GoogleAuthProvider.credential(
-                withIDToken: idToken,
-                accessToken: user.accessToken.tokenString
-            )
-
-            // Sign in to Firebase with Google credential
-            Task {
-                do {
-                    let authResult = try await Auth.auth().signIn(with: credential)
-
-                    // Check if user document exists to determine if new user
-                    let db = Firestore.firestore()
-                    let userDoc = try await db.collection("users").document(authResult.user.uid).getDocument()
-                    let isNewUser = !userDoc.exists
-
-                    // Create/update user profile in Firestore
-                    var userData: [String: Any] = [
-                        "uid": authResult.user.uid,
-                        "email": authResult.user.email ?? "",
-                        "firstName": user.profile?.givenName ?? "Utilisateur",
-                        "displayName": user.profile?.name ?? "Utilisateur",
-                        "photoURL": user.profile?.imageURL(withDimension: 200)?.absoluteString ?? "",
-                        "authProvider": "google",
-                        "lastLoginAt": Timestamp(date: Date())
-                    ]
-
-                    // For new users, set onboardingCompleted and createdAt
-                    if isNewUser {
-                        userData["onboardingCompleted"] = false
-                        userData["createdAt"] = Timestamp(date: Date())
-                    }
-
-                    try await db.collection("users")
-                        .document(authResult.user.uid)
-                        .setData(userData, merge: true)
-
-                    // Save firstName to UserDefaults for offline access
-                    UserDefaults.standard.set(user.profile?.givenName ?? "Utilisateur", forKey: "userFirstName")
-
-                    // Identify user with RevenueCat so purchases are tied to this account
-                    await RevenueCatManager.shared.identifyUser(userId: authResult.user.uid)
-
-                    await MainActor.run {
-                        isLoading = false
-                        HapticManager.success()
-                        onComplete()
-                    }
-                } catch {
-                    await MainActor.run {
-                        isLoading = false
-                        errorMessage = "Erreur Firebase: \(error.localizedDescription)"
-                    }
+                    errorMessage = "onboarding_v2.auth.generic_error".localized
                 }
             }
         }
@@ -1084,7 +649,6 @@ struct AppleAuthView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showEmailAuth = false
-    @State private var showGoogleAuth = false
     @State private var currentNonce: String?
 
     var onComplete: () -> Void
@@ -1203,29 +767,6 @@ struct AppleAuthView: View {
 
                 // Other auth methods
                 HStack(spacing: 16) {
-                    if false {
-                    Button(action: {
-                        HapticManager.light()
-                        showGoogleAuth = true
-                    }) {
-                        HStack(spacing: 8) {
-                            Image("GoogleLogoWhite")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 18, height: 18)
-
-                            Text("Google")
-                                .font(.custom("Poppins-Medium", size: 14))
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
-                        )
-                    }
-                    }
 
                     // Email
                     Button(action: {
@@ -1261,15 +802,6 @@ struct AppleAuthView: View {
                     .scaleEffect(1.5)
             }
         }
-        .fullScreenCover(isPresented: $showGoogleAuth) {
-            GoogleAuthView(onComplete: {
-                showGoogleAuth = false
-                onComplete()
-            })
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
-        }
         .fullScreenCover(isPresented: $showEmailAuth) {
             EmailAuthView(onComplete: {
                 showEmailAuth = false
@@ -1289,12 +821,6 @@ struct AppleAuthView: View {
                 return
             }
 
-            guard let appleIDToken = appleIDCredential.identityToken,
-                  let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                errorMessage = "onboarding_v2.auth.token_error".localized
-                return
-            }
-
             guard let nonce = currentNonce else {
                 errorMessage = "onboarding_v2.auth.token_error".localized
                 return
@@ -1302,82 +828,22 @@ struct AppleAuthView: View {
 
             isLoading = true
 
-            Task {
+            Task { @MainActor in
                 do {
-                    // Create credential with nonce
-                    let credential = OAuthProvider.appleCredential(
-                        withIDToken: idTokenString,
-                        rawNonce: nonce,
-                        fullName: appleIDCredential.fullName
-                    )
-
-                    let authResult = try await Auth.auth().signIn(with: credential)
-                    let userId = authResult.user.uid
-
-                    // Check if user document already exists
-                    let db = Firestore.firestore()
-                    let userDoc = try await db.collection("users").document(userId).getDocument()
-
-                    let isNewUser = !userDoc.exists
-
-                    // Get name from Apple credential (only provided on first sign-in)
-                    let firstName = appleIDCredential.fullName?.givenName
-                    let displayName = [appleIDCredential.fullName?.givenName, appleIDCredential.fullName?.familyName]
-                        .compactMap { $0 }
-                        .joined(separator: " ")
-
-                    // Create/update user profile in Firestore
-                    var userData: [String: Any] = [
-                        "uid": userId,
-                        "email": authResult.user.email ?? appleIDCredential.email ?? "",
-                        "authProvider": "apple",
-                        "lastLoginAt": Timestamp(date: Date())
-                    ]
-
-                    // For new users, set onboardingCompleted to false and createdAt
-                    if isNewUser {
-                        userData["onboardingCompleted"] = false
-                        userData["createdAt"] = Timestamp(date: Date())
-                    }
-
-                    // Only add name fields if we got them (first sign-in only)
-                    if let firstName = firstName, !firstName.isEmpty {
-                        userData["firstName"] = firstName
-                        UserDefaults.standard.set(firstName, forKey: "userFirstName")
-                    } else if isNewUser {
-                        // New user but no name provided - use fallback
-                        userData["firstName"] = "User"
-                        UserDefaults.standard.set("User", forKey: "userFirstName")
-                    }
-
-                    if !displayName.isEmpty {
-                        userData["displayName"] = displayName
-                    }
-
-                    try await db.collection("users")
-                        .document(userId)
-                        .setData(userData, merge: true)
-
-                    // Identify user with RevenueCat so purchases are tied to this account
-                    await RevenueCatManager.shared.identifyUser(userId: userId)
-
-                    await MainActor.run {
-                        isLoading = false
-                        HapticManager.success()
-                        onComplete()
-                    }
+                    _ = try await completeAppleSignIn(credential: appleIDCredential, nonce: nonce)
+                    isLoading = false
+                    HapticManager.success()
+                    onComplete()
                 } catch {
-                    await MainActor.run {
-                        isLoading = false
-                        errorMessage = "Erreur Firebase: \(error.localizedDescription)"
-                    }
+                    isLoading = false
+                    errorMessage = "onboarding_v2.auth.apple_error".localized
                 }
             }
 
         case .failure(let error):
             // Don't show error for user cancellation
             if (error as NSError).code != ASAuthorizationError.canceled.rawValue {
-                errorMessage = "Erreur Apple Sign In: \(error.localizedDescription)"
+                errorMessage = "onboarding_v2.auth.apple_error".localized
             }
         }
     }
@@ -1399,5 +865,5 @@ struct CustomTextFieldStyle: TextFieldStyle {
 }
 
 #Preview {
-    AuthenticationView(onComplete: {}, onSkip: {})
+    AuthenticationView(onComplete: {})
 }

@@ -10,9 +10,10 @@
 import SwiftUI
 
 struct CommitmentPledgeView: View {
+    var onBack: (() -> Void)? = nil
     let onContinue: () -> Void
 
-    @State private var selectedDuration: CommitmentDuration = .sixtySixDays
+    @State private var selectedDuration: CommitmentDuration = .fourWeeks
     @State private var holdProgress: CGFloat = 0.0
     @State private var isHolding: Bool = false
     @State private var isCommitted: Bool = false
@@ -22,6 +23,7 @@ struct CommitmentPledgeView: View {
     @State private var hapticStep: Int = 0
     @State private var showCommitted: Bool = false
     @State private var showConfetti: Bool = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     // MARK: - Duration Options
 
@@ -37,15 +39,6 @@ struct CommitmentPledgeView: View {
             case .twoWeeks: return "bolt.fill"
             case .fourWeeks: return "star.fill"
             case .sixtySixDays: return "crown.fill"
-            }
-        }
-
-        var percentage: String {
-            switch self {
-            case .oneWeek: return "8%"
-            case .twoWeeks: return "12%"
-            case .fourWeeks: return "23%"
-            case .sixtySixDays: return "57%"
             }
         }
 
@@ -136,6 +129,7 @@ struct CommitmentPledgeView: View {
                     .allowsHitTesting(false)
             }
         }
+        .onboardingBackButton(onBack)
         .onAppear {
             screenViewTime = Date()
             AnalyticsManager.shared.track(event: "onboarding_commitment_viewed", properties: [:])
@@ -146,7 +140,7 @@ struct CommitmentPledgeView: View {
 
     private func durationCard(_ duration: CommitmentDuration) -> some View {
         let isSelected = selectedDuration == duration
-        let isRecommended = duration == .sixtySixDays
+        let isRecommended = duration == .fourWeeks // the length of the personal plan
 
         return Button(action: {
             HapticManager.light()
@@ -200,16 +194,6 @@ struct CommitmentPledgeView: View {
                 .layoutPriority(1)
 
                 // Percentage badge
-                VStack(spacing: 1) {
-                    Text(duration.percentage)
-                        .font(.custom("Poppins-SemiBold", size: 13))
-                        .foregroundColor(isSelected ? Color(hex: "B794F6") : .white.opacity(0.35))
-                    Text("onboarding_v2.commitment.chose".localized)
-                        .font(.custom("Poppins-Regular", size: 9))
-                        .foregroundColor(isSelected ? Color(hex: "B794F6").opacity(0.6) : .white.opacity(0.2))
-                }
-                .frame(width: 52)
-
                 // Radio button
                 ZStack {
                     Circle()
@@ -329,12 +313,14 @@ struct CommitmentPledgeView: View {
     }
 
     private func commitCompleted() {
+        // Kept so the app can remind the user of their own commitment later.
+        UserDefaults.standard.set(selectedDuration.rawValue, forKey: "onboarding_commitment_duration")
         isHolding = false
         HapticManager.success()
 
         withAnimation(.easeOut(duration: 0.4)) {
             isCommitted = true
-            showConfetti = true
+            showConfetti = !reduceMotion
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

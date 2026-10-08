@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct ScientificPlanView: View {
+    var onBack: (() -> Void)? = nil
     let onContinue: () -> Void
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var screenViewTime: Date?
@@ -39,26 +40,27 @@ struct ScientificPlanView: View {
                     VStack(spacing: 24) {
                         // Harvard Quote
                         ScientificQuoteCard(
-                            logoImage: "logo_harvard",
+                            symbol: "doc.text",
                             quote: "onboarding_v2.scientific.harvard_quote".localized,
                             highlightedText: "onboarding_v2.scientific.harvard_highlight".localized,
-                            source: "onboarding_v2.scientific.harvard_source".localized
+                            // Citations stay in their original language and are never translated.
+                            source: "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology, 67, 289–314."
                         )
 
                         // UCL Quote
                         ScientificQuoteCard(
-                            logoImage: "logo_ucl",
+                            symbol: "doc.text",
                             quote: "onboarding_v2.scientific.ucl_quote".localized,
                             highlightedText: "onboarding_v2.scientific.ucl_highlight".localized,
-                            source: "onboarding_v2.scientific.ucl_source".localized
+                            source: "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology, 40(6), 998–1009."
                         )
 
                         // Atomic Habits Quote
                         ScientificQuoteCard(
-                            logoImage: "logo_atomic_habits",
+                            symbol: "book.closed",
                             quote: "onboarding_v2.scientific.atomic_quote".localized,
                             highlightedText: "onboarding_v2.scientific.atomic_highlight".localized,
-                            source: "onboarding_v2.scientific.atomic_source".localized
+                            source: "Clear, J. (2018). Atomic Habits. New York: Avery."
                         )
                     }
                     .padding(.horizontal, 24)
@@ -106,6 +108,7 @@ struct ScientificPlanView: View {
             }
         }
         .ignoresSafeArea()
+        .onboardingBackButton(onBack)
         .onAppear {
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingScientificPlanViewed()
@@ -116,7 +119,7 @@ struct ScientificPlanView: View {
 // MARK: - Scientific Quote Card
 
 struct ScientificQuoteCard: View {
-    let logoImage: String
+    let symbol: String
     let quote: String
     let highlightedText: String
     let source: String
@@ -126,11 +129,11 @@ struct ScientificQuoteCard: View {
             // Top section: Logo left, Quote right with first gradient
             HStack(alignment: .top, spacing: 12) {
                 // Logo
-                Image(logoImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
+                Image(systemName: symbol)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundColor(Color(hex: "D4B4FF"))
                     .frame(width: 50, height: 50)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .glassCard(cornerRadius: 8)
 
                 // Quote with guillemets
                 Text("\"\(attributedQuote)\"")

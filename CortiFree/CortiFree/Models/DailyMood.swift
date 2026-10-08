@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 struct DailyMood: Codable, Identifiable {
     var id: String // Format: "YYYY-MM-DD"

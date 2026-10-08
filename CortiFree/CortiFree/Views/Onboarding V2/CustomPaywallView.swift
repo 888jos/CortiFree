@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 import SuperwallKit
 
 struct CustomPaywallView: View {
@@ -24,7 +23,7 @@ struct CustomPaywallView: View {
 
     @State private var selectedPlan: PaywallPlan = .yearly
     @State private var userName: String = ""
-    @State private var radarAnimationProgress: Double = 0.0 // 0.0 = week 0, 1.0 = week 10
+    @State private var radarAnimationProgress: Double = 0.0 // 0.0 = today, 1.0 = day 28
     @State private var currentHabitIndex: Int = 0
     @State private var currentWeek: Int = 1
     @State private var showStartProgramScreen: Bool = false
@@ -33,136 +32,42 @@ struct CustomPaywallView: View {
     @State private var showPurchaseError: Bool = false
     @State private var purchaseErrorMessage: String = ""
 
-    // MARK: - Prices (not used anymore, Superwall handles pricing)
-    // NOTE: These are placeholder values, Superwall displays the real prices
-
-    /// Prix mensuel (placeholder)
-    private var monthlyPrice: String {
-        "Loading..."
-    }
-
-    /// Prix annuel (placeholder)
-    private var yearlyPrice: String {
-        "Loading..."
-    }
-
-    /// Équivalent mensuel (placeholder)
-    private var yearlyMonthlyEquivalent: String {
-        "Loading..."
-    }
-
-    /// Pourcentage d'économie (placeholder)
-    private var discountPercentage: Int {
-        70
-    }
-
-    /// Prix journalier (placeholder)
-    private var dailyPrice: String {
-        "Loading..."
-    }
-
-    /// Période d'essai gratuit (placeholder)
-    private var trialPeriod: String? {
-        nil
-    }
-
-    /// Indique si les produits sont chargés (always false now)
-    private var productsReady: Bool {
-        false
-    }
-
-    // Les habitudes avec leurs statistiques de progression (same as HabitsProgressFlowView)
+    // Same week-4 targets as the habits progress screen, scaled to the quiz's daily time.
     private var habitProgresses: [PaywallHabitProgress] {
-        [
+        let titleIDs = ["breathing": "breathe", "meditation": "meditate"]
+        return OnboardingHabitTargets.targets(availableMinutes: habitsQuizResult?.availableTime).map { target in
             PaywallHabitProgress(
-                icon: "wind",
-                title: "paywall_custom.habit_breathe_title".localized,
-                yAxisValues: ["15 min", "30 min", "45 min", "1h"],
-                currentValue: "1h",
-                statMessage: "paywall_custom.habit_breathe_stat".localized,
-                curveStyle: 0
-            ),
-            PaywallHabitProgress(
-                icon: "figure.mind.and.body",
-                title: "paywall_custom.habit_meditate_title".localized,
-                yAxisValues: ["20 min", "40 min", "1h", "1h20", "1h40"],
-                currentValue: "1h30",
-                statMessage: "paywall_custom.habit_meditate_stat".localized,
-                curveStyle: 1
-            ),
-            PaywallHabitProgress(
-                icon: "book.pages",
-                title: "paywall_custom.habit_journal_title".localized,
-                yAxisValues: ["2x", "3x", "5x", "7x"],
-                currentValue: "7x",
-                statMessage: "paywall_custom.habit_journal_stat".localized,
-                curveStyle: 2
-            ),
-            PaywallHabitProgress(
-                icon: "figure.walk",
-                title: "paywall_custom.habit_sport_title".localized,
-                yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
-                currentValue: "3h30",
-                statMessage: "paywall_custom.habit_sport_stat".localized,
-                curveStyle: 3
-            ),
-            PaywallHabitProgress(
-                icon: "drop.fill",
-                title: "paywall_custom.habit_water_title".localized,
-                yAxisValues: ["1.5L", "2L", "2.5L", "3L"],
-                currentValue: "2,5L",
-                statMessage: "paywall_custom.habit_water_stat".localized,
-                curveStyle: 4
-            ),
-            PaywallHabitProgress(
-                icon: "tree.fill",
-                title: "paywall_custom.habit_nature_title".localized,
-                yAxisValues: ["45 min", "1h30", "2h15", "3h", "3h45"],
-                currentValue: "3h30",
-                statMessage: "paywall_custom.habit_nature_stat".localized,
-                curveStyle: 5
-            ),
-            PaywallHabitProgress(
-                icon: "moon.zzz.fill",
-                title: "paywall_custom.habit_sleep_title".localized,
-                yAxisValues: ["6h", "6.5h", "7h", "7.5h", "8h"],
-                currentValue: "8h",
-                statMessage: "paywall_custom.habit_sleep_stat".localized,
-                curveStyle: 6
-            ),
-            PaywallHabitProgress(
-                icon: "person.2.fill",
-                title: "paywall_custom.habit_social_title".localized,
-                yAxisValues: ["1x", "2x", "3x", "4x"],
-                currentValue: "4x",
-                statMessage: "paywall_custom.habit_social_stat".localized,
-                curveStyle: 7
+                icon: target.icon,
+                title: "paywall_custom.habit_\(titleIDs[target.id] ?? target.id)_title".localized,
+                yAxisValues: target.yAxisValues,
+                currentValue: target.currentValue,
+                statMessage: target.statMessage,
+                curveStyle: target.curveStyle
             )
-        ]
+        }
     }
 
     private var currentHabitProgress: PaywallHabitProgress {
         habitProgresses[currentHabitIndex]
     }
 
-    // Calculate end date (66 days from now)
+    // End date of the plan
+    /// Last day of the 28-day personal plan started today.
     private var endDate: Date {
-        Calendar.current.date(byAdding: .day, value: 66, to: Date()) ?? Date()
+        Calendar.current.date(byAdding: .day, value: PersonalPlan.length - 1, to: Date()) ?? Date()
     }
 
-    private var formattedEndDate: String {
+    /// Dates follow the app language, not the device region.
+    private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = "d MMM yyyy"
-        return formatter.string(from: endDate)
+        formatter.locale = LanguageManager.shared.currentLanguage.locale
+        formatter.setLocalizedDateFormatFromTemplate("d MMM yyyy")
+        return formatter.string(from: date)
     }
 
-    private var formattedTodayDate: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = "d MMM yyyy"
-        return formatter.string(from: Date())
-    }
+    private var formattedEndDate: String { formattedDate(endDate) }
+
+    private var formattedTodayDate: String { formattedDate(Date()) }
 
     var body: some View {
         ZStack {
@@ -275,50 +180,19 @@ struct CustomPaywallView: View {
 
     // MARK: - Load User Name
 
+    /// First name only; stays empty when unknown so the copy falls back to a version without a name.
     private func loadUserName() {
         guard let user = Auth.auth().currentUser else {
-            userName = "vous"
+            userName = ""
             return
         }
-        // Priority 1: displayName from Firebase Auth (Google/Apple Sign In)
         if let displayName = user.displayName, !displayName.isEmpty {
             userName = displayName.components(separatedBy: " ").first ?? displayName
-            return
-        }
-        // Priority 2: UserDefaults cache (set at signup for all providers)
-        if let cached = UserDefaults.standard.string(forKey: "userFirstName"), !cached.isEmpty {
+        } else if let cached = UserDefaults.standard.string(forKey: "userFirstName"), !cached.isEmpty {
             userName = cached
-            return
-        }
-        // Priority 3: email prefix (no Firestore read needed)
-        if let email = user.email {
-            let prefix = email.components(separatedBy: "@").first ?? ""
-            userName = prefix.isEmpty ? "vous" : prefix
         } else {
-            userName = "vous"
+            userName = ""
         }
-    }
-
-    // MARK: - Close Button
-
-    private var closeButton: some View {
-        HStack {
-            Spacer()
-            Button(action: {
-                HapticManager.light()
-                if requiresPurchaseToComplete {
-                    presentSuperwallPaywall()
-                } else {
-                    onComplete()
-                }
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 28))
-                    .foregroundColor(.white.opacity(0.4))
-            }
-        }
-        .padding(.horizontal, AppConstants.Layout.paddingLarge)
-        .padding(.top, 10)
     }
 
     // MARK: - Header Section
@@ -439,6 +313,16 @@ struct CustomPaywallView: View {
         ]
     }
 
+    /// The map is keyed by the FR/EN labels; a symptom picked in de/es/ja/ko is matched through its
+    /// stable id (symptom_checker.<group>.<n>) and the French label of that id.
+    private static let frenchBundle = Bundle.main.path(forResource: "fr", ofType: "lproj").flatMap(Bundle.init(path:))
+
+    private static func frenchLabel(for symptom: String) -> String {
+        guard let id = PlanLocalizationLookup.symptomIDs(from: [symptom]).first,
+              let bundle = frenchBundle else { return symptom }
+        return bundle.localizedString(forKey: "symptom_checker.\(id)", value: symptom, table: nil)
+    }
+
     private var detectedIssues: [DetectedIssue] {
         let map = symptomToIssue
 
@@ -446,7 +330,7 @@ struct CustomPaywallView: View {
         var seenThemes: Set<String> = []
         var symptomFixes: [DetectedIssue] = []
         for symptom in selectedSymptoms {
-            guard let issue = map[symptom], !seenThemes.contains(issue.theme) else { continue }
+            guard let issue = map[symptom] ?? map[Self.frenchLabel(for: symptom)], !seenThemes.contains(issue.theme) else { continue }
             seenThemes.insert(issue.theme)
             symptomFixes.append(issue)
             if symptomFixes.count == 3 { break }
@@ -525,7 +409,7 @@ struct CustomPaywallView: View {
                 HabitProgressChart(
                     yAxisValues: currentHabitProgress.yAxisValues,
                     currentValue: currentHabitProgress.currentValue,
-                    weekNumber: 10,
+                    weekNumber: OnboardingHabitTargets.planWeeks,
                     maxValue: 4.0,
                     currentProgress: 3.7,
                     curveStyle: currentHabitProgress.curveStyle,
@@ -660,10 +544,19 @@ struct CustomPaywallView: View {
             Divider().background(Color.white.opacity(0.1))
 
             PaywallFeatureListRow(
-                icon: "checkmark.square.fill",
-                title: "paywall_custom.feature_tasks_title".localized,
-                description: "paywall_custom.feature_tasks_desc".localized,
+                icon: "headphones",
+                title: "paywall_custom.feature_library_title".localized,
+                description: "paywall_custom.feature_library_desc".localized,
                 isNew: false
+            )
+
+            Divider().background(Color.white.opacity(0.1))
+
+            PaywallFeatureListRow(
+                icon: "bubble.left.and.text.bubble.right.fill",
+                title: "paywall_custom.feature_milo_title".localized,
+                description: "paywall_custom.feature_milo_desc".localized,
+                isNew: true
             )
 
             Divider().background(Color.white.opacity(0.1))
@@ -681,7 +574,7 @@ struct CustomPaywallView: View {
                 icon: "pencil.and.outline",
                 title: "paywall_custom.feature_journal_title".localized,
                 description: "paywall_custom.feature_journal_desc".localized,
-                isNew: true
+                isNew: false
             )
 
         }
@@ -700,18 +593,24 @@ struct CustomPaywallView: View {
         radarAnimationProgress >= 0.5
     }
 
-    // Irregular progress values for each vertex
+    // Today: the user's own quiz scores. Day 28: an indicative projection.
+    // Vertex order: global, serenity, sleep, energy, focus, balance.
     private var smallProgress: [Double] {
-        [0.15, 0.22, 0.18, 0.12, 0.20, 0.16] // Irregular small shape
+        guard let result = habitsQuizResult else { return [0.15, 0.22, 0.18, 0.12, 0.20, 0.16] }
+        return [result.globalScore, result.serenityScore, result.sleepScore,
+                result.energyScore, result.focusScore, result.balanceScore]
+            .map { min(0.85, max(0.15, Double($0) / 100)) }
     }
 
     private var largeProgress: [Double] {
-        [0.92, 0.85, 0.95, 0.88, 0.90, 0.93] // Irregular large shape
+        smallProgress.map { $0 + (0.95 - $0) * 0.7 }
     }
 
     private var radarChartSection: some View {
         VStack(spacing: 16) {
-            Text(String(format: "paywall_custom.radar_title".localized, userName))
+            Text(userName.isEmpty
+                 ? "paywall_custom.radar_title_generic".localized
+                 : String(format: "paywall_custom.radar_title".localized, userName))
                 .font(.faroBold(22))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)

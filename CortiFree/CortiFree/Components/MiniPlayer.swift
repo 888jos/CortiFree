@@ -160,13 +160,11 @@ struct SoundMiniPlayer: View {
     var body: some View {
         if let exercise = soundPlayer.currentExercise {
             HStack(spacing: 16) {
-                // Icon
-                Image(systemName: exercise.icon)
-                    .font(.system(size: 24))
-                    .foregroundColor(Color.appTheme)
-                    .frame(width: 40, height: 40)
-                    .background(Color.white.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                // Ambient sound photo
+                Color.clear
+                    .overlay { Image(exercise.soundImageName).resizable().scaledToFill() }
+                    .frame(width: 46, height: 46)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
                 // Title & progress (cliquable pour ouvrir le duration picker)
                 VStack(alignment: .leading, spacing: 4) {

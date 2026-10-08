@@ -38,7 +38,7 @@ struct WidgetDataStore {
     /// Sauvegarde les tâches + le jour calculé depuis l'app principale
     /// Le jour est passé directement (calculé par UserSettings.currentProgramDay)
     /// pour éviter tout décalage de recalcul dans le widget.
-    static func saveTasks(_ tasks: [WidgetTask], programDay: Int? = nil) {
+    static func saveTasks(_ tasks: [WidgetTask], programDay: Int? = nil, startDate: Date? = nil) {
         guard let defaults = sharedDefaults else { return }
         if let encoded = try? JSONEncoder().encode(tasks) {
             defaults.set(encoded, forKey: tasksKey)
@@ -47,8 +47,8 @@ struct WidgetDataStore {
         if let day = programDay {
             defaults.set(day, forKey: programDayKey)
         }
-        // Sauvegarde aussi la startDate pour le recalcul à minuit
-        if let startDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
+        // Sauvegarde aussi la startDate pour le recalcul à minuit (celle du plan si fournie)
+        if let startDate = startDate ?? UserDefaults.standard.object(forKey: "programStartDate") as? Date {
             defaults.set(startDate, forKey: programStartDateKey)
         }
         WidgetCenter.shared.reloadAllTimelines()
@@ -73,14 +73,16 @@ struct WidgetDataStore {
             // Vérifier que le jour sauvegardé correspond toujours au bon jour calendaire
             // (cas : minuit passé depuis le dernier sync app → +1)
             if let startDate = defaults.object(forKey: programStartDateKey) as? Date {
-                let recalculated = max(1, (Calendar.current.dateComponents([.day], from: startDate, to: Date()).day ?? 0) + 1)
+                let cal = Calendar.current
+                let recalculated = max(1, (cal.dateComponents([.day], from: cal.startOfDay(for: startDate), to: cal.startOfDay(for: Date())).day ?? 0) + 1)
                 return recalculated
             }
             return savedDay
         }
         // Fallback : recalcul depuis startDate
         guard let startDate = defaults.object(forKey: programStartDateKey) as? Date else { return 1 }
-        let days = Calendar.current.dateComponents([.day], from: startDate, to: Date()).day ?? 0
+        let cal = Calendar.current
+        let days = cal.dateComponents([.day], from: cal.startOfDay(for: startDate), to: cal.startOfDay(for: Date())).day ?? 0
         return max(1, days + 1)
     }
 }

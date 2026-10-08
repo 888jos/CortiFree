@@ -2,28 +2,30 @@
 //  AvatarProgressCard.swift
 //  CortiFree
 //
-//  Carte avatar minimaliste avec grille de progression 66 jours
+//  Carte avatar minimaliste avec la grille du plan personnel (28 jours, une ligne par semaine)
 //
 
 import SwiftUI
-import FirebaseAuth
 import Combine
-import WidgetKit
 
 struct AvatarProgressCard: View {
-    @State private var currentProgramDay: Int = 1 // Jour actuel du programme (1-66), synced with TasksV2
+    @ObservedObject private var planStore = PersonalPlanStore.shared
     @State private var isPressed: Bool = false
     @State private var isFlipped: Bool = false
-    @State private var startDate: Date = Date()
     @State private var currentStreak: Int = 0
     @State private var bestStreak: Int = 0
     @State private var showBadgesScreen: Bool = false
     @State private var firstName: String = ""
     @State private var didLoadProgress: Bool = false
 
-    private let totalDays = 66
-    private let columns = 8   // 8 colonnes pour cellules plus grandes
-    private let rows = 9      // 9 lignes (72 cases, on n'affiche que 66)
+    private let totalDays = PersonalPlan.length
+    private let columns = 7   // une ligne par semaine du plan
+    private let cellSize: CGFloat = 20
+    private let cellSpacing: CGFloat = 5
+
+    /// Jour du plan (1...28), même source que l'onglet Plan.
+    private var currentProgramDay: Int { min(planStore.todayIndex, totalDays) }
+    private var startDate: Date { planStore.plan?.startDate ?? Date() }
 
     var body: some View {
         ZStack {
@@ -85,12 +87,12 @@ struct AvatarProgressCard: View {
 
             // Grid overlay INSIDE the image, in the last quarter
             VStack(spacing: 0) {
-                // Grid of 66 days (no animation)
-                LazyVGrid(columns: Array(repeating: GridItem(.fixed(12), spacing: 3), count: columns), spacing: 3) {
+                // Grid of the plan days (no animation)
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(cellSize), spacing: cellSpacing), count: columns), spacing: cellSpacing) {
                     ForEach(0..<totalDays, id: \.self) { day in
-                        RoundedRectangle(cornerRadius: 2)
+                        RoundedRectangle(cornerRadius: 4)
                             .fill(dayColor(for: day))
-                            .frame(width: 12, height: 12)
+                            .frame(width: cellSize, height: cellSize)
                     }
                 }
                 .padding(.horizontal, 12)
@@ -262,61 +264,12 @@ struct AvatarProgressCard: View {
     }
 
     private func loadProgress() {
-        // Load current program day from Firebase UserSettings (same source as TasksV2)
-        Task {
-            guard let userId = Auth.auth().currentUser?.uid else {
-                // Fallback to UserDefaults calculation
-                loadFromUserDefaults()
-                return
-            }
+        // Le plan est déjà chargé par l'onglet Plan ; on s'assure qu'il existe si l'accueil s'ouvre en premier.
+        Task { await planStore.ensurePlan() }
 
-            do {
-                if let settings = try await FirebaseManager.shared.fetchUserSettings(uid: userId) {
-                    await MainActor.run {
-                        currentProgramDay = min(settings.currentProgramDay, 66)
-                        startDate = settings.programStartDate
-                        // Sync program day to AppGroup so widget shows correct day
-                        // even if user has never opened the Tasks tab
-                        WidgetDataStore.sharedDefaults?.set(currentProgramDay, forKey: WidgetDataStore.programDayKey)
-                        WidgetCenter.shared.reloadAllTimelines()
-                    }
-                } else {
-                    loadFromUserDefaults()
-                }
-            } catch {
-                loadFromUserDefaults()
-            }
-        }
-
-        // Load current streak from UserDefaults
         currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
-
-        // Load best streak from UserDefaults
         bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
-
-        // Load first name
         firstName = getUserFirstName()
-
-        #if DEBUG
-        print("📊 AvatarProgressCard loaded: Day \(currentProgramDay)/\(totalDays), Streak: \(currentStreak)")
-        #endif
-    }
-
-    private func loadFromUserDefaults() {
-        // Fallback: Calculate from programStartDate if Firebase fails
-        if let savedStartDate = UserDefaults.standard.object(forKey: "programStartDate") as? Date {
-            startDate = savedStartDate
-
-            let calendar = Calendar.current
-            let startOfToday = calendar.startOfDay(for: Date())
-            let startOfProgramDay = calendar.startOfDay(for: savedStartDate)
-
-            if let daysDifference = calendar.dateComponents([.day], from: startOfProgramDay, to: startOfToday).day {
-                currentProgramDay = min(daysDifference + 1, 66) // +1 because day 1 is the start day
-            }
-        } else {
-            currentProgramDay = 1
-        }
     }
 
     private func getUserFirstName() -> String {
@@ -373,16 +326,12 @@ struct AvatarProgressCard: View {
     }
 
     private var nextBadgeInfo: (title: String, daysLeft: Int)? {
-        let milestones = [3, 7, 14, 21, 30, 40, 50, 60, 66]
+        let milestones = [3, 7, 14, 21, 28]
         let badgeTitles = [
             LanguageManager.shared.localizedString(for: "avatar.badge.beginner"),
             LanguageManager.shared.localizedString(for: "avatar.badge.motivated"),
             LanguageManager.shared.localizedString(for: "avatar.badge.determined"),
             LanguageManager.shared.localizedString(for: "avatar.badge.engaged"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.assiduous"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.champion"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.invincible"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.legend"),
             LanguageManager.shared.localizedString(for: "avatar.badge.master")
         ]
 

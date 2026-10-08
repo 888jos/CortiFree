@@ -6,19 +6,11 @@
 //
 
 import Foundation
-import FirebaseCore
-import FirebaseFirestore
+import UIKit
 
 class AppFixes {
     static let shared = AppFixes()
     private init() {}
-
-    // MARK: - Fix Firestore Settings (doit être appelé AVANT Firebase.configure())
-
-    static func configureFirestoreBeforeInit() {
-        // Cette fonction doit être appelée dans AppDelegate AVANT FirebaseApp.configure()
-        // Pour éviter le crash "settings can no longer be changed"
-    }
 
     // MARK: - Fix TaskManager (réduire de 59 à 10 tasks essentielles)
 

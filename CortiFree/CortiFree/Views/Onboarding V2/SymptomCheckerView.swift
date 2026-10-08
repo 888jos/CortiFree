@@ -10,9 +10,16 @@ import SwiftUI
 private let accentPurple = Color(hex: "B794F6")
 
 struct SymptomCheckerView: View {
+    var onBack: (() -> Void)? = nil
     let onContinue: (Set<String>) -> Void
 
-    @State private var selectedSymptoms: Set<String> = []
+    @State private var selectedSymptoms: Set<String>
+
+    init(initialSelection: Set<String> = [], onBack: (() -> Void)? = nil, onContinue: @escaping (Set<String>) -> Void) {
+        self.onBack = onBack
+        self.onContinue = onContinue
+        _selectedSymptoms = State(initialValue: initialSelection)
+    }
     @State private var screenViewTime: Date?
 
     // MARK: - Data (localized via .strings keys)
@@ -63,6 +70,10 @@ struct SymptomCheckerView: View {
 
                 // ── Header — left aligned, no logo ──
                 VStack(alignment: .leading, spacing: 12) {
+                    if let onBack {
+                        OnboardingBackButton(action: onBack)
+                            .padding(.leading, -12)
+                    }
                     Text("symptom_checker.title".localized)
                         .font(.faroBold(28))
                         .foregroundColor(.white)
@@ -83,7 +94,7 @@ struct SymptomCheckerView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-                .padding(.top, 34)
+                .padding(.top, onBack == nil ? 34 : 4)
                 .padding(.bottom, 24)
 
                 // ── Scroll content ──
@@ -127,6 +138,8 @@ struct SymptomCheckerView: View {
                                 ]
                             )
                         }
+                        let symptomIDs = PlanLocalizationLookup.symptomIDs(from: selectedSymptoms)
+                        PersonalPlanStore.shared.updateOnboardingDraft { $0.symptomIDs = symptomIDs }
                         onContinue(selectedSymptoms)
                     }) {
                         Text("symptom_checker.cta".localized)

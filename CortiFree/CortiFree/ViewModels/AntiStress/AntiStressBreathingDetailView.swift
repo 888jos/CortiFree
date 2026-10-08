@@ -20,7 +20,11 @@ struct AntiStressBreathingDetailView: View {
     @State private var showHowItWorks = true
     @State private var showScience = false
 
-    private let durations = [60, 120, 180, 300, 600] // 1min, 2min, 3min, 5min, 10min
+    /// The pattern's own durations (e.g. 4-7-8 is capped at 5 min), in seconds.
+    private var durations: [Int] {
+        let minutes = exerciseType.breathingPattern?.durationChoices.sorted() ?? []
+        return minutes.isEmpty ? [60, 120, 180, 300, 600] : minutes.map { $0 * 60 }
+    }
 
     var body: some View {
         ZStack {
@@ -62,6 +66,9 @@ struct AntiStressBreathingDetailView: View {
             withAnimation(Animation.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
                 pulseAnimation = true
             }
+            if !durations.contains(selectedDuration) {
+                selectedDuration = durations.min { abs($0 - 180) < abs($1 - 180) } ?? 180
+            }
         }
         .fullScreenCover(isPresented: $showBreathingExercise) {
             if let pattern = exerciseType.breathingPattern {
@@ -69,10 +76,9 @@ struct AntiStressBreathingDetailView: View {
                     pattern: pattern,
                     duration: Double(selectedDuration)
                 ) {
+                    // The breathing session records itself (real time breathed, Health minutes);
+                    // a second anti-stress record would double count (or credit a stale exercise).
                     showBreathingExercise = false
-                    Task {
-                        await viewModel.completeExercise()
-                    }
                     dismiss()
                 }
             }

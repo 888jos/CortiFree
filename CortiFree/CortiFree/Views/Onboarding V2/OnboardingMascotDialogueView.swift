@@ -9,6 +9,7 @@ struct OnboardingMascotDialogueView: View {
     let message: String
     var prominent: Bool = false
     @State private var displayedMessage = ""
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var mascotSize: CGFloat { prominent ? 223 : 122 }
     private var bubbleHeight: CGFloat { mascotSize * 0.8 }
@@ -23,12 +24,14 @@ struct OnboardingMascotDialogueView: View {
                 .foregroundStyle(Color(hex: "1A1A4E"))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(0)
-                .lineLimit(4)
-                .minimumScaleFactor(0.58)
+                // Grows with larger text sizes instead of shrinking the words to an unreadable size.
+                .lineLimit(nil)
+                .minimumScaleFactor(0.85)
+                .fixedSize(horizontal: false, vertical: true)
                 .allowsTightening(true)
                 .padding(.horizontal, prominent ? 24 : 22)
                 .padding(.vertical, 8)
-                .frame(maxWidth: .infinity, minHeight: bubbleHeight, maxHeight: bubbleHeight, alignment: .center)
+                .frame(maxWidth: .infinity, minHeight: bubbleHeight, alignment: .center)
                 .background {
                     ZStack(alignment: .leading) {
                         SpeechBubbleTail()
@@ -41,7 +44,13 @@ struct OnboardingMascotDialogueView: View {
                 }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(message)
         .task(id: message) {
+            if reduceMotion {
+                displayedMessage = message
+                return
+            }
             displayedMessage = ""
             for character in message {
                 guard !Task.isCancelled else { return }
@@ -83,6 +92,42 @@ struct OnboardingProgressBar: View {
             }
         }
         .frame(height: 8)
-        .accessibilityValue("\(Int(progress * 100)) percent")
+        .accessibilityValue(Text((min(max(progress, 0), 1)).formatted(.percent.precision(.fractionLength(0)))))
+    }
+}
+
+/// Back chevron shared by the onboarding screens that don't have their own header.
+struct OnboardingBackButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            HapticManager.light()
+            action()
+        } label: {
+            Image(systemName: "chevron.left")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("common.back".localized)
+    }
+}
+
+extension View {
+    /// Pins the onboarding back chevron to the top-leading corner (inside the safe area).
+    @ViewBuilder
+    func onboardingBackButton(_ action: (() -> Void)?) -> some View {
+        if let action {
+            overlay(alignment: .topLeading) {
+                OnboardingBackButton(action: action)
+                    .padding(.leading, 12)
+                    .padding(.top, 4)
+            }
+        } else {
+            self
+        }
     }
 }

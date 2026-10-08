@@ -16,3 +16,8 @@
 "NSMicrophoneUsageDescription" = "CortiFree a besoin d'accéder au microphone pour les exercices guidés de méditation et de respiration.";
 "NSLocationWhenInUseUsageDescription" = "CortiFree utilise votre localisation pour fournir des suggestions d'activités nature personnalisées selon votre région.";
 "NSMotionUsageDescription" = "CortiFree utilise le suivi de mouvement pour surveiller votre activité physique et fournir de meilleures recommandations d'exercices.";
+"NSHealthShareUsageDescription" = "CortiFree lit tes questionnaires d'anxiété (GAD-7) et tes humeurs pour personnaliser ton plan. Ces données restent sur ton iPhone.";
+"NSHealthUpdateUsageDescription" = "CortiFree enregistre tes points anxiété, tes humeurs et tes minutes de pleine conscience dans Apple Santé.";
+
+// MARK: - Tracking
+"NSUserTrackingUsageDescription" = "CortiFree utilise cet identifiant pour personnaliser votre expérience et mesurer l'efficacité des publicités.";

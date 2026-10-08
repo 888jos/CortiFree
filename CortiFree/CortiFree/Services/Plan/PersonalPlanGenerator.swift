@@ -35,6 +35,10 @@ struct PlanAnalysis {
     var fatigue: Bool
     var isolation: Bool
     var senior: Bool
+    /// Latest GAD-7 band (on-device only, never stored in the plan).
+    var anxiety: AnxietySeverity?
+    /// Content the user asked not to see again (PlanPreferences.excludedRefIDs).
+    var excluded: Set<String> = []
 }
 
 enum PersonalPlanGenerator {
@@ -44,11 +48,15 @@ enum PersonalPlanGenerator {
     static func generate(
         profile: PlanProfile,
         overrideGoal: PlanGoal? = nil,
+        anxiety: AnxietySeverity? = nil,
         startDate: Date = Date(),
-        cycle: Int = 1
+        cycle: Int = 1,
+        excluded: Set<String> = [],
+        variation: Int = 0
     ) -> PersonalPlan {
-        let analysis = analyze(profile, overrideGoal: overrideGoal)
-        let seedString = "\(fingerprint(profile))|\(analysis.primary.rawValue)|\(analysis.secondary.rawValue)|\(cycle)"
+        var analysis = analyze(profile, overrideGoal: overrideGoal, anxiety: anxiety)
+        analysis.excluded = excluded
+        let seedString = "\(fingerprint(profile))|\(analysis.primary.rawValue)|\(analysis.secondary.rawValue)|\(cycle)|\(anxiety?.rawValue ?? "-")" + (variation > 0 ? "|v\(variation)" : "")
         var rng = SeededGenerator(seed: seedString)
 
         var audioHistory = UsageHistory()
@@ -57,7 +65,8 @@ enum PersonalPlanGenerator {
         var days: [PlanDay] = []
 
         // Daily anchor habit: sport / social are not daily-friendly, so they never anchor.
-        let anchorHabit = rankedHabits(analysis).first { $0 != "sport" && $0 != "social" } ?? "water"
+        let ranked = rankedHabits(analysis)
+        let anchorHabit = ranked.first { $0 != "sport" && $0 != "social" } ?? ranked.first ?? "water"
 
         for dayNumber in 1...PersonalPlan.length {
             let week = (dayNumber - 1) / 7 + 1
@@ -107,7 +116,7 @@ enum PersonalPlanGenerator {
 
     // MARK: - Analysis
 
-    static func analyze(_ profile: PlanProfile, overrideGoal: PlanGoal? = nil) -> PlanAnalysis {
+    static func analyze(_ profile: PlanProfile, overrideGoal: PlanGoal? = nil, anxiety: AnxietySeverity? = nil) -> PlanAnalysis {
         var weights: [PlanGoal: Double] = Dictionary(uniqueKeysWithValues: PlanGoal.allCases.map { ($0, 0) })
         let symptoms = Set(profile.symptomIDs)
         let answers = profile.quizAnswers ?? []
@@ -163,6 +172,14 @@ enum PersonalPlanGenerator {
             weights[goal, default: 0] += value
         }
 
+        // 5. GAD-7 anxiety check (measured, so it outweighs a single symptom)
+        switch anxiety {
+        case .mild: weights[.stress, default: 0] += 0.5
+        case .moderate: weights[.stress, default: 0] += 1.5; weights[.emotional, default: 0] += 0.5
+        case .severe: weights[.stress, default: 0] += 2.5; weights[.emotional, default: 0] += 1
+        case .minimal, nil: break
+        }
+
         // Primary goal: user override > reasons > Q11 > weights > stress
         let order = PlanGoal.allCases
         func best(_ candidates: [PlanGoal]) -> PlanGoal? {
@@ -192,7 +209,7 @@ enum PersonalPlanGenerator {
 
         // Chronicity & availability
         let duration = profile.durationCode ?? ""
-        let gentle = duration == "1_year_plus" || duration == "years" || (scores.global.map { $0 < 30 } ?? false)
+        let gentle = duration == "1_year_plus" || duration == "years" || (scores.global.map { $0 < 30 } ?? false) || anxiety == .severe
         let availableMinutes: Int? = answers.count > 11 ? [10, 22, 37, 52, 75][safe: answers[11]] : profile.availableMinutes
         let compact = (availableMinutes ?? 22) < 15
 
@@ -211,7 +228,8 @@ enum PersonalPlanGenerator {
             racingMind: symptoms.contains("mental.3") || symptoms.contains("mental.1"),
             fatigue: symptoms.contains("physical.2") || (scores.energy.map { $0 < 40 } ?? false),
             isolation: symptoms.contains("social.1") || symptoms.contains("social.3"),
-            senior: profile.ageCode == "55_plus"
+            senior: profile.ageCode == "55_plus",
+            anxiety: anxiety
         )
     }
 
@@ -262,6 +280,7 @@ enum PersonalPlanGenerator {
         }
         if theme == .soothe { w[.sos, default: 0] += 0.5; w[.calm, default: 0] += 0.5 }
         if analysis.gentle || analysis.palpitations { w[.sos, default: 0] += 0.5; w[.energy] = (w[.energy] ?? 0) * 0.3 }
+        if let anxiety = analysis.anxiety, anxiety >= .moderate { w[.calm, default: 0] += 0.5; w[.sos, default: 0] += 0.5 }
         return w
     }
 
@@ -270,7 +289,7 @@ enum PersonalPlanGenerator {
         // Stimulating techniques are excluded when they may not be appropriate.
         let excludeIntense = analysis.gentle || analysis.palpitations || analysis.senior || week == 1
         let candidates = BreathingPattern.allPatterns
-            .filter { !(excludeIntense && $0.key == "kapalabhati") }
+            .filter { !(excludeIntense && $0.key == "kapalabhati") && !analysis.excluded.contains($0.key) }
             .sorted { $0.key < $1.key }
 
         var bestPattern: BreathingPattern?
@@ -319,6 +338,7 @@ enum PersonalPlanGenerator {
         if analysis.gentle { w[.selfCompassion, default: 0] += 1; w[.stressSOS, default: 0] += 0.5 }
         if analysis.tension { w[.bodyRelax, default: 0] += 1 }
         if analysis.racingMind { w[.anxiety, default: 0] += 0.5 }
+        if let anxiety = analysis.anxiety, anxiety >= .moderate { w[.anxiety, default: 0] += 1; w[.stressSOS, default: 0] += 0.5 }
         return w
     }
 
@@ -329,7 +349,7 @@ enum PersonalPlanGenerator {
         if eveningPresent { weights[.sleep] = 0 }
 
         let cap = audioCap(week: week, analysis: analysis, cycle: cycle)
-        let catalog = GuidedSessionCatalog.all.sorted { $0.id < $1.id }
+        let catalog = GuidedSessionCatalog.all.filter { !analysis.excluded.contains($0.id) }.sorted { $0.id < $1.id }
         var fitting = catalog.filter { $0.durationMinutes <= cap && $0.id != excluding && (weights[$0.category] ?? 0) > 0 }
         if fitting.isEmpty {
             fitting = catalog.filter { $0.id != excluding && (weights[$0.category] ?? 0) > 0 }
@@ -395,7 +415,7 @@ enum PersonalPlanGenerator {
 
         var candidates = GuidedSessionCatalog.sessions(in: .sleep)
         candidates += ["body-pmr-8", "body-scan-10", "body-yoga-nidra-15"].compactMap(GuidedSessionCatalog.session(id:))
-        candidates = candidates.sorted { $0.id < $1.id }
+        candidates = candidates.filter { !analysis.excluded.contains($0.id) }.sorted { $0.id < $1.id }
         var fitting = candidates.filter { $0.durationMinutes <= cap }
         if fitting.isEmpty { fitting = Array(candidates.sorted { $0.durationMinutes < $1.durationMinutes }.prefix(1)) }
 
@@ -439,13 +459,14 @@ enum PersonalPlanGenerator {
         if analysis.fatigue { w["water", default: 0] += 0.5; w["sport", default: 0] += 0.5 }
         if analysis.isolation { w["social", default: 0] += 1 }
         if analysis.tension { w["nature", default: 0] += 0.5 }
+        for id in analysis.excluded where w[id] != nil { w[id] = 0 }
         return w
     }
 
     /// Habits ordered by relevance (stable).
     static func rankedHabits(_ analysis: PlanAnalysis) -> [String] {
         let w = combinedHabitWeights(analysis)
-        return habitIDs.sorted { a, b in
+        return habitIDs.filter { !analysis.excluded.contains($0) }.sorted { a, b in
             let wa = w[a] ?? 0, wb = w[b] ?? 0
             return wa != wb ? wa > wb : (habitIDs.firstIndex(of: a)! < habitIDs.firstIndex(of: b)!)
         }
@@ -500,6 +521,72 @@ enum PersonalPlanGenerator {
         }
     }
 
+    // MARK: - Alternatives (plan editing)
+
+    /// Replacement candidates for one item of a day, best first: same kind, suited to the
+    /// plan's goal, not already in the day, not excluded by the user. The returned items keep
+    /// the slot id (so completion keys stay stable), except habits which are keyed by habit.
+    static func alternatives(for item: PlanItem, in plan: PersonalPlan, dayNumber: Int, anxiety: AnxietySeverity? = nil, limit: Int = 5) -> [PlanItem] {
+        guard let day = plan.day(dayNumber) else { return [] }
+        var analysis = analyze(plan.profile, overrideGoal: plan.goal, anxiety: anxiety)
+        analysis.excluded = plan.excludedRefIDs
+        let theme = PlanWeekTheme.forWeek(day.week)
+        let usedRefs = Set(day.items.map(\.refID))
+
+        switch item.kind {
+        case .breathing:
+            let weights = breathingWeights(goal: plan.goal, theme: theme, analysis: analysis)
+            let excludeIntense = analysis.gentle || analysis.palpitations || analysis.senior || day.week == 1
+            return BreathingPattern.allPatterns
+                .filter { !usedRefs.contains($0.key) && !analysis.excluded.contains($0.key) }
+                .filter { !(excludeIntense && $0.key == "kapalabhati") }
+                .sorted { a, b in
+                    let wa = weights[a.category] ?? 0, wb = weights[b.category] ?? 0
+                    return wa != wb ? wa > wb : a.key < b.key
+                }
+                .prefix(limit)
+                .map { pattern in
+                    let choices = pattern.durationChoices.isEmpty ? [pattern.defaultMinutes] : pattern.durationChoices.sorted()
+                    let minutes = choices.min { abs($0 - item.minutes) < abs($1 - item.minutes) } ?? max(1, pattern.defaultMinutes)
+                    let shortest = choices.first ?? minutes
+                    return PlanItem(id: item.id, kind: .breathing, refID: pattern.key, minutes: minutes,
+                                    shortRefID: nil, shortMinutes: shortest < minutes ? shortest : nil, variant: nil)
+                }
+
+        case .audio, .evening:
+            let pool: [GuidedSession]
+            var weights: [AudioSessionCategory: Double]
+            if item.kind == .evening {
+                pool = GuidedSessionCatalog.sessions(in: .sleep)
+                    + ["body-pmr-8", "body-scan-10", "body-yoga-nidra-15"].compactMap(GuidedSessionCatalog.session(id:))
+                weights = [.sleep: 3, .bodyRelax: 1.5]
+            } else {
+                pool = GuidedSessionCatalog.all
+                weights = audioWeights(goal: plan.goal, theme: theme, analysis: analysis, eveningPresent: day.items.contains { $0.kind == .evening })
+            }
+            let cap = max(item.minutes + 3, 5)
+            return pool
+                .filter { !usedRefs.contains($0.id) && !analysis.excluded.contains($0.id) && (weights[$0.category] ?? 0) > 0 }
+                .sorted { a, b in
+                    // Relevance first, then closest to the replaced session's length.
+                    let sa = (weights[a.category] ?? 0) - (a.durationMinutes > cap ? 2 : 0) - Double(abs(a.durationMinutes - item.minutes)) * 0.15
+                    let sb = (weights[b.category] ?? 0) - (b.durationMinutes > cap ? 2 : 0) - Double(abs(b.durationMinutes - item.minutes)) * 0.15
+                    return sa != sb ? sa > sb : a.id < b.id
+                }
+                .prefix(limit)
+                .map { PlanItem(id: item.id, kind: item.kind, refID: $0.id, minutes: $0.durationMinutes,
+                                shortRefID: nil, shortMinutes: nil, variant: nil) }
+
+        case .habit:
+            let used = Set(day.items.filter { $0.kind == .habit }.map(\.refID))
+            return rankedHabits(analysis)
+                .filter { !used.contains($0) }
+                .prefix(limit)
+                .map { PlanItem(id: "habit_\($0)", kind: .habit, refID: $0, minutes: 0,
+                                shortRefID: nil, shortMinutes: nil, variant: 0) }
+        }
+    }
+
     // MARK: - Insights ("why this plan")
 
     private static func insights(for analysis: PlanAnalysis, profile: PlanProfile, anchorHabit: String) -> [String] {
@@ -521,6 +608,8 @@ enum PersonalPlanGenerator {
         if analysis.primary == .sleep || analysis.secondary == .sleep { result.append("evening") }
         if analysis.racingMind { result.append("racing_mind") }
         if analysis.isolation { result.append("isolation") }
+        // No band in the code: the plan is mirrored to Firestore.
+        if analysis.anxiety != nil { result.append("anxiety_check") }
         result.append("anchor:\(anchorHabit)")
         result.append("progression")
         return result

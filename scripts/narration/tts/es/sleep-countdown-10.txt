@@ -1,0 +1,154 @@
+# sleep-countdown-10 · Cuenta atrás hacia el sueño (ES)
+[pause 1.5s]
+[soft, calm, unhurried] Esta noche, vamos a contar. No ovejas. Respiraciones.
+De cincuenta a uno, un número en cada exhalación.
+Es una tarea muy sencilla, casi aburrida. Y eso es justo lo que necesita una mente que todavía quiere trabajar.
+Le damos una pequeña tarea. Suficiente para mantenerla ocupada. No tanto como para despertarla.
+Un poco como darle un sonajero a un niño que todavía no está listo para dormir. Lo sostiene, lo mira, y sin darse cuenta, se le empiezan a cerrar los ojos.
+[pause 2s]
+
+[soft] Antes de empezar, prepárate para la noche.
+Túmbate en la postura en la que sueles quedarte dormido. Sube el edredón hasta donde te guste. Busca el hueco de la almohada, el que ya conoce la forma de tu cabeza.
+Deja los brazos donde estén cómodos. Si algo te molesta, una arruga en la sábana, un mechón de pelo, una pierna en mala postura, tómate un momento para arreglarlo ahora.
+Después, ya no tendrás que moverte. La cama se encargará del resto.
+[pause 4s]
+
+[gentle, reassuring] Hay una regla, solo una. Si pierdes la cuenta, no importa en absoluto.
+Si no recuerdas si ibas por el treinta y dos o por el veintiocho, elige el número que quieras y sigue desde ahí.
+Si tu respiración no coincide con mi voz, tampoco importa. Tu respiración tiene razón. Síguela, y deja que mi voz vaya detrás, como un sonido suave de fondo.
+Y si te duermes antes del final, es perfecto. Poca gente llega hasta abajo del todo.
+No es una competición. Nadie lo está comprobando. No hay una forma correcta de contar, solo la tuya.
+[pause 2s]
+
+[soft, slow] Para empezar, tres respiraciones, un poco más lentas de lo habitual.
+Inhala suavemente por la nariz, sintiendo el aire fresco que entra...
+[pause 3s]
+y deja salir el aire durante mucho tiempo, ya tibio, por la nariz o por la boca.
+[pause 6s]
+Otra vez. Inhala, sintiendo cómo el vientre se eleva bajo el edredón...
+[pause 3s]
+y exhala, sintiendo cómo baja, muy suave, como un globo que se vacía despacio.
+[pause 6s]
+Una última vez. Inhala...
+[pause 3s]
+y exhala, dejando caer todo el peso del cuerpo en el colchón.
+[pause 6s]
+[soft, soothing] Ahora deja que la respiración vuelva a su ritmo natural. Deja de dirigirla. Sabe lo que tiene que hacer. Lo hace cada noche sin ti.
+En cada exhalación, diré un número. Puedes repetirlo en tu cabeza conmigo, como un eco.
+Y entre los números, te invitaré a soltar una pequeña parte de tu cuerpo.
+Allá vamos.
+[pause 3s]
+
+[slow, soothing] Cincuenta. El aire sale, y los hombros bajan un poco, alejándose de las orejas.
+[pause 3s]
+Cuarenta y nueve. La frente se alisa, como una sábana estirada con la mano. El espacio entre las cejas se ensancha.
+[pause 3s]
+Cuarenta y ocho. La mandíbula se afloja. Los dientes se separan. La lengua descansa, blanda y pesada, en el fondo de la boca.
+[pause 3s]
+Cuarenta y siete. Las manos se abren, muy suavemente, con los dedos un poco separados. Ya no tienen nada que sostener.
+[pause 3s]
+Cuarenta y seis. La nuca se acomoda en la almohada, y la almohada recibe todo el peso de la cabeza.
+[pause 3s]
+Cuarenta y cinco. El pecho se ablanda. Ya no necesita sostenerse. Apenas se eleva.
+[pause 3s]
+Cuarenta y cuatro. El vientre está blando. Sube y baja solo, como una ola lenta que llega a la arena.
+[pause 3s]
+Cuarenta y tres. La espalda se extiende sobre el colchón, vértebra a vértebra, de arriba abajo.
+[pause 3s]
+Cuarenta y dos. Las caderas se hunden un poco más. Los muslos se vuelven pesados, tibios y quietos.
+[pause 3s]
+Cuarenta y uno. Las pantorrillas, los tobillos, los pies se sueltan, allá abajo, al fondo de la cama. Hasta los dedos de los pies descansan ya.
+[pause 3s]
+Cuarenta. Todo tu cuerpo descansa. De la cabeza a los pies, ya no queda nada que cargar.
+[pause 5s]
+
+[softer, slower] Ahora dejaremos un poco más de espacio.
+Solo diré un número de cada dos. El de en medio, lo cuentas tú solo, en la siguiente exhalación.
+Mientras tanto, mi voz se quedará aquí, muy baja, diciéndote cosas suaves. Puedes escucharla, o dejar que pase de largo.
+No hace falta ser preciso. Si te saltas un número, o cuentas dos veces el mismo, déjalo estar. Los números están para llevarte, no para vigilarte.
+[pause 3s]
+Treinta y nueve.
+[pause 5s]
+En la siguiente respiración, contarás treinta y ocho tú solo. O quizá no. Da exactamente igual.
+[pause 4s]
+Treinta y siete. Imagina que cada número es un escalón, y que bajas por una escalera cubierta de una alfombra gruesa y suave.
+Tus pies no hacen ningún ruido. La barandilla es lisa y tibia bajo tu mano. Bajas sin prisa, un escalón por cada respiración.
+[pause 5s]
+Treinta y cinco. Con cada escalón todo está un poco más oscuro, un poco más suave, un poco más cálido.
+Como si bajaras hacia una habitación donde alguien ya ha encendido una lamparita y ha corrido las cortinas. La cama está hecha. Las sábanas están frescas y limpias.
+[pause 5s]
+Treinta y tres. Tu cuerpo pesa como un saco de arena dejado en el suelo. Una vez que está ahí, no se mueve. Simplemente toma la forma de lo que tiene debajo.
+[pause 5s]
+Treinta y uno. Tu cabeza se hunde en la almohada, como en nieve recién caída. Silenciosa. Suave. A tu alrededor, el mundo se queda callado.
+[pause 5s]
+Veintinueve. Si pasan pensamientos, déjalos pasar. Pueden hacer ruido a lo lejos, como una calle detrás de una ventana cerrada. Solo tienes que sostener un número, nada más.
+[pause 5s]
+Veintisiete. Los párpados pesan. Descansan como dos cortinitas corridas para la noche. Detrás, todo es oscuro y suave.
+[pause 5s]
+Veinticinco.
+[pause 4s]
+La mitad del camino. Fíjate en cuánto más lenta es tu respiración que al principio. No has hecho nada para conseguirlo. Se ha ralentizado sola, número a número.
+[pause 4s]
+
+[quieter, slower] A partir de aquí, sigues tú solo.
+Mi voz solo te dará algunas referencias de vez en cuando. Entre medias, cuenta a tu ritmo, cada vez que sale el aire.
+Si te desvías, retoma desde cualquier número. El número no importa. Lo que importa es la respiración que baja, y tú bajando con ella.
+[pause 4s]
+[storytelling, soft] Mientras cuentas, imagina una piedra lisa que se hunde despacio hasta el fondo de un lago. Desciende, en silencio, a través de un agua tranquila y templada.
+No tiene que hacer nada para hundirse. Simplemente se deja llevar hacia abajo, cada vez más lejos de la superficie.
+Allá arriba están el día, el ruido, las pantallas. Aquí abajo, solo hay una luz que se va apagando despacio, capa tras capa, del azul pálido al azul profundo.
+[pause 4s]
+Tu cuerpo es como esa piedra. Pesado, liso, quieto.
+Te hundes con cada respiración, un poco más en el colchón.
+En el fondo del lago hay una arena fina, y la piedra se posa en ella sin ruido. Ha llegado. Puede quedarse ahí toda la noche.
+[pause 6s]
+Veinte, más o menos. O en otro sitio. No importa.
+[pause 3s]
+Tus brazos pesan tanto que podrías olvidar dónde están. Se sienten tibios, como si descansaran en un rayo de sol.
+Las piernas también. Se funden con las sábanas, como si formaran parte de la cama.
+Y esa pesadez sube despacio, de los pies a las rodillas, de las rodillas al vientre, del vientre al pecho. Un calor tranquilo, que se toma todo el tiempo que necesita.
+[pause 5s]
+Ahora imagina un edificio alto al anochecer. Todas las ventanas están encendidas.
+Y una a una, piso a piso, las luces se apagan. Con suavidad. Sin ningún orden.
+Cada ventana que se oscurece es un pensamiento que se va a dormir.
+[pause 3s]
+La oficina del tercer piso. La cocina del quinto. Un dormitorio arriba del todo. El edificio se vuelve oscuro y silencioso, igual que tú.
+[pause 6s]
+
+[almost whispering, slower] Quince, quizá.
+[pause 3s]
+Los números se vuelven borrosos. Se espacian. Algunos desaparecen.
+Es normal. De hecho, es señal de que te estás dejando llevar.
+Si sigues contando, cuenta más despacio. Si has dejado de contar, no hace falta volver a empezar.
+[pause 5s]
+Fuera, quizá, caen unos copos de nieve en la noche. Se posan en los tejados, en los coches, en las ramas. Sin ruido. Cada uno a su turno.
+[pause 4s]
+Piensa en un reloj de arena. La arena cae, grano a grano. Abajo forma un pequeño montón, suave e inmóvil.
+Tu respiración es como esa arena. Fluye, despacio, y se asienta.
+[pause 6s]
+Doce, o trece. Tu respiración se ha vuelto tan ligera que apenas la sientes, solo un pequeño ir y venir en el borde de la nariz.
+[pause 3s]
+La mandíbula está suelta. Las mejillas están sueltas. Toda tu cara se ha suavizado, como la cara de alguien que ya duerme.
+Tus manos reposan pesadas y tibias sobre la sábana. No sabrías decir dónde terminan tus dedos y dónde empieza la tela.
+[pause 5s]
+El siguiente número puede llegar. O no. Tu respiración simplemente continúa, paciente y regular, sin que tengas que ocuparte de ella.
+Ya no hay nada a lo que agarrarse. Ni los números, ni el día, ni el mañana.
+Solo la respiración, que entra...
+[pause 3s]
+y que sale.
+[pause 6s]
+[soft, calm] Si tus noches suelen ser difíciles, plantéate hablar algún día con un profesional de la salud. Por ahora, deja que los números te lleven.
+[pause 5s]
+[almost whispering] Diez...
+[pause 5s]
+Los hombros pesan. Las manos pesan.
+La cabeza descansa. Toda la espalda descansa.
+[pause 6s]
+Pesado... tibio... lento...
+[pause 4s]
+La cama te sostiene. La noche te envuelve.
+[pause 5s]
+Nada que hacer... nada que sostener...
+[pause 5s]
+Sigue contando... o suéltalo todo...
+[pause 10s]

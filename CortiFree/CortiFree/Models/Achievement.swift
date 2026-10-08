@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 struct Achievement: Identifiable, Codable, Equatable {
     let id: String

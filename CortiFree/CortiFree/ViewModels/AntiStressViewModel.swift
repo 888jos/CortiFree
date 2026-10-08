@@ -8,7 +8,6 @@
 
 import Foundation
 import Combine
-import FirebaseFirestore
 
 @MainActor
 class AntiStressViewModel: ObservableObject {
@@ -16,7 +15,6 @@ class AntiStressViewModel: ObservableObject {
     @Published var currentExercise: AntiStressExerciseType?
     @Published var isExerciseComplete = false
 
-    private let firebaseService = FirebaseService.shared
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Situation Selection
@@ -28,13 +26,12 @@ class AntiStressViewModel: ObservableObject {
 
     private func saveLastSituation(_ situation: StressSituation) {
         Task {
-            guard let userId = firebaseService.currentUserId else { return }
-
-            let db = Firestore.firestore()
-            try? await db.collection("users").document(userId).updateData([
-                "lastSituation": situation.rawValue,
-                "lastSituationTimestamp": Timestamp()
-            ])
+            guard Auth.auth().currentUser != nil else { return }
+            let _: JSONValue? = try? await ConvexBackend.shared.call(
+                .mutation,
+                path: "profile:recordSituation",
+                args: ["situation": situation.rawValue]
+            )
         }
     }
 
@@ -72,33 +69,17 @@ class AntiStressViewModel: ObservableObject {
         situation: StressSituation,
         duration: Int
     ) async throws {
-        guard let userId = firebaseService.currentUserId else { return }
-
-        let db = Firestore.firestore()
-        let completion = ExerciseCompletion(
-            exerciseType: exerciseType,
-            situation: situation,
-            completedAt: Timestamp(),
-            duration: duration
-        )
-
-        // Save to exercises_done subcollection (XP removed)
-        try await db.collection("users")
-            .document(userId)
-            .collection("exercises_done")
-            .addDocument(data: [
+        guard Auth.auth().currentUser != nil else { return }
+        let _: String = try await ConvexBackend.shared.call(
+            .mutation,
+            path: "progress:recordExerciseSession",
+            args: [
                 "exerciseType": exerciseType.rawValue,
                 "situation": situation.rawValue,
-                "completedAt": completion.completedAt,
-                "duration": duration
-            ])
-
-        // Update user stats
-        try await db.collection("users").document(userId).updateData([
-            "lastExerciseType": exerciseType.rawValue,
-            "lastExerciseDate": Timestamp(),
-            "totalExercisesCompleted": FieldValue.increment(Int64(1))
-        ])
+                "durationSeconds": duration,
+                "source": "anti_stress",
+            ]
+        )
     }
 
     // MARK: - Reset

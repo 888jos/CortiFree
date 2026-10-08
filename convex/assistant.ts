@@ -1,3 +1,4 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -16,7 +17,7 @@ export const chat = action({
     ),
   },
   handler: async (ctx, { messages }) => {
-    if (!(await ctx.auth.getUserIdentity())) {
+    if ((await getAuthUserId(ctx)) === null) {
       throw new Error("Authentication required");
     }
     if (messages.length === 0 || messages.length > maxMessages) {

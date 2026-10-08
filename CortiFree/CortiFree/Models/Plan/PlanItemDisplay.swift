@@ -136,6 +136,8 @@ enum PlanArtwork {
         case .bodyRelax: return "routine_relaxation"
         case .anxiety: return "situation_anxiete"
         case .selfCompassion: return "routine_stress"
+        case .firstSteps: return "meditation_01"
+        case .stressScience: return "routine_stress"
         }
     }
 }
@@ -179,8 +181,8 @@ enum PlanDaySlot: String, CaseIterable, Identifiable {
 /// Single entry point used by the plan to start a guided audio session.
 enum PlanPlaybackRouter {
     @MainActor
-    static func play(sessionID: String) {
+    static func play(sessionID: String, recordsSession: Bool = true) {
         guard let session = GuidedSessionCatalog.session(id: sessionID) else { return }
-        GuidedSessionPlayer.shared.play(session, presentFullPlayer: true)
+        GuidedSessionPlayer.shared.play(session, presentFullPlayer: true, recordsSession: recordsSession)
     }
 }

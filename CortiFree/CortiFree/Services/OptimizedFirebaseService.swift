@@ -1,114 +1,73 @@
-//
-//  OptimizedFirebaseService.swift
-//  CortiFree
-//
-//  Service Firebase optimisé pour performance mobile
-//  Utilise des opérations asynchrones et batch pour éviter les blocages UI
-//
-
 import Foundation
-import FirebaseFirestore
-import FirebaseAuth
 
-class OptimizedFirebaseService {
+/// Transitional name kept so existing onboarding call sites remain compatible.
+/// Persistence is handled entirely by Convex.
+@MainActor
+final class OptimizedFirebaseService {
     static let shared = OptimizedFirebaseService()
-    private let db = Firestore.firestore()
-    private let queue = DispatchQueue(label: "firebase.queue", qos: .background)
+    private init() {}
 
-    private init() {
-        // DO NOT configure Firestore settings - causes crash
-        // Firestore uses default settings
-    }
-
-    // MARK: - Optimized Save Operations
-
-    /// Save quiz data in background without blocking UI
     func saveQuizDataInBackground(_ result: HabitsQuizResult, overallData: OverallQuizData?) {
-        queue.async { [weak self] in
-            guard let self = self,
-                  let userId = Auth.auth().currentUser?.uid else { return }
+        guard Auth.auth().currentUser != nil else { return }
+        let baseline = result.baselineData
+        var args: [String: Any] = [
+            "baseline": [
+                "method": "quiz",
+                "currentHabits": [
+                    "wakeTime": baseline.wakeTime,
+                    "sleepDuration": baseline.sleepDuration,
+                    "waterIntake": baseline.waterIntake,
+                    "exerciseFrequency": baseline.exerciseFrequency,
+                    "exerciseDuration": baseline.exerciseDuration,
+                    "meditationFrequency": baseline.meditationFrequency,
+                    "meditationDuration": baseline.meditationDuration,
+                    "breathingFrequency": baseline.breathingFrequency,
+                ],
+                "preferences": [
+                    "availableTime": baseline.availableTime,
+                    "preferredIntensity": baseline.preferredIntensity,
+                    "hasPhysicalLimitations": false,
+                    "preferredTimeOfDay": "morning",
+                    "primaryGoal": result.primaryGoal,
+                ],
+                "quizAnswers": result.answers,
+            ],
+        ]
+        if let overallData { args["profile"] = Self.profileAnswers(overallData) }
 
-            // Prepare all data first
-            let batch = self.db.batch()
-
-            // 1. Baseline data
-            let baselineRef = self.db.collection("users").document(userId)
-                .collection("baseline").document("initial")
-
-            let baselineData = self.prepareBaselineData(result)
-            batch.setData(baselineData, forDocument: baselineRef)
-
-            // 2. User profile (if available)
-            if let overallData = overallData {
-                let profileRef = self.db.collection("users").document(userId)
-                let profileData = self.prepareProfileData(overallData)
-                batch.setData(profileData, forDocument: profileRef, merge: true)
-            }
-
-            // 3. Execute batch write (single network call)
-            batch.commit { error in
+        Task {
+            do {
+                let _: JSONValue = try await ConvexBackend.shared.call(
+                    .mutation, path: "baseline:saveInitial", args: args
+                )
                 #if DEBUG
-                if let error = error {
-                    print("❌ Batch write error: \(error)")
-                } else {
-                    print("✅ Data saved successfully in background")
-                }
+                print("✅ Onboarding baseline saved to Convex")
+                #endif
+            } catch {
+                #if DEBUG
+                print("⚠️ Convex onboarding save failed: \(error.localizedDescription)")
                 #endif
             }
         }
     }
 
-    // MARK: - Helper Methods
-
-    private func prepareBaselineData(_ result: HabitsQuizResult) -> [String: Any] {
-        let baseline = result.baselineData
-
-        return [
-            "collectedAt": FieldValue.serverTimestamp(),
-            "method": "quiz",
-            "currentHabits": [
-                "wakeTime": baseline.wakeTime,
-                "sleepDuration": baseline.sleepDuration,
-                "waterIntake": baseline.waterIntake,
-                "exerciseFrequency": baseline.exerciseFrequency,
-                "exerciseDuration": baseline.exerciseDuration,
-                "meditationFrequency": baseline.meditationFrequency,
-                "meditationDuration": baseline.meditationDuration,
-                "breathingFrequency": baseline.breathingFrequency
-            ],
-            "preferences": [
-                "availableTime": baseline.availableTime,
-                "preferredIntensity": baseline.preferredIntensity,
-                "hasPhysicalLimitations": false, // Removed from quiz
-                "preferredTimeOfDay": "morning", // Default value
-                "primaryGoal": result.primaryGoal
-            ]
-        ]
-    }
-
-    private func prepareProfileData(_ data: OverallQuizData) -> [String: Any] {
-        var profileData: [String: Any] = [
+    static func profileAnswers(_ data: OverallQuizData) -> [String: Any] {
+        var answers: [String: Any] = [
             "age": data.age,
             "gender": data.gender,
             "genderCode": data.genderCode,
             "stressReasons": data.reasons,
             "stressDuration": data.duration,
-            "onboardingCompletedAt": Date(),
-            "hasBaseline": true
         ]
-        if let acquisitionChannel = data.acquisitionChannel, !acquisitionChannel.isEmpty {
-            profileData["acquisitionChannel"] = acquisitionChannel
+        if let channel = data.acquisitionChannel, !channel.isEmpty {
+            answers["acquisitionChannel"] = channel
         }
-        return profileData
+        return answers
     }
-
 }
-
-// MARK: - Simplified Onboarding Integration
 
 extension OnboardingV2FlowView {
     func optimizedSaveData(result: HabitsQuizResult, overallData: OverallQuizData?) {
-        // Save in background without blocking UI
         OptimizedFirebaseService.shared.saveQuizDataInBackground(result, overallData: overallData)
     }
 }

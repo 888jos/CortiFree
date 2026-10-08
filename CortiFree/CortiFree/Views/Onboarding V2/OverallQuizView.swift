@@ -183,30 +183,8 @@ struct OverallQuizView: View {
             .opacity(currentQuestionIndex > 0 ? 1.0 : 0.0)
 
             // Progress bar (center - prend tout l'espace entre bouton et flag)
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    // Background
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(hex: "1D1D1D"))
-                        .frame(height: 8)
-
-                    // Progress fill
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "B794F6"),
-                                    Color(hex: "D4B4FF")
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: geometry.size.width * progress, height: 8)
-                        .animation(.easeInOut(duration: 0.3), value: progress)
-                }
-            }
-            .frame(height: 8)
+            OnboardingProgressBar(progress: progress)
+                .animation(.easeInOut(duration: 0.3), value: progress)
             .padding(.horizontal, 16)
 
             // Language selector button (right)
@@ -497,12 +475,12 @@ struct OverallQuizView: View {
             "onboarding_v2.overall.reason_sleep".localized,
             "onboarding_v2.overall.reason_anxiety".localized,
             "onboarding_v2.overall.reason_energy".localized,
-            "onboarding_v2.overall.reason_focus".localized,
             "onboarding_v2.overall.reason_mental".localized,
             "onboarding_v2.overall.reason_difficult".localized,
             "onboarding_v2.overall.reason_habits".localized
         ]
-        let reasonCodes = ["sleep", "anxiety", "energy", "focus", "mental", "difficult", "habits"]
+        // Same order as the answer buttons (indexes 0...5); there is no "focus" button.
+        let reasonCodes = ["sleep", "anxiety", "energy", "mental", "difficult", "habits"]
         let durationOptions = [
             "onboarding_v2.overall.duration_weeks".localized,
             "onboarding_v2.overall.duration_2_6_months".localized,
@@ -528,6 +506,12 @@ struct OverallQuizView: View {
             duration: durationOptions[selectedDuration ?? 0],
             durationCode: durationCodes[selectedDuration ?? 0]
         )
+        PersonalPlanStore.shared.updateOnboardingDraft { profile in
+            profile.reasonCodes = data.reasonCodes
+            profile.durationCode = data.durationCode
+            profile.ageCode = data.ageCode
+            profile.genderCode = data.genderCode
+        }
 
         // Track quiz completion
         let totalTime = quizStartTime.map { Date().timeIntervalSince($0) } ?? 0

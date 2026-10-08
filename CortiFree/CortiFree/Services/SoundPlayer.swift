@@ -26,7 +26,7 @@ class SoundPlayer: ObservableObject {
     private var accumulatedPlayTime: TimeInterval = 0  // Temps accumulé avant la pause
 
     private init() {
-        setupAudioSession()
+        AudioFocus.configureAtLaunch()
         setupRemoteTransportControls()
         setupNotifications()
         NotificationCenter.default.addObserver(
@@ -49,18 +49,9 @@ class SoundPlayer: ObservableObject {
 
     // MARK: - Audio Session
 
-    private func setupAudioSession() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(
-                .playback,
-                mode: .default,
-                options: []  // Pas de mixWithOthers — on veut prendre le focus comme Spotify
-            )
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Failed to setup audio session: \(error.localizedDescription)")
-        }
-    }
+    // SoundPlayer.shared is created at launch (ContentView): only configure the session
+    // there. The focus is taken in play()/resume() so opening the app never stops the
+    // user's music (see AudioFocus).
 
     // MARK: - Remote Controls (Control Center)
 
@@ -103,8 +94,8 @@ class SoundPlayer: ObservableObject {
             MPNowPlayingInfoPropertyElapsedPlaybackTime: totalPlayTime
         ]
 
-        // Artwork — utilise l'icône de l'app comme artwork
-        if let image = UIImage(named: "AppIcon") ?? UIImage(named: "AppIcon60x60") {
+        // Artwork — the ambient sound photo (falls back to the app icon)
+        if let image = UIImage(named: exercise.soundImageName) ?? UIImage(named: "AppIcon") ?? UIImage(named: "AppIcon60x60") {
             info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
         }
 
@@ -153,7 +144,6 @@ class SoundPlayer: ObservableObject {
             let optionsValue = info[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
             let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
             if options.contains(.shouldResume) {
-                try? AVAudioSession.sharedInstance().setActive(true)
                 resume()
             }
 
@@ -189,8 +179,10 @@ class SoundPlayer: ObservableObject {
             return
         }
 
-        // Stop current if playing
-        stop()
+        // Stop current if playing (keeping the audio focus: taken again just below, so
+        // the user's other app is not told to resume in between).
+        stop(releasingFocus: false)
+        AudioFocus.acquire(.ambientSound)
 
         // Only one thing plays at a time: stop any guided audio session.
         stopGuidedSession()
@@ -198,6 +190,7 @@ class SoundPlayer: ObservableObject {
         currentExercise = exercise
 
         guard let audioFileName = exercise.audioFileName else {
+            AudioFocus.release(.ambientSound)
             print("No audio file for this exercise")
             return
         }
@@ -208,16 +201,12 @@ class SoundPlayer: ObservableObject {
             .replacingOccurrences(of: ".m4a", with: "")
         guard let url = Bundle.main.url(forResource: baseName, withExtension: "m4a")
                 ?? Bundle.main.url(forResource: baseName, withExtension: "mp3") else {
+            AudioFocus.release(.ambientSound)
             print("Audio file not found: \(audioFileName)")
             return
         }
 
         do {
-            // Réactiver la session au cas où elle aurait été désactivée
-            // (le lecteur de séances guidées utilise le mode .spokenAudio)
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
-            try AVAudioSession.sharedInstance().setActive(true)
-
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.numberOfLoops = -1 // Loop indefinitely
             audioPlayer?.prepareToPlay()
@@ -232,6 +221,7 @@ class SoundPlayer: ObservableObject {
             updateNowPlayingInfo()
             triggerHaptic(.light)
         } catch {
+            AudioFocus.release(.ambientSound)
             print("Failed to play audio: \(error.localizedDescription)")
         }
     }
@@ -256,8 +246,7 @@ class SoundPlayer: ObservableObject {
 
     func resume() {
         guard currentExercise != nil, audioPlayer != nil else { return }
-        // Réactiver la session si nécessaire
-        try? AVAudioSession.sharedInstance().setActive(true)
+        AudioFocus.acquire(.ambientSound)
 
         audioPlayer?.play()
         isPlaying = true
@@ -269,6 +258,10 @@ class SoundPlayer: ObservableObject {
     }
 
     func stop() {
+        stop(releasingFocus: true)
+    }
+
+    private func stop(releasingFocus: Bool) {
         let finishedExercise = currentExercise
         let finishedDuration = Int(totalPlayTime.rounded())
 
@@ -284,15 +277,19 @@ class SoundPlayer: ObservableObject {
         playStartTime = nil
         selectedDuration = nil
         stopTimer()
+        if releasingFocus { AudioFocus.release(.ambientSound) }
 
         if let finishedExercise {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
-            ExerciseSessionRecorder.shared.record(
-                exerciseID: finishedExercise.id,
-                category: progressCategory(for: finishedExercise.type),
-                durationSeconds: finishedDuration,
-                source: "sound_player"
-            )
+            let category = progressCategory(for: finishedExercise.type)
+            Task { @MainActor in
+                ExerciseSessionRecorder.shared.record(
+                    exerciseID: finishedExercise.id,
+                    category: category,
+                    durationSeconds: finishedDuration,
+                    source: "sound_player"
+                )
+            }
         }
     }
 

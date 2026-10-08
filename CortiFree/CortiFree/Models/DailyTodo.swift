@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 struct DailyTodo: Identifiable, Codable, Equatable {
     @DocumentID var id: String?
@@ -16,4 +15,13 @@ struct DailyTodo: Identifiable, Codable, Equatable {
     let createdAt: Date
     var isCompleted: Bool // Simple checkbox
     var isActive: Bool // User can delete/archive todos
+
+    init(id: String? = nil, userId: String, title: String, createdAt: Date, isCompleted: Bool, isActive: Bool) {
+        self._id = DocumentID(wrappedValue: id)
+        self.userId = userId
+        self.title = title
+        self.createdAt = createdAt
+        self.isCompleted = isCompleted
+        self.isActive = isActive
+    }
 }

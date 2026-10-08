@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import FirebaseAuth
+import UserNotifications
 
 struct OnboardingCompletionView: View {
     let habitsQuizResult: HabitsQuizResult?
@@ -18,6 +18,7 @@ struct OnboardingCompletionView: View {
 
     @State private var hasTrackedCompletion = false
     @State private var hasCompletedOnboarding = false // Prevent double completion
+    @State private var restoreMessage: String?
 
     // DEBUG: Set to true to bypass paywall during development
     // Change to false before shipping to App Store!
@@ -46,19 +47,46 @@ struct OnboardingCompletionView: View {
             onPurchase: { _ in
                 // Not used - no purchase functionality
             },
-            onRestore: {
-                // Not used - no restore functionality
-            },
+            onRestore: restorePurchases,
             habitsQuizResult: habitsQuizResult,
             selectedSymptoms: selectedSymptoms,
             requiresPurchaseToComplete: true
         )
+        .alert(
+            restoreMessage ?? "",
+            isPresented: Binding(get: { restoreMessage != nil }, set: { if !$0 { restoreMessage = nil } })
+        ) {
+            Button("common.ok".localized, role: .cancel) {}
+        }
         .onAppear {
             // Track completion screen viewed
             AnalyticsManager.shared.trackOnboardingCompletionViewed(
                 quizAnswersCount: habitsQuizResult?.answers.count ?? 0,
                 hasQuizData: habitsQuizResult != nil
             )
+        }
+    }
+
+    // MARK: - Restore
+
+    /// Restores an existing subscription (reinstall, new device) and finishes the onboarding
+    /// when the "pro" entitlement comes back.
+    private func restorePurchases() {
+        Task { @MainActor in
+            do {
+                _ = try await RevenueCatManager.shared.restorePurchases()
+            } catch {
+                restoreMessage = "settings.restore.nothing".localized
+                return
+            }
+            if RevenueCatManager.shared.hasPremiumEntitlement {
+                guard !hasCompletedOnboarding else { return }
+                hasCompletedOnboarding = true
+                trackOnboardingCompletion()
+                onViewPlan()
+            } else {
+                restoreMessage = "settings.restore.nothing".localized
+            }
         }
     }
 
@@ -85,14 +113,25 @@ struct OnboardingCompletionView: View {
         }
 
         // Calculate total onboarding time from start to completion
-        var totalTime: Double? = nil
-        if let startTime = onboardingStartTime {
-            totalTime = Date().timeIntervalSince(startTime)
+        let totalTime = onboardingStartTime.map { Date().timeIntervalSince($0) }
+
+        Task { @MainActor in
+            let notificationsEnabled = await Self.notificationsAuthorized()
+            trackOnboardingCompleted(result: result, totalTime: totalTime, notificationsEnabled: notificationsEnabled)
         }
+    }
 
-        // TODO: Get actual notifications permission status
-        let notificationsEnabled = false // Placeholder
+    private static func notificationsAuthorized() async -> Bool {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        switch settings.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return true
+        default:
+            return false
+        }
+    }
 
+    private func trackOnboardingCompleted(result: HabitsQuizResult, totalTime: Double?, notificationsEnabled: Bool) {
         // Get user name from Auth
         let currentUser = Auth.auth().currentUser
         let firstName: String? = {
@@ -102,6 +141,13 @@ struct OnboardingCompletionView: View {
             return UserDefaults.standard.string(forKey: "userFirstName")
         }()
 
+        // Profile answers saved by the quiz steps (age bracket → its lower bound, e.g. "25_34" → 25).
+        let draft = PersonalPlanStore.shared.storedOnboardingProfile()
+        let age = draft?.ageCode.flatMap { code in
+            code == "under_18" ? 17 : Int(code.split(separator: "_").first ?? "")
+        }
+        let gender = draft?.genderCode
+
         // Track complete onboarding with all data
         AnalyticsManager.shared.trackOnboardingCompleted(
             totalTime: totalTime,
@@ -109,8 +155,8 @@ struct OnboardingCompletionView: View {
             notificationsEnabled: notificationsEnabled,
             userId: currentUser?.uid,
             firstName: firstName,
-            age: nil,
-            gender: nil
+            age: age,
+            gender: gender
         )
 
         // Set user profile if authenticated
@@ -121,8 +167,8 @@ struct OnboardingCompletionView: View {
             AnalyticsManager.shared.setUserProfile(
                 firstName: firstName,
                 email: currentUser?.email,
-                age: nil,
-                gender: nil,
+                age: age,
+                gender: gender,
                 primaryGoal: result.primaryGoal
             )
         }

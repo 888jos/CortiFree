@@ -32,6 +32,10 @@ struct ConfettiAnimation: View {
                     createConfetti(in: geometry)
                 }
             }
+            // Callers insert this view with trigger already true: onChange alone never fired.
+            .onAppear {
+                if trigger { createConfetti(in: geometry) }
+            }
         }
         .allowsHitTesting(false)
     }

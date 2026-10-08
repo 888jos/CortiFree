@@ -6,86 +6,26 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 import Combine
 
 struct ProfileView: View {
+    @Binding var selectedTab: ContentView.Tab
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = ProfileViewModel()
+    @StateObject private var progress = ProgressViewModel()
+    @ObservedObject private var planStore = PersonalPlanStore.shared
     @ObservedObject private var achievementService = AchievementService.shared
     @ObservedObject private var habitBadgeService = HabitBadgeService.shared
     // Re-render (localized strings) right after a language change in Settings
     @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showSettings = false
     @State private var showEditProfile = false
-    @State private var selectedTab: ProfileTab = .habits
+    @State private var showAchievements = false
+    @State private var showJournal = false
+    @State private var showJournalHistory = false
+    @State private var showAssistant = false
     @State private var firstName: String = ""
-
-    enum ProfileTab {
-        case habits
-        case achievements
-    }
-
-    // Computed habits data from ViewModel
-    private var habits: [(name: String, icon: String, progress: Double, color: Color)] {
-        [
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.meditation"),
-                "brain.head.profile",
-                calculateProgress(habitId: "meditation"),
-                Color(hex: "9B59B6")
-            ),
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.breathing"),
-                "wind",
-                calculateProgress(habitId: "breathing"),
-                Color(hex: "1ABC9C")
-            ),
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.journal"),
-                "book.fill",
-                calculateProgress(habitId: "journal"),
-                Color(hex: "E74C3C")
-            ),
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.sport"),
-                "figure.run",
-                calculateProgress(habitId: "sport"),
-                Color(hex: "2ECC71")
-            ),
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.water"),
-                "drop.fill",
-                calculateProgress(habitId: "water"),
-                Color(hex: "3498DB")
-            ),
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.nature"),
-                "leaf.fill",
-                calculateProgress(habitId: "nature"),
-                Color(hex: "27AE60")
-            ),
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.sleep"),
-                "moon.fill",
-                calculateProgress(habitId: "sleep"),
-                Color(hex: "E67E22")
-            ),
-            (
-                LanguageManager.shared.localizedString(for: "profile.habit.social"),
-                "person.2.fill",
-                calculateProgress(habitId: "social"),
-                Color(hex: "F39C12")
-            )
-        ]
-    }
-
-    // Calculate progress percentage for a habit (completed / total)
-    private func calculateProgress(habitId: String) -> Double {
-        guard let stats = viewModel.habitProgress[habitId] else { return 0.0 }
-        guard stats.total > 0 else { return 0.0 }
-        return Double(stats.completed) / Double(stats.total)
-    }
+    @State private var todayDone = 0
 
     var body: some View {
         ZStack {
@@ -93,7 +33,49 @@ struct ProfileView: View {
             GalaxyBackgroundView(intensity: 0.75)
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
+            ZStack(alignment: .top) {
+                // Scrollable content: starts just below the banner and scrolls UNDER it
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 24) {
+                        ProfileStatsStrip(
+                            streak: max(progress.data.currentStreak, UserPersistence.streakDays),
+                            calmMinutes: calmMinutes,
+                            unlockedBadges: totalUnlockedBadges,
+                            totalBadges: totalBadges,
+                            action: { selectedTab = .progress }
+                        )
+                        .cascadeAppear(index: 0, totalCount: 7, baseDelay: 0.05)
+
+                        if let plan = planStore.plan {
+                            ProfileWhyCard(plan: plan)
+                                .cascadeAppear(index: 1, totalCount: 7, baseDelay: 0.05)
+
+                            ProfilePlanCard(plan: plan, todayDone: todayDone, action: { selectedTab = .tasks })
+                                .cascadeAppear(index: 2, totalCount: 7, baseDelay: 0.05)
+                        }
+
+                        ProfileSessionsSection(explore: { selectedTab = .library })
+                            .cascadeAppear(index: 3, totalCount: 7, baseDelay: 0.05)
+
+                        ProfileMoodCard(
+                            days: lastSevenDays,
+                            write: { showJournal = true },
+                            history: { showJournalHistory = true }
+                        )
+                        .cascadeAppear(index: 4, totalCount: 7, baseDelay: 0.05)
+
+                        ProfileBadgesShowcase(achievements: streakAchievements, seeAll: { showAchievements = true })
+                            .cascadeAppear(index: 5, totalCount: 7, baseDelay: 0.05)
+
+                        ProfileShortcutsSection(openMilo: { showAssistant = true })
+                            .cascadeAppear(index: 6, totalCount: 7, baseDelay: 0.05)
+
+                        Spacer(minLength: 120)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 168)
+                }
+
                 // Fixed header (banner + profile elements) - stays on top
                 ZStack(alignment: .center) {
                     // Banner image
@@ -111,42 +93,8 @@ struct ProfileView: View {
                 }
                 .frame(height: 220)
                 .zIndex(1) // Ensure header stays on top
-
-                // Scrollable content: tabs and sections (scroll UNDER the header)
-                VStack(spacing: 0) {
-                    // Tab selector
-                    tabSelector
-                        .padding(.horizontal, 32)
-                        .padding(.top, 8)
-                        .padding(.bottom, 12)
-
-                    // Content based on selected tab with smooth transition
-                    TabView(selection: $selectedTab) {
-                        // Habits Section (scrollable)
-                        ScrollView(showsIndicators: false) {
-                            habitsSection
-                                .padding(.horizontal, 32)
-                                .padding(.top, 8)
-
-                            Spacer(minLength: 100)
-                        }
-                        .tag(ProfileTab.habits)
-
-                        // Achievements Section (scrollable)
-                        ScrollView(showsIndicators: false) {
-                            achievementsSection
-                                .padding(.horizontal, 32)
-                                .padding(.top, 8)
-
-                            Spacer(minLength: 100)
-                        }
-                        .tag(ProfileTab.achievements)
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .animation(.appSpring, value: selectedTab)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
             }
+
         }
         .ignoresSafeArea(.keyboard)
         .fullScreenCover(isPresented: $showSettings) {
@@ -157,22 +105,42 @@ struct ProfileView: View {
             EditProfileView()
                 .environmentObject(authViewModel)
         }
+        .fullScreenCover(isPresented: $showAchievements) {
+            AchievementsView()
+        }
+        .fullScreenCover(isPresented: $showJournal) {
+            JournalHomeView()
+        }
+        .fullScreenCover(isPresented: $showJournalHistory) {
+            JournalHistoryView()
+        }
+        .sheet(isPresented: $showAssistant) {
+            AssistantChatView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
         .onAppear {
-            // Initialize firstName
             firstName = getUserFirstName()
-            // Refresh profile data when view appears
+            refreshTodayDone()
             Task {
                 await viewModel.loadProfilePhoto()
-                await viewModel.refreshProfile()
-                // Load habit badges immediately
+                await planStore.ensurePlan()
+                refreshTodayDone()
+                await progress.loadIfNeeded()
+                await achievementService.loadAchievements()
                 await habitBadgeService.loadHabitBadges()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskValidated"))) { _ in
-            // Refresh habit progress when a task is validated
-            Task {
-                await viewModel.refreshProfile()
-            }
+            refreshTodayDone()
+            Task { await progress.refresh() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("DailyCheckInSaved"))) { _ in
+            Task { await progress.refresh() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskSkippedAfterValidation"))) { _ in
+            refreshTodayDone()
+            Task { await progress.refresh() }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ProfileUpdated"))) { _ in
             // Refresh firstName / photo when profile is updated
@@ -298,72 +266,49 @@ struct ProfileView: View {
         }
     }
 
-    // MARK: - Tab Selector
+    // MARK: - Data
 
-    private var tabSelector: some View {
-        HStack(spacing: 2) {
-            // Habitudes tab
-            Button(action: {
-                HapticManager.light()
-                withAnimation(.appSpring) {
-                    selectedTab = .habits
-                }
-            }) {
-                Text(LanguageManager.shared.localizedString(for: "profile.tab.habits"))
-                    .font(.custom(selectedTab == .habits ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
-                    .foregroundColor(selectedTab == .habits ? .black : .white.opacity(0.7))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .fill(selectedTab == .habits ? .white : Color.clear)
-                    )
-            }
-
-            // Achievements tab
-            Button(action: {
-                HapticManager.light()
-                withAnimation(.appSpring) {
-                    selectedTab = .achievements
-                }
-            }) {
-                Text(LanguageManager.shared.localizedString(for: "profile.tab.badges"))
-                    .font(.custom(selectedTab == .achievements ? "Poppins-SemiBold" : "Poppins-Regular", size: 12))
-                    .foregroundColor(selectedTab == .achievements ? .black : .white.opacity(0.7))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .fill(selectedTab == .achievements ? .white : Color.clear)
-                    )
-            }
-        }
-        .padding(3)
-        .glassCard(cornerRadius: 12)
-        .frame(maxWidth: 300)
-        .zIndex(2)
+    private var calmMinutes: Int {
+        progress.data.activities.reduce(0) { $0 + $1.durationSeconds } / 60
     }
 
-    // MARK: - Habits Section
-
-    private var habitsSection: some View {
-        VStack(spacing: 20) {
-            // List of horizontal habit bars
-            ForEach(Array(habits.enumerated()), id: \.offset) { index, habit in
-                let habitId = getHabitId(from: habit.name)
-                let stats = viewModel.habitProgress[habitId]
-                HorizontalHabitBar(
-                    icon: habit.icon,
-                    title: habit.name,
-                    progress: habit.progress,
-                    color: habit.color,
-                    completed: stats?.completed ?? 0,
-                    total: stats?.total ?? 0,
-                    animationTrigger: selectedTab == .habits
-                )
-                .cascadeAppear(index: index, totalCount: habits.count, baseDelay: 0.05)
-            }
+    /// Last seven days (oldest first), padded so the mood row always shows a full week.
+    private var lastSevenDays: [ProgressDay] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        return (0..<7).reversed().compactMap { offset in
+            guard let date = calendar.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            return progress.data.days.first { calendar.isDate($0.date, inSameDayAs: date) }
+                ?? ProgressDay(date: date, completionCount: 0, moodScore: nil)
         }
+    }
+
+    private var streakAchievements: [Achievement] {
+        achievementService.achievements.filter { $0.category == .streak }
+    }
+
+    private var totalUnlockedBadges: Int {
+        achievementService.unlockedCount + habitBadgeService.unlockedBadgesCount
+    }
+
+    private var totalBadges: Int {
+        achievementService.totalCount + habitBadgeService.totalBadgesCount
+    }
+
+    /// Plan items of today validated today (local completions, available offline).
+    private func refreshTodayDone() {
+        guard let plan = planStore.plan, !plan.isFinished,
+              let day = plan.day(plan.dayIndex()) else {
+            todayDone = 0
+            return
+        }
+        let keys = Set(day.items.map(\.statusKey))
+        let userID = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
+        todayDone = Set(
+            LocalProgressStore.load(for: userID)
+                .filter { Calendar.current.isDateInToday($0.completedAt) && keys.contains($0.taskID) }
+                .map(\.taskID)
+        ).count
     }
 
     // MARK: - Helper Methods
@@ -379,197 +324,9 @@ struct ProfileView: View {
         }
         return ""
     }
-
-    private func getHabitId(from habitName: String) -> String {
-        switch habitName {
-        case LanguageManager.shared.localizedString(for: "profile.habit.meditation"): return "meditation"
-        case LanguageManager.shared.localizedString(for: "profile.habit.breathing"): return "breathing"
-        case LanguageManager.shared.localizedString(for: "profile.habit.journal"): return "journal"
-        case LanguageManager.shared.localizedString(for: "profile.habit.sport"): return "sport"
-        case LanguageManager.shared.localizedString(for: "profile.habit.water"): return "water"
-        case LanguageManager.shared.localizedString(for: "profile.habit.nature"): return "nature"
-        case LanguageManager.shared.localizedString(for: "profile.habit.sleep"): return "sleep"
-        case LanguageManager.shared.localizedString(for: "profile.habit.social"): return "social"
-        default: return "unknown"
-        }
-    }
-
-    // MARK: - Achievements Section
-
-    private var achievementsSection: some View {
-        ScrollView {
-            VStack(spacing: 32) {
-                // Global Progress Header
-                globalBadgeProgress
-
-                // SECTION 1: Streak Achievements (3x3 grid)
-                VStack(spacing: 16) {
-                    // Section header
-                    HStack(spacing: 12) {
-                        Text(LanguageManager.shared.localizedString(for: "profile.achievements.streaks"))
-                            .font(.faroSemiBold(16))
-                            .foregroundColor(.white)
-
-                        Spacer()
-
-                        Text("\(streakAchievements.filter { $0.isUnlocked }.count)/\(streakAchievements.count)")
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 12)
-
-                    // Grid 3 colonnes pour streaks
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 16),
-                        GridItem(.flexible(), spacing: 16),
-                        GridItem(.flexible(), spacing: 16)
-                    ], spacing: 20) {
-                        ForEach(Array(streakAchievements.enumerated()), id: \.element.id) { index, achievement in
-                            AchievementBadge(
-                                achievement: achievement,
-                                size: .medium
-                            )
-                            .cascadeAppear(index: index, totalCount: streakAchievements.count, baseDelay: 0.05)
-                        }
-                    }
-                }
-
-                // Divider horizontal
-                Rectangle()
-                    .fill(Color.white.opacity(0.15))
-                    .frame(height: 1)
-                    .padding(.vertical, 20)
-
-                // SECTION 2: Habit Badges (3 per row)
-                VStack(spacing: 16) {
-                    // Section header
-                    HStack(spacing: 12) {
-                        Text(LanguageManager.shared.localizedString(for: "profile.achievements.habits"))
-                            .font(.faroSemiBold(16))
-                            .foregroundColor(.white)
-
-                        Spacer()
-
-                        Text("\(habitBadgeService.unlockedBadgesCount)/\(habitBadgeService.totalBadgesCount)")
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 12)
-
-                    // Grid 3 colonnes pour habits avec animation staggered
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 16),
-                        GridItem(.flexible(), spacing: 16),
-                        GridItem(.flexible(), spacing: 16)
-                    ], spacing: 20) {
-                        ForEach(Array(HabitBadge.allHabitIds.enumerated()), id: \.element) { index, habitId in
-                            SingleEvolvingHabitBadge(
-                                habitId: habitId,
-                                badges: habitBadgeService.badges(for: habitId),
-                                currentProgress: getHabitProgress(habitId),
-                                totalTasks: getHabitTotal(habitId)
-                            )
-                            .cascadeAppear(index: index, totalCount: HabitBadge.allHabitIds.count, baseDelay: 0.05)
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 20)
-        }
-        .overlay(
-            Group {
-                // Habit badge unlock popup
-                if habitBadgeService.showBadgePopup, let badge = habitBadgeService.newlyUnlockedBadge {
-                    BadgeEvolutionView(badge: badge, isPresented: $habitBadgeService.showBadgePopup)
-                        .transition(.opacity)
-                }
-            }
-        )
-    }
-
-    // MARK: - Global Badge Progress
-
-    private var globalBadgeProgress: some View {
-        VStack(spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(LanguageManager.shared.localizedString(for: "profile.achievements.badges_title"))
-                        .font(.faroBold(24))
-                        .foregroundColor(.white)
-
-                    Text("\(totalUnlockedBadges)/\(totalBadges) \(LanguageManager.shared.localizedString(for: "profile.achievements.unlocked"))")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white.opacity(0.7))
-                }
-
-                Spacer()
-            }
-
-            // Progress bar
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.white.opacity(0.1))
-                        .frame(height: 8)
-
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: "B794F6"), Color(hex: "9B59B6")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: geo.size.width * globalBadgePercentage, height: 8)
-                }
-            }
-            .frame(height: 8)
-
-            Text("\(Int(globalBadgePercentage * 100))% \(LanguageManager.shared.localizedString(for: "profile.achievements.complete"))")
-                .font(.custom("Poppins-Regular", size: 12))
-                .foregroundColor(.white.opacity(0.6))
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(18)
-        .glassCard(cornerRadius: 22)
-    }
-
-    // MARK: - Helper Computed Properties
-
-    private var streakAchievements: [Achievement] {
-        achievementService.achievements.filter { $0.category == .streak }
-    }
-
-    private var totalUnlockedBadges: Int {
-        achievementService.unlockedCount + habitBadgeService.unlockedBadgesCount
-    }
-
-    private var totalBadges: Int {
-        achievementService.totalCount + habitBadgeService.totalBadgesCount
-    }
-
-    private var globalBadgePercentage: Double {
-        guard totalBadges > 0 else { return 0 }
-        return Double(totalUnlockedBadges) / Double(totalBadges)
-    }
-
-    private func getHabitProgress(_ habitId: String) -> Int {
-        let stats = viewModel.habitProgress[habitId]
-        if let completed = stats?.completed { return completed }
-        let userId = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
-        return LocalProgressStore.completedCount(for: habitId, userID: userId)
-    }
-
-    private func getHabitTotal(_ habitId: String) -> Int {
-        let stats = viewModel.habitProgress[habitId]
-        return stats?.total ?? TaskStatusService.habitTotals[habitId, default: 0]
-    }
 }
 
 #Preview {
-    ProfileView()
+    ProfileView(selectedTab: .constant(.profile))
         .environment(\.locale, Locale(identifier: "en"))
 }

@@ -1,0 +1,41 @@
+# sos-box-breathing-2 · Respiration carrée (FR)
+[pause 1.5s]
+[calm, clear] Assieds-toi ou tiens-toi bien droit, les pieds à plat, les épaules posées. On y va.
+La respiration carrée a quatre côtés, et chaque côté dure environ quatre secondes. Des pompiers, des infirmiers et des pilotes l'utilisent pour garder la tête claire sous pression.
+[clear, unhurried] Tu inspires, tu retiens, tu expires, puis tu restes un moment poumons vides. Tout par le nez, sans forcer, comme si tu traçais un carré dans ta tête. Un côté qui monte, un qui traverse, un qui descend, un qui revient.
+Je vais te donner un mot pour chaque côté, et le silence fera le compte. Commence par laisser sortir ton air, doucement.
+[pause 2s]
+[calm] Inspire.
+[pause 3.5s]
+Retiens.
+[pause 3.5s]
+Expire.
+[pause 3.5s]
+Reste, poumons vides.
+[pause 3.5s]
+[soft] Encore une fois. Inspire.
+[pause 3.5s]
+Retiens, la gorge souple.
+[pause 3s]
+Expire, les épaules descendent.
+[pause 3s]
+Attends, tout tranquillement.
+[pause 3s]
+[quieter] Maintenant, je vais parler encore moins. Garde le même carré, je marque seulement les coins.
+[pause 1s]
+Inspire.
+[pause 3.5s]
+Retiens, les épaules relâchées.
+[pause 3s]
+Expire.
+[pause 3.5s]
+Attends.
+[pause 3.5s]
+[gentle, reassuring] Si la rétention te gêne, raccourcis-la. Un carré plus petit reste un carré. Et si tu as la tête qui tourne ou que tu te sens mal, reviens simplement à ta respiration naturelle.
+Pendant que tu traces le carré, ton esprit a une tâche simple à faire. Il reste moins de place pour ce qui t'inquiétait.
+Remarque les quatre coins. Le haut du souffle, le bas du souffle, et ces petits paliers entre les deux, où tout est immobile.
+[soft, unhurried] Maintenant, un dernier carré, rien qu'à toi, à ton propre rythme.
+[pause 6s]
+[softer] Puis laisse-le aller. Ton souffle reprend sa forme naturelle, tout seul.
+[warm, grounded] Tu as retrouvé tes appuis, avec l'esprit un peu plus clair. Tu peux y retourner maintenant.
+[pause 4s]

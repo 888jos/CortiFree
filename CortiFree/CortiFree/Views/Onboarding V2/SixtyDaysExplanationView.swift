@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct SixtyDaysExplanationView: View {
+    var onBack: (() -> Void)? = nil
     let onContinue: () -> Void
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var screenViewTime: Date?
@@ -65,34 +66,21 @@ struct SixtyDaysExplanationView: View {
                     .padding(.horizontal, 32)
                     .padding(.bottom, 32)
 
-                    // Stats Grid
-                    VStack(spacing: 16) {
-                        HStack(spacing: 16) {
-                            BenefitStatCard(
-                                title: "onboarding_v2.sixty_days.boost_energy".localized,
-                                percentage: "38%",
-                                color: Color(hex: "B794F6")
-                            )
+                    // The program the user actually gets: four weekly themes, renewable.
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("onboarding_v2.sixty_days.plan_title".localized)
+                            .font(.faroSemiBold(20))
+                            .foregroundColor(.white)
 
-                            BenefitStatCard(
-                                title: "onboarding_v2.sixty_days.reduce_fatigue".localized,
-                                percentage: "15%",
-                                color: Color(hex: "B794F6")
-                            )
-                        }
+                        Text("onboarding_v2.sixty_days.plan_subtitle".localized)
+                            .font(.custom("Poppins-Regular", size: 14))
+                            .foregroundColor(.white.opacity(0.7))
+                            .fixedSize(horizontal: false, vertical: true)
 
-                        HStack(spacing: 16) {
-                            BenefitStatCard(
-                                title: "onboarding_v2.sixty_days.gain_serenity".localized,
-                                percentage: "27%",
-                                color: Color(hex: "B794F6")
-                            )
-
-                            BenefitStatCard(
-                                title: "onboarding_v2.sixty_days.improve_focus".localized,
-                                percentage: "24%",
-                                color: Color(hex: "B794F6")
-                            )
+                        VStack(spacing: 10) {
+                            ForEach(Array(PlanWeekTheme.allCases.enumerated()), id: \.element) { index, theme in
+                                WeekThemeCard(week: index + 1, theme: theme)
+                            }
                         }
                     }
                     .padding(.horizontal, 24)
@@ -107,42 +95,10 @@ struct SixtyDaysExplanationView: View {
                         Spacer()
                             .frame(height: 16)
 
-                        VStack(spacing: 8) {
-                            ScientificLinkRow(
-                                logoImage: "logo_psycnet",
-                                title: "onboarding_v2.sixty_days.source_1".localized,
-                                source: "psycnet.apa.org"
-                            )
-
-                            ScientificLinkRow(
-                                logoImage: "logo_nih",
-                                title: "onboarding_v2.sixty_days.source_2".localized,
-                                source: "pmc.ncbi.nlm.nih.gov"
-                            )
-
-                            ScientificLinkRow(
-                                logoImage: "logo_nih",
-                                title: "onboarding_v2.sixty_days.source_3".localized,
-                                source: "pubmed.ncbi.nlm.nih.gov"
-                            )
-
-                            ScientificLinkRow(
-                                logoImage: "logo_ucl",
-                                title: "onboarding_v2.sixty_days.source_4".localized,
-                                source: "blogs.ucl.ac.uk"
-                            )
-
-                            ScientificLinkRow(
-                                logoImage: "logo_nih",
-                                title: "onboarding_v2.sixty_days.source_5".localized,
-                                source: "nihrecord.nih.gov"
-                            )
-
-                            ScientificLinkRow(
-                                logoImage: "logo_guardian",
-                                title: "onboarding_v2.sixty_days.source_6".localized,
-                                source: "theguardian.com"
-                            )
+                        VStack(alignment: .leading, spacing: 12) {
+                            ForEach(ScientificReference.habitFormation) { reference in
+                                ScientificLinkRow(reference: reference)
+                            }
                         }
                     }
                     .padding(16)
@@ -185,6 +141,7 @@ struct SixtyDaysExplanationView: View {
             }
         }
         .ignoresSafeArea()
+        .onboardingBackButton(onBack)
         .onAppear {
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingSixtyDaysExplanationViewed()
@@ -192,63 +149,100 @@ struct SixtyDaysExplanationView: View {
     }
 }
 
-// MARK: - Benefit Stat Card
+// MARK: - Week theme card
 
-struct BenefitStatCard: View {
-    let title: String
-    let percentage: String
-    let color: Color
+struct WeekThemeCard: View {
+    let week: Int
+    let theme: PlanWeekTheme
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.custom("Poppins-Regular", size: 13))
-                .foregroundColor(.white.opacity(0.8))
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
+        HStack(alignment: .top, spacing: 14) {
+            Text(String(format: "onboarding.week_progress.week_number".localized, week))
+                .font(.custom("Poppins-SemiBold", size: 12))
+                .foregroundColor(Color(hex: "D4B4FF"))
+                .frame(width: 78, alignment: .leading)
 
-            HStack(spacing: 4) {
-                Text(percentage)
-                    .font(.faroBold(28))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(theme.localizedTitle)
+                    .font(.custom("Poppins-SemiBold", size: 15))
                     .foregroundColor(.white)
-
-                Image(systemName: "arrow.up")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
+                Text(theme.localizedSubtitle)
+                    .font(.custom("Poppins-Regular", size: 13))
+                    .foregroundColor(.white.opacity(0.7))
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .glassCard(cornerRadius: 16, tint: color)
+        .padding(14)
+        .glassCard(cornerRadius: 14, tint: Color(hex: "B794F6"))
     }
+}
+
+// MARK: - Scientific references
+
+/// Published sources shown in the onboarding. Authors and titles stay in their original
+/// language (they are citations, never translated); only the summary line is localized.
+struct ScientificReference: Identifiable {
+    let id: String
+    let citation: String
+    let summaryKey: String
+    let url: URL
+
+    static let habitFormation: [ScientificReference] = [
+        ScientificReference(
+            id: "lally2010",
+            citation: "Lally, P., van Jaarsveld, C. H. M., Potts, H. W. W., & Wardle, J. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology, 40(6), 998–1009.",
+            summaryKey: "onboarding_v2.sources.lally_summary",
+            url: URL(string: "https://doi.org/10.1002/ejsp.674")!
+        ),
+        ScientificReference(
+            id: "gardner2012",
+            citation: "Gardner, B., Lally, P., & Wardle, J. (2012). Making health habitual: the psychology of ‘habit-formation’ and general practice. British Journal of General Practice, 62(605), 664–666.",
+            summaryKey: "onboarding_v2.sources.gardner_summary",
+            url: URL(string: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3505409/")!
+        ),
+        ScientificReference(
+            id: "wood2016",
+            citation: "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology, 67, 289–314.",
+            summaryKey: "onboarding_v2.sources.wood_summary",
+            url: URL(string: "https://doi.org/10.1146/annurev-psych-122414-033417")!
+        )
+    ]
 }
 
 // MARK: - Scientific Link Row
 
 struct ScientificLinkRow: View {
-    let logoImage: String
-    let title: String
-    let source: String
+    let reference: ScientificReference
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(logoImage)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 20, height: 20)
+        Link(destination: reference.url) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "doc.text.magnifyingglass")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Color(hex: "D4B4FF"))
+                    .frame(width: 20)
 
-            Text(title)
-                .font(.custom("Poppins-Medium", size: 12))
-                .foregroundColor(.white)
-                .lineLimit(1)
-                .truncationMode(.tail)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(reference.summaryKey.localized)
+                        .font(.custom("Poppins-Medium", size: 13))
+                        .foregroundColor(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(reference.citation)
+                        .font(.custom("Poppins-Regular", size: 11))
+                        .foregroundColor(.white.opacity(0.6))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
-            Text("• \(source)")
-                .font(.custom("Poppins-Regular", size: 11))
-                .foregroundColor(.white.opacity(0.6))
-                .lineLimit(1)
-                .truncationMode(.tail)
+                Spacer(minLength: 0)
+
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.5))
+            }
+            .multilineTextAlignment(.leading)
         }
+        .accessibilityHint("onboarding_v2.sources.open_hint".localized)
     }
 }
 

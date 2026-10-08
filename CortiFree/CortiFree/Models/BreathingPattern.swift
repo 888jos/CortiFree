@@ -187,9 +187,16 @@ struct BreathingPattern: Identifiable, Equatable {
     var localizedWhenToUse: String { text("when", fallback: description) }
     var localizedScience: String { text("science", fallback: "") }
 
-    var accentColor: Color { Color(hex: accentHex) }
+    /// One colour per category (calm = green, sleep = violet…), the same as the category icon,
+    /// so a category never shows several different colours. `accentHex` is kept for legacy data.
+    var accentColor: Color { category.color }
 
     /// Compact rhythm, e.g. "4 · 7 · 8" or "2+1 · 6".
+    /// Stimulating techniques or long breath holds: show the safety caution before starting.
+    var requiresCaution: Bool {
+        ["kapalabhati", "bhastrika", "energize", "four_seven_eight"].contains(key)
+    }
+
     var rhythmLabel: String {
         func f(_ v: Double) -> String {
             v == v.rounded() ? String(Int(v)) : String(format: "%.1f", v)

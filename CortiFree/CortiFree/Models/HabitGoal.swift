@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 // MARK: - Habit Goal Model
 
@@ -57,8 +56,8 @@ struct HabitGoal: Codable {
     }
 
     static func from(document: DocumentSnapshot) -> HabitGoal? {
-        guard let data = document.data(),
-              let habitId = data["habitId"] as? String,
+        let data = document.data()
+        guard let habitId = data["habitId"] as? String,
               let frequencyPerWeek = data["frequencyPerWeek"] as? Int else {
             return nil
         }

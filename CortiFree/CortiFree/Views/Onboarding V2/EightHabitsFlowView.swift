@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct EightHabitsFlowView: View {
+    var onBack: (() -> Void)? = nil
     let onComplete: () -> Void
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentHabitIndex: Int = 0
@@ -391,10 +392,10 @@ struct EightHabitsFlowView: View {
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                                    // Value with arrow
+                                    // Direction only: the effect size depends on each person, so no figure is shown.
                                     HStack(spacing: 4) {
                                         Image(systemName: impact.value.hasPrefix("+") ? "arrow.up" : "arrow.down")
-                                            .font(.system(size: 12, weight: .bold))
+                                            .font(.system(size: 20, weight: .bold))
                                             .foregroundStyle(
                                                 LinearGradient(
                                                     colors: impactColor(for: impact.value),
@@ -403,15 +404,6 @@ struct EightHabitsFlowView: View {
                                                 )
                                             )
 
-                                        Text(impact.value.replacingOccurrences(of: "+", with: "").replacingOccurrences(of: "-", with: ""))
-                                            .font(.custom("Faro Lucky", size: 24, relativeTo: .title))
-                                            .foregroundStyle(
-                                                LinearGradient(
-                                                    colors: impactColor(for: impact.value),
-                                                    startPoint: .leading,
-                                                    endPoint: .trailing
-                                                )
-                                            )
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 }
@@ -478,6 +470,7 @@ struct EightHabitsFlowView: View {
             .zIndex(100)
         }
         .background(Color.black.opacity(0.001))
+        .onboardingBackButton(onBack)
         .onAppear {
             screenViewTime = Date()
             viewedHabits.insert(currentHabitIndex)
@@ -490,40 +483,10 @@ struct EightHabitsFlowView: View {
 
     // MARK: - Helper Function
 
+    /// The whole benefit is set in the same weight in every language (keyword highlighting
+    /// only ever matched French and English, and not all of them).
     private func highlightedBenefit(_ text: String) -> AttributedString {
-        var attributedString = AttributedString(text)
-        attributedString.foregroundColor = .white
-
-        // Keywords to highlight in both languages
-        let keywords = [
-            // French
-            "réduit le stress", "améliore l'humeur", "renforce le système immunitaire",
-            "améliore la qualité du sommeil", "améliore la concentration",
-            "favorise la clarté mentale", "augmente les niveaux d'énergie",
-            "réduit le cortisol", "réduit l'anxiété", "améliore la régulation émotionnelle",
-            "réduit la rumination", "produit des endorphines", "réduit le stress",
-            "améliore l'énergie", "améliore la concentration", "réduit la fatigue mentale",
-            "régule l'humeur", "abaisse la tension artérielle", "renforce le système immunitaire",
-            "consolide la mémoire", "régule les émotions", "réduit le sentiment d'isolement",
-            "améliore la résilience au stress", "augmente le bien-être",
-            // English
-            "reduces cortisol", "reduces anxiety", "improves heart rate variability",
-            "calms the mind", "increases gray matter", "improves emotional regulation",
-            "clarifies", "reduces rumination", "improves sleep quality",
-            "produces natural endorphins", "reduces stress", "improves daily energy",
-            "improves concentration", "reduces mental fatigue", "regulates mood",
-            "lowers blood pressure", "improves mood", "strengthens immune system",
-            "consolidates memory", "regulates emotions", "reduces feelings of isolation",
-            "improves stress resilience", "increases wellbeing"
-        ]
-
-        for keyword in keywords {
-            if let range = attributedString.range(of: keyword, options: .caseInsensitive) {
-                attributedString[range].foregroundColor = Color(hex: "B794F6")
-            }
-        }
-
-        return attributedString
+        AttributedString(text)
     }
 
     private func iconForEmoji(_ emoji: String) -> String {

@@ -7,9 +7,6 @@
 
 import SwiftUI
 import UIKit
-import FirebaseCore
-import FirebaseAuth
-import FirebaseFirestore
 import UserNotifications
 #if canImport(GoogleSignIn)
 import GoogleSignIn
@@ -19,14 +16,6 @@ import SuperwallKit
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-
-        // Configure Firebase
-        FirebaseApp.configure()
-
-        // Enable Firestore offline persistence (must be set before first Firestore access)
-        let firestoreSettings = FirestoreSettings()
-        firestoreSettings.cacheSettings = PersistentCacheSettings(sizeBytes: 50 * 1024 * 1024 as NSNumber)
-        Firestore.firestore().settings = firestoreSettings
 
         // Set notification delegate
         UNUserNotificationCenter.current().delegate = self
@@ -64,17 +53,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
         purchaseController.syncSubscriptionStatus()
 
-        // Sync RevenueCat with Firebase user on app launch
-        // IMPORTANT: premium is NOT active until identifyUser/getCustomerInfo returns
-        if let firebaseUser = Auth.auth().currentUser {
-            Task {
-                await RevenueCatManager.shared.identifyUser(userId: firebaseUser.uid)
-                // Belt-and-suspenders: force server fetch to guarantee isPremiumStatusReady = true
+        // Restore the Convex session before linking RevenueCat to an account.
+        Task { @MainActor in
+            await UnifiedFirebaseService.shared.auth.restoreSession()
+            if let user = UnifiedFirebaseService.shared.auth.currentUser {
+                await RevenueCatManager.shared.identifyUser(userId: user.uid)
                 await RevenueCatManager.shared.refreshCustomerInfo(forceServerFetch: true)
-            }
-        } else {
-            // No Firebase user - force server fetch + load offerings for anonymous user
-            Task {
+            } else {
                 await RevenueCatManager.shared.refreshCustomerInfo(forceServerFetch: true)
                 await RevenueCatManager.shared.loadCurrentOffering()
             }
@@ -85,10 +70,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("🚀 Initializing TaskManager...")
         #endif
         _ = TaskManager.shared
-
-        // Apply fixes
-        AppFixes.shared.optimizeTaskManager()
-        AppFixes.shared.suppressNetworkLogs()
 
         return true
     }

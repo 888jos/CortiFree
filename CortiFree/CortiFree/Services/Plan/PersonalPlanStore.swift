@@ -2,14 +2,13 @@
 //  PersonalPlanStore.swift
 //  CortiFree
 //
-//  Owns the current personalized plan: local Codable cache (per user), Firestore mirror
-//  (users/{uid}/personalized_plan/current), onboarding profile persistence and migration
+//  Owns the current personalized plan: local Codable cache and Convex mirror,
+//  onboarding profile persistence and migration
 //  of existing users (built from their stored onboarding answers, starting today).
 //
 
 import Foundation
-import FirebaseAuth
-import FirebaseFirestore
+import Combine
 
 @MainActor
 final class PersonalPlanStore: ObservableObject {
@@ -17,6 +16,8 @@ final class PersonalPlanStore: ObservableObject {
 
     @Published private(set) var plan: PersonalPlan?
     @Published private(set) var isLoading = false
+    /// True while showing a memory-only plan because the cloud plan couldn't be read.
+    private var isProvisional = false
 
     private let defaults = UserDefaults.standard
     /// Last onboarding answers (not per-user: onboarding can happen before sign-in).
@@ -27,6 +28,74 @@ final class PersonalPlanStore: ObservableObject {
     private init() {
         loadedForUser = userKey
         plan = loadLocalPlan()
+        observeAudioCompletion()
+        observeJournal()
+    }
+
+    // MARK: - Plan audio completion
+
+    /// A plan audio item started today. Persisted so it is credited even if the user leaves the
+    /// Plan tab, resumes from the mini player, or the app is relaunched before the end.
+    private struct PendingAudio: Codable {
+        let itemID: String
+        let sessionIDs: [String]
+        let day: String
+    }
+
+    /// Plan item done outside the Plan tab (audio finished, journal written); the Plan tab marks it
+    /// done (even later, when it next appears), then calls consume.
+    @Published private(set) var completedItemID: String?
+    private let pendingAudioKey = "plan.pendingAudio.v1"
+    private var audioFinishObserver: AnyCancellable?
+
+    func setPendingAudio(_ item: PlanItem) {
+        let pending = PendingAudio(itemID: item.id, sessionIDs: [item.refID, item.shortRefID].compactMap { $0 },
+                                   day: Self.dayString(Date()))
+        if let data = try? JSONEncoder().encode(pending) { defaults.set(data, forKey: pendingAudioKey) }
+    }
+
+    func consumeCompletedItem() { completedItemID = nil }
+
+    private var journalObserver: NSObjectProtocol?
+
+    /// Writing in the journal validates today's "journal" habit if the plan has one.
+    private func observeJournal() {
+        journalObserver = NotificationCenter.default.addObserver(forName: .journalEntrySaved, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, let plan = self.plan, !plan.isFinished,
+                      let item = plan.day(plan.dayIndex())?.items.first(where: { $0.kind == .habit && $0.refID == "journal" }) else { return }
+                self.completedItemID = item.id
+            }
+        }
+    }
+
+    private func observeAudioCompletion() {
+        audioFinishObserver = GuidedSessionPlayer.shared.$didFinish
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.handleAudioFinished() }
+    }
+
+    private func handleAudioFinished() {
+        guard let data = defaults.data(forKey: pendingAudioKey),
+              let pending = try? JSONDecoder().decode(PendingAudio.self, from: data) else { return }
+        // Only today's item: a session finished on another day belongs to that day's plan.
+        guard pending.day == Self.dayString(Date()) else {
+            defaults.removeObject(forKey: pendingAudioKey)
+            return
+        }
+        guard let current = GuidedSessionPlayer.shared.currentSession?.id, pending.sessionIDs.contains(current) else { return }
+        defaults.removeObject(forKey: pendingAudioKey)
+        completedItemID = pending.itemID
+    }
+
+    private static func dayString(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
     }
 
     private var userKey: String { Auth.auth().currentUser?.uid ?? UserPersistence.localUserID }
@@ -45,7 +114,7 @@ final class PersonalPlanStore: ObservableObject {
             plan = loadLocalPlan()
         }
         if plan == nil { plan = loadLocalPlan() }
-        if plan != nil { return }
+        if plan != nil && !isProvisional { return }
 
         if let ensureTask { await ensureTask.value; return }
         let task = Task { [weak self] in
@@ -53,14 +122,23 @@ final class PersonalPlanStore: ObservableObject {
             self.isLoading = true
             defer { self.isLoading = false }
 
-            if let remote = await self.fetchRemotePlan() {
+            switch await self.fetchRemotePlan() {
+            case .found(let remote):
+                self.isProvisional = false
                 self.plan = remote
                 self.saveLocal(remote)
-                return
+            case .absent:
+                self.isProvisional = false
+                let profile = await self.bestAvailableProfile()
+                self.apply(PersonalPlanGenerator.generate(profile: profile, anxiety: self.anxiety, startDate: Date()))
+            case .unavailable:
+                // Offline or unreadable: never overwrite the cloud plan. Show a temporary plan
+                // (memory only) and try the remote again on the next ensurePlan().
+                guard self.plan == nil else { return }
+                let profile = await self.bestAvailableProfile()
+                self.isProvisional = true
+                self.plan = PersonalPlanGenerator.generate(profile: profile, anxiety: self.anxiety, startDate: Date())
             }
-            let profile = await self.bestAvailableProfile()
-            let newPlan = PersonalPlanGenerator.generate(profile: profile, startDate: Date())
-            self.apply(newPlan)
         }
         ensureTask = task
         await task.value
@@ -72,15 +150,49 @@ final class PersonalPlanStore: ObservableObject {
         var profile = profile
         profile.source = "onboarding"
         saveOnboardingProfile(profile)
-        let newPlan = PersonalPlanGenerator.generate(profile: profile, startDate: Date())
+        let newPlan = PersonalPlanGenerator.generate(profile: profile, anxiety: anxiety, startDate: Date())
         apply(newPlan)
     }
 
-    /// Change goal (or regenerate with the same inputs). Restarts at day 1 today.
-    func regenerate(goal: PlanGoal?) {
+    /// Change goal (nil = keep the current goal choice and just rebuild). Past days and the
+    /// day count are kept: only today and the days ahead are rebuilt.
+    /// Returns false when nothing changed (no plan day left to rebuild).
+    @discardableResult
+    func regenerate(goal: PlanGoal?, source: PlanEditSource = .user, reason: String? = nil) -> Bool {
+        guard let old = plan else {
+            let profile = storedOnboardingProfile() ?? PlanProfile()
+            apply(PersonalPlanGenerator.generate(profile: profile, overrideGoal: goal, anxiety: anxiety, startDate: Date()))
+            return true
+        }
+        let today = old.dayIndex()
+        guard today <= PersonalPlan.length, isEditable(dayNumber: today) else { return false }
+        let override = goal ?? (old.goalChosenByUser ? old.goal : nil)
+        // A plain "rebuild" must propose something new: vary the seed with each rebuild.
+        let variation = goal == nil ? (old.edits ?? []).filter { $0.kind == .regenerate }.count + 1 : 0
+        var rebuilt = PersonalPlanGenerator.generate(profile: old.profile, overrideGoal: override, anxiety: anxiety,
+                                                     startDate: old.startDate, cycle: old.cycle, excluded: old.excludedRefIDs,
+                                                     variation: variation)
+        rebuilt.days = old.days.filter { $0.dayNumber < today } + rebuilt.days.filter { $0.dayNumber >= today }
+        rebuilt.preferences = old.preferences
+        rebuilt.edits = (old.edits ?? []) + [PlanEdit(
+            date: Date(), source: source, kind: goal != nil && goal != old.goal ? .goalChange : .regenerate,
+            dayNumber: today, itemID: nil, fromRefID: old.goal.rawValue, toRefID: rebuilt.goal.rawValue, reason: reason
+        )]
+        rebuilt.updatedAt = Date()
+        commitEdit(rebuilt, previous: old)
+        return true
+    }
+
+    /// "Restart my program" (profile): a fresh plan starting today at day 1, same goal choice.
+    /// Completion history is keyed by program day, which restarts at the same time.
+    func restartFromDayOne() {
         let profile = plan?.profile ?? storedOnboardingProfile() ?? PlanProfile()
-        let newPlan = PersonalPlanGenerator.generate(profile: profile, overrideGoal: goal, startDate: Date(), cycle: plan?.cycle ?? 1)
-        apply(newPlan)
+        let override: PlanGoal? = (plan?.goalChosenByUser ?? false) ? plan?.goal : nil
+        var fresh = PersonalPlanGenerator.generate(profile: profile, overrideGoal: override, anxiety: anxiety,
+                                                   startDate: Date(), cycle: 1, excluded: plan?.excludedRefIDs ?? [])
+        fresh.preferences = plan?.preferences
+        undoSnapshot = nil
+        apply(fresh)
     }
 
     /// After day 28: start a follow-up cycle with the same or a new goal.
@@ -88,8 +200,180 @@ final class PersonalPlanStore: ObservableObject {
         let profile = plan?.profile ?? storedOnboardingProfile() ?? PlanProfile()
         let keepGoal = goal ?? plan?.goal
         let override: PlanGoal? = (plan?.goalChosenByUser ?? false) || goal != nil ? keepGoal : nil
-        let newPlan = PersonalPlanGenerator.generate(profile: profile, overrideGoal: override, startDate: Date(), cycle: (plan?.cycle ?? 1) + 1)
+        var newPlan = PersonalPlanGenerator.generate(profile: profile, overrideGoal: override, anxiety: anxiety, startDate: Date(),
+                                                     cycle: (plan?.cycle ?? 1) + 1, excluded: plan?.excludedRefIDs ?? [])
+        newPlan.preferences = plan?.preferences
         apply(newPlan)
+    }
+
+    /// After the day-1 anxiety check: rebuild today's plan with it (same goal choice and cycle).
+    /// Later checks only measure progress; they shape the next cycle.
+    func applyAnxietyCheck() {
+        guard let plan, plan.dayIndex() == 1 else { return }
+        let newPlan = PersonalPlanGenerator.generate(
+            profile: plan.profile,
+            overrideGoal: plan.goalChosenByUser ? plan.goal : nil,
+            anxiety: anxiety,
+            startDate: plan.startDate,
+            cycle: plan.cycle,
+            excluded: plan.excludedRefIDs
+        )
+        var adjusted = newPlan
+        adjusted.preferences = plan.preferences
+        apply(adjusted)
+    }
+
+    /// Latest GAD-7 band, from the on-device history only.
+    private var anxiety: AnxietySeverity? { AnxietyCheckStore.shared.currentSeverity }
+
+    // MARK: - Editing
+
+    /// The plan before the last edit, for a one-step undo (in memory only).
+    @Published private(set) var undoSnapshot: PersonalPlan?
+
+    /// Days that can still be edited: today and the days ahead.
+    func isEditable(dayNumber: Int) -> Bool {
+        // A temporary (offline) plan must not be edited: saving it would replace the cloud plan.
+        guard let plan, !isProvisional else { return false }
+        let today = plan.dayIndex()
+        return today <= PersonalPlan.length && dayNumber >= today && dayNumber <= PersonalPlan.length
+    }
+
+    /// Replacement candidates for an item (same kind, suited to the goal), best first.
+    func alternatives(dayNumber: Int, itemID: String) -> [PlanItem] {
+        guard let plan, let item = plan.day(dayNumber)?.items.first(where: { $0.id == itemID }) else { return [] }
+        return PersonalPlanGenerator.alternatives(for: item, in: plan, dayNumber: dayNumber, anxiety: anxiety)
+    }
+
+    /// Something to add to a day: one suggestion per kind (breathing, guided session, habit).
+    func additions(dayNumber: Int) -> [PlanItem] {
+        guard let plan, let day = plan.day(dayNumber) else { return [] }
+        let probes = [
+            PlanItem(id: "breathing", kind: .breathing, refID: "", minutes: 3, shortRefID: nil, shortMinutes: nil, variant: nil),
+            PlanItem(id: "meditation", kind: .audio, refID: "", minutes: 5, shortRefID: nil, shortMinutes: nil, variant: nil),
+            PlanItem(id: "habit", kind: .habit, refID: "", minutes: 0, shortRefID: nil, shortMinutes: nil, variant: nil)
+        ]
+        return probes.flatMap { probe in
+            PersonalPlanGenerator.alternatives(for: probe, in: plan, dayNumber: day.dayNumber, anxiety: anxiety, limit: 2)
+                .map { candidate in
+                    PlanItem(id: uniqueID(for: candidate, in: day), kind: candidate.kind, refID: candidate.refID, minutes: candidate.minutes,
+                             shortRefID: nil, shortMinutes: nil, variant: candidate.variant)
+                }
+        }
+    }
+
+    /// Replaces one item. `excludeOld` also stops proposing the old content in future rebuilds.
+    @discardableResult
+    func swapItem(dayNumber: Int, itemID: String, with replacement: PlanItem,
+                  source: PlanEditSource = .user, reason: String? = nil, excludeOld: Bool = false) -> Bool {
+        guard let old = plan, isEditable(dayNumber: dayNumber), Self.isValid(replacement),
+              let dayIndex = old.days.firstIndex(where: { $0.dayNumber == dayNumber }),
+              let itemIndex = old.days[dayIndex].items.firstIndex(where: { $0.id == itemID }) else { return false }
+        let current = old.days[dayIndex].items[itemIndex]
+        guard replacement.kind == current.kind || (current.kind == .evening && replacement.kind == .audio) else { return false }
+
+        var updated = old
+        var items = updated.days[dayIndex].items
+        // Habits are keyed by habit id; other kinds keep their slot id so completion keys stay stable.
+        let id = current.kind == .habit ? "habit_\(replacement.refID)" : current.id
+        guard current.kind != .habit || !items.contains(where: { $0.id == id && $0.id != current.id }) else { return false }
+        items[itemIndex] = PlanItem(id: id, kind: current.kind, refID: replacement.refID, minutes: replacement.minutes,
+                                    shortRefID: replacement.shortRefID, shortMinutes: replacement.shortMinutes, variant: replacement.variant)
+        updated.days[dayIndex] = PlanDay(dayNumber: dayNumber, week: old.days[dayIndex].week, items: items)
+        if excludeOld { updated.preferences = (old.preferences ?? PlanPreferences()).adding(current.refID) }
+        record(&updated, .swap, source: source, day: dayNumber, itemID: current.id, from: current.refID, to: replacement.refID, reason: reason)
+        commitEdit(updated, previous: old)
+        return true
+    }
+
+    /// Removes one item (a day always keeps at least one).
+    @discardableResult
+    func removeItem(dayNumber: Int, itemID: String, source: PlanEditSource = .user, reason: String? = nil, exclude: Bool = false) -> Bool {
+        guard let old = plan, isEditable(dayNumber: dayNumber),
+              let dayIndex = old.days.firstIndex(where: { $0.dayNumber == dayNumber }),
+              let item = old.days[dayIndex].items.first(where: { $0.id == itemID }),
+              old.days[dayIndex].items.count > 1 else { return false }
+        var updated = old
+        updated.days[dayIndex] = PlanDay(dayNumber: dayNumber, week: old.days[dayIndex].week,
+                                         items: old.days[dayIndex].items.filter { $0.id != itemID })
+        if exclude { updated.preferences = (old.preferences ?? PlanPreferences()).adding(item.refID) }
+        record(&updated, .remove, source: source, day: dayNumber, itemID: itemID, from: item.refID, to: nil, reason: reason)
+        commitEdit(updated, previous: old)
+        return true
+    }
+
+    /// Adds an item to a day (at most 8 items per day).
+    @discardableResult
+    func addItem(_ item: PlanItem, dayNumber: Int, source: PlanEditSource = .user, reason: String? = nil) -> Bool {
+        guard let old = plan, isEditable(dayNumber: dayNumber), Self.isValid(item),
+              let dayIndex = old.days.firstIndex(where: { $0.dayNumber == dayNumber }),
+              old.days[dayIndex].items.count < 8 else { return false }
+        let day = old.days[dayIndex]
+        guard !day.items.contains(where: { $0.refID == item.refID && $0.kind == item.kind }) else { return false }
+        let added = PlanItem(id: uniqueID(for: item, in: day), kind: item.kind, refID: item.refID, minutes: item.minutes,
+                             shortRefID: item.shortRefID, shortMinutes: item.shortMinutes, variant: item.variant)
+        var updated = old
+        var items = day.items
+        // Keep the evening ritual last.
+        if let eveningIndex = items.firstIndex(where: { $0.kind == .evening }), added.kind != .evening {
+            items.insert(added, at: eveningIndex)
+        } else {
+            items.append(added)
+        }
+        updated.days[dayIndex] = PlanDay(dayNumber: dayNumber, week: day.week, items: items)
+        record(&updated, .add, source: source, day: dayNumber, itemID: added.id, from: nil, to: added.refID, reason: reason)
+        commitEdit(updated, previous: old)
+        return true
+    }
+
+    /// Restores the plan as it was before the last edit.
+    func undoLastEdit() {
+        guard let snapshot = undoSnapshot else { return }
+        undoSnapshot = nil
+        apply(snapshot)
+    }
+
+    /// Content ids must exist in the catalogues (protects against stale or invented ids).
+    static func isValid(_ item: PlanItem) -> Bool {
+        switch item.kind {
+        case .breathing: return BreathingPattern.pattern(named: item.refID) != nil
+        case .audio, .evening: return GuidedSessionCatalog.session(id: item.refID) != nil
+        case .habit: return PersonalPlanGenerator.habitIDs.contains(item.refID)
+        }
+    }
+
+    /// Item ids double as completion keys: they must be unique in the day and keep a word
+    /// TaskStatusService maps to the right habit ("breathing", "meditation", "habit_x").
+    private func uniqueID(for item: PlanItem, in day: PlanDay) -> String {
+        let base: String
+        switch item.kind {
+        case .breathing: base = "breathing"
+        case .audio: base = "meditation"
+        case .evening: base = "meditation_evening"
+        case .habit: return "habit_\(item.refID)"
+        }
+        let existing = Set(day.items.map(\.id))
+        guard existing.contains(base) else { return base }
+        var n = 2
+        while existing.contains("\(base)_\(n)") { n += 1 }
+        return "\(base)_\(n)"
+    }
+
+    private func record(_ plan: inout PersonalPlan, _ kind: PlanEditKind, source: PlanEditSource, day: Int,
+                        itemID: String?, from: String?, to: String?, reason: String?) {
+        plan.edits = (plan.edits ?? []) + [PlanEdit(date: Date(), source: source, kind: kind, dayNumber: day,
+                                                    itemID: itemID, fromRefID: from, toRefID: to, reason: reason)]
+        plan.updatedAt = Date()
+    }
+
+    private func commitEdit(_ updated: PersonalPlan, previous: PersonalPlan) {
+        undoSnapshot = previous
+        apply(updated)
+        if let edit = updated.edits?.last {
+            AnalyticsManager.shared.track(event: "plan_edited", properties: [
+                "kind": edit.kind.rawValue, "source": edit.source.rawValue, "plan_day": edit.dayNumber
+            ])
+        }
     }
 
     // MARK: - Onboarding profile
@@ -100,6 +384,15 @@ final class PersonalPlanStore: ObservableObject {
         }
     }
 
+    /// Saves onboarding answers as soon as each quiz step is done, so a resumed onboarding
+    /// (app killed mid-way: in-memory answers are gone) still builds a personalized plan.
+    func updateOnboardingDraft(_ update: (inout PlanProfile) -> Void) {
+        var profile = storedOnboardingProfile() ?? PlanProfile()
+        update(&profile)
+        profile.source = "onboarding"
+        saveOnboardingProfile(profile)
+    }
+
     func storedOnboardingProfile() -> PlanProfile? {
         guard let data = defaults.data(forKey: onboardingProfileKey) else { return nil }
         return try? JSONDecoder().decode(PlanProfile.self, from: data)
@@ -108,6 +401,7 @@ final class PersonalPlanStore: ObservableObject {
     // MARK: - Persistence
 
     private func apply(_ newPlan: PersonalPlan) {
+        isProvisional = false
         plan = newPlan
         saveLocal(newPlan)
         Task { await saveRemote(newPlan) }
@@ -128,7 +422,7 @@ final class PersonalPlanStore: ObservableObject {
     }
 
     private func saveRemote(_ plan: PersonalPlan) async {
-        guard let uid = Auth.auth().currentUser?.uid,
+        guard Auth.auth().currentUser != nil,
               let data = try? JSONEncoder().encode(plan),
               let json = String(data: data, encoding: .utf8) else { return }
         let doc: [String: Any] = [
@@ -139,17 +433,15 @@ final class PersonalPlanStore: ObservableObject {
             "compact": plan.compact,
             "cycle": plan.cycle,
             "lengthDays": PersonalPlan.length,
-            "startDate": Timestamp(date: plan.startDate),
+            "startDate": plan.startDate.timeIntervalSince1970 * 1000,
             "goalChosenByUser": plan.goalChosenByUser,
             "profileSource": plan.profile.source,
-            "planJSON": json,
-            "updatedAt": FieldValue.serverTimestamp()
+            "planJSON": json
         ]
         do {
-            try await Firestore.firestore()
-                .collection("users").document(uid)
-                .collection("personalized_plan").document("current")
-                .setData(doc)
+            let _: String = try await ConvexBackend.shared.call(
+                .mutation, path: "plan:saveCurrent", args: doc
+            )
         } catch {
             #if DEBUG
             print("⚠️ PersonalPlanStore: remote save failed: \(error.localizedDescription)")
@@ -157,57 +449,75 @@ final class PersonalPlanStore: ObservableObject {
         }
     }
 
-    private func fetchRemotePlan() async -> PersonalPlan? {
-        guard let uid = Auth.auth().currentUser?.uid else { return nil }
+    private enum RemotePlanResult {
+        case found(PersonalPlan)
+        /// Confirmed: no plan stored for this user (or signed out).
+        case absent
+        /// Network error or a stored plan this version can't read: must not be overwritten.
+        case unavailable
+    }
+
+    private func fetchRemotePlan() async -> RemotePlanResult {
+        guard Auth.auth().currentUser != nil else { return .absent }
         do {
-            let snapshot = try await Firestore.firestore()
-                .collection("users").document(uid)
-                .collection("personalized_plan").document("current")
-                .getDocument()
-            guard let json = snapshot.data()?["planJSON"] as? String,
-                  let data = json.data(using: .utf8),
+            struct RemotePlan: Decodable { let planJSON: String }
+            let remote: RemotePlan? = try await ConvexBackend.shared.call(
+                .query, path: "plan:getCurrent"
+            )
+            guard let remote else { return .absent }
+            guard let data = remote.planJSON.data(using: .utf8),
                   let decoded = try? JSONDecoder().decode(PersonalPlan.self, from: data),
-                  decoded.days.count == PersonalPlan.length else { return nil }
-            return decoded
+                  decoded.days.count == PersonalPlan.length else { return .unavailable }
+            return .found(decoded)
         } catch {
-            return nil
+            return .unavailable
         }
     }
 
     // MARK: - Migration (existing users)
 
-    /// Local onboarding answers, else Firestore profile/baseline, else empty (→ stress track).
+    /// Local onboarding answers, else Convex profile/baseline, else empty (→ stress track).
     private func bestAvailableProfile() async -> PlanProfile {
         if let local = storedOnboardingProfile(), !local.isEmpty { return local }
         var profile = PlanProfile()
         profile.genderCode = defaults.string(forKey: "onboarding_gender")
 
-        guard let uid = Auth.auth().currentUser?.uid else { return profile }
-        let db = Firestore.firestore()
-        if let user = try? await db.collection("users").document(uid).getDocument().data() {
-            if let reasons = user["stressReasons"] as? [String] {
+        guard Auth.auth().currentUser != nil else { return profile }
+        struct Inputs: Decodable {
+            struct Onboarding: Decodable {
+                let age: String?
+                let genderCode: String?
+                let stressReasons: [String]?
+                let stressDuration: String?
+            }
+            let onboarding: Onboarding?
+            let quizAnswers: [Int]?
+            let primaryGoal: String?
+            let availableTime: Int?
+        }
+        guard let inputs: Inputs = try? await ConvexBackend.shared.call(.query, path: "plan:planInputs") else {
+            return profile
+        }
+        if let user = inputs.onboarding {
+            if let reasons = user.stressReasons {
                 profile.reasonCodes = reasons.compactMap {
                     PlanLocalizationLookup.code(for: $0, prefix: "onboarding_v2.overall.reason_",
                                                 codes: ["sleep", "anxiety", "energy", "focus", "mental", "difficult", "habits"])
                 }
             }
-            if let duration = user["stressDuration"] as? String {
+            if let duration = user.stressDuration {
                 profile.durationCode = PlanLocalizationLookup.code(for: duration, prefix: "onboarding_v2.overall.duration_",
                                                                    codes: ["weeks", "2_6_months", "6_12_months", "1_year_plus", "years"])
             }
-            if let age = user["age"] as? String {
+            if let age = user.age {
                 profile.ageCode = PlanLocalizationLookup.code(for: age, prefix: "onboarding_v2.overall.age_",
                                                               codes: ["under_18", "18_24", "25_34", "35_44", "45_54", "55_plus"])
             }
-            if let gender = user["genderCode"] as? String { profile.genderCode = gender }
+            if let gender = user.genderCode { profile.genderCode = gender }
         }
-        if let baseline = try? await db.collection("users").document(uid).collection("baseline").document("initial").getDocument().data() {
-            if let answers = baseline["quizAnswers"] as? [Int], answers.count >= 8 { profile.quizAnswers = answers }
-            if let prefs = baseline["preferences"] as? [String: Any] {
-                profile.improvementGoal = prefs["primaryGoal"] as? String
-                profile.availableMinutes = prefs["availableTime"] as? Int
-            }
-        }
+        if let answers = inputs.quizAnswers, answers.count >= 8 { profile.quizAnswers = answers }
+        profile.improvementGoal = inputs.primaryGoal
+        profile.availableMinutes = inputs.availableTime
         profile.source = profile.isEmpty ? "default" : "migrated"
         return profile
     }
@@ -255,5 +565,13 @@ enum PlanLocalizationLookup {
 
     private static func normalize(_ s: String) -> String {
         s.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+}
+
+private extension PlanPreferences {
+    func adding(_ refID: String) -> PlanPreferences {
+        var copy = self
+        copy.excludedRefIDs.insert(refID)
+        return copy
     }
 }

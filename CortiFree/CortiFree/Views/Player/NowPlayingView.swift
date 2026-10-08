@@ -12,6 +12,7 @@ struct NowPlayingView: View {
     @ObservedObject private var player = GuidedSessionPlayer.shared
     @ObservedObject private var clock = GuidedSessionPlayer.shared.clock
     @ObservedObject private var languageManager = LanguageManager.shared
+    @ObservedObject private var library = SessionLibraryStore.shared
 
     @State private var dragOffset: CGFloat = 0
     @State private var scrubValue: Double?
@@ -113,9 +114,7 @@ struct NowPlayingView: View {
             .buttonStyle(.plain)
             .accessibilityLabel(t("audio.close_player"))
 
-            Spacer()
-
-            VStack(spacing: 2) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(t("audio.now_playing").uppercased())
                     .font(.system(size: 11, weight: .semibold))
                     .tracking(1.2)
@@ -123,9 +122,14 @@ struct NowPlayingView: View {
                 Text(session.category.title.localized)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
+                    .lineLimit(1)
             }
+            .padding(.leading, 6)
 
-            Spacer()
+            Spacer(minLength: 8)
+
+            favoriteButton(session)
+            downloadButton(session)
 
             Menu {
                 Button(role: .destructive) {
@@ -142,6 +146,48 @@ struct NowPlayingView: View {
                     .cfGlassCircle()
             }
         }
+    }
+
+    private func favoriteButton(_ session: GuidedSession) -> some View {
+        let isFavorite = library.isFavorite(session)
+        return Button {
+            HapticManager.light()
+            library.toggleFavorite(session)
+        } label: {
+            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(isFavorite ? Color(hex: "F472B6") : .white)
+                .contentTransition(.symbolEffect(.replace))
+                .frame(width: 44, height: 44)
+                .cfGlassCircle()
+        }
+        .buttonStyle(.plain)
+        .sensoryFeedback(.selection, trigger: isFavorite)
+        .accessibilityLabel(t(isFavorite ? "library.v2.unfavorite" : "library.v2.favorite"))
+    }
+
+    private func downloadButton(_ session: GuidedSession) -> some View {
+        let state = library.downloadState(session)
+        return Button {
+            HapticManager.light()
+            library.toggleDownload(session)
+        } label: {
+            Group {
+                if state == .downloading {
+                    ProgressView().controlSize(.small).tint(.white)
+                } else {
+                    Image(systemName: state == .downloaded ? "checkmark.circle.fill" : "arrow.down.circle")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(state == .downloaded ? AudioPalette.accent : .white)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+            }
+            .frame(width: 44, height: 44)
+            .cfGlassCircle()
+        }
+        .buttonStyle(.plain)
+        .disabled(state == .downloading)
+        .accessibilityLabel(t(LibraryDownloadButton.labelKey(state)))
     }
 
     // MARK: - Artwork
@@ -179,6 +225,16 @@ struct NowPlayingView: View {
                 .font(.system(size: 15))
                 .foregroundStyle(AudioPalette.secondaryText)
                 .lineLimit(2)
+            if !session.hasNarrationInCurrentLanguage {
+                // No narration in the app language yet: the English version plays.
+                Label(t("audio.script.english_narration"), systemImage: "globe")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(AudioPalette.secondaryText)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Capsule().stroke(Color.white.opacity(0.3)))
+                    .padding(.top, 2)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -377,6 +433,7 @@ struct NowPlayingView: View {
                 )
             }
             .buttonStyle(.plain)
+
 
             if player.script != nil {
                 Button {

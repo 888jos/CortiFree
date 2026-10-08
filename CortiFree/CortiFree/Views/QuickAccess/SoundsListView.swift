@@ -13,6 +13,7 @@ struct SoundsListView: View {
     @ObservedObject private var languageManager = LanguageManager.shared
     @StateObject private var viewModel = LibraryViewModel()
     @ObservedObject private var soundPlayer = SoundPlayer.shared
+    @ObservedObject private var library = SessionLibraryStore.shared
 
     private var sounds: [(id: String, icon: String, titleKey: String, imageName: String)] {
         [
@@ -50,6 +51,15 @@ struct SoundsListView: View {
                                 isPlaying: soundPlayer.currentExercise?.id == sound.id && soundPlayer.isPlaying
                             ) {
                                 playSound(id: sound.id, title: languageManager.localized(sound.titleKey))
+                            }
+                            .overlay(alignment: .topTrailing) {
+                                if let exercise = Exercise.sounds.first(where: { $0.id == sound.id }) {
+                                    LibraryDownloadButton(state: library.isDownloaded(exercise) ? .downloaded : .none) {
+                                        library.toggleDownload(exercise)
+                                    }
+                                    .shadow(color: .black.opacity(0.5), radius: 4)
+                                    .padding(4)
+                                }
                             }
                         }
                     }

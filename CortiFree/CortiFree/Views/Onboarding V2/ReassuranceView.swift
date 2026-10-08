@@ -3,11 +3,10 @@
 //  CortiFree
 //
 //  Created by Claude on 11/11/2025.
-//  Reassurance screen with video background and animated text
+//  Reassurance screen with animated text (tap to show it all)
 //
 
 import SwiftUI
-import AVKit
 
 struct ReassuranceView: View {
     let overallData: OverallQuizData?
@@ -18,7 +17,6 @@ struct ReassuranceView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var displayedText: String = ""
     @State private var currentCharacterIndex: Int = 0
-    @State private var player: AVPlayer?
     @State private var showButton: Bool = false
     @State private var screenViewTime: Date?
 
@@ -35,7 +33,17 @@ struct ReassuranceView: View {
         let message2 = personalizedMessage
         let message3 = "onboarding_v2.reassurance.message_part3".localized
         let message4 = "onboarding_v2.reassurance.message_part4".localized
-        return "\(message1)\n\n\(message2)\n\n\(message3)\n\n\(message4)"
+        var text = "\(message1)\n\n\(message2)\n\n\(message3)\n\n\(message4)"
+        if needsSupportMessage {
+            text += "\n\n" + "onboarding_v2.reassurance.support".localized
+        }
+        return text
+    }
+
+    /// Minors and people going through a hard time get a pointer to real help.
+    private var needsSupportMessage: Bool {
+        guard let data = overallData else { return false }
+        return data.ageCode == "under_18" || data.reasonCodes.contains("difficult")
     }
 
     private var personalizedMessage: String {
@@ -64,15 +72,8 @@ struct ReassuranceView: View {
 
     var body: some View {
         ZStack {
-            // Video background
-            if let player = player {
-                VideoPlayerBackground(player: player)
-                    .ignoresSafeArea()
-            } else {
-                // Fallback to galaxy background
-                GalaxyBackgroundView()
-                    .ignoresSafeArea()
-            }
+            GalaxyBackgroundView()
+                .ignoresSafeArea()
 
             // Dark overlay for readability
             Color.black.opacity(0.5)
@@ -93,6 +94,9 @@ struct ReassuranceView: View {
                         .lineSpacing(6)
                         .frame(minHeight: 200, alignment: .top)
                         .padding(.horizontal, 40)
+                        .contentShape(Rectangle())
+                        .onTapGesture { revealFullText() }
+                        .accessibilityAction(named: Text("common.continue".localized)) { revealFullText() }
 
                 }
                 // Keep the copy visible after the larger mascot artwork.
@@ -154,27 +158,7 @@ struct ReassuranceView: View {
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingReassuranceViewed(userName: "")
 
-            setupVideo()
             startTextAnimation()
-        }
-    }
-
-    // MARK: - Setup Video
-
-    private func setupVideo() {
-        // TODO: Replace "reassurance_video" with actual video name
-        if let videoURL = Bundle.main.url(forResource: "reassurance_video", withExtension: "mp4") {
-            player = AVPlayer(url: videoURL)
-
-            // Loop video
-            NotificationCenter.default.addObserver(
-                forName: .AVPlayerItemDidPlayToEndTime,
-                object: player?.currentItem,
-                queue: .main
-            ) { _ in
-                player?.seek(to: .zero)
-                player?.play()
-            }
         }
     }
 
@@ -184,6 +168,16 @@ struct ReassuranceView: View {
         // Start animation after short delay (reduced by 50%)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             animateNextCharacter()
+        }
+    }
+
+    /// Tapping the text shows it all at once (the typewriter effect is optional).
+    private func revealFullText() {
+        guard currentCharacterIndex < fullText.count else { return }
+        currentCharacterIndex = fullText.count
+        displayedText = fullText
+        withAnimation(.easeInOut(duration: 0.3)) {
+            showButton = true
         }
     }
 
@@ -213,33 +207,6 @@ struct ReassuranceView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             animateNextCharacter()
         }
-    }
-}
-
-// MARK: - Video Player Background
-
-struct VideoPlayerBackground: UIViewRepresentable {
-    let player: AVPlayer
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(playerLayer)
-        context.coordinator.playerLayer = playerLayer
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        context.coordinator.playerLayer?.frame = uiView.bounds
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-
-    class Coordinator {
-        var playerLayer: AVPlayerLayer?
     }
 }
 

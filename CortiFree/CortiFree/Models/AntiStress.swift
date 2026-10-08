@@ -8,7 +8,6 @@
 
 import Foundation
 import SwiftUI
-import FirebaseFirestore
 
 // MARK: - Stress Situation
 
@@ -432,7 +431,7 @@ extension AntiStressExerciseType {
         case .boxBreathing:
             return .boxBreathing   // 4-4-4-4
         case .alternateBreathing:
-            return .fourSevenEight // 4-7-8
+            return .alternateNostril // nadi shodhana (4-7-8 is a sleep pattern)
         default:
             return nil // Non-breathing exercises
         }

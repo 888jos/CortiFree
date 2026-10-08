@@ -7,8 +7,6 @@
 
 import Foundation
 import UIKit
-import FirebaseAuth
-import FirebaseFirestore
 
 @MainActor
 class ProfileViewModel: ObservableObject {
@@ -55,17 +53,15 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
-    /// Local photo first; on a fresh install / new device, restore it from users/{uid}.profilePhotoBase64.
+    /// Local photo first; on a fresh install / new device, restore it from Convex storage.
     func loadProfilePhoto() async {
         if let local = ProfilePhotoStorage.load() {
             profilePhoto = local
             return
         }
         profilePhoto = nil
-        guard let uid = Auth.auth().currentUser?.uid,
-              let snapshot = try? await Firestore.firestore().collection("users").document(uid).getDocument(),
-              let base64 = snapshot.data()?["profilePhotoBase64"] as? String,
-              let data = Data(base64Encoded: base64),
+        guard let remoteURL = Auth.auth().currentUser?.photoURL,
+              let (data, _) = try? await URLSession.shared.data(from: remoteURL),
               let image = UIImage(data: data) else { return }
         ProfilePhotoStorage.save(data)
         profilePhoto = image

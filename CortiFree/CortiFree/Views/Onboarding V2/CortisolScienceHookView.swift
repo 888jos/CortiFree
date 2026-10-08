@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct CortisolScienceHookView: View {
+    var onBack: (() -> Void)? = nil
     let onContinue: () -> Void
 
     @State private var screenViewTime: Date?
@@ -119,6 +120,7 @@ struct CortisolScienceHookView: View {
                 .padding(.bottom, 50)
             }
         }
+        .onboardingBackButton(onBack)
         .onAppear {
             screenViewTime = Date()
             AnalyticsManager.shared.track(event: "onboarding_science_hook_viewed")

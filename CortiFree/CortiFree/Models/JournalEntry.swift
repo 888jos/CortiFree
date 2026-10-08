@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 struct JournalEntry: Identifiable, Codable {
     @DocumentID var id: String?
@@ -24,6 +23,34 @@ struct JournalEntry: Identifiable, Codable {
     var prompt: String?
     var tags: [String]?
     var isFavorite: Bool?
+
+    init(
+        id: String? = nil,
+        content: String,
+        createdAt: Date,
+        userId: String,
+        mood: Mood? = nil,
+        photoURL: String? = nil,
+        wordCount: Int? = nil,
+        meditationId: String? = nil,
+        meditationType: String? = nil,
+        prompt: String? = nil,
+        tags: [String]? = nil,
+        isFavorite: Bool? = nil
+    ) {
+        self._id = DocumentID(wrappedValue: id)
+        self.content = content
+        self.createdAt = createdAt
+        self.userId = userId
+        self.mood = mood
+        self.photoURL = photoURL
+        self.wordCount = wordCount
+        self.meditationId = meditationId
+        self.meditationType = meditationType
+        self.prompt = prompt
+        self.tags = tags
+        self.isFavorite = isFavorite
+    }
 
     enum CodingKeys: String, CodingKey {
         case id

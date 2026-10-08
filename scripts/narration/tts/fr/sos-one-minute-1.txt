@@ -1,0 +1,26 @@
+# sos-one-minute-1 · Une minute pour souffler (FR)
+[pause 1.5s]
+[calm, clear] Arrête-toi un instant. Là où tu es, tel que tu es.
+Debout, assis, dans un couloir... n'importe où, ça marche. Tu peux garder les yeux ouverts.
+[pause 1.5s]
+[soft] Inspire doucement par le nez...
+[pause 4s]
+[slow] Et laisse sortir l'air encore plus lentement, comme à travers une paille...
+[pause 6s]
+[clear] Maintenant, jetons un rapide coup d'œil à l'intérieur. Trois questions, un mot chacune.
+Ton corps. Qu'est-ce qui ressort ? Tendu, chaud, fatigué... Un seul mot.
+[pause 2.5s]
+Ton émotion. De l'agacement, de l'inquiétude, pas grand-chose ? Un mot, sans jugement.
+[pause 2.5s]
+Ton esprit. De quoi est-il occupé, là, tout de suite ? Encore un mot.
+[pause 3s]
+[warm] Le simple fait de nommer te donne déjà un peu de recul.
+[soft] Encore une respiration lente. Inspire...
+[pause 4s]
+[slow] Et expire, sans te presser, jusqu'au bout.
+[pause 6s]
+[calm, grounded] Maintenant, avance. Quelle est la prochaine petite chose à faire ? Pas toute la journée. Juste la toute prochaine étape.
+Décrocher ce téléphone. Ouvrir cette porte. Répondre à ce message-là.
+[pause 2s]
+[warm, encouraging] Tu l'as ? Alors vas-y, avec ce souffle plus calme.
+[pause 4s]

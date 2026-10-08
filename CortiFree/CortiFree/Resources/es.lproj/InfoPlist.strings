@@ -7,3 +7,8 @@
 "NSMotionUsageDescription" = "CortiFree utiliza el seguimiento de movimiento para supervisar su actividad física y proporcionar mejores recomendaciones de ejercicio.";
 "NSPhotoLibraryAddUsageDescription" = "CortiFree necesita permiso para guardar imágenes a su biblioteca de fotos.";
 "NSMicrophoneUsageDescription" = "CortiFree necesita acceso al micrófono para ejercicios guiados de meditación y respiración.";
+"NSHealthShareUsageDescription" = "CortiFree lee tus cuestionarios de ansiedad (GAD-7) y tus estados de ánimo para personalizar tu plan. Estos datos se quedan en tu iPhone.";
+"NSHealthUpdateUsageDescription" = "CortiFree guarda tus chequeos de ansiedad, estados de ánimo y minutos de atención plena en Apple Salud.";
+
+// MARK: - Tracking
+"NSUserTrackingUsageDescription" = "CortiFree usa este identificador para personalizar tu experiencia y medir la eficacia de los anuncios.";

@@ -10,6 +10,7 @@ struct NotificationPermissionsView: View {
     let onContinue: () -> Void
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var isRequestingPermission = false
+    @State private var reminderTime = NotificationService.shared.morningReminderDate
 
     var body: some View {
         ZStack {
@@ -27,12 +28,7 @@ struct NotificationPermissionsView: View {
                 Spacer()
 
                 permissionCard
-                    .padding(.horizontal, 42)
-
-                Image(systemName: "arrow.down")
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundStyle(Color(hex: "B794F6"))
-                    .padding(.top, 24)
+                    .padding(.horizontal, 24)
 
                 Spacer()
 
@@ -60,53 +56,52 @@ struct NotificationPermissionsView: View {
         }
     }
 
+    /// A CortiFree reminder as it will appear on the lock screen (not a copy of the
+    /// system permission alert), followed by the time picker.
     private var permissionCard: some View {
-        VStack(spacing: 0) {
-            Image(systemName: "app.badge.fill")
-                .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(Color(hex: "8B5CF6"))
-                .frame(width: 58, height: 58)
-                .background(Color(hex: "EDE9FE"), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        VStack(spacing: 18) {
+            HStack(alignment: .top, spacing: 12) {
+                Image("AppLogo")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 38, height: 38)
+                    .background(Color(hex: "1A1A4E"))
+                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
 
-            Text("onboarding_v2.notifications.preview_title".localized)
-                .font(.poppinsSemiBold(16))
-                .foregroundStyle(Color(hex: "181829"))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 16)
-                .padding(.horizontal, 18)
-
-            Text("onboarding_v2.notifications.preview_body".localized)
-                .font(.poppinsRegular(12))
-                .foregroundStyle(Color(hex: "555568"))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 8)
-                .padding(.horizontal, 18)
-
-            Divider()
-                .padding(.top, 18)
-
-            HStack(spacing: 0) {
-                Text("onboarding_v2.notifications.dont_allow".localized)
-                    .frame(maxWidth: .infinity)
-
-                Divider()
-
-                Text("onboarding_v2.notifications.allow_short".localized)
-                    .foregroundStyle(Color(hex: "8B5CF6"))
-                    .frame(maxWidth: .infinity)
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack {
+                        Text(verbatim: "CortiFree")
+                            .font(.poppinsSemiBold(14))
+                        Spacer()
+                        Text(reminderTime, style: .time)
+                            .font(.poppinsRegular(12))
+                            .opacity(0.6)
+                    }
+                    Text("inline.notificationservice.00".localized)
+                        .font(.poppinsSemiBold(14))
+                    Text("inline.notificationservice.01".localized)
+                        .font(.poppinsRegular(13))
+                        .opacity(0.8)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .foregroundStyle(.white)
             }
-            .font(.poppinsMedium(14))
-            .foregroundStyle(Color(hex: "77778A"))
-            .frame(height: 48)
+            .padding(14)
+            .glassCard(cornerRadius: 22)
+
+            HStack {
+                Text("onboarding_v2.notifications.time_label".localized)
+                    .font(.poppinsMedium(15))
+                    .foregroundStyle(.white)
+                Spacer()
+                DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .glassCard(cornerRadius: 16)
         }
-        .padding(.top, 20)
-        .background(Color.white.opacity(0.96), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(Color(hex: "B794F6").opacity(0.45), lineWidth: 2)
-        )
     }
 
     private func skipPermission() {
@@ -140,6 +135,7 @@ struct NotificationPermissionsView: View {
 
     private func finishPermissionRequest(granted: Bool) {
         UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
+        NotificationService.shared.setMorningReminder(reminderTime)
         AnalyticsManager.shared.trackOnboardingNotificationPermissionsGranted(granted: granted)
         DispatchQueue.main.async {
             isRequestingPermission = false

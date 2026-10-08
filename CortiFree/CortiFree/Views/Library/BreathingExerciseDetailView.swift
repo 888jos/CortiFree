@@ -15,6 +15,7 @@ struct BreathingExerciseDetailView: View {
     @ObservedObject private var languageManager = LanguageManager.shared
     @ObservedObject private var preferences = BreathingPreferences.shared
     @ObservedObject private var voiceOverManager = VoiceOverManager.shared
+    @ObservedObject private var library = SessionLibraryStore.shared
     @State private var selectedMinutes: Int
     @State private var detailsExpanded = false
     @State private var showsAmbiences = false
@@ -41,6 +42,15 @@ struct BreathingExerciseDetailView: View {
                             .font(.system(size: 19, weight: .regular, design: .rounded))
                             .foregroundStyle(.white.opacity(0.92))
                             .fixedSize(horizontal: false, vertical: true)
+                        if pattern.requiresCaution {
+                            Label(t("breathing.detail.caution"), systemImage: "exclamationmark.triangle.fill")
+                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .foregroundStyle(Color(hex: "FFD36B"))
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(14)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Color(hex: "FFD36B").opacity(0.10)))
+                        }
                         actions
                         if pattern.durationChoices.count > 1 { durationPicker }
                         details
@@ -55,7 +65,7 @@ struct BreathingExerciseDetailView: View {
             .scrollIndicators(.hidden)
             .ignoresSafeArea(edges: .top)
 
-            closeButton
+            topActions
         }
         .safeAreaInset(edge: .bottom, spacing: 0) { startButton }
         .sheet(isPresented: $showsAmbiences) {
@@ -116,19 +126,44 @@ struct BreathingExerciseDetailView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var closeButton: some View {
-        Button { dismiss() } label: {
-            Image(systemName: "xmark")
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(.white)
-                .frame(width: 32, height: 32)
+    /// Like, download and close, top right over the artwork.
+    private var topActions: some View {
+        let isFavorite = library.isFavorite(pattern)
+        let isDownloaded = library.isDownloaded(pattern)
+        return HStack(spacing: 0) {
+            topButton(isFavorite ? "heart.fill" : "heart",
+                      tint: isFavorite ? Color(hex: "F472B6") : .white,
+                      label: t(isFavorite ? "library.v2.unfavorite" : "library.v2.favorite")) {
+                library.toggleFavorite(pattern)
+            }
+            .sensoryFeedback(.selection, trigger: isFavorite)
+            topButton(isDownloaded ? "checkmark.circle.fill" : "arrow.down.circle",
+                      tint: isDownloaded ? AudioPalette.accent : .white,
+                      label: t(isDownloaded ? "library.downloaded.remove" : "library.download")) {
+                library.toggleDownload(pattern)
+            }
+            .sensoryFeedback(.success, trigger: isDownloaded)
+            topButton("xmark", tint: .white, label: t("breathing.session.close")) { dismiss() }
+        }
+        .padding(.top, 14)
+        .padding(.trailing, 10)
+    }
+
+    private func topButton(_ symbol: String, tint: Color, label: String, action: @escaping () -> Void) -> some View {
+        Button {
+            HapticManager.light()
+            action()
+        } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(tint)
+                .contentTransition(.symbolEffect(.replace))
+                .frame(width: 34, height: 34)
                 .background(.ultraThinMaterial, in: Circle())
                 .frame(width: 44, height: 44)
         }
         .buttonStyle(PressableCardStyle())
-        .padding(.top, 14)
-        .padding(.trailing, 10)
-        .accessibilityLabel(t("breathing.session.close"))
+        .accessibilityLabel(label)
     }
 
     // MARK: Actions

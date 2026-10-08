@@ -1,5 +1,4 @@
 import Foundation
-import FirebaseAuth
 
 @MainActor
 final class ProgressViewModel: ObservableObject {
@@ -11,8 +10,8 @@ final class ProgressViewModel: ObservableObject {
     private let cacheKeyPrefix = "progressDashboardCacheV2"
     private var didLoad = false
 
-    init(service: ProgressAnalyticsService = .shared) {
-        self.service = service
+    init(service: ProgressAnalyticsService? = nil) {
+        self.service = service ?? .shared
         loadCache()
     }
 

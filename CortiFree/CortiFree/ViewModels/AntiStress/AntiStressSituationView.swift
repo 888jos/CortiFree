@@ -92,7 +92,8 @@ struct AntiStressSituationView: View {
                 if let situation = selectedSituation {
                     ExerciseRecommendationView(
                         situation: situation,
-                        viewModel: viewModel
+                        viewModel: viewModel,
+                        closeFlow: { dismiss() }
                     )
                 }
             }

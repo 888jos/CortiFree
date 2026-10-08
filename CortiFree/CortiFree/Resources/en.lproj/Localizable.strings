@@ -625,7 +625,7 @@
 "auth.login_google_personalized" = "Sign in with your Google account to access your personalized space";
 "auth.sign_in_google" = "Sign in with Google";
 "auth.create_account" = "Create account";
-"auth.login" = "Login";
+"auth.login" = "Sign in";
 "auth.first_name" = "First name";
 "auth.email" = "Email";
 "auth.password" = "Password";
@@ -1310,9 +1310,9 @@
 
 // MARK: - Onboarding V2 - Week Progress
 "onboarding.week_progress.week_number" = "Week %d";
-"onboarding.week_progress.week_1_message" = "You're starting out — your beginning is a bit weak.";
-"onboarding.week_progress.week_5_message" = "You're progressing — keep it up!";
-"onboarding.week_progress.week_10_message" = "You've mastered all areas — your progress is evident!";
+"onboarding.week_progress.week_1_message" = "Week 1: easing the pressure. This is your starting point.";
+"onboarding.week_progress.week_5_message" = "Week 2: your rituals settle in.";
+"onboarding.week_progress.week_10_message" = "Week 4: you lock in what works for you.";
 
 // MARK: - Onboarding V2 - Habits Progress Flow
 "onboarding.habits_progress_flow.title" = "Your habit evolution";
@@ -2917,7 +2917,7 @@
 "tips.card.emergency_kit.section2.title" = "Urgent physical release";
 "tips.card.emergency_kit.section2.content" = "When stress is IN your body:\n\n• Sprint 30 seconds at full speed (if safe place)\n• 20 jumping jacks\n• Squeeze a pillow/cushion hard then release (5x)\n• Push against a wall with all your strength (10 sec)\n\nStress energy MUST leave the body.";
 "tips.card.emergency_kit.section3.title" = "Who to call";
-"tips.card.emergency_kit.section3.content" = "Prepare this list NOW (in your phone):\n\n• 3 trusted friends/family\n• Listening line (Crisis Text Line: text HOME to 741741)\n• Your therapist if you have one\n• Emergency if immediate danger: 911\n\nIn crisis, you don't think clearly.\nPrepared list = lifeline.";
+"tips.card.emergency_kit.section3.content" = "Prepare this list NOW (in your phone):\n\n• 3 trusted friends/family\n• Crisis line (US: call or text 988)\n• Your therapist if you have one\n• Emergency if immediate danger: 911 (112 in Europe)\n\nIn crisis, you don't think clearly.\nPrepared list = lifeline.";
 "tips.card.emergency_kit.section4.title" = "Permission to take a break";
 "tips.card.emergency_kit.section4.content" = "You have the RIGHT to:\n\n• Cancel plans\n• Say \"I can't today\"\n• Take a mental rest day\n• Delegate what can be delegated\n• Put your phone in airplane mode\n\nTaking care of yourself ≠ Selfishness.\nIt's SURVIVAL.\n\nIf you're not well, you can't help anyone.";
 "tips.card.emergency_kit.section5.title" = "After the crisis";
@@ -3224,7 +3224,7 @@
 "onboarding_v2.comparison.today" = "Today";
 "onboarding_v2.comparison.day66" = "Day 66";
 "onboarding_v2.comparison.disclaimer" = "An illustrative projection based on consistent practice. Results vary from person to person.";
-"onboarding_v2.comparison.cta" = "Build my plan";
+"onboarding_v2.comparison.cta" = "Continue";
 "onboarding_v2.insight.pattern.title" = "Your answers are starting to form a pattern";
 "onboarding_v2.insight.pattern.subtitle" = "These are the first areas where your recovery may benefit from more support.";
 "onboarding_v2.insight.pattern.cta" = "Continue my analysis";
@@ -3275,8 +3275,8 @@
 "onboarding_v2.scientific.point_3" = "Personalized progress tracking";
 
 // MARK: - Onboarding V2 - Authentication
-"onboarding_v2.auth.title" = "Unlock your CortiFree Score";
-"onboarding_v2.auth.subtitle" = "Create your account to reveal your personalized results and save your plan.";
+"onboarding_v2.auth.title" = "Save your plan";
+"onboarding_v2.auth.subtitle" = "Create your account to keep your personal plan and progress on all your devices.";
 "onboarding_v2.auth.email_placeholder" = "Email";
 "onboarding_v2.auth.password_placeholder" = "Password";
 "onboarding_v2.auth.signup_button" = "Sign up";
@@ -3331,7 +3331,7 @@
 "onboarding_v2.loading.personalizing" = "Personalizing your journey";
 "onboarding_v2.loading.plan_creation" = "Creating your plan";
 "onboarding_v2.loading.finalizing" = "Finalizing recommendations";
-"onboarding_v2.loading.see_plan" = "See my 66-day plan";
+"onboarding_v2.loading.see_plan" = "See my plan";
 
 // MARK: - Onboarding V2 - CortiFree Rating
 "onboarding_v2.rating.title" = "Your CortiFree Score";
@@ -3342,44 +3342,44 @@
 // MARK: - Onboarding V2 - Eight Habits Intro
 "onboarding_v2.eight_habits.intro_title" = "The 8 key habits";
 "onboarding_v2.eight_habits.intro_subtitle" = "for a serene life";
-"onboarding_v2.eight_habits.intro_description" = "To reduce your cortisol levels, you need the 8 fundamental habits below.";
+"onboarding_v2.eight_habits.intro_description" = "Your 28-day plan draws on these 8 habits, which help your body handle stress better.";
 
 // MARK: - Onboarding V2 - Eight Habits Details
 "onboarding_v2.eight_habits.breathing.title" = "Breathe consciously";
 "onboarding_v2.eight_habits.breathing.subtitle" = "Activate your parasympathetic nervous system";
-"onboarding_v2.eight_habits.breathing.benefit_1" = "Reduces cortisol in 5 minutes";
+"onboarding_v2.eight_habits.breathing.benefit_1" = "Helps bring the pressure down in a few minutes";
 "onboarding_v2.eight_habits.breathing.benefit_2" = "Improves heart rate variability";
 "onboarding_v2.eight_habits.breathing.benefit_3" = "Instantly calms the mind";
 
 "onboarding_v2.eight_habits.meditation.title" = "Meditate mindfully";
 "onboarding_v2.eight_habits.meditation.subtitle" = "Strengthen your attention capacity";
-"onboarding_v2.eight_habits.meditation.benefit_1" = "Increases gray matter";
-"onboarding_v2.eight_habits.meditation.benefit_2" = "Reduces anxiety by 58%";
+"onboarding_v2.eight_habits.meditation.benefit_1" = "Trains attention and calm";
+"onboarding_v2.eight_habits.meditation.benefit_2" = "Can help reduce anxiety";
 "onboarding_v2.eight_habits.meditation.benefit_3" = "Improves emotional regulation";
 
 "onboarding_v2.eight_habits.journal.title" = "Write your thoughts";
 "onboarding_v2.eight_habits.journal.subtitle" = "Release accumulated mental stress";
 "onboarding_v2.eight_habits.journal.benefit_1" = "Clarifies confused thoughts";
-"onboarding_v2.eight_habits.journal.benefit_2" = "Reduces rumination by 40%";
+"onboarding_v2.eight_habits.journal.benefit_2" = "Helps you step back from rumination";
 "onboarding_v2.eight_habits.journal.benefit_3" = "Improves sleep quality";
 
 "onboarding_v2.eight_habits.sport.title" = "Move regularly";
 "onboarding_v2.eight_habits.sport.subtitle" = "Release physical tension";
 "onboarding_v2.eight_habits.sport.benefit_1" = "Produces natural endorphins";
-"onboarding_v2.eight_habits.sport.benefit_2" = "Reduces stress by 75%";
+"onboarding_v2.eight_habits.sport.benefit_2" = "Helps release stress";
 "onboarding_v2.eight_habits.sport.benefit_3" = "Improves daily energy";
 
 "onboarding_v2.eight_habits.water.title" = "Stay hydrated";
 "onboarding_v2.eight_habits.water.subtitle" = "Optimize brain functions";
-"onboarding_v2.eight_habits.water.benefit_1" = "Improves concentration by 30%";
+"onboarding_v2.eight_habits.water.benefit_1" = "Helps you stay focused";
 "onboarding_v2.eight_habits.water.benefit_2" = "Reduces mental fatigue";
 "onboarding_v2.eight_habits.water.benefit_3" = "Regulates mood";
 
 "onboarding_v2.eight_habits.nature.title" = "Connect with nature";
 "onboarding_v2.eight_habits.nature.subtitle" = "Naturally reduces cortisol";
-"onboarding_v2.eight_habits.nature.benefit_1" = "Lowers blood pressure";
-"onboarding_v2.eight_habits.nature.benefit_2" = "Improves mood by 60%";
-"onboarding_v2.eight_habits.nature.benefit_3" = "Strengthens immune system";
+"onboarding_v2.eight_habits.nature.benefit_1" = "Helps your body relax";
+"onboarding_v2.eight_habits.nature.benefit_2" = "Lifts your mood";
+"onboarding_v2.eight_habits.nature.benefit_3" = "Quiets the mind";
 
 "onboarding_v2.eight_habits.sleep.title" = "Sleep enough";
 "onboarding_v2.eight_habits.sleep.subtitle" = "Repair body and mind";
@@ -3391,7 +3391,7 @@
 "onboarding_v2.eight_habits.social.subtitle" = "Releases oxytocin naturally";
 "onboarding_v2.eight_habits.social.benefit_1" = "Reduces feelings of isolation";
 "onboarding_v2.eight_habits.social.benefit_2" = "Improves stress resilience";
-"onboarding_v2.eight_habits.social.benefit_3" = "Increases wellbeing by 50%";
+"onboarding_v2.eight_habits.social.benefit_3" = "Supports wellbeing";
 
 // MARK: - Onboarding V2 - Week Progress
 "onboarding_v2.week_progress.title" = "Your progress";
@@ -3441,7 +3441,7 @@
 "onboarding_v2.paywall.countdown" = "Special offer expires in";
 "onboarding_v2.paywall.guarantee" = "7-day money-back guarantee";
 
-"onboarding_v2.reassurance.time_estimate" = "Takes 2 minutes";
+"onboarding_v2.reassurance.time_estimate" = "About 2 minutes";
 
 // MARK: - Onboarding V2 - Rating View (additional keys)
 "onboarding_v2.rating.current_title" = "Your current score";
@@ -3457,10 +3457,10 @@
 "onboarding_v2.rating.glow" = "Glow";
 
 // MARK: - Onboarding V2 - Sixty Days View
-"onboarding_v2.sixty_days.studies_confirm" = "Scientific studies confirm:";
+"onboarding_v2.sixty_days.studies_confirm" = "Research shows:";
 "onboarding_v2.sixty_days.days" = "66 days";
-"onboarding_v2.sixty_days.time_needed" = "is the time needed to anchor a";
-"onboarding_v2.sixty_days.habit_transform" = "habit and truly transform your life.";
+"onboarding_v2.sixty_days.time_needed" = "is the average time it takes for a";
+"onboarding_v2.sixty_days.habit_transform" = "new habit to become automatic.";
 "onboarding_v2.sixty_days.boost_energy" = "Boost your energy";
 "onboarding_v2.sixty_days.reduce_fatigue" = "Reduce fatigue";
 "onboarding_v2.sixty_days.gain_serenity" = "Gain serenity";
@@ -3495,8 +3495,8 @@
 "onboarding_v2.eight_habits.intro_life" = "cortisol levels, you need the";
 "onboarding_v2.eight_habits.intro_fundamental" = "8 fundamental habits";
 "onboarding_v2.eight_habits.intro_below" = "below.";
-"onboarding_v2.eight_habits.intro_see_change" = "Discover how your life will change in 66 days\nthanks to these 8 habits:";
-"onboarding_v2.eight_habits.impact_title" = "Impact after 10 weeks";
+"onboarding_v2.eight_habits.intro_see_change" = "See what these 8 habits\ncan change in 28 days:";
+"onboarding_v2.eight_habits.impact_title" = "What this habit supports";
 
 // Impact labels for habits
 "onboarding_v2.eight_habits.impact.lung_capacity" = "Lung\ncapacity";
@@ -3576,11 +3576,11 @@
 "onboarding_v2.habits_progress.loading" = "Loading your habits...";
 "onboarding_v2.habits_progress.loading_chart" = "Loading chart...";
 "onboarding_v2.habits_progress.description_part1" = "Each week, your tasks become ";
-"onboarding_v2.habits_progress.description_highlight" = "progressively more challenging";
-"onboarding_v2.habits_progress.description_part2" = " to refresh your dopaminergic system.";
+"onboarding_v2.habits_progress.description_highlight" = "gradually richer";
+"onboarding_v2.habits_progress.description_part2" = " so you keep progressing without losing heart.";
 "onboarding_v2.habits_progress.with_cortifree" = "With CortiFree";
 "onboarding_v2.habits_progress.without_cortifree" = "Without CortiFree";
-"onboarding_v2.habits_progress.by_week" = "By week %d, you will ";
+"onboarding_v2.habits_progress.by_week" = "By week %d, you ";
 "onboarding_v2.habits_progress.week_number" = "Week %d";
 "onboarding_v2.habits_progress.breathing_title" = "Breathe consciously";
 "onboarding_v2.habits_progress.breathing_stat" = "practice conscious breathing 1h per week.";
@@ -3591,11 +3591,11 @@
 "onboarding_v2.habits_progress.sport_title" = "Exercise";
 "onboarding_v2.habits_progress.sport_stat" = "exercise 3h30 per week.";
 "onboarding_v2.habits_progress.water_title" = "Drink water";
-"onboarding_v2.habits_progress.water_stat" = "drink 2.5L of water per day.";
+"onboarding_v2.habits_progress.water_stat" = "will drink about 2 L of water a day.";
 "onboarding_v2.habits_progress.nature_title" = "Spend time in nature";
 "onboarding_v2.habits_progress.nature_stat" = "spend 3h30 in nature per week.";
 "onboarding_v2.habits_progress.sleep_title" = "Follow a sleep routine";
-"onboarding_v2.habits_progress.sleep_stat" = "sleep 8 hours per night.";
+"onboarding_v2.habits_progress.sleep_stat" = "will aim for 7 to 8 hours of sleep a night.";
 "onboarding_v2.habits_progress.social_title" = "Connect socially";
 "onboarding_v2.habits_progress.social_stat" = "connect socially 4 times per week.";
 
@@ -3814,29 +3814,29 @@
 "onboarding_v2.commitment.1_week" = "1 week";
 "onboarding_v2.commitment.2_weeks" = "2 weeks";
 "onboarding_v2.commitment.2_weeks_sub" = "Build momentum";
-"onboarding_v2.commitment.4_weeks" = "4 weeks";
-"onboarding_v2.commitment.4_weeks_sub" = "Real change";
+"onboarding_v2.commitment.4_weeks" = "28 days";
+"onboarding_v2.commitment.4_weeks_sub" = "The length of your plan";
 "onboarding_v2.commitment.66_days" = "66 days";
 "onboarding_v2.commitment.subtitle" = "Choose your commitment length";
 "onboarding_v2.commitment.recommended" = "Recommended";
 "onboarding_v2.commitment.chose" = "chose";
 "onboarding_v2.commitment.1_week_sub" = "Try it out";
-"onboarding_v2.commitment.66_days_sub" = "Proven results";
+"onboarding_v2.commitment.66_days_sub" = "Several cycles to anchor your habits";
 "onboarding_v2.commitment.hold_instruction" = "Press and hold to commit";
 "onboarding_v2.commitment.committed" = "You're committed.";
 
 // MARK: - StressPatternValidationView
-"stress_pattern.analysis_complete" = "Analysis complete";
-"stress_pattern.news_to_break" = "We've got some news to break to you...";
+"stress_pattern.analysis_complete" = "Your quiz result";
+"stress_pattern.news_to_break" = "Here's what your answers show.";
 "stress_pattern.cortisol_above" = "Your cortisol is estimated **%d points above** normal";
-"stress_pattern.disclaimer" = "This estimate does not constitute a medical diagnosis.";
+"stress_pattern.disclaimer" = "A self-assessment based on your answers. It is not a cortisol measurement or a medical diagnosis.";
 "stress_pattern.cta" = "Check your symptoms";
 "stress_pattern.bar_you" = "You";
-"stress_pattern.bar_normal" = "Normal";
+"stress_pattern.bar_normal" = "Calm profile";
 
 // MARK: - SymptomCheckerView
 "symptom_checker.title" = "Your symptoms";
-"symptom_checker.alert" = "Chronically elevated cortisol can cause lasting damage to your brain, metabolism, and immune system.";
+"symptom_checker.alert" = "Long-lasting stress can show up in your body, your mind and your relationships. Spotting your signals helps tailor your plan.";
 "symptom_checker.select_all" = "Select everything you experience";
 "symptom_checker.count_singular" = "%d symptom selected";
 "symptom_checker.count_plural" = "%d symptoms selected";
@@ -3905,7 +3905,7 @@
 "onboarding_v2.rating_proof.review_1_name" = "Sarah";
 "onboarding_v2.rating_proof.review_1_text" = "I thought I lacked discipline. I actually needed simple routines. The breathing exercises really help me after work.";
 "onboarding_v2.rating_proof.review_2_name" = "Mike";
-"onboarding_v2.rating_proof.review_2_text" = "The 66-day format makes progress feel concrete. I sleep better and feel less tension during the day.";
+"onboarding_v2.rating_proof.review_2_text" = "The 28-day plan makes progress feel concrete. I sleep better and feel less tension during the day.";
 "onboarding_v2.rating_proof.review_3_name" = "Emma";
 "onboarding_v2.rating_proof.review_3_text" = "I like that the app explains why each habit helps. It makes me want to keep going without feeling judged.";
 "onboarding_v2.rating_proof.review_4_name" = "Alex";
@@ -3914,16 +3914,16 @@
 "onboarding_v2.rating_proof.review_5_text" = "I feel calmer, especially in the morning. The reminders and tracking help me stay consistent.";
 
 // MARK: - CortisolScienceHookView
-"cortisol_hook.title" = "Here's what's happening\nin your body right now";
-"cortisol_hook.subtitle" = "Cortisol level over 24 hours";
-"cortisol_hook.legend_now" = "You now";
-"cortisol_hook.legend_66" = "In 66 days";
+"cortisol_hook.title" = "What chronic stress\ncan do to your daily rhythm";
+"cortisol_hook.subtitle" = "Illustrative cortisol curves over 24 hours";
+"cortisol_hook.legend_now" = "Chronic stress";
+"cortisol_hook.legend_66" = "Balanced rhythm";
 "cortisol_hook.level_high" = "High";
 "cortisol_hook.level_normal" = "Normal";
 "cortisol_hook.level_low" = "Low";
-"cortisol_hook.insight_1" = "At night, your cortisol stays too high — your brain never fully shuts down.";
-"cortisol_hook.insight_2" = "Your morning spike comes too early, too hard. Guaranteed crash by 3pm.";
-"cortisol_hook.insight_3" = "66 days of practice is all it takes to reverse this. Not years.";
+"cortisol_hook.insight_1" = "Under chronic stress, cortisol can stay high in the evening, which makes it harder to fall asleep.";
+"cortisol_hook.insight_2" = "In the morning the peak can be sharper, and energy drops faster during the day.";
+"cortisol_hook.insight_3" = "Regular breathing, sleep and movement help your body find a calmer rhythm.";
 "cortisol_hook.cta" = "Continue";
 
 // MARK: - FirstLaunchWelcomeView
@@ -3940,28 +3940,28 @@
 // MARK: - CustomPaywallView
 
 // Header - Personalized title (no primary goal)
-"paywall_custom.title_default" = "In 66 days, you will have\ntransformed your life.";
+"paywall_custom.title_default" = "In 28 days,\nyou'll have built new habits.";
 
 // Header - Personalized titles by goal
-"paywall_custom.title_sleep" = "In 66 days,\nyou'll sleep soundly again.";
-"paywall_custom.title_stress" = "In 66 days,\nyour cortisol will be under control.";
-"paywall_custom.title_energy" = "In 66 days,\nyou'll have your energy back.";
-"paywall_custom.title_focus" = "In 66 days,\nyou'll focus effortlessly.";
-"paywall_custom.title_balance" = "In 66 days,\nyou'll find your balance.";
+"paywall_custom.title_sleep" = "In 28 days,\nyou'll be on your way to better sleep.";
+"paywall_custom.title_stress" = "In 28 days,\nyou'll handle stress better.";
+"paywall_custom.title_energy" = "In 28 days,\nyou'll have more everyday energy.";
+"paywall_custom.title_focus" = "In 28 days,\nfocusing will come more easily.";
+"paywall_custom.title_balance" = "In 28 days,\nyou'll have found more balance.";
 
 // Promise section
-"paywall_custom.promise_subtitle" = "Your destiny awaits. You will unlock\nyour true potential on:";
+"paywall_custom.promise_subtitle" = "Your 28-day plan ends on:";
 
 // Plan toggle
 "paywall_custom.plan_without" = "Without CortiFree";
 
 // Date transformation section
 "paywall_custom.if_start_today" = "If you start today";
-"paywall_custom.transform_subtitle" = "You will transform your life and become\nthe best version of yourself by:";
+"paywall_custom.transform_subtitle" = "If you follow your plan, your first habits\nwill be in place by:";
 
 // Features section
 "paywall_custom.feature_program_title" = "Personalized program";
-"paywall_custom.feature_program_desc" = "A plan adapted to your level, updated weekly.";
+"paywall_custom.feature_program_desc" = "A 28-day plan based on your answers, which you can change at any time.";
 "paywall_custom.feature_tasks_title" = "Task planning";
 "paywall_custom.feature_tasks_desc" = "Science-based habits to help you daily.";
 "paywall_custom.feature_tracking_title" = "Progress tracking";
@@ -3970,14 +3970,14 @@
 "paywall_custom.feature_journal_desc" = "Record your thoughts and emotions to know yourself better.";
 
 // Radar chart section
-"paywall_custom.radar_title" = "%@'s improvement in 66 days";
+"paywall_custom.radar_title" = "%@'s progress over 28 days";
 
 // Radar labels
 "paywall_custom.radar_label_global" = "Overall";
 "paywall_custom.radar_label_serenity" = "Serenity";
 "paywall_custom.radar_label_sleep" = "Sleep";
 "paywall_custom.radar_label_energy" = "Energy";
-"paywall_custom.radar_label_balance" = "Glow";
+"paywall_custom.radar_label_balance" = "Balance";
 
 // Floating CTA
 "paywall_custom.cta_start" = "Start my program";
@@ -4018,15 +4018,15 @@
 // Symptom fix strings - Physical
 "paywall_custom.fix_sleep" = "You sleep deeply and wake up actually rested";
 "paywall_custom.fix_fatigue" = "Chronic fatigue fades, your energy holds all day long";
-"paywall_custom.fix_headaches" = "Headaches ease as your cortisol comes back down";
+"paywall_custom.fix_headaches" = "You release the tension weighing on your head and neck";
 "paywall_custom.fix_tension" = "Physical tension releases, your body stops being on high alert";
-"paywall_custom.fix_weight" = "Your metabolism rebalances when cortisol stops overloading it";
+"paywall_custom.fix_weight" = "You look after your body with steadier habits";
 "paywall_custom.fix_heart" = "Your heart rate steadies, breathing becomes your most powerful tool";
 
 // Symptom fix strings - Social
 "paywall_custom.fix_isolation" = "You rediscover the desire for connection without forcing it";
 "paywall_custom.fix_conflicts" = "Your relationships ease when you stop running on edge";
-"paywall_custom.fix_interest" = "Your passions return when cortisol stops stealing your energy";
+"paywall_custom.fix_interest" = "Your interests come back as your energy returns";
 "paywall_custom.fix_communication" = "You communicate better when your nervous system is regulated";
 "paywall_custom.fix_impatience" = "You find gentleness again with the people who matter most";
 
@@ -4035,9 +4035,9 @@
 "paywall_custom.fallback_sleep" = "You sleep and wake up actually rested";
 "paywall_custom.fallback_energy" = "Your energy holds all day without crashing";
 "paywall_custom.fallback_focus" = "Your focus returns, effortless flow state";
-"first_launch.cta_sub" = "Free quiz · 5 minutes";
+"first_launch.cta_sub" = "Free quiz · 4 minutes";
 "editprofile.first_name_required" = "Enter a first name before saving your profile.";
-"first_launch.mascot_intro" = "Hey, I'm Milo, your personal companion here to help you rediscover your glow, serenity, and focus. I have a few questions for you so I can create your personalized plan.";
+"first_launch.mascot_intro" = "Hey, I'm Milo, your personal companion here to help you find calm, energy and focus again. I have a few questions for you so I can create your personalized plan.";
 "first_launch.mascot_greeting" = "Hey, I'm Milo";
 "first_launch.mascot_role" = "Your personal guide to feel calmer, sleep better, and focus.";
 "first_launch.mascot_plan" = "Answer a few questions. I’ll create your plan.";
@@ -4173,12 +4173,12 @@
 "inline.notificationservice.06" = "Your plan is almost ready";
 "inline.notificationservice.07" = "2 min left to discover your personalized stress profile";
 "inline.notificationservice.08" = "You deserve to sleep better tonight";
-"inline.notificationservice.09" = "Your 66-day journey is waiting — start now";
+"inline.notificationservice.09" = "Your 28-day plan is waiting — start now";
 "inline.notificationservice.10" = "Every day without action, stress builds up";
-"inline.notificationservice.11" = "Pick up where you left off — 66 days to change everything";
+"inline.notificationservice.11" = "Pick up where you left off — your 28-day plan is ready";
 "inline.notificationservice.12" = "3-day free trial 🎁";
 "inline.notificationservice.13" = "No commitment — cancel anytime. Your body will thank you.";
-"inline.notificationservice.14" = "Imagine yourself in 66 days";
+"inline.notificationservice.14" = "Imagine yourself in 28 days";
 "inline.notificationservice.15" = "Calmer. Better rested. More focused. It's possible.";
 "inline.notificationservice.16" = "Cortisol doesn't regulate itself";
 "inline.notificationservice.17" = "A neuroscience-based program, made for you. Try it free.";
@@ -4187,7 +4187,7 @@
 "inline.notificationservice.20" = "Stress doesn't take a break";
 "inline.notificationservice.21" = "But you can learn to manage it. Your program is ready.";
 "inline.notificationservice.22" = "We're holding your spot 🎯";
-"inline.notificationservice.23" = "Your 66-day cortisol reset plan is still available";
+"inline.notificationservice.23" = "Your 28-day stress plan is still available";
 "inline.notificationservice.24" = "3 days in a row! 🔥";
 "inline.notificationservice.25" = "You're building the habit! Keep it up";
 "inline.notificationservice.26" = "1 full week! 🎉";
@@ -4556,6 +4556,20 @@
 "plan.next.title" = "Next step";
 "plan.next.start" = "Start";
 "plan.next.all_done" = "Day complete, well done!";
+"plan.edit.button" = "Edit";
+"plan.edit.done" = "Done";
+"plan.edit.swap" = "Replace";
+"plan.edit.remove" = "Remove";
+"plan.edit.add" = "Add an exercise";
+"plan.edit.updated" = "Plan updated";
+"plan.edit.undo" = "Undo";
+"plan.swap.title" = "Replace";
+"plan.swap.subtitle" = "Pick an alternative to “%@”, suited to your goal.";
+"plan.swap.empty" = "No alternative available right now.";
+"plan.swap.exclude" = "Don’t suggest it again";
+"plan.swap.exclude_subtitle" = "It won’t come back in your next days.";
+"plan.add.title" = "Add to your day";
+"plan.add.subtitle" = "Ideas picked for your goal.";
 "plan.short.title" = "Short on time today?";
 "plan.short.subtitle" = "Switch to short versions: the essentials in a few minutes.";
 "plan.short.badge" = "Short version";
@@ -4566,13 +4580,13 @@
 "plan.action.start" = "Start the exercise";
 "plan.action.open" = "See the habit";
 "plan.close" = "Close";
-"plan.regenerate" = "Rebuild my plan";
+"plan.regenerate" = "Rebuild upcoming days";
 "plan.change.button" = "Change goal";
 "plan.change.title" = "Choose your goal";
-"plan.change.subtitle" = "Your plan will be rebuilt and restart at day 1. Your streak and history are kept.";
+"plan.change.subtitle" = "Your upcoming days will be rebuilt around this goal. You keep your current day, streak and history.";
 "plan.change.subtitle_cycle" = "Your new 28-day cycle will be built around this goal.";
 "plan.change.current" = "Current";
-"plan.change.confirm" = "Create my plan";
+"plan.change.confirm" = "Update my plan";
 "plan.finished.title" = "You completed your 28 days!";
 "plan.finished.subtitle" = "Well done for showing up. Shall we keep going?";
 "plan.finished.same" = "New cycle: %@";
@@ -4605,7 +4619,7 @@
 "library.v2.search" = "A session, a need…";
 "library.v2.continue" = "Continue";
 "library.v2.quick_start" = "Quick start";
-"library.v2.quick_hint" = "Starts a short session";
+"library.v2.quick_hint" = "Shows the sessions for this goal";
 "library.v2.quick.stressSOS" = "Stress";
 "library.v2.quick.sleep" = "Sleep";
 "library.v2.quick.anxiety" = "Anxiety";
@@ -4645,7 +4659,7 @@
 "library.collection.downloads" = "Downloads";
 "library.collection.favorites" = "Favorites";
 "library.collection.recent.empty" = "Sessions you listen to will appear here.";
-"library.collection.downloads.empty" = "Sessions already prepared on your phone will appear here. They start instantly, even offline.";
+"library.collection.downloads.empty" = "Tap the download arrow on a meditation, breathing exercise or sound to keep it here, ready even offline.";
 "library.collection.favorites.empty" = "Tap the heart on a session to find it here.";
 
 /* Breathing v2 */
@@ -4679,3 +4693,310 @@
 "settings.delete.not_signed_in" = "Sign in to delete your account.";
 "settings.delete.recent_login_required" = "For security, please sign out, sign back in, then try deleting your account again.";
 "achievements.habits" = "Habits";
+
+/* Apple Health & anxiety check (GAD-7) */
+"anxiety_check.card.title" = "Your anxiety check";
+"anxiety_check.card.subtitle_first" = "1 minute to tailor your plan to how you really feel.";
+"anxiety_check.card.subtitle_progress" = "2 weeks have passed: see how your anxiety has evolved.";
+"anxiety_check.card.start" = "Start";
+"anxiety_check.card.later" = "Later";
+"anxiety_check.title" = "Anxiety check";
+"anxiety_check.intro_first" = "7 short questions about the last 2 weeks. Your answers fine-tune your plan.";
+"anxiety_check.intro_progress" = "7 short questions about the last 2 weeks, to measure how far you've come since the start of your plan.";
+"anxiety_check.duration" = "About 1 minute";
+"anxiety_check.begin" = "Begin";
+"anxiety_check.back" = "Back";
+"anxiety_check.progress" = "Question %d of %d";
+"anxiety_check.prompt" = "Over the last 2 weeks, how often have you been bothered by the following?";
+"anxiety_check.q1" = "Feeling nervous, anxious, or on edge";
+"anxiety_check.q2" = "Not being able to stop or control worrying";
+"anxiety_check.q3" = "Worrying too much about different things";
+"anxiety_check.q4" = "Trouble relaxing";
+"anxiety_check.q5" = "Being so restless that it's hard to sit still";
+"anxiety_check.q6" = "Becoming easily annoyed or irritable";
+"anxiety_check.q7" = "Feeling afraid, as if something awful might happen";
+"anxiety_check.answer.0" = "Not at all";
+"anxiety_check.answer.1" = "Several days";
+"anxiety_check.answer.2" = "More than half the days";
+"anxiety_check.answer.3" = "Nearly every day";
+"anxiety_check.severity.minimal" = "Minimal";
+"anxiety_check.severity.mild" = "Mild";
+"anxiety_check.severity.moderate" = "Moderate";
+"anxiety_check.severity.severe" = "High";
+"anxiety_check.severity.minimal.description" = "Your answers show little anxiety right now. Your plan helps you keep it that way.";
+"anxiety_check.severity.mild.description" = "Your answers show mild anxiety. Regular practice can really help bring it down.";
+"anxiety_check.severity.moderate.description" = "Your answers show moderate anxiety. Your plan puts more emphasis on calming practices. If it weighs on your daily life, talking to a professional can help.";
+"anxiety_check.severity.severe.description" = "Your answers show high anxiety. Your plan starts very gently. This is not a diagnosis, but we encourage you to talk to a doctor or a therapist.";
+"anxiety_check.result.title" = "Your result";
+"anxiety_check.result.imported" = "Imported from Apple Health";
+"anxiety_check.result.plan_adjusted" = "Your plan has been adjusted to this result.";
+"anxiety_check.result.done" = "Done";
+"anxiety_check.result.lower" = "Down from %d at the start of your plan. Well done!";
+"anxiety_check.result.same" = "Same as at the start of your plan (%d). Keep going, it takes time.";
+"anxiety_check.result.higher" = "Up from %d at the start of your plan. Hard periods happen: be gentle with yourself.";
+"anxiety_check.support.title" = "You don't have to face this alone";
+"anxiety_check.support.body" = "A doctor, psychologist or therapist can help you. If you feel in danger, call your local emergency number (911 in the US, 112 in Europe), or call or text 988 in the US.";
+"anxiety_check.disclaimer" = "GAD-7 screening questionnaire. It does not replace a medical diagnosis or advice.";
+"health.connect.title" = "Connect Apple Health";
+"health.connect.subtitle" = "Import a questionnaire you already took in Health, and save your checks, moods and mindful minutes there. Your health data stays on your iPhone.";
+"health.connect.button" = "Connect";
+"settings.health.title" = "Apple Health";
+"settings.health.subtitle" = "Anxiety checks, moods and mindful minutes (stays on your iPhone)";
+"plan.why.anxiety_check" = "Your anxiety check was taken into account to set the pace and the calming practices of your plan.";
+
+// Profile v2
+"profile.v2.streak" = "Streak";
+"profile.v2.minutes" = "Calm min";
+"profile.v2.badges" = "Badges";
+"profile.v2.why.goal" = "My goal";
+"profile.v2.plan.today_done" = "%d/%d done today";
+"profile.v2.plan.finished" = "Plan complete, well done!";
+"profile.v2.plan.cta" = "Continue my plan";
+"profile.v2.plan.cta_finished" = "See what's next";
+"profile.v2.sessions.title" = "My sessions";
+"profile.v2.sessions.empty" = "Add your favorite sessions with ♡ to find them here.";
+"profile.v2.sessions.explore" = "Explore the library";
+"profile.v2.see_all" = "See all";
+"profile.v2.mood.title" = "My mood";
+"profile.v2.mood.subtitle" = "Your last 7 days";
+"profile.v2.mood.empty" = "Do your daily check-in to track your mood here.";
+"profile.v2.mood.write" = "Write";
+"profile.v2.mood.history" = "History";
+"profile.v2.more.title" = "More";
+"profile.v2.more.milo" = "Talk to Milo";
+"profile.v2.more.milo_sub" = "Your companion, here anytime";
+"profile.v2.more.invite" = "Invite someone";
+"profile.v2.more.invite_sub" = "Share CortiFree with someone who needs it";
+"profile.v2.more.rate" = "Rate CortiFree";
+"profile.v2.more.rate_sub" = "Your feedback helps us a lot";
+"profile.v2.more.share_message" = "I use CortiFree to ease my stress, give it a try:";
+
+/* Celebrations */
+"celebration.streak.title_first" = "Streak started!";
+"celebration.streak.title" = "%d days in a row";
+"celebration.streak.subtitle" = "First exercise of the day done";
+"celebration.day.title" = "Day complete!";
+"celebration.day.subtitle" = "%d exercises · %d min for you";
+"celebration.milestone.share" = "Share";
+"celebration.milestone.share_text" = "I unlocked “%@” on CortiFree.";
+
+/* Milo: release safety (auth, consent, errors) */
+"assistant.error.unavailable" = "Milo is unavailable right now. Please try again in a moment.";
+"assistant.error.signin" = "Please sign in again to keep chatting with Milo.";
+"assistant.error.offline" = "You seem to be offline. Check your connection and try again.";
+"assistant.error.invalid" = "Milo sent an unexpected reply. Please try again.";
+"assistant.signin.required" = "Milo is available once you’re signed in. Create a free account or sign in from your Profile to start chatting.";
+"assistant.consent.title" = "Before you chat with Milo";
+"assistant.consent.point.provider" = "Your messages are sent through CortiFree’s server to an AI provider (DeepSeek) to generate Milo’s replies.";
+"assistant.consent.point.plan" = "To personalize answers, a short summary of your CortiFree plan (goal, exercises, progress) is sent along with your messages.";
+"assistant.consent.point.diagnosis" = "Milo offers general wellbeing information, not a diagnosis or medical advice. In an emergency, contact your local emergency services.";
+"assistant.consent.point.revoke" = "You can withdraw this consent at any time in Settings › Privacy.";
+"assistant.consent.privacy" = "Read the privacy policy";
+"assistant.consent.accept" = "I agree, continue";
+"assistant.consent.decline" = "Not now";
+"settings.privacy.milo" = "Milo AI assistant";
+"settings.privacy.milo_subtitle" = "Allow your messages and a plan summary to be processed by DeepSeek";
+
+// MARK: - Auth & onboarding demo
+"auth.sign_up" = "Sign up";
+"auth.signup_subtitle" = "Join CortiFree and start your wellbeing journey";
+"auth.signup_with_apple" = "Sign up with Apple";
+"auth.signup_with_google" = "Sign up with Google";
+"auth.signup_with_email" = "Sign up with Email";
+"auth.already_account_question" = "Already have an account?";
+"auth.welcome_back" = "Welcome back!";
+"auth.signin_subtitle" = "Sign in to continue your journey";
+"auth.signin_with_apple" = "Sign in with Apple";
+"auth.signin_with_email" = "Sign in with Email";
+"auth.no_account_question" = "Don't have an account yet?";
+"auth.enter_details" = "Enter your details";
+"auth.enter_credentials" = "Enter your credentials";
+"auth.first_name_placeholder" = "Your first name";
+"auth.email_placeholder" = "your@email.com";
+"auth.password_placeholder" = "Min. 6 characters";
+"auth.confirm_placeholder" = "Confirm";
+"auth.forgot_password" = "Forgot password?";
+"auth.other_method" = "Other method";
+"auth.google_title" = "Google sign-in";
+"auth.google_subtitle" = "Use your Google account to continue";
+"auth.apple_title" = "Apple sign-in";
+"auth.apple_subtitle" = "Use your Apple ID to continue";
+"auth.error.google_launch" = "Couldn't start Google Sign-In";
+"auth.error.google_config" = "Google configuration missing";
+"auth.error.missing_info" = "Couldn't retrieve your account information";
+"auth.error.apple" = "Apple authentication error";
+"auth.error.token" = "Couldn't retrieve the sign-in token";
+"auth.error.generic" = "Error: %@";
+"auth.default_user_name" = "User";
+"auth.reset.email_sent_title" = "Email sent!";
+"auth.reset.email_sent_message" = "Check your inbox and follow the instructions to reset your password.";
+"auth.reset.instructions" = "Enter your email and we'll send you a link to reset your password.";
+"auth.reset.send_link" = "Send link";
+"common.done" = "Done";
+"common.retry" = "Retry";
+"onboarding_v2.breath_demo.nice_work" = "Nice work";
+"onboarding_v2.breath_demo.take_a_breath" = "Take a breath";
+"onboarding_v2.breath_demo.ready" = "Ready?";
+"onboarding_v2.breath_demo.rhythm" = "4 in / 6 out";
+"onboarding_v2.breath_demo.continue" = "Continue";
+"onboarding_v2.breath_demo.inhale" = "Inhale";
+"onboarding_v2.breath_demo.exhale" = "Exhale";
+"onboarding_v2.breath_demo.done_subtitle" = "You just created a calm moment.";
+"onboarding_v2.breath_demo.instructions" = "Follow the curve: breathe in for 4 seconds, then out for 6.";
+"onboarding_v2.breath_demo.begin" = "Begin breathing (30s)";
+
+// MARK: - Auth & onboarding demo
+"onboarding_v2.testimonial.4_name" = "Lucas";
+"onboarding_v2.testimonial.4_age" = "35 years old";
+"onboarding_v2.testimonial.4_text" = "My colleagues noticed I was calmer at work.";
+"antistress.recommendation.best" = "Best for you right now";
+"antistress.recommendation.more" = "Other options";
+"antistress.kind.breathing" = "Breathing";
+"antistress.kind.meditation" = "Meditation";
+"antistress.kind.movement" = "Movement";
+"antistress.kind.grounding" = "Grounding";
+"antistress.kind.sound" = "Sound";
+
+/* Milo welcome, exercise cards and downloads */
+"assistant.welcome.subtitle" = "What’s on your mind? Tap a line below or write it the way you’d say it.";
+"assistant.greeting.morning" = "Good morning";
+"assistant.greeting.day" = "Hi there";
+"assistant.greeting.evening" = "Good evening";
+"assistant.greeting.night" = "Still awake?";
+"assistant.suggest.start_calm" = "Help me start the day calmly";
+"assistant.suggest.woke_anxious" = "I woke up feeling anxious";
+"assistant.suggest.focus_today" = "I need to focus this morning";
+"assistant.suggest.stressed_now" = "I’m stressed and need a quick reset";
+"assistant.suggest.work_break" = "I need a break from work";
+"assistant.suggest.cant_focus" = "I can’t concentrate";
+"assistant.suggest.body_tense" = "My body feels tense";
+"assistant.suggest.unwind" = "I want to unwind after today";
+"assistant.suggest.racing_mind" = "My mind won’t stop racing";
+"assistant.suggest.hard_day" = "Today was a hard day";
+"assistant.suggest.sleep_better" = "I want to sleep better";
+"assistant.suggest.cant_fall_asleep" = "I can’t fall asleep";
+"assistant.suggest.calm_sound" = "Play something calming to fall asleep";
+"assistant.card.start" = "Start";
+"assistant.card.pause" = "Pause";
+"assistant.card.kind.breathing" = "Breathing";
+"assistant.card.kind.meditation" = "Guided meditation";
+"assistant.card.kind.sound" = "Sound";
+"library.download" = "Download";
+"library.downloading" = "Downloading…";
+"library.downloaded" = "Downloaded";
+"library.downloaded.remove" = "Remove from downloads";
+"library.downloads.subtitle" = "Ready on your phone, even offline.";
+"library.downloads.sound_loop" = "Ambient sound · loop";
+
+/* Milo details menu */
+"milo.menu.open" = "Milo details and settings";
+"milo.menu.done" = "Done";
+"milo.menu.cancel" = "Cancel";
+"milo.menu.remaining" = "%d messages left today";
+"milo.menu.section.conversation" = "Conversation";
+"milo.menu.new" = "New conversation";
+"milo.menu.history" = "Conversation history";
+"milo.menu.temporary" = "Temporary conversation";
+"milo.menu.temporary.note" = "This conversation won’t be saved in your history on this phone.";
+"milo.menu.section.personalize" = "Personalize";
+"milo.menu.memory" = "What Milo remembers";
+"milo.menu.memory.empty" = "Nothing yet";
+"milo.menu.length" = "Reply length";
+"milo.menu.length.short" = "Short";
+"milo.menu.length.detailed" = "Detailed";
+"milo.menu.cards" = "Suggest exercises";
+"milo.menu.cards.note" = "Milo adds a meditation, breathing exercise or sound you can start right away.";
+"milo.menu.section.privacy" = "Privacy";
+"milo.menu.consent" = "Allow Milo";
+"milo.menu.consent.note" = "Your messages are sent through CortiFree’s server to an AI provider. Turn this off to stop.";
+"milo.menu.about" = "About Milo";
+"milo.menu.delete" = "Delete this conversation";
+"milo.menu.delete.confirm" = "Delete this conversation?";
+"milo.menu.delete.message" = "It will be removed from this phone. Copies already processed by the AI provider are not affected.";
+"milo.menu.delete.action" = "Delete";
+"milo.history.empty" = "Your past conversations with Milo will appear here.";
+"milo.history.clear" = "Clear all";
+"milo.history.clear.confirm" = "Clear your whole history with Milo?";
+"milo.memory.intro" = "Tell Milo what’s useful to know about you: your rhythm, what helps, what to avoid. Milo uses it to tailor every reply.";
+"milo.memory.placeholder" = "E.g. I work night shifts. Box breathing helps me. I’d rather not talk about my weight.";
+"milo.memory.clear" = "Erase memory";
+"milo.memory.save" = "Save";
+"milo.memory.privacy" = "Stored on this phone and sent with your messages to personalize replies. Don’t include health details you’d rather keep private.";
+"milo.about.title" = "Milo is an AI companion that helps you slow down and find the right exercise for the moment.";
+"milo.about.not_medical" = "Milo doesn’t diagnose, treat, or replace a health professional. Its replies can be wrong: trust your own judgment.";
+"milo.about.data" = "Your conversation history stays on this phone. Messages, a short summary of your plan and what Milo remembers are sent through CortiFree’s server to an AI provider to write each reply.";
+"milo.about.emergency" = "If you’re in danger or in distress, contact your local emergency services or a crisis line right away.";
+
+/* Onboarding audit fixes */
+"stress_pattern.load_above" = "Your stress load is estimated at **%1$d/100**, above a calm profile (%2$d/100).";
+"stress_pattern.load_near" = "Your stress load is estimated at **%1$d/100**, close to a calm profile (%2$d/100).";
+"onboarding_v2.sixty_days.plan_title" = "Your plan: 28 days, renewable";
+"onboarding_v2.sixty_days.plan_subtitle" = "Each week has a theme. At the end, you can start a new cycle to keep building your habits.";
+"onboarding_v2.sources.lally_summary" = "On average 66 days (18 to 254) for a daily behaviour to become automatic.";
+"onboarding_v2.sources.gardner_summary" = "Repeating an action in the same context gradually makes it automatic.";
+"onboarding_v2.sources.wood_summary" = "Habits form through repetition in stable contexts.";
+"onboarding_v2.sources.open_hint" = "Opens the study in your browser";
+"onboarding_v2.comparison.day28" = "Day 28";
+"onboarding_v2.week_progress.start_note" = "Your starting point, based on your quiz answers.";
+"onboarding_v2.week_progress.projection_note" = "An indicative projection with regular practice. Everyone's path is different.";
+"onboarding_v2.habits_progress.breathing_stat_fmt" = "will practise mindful breathing for %@ a week.";
+"onboarding_v2.habits_progress.meditation_stat_fmt" = "will meditate for %@ a week.";
+"onboarding_v2.habits_progress.journal_stat_fmt" = "will write in your journal %d times a week.";
+"onboarding_v2.habits_progress.sport_stat_fmt" = "will move for %@ a week.";
+"onboarding_v2.habits_progress.nature_stat_fmt" = "will spend %@ outdoors in nature each week.";
+"onboarding_v2.habits_progress.social_stat_fmt" = "will make time for the people you love %d times a week.";
+"paywall_custom.radar_title_generic" = "Your progress over 28 days";
+"paywall_custom.feature_library_title" = "Guided library";
+"paywall_custom.feature_library_desc" = "100+ guided meditations, breathing exercises and calming sounds.";
+"paywall_custom.feature_milo_title" = "Milo, your assistant";
+"paywall_custom.feature_milo_desc" = "Ask him anything, anytime: he knows your plan and suggests the right exercise.";
+"onboarding_v2.auth.generic_error" = "Sign-in didn't work. Check your email and password, then try again.";
+"first_launch.have_account" = "I already have an account";
+"onboarding_v2.reassurance.support" = "If things feel really hard right now, you don't have to handle it alone: talk to someone you trust or a doctor, or contact a local helpline. In an emergency, call your local emergency number.";
+"onboarding_v2.notifications.time_label" = "Reminder time";
+
+/* Milo: bring your story (import a chat or a Health PDF) */
+"milo.import.title" = "Bring your story to Milo";
+"milo.import.subtitle" = "Already told ChatGPT or Claude everything? Share it with Milo so it knows you from day one.";
+"milo.import.privacy" = "Milo reads it once to write a short summary. Only that summary is kept, and you can delete it anytime in Milo's memory.";
+"milo.import.ask.title" = "Ask your AI about you";
+"milo.import.ask.note" = "The fastest way: your AI already knows you.";
+"milo.import.ask.step1" = "Open your AI: the question is already written, just send it.";
+"milo.import.ask.step2" = "Copy its answer, come back and paste it here.";
+"milo.import.ask.copy" = "Copy the question";
+"milo.import.ask.prompt" = "Based on everything you know about me from our conversations, describe in a few honest paragraphs what stresses me, how I sleep, what I keep worrying about and what I have been going through lately. No advice, just what you have noticed about me.";
+"milo.import.paste.title" = "Paste a conversation";
+"milo.import.paste.note" = "Copy a chat with ChatGPT, Claude, Gemini… or your own notes.";
+"milo.import.file.title" = "Import a screenshot, PDF or file";
+"milo.import.file.note" = "Your Apple Health anxiety result (a screenshot works), a saved conversation or a PDF.";
+"milo.import.file.screenshot" = "Screenshot";
+"milo.import.file.button" = "File";
+"milo.import.error.unreadable" = "Milo couldn't read this file. Try a PDF or a text file.";
+"milo.import.error.empty" = "There isn't enough text here for Milo to learn something about you.";
+"milo.import.error.not_personal" = "Milo didn't find anything about you in this document. Try a conversation where you talk about yourself.";
+"milo.import.reading.title" = "Milo is reading…";
+"milo.import.reading.step.read" = "Reading your conversation";
+"milo.import.reading.step.health" = "Reading your Health export";
+"milo.import.reading.step.notice" = "Noticing what weighs on you";
+"milo.import.reading.step.connect" = "Connecting it to your plan";
+"milo.import.topic.sleep" = "Sleep";
+"milo.import.topic.anxiety" = "Anxiety";
+"milo.import.topic.work" = "Work";
+"milo.import.topic.studies" = "Studies";
+"milo.import.topic.relationships" = "Relationships";
+"milo.import.topic.family" = "Family";
+"milo.import.topic.overthinking" = "Overthinking";
+"milo.import.topic.energy" = "Energy";
+"milo.import.topic.self_esteem" = "Self-esteem";
+"milo.import.topic.focus" = "Focus";
+"milo.import.result.eyebrow" = "Milo read it";
+"milo.import.result.title" = "Here's what I understood";
+"milo.import.result.first_step" = "Your first step";
+"milo.import.result.disclaimer" = "Milo is a wellbeing companion, not a doctor: this summary is not a diagnosis.";
+"milo.import.result.keep" = "Keep it and talk with Milo";
+"milo.import.result.discard" = "Don't keep it";
+"milo.import.banner.title" = "Bring your story to Milo";
+"milo.import.banner.title_known" = "Milo knows your story";
+"milo.import.banner.subtitle" = "Share a ChatGPT or Claude chat, or your Apple Health result.";
+"milo.memory.insight.title" = "What Milo learned from your import";
+"milo.memory.insight.delete" = "Delete this summary";

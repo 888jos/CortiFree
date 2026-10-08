@@ -177,3 +177,14 @@ extension Exercise {
         return GuidedSessionCatalog.session(forLegacyID: id)
     }
 }
+
+// MARK: - Ambient sound artwork
+
+extension Exercise {
+    /// Photo of an ambient sound (rain, ocean…), used by the library tiles, the mini player and the lock screen.
+    var soundImageName: String {
+        let images = ["rain": "sound_rain", "ocean": "sound_ocean", "fire": "sound_fire", "whitenoise": "sound_whitenoise",
+                      "wind": "sound_morning", "forest": "sound_forest", "stream": "sound_stream", "night": "sound_night"]
+        return images[id] ?? "sound_rain"
+    }
+}

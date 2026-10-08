@@ -8,8 +8,6 @@
 import Foundation
 import RevenueCat
 import Combine
-import FirebaseFirestore
-import FirebaseAuth
 
 /// Centralized manager for RevenueCat SDK operations
 /// Handles subscription management, entitlement checking, and customer info
@@ -201,11 +199,15 @@ class RevenueCatManager: ObservableObject {
         // Mark that we've received a definitive answer from RevenueCat
         isPremiumStatusReady = true
 
-        // Sync isPaid status to Firestore
-        if let userId = Auth.auth().currentUser?.uid {
-            let db = Firestore.firestore()
-            db.collection("users").document(userId)
-                .setData(["isPaid": hasPremiumEntitlement], merge: true)
+        // Informational mirror in Convex. Server-side access must still trust RevenueCat.
+        if Auth.auth().currentUser != nil {
+            Task {
+                let _: JSONValue? = try? await ConvexBackend.shared.call(
+                    .mutation,
+                    path: "profile:setSubscriptionStatus",
+                    args: ["isPaid": hasPremiumEntitlement, "entitlementId": entitlementID]
+                )
+            }
         }
 
         #if DEBUG

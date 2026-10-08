@@ -8,11 +8,27 @@
 
 import SwiftUI
 import AuthenticationServices
-import FirebaseAuth
-import FirebaseFirestore
 import Lottie
 import GoogleSignIn
 import GoogleSignInSwift
+import CryptoKit
+
+private func authRandomNonce(length: Int = 32) -> String {
+    let characters = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+    var result = ""
+    while result.count < length {
+        var byte: UInt8 = 0
+        guard SecRandomCopyBytes(kSecRandomDefault, 1, &byte) == errSecSuccess else { continue }
+        if Int(byte) < characters.count * (256 / characters.count) {
+            result.append(characters[Int(byte) % characters.count])
+        }
+    }
+    return result
+}
+
+private func authSHA256(_ input: String) -> String {
+    SHA256.hash(data: Data(input.utf8)).map { String(format: "%02x", $0) }.joined()
+}
 
 struct AuthView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -76,11 +92,11 @@ struct AuthSignUpView: View {
             VStack(spacing: 0) {
                 // Title
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Créer un compte")
+                    Text("auth.create_account".localized)
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
 
-                    Text("Rejoignez CortiFree et commencez votre parcours bien-être")
+                    Text("auth.signup_subtitle".localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.85))
                 }
@@ -107,7 +123,7 @@ struct AuthSignUpView: View {
                                 .font(.system(size: 20))
                                 .foregroundColor(.white)
 
-                            Text("S'inscrire avec Apple")
+                            Text("auth.signup_with_apple".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -130,7 +146,7 @@ struct AuthSignUpView: View {
                                 .scaledToFit()
                                 .frame(width: 22, height: 22)
 
-                            Text("S'inscrire avec Google")
+                            Text("auth.signup_with_google".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -153,7 +169,7 @@ struct AuthSignUpView: View {
                                 .font(.system(size: 18))
                                 .foregroundColor(.white)
 
-                            Text("S'inscrire avec Email")
+                            Text("auth.signup_with_email".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -171,11 +187,11 @@ struct AuthSignUpView: View {
                     switchToLogin()
                 }) {
                     HStack(spacing: 4) {
-                        Text("Déjà un compte ?")
+                        Text("auth.already_account_question".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.7))
 
-                        Text("Se connecter")
+                        Text("auth.sign_in".localized)
                             .font(.custom("Poppins-SemiBold", size: 14))
                             .foregroundColor(.white)
                     }
@@ -247,11 +263,11 @@ struct AuthLoginView: View {
             VStack(spacing: 0) {
                 // Title
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Bon retour !")
+                    Text("auth.welcome_back".localized)
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
 
-                    Text("Connectez-vous pour continuer votre parcours")
+                    Text("auth.signin_subtitle".localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.85))
                 }
@@ -278,7 +294,7 @@ struct AuthLoginView: View {
                                 .font(.system(size: 20))
                                 .foregroundColor(.white)
 
-                            Text("Se connecter avec Apple")
+                            Text("auth.signin_with_apple".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -301,7 +317,7 @@ struct AuthLoginView: View {
                                 .scaledToFit()
                                 .frame(width: 22, height: 22)
 
-                            Text("Se connecter avec Google")
+                            Text("auth.sign_in_google".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -324,7 +340,7 @@ struct AuthLoginView: View {
                                 .font(.system(size: 18))
                                 .foregroundColor(.white)
 
-                            Text("Se connecter avec Email")
+                            Text("auth.signin_with_email".localized)
                                 .font(.custom("Poppins-Medium", size: 16))
                                 .foregroundColor(.white)
                         }
@@ -342,11 +358,11 @@ struct AuthLoginView: View {
                     switchToSignUp()
                 }) {
                     HStack(spacing: 4) {
-                        Text("Pas encore de compte ?")
+                        Text("auth.no_account_question".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.7))
 
-                        Text("Créer un compte")
+                        Text("auth.create_account".localized)
                             .font(.custom("Poppins-SemiBold", size: 14))
                             .foregroundColor(.white)
                     }
@@ -456,11 +472,11 @@ struct AuthEmailFormView: View {
 
                     // Title
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(isSignUp ? "Créer un compte" : "Connexion")
+                        Text(isSignUp ? "auth.create_account".localized : "auth.login".localized)
                             .font(.custom("Poppins-Bold", size: 28))
                             .foregroundColor(.white)
 
-                        Text(isSignUp ? "Entrez vos informations" : "Entrez vos identifiants")
+                        Text(isSignUp ? "auth.enter_details".localized : "auth.enter_credentials".localized)
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(.white.opacity(0.85))
                     }
@@ -472,11 +488,11 @@ struct AuthEmailFormView: View {
                         // Username (only for sign up)
                         if isSignUp {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Prénom")
+                                Text("auth.first_name".localized)
                                     .font(.custom("Poppins-Medium", size: 14))
                                     .foregroundColor(.white)
 
-                                TextField("", text: $username, prompt: Text("Votre prénom").foregroundColor(.white.opacity(0.5)))
+                                TextField("", text: $username, prompt: Text("auth.first_name_placeholder".localized).foregroundColor(.white.opacity(0.5)))
                                     .font(.custom("Poppins-Regular", size: 16))
                                     .foregroundColor(.white)
                                     .focused($focusedField, equals: .username)
@@ -495,11 +511,11 @@ struct AuthEmailFormView: View {
 
                         // Email
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Email")
+                            Text("auth.email".localized)
                                 .font(.custom("Poppins-Medium", size: 14))
                                 .foregroundColor(.white)
 
-                            TextField("", text: $email, prompt: Text("votre@email.com").foregroundColor(.white.opacity(0.5)))
+                            TextField("", text: $email, prompt: Text("auth.email_placeholder".localized).foregroundColor(.white.opacity(0.5)))
                                 .font(.custom("Poppins-Regular", size: 16))
                                 .foregroundColor(.white)
                                 .textInputAutocapitalization(.never)
@@ -519,19 +535,19 @@ struct AuthEmailFormView: View {
 
                         // Password
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Mot de passe")
+                            Text("auth.password".localized)
                                 .font(.custom("Poppins-Medium", size: 14))
                                 .foregroundColor(.white)
 
                             HStack {
                                 if showPassword {
-                                    TextField("", text: $password, prompt: Text(isSignUp ? "Min. 6 caractères" : "••••••••").foregroundColor(.white.opacity(0.5)))
+                                    TextField("", text: $password, prompt: Text(isSignUp ? "auth.password_placeholder".localized : "••••••••").foregroundColor(.white.opacity(0.5)))
                                         .font(.custom("Poppins-Regular", size: 16))
                                         .foregroundColor(.white)
                                         .textInputAutocapitalization(.never)
                                         .focused($focusedField, equals: .password)
                                 } else {
-                                    SecureField("", text: $password, prompt: Text(isSignUp ? "Min. 6 caractères" : "••••••••").foregroundColor(.white.opacity(0.5)))
+                                    SecureField("", text: $password, prompt: Text(isSignUp ? "auth.password_placeholder".localized : "••••••••").foregroundColor(.white.opacity(0.5)))
                                         .font(.custom("Poppins-Regular", size: 16))
                                         .foregroundColor(.white)
                                         .textInputAutocapitalization(.never)
@@ -559,12 +575,12 @@ struct AuthEmailFormView: View {
                         // Confirm Password (only for sign up)
                         if isSignUp {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Confirmer le mot de passe")
+                                Text("auth.confirm_password".localized)
                                     .font(.custom("Poppins-Medium", size: 14))
                                     .foregroundColor(.white)
 
                                 HStack {
-                                    SecureField("", text: $confirmPassword, prompt: Text("Confirmez").foregroundColor(.white.opacity(0.5)))
+                                    SecureField("", text: $confirmPassword, prompt: Text("auth.confirm_placeholder".localized).foregroundColor(.white.opacity(0.5)))
                                         .font(.custom("Poppins-Regular", size: 16))
                                         .foregroundColor(.white)
                                         .textInputAutocapitalization(.never)
@@ -599,7 +615,7 @@ struct AuthEmailFormView: View {
                             HStack {
                                 Spacer()
                                 Button(action: { showResetPassword = true }) {
-                                    Text("Mot de passe oublié ?")
+                                    Text("auth.forgot_password".localized)
                                         .font(.custom("Poppins-Medium", size: 14))
                                         .foregroundColor(.white.opacity(0.8))
                                 }
@@ -642,7 +658,7 @@ struct AuthEmailFormView: View {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             } else {
-                                Text(isSignUp ? "Créer mon compte" : "Se connecter")
+                                Text(isSignUp ? "auth.create_my_account".localized : "auth.sign_in".localized)
                                     .font(.custom("Poppins-SemiBold", size: 16))
                             }
                         }
@@ -659,7 +675,7 @@ struct AuthEmailFormView: View {
                         Rectangle()
                             .fill(Color.white.opacity(0.3))
                             .frame(height: 1)
-                        Text("Autre méthode")
+                        Text("auth.other_method".localized)
                             .font(.custom("Poppins-Regular", size: 14))
                             .foregroundColor(.white.opacity(0.6))
                         Rectangle()
@@ -817,12 +833,12 @@ struct AuthGoogleView: View {
                         .scaledToFit()
                         .frame(width: 80, height: 80)
 
-                    Text("Connexion Google")
+                    Text("auth.google_title".localized)
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
-                    Text("Utilisez votre compte Google pour continuer")
+                    Text("auth.google_subtitle".localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.85))
                         .multilineTextAlignment(.center)
@@ -845,7 +861,7 @@ struct AuthGoogleView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "0A0A2E")))
                     } else {
-                        Text("Continuer avec Google")
+                        Text("auth.continue_with_google".localized)
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundColor(Color(hex: "0A0A2E"))
                     }
@@ -862,7 +878,7 @@ struct AuthGoogleView: View {
                     Rectangle()
                         .fill(Color.white.opacity(0.3))
                         .frame(height: 1)
-                    Text("Autre méthode")
+                    Text("auth.other_method".localized)
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                     Rectangle()
@@ -906,7 +922,7 @@ struct AuthGoogleView: View {
                                 .font(.system(size: 16))
                                 .foregroundColor(.white)
 
-                            Text("Email")
+                            Text("auth.email".localized)
                                 .font(.custom("Poppins-Medium", size: 14))
                                 .foregroundColor(.white)
                         }
@@ -937,13 +953,13 @@ struct AuthGoogleView: View {
 
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootViewController = windowScene.windows.first?.rootViewController else {
-            errorMessage = "Impossible de lancer Google Sign In"
+            errorMessage = "auth.error.google_launch".localized
             isLoading = false
             return
         }
 
         guard let clientID = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String else {
-            errorMessage = "Configuration Google manquante"
+            errorMessage = "auth.error.google_config".localized
             isLoading = false
             return
         }
@@ -955,7 +971,7 @@ struct AuthGoogleView: View {
             if let error = error {
                 DispatchQueue.main.async {
                     self.isLoading = false
-                    self.errorMessage = "Erreur: \(error.localizedDescription)"
+                    self.errorMessage = String(format: "auth.error.generic".localized, error.localizedDescription)
                 }
                 return
             }
@@ -964,49 +980,20 @@ struct AuthGoogleView: View {
                   let idToken = user.idToken?.tokenString else {
                 DispatchQueue.main.async {
                     self.isLoading = false
-                    self.errorMessage = "Impossible de récupérer les informations"
+                    self.errorMessage = "auth.error.missing_info".localized
                 }
                 return
             }
 
-            let credential = GoogleAuthProvider.credential(
-                withIDToken: idToken,
-                accessToken: user.accessToken.tokenString
-            )
-
             Task {
                 do {
-                    let authResult = try await Auth.auth().signIn(with: credential)
-
-                    let userData: [String: Any] = [
-                        "uid": authResult.user.uid,
-                        "email": authResult.user.email ?? "",
-                        "firstName": user.profile?.givenName ?? "Utilisateur",
-                        "displayName": user.profile?.name ?? "Utilisateur",
-                        "photoURL": user.profile?.imageURL(withDimension: 200)?.absoluteString ?? "",
-                        "createdAt": Timestamp(date: Date()),
-                        "authProvider": "google",
-                        "lastLoginAt": Timestamp(date: Date())
-                    ]
-
-                    try await Firestore.firestore()
-                        .collection("users")
-                        .document(authResult.user.uid)
-                        .setData(userData, merge: true)
-
-                    UserDefaults.standard.set(user.profile?.givenName ?? "Utilisateur", forKey: "userFirstName")
-
-                    // Vérifier si l'utilisateur a déjà complété l'onboarding
-                    let userDoc = try await Firestore.firestore()
-                        .collection("users")
-                        .document(authResult.user.uid)
-                        .getDocument()
-
-                    if let data = userDoc.data(),
-                       let onboardingCompleted = data["onboardingCompleted"] as? Bool,
-                       onboardingCompleted {
-                        UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
-                    }
+                    let signedIn = try await Auth.auth().signInWithGoogle(
+                        idToken: idToken,
+                        firstName: user.profile?.givenName
+                    )
+                    UserDefaults.standard.set(user.profile?.givenName ?? "auth.default_user_name".localized, forKey: "userFirstName")
+                    UserDefaults.standard.set(signedIn.onboardingCompleted, forKey: "onboardingV2Completed")
+                    await RevenueCatManager.shared.identifyUser(userId: signedIn.uid)
 
                     await MainActor.run {
                         isLoading = false
@@ -1016,7 +1003,7 @@ struct AuthGoogleView: View {
                 } catch {
                     await MainActor.run {
                         isLoading = false
-                        errorMessage = "Erreur: \(error.localizedDescription)"
+                        errorMessage = String(format: "auth.error.generic".localized, error.localizedDescription)
                     }
                 }
             }
@@ -1032,6 +1019,7 @@ struct AuthAppleView: View {
     @State private var errorMessage: String?
     @State private var showEmailAuth = false
     @State private var showGoogleAuth = false
+    @State private var currentNonce: String?
 
     var onComplete: () -> Void
     var isSignUp: Bool = true
@@ -1092,12 +1080,12 @@ struct AuthAppleView: View {
                         .font(.system(size: 60))
                         .foregroundColor(.white)
 
-                    Text("Connexion Apple")
+                    Text("auth.apple_title".localized)
                         .font(.custom("Poppins-Bold", size: 28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
-                    Text("Utilisez votre identifiant Apple pour continuer")
+                    Text("auth.apple_subtitle".localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.85))
                         .multilineTextAlignment(.center)
@@ -1116,7 +1104,10 @@ struct AuthAppleView: View {
 
                 // Sign in with Apple button
                 SignInWithAppleButton(.signIn) { request in
+                    let nonce = authRandomNonce()
+                    currentNonce = nonce
                     request.requestedScopes = [.fullName, .email]
+                    request.nonce = authSHA256(nonce)
                 } onCompletion: { result in
                     handleAppleSignIn(result)
                 }
@@ -1132,7 +1123,7 @@ struct AuthAppleView: View {
                     Rectangle()
                         .fill(Color.white.opacity(0.3))
                         .frame(height: 1)
-                    Text("Autre méthode")
+                    Text("auth.other_method".localized)
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.6))
                     Rectangle()
@@ -1178,7 +1169,7 @@ struct AuthAppleView: View {
                                 .font(.system(size: 16))
                                 .foregroundColor(.white)
 
-                            Text("Email")
+                            Text("auth.email".localized)
                                 .font(.custom("Poppins-Medium", size: 14))
                                 .foregroundColor(.white)
                         }
@@ -1217,13 +1208,17 @@ struct AuthAppleView: View {
         switch result {
         case .success(let authorization):
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                errorMessage = "Erreur d'authentification Apple"
+                errorMessage = "auth.error.apple".localized
                 return
             }
 
             guard let appleIDToken = appleIDCredential.identityToken,
                   let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                errorMessage = "Impossible de récupérer le token"
+                errorMessage = "auth.error.token".localized
+                return
+            }
+            guard let nonce = currentNonce else {
+                errorMessage = "auth.error.token".localized
                 return
             }
 
@@ -1231,51 +1226,17 @@ struct AuthAppleView: View {
 
             Task {
                 do {
-                    let credential = OAuthProvider.appleCredential(
-                        withIDToken: idTokenString,
-                        rawNonce: nil,
-                        fullName: appleIDCredential.fullName
-                    )
-
-                    let authResult = try await Auth.auth().signIn(with: credential)
-
                     let firstName = appleIDCredential.fullName?.givenName
-                    let displayName = [appleIDCredential.fullName?.givenName, appleIDCredential.fullName?.familyName]
-                        .compactMap { $0 }
-                        .joined(separator: " ")
-
-                    var userData: [String: Any] = [
-                        "uid": authResult.user.uid,
-                        "email": authResult.user.email ?? appleIDCredential.email ?? "",
-                        "createdAt": Timestamp(date: Date()),
-                        "authProvider": "apple",
-                        "lastLoginAt": Timestamp(date: Date())
-                    ]
-
-                    if let firstName = firstName, !firstName.isEmpty {
-                        userData["firstName"] = firstName
+                    let user = try await Auth.auth().signInWithApple(
+                        identityToken: idTokenString,
+                        rawNonce: nonce,
+                        firstName: firstName
+                    )
+                    if let firstName, !firstName.isEmpty {
                         UserDefaults.standard.set(firstName, forKey: "userFirstName")
                     }
-                    if !displayName.isEmpty {
-                        userData["displayName"] = displayName
-                    }
-
-                    try await Firestore.firestore()
-                        .collection("users")
-                        .document(authResult.user.uid)
-                        .setData(userData, merge: true)
-
-                    // Vérifier si l'utilisateur a déjà complété l'onboarding
-                    let userDoc = try await Firestore.firestore()
-                        .collection("users")
-                        .document(authResult.user.uid)
-                        .getDocument()
-
-                    if let data = userDoc.data(),
-                       let onboardingCompleted = data["onboardingCompleted"] as? Bool,
-                       onboardingCompleted {
-                        UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
-                    }
+                    UserDefaults.standard.set(user.onboardingCompleted, forKey: "onboardingV2Completed")
+                    await RevenueCatManager.shared.identifyUser(userId: user.uid)
 
                     await MainActor.run {
                         isLoading = false
@@ -1285,14 +1246,14 @@ struct AuthAppleView: View {
                 } catch {
                     await MainActor.run {
                         isLoading = false
-                        errorMessage = "Erreur: \(error.localizedDescription)"
+                        errorMessage = String(format: "auth.error.generic".localized, error.localizedDescription)
                     }
                 }
             }
 
         case .failure(let error):
             if (error as NSError).code != ASAuthorizationError.canceled.rawValue {
-                errorMessage = "Erreur: \(error.localizedDescription)"
+                errorMessage = String(format: "auth.error.generic".localized, error.localizedDescription)
             }
         }
     }

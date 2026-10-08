@@ -1,0 +1,26 @@
+# sos-one-minute-1 · Un minuto para respirar (ES)
+[pause 1.5s]
+[calm, clear] Detente un momento. Justo donde estás, tal como estás.
+De pie, sentado, en un pasillo... cualquier lugar sirve. Puedes dejar los ojos abiertos.
+[pause 1.5s]
+[soft] Inhala suavemente por la nariz...
+[pause 4s]
+[slow] Y suelta el aire todavía más despacio, como a través de una pajita...
+[pause 6s]
+[clear] Ahora, echemos un vistazo rápido hacia dentro. Tres preguntas, una palabra para cada una.
+Tu cuerpo. ¿Qué destaca? Tenso, acalorado, cansado... Solo una palabra.
+[pause 2.5s]
+Tu emoción. ¿Irritación, preocupación, nada especial? Una palabra, sin juzgar.
+[pause 2.5s]
+Tu mente. ¿En qué está ocupada, ahora mismo? Una palabra más.
+[pause 3s]
+[warm] Solo con nombrarlo ya tomas un poco de distancia.
+[soft] Una respiración lenta más. Inhala...
+[pause 4s]
+[slow] Y exhala, sin prisa, hasta el final.
+[pause 6s]
+[calm, grounded] Ahora, sigue adelante. ¿Cuál es la próxima cosa pequeña que hacer? No todo el día. Solo el siguiente paso.
+Contestar esa llamada. Abrir esa puerta. Responder ese único mensaje.
+[pause 2s]
+[warm, encouraging] ¿Lo tienes? Entonces adelante, con esta respiración más tranquila.
+[pause 4s]

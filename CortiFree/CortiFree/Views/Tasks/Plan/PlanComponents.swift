@@ -401,8 +401,17 @@ struct PlanItemCard: View {
     let onOpen: () -> Void
     let onToggleDone: () -> Void
     let onSkip: () -> Void
+    /// Edit mode: replace / remove controls instead of the completion circle.
+    var isEditing = false
+    var onSwap: (() -> Void)?
+    var onRemove: (() -> Void)?
+
+    @State private var donePop = false
+    @State private var ringPulse = false
+    @State private var ringVisible = false
 
     private var isDone: Bool { status == .done }
+    private var canEdit: Bool { !isDone && (onSwap != nil || onRemove != nil) }
     private var isSkipped: Bool { status == .skipped }
 
     var body: some View {
@@ -452,35 +461,70 @@ struct PlanItemCard: View {
             .buttonStyle(.plain)
             .accessibilityHint(openHint)
 
-            Button {
-                guard isEditable else { HapticManager.error(); return }
-                onToggleDone()
-            } label: {
-                ZStack {
-                    Circle()
-                        .strokeBorder(isDone ? PlanPalette.done : .white.opacity(0.3), lineWidth: 2)
-                        .background(Circle().fill(isDone ? PlanPalette.done : .clear))
-                    if isDone {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(PlanPalette.deep)
-                    } else if isSkipped {
-                        Image(systemName: "forward.end.fill")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.5))
+            if isEditing && canEdit {
+                HStack(spacing: 6) {
+                    if let onSwap {
+                        editButton("arrow.triangle.2.circlepath", label: "plan.edit.swap".localized, action: onSwap)
+                    }
+                    if let onRemove {
+                        editButton("minus", label: "plan.edit.remove".localized, action: onRemove)
                     }
                 }
-                .frame(width: 28, height: 28)
-                .frame(width: 44, height: 44)
-                .contentShape(Circle())
+                .transition(.scale.combined(with: .opacity))
+            } else {
+                Button {
+                    guard isEditable else { HapticManager.error(); return }
+                    onToggleDone()
+                } label: {
+                    ZStack {
+                        Circle()
+                            .strokeBorder(isDone ? PlanPalette.done : .white.opacity(0.3), lineWidth: 2)
+                            .background(Circle().fill(isDone ? PlanPalette.done : .clear))
+                        if isDone {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(PlanPalette.deep)
+                                .transition(.scale(scale: 0.2).combined(with: .opacity))
+                        } else if isSkipped {
+                            Image(systemName: "forward.end.fill")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                    }
+                    .frame(width: 28, height: 28)
+                    // Micro celebration: the checkbox pops and sends a ring out when validated.
+                    .scaleEffect(donePop ? 1.18 : 1)
+                    .overlay(
+                        Circle()
+                            .stroke(PlanPalette.done, lineWidth: 2)
+                            .scaleEffect(ringPulse ? 2.1 : 1)
+                            .opacity(ringPulse ? 0 : (ringVisible ? 0.9 : 0))
+                    )
+                    .frame(width: 44, height: 44)
+                    .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .opacity(isEditable ? 1 : 0.5)
+                .accessibilityLabel((isDone ? "plan.action.undo" : "plan.action.mark_done").localized)
             }
-            .buttonStyle(.plain)
-            .opacity(isEditable ? 1 : 0.5)
-            .accessibilityLabel((isDone ? "plan.action.undo" : "plan.action.mark_done").localized)
         }
         .padding(12)
         .planGlass(cornerRadius: 22, interactive: true)
         .opacity(isSkipped ? 0.5 : 1)
+        .onChange(of: isDone) { _, done in
+            guard done else { return }
+            ringPulse = false
+            ringVisible = true
+            withAnimation(.spring(response: 0.22, dampingFraction: 0.45)) { donePop = true }
+            withAnimation(.easeOut(duration: 0.6)) { ringPulse = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { donePop = false }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                ringVisible = false
+                ringPulse = false
+            }
+        }
         .contextMenu {
             if isEditable {
                 Button { onToggleDone() } label: {
@@ -492,8 +536,34 @@ struct PlanItemCard: View {
                         Label("plan.action.skip".localized, systemImage: "forward.end")
                     }
                 }
+                if !isDone, let onSwap {
+                    Button { onSwap() } label: {
+                        Label("plan.edit.swap".localized, systemImage: "arrow.triangle.2.circlepath")
+                    }
+                }
+                if !isDone, let onRemove {
+                    Button(role: .destructive) { onRemove() } label: {
+                        Label("plan.edit.remove".localized, systemImage: "minus.circle")
+                    }
+                }
             }
         }
+    }
+
+    private func editButton(_ systemName: String, label: String, action: @escaping () -> Void) -> some View {
+        Button {
+            HapticManager.light()
+            action()
+        } label: {
+            Image(systemName: systemName)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 34, height: 34)
+                .background(Circle().fill(.white.opacity(0.12)))
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 
     private var openHint: String {

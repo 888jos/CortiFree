@@ -2,8 +2,8 @@
 //  StressPatternValidationView.swift
 //  CortiFree
 //
-//  Cortisol analysis result screen after habits quiz
-//  Shows cortisol comparison histogram (user vs average)
+//  Quiz result screen after the habits quiz
+//  Shows the self-assessed stress load (0-100) next to a serene reference profile
 //  Button leads to symptom checker
 //
 
@@ -18,31 +18,29 @@ struct StressPatternValidationView: View {
 
     // MARK: - Computed Data
 
-    // Échelle absolue fixe : 0 → 80 µg/dL
-    // Le vert (normale) est ancré à 18 → toujours lisible et bas
-    // L'user monte entre 30 et 72 → toujours au-dessus du vert, impactant
-    private let scaleMax: CGFloat = 80
-
-    private var avgCortisolValue: Int { 18 }
-
-    // globalScore 0-100 → valeur 54-96 (toujours impactant, bien au-dessus de la normale)
-    private var userCortisolValue: Int {
-        let score = habitsQuizResult.globalScore
-        // score=0 → 54, score=100 → 96 (plage de 42 pts)
-        return max(54, min(96, Int(Double(score) * 0.42 + 54)))
+    // Self-assessed stress load on a 0–100 scale, derived from the quiz domains
+    // (globalScore is 100 when every answer is the calmest one). It is not a cortisol
+    // measurement, and the screen says so.
+    private var stressLoad: Int {
+        max(0, min(100, 100 - habitsQuizResult.globalScore))
     }
 
-    // Kept for analytics tracking
-    private var cortisolPercentAbove: Int {
-        userCortisolValue - avgCortisolValue
+    /// Load of someone who mostly picks the calm side of each answer ("rarely", "often relaxed").
+    private let sereneReference = 30
+
+    private var isAboveReference: Bool { stressLoad > sereneReference }
+
+    private var userBarRatio: CGFloat { min(0.92, max(0.08, CGFloat(stressLoad) / 100)) }
+    private var referenceBarRatio: CGFloat { CGFloat(sereneReference) / 100 }
+
+    private var userBarColors: [Color] {
+        isAboveReference ? [Color(hex: "FF6B6B"), Color(hex: "EF4444")] : [Color(hex: "B7F7A6"), Color(hex: "53B96B")]
     }
 
-    // Ratios sur l'échelle absolue 0–80, visuellement capés
-    // Vert : 18/80 = 22.5% → on affiche 28% (un peu gonflé pour la lisibilité)
-    private var avgBarRatio: CGFloat { 0.28 }
-    // User : avgBarRatio × 1.3 au minimum, capé à 0.88 pour garder de l'espace au-dessus
-    private var userBarRatio: CGFloat {
-        min(0.88, max(avgBarRatio * 1.3, CGFloat(userCortisolValue) / scaleMax))
+    private var resultText: AttributedString {
+        let key = isAboveReference ? "stress_pattern.load_above" : "stress_pattern.load_near"
+        let text = String(format: key.localized, stressLoad, sereneReference)
+        return (try? AttributedString(markdown: text)) ?? AttributedString(text)
     }
 
     var body: some View {
@@ -81,19 +79,15 @@ struct StressPatternValidationView: View {
                     .frame(height: 28)
 
                 // Histogram
-                cortisolHistogram
+                stressHistogram
                     .frame(height: 336) // 280 × 1.2
                     .padding(.horizontal, 40)
 
                 Spacer()
                     .frame(height: 48)
 
-                // Cortisol stat
-                Text(
-                    (try? AttributedString(
-                        markdown: String(format: "stress_pattern.cortisol_above".localized, cortisolPercentAbove)
-                    )) ?? AttributedString(String(format: "stress_pattern.cortisol_above".localized, cortisolPercentAbove))
-                )
+                // Result sentence
+                Text(resultText)
                     .font(.custom("Poppins-Medium", size: 15))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
@@ -119,7 +113,7 @@ struct StressPatternValidationView: View {
                             event: "onboarding_stress_pattern_continue",
                             properties: [
                                 "time_spent": timeSpent,
-                                "cortisol_percent_above": cortisolPercentAbove
+                                "stress_load": stressLoad
                             ]
                         )
                     }
@@ -127,7 +121,7 @@ struct StressPatternValidationView: View {
                     onContinue()
                 }) {
                     HStack(spacing: 8) {
-                        Image(systemName: "stethoscope")
+                        Image(systemName: "list.bullet.clipboard")
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.white)
 
@@ -147,7 +141,7 @@ struct StressPatternValidationView: View {
             screenViewTime = Date()
             AnalyticsManager.shared.track(
                 event: "onboarding_stress_pattern_viewed",
-                properties: ["cortisol_percent_above": cortisolPercentAbove]
+                properties: ["stress_load": stressLoad]
             )
 
             withAnimation(.easeOut(duration: 1.2).delay(0.4)) {
@@ -158,7 +152,7 @@ struct StressPatternValidationView: View {
 
     // MARK: - Histogram
 
-    private var cortisolHistogram: some View {
+    private var stressHistogram: some View {
         GeometryReader { geo in
             let maxHeight = geo.size.height - 28
             let barWidth: CGFloat = 67 // 56 × 1.2
@@ -166,9 +160,9 @@ struct StressPatternValidationView: View {
             HStack(alignment: .bottom, spacing: 38) {
                 Spacer()
 
-                // User bar (red: elevated level)
+                // User bar (red above the serene reference, green otherwise)
                 VStack(spacing: 0) {
-                    Text("\(userCortisolValue)")
+                    Text("\(stressLoad)")
                         .font(.faroBold(18))
                         .foregroundColor(.white)
                         .padding(.top, 10)
@@ -179,7 +173,7 @@ struct StressPatternValidationView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
                             LinearGradient(
-                                colors: [Color(hex: "FF6B6B"), Color(hex: "EF4444")],
+                                colors: userBarColors,
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -193,15 +187,15 @@ struct StressPatternValidationView: View {
                         .offset(y: 24)
                 }
 
-                // Average bar (vert)
+                // Serene reference bar
                 VStack(spacing: 0) {
-                    Text("\(avgCortisolValue)")
+                    Text("\(sereneReference)")
                         .font(.faroBold(18))
                         .foregroundColor(.white)
                         .padding(.top, 10)
                     Spacer()
                 }
-                .frame(width: barWidth, height: maxHeight * avgBarRatio * barProgress)
+                .frame(width: barWidth, height: maxHeight * referenceBarRatio * barProgress)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
                         .fill(

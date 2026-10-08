@@ -13,6 +13,7 @@ struct GroundingExerciseView: View {
     @ObservedObject var viewModel: AntiStressViewModel
     @Environment(\.dismiss) var dismiss
 
+    @State private var didComplete = false
     @State private var currentStep = 0
     @State private var showCompletion = false
     @State private var showConfetti = false
@@ -264,21 +265,24 @@ struct GroundingExerciseView: View {
     }
 
     private func completeExercise() {
+        // Repeated taps on the last step must not save the exercise twice.
+        guard !didComplete else { return }
+        didComplete = true
         voiceOverManager.announceCompletion()
+        HapticManager.success()
 
+        // Celebrate right away; saving runs in the background (offline, Firestore only
+        // returns on reconnect and the user was stuck on the last step).
+        withAnimation {
+            showConfetti = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            withAnimation {
+                showCompletion = true
+            }
+        }
         Task {
             await viewModel.completeExercise()
-            HapticManager.success()
-
-            withAnimation {
-                showConfetti = true
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation {
-                    showCompletion = true
-                }
-            }
         }
     }
 }

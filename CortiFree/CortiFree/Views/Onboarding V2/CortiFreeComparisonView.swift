@@ -184,7 +184,7 @@ struct CortiFreeComparisonView: View {
             HStack {
                 Text("onboarding_v2.comparison.today".localized)
                 Spacer()
-                Text("onboarding_v2.comparison.day66".localized)
+                Text("onboarding_v2.comparison.day28".localized)
             }
             .font(.custom("Poppins-Medium", size: 11))
             .foregroundStyle(.white.opacity(0.45))

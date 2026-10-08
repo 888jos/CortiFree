@@ -18,6 +18,7 @@ struct JournalHomeView: View {
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var photoImage: UIImage?
     @State private var showSuccessMessage = false
+    @State private var saveError: String?
     @State private var isLoadingToday = true
     @State private var todayEntry: JournalEntry?
     @State private var showHistory = false
@@ -133,6 +134,14 @@ struct JournalHomeView: View {
                 showImagePicker = true
             }
             Button("Annuler", role: .cancel) {}
+        }
+        .alert(LanguageManager.shared.localizedString(for: "alert.error.title"), isPresented: Binding(
+            get: { saveError != nil },
+            set: { if !$0 { saveError = nil } }
+        )) {
+            Button(LanguageManager.shared.localizedString(for: "common.ok"), role: .cancel) { saveError = nil }
+        } message: {
+            Text(saveError ?? "")
         }
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(image: $photoImage, sourceType: imagePickerSourceType)
@@ -556,6 +565,12 @@ struct JournalHomeView: View {
             wordCount: wordCount,
             entryId: todayEntry?.id  // Pass existing entry ID for update
         )
+
+        // Not saved (signed out, network…): say so instead of a false "saved".
+        if let error = viewModel.errorMessage {
+            saveError = error
+            return
+        }
 
         // Show success message
         withAnimation {

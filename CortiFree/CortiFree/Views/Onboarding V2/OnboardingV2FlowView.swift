@@ -9,8 +9,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
-import FirebaseFirestore
 import UserNotifications
 
 #if DEBUG
@@ -79,6 +77,7 @@ struct OnboardingV2FlowView: View {
     @State private var errorMessage = ""
     @State private var onboardingStartTime: Date?
     @State private var suppressDropOffLiveActivity = false
+    @State private var showReturningUserSignIn = false
 
     private let firebaseManager = FirebaseManager.shared
 
@@ -106,7 +105,6 @@ struct OnboardingV2FlowView: View {
         case habitsProgress
         case notificationPermissions
         case commitmentPledge
-        case socialProof
         case complete
 
         // Define logical checkpoints where user can resume
@@ -125,7 +123,7 @@ struct OnboardingV2FlowView: View {
                 return .eightHabitsIntro
             case .eightHabits, .notificationPermissions, .habitsProgress, .commitmentPledge:
                 return .eightHabits
-            case .socialProof, .complete:
+            case .complete:
                 return .complete
             }
         }
@@ -194,6 +192,8 @@ struct OnboardingV2FlowView: View {
         }
         #endif
 
+        restoreAnswersFromDraft()
+
         // If user has seen paywall but not completed onboarding, go directly to paywall
         if hasSeenPaywall && !isOnboardingComplete {
             #if DEBUG
@@ -203,9 +203,11 @@ struct OnboardingV2FlowView: View {
             return
         }
 
-        // Legacy checkpoints from the removed Glow Scan / score screens resume at authentication
+        // Legacy checkpoints from removed screens (Glow Scan / score, social proof)
         if savedCheckpoint == "glowScan" || savedCheckpoint == "glowScore" {
             savedCheckpoint = OnboardingStep.authentication.rawValue
+        } else if savedCheckpoint == "socialProof" {
+            savedCheckpoint = OnboardingStep.complete.rawValue
         }
 
         // If we have a saved checkpoint, resume from there
@@ -215,6 +217,25 @@ struct OnboardingV2FlowView: View {
             print("📍 Resuming from checkpoint: \(step.rawValue)")
             #endif
             currentStep = step.checkpoint
+        }
+    }
+
+    /// The answers only live in memory during the flow; when it resumes from a checkpoint
+    /// (app killed, re-engagement notification, Live Activity), rebuild them from the
+    /// onboarding draft saved by each quiz step so the plan, the analysis and the paywall
+    /// stay personalized.
+    private func restoreAnswersFromDraft() {
+        guard !savedCheckpoint.isEmpty || hasSeenPaywall,
+              let draft = PersonalPlanStore.shared.storedOnboardingProfile() else { return }
+
+        if overallQuizData == nil, !draft.reasonCodes.isEmpty || draft.durationCode != nil {
+            overallQuizData = OverallQuizData(restoringFrom: draft)
+        }
+        if habitsQuizResult == nil, let answers = draft.quizAnswers, answers.count == 12 {
+            habitsQuizResult = HabitsQuizResult(answers: answers)
+        }
+        if selectedSymptoms.isEmpty, !draft.symptomIDs.isEmpty {
+            selectedSymptoms = Set(draft.symptomIDs.map { "symptom_checker.\($0)".localized })
         }
     }
 
@@ -291,8 +312,20 @@ struct OnboardingV2FlowView: View {
     private var currentStepView: some View {
         switch currentStep {
         case .welcome:
-            FirstLaunchWelcomeView {
-                currentStep = .overall
+            FirstLaunchWelcomeView(
+                onContinue: { currentStep = .overall },
+                onSignIn: { showReturningUserSignIn = true }
+            )
+            .fullScreenCover(isPresented: $showReturningUserSignIn) {
+                // Returning user: a finished onboarding on the account sets onboardingV2Completed
+                // and the app root switches to the app. Otherwise the quiz starts as usual.
+                EmailAuthView(startsWithSignIn: true) {
+                    showReturningUserSignIn = false
+                    UserDefaults.standard.set(true, forKey: "user_is_authenticated")
+                    if !isOnboardingComplete {
+                        currentStep = .overall
+                    }
+                }
             }
 
         case .overall:
@@ -339,35 +372,39 @@ struct OnboardingV2FlowView: View {
             }
 
         case .symptomChecker:
-            SymptomCheckerView(onContinue: { symptoms in
-                selectedSymptoms = symptoms
-                currentStep = .cortisolScienceHook
-            })
+            SymptomCheckerView(
+                initialSelection: selectedSymptoms,
+                onBack: { currentStep = .stressPatternValidation },
+                onContinue: { symptoms in
+                    selectedSymptoms = symptoms
+                    currentStep = .cortisolScienceHook
+                }
+            )
 
         case .cortisolScienceHook:
-            CortisolScienceHookView(onContinue: {
-                currentStep = .sixtyDayExplanation
-            })
+            CortisolScienceHookView(
+                onBack: { currentStep = .symptomChecker },
+                onContinue: { currentStep = .sixtyDayExplanation }
+            )
 
         case .sixtyDayExplanation:
-            SixtyDaysExplanationView(onContinue: {
-                currentStep = .scientificPlan
-            })
+            SixtyDaysExplanationView(
+                onBack: { currentStep = .cortisolScienceHook },
+                onContinue: { currentStep = .scientificPlan }
+            )
 
         case .scientificPlan:
-            ScientificPlanView(onContinue: {
-                currentStep = .authentication
-            })
+            ScientificPlanView(
+                onBack: { currentStep = .sixtyDayExplanation },
+                onContinue: { currentStep = .authentication }
+            )
 
         case .authentication:
             AuthenticationView(
+                onBack: { currentStep = .scientificPlan },
                 onComplete: {
                     // Mark user as authenticated for re-engagement tracking
                     UserDefaults.standard.set(true, forKey: "user_is_authenticated")
-                    currentStep = .loading
-                },
-                onSkip: {
-                    UserDefaults.standard.set(false, forKey: "user_is_authenticated")
                     currentStep = .loading
                 }
             )
@@ -387,12 +424,14 @@ struct OnboardingV2FlowView: View {
             })
 
         case .weekProgress:
-            WeekProgressView(onContinue: {
-                currentStep = .eightHabits
-            })
+            WeekProgressView(
+                habitsQuizResult: habitsQuizResult,
+                onBack: { currentStep = .eightHabitsIntro },
+                onContinue: { currentStep = .eightHabits }
+            )
 
         case .eightHabits:
-            EightHabitsFlowView(onComplete: {
+            EightHabitsFlowView(onBack: { currentStep = .weekProgress }, onComplete: {
                 #if DEBUG
                 print("✅ OnboardingV2FlowView: Checking notification permission")
                 #endif
@@ -408,34 +447,41 @@ struct OnboardingV2FlowView: View {
             })
 
         case .habitsProgress:
-            HabitsProgressFlowView(onComplete: {
-                #if DEBUG
-                print("✅ OnboardingV2FlowView: Transition .habitsProgress → .commitmentPledge")
-                #endif
-                // Generate personalized plan based on quiz results
-                if let habitsResult = habitsQuizResult {
-                    saveDataAndGeneratePlan(result: habitsResult)
+            HabitsProgressFlowView(
+                availableMinutes: habitsQuizResult?.availableTime,
+                onBack: { currentStep = .eightHabits },
+                onComplete: {
+                    #if DEBUG
+                    print("✅ OnboardingV2FlowView: Transition .habitsProgress → .commitmentPledge")
+                    #endif
+                    // Generate personalized plan based on quiz results
+                    if let habitsResult = habitsQuizResult {
+                        saveDataAndGeneratePlan(result: habitsResult)
+                    } else if let draft = PersonalPlanStore.shared.storedOnboardingProfile(), !draft.isEmpty {
+                        // Answers not in memory (should not happen after restoreAnswersFromDraft):
+                        // still build the plan from what each quiz step saved.
+                        PersonalPlanStore.shared.createPlanFromOnboarding(draft)
+                    }
+                    currentStep = .commitmentPledge
                 }
-                currentStep = .commitmentPledge
-            })
+            )
 
         case .commitmentPledge:
-            CommitmentPledgeView(onContinue: {
-                currentStep = .complete
-            })
+            CommitmentPledgeView(
+                onBack: { currentStep = .habitsProgress },
+                onContinue: { currentStep = .complete }
+            )
 
-        case .socialProof, .complete:
+        case .complete:
             OnboardingCompletionView(
                 habitsQuizResult: habitsQuizResult,
                 selectedSymptoms: selectedSymptoms,
                 onboardingStartTime: onboardingStartTime,
                 language: onboardingLanguage, // Pass detected language
                 onViewPlan: {
-                    // After paywall acceptance (trial started), complete onboarding
+                    // After paywall acceptance (trial started), complete onboarding.
+                    // Trial reminders are handled by Apple's own trial notification.
                     completeOnboarding()
-
-                    // Schedule trial notifications
-                    NotificationService.shared.scheduleTrialNotifications()
                 }
             )
         }
@@ -488,20 +534,21 @@ struct OnboardingV2FlowView: View {
         // Set routine start date for program progress tracking
         UserDefaults.standard.set(Date(), forKey: "routineStartDate")
 
-        // Update Firestore onboardingCompleted field
-        if let userId = Auth.auth().currentUser?.uid {
+        // Persist completion in Convex.
+        if Auth.auth().currentUser != nil {
             Task {
                 do {
-                    try await Firestore.firestore()
-                        .collection("users")
-                        .document(userId)
-                        .setData(["onboardingCompleted": true], merge: true)
+                    let _: JSONValue = try await ConvexBackend.shared.call(
+                        .mutation,
+                        path: "profile:saveOnboarding",
+                        args: ["completed": true]
+                    )
                     #if DEBUG
-                    print("✅ Firestore onboardingCompleted set to true")
+                    print("✅ Convex onboardingCompleted set to true")
                     #endif
                 } catch {
                     #if DEBUG
-                    print("⚠️ Failed to update Firestore onboardingCompleted: \(error.localizedDescription)")
+                    print("⚠️ Failed to update onboardingCompleted: \(error.localizedDescription)")
                     #endif
                 }
             }
@@ -526,7 +573,7 @@ struct OnboardingV2FlowView: View {
     private func saveDataAndGeneratePlan(result: HabitsQuizResult) {
         // Plan personnalisé (28 jours) généré à partir des réponses : raison + durée du stress,
         // âge, réponses du quiz habitudes (domaines les plus fragiles, objectif, temps dispo)
-        // et symptômes. Sauvegardé en local + Firestore users/{uid}/personalized_plan/current.
+        // et symptômes. Sauvegardé en local + Convex.
         PlanGenerationService.shared.generatePersonalizedPlan(
             quizResult: result,
             overallData: overallQuizData,
@@ -534,7 +581,7 @@ struct OnboardingV2FlowView: View {
         )
 
         Task {
-            // Save quiz responses to Firebase
+            // Save quiz responses to Convex
             if let overallData = overallQuizData {
                 await saveOverallDataToFirebase(overallData)
             }
@@ -545,24 +592,13 @@ struct OnboardingV2FlowView: View {
     }
 
     private func saveOverallDataToFirebase(_ data: OverallQuizData) async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-
-        // Save user profile
-        let userData: [String: Any] = [
-            "age": data.age,
-            "gender": data.gender,
-            "genderCode": data.genderCode,
-            "stressReasons": data.reasons,
-            "stressDuration": data.duration,
-            "onboardingCompletedAt": Date()
-        ]
-
-        // Save directly to Firestore
+        guard Auth.auth().currentUser != nil else { return }
         do {
-            try await Firestore.firestore()
-                .collection("users")
-                .document(userId)
-                .setData(userData, merge: true)
+            let _: JSONValue = try await ConvexBackend.shared.call(
+                .mutation,
+                path: "profile:saveOnboarding",
+                args: ["answers": OptimizedFirebaseService.profileAnswers(data)]
+            )
             #if DEBUG
             print("✅ User profile updated")
             #endif
@@ -627,17 +663,16 @@ struct OnboardingBreathingIntroView: View {
                         Button(action: primaryAction) {
                             Text(primaryTitle)
                                 .font(.poppinsSemiBold(17))
-                                .foregroundStyle(Color(hex: "1A1A4E"))
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 56)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                                .contentShape(Capsule())
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.glassPrimary)
                         .padding(.horizontal, 24)
                     }
 
-                    if !isComplete {
+                    // Before the exercise starts, "Skip" already sits in the header.
+                    if isStarted && !isComplete {
                         Button("onboarding_v2.skip".localized) {
                             HapticManager.light()
                             exitToNextStep()
@@ -695,12 +730,12 @@ struct OnboardingBreathingIntroView: View {
             Spacer(minLength: 20)
 
             VStack(spacing: 8) {
-                Text(isComplete ? "Nice work" : "Take a breath")
+                Text(isComplete ? "onboarding_v2.breath_demo.nice_work".localized : "onboarding_v2.breath_demo.take_a_breath".localized)
                     .font(.faroBold(30))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
-                Text(isComplete ? "You just created a calm moment." : "Follow the curve: breathe in for 4 seconds, then out for 6.")
+                Text(isComplete ? "onboarding_v2.breath_demo.done_subtitle".localized : "onboarding_v2.breath_demo.instructions".localized)
                     .font(.poppinsRegular(16))
                     .foregroundStyle(.white.opacity(0.72))
                     .multilineTextAlignment(.center)
@@ -715,10 +750,10 @@ struct OnboardingBreathingIntroView: View {
                 let elapsed = breathStartDate.map { context.date.timeIntervalSince($0) } ?? 0
                 VStack(spacing: 18) {
                     VStack(spacing: 5) {
-                        Text(isStarted ? phaseTitle(at: elapsed) : "Ready?")
+                        Text(isStarted ? phaseTitle(at: elapsed) : "onboarding_v2.breath_demo.ready".localized)
                             .font(.faroBold(25))
                             .foregroundStyle(.white)
-                        Text(isStarted ? phaseCountdown(at: elapsed) : "4 in / 6 out")
+                        Text(isStarted ? phaseCountdown(at: elapsed) : "onboarding_v2.breath_demo.rhythm".localized)
                             .font(.poppinsMedium(16))
                             .foregroundStyle(.white.opacity(0.78))
                             .monospacedDigit()
@@ -758,7 +793,7 @@ struct OnboardingBreathingIntroView: View {
                     .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Back")
+            .accessibilityLabel("common.back".localized)
 
             Spacer()
 
@@ -777,8 +812,8 @@ struct OnboardingBreathingIntroView: View {
     }
 
     private var primaryTitle: String {
-        if isComplete { return "Continue" }
-        return "Begin breathing (30s)"
+        if isComplete { return "onboarding_v2.breath_demo.continue".localized }
+        return "onboarding_v2.breath_demo.begin".localized
     }
 
     private func exitToNextStep() {
@@ -788,7 +823,7 @@ struct OnboardingBreathingIntroView: View {
     }
 
     private func phaseTitle(at elapsed: Double) -> String {
-        elapsed.truncatingRemainder(dividingBy: 10) < 4 ? "Inhale" : "Exhale"
+        elapsed.truncatingRemainder(dividingBy: 10) < 4 ? "onboarding_v2.breath_demo.inhale".localized : "onboarding_v2.breath_demo.exhale".localized
     }
 
     private func phaseCountdown(at elapsed: Double) -> String {
@@ -816,5 +851,28 @@ struct OnboardingBreathingIntroView: View {
 
     private func startBreathingCycle() {
         breathStartDate = Date()
+    }
+}
+
+// MARK: - Draft restore
+
+extension OverallQuizData {
+    /// Rebuilds the profile answers from the codes saved in the onboarding draft.
+    init(restoringFrom draft: PlanProfile) {
+        let genderCode = draft.genderCode ?? "other"
+        let ageCode = draft.ageCode ?? "25_34"
+        let durationCode = draft.durationCode ?? "weeks"
+        let genderKey = ["male": "gender_male", "female": "gender_female"][genderCode] ?? "gender_other"
+        self.init(
+            gender: "onboarding_v2.overall.\(genderKey)".localized,
+            genderCode: genderCode,
+            age: "onboarding_v2.overall.age_\(ageCode)".localized,
+            ageCode: ageCode,
+            acquisitionChannel: nil,
+            reasons: draft.reasonCodes.map { "onboarding_v2.overall.reason_\($0)".localized },
+            reasonCodes: draft.reasonCodes,
+            duration: "onboarding_v2.overall.duration_\(durationCode)".localized,
+            durationCode: durationCode
+        )
     }
 }

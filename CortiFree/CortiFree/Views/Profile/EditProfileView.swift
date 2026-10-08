@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 import AuthenticationServices
 
 struct EditProfileView: View {
@@ -577,17 +576,6 @@ struct EditProfileView: View {
 
         Task {
             if let user = Auth.auth().currentUser {
-                // Sync remotely when available, while keeping the local save if the network fails.
-                do {
-                    let changeRequest = user.createProfileChangeRequest()
-                    changeRequest.displayName = trimmedFirstName
-                    try await changeRequest.commitChanges()
-                } catch {
-                    #if DEBUG
-                    print("Profile Auth name sync failed: \(error)")
-                    #endif
-                }
-
                 do {
                     try await FirebaseManager.shared.updateUserProfile(
                         uid: user.uid,
@@ -613,7 +601,7 @@ struct EditProfileView: View {
     // MARK: - Save Profile Photo
 
     private func saveProfilePhoto(_ image: UIImage) {
-        // Resized so it fits comfortably in a Firestore field (1 MB doc limit)
+        // Resized before upload to Convex file storage.
         guard let imageData = ProfilePhotoStorage.compressedJPEG(from: image) else {
             HapticManager.error()
             return
@@ -660,6 +648,9 @@ struct EditProfileView: View {
         var localSettings = UserSettings.loadFromUserDefaults() ?? UserSettings()
         localSettings.programStartDate = newStartDate
         localSettings.saveToUserDefaults()
+        ProgressAnalyticsService.shared.invalidateDashboardCache()
+        // The plan restarts at day 1 too, otherwise plan days and history keys drift apart.
+        PersonalPlanStore.shared.restartFromDayOne()
 
         // Update Firebase programStartDate
         if let uid = Auth.auth().currentUser?.uid {
@@ -668,6 +659,8 @@ struct EditProfileView: View {
                     var settings = (try? await FirebaseManager.shared.fetchUserSettings(uid: uid)) ?? localSettings
                     settings.programStartDate = newStartDate
                     try await FirebaseManager.shared.saveUserSettings(uid: uid, settings: settings)
+                    try await FirebaseManager.shared.resetProgramDayData(uid: uid)
+                    ProgressAnalyticsService.shared.invalidateDashboardCache()
                     #if DEBUG
                     print("✅ Program restarted to day 1")
                     #endif

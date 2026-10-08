@@ -1,0 +1,41 @@
+# sos-box-breathing-2 · Respiración cuadrada (ES)
+[pause 1.5s]
+[calm, clear] Siéntate o ponte de pie con la espalda recta, los pies bien apoyados, los hombros sueltos. Vamos allá.
+La respiración cuadrada tiene cuatro lados, y cada lado dura unos cuatro segundos. Bomberos, personal sanitario y pilotos la usan para mantener la cabeza clara bajo presión.
+[clear, unhurried] Inhalas, retienes, exhalas, y luego descansas con los pulmones vacíos. Todo por la nariz, sin forzar, como si dibujaras un cuadrado en tu mente. Un lado sube, otro va en línea recta, otro baja, otro vuelve.
+Te daré una palabra para cada lado, y el silencio llevará la cuenta. Empieza soltando el aire con calma.
+[pause 2s]
+[calm] Inhala.
+[pause 3.5s]
+Retén.
+[pause 3.5s]
+Exhala.
+[pause 3.5s]
+Descansa, vacío.
+[pause 3.5s]
+[soft] Otra vez. Inhala.
+[pause 3.5s]
+Retén, la garganta suave.
+[pause 3s]
+Exhala, los hombros bajan.
+[pause 3s]
+Espera, con calma.
+[pause 3s]
+[quieter] Ahora hablaré todavía menos. Mantén el mismo cuadrado, y yo solo marcaré las esquinas.
+[pause 1s]
+Inhala.
+[pause 3.5s]
+Retén, hombros sueltos.
+[pause 3s]
+Exhala.
+[pause 3.5s]
+Espera.
+[pause 3.5s]
+[gentle, reassuring] Si retener el aire te incomoda, hazlo más corto. Un cuadrado más pequeño sigue siendo un cuadrado. Y si notas mareo o alguna molestia, vuelve simplemente a tu respiración natural.
+Mientras dibujas el cuadrado, tu mente tiene una tarea sencilla. Le queda menos espacio para lo que te preocupaba.
+Fíjate en las cuatro esquinas. La cima de la respiración, el fondo de la respiración, y esas pequeñas mesetas entre ambas, donde todo está quieto.
+[soft, unhurried] Ahora un último cuadrado, solo tuyo, a tu ritmo.
+[pause 6s]
+[softer] Luego suéltalo. Tu respiración recupera su forma natural, por sí sola.
+[warm, grounded] Has recuperado tu centro, con la mente un poco más clara. Ya puedes volver a lo tuyo.
+[pause 4s]

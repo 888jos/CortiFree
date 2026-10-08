@@ -1,17 +1,15 @@
 {
-  "name": "cortifree-functions",
-  "description": "CortiFree Firebase Cloud Functions",
+  "name": "cortifree-legacy-export",
+  "description": "One-shot legacy data exporter for the Convex migration",
   "private": true,
   "engines": {
     "node": "22"
   },
-  "main": "index.js",
   "scripts": {
-    "lint": "node --check index.js",
+    "lint": "node --check scripts/export-firestore-for-convex.js",
     "migration:export": "node scripts/export-firestore-for-convex.js"
   },
   "dependencies": {
-    "firebase-admin": "^13.0.0",
-    "firebase-functions": "^6.0.0"
+    "firebase-admin": "^14.5.0"
   }
 }

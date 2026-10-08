@@ -82,9 +82,9 @@ enum HabitConfiguration {
         case AppConstants.Habits.ID.sleep:
             return ("habit_sleep", "moon.zzz.fill")
         case AppConstants.Habits.ID.breathing:
-            return ("habit_breathing", "wind")
+            return ("habit_breathe", "wind")
         case AppConstants.Habits.ID.meditation:
-            return ("habit_meditation", "sparkles")
+            return ("habit_meditate", "sparkles")
         case AppConstants.Habits.ID.water:
             return ("habit_water", "drop.fill")
         case AppConstants.Habits.ID.sport:

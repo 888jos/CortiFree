@@ -7,7 +7,7 @@
 "widget.program" = "CORTIFREE PROGRAM";
 "widget.tasks" = "tasks";
 "widget.day" = "Day";
-"widget.day_of" = "/66";
+"widget.day_of" = "/28";
 
 // MARK: - Widget footer messages
 "widget.footer.zero"    = "0%% done, get started!";

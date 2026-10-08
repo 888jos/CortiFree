@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import FirebaseCore
-import FirebaseFirestore
 
 class PerformanceManager {
     static let shared = PerformanceManager()
@@ -17,34 +15,14 @@ class PerformanceManager {
     // MARK: - App Launch Optimizations
 
     func configureForOptimalPerformance() {
-        // 1. Optimize Firestore
-        configureFirestore()
-
-        // 2. Reduce animation complexity
+        // 1. Reduce animation complexity
         configureAnimations()
 
-        // 3. Configure image caching
+        // 2. Configure image caching
         configureImageCaching()
 
-        // 4. Optimize memory usage
+        // 3. Optimize memory usage
         configureMemoryManagement()
-    }
-
-    private func configureFirestore() {
-        // IMPORTANT: Firestore settings can only be set BEFORE first use
-        // This is now handled in AppDelegate/SceneDelegate before any Firebase calls
-
-        // We can still configure caching at runtime
-        let db = Firestore.firestore()
-
-        // Enable offline persistence (safe to call multiple times)
-        db.disableNetwork { error in
-            if error == nil {
-                db.enableNetwork { _ in
-                    print("✅ Firestore network re-enabled with optimizations")
-                }
-            }
-        }
     }
 
     private func configureAnimations() {

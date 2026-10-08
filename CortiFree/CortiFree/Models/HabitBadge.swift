@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
 
 struct HabitBadge: Identifiable, Codable {
     @DocumentID var id: String?
@@ -16,6 +15,22 @@ struct HabitBadge: Identifiable, Codable {
     var requirement: Int // Nombre de tâches requis pour débloquer
     var progress: Int // Nombre de tâches actuellement complétées
     var unlockedAt: Date?
+
+    init(
+        id: String? = nil,
+        habitId: String,
+        level: BadgeLevel,
+        requirement: Int,
+        progress: Int,
+        unlockedAt: Date?
+    ) {
+        self._id = DocumentID(wrappedValue: id)
+        self.habitId = habitId
+        self.level = level
+        self.requirement = requirement
+        self.progress = progress
+        self.unlockedAt = unlockedAt
+    }
 
     var isUnlocked: Bool {
         return unlockedAt != nil

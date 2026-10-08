@@ -1,13 +1,12 @@
 import Foundation
-import FirebaseAuth
-import FirebaseFirestore
 
+@MainActor
 final class ProgressAnalyticsService {
     static let shared = ProgressAnalyticsService()
 
-    private let db = Firestore.firestore()
     private let calendar = Calendar.current
     private var dashboardCache: [String: (loadedAt: Date, value: ProgressDashboardData)] = [:]
+    private let dashboardCacheLock = NSLock()
     private let dashboardCacheInterval: TimeInterval = 30
 
     private init() {}
@@ -34,93 +33,101 @@ final class ProgressAnalyticsService {
 
         guard Auth.auth().currentUser != nil else { return }
 
-        let stableTaskID = taskID.unicodeScalars
-            .map { String(format: "%02X", $0.value) }
-            .joined()
-        let documentID = "task_\(programDay)_\(stableTaskID)"
         let data: [String: Any] = [
             "taskId": taskID,
             "habitId": habitID,
             "programDay": programDay,
-            "completedAt": Timestamp(date: completedAt),
+            "completedAt": completedAt.timeIntervalSince1970 * 1000,
             "durationActualSeconds": max(0, durationSeconds),
             "source": "tasks_v2"
         ]
+        let _: String = try await ConvexBackend.shared.call(
+            .mutation, path: "tasks:recordCompletion", args: data
+        )
 
-        try await db.collection("users")
-            .document(userID)
-            .collection("completed_tasks")
-            .document(documentID)
-            .setData(data, merge: true)
+        invalidateDashboardCache()
+    }
 
-        dashboardCache.removeValue(forKey: userID)
+    /// Undoes `recordTaskCompletion` locally and in Convex.
+    func removeTaskCompletion(taskID: String, programDay: Int) async throws {
+        let userID = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
+        LocalProgressStore.removeCompletion(taskID: taskID, programDay: programDay, userID: userID)
+        invalidateDashboardCache()
+
+        guard Auth.auth().currentUser != nil else { return }
+        let _: JSONValue = try await ConvexBackend.shared.call(
+            .mutation,
+            path: "tasks:removeCompletion",
+            args: ["taskId": taskID, "programDay": programDay]
+        )
+        invalidateDashboardCache()
+    }
+
+    /// Call after any local write that Progress reads (completions, sessions, check-ins).
+    func invalidateDashboardCache() {
+        dashboardCacheLock.lock()
+        dashboardCache.removeAll()
+        dashboardCacheLock.unlock()
+    }
+
+    private func cachedDashboard(for userID: String, now: Date) -> ProgressDashboardData? {
+        dashboardCacheLock.lock()
+        defer { dashboardCacheLock.unlock() }
+        guard let cached = dashboardCache[userID],
+              now.timeIntervalSince(cached.loadedAt) < dashboardCacheInterval else { return nil }
+        return cached.value
+    }
+
+    private func storeDashboard(_ dashboard: ProgressDashboardData, for userID: String, now: Date) {
+        dashboardCacheLock.lock()
+        dashboardCache[userID] = (now, dashboard)
+        dashboardCacheLock.unlock()
     }
 
     func fetchDashboard(userID: String, now: Date = Date()) async throws -> ProgressDashboardData {
-        if let cached = dashboardCache[userID], now.timeIntervalSince(cached.loadedAt) < dashboardCacheInterval {
-            return cached.value
+        if let cached = cachedDashboard(for: userID, now: now) {
+            return cached
         }
         guard Auth.auth().currentUser != nil else {
             return fetchLocalDashboard(userID: userID, now: now)
         }
 
-        let userRef = db.collection("users").document(userID)
         let today = calendar.startOfDay(for: now)
-
-        async let settingsDocumentRequest = userRef.collection("settings").document("preferences").getDocument()
-        async let userDocumentRequest = userRef.getDocument()
-        let (settingsDocument, userDocument) = try await (settingsDocumentRequest, userDocumentRequest)
-        let programStartDate = min(
-            resolveProgramStartDate(
-                from: settingsDocument,
-                userData: userDocument.data() ?? [:],
-                now: now
-            ),
-            today
+        let snapshot: JSONValue = try await ConvexBackend.shared.call(
+            .query, path: "progress:analyticsSnapshot"
         )
+        guard case .object(let root) = snapshot else { throw ConvexBackendError.invalidResponse }
+        let startMilliseconds = root["programStartDate"]?.doubleValue
+            ?? root["onboardingCompletedAt"]?.doubleValue
+            ?? root["createdAt"]?.doubleValue
+            ?? now.timeIntervalSince1970 * 1000
+        let programStartDate = min(Date(timeIntervalSince1970: startMilliseconds / 1000), today)
         let elapsedDays = max(
             1,
             (calendar.dateComponents([.day], from: calendar.startOfDay(for: programStartDate), to: today).day ?? 0) + 1
         )
-
-        async let taskStatusesRequest = userRef.collection("task_statuses").getDocuments()
-        async let completedTasksRequest = userRef.collection("completed_tasks")
-            .whereField("completedAt", isGreaterThanOrEqualTo: Timestamp(date: programStartDate))
-            .getDocuments()
-        async let habitTrackingRequest = userRef.collection("habit_tracking").getDocuments()
-        async let exercisesRequest = userRef.collection("exercises_done")
-            .whereField("completedAt", isGreaterThanOrEqualTo: Timestamp(date: programStartDate))
-            .getDocuments()
-        async let moodsRequest = userRef.collection("daily_moods")
-            .whereField("date", isGreaterThanOrEqualTo: Timestamp(date: programStartDate))
-            .getDocuments()
-        async let checkInsRequest = userRef.collection("daily_checkins")
-            .whereField("date", isGreaterThanOrEqualTo: Timestamp(date: programStartDate))
-            .getDocuments()
-
-        let (taskStatuses, completedTasks, habitTracking, exercises, moods, checkIns) = try await (
-            taskStatusesRequest,
-            completedTasksRequest,
-            habitTrackingRequest,
-            exercisesRequest,
-            moodsRequest,
-            checkInsRequest
-        )
+        let taskStatuses = statusSnapshots(root["taskStatuses"])
+        let completedTasks = snapshots(root["completedTasks"], timestampKeys: ["completedAt"])
+        let habitTracking = snapshots(root["habitTracking"], timestampKeys: ["lastCompletedAt", "updatedAt"])
+        let exercises = snapshots(root["exerciseSessions"], timestampKeys: ["completedAt"])
+        let moods = snapshots(root["moods"], dateKeys: ["date"])
+        let checkIns = snapshots(root["checkins"], dateKeys: ["date"])
 
         let taskCompletions = parseTaskCompletions(
-            taskStatuses.documents,
+            taskStatuses,
             programStartDate: programStartDate,
             startDate: programStartDate,
             metricStartDate: programStartDate,
             now: now
         )
-        var completedTaskData = parseCompletedTasks(completedTasks.documents)
+        var completedTaskData = parseCompletedTasks(completedTasks)
         completedTaskData.merge(
             parseLocalCompletions(
-                LocalProgressStore.load(for: userID)
+                LocalProgressStore.load(for: userID),
+                since: programStartDate
             )
         )
-        let habitTrackingData = parseHabitTracking(habitTracking.documents)
+        let habitTrackingData = parseHabitTracking(habitTracking)
         let mergedTaskCompletions = mergeTaskData(
             taskCompletions,
             completedTaskData,
@@ -128,29 +135,23 @@ final class ProgressAnalyticsService {
             programStartDate: programStartDate
         )
         let exerciseRecords = mergeExerciseRecords(
-            parseExercises(exercises.documents),
+            parseExercises(exercises),
             parseLocalSessions(LocalActivitySessionStore.load(for: userID))
         )
-        let moodScores = parseMoods(moods.documents)
+        let moodScores = parseMoods(moods)
         let days = ProgressAggregation.days(
             programStartDate: programStartDate,
             taskCompletionsByProgramDay: mergedTaskCompletions.byDay,
             exerciseDates: exerciseRecords.map(\.date),
             moodScoresByDate: moodScores,
-            checkInDates: parseCheckInDates(checkIns.documents),
+            checkInDates: parseCheckInDates(checkIns),
             range: elapsedDays,
             now: now,
             calendar: calendar
         )
         let streaks = ProgressAggregation.streaks(from: days)
-        let storedBest = max(
-            userDocument.data()?["longestStreakDays"] as? Int ?? 0,
-            UserPersistence.bestStreak
-        )
-        let storedCurrent = max(
-            userDocument.data()?["currentStreakDays"] as? Int ?? 0,
-            UserPersistence.streakDays
-        )
+        let storedBest = UserPersistence.bestStreak
+        let storedCurrent = UserPersistence.streakDays
         let visibleContinuityLimit = days.last?.isActive == false
             ? max(0, days.count - 1)
             : days.count
@@ -170,7 +171,7 @@ final class ProgressAnalyticsService {
         let lastSevenDaysStart = calendar.date(byAdding: .day, value: -6, to: today) ?? today
         let previousSevenDaysStart = calendar.date(byAdding: .day, value: -13, to: today) ?? today
         let checkInTrends = parseCheckInTrends(
-            checkIns.documents,
+            checkIns,
             currentStartDate: lastSevenDaysStart,
             previousStartDate: previousSevenDaysStart
         )
@@ -185,7 +186,7 @@ final class ProgressAnalyticsService {
             domainTrends: checkInTrends,
             topActivity: topActivity
         )
-        dashboardCache[userID] = (now, dashboard)
+        storeDashboard(dashboard, for: userID, now: now)
         return dashboard
     }
 
@@ -204,7 +205,7 @@ final class ProgressAnalyticsService {
             1,
             (calendar.dateComponents([.day], from: calendar.startOfDay(for: programStartDate), to: today).day ?? 0) + 1
         )
-        let completedTaskData = parseLocalCompletions(localCompletions)
+        let completedTaskData = parseLocalCompletions(localCompletions, since: programStartDate)
         let exerciseRecords = parseLocalSessions(localSessions)
         let days = ProgressAggregation.days(
             programStartDate: programStartDate,
@@ -235,12 +236,60 @@ final class ProgressAnalyticsService {
         )
     }
 
+    private func snapshots(
+        _ value: JSONValue?,
+        timestampKeys: Set<String> = [],
+        dateKeys: Set<String> = []
+    ) -> [QueryDocumentSnapshot] {
+        (value?.arrayValue ?? []).compactMap { row in
+            guard case .object(let object) = row else { return nil }
+            var fields = object.mapValues(\.foundationValue)
+            for key in timestampKeys {
+                if let milliseconds = object[key]?.doubleValue {
+                    fields[key] = Timestamp(date: Date(timeIntervalSince1970: milliseconds / 1000))
+                }
+            }
+            for key in dateKeys {
+                if case .string(let value) = object[key],
+                   let date = Self.dateKeyFormatter.date(from: value) {
+                    fields[key] = Timestamp(date: date)
+                }
+            }
+            let id = (fields["_id"] as? String) ?? UUID().uuidString
+            return QueryDocumentSnapshot(documentID: id, fields: fields)
+        }
+    }
+
+    private func statusSnapshots(_ value: JSONValue?) -> [QueryDocumentSnapshot] {
+        (value?.arrayValue ?? []).compactMap { row in
+            guard case .object(let object) = row,
+                  let day = object["programDay"]?.doubleValue.map(Int.init) else { return nil }
+            var fields: [String: Any] = [:]
+            if case .object(let statuses) = object["statuses"] {
+                for (key, status) in statuses { fields[key] = status.foundationValue }
+            }
+            if let milliseconds = object["updatedAt"]?.doubleValue {
+                fields["lastUpdated"] = Timestamp(date: Date(timeIntervalSince1970: milliseconds / 1000))
+            }
+            return QueryDocumentSnapshot(documentID: "day_\(day)", fields: fields)
+        }
+    }
+
+    private static let dateKeyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+
     private func resolveProgramStartDate(
         from document: DocumentSnapshot,
         userData: [String: Any],
         now: Date
     ) -> Date {
-        if let timestamp = document.data()?["programStartDate"] as? Timestamp {
+        if let timestamp = document.data()["programStartDate"] as? Timestamp {
             return timestamp.dateValue()
         }
         if let settings = UserSettings.loadFromUserDefaults() {
@@ -276,6 +325,9 @@ final class ProgressAnalyticsService {
             guard let completionDate = calendar.date(byAdding: .day, value: day - 1, to: calendar.startOfDay(for: programStartDate)),
                   completionDate >= calendar.startOfDay(for: startDate),
                   completionDate <= calendar.startOfDay(for: now) else { continue }
+            // Left over from before a program restart (same day key, older program).
+            if let lastUpdated = (document.data()["lastUpdated"] as? Timestamp)?.dateValue(),
+               lastUpdated < calendar.startOfDay(for: programStartDate) { continue }
             var doneCount = 0
 
             for (title, value) in document.data() where title != "lastUpdated" {
@@ -405,11 +457,14 @@ final class ProgressAnalyticsService {
     }
 
     private func parseLocalCompletions(
-        _ completions: [LocalProgressStore.Completion]
+        _ completions: [LocalProgressStore.Completion],
+        since programStartDate: Date
     ) -> CompletedTaskData {
         var result = CompletedTaskData()
+        // Program days restart at 1 after a program restart: older completions would land on the new days.
+        let programStart = calendar.startOfDay(for: programStartDate)
 
-        for completion in completions where completion.programDay > 0 {
+        for completion in completions where completion.programDay > 0 && completion.completedAt >= programStart {
             result.byProgramDay[completion.programDay, default: 0] += 1
             let date = calendar.startOfDay(for: completion.completedAt)
             result.byDate[date, default: 0] += 1

@@ -1,0 +1,4138 @@
+{
+ "version": 1,
+ "language_source": "fr",
+ "length_rule": {
+  "words_per_minute": 150,
+  "formula": "target_words = round(150 * target_minutes * speech_ratio)",
+  "speech_ratio": {
+   "default": 0.9,
+   "sleep_yoga_nidra_body_scan": 0.8,
+   "sleep_story": 1.0
+  },
+  "tolerance": "±10 % sur target_words (mots prononcés, hors marqueurs [pause Ns])"
+ },
+ "id_convention": "kebab-case <theme>-<slug>-<minutes>, comme les IDs existants (ne jamais renommer un ID existant, même si sa durée change)",
+ "summary": {
+  "total_sessions": 103,
+  "kept": 0,
+  "rewrite": 30,
+  "new": 73,
+  "total_minutes": 856,
+  "total_target_words": 113580,
+  "per_theme": {
+   "firstSteps": {
+    "sessions": 8,
+    "minutes": 60
+   },
+   "stressSOS": {
+    "sessions": 11,
+    "minutes": 45
+   },
+   "workBreak": {
+    "sessions": 11,
+    "minutes": 78
+   },
+   "anxiety": {
+    "sessions": 10,
+    "minutes": 80
+   },
+   "sleep": {
+    "sessions": 12,
+    "minutes": 190
+   },
+   "morning": {
+    "sessions": 10,
+    "minutes": 68
+   },
+   "bodyRelax": {
+    "sessions": 10,
+    "minutes": 92
+   },
+   "selfCompassion": {
+    "sessions": 10,
+    "minutes": 80
+   },
+   "focus": {
+    "sessions": 11,
+    "minutes": 89
+   },
+   "stressScience": {
+    "sessions": 10,
+    "minutes": 74
+   }
+  }
+ },
+ "themes": [
+  {
+   "id": "firstSteps",
+   "is_new": true,
+   "title": {
+    "fr": "Premiers pas",
+    "en": "First steps",
+    "de": "Erste Schritte",
+    "es": "Primeros pasos",
+    "ja": "はじめての瞑想",
+    "ko": "명상 첫걸음"
+   },
+   "subtitle": {
+    "fr": "Apprends à méditer en 7 jours, quelques minutes par jour",
+    "en": "Learn to meditate in 7 days, a few minutes a day",
+    "de": "In 7 Tagen meditieren lernen – ein paar Minuten täglich",
+    "es": "Aprende a meditar en 7 días, unos minutos al día",
+    "ja": "1日数分、7日間で瞑想の基本が身につく",
+    "ko": "하루 몇 분, 7일 만에 명상의 기본 익히기"
+   },
+   "rationale": "Nouveau thème. Aujourd'hui rien n'accueille le débutant : il tombe directement sur des techniques. Un parcours de 7 jours progressif (5 → 10 min) est le standard du marché (Petit Bambou, Headspace) et le meilleur levier d'activation/rétention des premiers jours d'abonnement. Chaque jour introduit UNE compétence et la réutilise ensuite. Le bonus « Quand ça ne marche pas » répond aux trois raisons d'abandon les plus fréquentes.",
+   "sessions": [
+    {
+     "id": "first-steps-day1-5",
+     "status": "new",
+     "title": {
+      "fr": "Jour 1 · S'asseoir et respirer",
+      "en": "Day 1 · Sit and breathe",
+      "de": "Tag 1 · Sitzen und atmen",
+      "es": "Día 1 · Siéntate y respira",
+      "ja": "1日目・座って、呼吸する",
+      "ko": "1일차 · 앉아서 숨 쉬기"
+     },
+     "subtitle": {
+      "fr": "Ce qu'est (et n'est pas) la méditation",
+      "en": "What meditation is (and isn't)",
+      "de": "Was Meditation ist – und was nicht",
+      "es": "Qué es (y qué no es) meditar",
+      "ja": "瞑想とは何か、何ではないか",
+      "ko": "명상이란 무엇이고 무엇이 아닌지"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Installation + ancrage respiratoire simple",
+     "purpose": "Pour la personne qui n'a jamais médité. Démystifie (on ne vide pas sa tête), apprend la posture et pose le souffle comme premier point d'appui.",
+     "outline": [
+      "Accueil : tu n'as rien à réussir, juste à être là 5 minutes",
+      "Mythe à lever : méditer n'est pas faire le vide, c'est remarquer",
+      "Posture : assis, dos digne mais pas raide, mains posées, yeux fermés ou regard bas",
+      "Trois respirations un peu plus profondes pour arriver",
+      "Sentir le souffle là où il est le plus net (narines, poitrine ou ventre)",
+      "Une minute en silence guidé léger à suivre le souffle",
+      "Clôture : ce que tu viens de faire, c'est méditer ; rendez-vous demain"
+     ],
+     "image": "habit_intro_meditate",
+     "ambience": null,
+     "audio_minutes": 7
+    },
+    {
+     "id": "first-steps-day2-6",
+     "status": "new",
+     "title": {
+      "fr": "Jour 2 · L'esprit qui vagabonde",
+      "en": "Day 2 · The wandering mind",
+      "de": "Tag 2 · Der wandernde Geist",
+      "es": "Día 2 · La mente que divaga",
+      "ja": "2日目・さまよう心",
+      "ko": "2일차 · 떠도는 마음"
+     },
+     "subtitle": {
+      "fr": "Se perdre dans ses pensées fait partie de l'exercice",
+      "en": "Getting lost in thought is part of the practice",
+      "de": "Abschweifen gehört zur Übung dazu",
+      "es": "Perderte en tus pensamientos es parte del ejercicio",
+      "ja": "考えにそれるのも、練習のうち",
+      "ko": "생각에 빠지는 것도 연습의 일부예요"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Ancrage respiratoire + retour après distraction",
+     "purpose": "Enseigne le geste central de toute méditation : remarquer qu'on est parti, puis revenir sans se juger. Désamorce le « je n'y arrive pas ».",
+     "outline": [
+      "Rappel du jour 1 et installation rapide",
+      "Ancrage sur le souffle au ventre",
+      "Explication : l'esprit va partir, c'est normal et même utile",
+      "Le geste en trois temps : remarquer, lâcher, revenir",
+      "Pratique avec relances espacées (« si tu es parti, reviens simplement »)",
+      "Image : chaque retour est une répétition, comme un muscle",
+      "Clôture : compter le nombre de retours n'a aucune importance"
+     ],
+     "image": "meditation_05",
+     "ambience": "stream",
+     "audio_minutes": 8
+    },
+    {
+     "id": "first-steps-day3-7",
+     "status": "new",
+     "title": {
+      "fr": "Jour 3 · Habiter son corps",
+      "en": "Day 3 · Coming home to your body",
+      "de": "Tag 3 · Im Körper ankommen",
+      "es": "Día 3 · Habitar tu cuerpo",
+      "ja": "3日目・からだに戻る",
+      "ko": "3일차 · 몸으로 돌아오기"
+     },
+     "subtitle": {
+      "fr": "Ton corps comme point d'ancrage quand la tête s'emballe",
+      "en": "Your body as an anchor when your mind races",
+      "de": "Der Körper als Anker, wenn der Kopf rast",
+      "es": "Tu cuerpo como ancla cuando la mente se acelera",
+      "ja": "頭が忙しいとき、からだを錨にする",
+      "ko": "머릿속이 복잡할 때 몸을 닻으로 삼기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.8,
+     "target_words": 840,
+     "technique": "Body scan court (introduction)",
+     "purpose": "Introduit le corps comme deuxième ancre, souvent plus accessible que le souffle pour les personnes stressées. Prépare aux body scans longs.",
+     "outline": [
+      "Installation, assis ou allongé",
+      "Pourquoi le corps : il est toujours au présent",
+      "Points de contact : pieds, assise, mains",
+      "Balayage rapide : pieds, jambes, bassin, dos",
+      "Ventre, poitrine, épaules, bras",
+      "Nuque, visage, sommet du crâne",
+      "Sentir le corps entier respirer",
+      "Clôture : tu peux revenir au corps n'importe quand dans la journée"
+     ],
+     "image": "routine_relaxation",
+     "ambience": "rain",
+     "audio_minutes": 10
+    },
+    {
+     "id": "first-steps-day4-8",
+     "status": "new",
+     "title": {
+      "fr": "Jour 4 · Sons et pensées",
+      "en": "Day 4 · Sounds and thoughts",
+      "de": "Tag 4 · Geräusche und Gedanken",
+      "es": "Día 4 · Sonidos y pensamientos",
+      "ja": "4日目・音と思考",
+      "ko": "4일차 · 소리와 생각"
+     },
+     "subtitle": {
+      "fr": "Laisser venir et repartir, sans tout suivre",
+      "en": "Let things come and go, without chasing them",
+      "de": "Kommen und gehen lassen, ohne hinterherzulaufen",
+      "es": "Dejar que llegue y se vaya, sin perseguirlo",
+      "ja": "追いかけず、来ては去るにまかせる",
+      "ko": "따라가지 않고 오가게 두기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Sons + pensées (noting simple)",
+     "purpose": "Apprend à observer ce qui passe (sons, pensées) au lieu de le combattre. Introduit la notation mentale douce (« pensée », « son »).",
+     "outline": [
+      "Installation et quelques souffles",
+      "Ouvrir l'écoute : sons proches, sons lointains, sans les nommer",
+      "Les sons arrivent et repartent tout seuls",
+      "Transposer aux pensées : elles aussi arrivent et repartent",
+      "Petit étiquetage mental : « pensée », « son », « sensation »",
+      "Pratique silencieuse avec étiquetage léger",
+      "Retour au souffle, clôture"
+     ],
+     "image": "meditation_07",
+     "ambience": "forest",
+     "audio_minutes": 11
+    },
+    {
+     "id": "first-steps-day5-8",
+     "status": "new",
+     "title": {
+      "fr": "Jour 5 · Accueillir ce que tu ressens",
+      "en": "Day 5 · Making room for feelings",
+      "de": "Tag 5 · Gefühlen Raum geben",
+      "es": "Día 5 · Acoger lo que sientes",
+      "ja": "5日目・感じていることを迎える",
+      "ko": "5일차 · 느끼는 것을 맞이하기"
+     },
+     "subtitle": {
+      "fr": "Une émotion, ça se sent dans le corps. Et ça passe.",
+      "en": "Emotions live in the body. And they pass.",
+      "de": "Gefühle wohnen im Körper. Und sie gehen vorüber.",
+      "es": "Las emociones se sienten en el cuerpo. Y pasan.",
+      "ja": "感情はからだに現れ、やがて過ぎていく",
+      "ko": "감정은 몸에서 느껴지고, 지나갑니다"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Accueil des émotions + main sur le cœur",
+     "purpose": "Introduit la relation bienveillante aux émotions : localiser, nommer, adoucir. Pont vers RAIN et l'autocompassion.",
+     "outline": [
+      "Installation et ancrage au souffle",
+      "Repérer l'humeur du moment, sans la changer",
+      "Où se loge-t-elle dans le corps ? Chaleur, serrement, poids",
+      "La nommer simplement : « il y a de l'agacement »",
+      "Respirer autour de la sensation, lui faire de la place",
+      "Main sur le cœur, une phrase douce pour soi",
+      "Clôture : ressentir n'est pas un échec de la méditation"
+     ],
+     "image": "meditation_06",
+     "ambience": "ocean",
+     "audio_minutes": 11
+    },
+    {
+     "id": "first-steps-day6-10",
+     "status": "new",
+     "title": {
+      "fr": "Jour 6 · Juste être là",
+      "en": "Day 6 · Simply being here",
+      "de": "Tag 6 · Einfach da sein",
+      "es": "Día 6 · Simplemente estar",
+      "ja": "6日目・ただ、ここにいる",
+      "ko": "6일차 · 그저 여기 있기"
+     },
+     "subtitle": {
+      "fr": "Lâcher l'ancre et goûter au calme ouvert",
+      "en": "Let go of the anchor and taste open calm",
+      "de": "Den Anker loslassen, offene Ruhe spüren",
+      "es": "Suelta el ancla y saborea la calma abierta",
+      "ja": "錨を手放し、ひらかれた静けさを味わう",
+      "ko": "닻을 내려놓고 열린 고요 맛보기"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Présence ouverte (première approche)",
+     "purpose": "Après avoir appris les ancres, on élargit : présence ouverte à tout ce qui se présente. Premier contact avec la qualité « spacieuse » de la méditation.",
+     "outline": [
+      "Installation et ancrage au souffle",
+      "Élargir au corps entier",
+      "Ajouter les sons, puis les pensées",
+      "Image du ciel : tout passe, le ciel reste",
+      "Plusieurs minutes de présence ouverte, peu de mots",
+      "Si tu te perds, reviens au souffle puis réouvre",
+      "Clôture : tu as utilisé tout ce que tu as appris cette semaine"
+     ],
+     "image": "guided_breathing_03",
+     "ambience": "stream",
+     "audio_minutes": 15
+    },
+    {
+     "id": "first-steps-day7-10",
+     "status": "new",
+     "title": {
+      "fr": "Jour 7 · Emporter la méditation avec toi",
+      "en": "Day 7 · Take it with you",
+      "de": "Tag 7 · Meditation für den Alltag",
+      "es": "Día 7 · Llévatelo contigo",
+      "ja": "7日目・日常へ持ち帰る",
+      "ko": "7일차 · 일상으로 가져가기"
+     },
+     "subtitle": {
+      "fr": "Construire une habitude qui tient vraiment",
+      "en": "Build a habit that actually sticks",
+      "de": "Eine Gewohnheit, die wirklich bleibt",
+      "es": "Crea un hábito que de verdad dure",
+      "ja": "本当に続く習慣をつくる",
+      "ko": "정말로 이어지는 습관 만들기"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Intégration + intention de pratique",
+     "purpose": "Clôt le parcours : courte pratique complète (souffle, corps, ouverture), puis choix concret d'un moment et d'un déclencheur quotidiens. Oriente vers les autres thèmes.",
+     "outline": [
+      "Accueil : 7 jours, bravo pour la régularité (sans exagérer)",
+      "Mini pratique complète : souffle, corps, ouverture",
+      "Rappel des 3 gestes clés : ancrer, remarquer, revenir",
+      "Choisir un moment fixe et un déclencheur (après le café, avant d'ouvrir les mails)",
+      "Visualiser demain ce moment-là, assis 3 minutes",
+      "Les micro-pratiques : 3 souffles au feu rouge, à la machine à café",
+      "Clôture : suggestions de thèmes selon tes besoins"
+     ],
+     "image": "habit_meditate",
+     "ambience": "morning",
+     "audio_minutes": 13
+    },
+    {
+     "id": "first-steps-troubleshoot-6",
+     "status": "new",
+     "title": {
+      "fr": "Quand ça ne marche pas",
+      "en": "When it doesn't seem to work",
+      "de": "Wenn es nicht klappt",
+      "es": "Cuando parece que no funciona",
+      "ja": "うまくいかないと感じたら",
+      "ko": "잘 안 된다고 느낄 때"
+     },
+     "subtitle": {
+      "fr": "Agitation, sommeil, doute : les trois obstacles, et quoi faire",
+      "en": "Restless, sleepy, doubtful: the three hurdles and what to do",
+      "de": "Unruhe, Müdigkeit, Zweifel – und was hilft",
+      "es": "Inquietud, sueño, dudas: los tres obstáculos y qué hacer",
+      "ja": "落ち着かない・眠い・疑い。3つの壁と対処法",
+      "ko": "들뜸, 졸음, 의심: 세 가지 장애물과 대처법"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Pédagogie + pratique courte (agitation, somnolence, doute)",
+     "purpose": "Pour qui pense « je suis nul en méditation ». Normalise les trois obstacles classiques et donne pour chacun un ajustement concret, testé sur place.",
+     "outline": [
+      "Accueil : si tu es là, c'est que tu n'as pas abandonné",
+      "Agitation : yeux ouverts, compter les souffles, expiration longue",
+      "Petite pratique : compter 1 à 5 sur l'expiration",
+      "Somnolence : redresser le dos, ouvrir les yeux, respirer plus frais",
+      "Doute (« ça sert à rien ») : le noter comme une pensée parmi d'autres",
+      "Petite pratique : étiqueter « doute » et revenir",
+      "Clôture : une méditation « ratée » est souvent celle qui entraîne le plus"
+     ],
+     "image": "task_meditate",
+     "ambience": null,
+     "audio_minutes": 8
+    }
+   ]
+  },
+  {
+   "id": "stressSOS",
+   "is_new": false,
+   "title": {
+    "fr": "SOS stress",
+    "en": "Stress SOS",
+    "de": "Stress-SOS",
+    "es": "SOS estrés",
+    "ja": "ストレスSOS",
+    "ko": "스트레스 SOS"
+   },
+   "subtitle": {
+    "fr": "1 à 7 minutes pour redescendre, tout de suite",
+    "en": "1 to 7 minutes to come back down, right now",
+    "de": "1 bis 7 Minuten, um sofort runterzukommen",
+    "es": "De 1 a 7 minutos para bajar revoluciones, ya",
+    "ja": "今すぐ落ち着くための1〜7分",
+    "ko": "지금 바로 가라앉히는 1~7분"
+   },
+   "rationale": "Thème existant, cœur de la promesse « anti-cortisol ». Recentré sur l'urgence : uniquement des formats courts (≤ 7 min), chacun pour un déclencheur précis (panique, colère, choc, conflit, surcharge, en public). Le titre « SOS stress » est plus naturel en français que « Stress SOS ». La cohérence cardiaque part dans le nouveau thème science.",
+   "sessions": [
+    {
+     "id": "sos-one-minute-1",
+     "status": "new",
+     "title": {
+      "fr": "Une minute pour souffler",
+      "en": "One minute to breathe",
+      "de": "Eine Minute zum Durchatmen",
+      "es": "Un minuto para respirar",
+      "ja": "ひと息つく1分",
+      "ko": "숨 돌리는 1분"
+     },
+     "subtitle": {
+      "fr": "Le bouton pause le plus court du catalogue",
+      "en": "The shortest pause button in the app",
+      "de": "Die kürzeste Pause-Taste der App",
+      "es": "El botón de pausa más corto de la app",
+      "ja": "いちばん短い「一時停止ボタン」",
+      "ko": "가장 짧은 일시정지 버튼"
+     },
+     "target_minutes": 1,
+     "speech_ratio": 0.9,
+     "target_words": 135,
+     "technique": "STOP (Stop, Respire, Observe, Poursuis)",
+     "purpose": "Pour le moment où tu n'as littéralement qu'une minute (entre deux appels, avant d'entrer quelque part). Méthode STOP, yeux ouverts possibles.",
+     "outline": [
+      "Stop : tu t'arrêtes là où tu es",
+      "Une respiration lente, expiration plus longue",
+      "Observe : corps, émotion, pensée, en un mot chacun",
+      "Une deuxième respiration lente",
+      "Poursuis : quelle est la prochaine petite action ?"
+     ],
+     "image": "guided_breathing_02",
+     "ambience": null,
+     "audio_minutes": 2
+    },
+    {
+     "id": "sos-box-breathing-2",
+     "status": "new",
+     "title": {
+      "fr": "Respiration carrée",
+      "en": "Box breathing",
+      "de": "Box-Atmung",
+      "es": "Respiración cuadrada",
+      "ja": "ボックス呼吸",
+      "ko": "박스 호흡"
+     },
+     "subtitle": {
+      "fr": "4 temps, 4 côtés : la technique des métiers sous pression",
+      "en": "Four counts, four sides: the go-to under pressure",
+      "de": "Vier Takte, vier Seiten – bewährt unter Druck",
+      "es": "Cuatro tiempos, cuatro lados: el clásico bajo presión",
+      "ja": "4拍×4辺。プレッシャー下の定番テクニック",
+      "ko": "4박자, 4면: 압박 속에서 쓰는 기본 기술"
+     },
+     "target_minutes": 2,
+     "speech_ratio": 0.9,
+     "target_words": 270,
+     "technique": "Respiration carrée (4-4-4-4)",
+     "purpose": "Respiration rythmée qui occupe l'esprit et stabilise quand on doit rester opérationnel. Comptage guidé du début à la fin.",
+     "outline": [
+      "Arrivée en une phrase, posture droite",
+      "Explication : inspire 4, retiens 4, expire 4, retiens 4",
+      "Trois cycles comptés à voix haute par la voix",
+      "Cycles suivants avec comptage plus discret",
+      "Option : raccourcir à 3 temps si c'est inconfortable",
+      "Retour au souffle naturel, une phrase de clôture"
+     ],
+     "image": "guided_breathing_04",
+     "ambience": null,
+     "audio_minutes": 3
+    },
+    {
+     "id": "sos-discreet-public-3",
+     "status": "new",
+     "title": {
+      "fr": "Stress en public, discrètement",
+      "en": "Stressed in public, discreetly",
+      "de": "Stress in der Öffentlichkeit – unauffällig",
+      "es": "Estrés en público, con discreción",
+      "ja": "人前でこっそり落ち着く",
+      "ko": "사람들 사이에서 조용히 진정하기"
+     },
+     "subtitle": {
+      "fr": "Dans le métro, une file, un open space : personne ne verra rien",
+      "en": "On the train, in a queue, at the office: no one will notice",
+      "de": "In der Bahn, in der Schlange, im Büro – niemand merkt es",
+      "es": "En el metro, en una fila, en la oficina: nadie lo notará",
+      "ja": "電車でも行列でもオフィスでも、誰にも気づかれずに",
+      "ko": "지하철, 줄, 사무실에서도 아무도 모르게"
+     },
+     "target_minutes": 3,
+     "speech_ratio": 0.9,
+     "target_words": 405,
+     "technique": "Ancrage yeux ouverts discret (pieds, mains, souffle)",
+     "purpose": "Pour les moments où on ne peut ni fermer les yeux ni s'isoler. Tout se fait de manière invisible : appuis, mains, regard, souffle.",
+     "outline": [
+      "Garde les yeux ouverts, on reste discret",
+      "Pousser légèrement les pieds dans le sol",
+      "Presser le pouce contre chaque doigt, un par un",
+      "Regard doux sur un point neutre",
+      "Expiration un peu plus longue, bouche fermée",
+      "Repérer trois sons autour de toi",
+      "Clôture : tu peux refaire ça n'importe où"
+     ],
+     "image": "guided_breathing_07",
+     "ambience": null,
+     "audio_minutes": 5
+    },
+    {
+     "id": "sos-reset-3",
+     "status": "rewrite",
+     "title": {
+      "fr": "Reset express",
+      "en": "Quick reset",
+      "de": "Schneller Reset",
+      "es": "Reinicio exprés",
+      "ja": "クイックリセット",
+      "ko": "빠른 리셋"
+     },
+     "subtitle": {
+      "fr": "Trois soupirs pour casser la montée de stress",
+      "en": "Three sighs to break a stress spike",
+      "de": "Drei Seufzer gegen die Stresswelle",
+      "es": "Tres suspiros para cortar el pico de estrés",
+      "ja": "3回のため息でストレスの波を断ち切る",
+      "ko": "세 번의 한숨으로 스트레스 파도 끊기"
+     },
+     "target_minutes": 3,
+     "speech_ratio": 0.9,
+     "target_words": 405,
+     "technique": "Soupir physiologique (double inspiration, longue expiration)",
+     "purpose": "La session SOS phare : le soupir physiologique, l'outil le plus rapide pour faire redescendre l'activation. À utiliser n'importe où.",
+     "outline": [
+      "Accueil : tu as bien fait de t'arrêter",
+      "Pieds au sol, dos qui se redresse",
+      "Explication brève du double soupir",
+      "Trois soupirs guidés, épaules qui tombent",
+      "Desserrer la mâchoire, langue posée",
+      "Souffle naturel, sentir l'appui du corps",
+      "Retour à la journée, un pas après l'autre"
+     ],
+     "image": "situation_tendu",
+     "ambience": null,
+     "audio_minutes": 4
+    },
+    {
+     "id": "sos-anger-cool-down-4",
+     "status": "new",
+     "title": {
+      "fr": "Quand la colère monte",
+      "en": "When anger rises",
+      "de": "Wenn die Wut hochkocht",
+      "es": "Cuando sube la rabia",
+      "ja": "怒りがこみ上げたら",
+      "ko": "화가 치밀어 오를 때"
+     },
+     "subtitle": {
+      "fr": "Laisser redescendre la pression avant de répondre",
+      "en": "Let the pressure drop before you respond",
+      "de": "Den Druck sinken lassen, bevor du reagierst",
+      "es": "Deja bajar la presión antes de responder",
+      "ja": "反応する前に、圧を下げる",
+      "ko": "대답하기 전에 압력을 낮추기"
+     },
+     "target_minutes": 4,
+     "speech_ratio": 0.9,
+     "target_words": 540,
+     "technique": "Refroidissement de la colère (expiration longue + pause avant réaction)",
+     "purpose": "Juste après une provocation, un mail injuste, un enfant qui pousse à bout. Crée l'espace entre stimulus et réaction, sans nier la colère.",
+     "outline": [
+      "Autorisation : la colère est légitime, on s'occupe juste de la réaction",
+      "Repérer où elle chauffe : mâchoire, poings, poitrine",
+      "Relâcher les mains, ouvrir les paumes",
+      "Expirations longues, comme pour refroidir une soupe",
+      "Nommer le besoin derrière la colère (respect, justice, repos)",
+      "Choisir : répondre maintenant, plus tard, ou pas du tout",
+      "Clôture : une respiration avant de reprendre"
+     ],
+     "image": "guided_breathing_06",
+     "ambience": null,
+     "audio_minutes": 6
+    },
+    {
+     "id": "sos-overwhelm-triage-4",
+     "status": "new",
+     "title": {
+      "fr": "Trop de choses à la fois",
+      "en": "Too much at once",
+      "de": "Alles auf einmal",
+      "es": "Demasiadas cosas a la vez",
+      "ja": "いろいろ重なりすぎたとき",
+      "ko": "한꺼번에 너무 많을 때"
+     },
+     "subtitle": {
+      "fr": "Quand tout s'empile : revenir à une seule chose",
+      "en": "When everything piles up: back to just one thing",
+      "de": "Wenn sich alles türmt: zurück zu einer Sache",
+      "es": "Cuando todo se acumula: vuelve a una sola cosa",
+      "ja": "すべてが積み重なったら、ひとつに戻る",
+      "ko": "모든 게 쌓일 때, 한 가지로 돌아오기"
+     },
+     "target_minutes": 4,
+     "speech_ratio": 0.9,
+     "target_words": 540,
+     "technique": "Ancrage + tri cognitif (une seule chose à la fois)",
+     "purpose": "Sensation d'être submergé (to-do qui déborde, sollicitations multiples). Calme le corps puis ramène l'esprit à la seule prochaine action.",
+     "outline": [
+      "Reconnaître : c'est beaucoup, et c'est normal d'être débordé",
+      "Trois expirations longues",
+      "Sentir les mains, poser le regard sur un point fixe",
+      "Vider la tête : nommer intérieurement tout ce qui tourne, sans trier",
+      "Se demander : quelle est la seule chose qui compte dans l'heure ?",
+      "Visualiser cette première petite étape",
+      "Clôture : le reste peut attendre son tour"
+     ],
+     "image": "situation_submerge",
+     "ambience": null,
+     "audio_minutes": 6
+    },
+    {
+     "id": "sos-panic-anchor-4",
+     "status": "rewrite",
+     "title": {
+      "fr": "Ancre anti-panique",
+      "en": "Panic anchor",
+      "de": "Anker bei Panik",
+      "es": "Ancla antipánico",
+      "ja": "パニックのいかり",
+      "ko": "공황 닻 내리기"
+     },
+     "subtitle": {
+      "fr": "Laisser passer la vague, les pieds bien ancrés",
+      "en": "Let the wave pass with your feet on the ground",
+      "de": "Die Welle vorbeiziehen lassen, fest am Boden",
+      "es": "Deja pasar la ola con los pies en el suelo",
+      "ja": "足を床につけて、波が過ぎるのを待つ",
+      "ko": "발을 땅에 딛고 파도가 지나가게 두기"
+     },
+     "target_minutes": 4,
+     "speech_ratio": 0.9,
+     "target_words": 540,
+     "technique": "Ancrage sensoriel + expiration longue pendant une crise de panique",
+     "purpose": "Pendant ou juste après une attaque de panique. Ne cherche pas à arrêter la vague mais à la traverser, ancré dans les pieds et les mains. Aucune rétention de souffle.",
+     "outline": [
+      "Validation immédiate : c'est très désagréable, et ce n'est pas dangereux, ça va passer",
+      "Pieds au sol, presser les mains l'une contre l'autre",
+      "Regarder autour : nommer 3 objets à voix basse",
+      "Expiration longue par la bouche, sans forcer l'inspiration",
+      "Image de la vague qui monte, culmine et redescend",
+      "Rester avec les sensations sans les combattre",
+      "Clôture : tu l'as traversée ; conseil d'en parler à un professionnel si c'est fréquent"
+     ],
+     "image": "situation_stresse",
+     "ambience": null,
+     "audio_minutes": 6
+    },
+    {
+     "id": "sos-cortisol-drop-5",
+     "status": "rewrite",
+     "title": {
+      "fr": "Faire baisser le cortisol",
+      "en": "Lower your cortisol",
+      "de": "Cortisol senken",
+      "es": "Baja tu cortisol",
+      "ja": "コルチゾールを下げる",
+      "ko": "코르티솔 낮추기"
+     },
+     "subtitle": {
+      "fr": "L'expiration longue qui dit à ton corps : tu es en sécurité",
+      "en": "The long exhale that tells your body it's safe",
+      "de": "Langes Ausatmen signalisiert: Du bist sicher",
+      "es": "La exhalación larga que le dice a tu cuerpo que está a salvo",
+      "ja": "長い吐く息がからだに安心を伝える",
+      "ko": "긴 날숨으로 몸에 안전하다고 알려주기"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Expiration prolongée (4-6 puis 4-8)",
+     "purpose": "La session « signature » de CortiFree : apprend le ratio inspiration courte / expiration longue, le moyen le plus simple de signaler la sécurité au corps. Base de nombreuses autres sessions.",
+     "outline": [
+      "Installation, main sur le ventre",
+      "Explication simple : l'expiration longue signale la sécurité (sans promesse médicale)",
+      "Observer le souffle tel qu'il est",
+      "Rythme 4-6 guidé avec comptage",
+      "Allonger à 7-8 si confortable",
+      "Laisser tomber le comptage, garder la lenteur",
+      "Remarquer les changements dans le corps",
+      "Clôture : ce rythme est disponible partout, discrètement"
+     ],
+     "image": "routine_stress",
+     "ambience": "ocean",
+     "audio_minutes": 7
+    },
+    {
+     "id": "sos-after-conflict-6",
+     "status": "new",
+     "title": {
+      "fr": "Après une dispute",
+      "en": "After an argument",
+      "de": "Nach einem Streit",
+      "es": "Después de una discusión",
+      "ja": "口論のあとで",
+      "ko": "다툰 후에"
+     },
+     "subtitle": {
+      "fr": "Retrouver ton calme avant de reparler à l'autre",
+      "en": "Find your calm before you talk again",
+      "de": "Zur Ruhe finden, bevor ihr wieder sprecht",
+      "es": "Recupera la calma antes de volver a hablar",
+      "ja": "相手と話す前に、まず自分の落ち着きを",
+      "ko": "다시 대화하기 전에 평정 되찾기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Décharge + recadrage après une dispute (relation proche)",
+     "purpose": "Après une dispute avec un proche (couple, famille, ami). Fait redescendre, aide à voir son besoin et celui de l'autre, prépare une reprise de dialogue. (Le conflit pro est dans « Au travail ».)",
+     "outline": [
+      "Reconnaître l'agitation : cœur, chaleur, pensées qui rejouent la scène",
+      "Expirations longues, épaules qui descendent",
+      "Laisser passer les répliques qui tournent (« je lui aurais dit… »)",
+      "Ce que je ressens, ce dont j'ai besoin",
+      "Ce que l'autre ressent peut-être, ce dont il a besoin",
+      "Choisir une première phrase apaisée pour reprendre contact",
+      "Clôture : pas d'obligation de réparer tout de suite"
+     ],
+     "image": "situation_recentrer",
+     "ambience": "stream",
+     "audio_minutes": 9
+    },
+    {
+     "id": "sos-bad-news-6",
+     "status": "new",
+     "title": {
+      "fr": "Encaisser une mauvaise nouvelle",
+      "en": "After bad news",
+      "de": "Nach einer schlechten Nachricht",
+      "es": "Tras una mala noticia",
+      "ja": "つらい知らせを受けたとき",
+      "ko": "나쁜 소식을 들었을 때"
+     },
+     "subtitle": {
+      "fr": "Juste après le choc, avant de devoir réfléchir",
+      "en": "Right after the shock, before you have to think",
+      "de": "Direkt nach dem Schock, bevor du denken musst",
+      "es": "Justo después del golpe, antes de tener que pensar",
+      "ja": "衝撃の直後、考えなければならない前に",
+      "ko": "충격 직후, 생각해야 하기 전에"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Stabilisation après un choc (orientation + autocompassion)",
+     "purpose": "Après un appel difficile, un diagnostic, une rupture, un refus. Ne résout rien : stabilise le corps, autorise l'émotion, prépare la suite immédiate.",
+     "outline": [
+      "Accueil : quelque chose de difficile vient d'arriver, prends ce temps",
+      "Orientation : regarder la pièce, sentir le sol, tu es ici",
+      "Respiration lente, sans objectif",
+      "Autorisation : sidération, larmes, rien du tout, tout est normal",
+      "Main sur le cœur ou le ventre, une phrase de soutien",
+      "Une seule question : de quoi ai-je besoin dans l'heure qui vient ?",
+      "Penser à une personne à appeler si besoin",
+      "Clôture douce, sans injonction d'aller mieux"
+     ],
+     "image": "meditation_08",
+     "ambience": "rain",
+     "audio_minutes": 8
+    },
+    {
+     "id": "sos-safe-place-7",
+     "status": "rewrite",
+     "title": {
+      "fr": "Ton refuge intérieur",
+      "en": "Your inner refuge",
+      "de": "Dein innerer Zufluchtsort",
+      "es": "Tu refugio interior",
+      "ja": "心の避難所",
+      "ko": "내면의 안식처"
+     },
+     "subtitle": {
+      "fr": "Visualise un lieu sûr et ancre-le pour y revenir",
+      "en": "Picture a safe place and anchor it to return anytime",
+      "de": "Stell dir einen sicheren Ort vor und verankere ihn",
+      "es": "Visualiza un lugar seguro y ánclalo para volver",
+      "ja": "安心できる場所を思い描き、いつでも戻れるように",
+      "ko": "안전한 장소를 떠올리고 언제든 돌아올 수 있게"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Visualisation du lieu sûr + ancrage gestuel",
+     "purpose": "Construire un lieu intérieur sûr, sensoriel et détaillé, puis l'associer à un geste (pouce-index) pour y revenir en quelques secondes en situation de stress.",
+     "outline": [
+      "Installation et quelques respirations lentes",
+      "Choisir un lieu réel ou imaginaire où l'on se sent en sécurité",
+      "L'explorer avec la vue : couleurs, lumière",
+      "Sons, odeurs, température, texture sous les pieds",
+      "Sentir la sécurité dans le corps",
+      "Associer un geste discret (pouce contre index)",
+      "Retour progressif, en gardant le geste comme raccourci"
+     ],
+     "image": "meditation_03",
+     "ambience": "stream",
+     "audio_minutes": 10
+    }
+   ]
+  },
+  {
+   "id": "workBreak",
+   "is_new": false,
+   "title": {
+    "fr": "Au travail",
+    "en": "At work",
+    "de": "Bei der Arbeit",
+    "es": "En el trabajo",
+    "ja": "仕事のなかで",
+    "ko": "일하는 중에"
+   },
+   "subtitle": {
+    "fr": "Souffler entre deux réunions, finir ta journée léger",
+    "en": "Breathe between meetings, finish your day lighter",
+    "de": "Zwischen Meetings durchatmen, leichter Feierabend machen",
+    "es": "Respira entre reuniones y termina el día más ligero",
+    "ja": "会議の合間にひと息、軽やかに一日を終える",
+    "ko": "회의 사이에 숨 돌리고, 가볍게 하루 마치기"
+   },
+   "rationale": "Thème existant élargi : le travail est le premier déclencheur de stress chronique pour la cible (25-45 ans actifs). « Pause travail » ne couvrait que les pauses ; « Au travail » couvre tout le cycle : avant (dimanche soir, trajet), pendant (présentation, critique, imposteur, déjeuner) et après (fermer la journée, soir d'épuisement).",
+   "sessions": [
+    {
+     "id": "work-desk-reset-3",
+     "status": "rewrite",
+     "title": {
+      "fr": "Pause au bureau",
+      "en": "Desk reset",
+      "de": "Schreibtisch-Reset",
+      "es": "Pausa en el escritorio",
+      "ja": "デスクでリセット",
+      "ko": "책상 앞 리셋"
+     },
+     "subtitle": {
+      "fr": "Lever les yeux de l'écran et relâcher la nuque",
+      "en": "Look away from the screen and release your neck",
+      "de": "Weg vom Bildschirm, Nacken lockern",
+      "es": "Aparta la vista de la pantalla y suelta el cuello",
+      "ja": "画面から目を離し、首をゆるめる",
+      "ko": "화면에서 눈을 떼고 목 풀기"
+     },
+     "target_minutes": 3,
+     "speech_ratio": 0.9,
+     "target_words": 405,
+     "technique": "Micro-pause posturale + regard au loin",
+     "purpose": "Pause de 3 minutes devant l'écran : relâche nuque et yeux, réinitialise la posture. Pour les longues sessions sur ordinateur.",
+     "outline": [
+      "Lever les yeux de l'écran, regarder au loin",
+      "Rouler doucement les épaules, puis les laisser tomber",
+      "Incliner la tête d'un côté puis de l'autre",
+      "Trois respirations amples",
+      "Réajuster l'assise, pieds à plat",
+      "Choisir la prochaine tâche avant de reprendre"
+     ],
+     "image": "routine_focus",
+     "ambience": "forest",
+     "audio_minutes": 5
+    },
+    {
+     "id": "work-after-meeting-5",
+     "status": "rewrite",
+     "title": {
+      "fr": "Après une réunion tendue",
+      "en": "After a tense meeting",
+      "de": "Nach einem angespannten Meeting",
+      "es": "Tras una reunión tensa",
+      "ja": "緊張した会議のあとで",
+      "ko": "긴장된 회의 후에"
+     },
+     "subtitle": {
+      "fr": "Évacuer la tension et choisir la suite",
+      "en": "Shake off the tension and choose what's next",
+      "de": "Spannung abschütteln und neu wählen",
+      "es": "Suelta la tensión y elige cómo seguir",
+      "ja": "緊張を振り払い、次を選ぶ",
+      "ko": "긴장을 털어내고 다음을 선택하기"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Décharge corporelle + choix de la suite",
+     "purpose": "Juste après une réunion tendue (désaccord, pression, ton sec). Évacue l'activation, laisse la scène se déposer, reprend la main sur la suite.",
+     "outline": [
+      "Arrivée : la réunion est terminée, tu es ici",
+      "Scanner la tension : mâchoire, épaules, ventre",
+      "Secouer légèrement les mains, expirations longues",
+      "Laisser passer les échanges qui se rejouent",
+      "Ce qui est vraiment important dans ce qui s'est dit",
+      "Choisir l'action suivante (ou décider de ne pas répondre tout de suite)",
+      "Clôture : reprendre avec un peu plus d'espace"
+     ],
+     "image": "situation_submerge",
+     "ambience": "stream",
+     "audio_minutes": 8
+    },
+    {
+     "id": "work-before-presentation-5",
+     "status": "new",
+     "title": {
+      "fr": "Avant de prendre la parole",
+      "en": "Before you speak up",
+      "de": "Bevor du sprichst",
+      "es": "Antes de hablar en público",
+      "ja": "人前で話す前に",
+      "ko": "발표하기 전에"
+     },
+     "subtitle": {
+      "fr": "Transformer le trac en énergie utile",
+      "en": "Turn stage fright into useful energy",
+      "de": "Lampenfieber in Energie verwandeln",
+      "es": "Convierte los nervios en energía útil",
+      "ja": "あがりを力に変える",
+      "ko": "떨림을 쓸모 있는 에너지로 바꾸기"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Recadrage de l'activation + respiration + répétition mentale",
+     "purpose": "Avant une présentation, un entretien, une prise de parole en réunion. Recadre le cœur qui bat comme de la préparation, pose la voix, visualise les premières secondes.",
+     "outline": [
+      "Reconnaître le trac : cœur, mains, ventre",
+      "Recadrer : ton corps se prépare à quelque chose d'important",
+      "Ancrage des pieds, posture haute et ouverte",
+      "Respiration ventrale, expiration longue pour poser la voix",
+      "Visualiser l'entrée et la première phrase, calmement",
+      "Intention : une seule chose que tu veux transmettre",
+      "Clôture : tu es prêt·e, vas-y"
+     ],
+     "image": "routine_energy",
+     "ambience": null,
+     "audio_minutes": 8
+    },
+    {
+     "id": "work-after-criticism-6",
+     "status": "new",
+     "title": {
+      "fr": "Après une critique",
+      "en": "After criticism",
+      "de": "Nach Kritik",
+      "es": "Tras una crítica",
+      "ja": "批判を受けたあとで",
+      "ko": "비판을 받은 후에"
+     },
+     "subtitle": {
+      "fr": "Garder ce qui est utile, lâcher ce qui blesse",
+      "en": "Keep what's useful, let go of what stings",
+      "de": "Das Nützliche behalten, das Verletzende loslassen",
+      "es": "Quédate con lo útil y suelta lo que duele",
+      "ja": "役立つことは受け取り、痛みは手放す",
+      "ko": "도움 되는 건 남기고 아픈 건 내려놓기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Autocompassion + tri du feedback",
+     "purpose": "Après un retour négatif, un entretien annuel difficile, un commentaire blessant. Apaise la piqûre puis sépare l'information utile du jugement sur soi.",
+     "outline": [
+      "Accueil : ça pique, c'est humain",
+      "Localiser la sensation dans le corps et respirer avec",
+      "Phrase d'autocompassion : « c'est dur d'entendre ça »",
+      "Séparer les faits de l'interprétation (« je suis nul »)",
+      "Que garder d'utile ? Une seule chose",
+      "Se rappeler une réussite récente pour rééquilibrer",
+      "Clôture : tu n'es pas réductible à ce retour"
+     ],
+     "image": "situation_tendu",
+     "ambience": "fire",
+     "audio_minutes": 7
+    },
+    {
+     "id": "work-screen-detox-6",
+     "status": "rewrite",
+     "title": {
+      "fr": "Détox d'écran",
+      "en": "Screen detox",
+      "de": "Bildschirm-Detox",
+      "es": "Desintoxicación de pantallas",
+      "ja": "スクリーン・デトックス",
+      "ko": "스크린 디톡스"
+     },
+     "subtitle": {
+      "fr": "Reposer les yeux et ralentir le flot de notifications",
+      "en": "Rest your eyes and slow the notification rush",
+      "de": "Augen ausruhen, Benachrichtigungsflut bremsen",
+      "es": "Descansa la vista y frena las notificaciones",
+      "ja": "目を休め、通知の嵐から離れる",
+      "ko": "눈을 쉬게 하고 알림의 홍수에서 벗어나기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Repos visuel (palming) + attention aux sens hors écran",
+     "purpose": "Après des heures d'écran et de notifications. Repose les yeux (palming, regard au loin) et ramène l'attention vers les sens non visuels.",
+     "outline": [
+      "Poser le téléphone hors de portée, retourner l'écran",
+      "Palming : paumes chaudes sur les yeux fermés",
+      "Respiration lente dans l'obscurité",
+      "Écoute des sons de la pièce",
+      "Sentir le corps, les mains vides",
+      "Rouvrir les yeux vers le point le plus lointain",
+      "Clôture : une règle simple pour la prochaine heure"
+     ],
+     "image": "meditation_07",
+     "ambience": "forest",
+     "audio_minutes": 8
+    },
+    {
+     "id": "work-commute-home-7",
+     "status": "new",
+     "title": {
+      "fr": "Le trajet du retour",
+      "en": "The commute home",
+      "de": "Der Heimweg",
+      "es": "El trayecto de vuelta",
+      "ja": "帰り道",
+      "ko": "퇴근길"
+     },
+     "subtitle": {
+      "fr": "Arriver chez toi sans rapporter le bureau",
+      "en": "Get home without bringing the office with you",
+      "de": "Zuhause ankommen, ohne das Büro mitzubringen",
+      "es": "Llega a casa sin traerte la oficina",
+      "ja": "仕事を持ち帰らずに家に着く",
+      "ko": "회사를 집까지 끌고 가지 않기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Transition consciente (yeux ouverts, pas au volant)",
+     "purpose": "En transports, à pied ou passager (jamais en conduisant). Utilise le trajet comme sas entre le rôle pro et la vie perso.",
+     "outline": [
+      "Avertissement sécurité : pas en conduisant, yeux ouverts",
+      "Sentir le mouvement, les appuis, le rythme du trajet",
+      "Laisser défiler la journée comme le paysage",
+      "Déposer un souci à chaque arrêt / chaque rue",
+      "Respiration lente, épaules qui se relâchent",
+      "Penser aux personnes ou au moment qui t'attendent",
+      "Clôture : préparer ton arrivée, le pas de la porte comme seuil"
+     ],
+     "image": "habit_nature_velo",
+     "ambience": null,
+     "audio_minutes": 9
+    },
+    {
+     "id": "work-end-of-day-8",
+     "status": "rewrite",
+     "title": {
+      "fr": "Fermer la journée",
+      "en": "Close the workday",
+      "de": "Den Arbeitstag abschließen",
+      "es": "Cierra la jornada",
+      "ja": "仕事を締めくくる",
+      "ko": "하루 업무 마무리"
+     },
+     "subtitle": {
+      "fr": "Ranger le travail pour retrouver ta soirée",
+      "en": "Put work away and get your evening back",
+      "de": "Arbeit ablegen, den Abend zurückgewinnen",
+      "es": "Guarda el trabajo y recupera tu tarde",
+      "ja": "仕事をしまって、夜の時間を取り戻す",
+      "ko": "일을 내려놓고 저녁을 되찾기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Rituel de clôture (bilan, liste, coupure symbolique)",
+     "purpose": "En fin de journée de travail, notamment en télétravail où la frontière est floue. Fait le bilan, dépose ce qui reste, marque symboliquement la fin.",
+     "outline": [
+      "Arrivée, souffle qui ralentit",
+      "Revoir la journée : trois choses faites, même petites",
+      "Ce qui reste : le déposer mentalement sur la liste de demain",
+      "Reconnaître une difficulté, la laisser au bureau",
+      "Geste symbolique : fermer l'ordinateur, éteindre la lumière",
+      "Ouvrir la soirée : de quoi as-tu envie ce soir ?",
+      "Clôture : la journée est finie"
+     ],
+     "image": "meditation_04",
+     "ambience": "fire",
+     "audio_minutes": 11
+    },
+    {
+     "id": "work-impostor-8",
+     "status": "new",
+     "title": {
+      "fr": "Syndrome de l'imposteur",
+      "en": "Impostor feelings",
+      "de": "Hochstapler-Gefühl",
+      "es": "Síndrome del impostor",
+      "ja": "インポスター症候群",
+      "ko": "가면 증후군"
+     },
+     "subtitle": {
+      "fr": "Quand une voix te dit que tu n'as rien à faire là",
+      "en": "When a voice says you don't belong here",
+      "de": "Wenn eine Stimme sagt, du gehörst nicht hierher",
+      "es": "Cuando una voz te dice que no mereces estar ahí",
+      "ja": "「ここにいる資格はない」という声がしたら",
+      "ko": "'넌 여기 있을 자격이 없어'라는 목소리가 들릴 때"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Défusion cognitive + rappel de preuves",
+     "purpose": "Pour la nouvelle prise de poste, la promotion, le projet trop grand. Prend de la distance avec la pensée « je vais être démasqué » sans la combattre.",
+     "outline": [
+      "Installation, souffle calme",
+      "Laisser venir la pensée typique, l'écouter",
+      "Défusion : « je remarque que j'ai la pensée que… »",
+      "La répéter avec une voix de dessin animé, observer l'effet",
+      "Rappel : beaucoup de personnes compétentes ressentent cela",
+      "Lister mentalement trois preuves concrètes de ta place",
+      "Revenir aux valeurs : pourquoi ce travail compte pour toi",
+      "Clôture : la pensée peut rester, tu avances quand même"
+     ],
+     "image": "meditation_04",
+     "ambience": null,
+     "audio_minutes": 10
+    },
+    {
+     "id": "work-sunday-dread-8",
+     "status": "new",
+     "title": {
+      "fr": "Le blues du dimanche soir",
+      "en": "Sunday evening dread",
+      "de": "Sonntagsblues",
+      "es": "El bajón del domingo por la noche",
+      "ja": "日曜の夜の憂うつ",
+      "ko": "일요일 저녁의 불안"
+     },
+     "subtitle": {
+      "fr": "Profiter de ta soirée au lieu de vivre lundi d'avance",
+      "en": "Enjoy your evening instead of living Monday in advance",
+      "de": "Den Abend genießen, statt den Montag vorwegzunehmen",
+      "es": "Disfruta tu noche en lugar de vivir el lunes por adelantado",
+      "ja": "月曜を先取りせず、今夜を楽しむ",
+      "ko": "월요일을 미리 살지 말고 오늘 저녁 즐기기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Report des soucis + ancrage dans le présent",
+     "purpose": "L'angoisse d'anticipation du dimanche soir. Range les préoccupations de la semaine dans un « rendez-vous » pour lundi et revient au week-end encore présent.",
+     "outline": [
+      "Accueil : l'anticipation est normale, ton cerveau veut te protéger",
+      "Repérer les pensées sur lundi, les compter sans les suivre",
+      "Les noter mentalement dans un carnet pour lundi 9 h",
+      "Une seule action préparatoire concrète, puis on ferme",
+      "Revenir au présent : pièce, sons, corps",
+      "Savourer un bon moment du week-end",
+      "Clôture : la soirée t'appartient encore"
+     ],
+     "image": "routine_relaxation",
+     "ambience": "fire",
+     "audio_minutes": 11
+    },
+    {
+     "id": "work-lunch-break-10",
+     "status": "new",
+     "title": {
+      "fr": "Pause déjeuner",
+      "en": "Lunch break",
+      "de": "Mittagspause",
+      "es": "Pausa para comer",
+      "ja": "ランチタイム",
+      "ko": "점심시간"
+     },
+     "subtitle": {
+      "fr": "Manger vraiment, pour repartir l'après-midi",
+      "en": "Actually taste your lunch and reset for the afternoon",
+      "de": "Bewusst essen und neu in den Nachmittag starten",
+      "es": "Come de verdad y recarga para la tarde",
+      "ja": "ちゃんと味わって、午後に備える",
+      "ko": "제대로 맛보고 오후를 위해 재충전"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Repas en pleine conscience + détente",
+     "purpose": "À écouter en mangeant, loin de l'écran. Ralentit le repas, réveille les sens et coupe le flux de travail, pour un après-midi moins tendu.",
+     "outline": [
+      "S'installer avec son repas, sans écran",
+      "Trois respirations avant la première bouchée",
+      "Regarder le plat : couleurs, textures, odeurs",
+      "Première bouchée très lente : goût, texture, température",
+      "Poser les couverts entre les bouchées",
+      "Remarquer la satiété qui arrive",
+      "Fin du repas : quelques minutes de détente, regard au loin",
+      "Intention pour l'après-midi"
+     ],
+     "image": "habit_social_cuisiner",
+     "ambience": "stream",
+     "audio_minutes": 14
+    },
+    {
+     "id": "work-burnout-evening-12",
+     "status": "new",
+     "title": {
+      "fr": "Soir d'épuisement",
+      "en": "Running on empty",
+      "de": "Völlig erschöpft am Abend",
+      "es": "Noche de agotamiento",
+      "ja": "疲れ果てた夜に",
+      "ko": "완전히 지친 저녁"
+     },
+     "subtitle": {
+      "fr": "Pour les soirs où il ne reste plus rien",
+      "en": "For evenings when there's nothing left",
+      "de": "Für Abende, an denen nichts mehr geht",
+      "es": "Para las noches en que ya no queda nada",
+      "ja": "もう何も残っていない夜のために",
+      "ko": "더는 남은 게 없는 저녁을 위해"
+     },
+     "target_minutes": 12,
+     "speech_ratio": 0.8,
+     "target_words": 1440,
+     "technique": "Repos guidé (scan doux + permission de ne rien faire)",
+     "purpose": "Pour les soirs de fatigue profonde, quand même méditer semble un effort. Aucune consigne exigeante : allongé, on se laisse porter. Mentionne qu'un épuisement durable mérite d'en parler à un médecin.",
+     "outline": [
+      "Accueil : tu n'as rien à faire, même pas bien méditer",
+      "S'allonger, se laisser porter par le support",
+      "Reconnaître la fatigue sans la juger",
+      "Scan très doux, zone par zone, en laissant aller",
+      "Permission : la journée est finie, ta valeur ne dépend pas de ta productivité",
+      "Longues plages de silence avec respiration naturelle",
+      "Une petite chose réconfortante pour la soirée",
+      "Clôture : rester allongé autant que tu veux ; si cet épuisement dure, parles-en à un professionnel de santé"
+     ],
+     "image": "situation_epuise",
+     "ambience": "rain",
+     "audio_minutes": 17
+    }
+   ]
+  },
+  {
+   "id": "anxiety",
+   "is_new": false,
+   "title": {
+    "fr": "Anxiété & émotions",
+    "en": "Anxiety & emotions",
+    "de": "Angst & Gefühle",
+    "es": "Ansiedad y emociones",
+    "ja": "不安と感情",
+    "ko": "불안 & 감정"
+   },
+   "subtitle": {
+    "fr": "Moins lutter contre ce que tu ressens, et ça s'apaise",
+    "en": "Stop fighting what you feel, and it softens",
+    "de": "Weniger gegen Gefühle kämpfen – dann wird es leichter",
+    "es": "Deja de pelear con lo que sientes y se suaviza",
+    "ja": "感情と闘うのをやめると、やわらいでいく",
+    "ko": "감정과 싸우지 않으면 누그러져요"
+   },
+   "rationale": "Thème existant, solide techniquement. On le complète avec les grands outils des thérapies cognitives et de la pleine conscience qui manquaient : report des soucis, noting, urge surfing, ainsi que des situations émotionnelles fréquentes (tristesse, incertitude, anxiété sociale). Le SOS gère l'aigu ; ce thème travaille la relation de fond aux émotions.",
+   "sessions": [
+    {
+     "id": "anxiety-grounding-54321-6",
+     "status": "rewrite",
+     "title": {
+      "fr": "Ancrage 5-4-3-2-1",
+      "en": "5-4-3-2-1 grounding",
+      "de": "5-4-3-2-1 Erdung",
+      "es": "Anclaje 5-4-3-2-1",
+      "ja": "5-4-3-2-1 グラウンディング",
+      "ko": "5-4-3-2-1 그라운딩"
+     },
+     "subtitle": {
+      "fr": "Revenir ici et maintenant avec tes cinq sens",
+      "en": "Come back to here and now with your five senses",
+      "de": "Mit fünf Sinnen ins Hier und Jetzt",
+      "es": "Vuelve al aquí y ahora con tus cinco sentidos",
+      "ja": "五感で「今ここ」に戻る",
+      "ko": "오감으로 지금 여기로 돌아오기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Ancrage 5-4-3-2-1 par les sens",
+     "purpose": "Ramène l'attention au présent par les cinq sens quand l'anxiété fait partir dans le futur. Yeux ouverts, faisable partout.",
+     "outline": [
+      "Accueil, yeux ouverts",
+      "5 choses que tu vois, en détail",
+      "4 choses que tu touches ou sens au contact",
+      "3 sons",
+      "2 odeurs (ou 2 odeurs aimées, imaginées)",
+      "1 goût",
+      "Remarquer le changement de niveau d'anxiété, clôture"
+     ],
+     "image": "situation_anxiete",
+     "ambience": "forest",
+     "audio_minutes": 9
+    },
+    {
+     "id": "anxiety-social-event-6",
+     "status": "new",
+     "title": {
+      "fr": "Avant une soirée ou un rendez-vous",
+      "en": "Before a party or a date",
+      "de": "Vor einer Party oder einem Date",
+      "es": "Antes de una fiesta o una cita",
+      "ja": "パーティーやデートの前に",
+      "ko": "모임이나 데이트 전에"
+     },
+     "subtitle": {
+      "fr": "Quand la timidité serre la gorge avant d'y aller",
+      "en": "When shyness tightens your throat before you go",
+      "de": "Wenn Schüchternheit vorher die Kehle zuschnürt",
+      "es": "Cuando la timidez te aprieta antes de ir",
+      "ja": "出かける前に人見知りで喉がつまるとき",
+      "ko": "가기 전에 낯가림으로 목이 조일 때"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Recadrage + ancrage + intention de curiosité",
+     "purpose": "Anxiété sociale avant un événement (soirée, rencontre, rendez-vous). Calme le corps, désamorce le « tout le monde va me juger », oriente l'attention vers les autres avec curiosité.",
+     "outline": [
+      "Reconnaître l'appréhension, sans s'en vouloir",
+      "Expirations longues, mains détendues",
+      "Remarquer les scénarios catastrophes, les étiqueter « prédictions »",
+      "Rappel : les autres pensent surtout à eux",
+      "Intention : être curieux d'une personne plutôt que de bien paraître",
+      "Préparer une question simple à poser",
+      "Clôture : tu peux partir quand tu veux, c'est permis"
+     ],
+     "image": "habit_social_verre",
+     "ambience": null,
+     "audio_minutes": 8
+    },
+    {
+     "id": "anxiety-rain-method-7",
+     "status": "rewrite",
+     "title": {
+      "fr": "Accueillir l'émotion",
+      "en": "Meet your emotion",
+      "de": "Dem Gefühl begegnen",
+      "es": "Acoge tu emoción",
+      "ja": "感情を迎え入れる",
+      "ko": "감정을 맞이하기"
+     },
+     "subtitle": {
+      "fr": "La méthode RAIN pour traverser une émotion difficile",
+      "en": "The RAIN method to move through a hard feeling",
+      "de": "Die RAIN-Methode für schwierige Gefühle",
+      "es": "El método RAIN para atravesar una emoción difícil",
+      "ja": "RAIN法でつらい感情を乗り越える",
+      "ko": "RAIN 기법으로 힘든 감정 지나가기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "RAIN (Reconnaître, Accepter, Investiguer, Nourrir)",
+     "purpose": "Méthode RAIN pas à pas pour traverser une émotion difficile au lieu de la fuir ou de s'y noyer.",
+     "outline": [
+      "Installation, choisir une situation modérément difficile (pas la pire)",
+      "R : reconnaître ce qui est là, le nommer",
+      "A : accepter, laisser être, « oui, c'est là »",
+      "I : investiguer avec bienveillance dans le corps",
+      "N : nourrir, se demander ce dont on a besoin et se l'offrir",
+      "Après RAIN : se reposer dans la conscience",
+      "Clôture"
+     ],
+     "image": "guided_breathing_06",
+     "ambience": "rain",
+     "audio_minutes": 10
+    },
+    {
+     "id": "anxiety-urge-surfing-7",
+     "status": "new",
+     "title": {
+      "fr": "Surfer sur l'envie",
+      "en": "Urge surfing",
+      "de": "Auf dem Drang surfen",
+      "es": "Surfear el impulso",
+      "ja": "衝動の波に乗る",
+      "ko": "충동의 파도 타기"
+     },
+     "subtitle": {
+      "fr": "Scroller, grignoter, fumer, vérifier : laisser passer l'envie sans y céder",
+      "en": "Scrolling, snacking, smoking, checking: ride the urge without giving in",
+      "de": "Scrollen, Naschen, Rauchen, Checken – den Drang vorbeiziehen lassen",
+      "es": "Scrollear, picar, fumar, revisar: deja pasar el impulso sin ceder",
+      "ja": "スマホ、間食、たばこ…衝動に負けずに過ぎ去らせる",
+      "ko": "스크롤, 간식, 담배, 확인… 굴복하지 않고 충동 흘려보내기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Urge surfing (surfer sur l'envie)",
+     "purpose": "Pour les compulsions de soulagement liées au stress. Observer l'envie comme une vague qui monte, culmine et redescend, sans lutter ni obéir.",
+     "outline": [
+      "Accueil : tu ressens une envie, c'est le bon moment",
+      "Nommer l'envie et ce qu'elle promet",
+      "Où est-elle dans le corps ? Intensité de 1 à 10",
+      "Image de la vague, la planche de surf = le souffle",
+      "Suivre la montée, rester sur la planche",
+      "Observer le pic, puis la décrue",
+      "Noter l'intensité à nouveau",
+      "Clôture : tu choisis maintenant librement"
+     ],
+     "image": "sound_ocean",
+     "ambience": "ocean",
+     "audio_minutes": 9
+    },
+    {
+     "id": "anxiety-leaves-stream-8",
+     "status": "rewrite",
+     "title": {
+      "fr": "Feuilles sur la rivière",
+      "en": "Leaves on a stream",
+      "de": "Blätter auf dem Fluss",
+      "es": "Hojas en el río",
+      "ja": "川を流れる葉",
+      "ko": "시냇물 위의 나뭇잎"
+     },
+     "subtitle": {
+      "fr": "Regarder tes pensées passer sans t'y accrocher",
+      "en": "Watch your thoughts float by without holding on",
+      "de": "Gedanken vorbeiziehen lassen, ohne festzuhalten",
+      "es": "Mira pasar tus pensamientos sin aferrarte",
+      "ja": "考えにしがみつかず、流れていくのを眺める",
+      "ko": "생각에 매달리지 않고 흘러가게 바라보기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Défusion cognitive (feuilles sur la rivière, ACT)",
+     "purpose": "Exercice classique de l'ACT : déposer chaque pensée sur une feuille et la regarder dériver. Apprend à voir ses pensées comme des pensées, pas des vérités.",
+     "outline": [
+      "Installation, souffle tranquille",
+      "Imaginer une rivière, des feuilles qui passent",
+      "Chaque pensée posée sur une feuille, quelle qu'elle soit",
+      "Laisser la feuille partir à son rythme",
+      "Si on s'accroche : remarquer, reposer sur une feuille",
+      "Pratique silencieuse",
+      "Clôture : la distance qu'on vient de créer"
+     ],
+     "image": "habit_nature",
+     "ambience": "stream",
+     "audio_minutes": 11
+    },
+    {
+     "id": "anxiety-noting-8",
+     "status": "new",
+     "title": {
+      "fr": "Nommer pour apaiser",
+      "en": "Name it to tame it",
+      "de": "Benennen, um zu beruhigen",
+      "es": "Nómbralo para calmarlo",
+      "ja": "名づけて静める",
+      "ko": "이름 붙이면 가라앉아요"
+     },
+     "subtitle": {
+      "fr": "Mettre un mot sur ce qui passe crée de la distance",
+      "en": "Putting a word on it creates space",
+      "de": "Ein Wort dafür finden schafft Abstand",
+      "es": "Ponerle palabras crea distancia",
+      "ja": "言葉にすると、距離が生まれる",
+      "ko": "말로 붙이면 거리가 생겨요"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Noting (notation mentale)",
+     "purpose": "Pratique de notation mentale : étiqueter d'un mot ce qui apparaît (pensée, son, sensation, émotion). Réduit l'identification aux pensées anxieuses.",
+     "outline": [
+      "Installation, ancrage au souffle",
+      "Principe : un mot simple, doux, puis retour",
+      "Noter les sensations : « contact », « chaleur »",
+      "Noter les sons : « entendre »",
+      "Noter les pensées : « planifier », « s'inquiéter », « juger »",
+      "Noter les émotions : « peur », « agacement »",
+      "Pratique libre avec peu de mots",
+      "Clôture"
+     ],
+     "image": "meditation_07",
+     "ambience": "whitenoise",
+     "audio_minutes": 12
+    },
+    {
+     "id": "anxiety-uncertainty-9",
+     "status": "new",
+     "title": {
+      "fr": "Vivre avec l'incertitude",
+      "en": "Living with uncertainty",
+      "de": "Mit Ungewissheit leben",
+      "es": "Vivir con la incertidumbre",
+      "ja": "不確かさとともに生きる",
+      "ko": "불확실함과 함께 살기"
+     },
+     "subtitle": {
+      "fr": "En attendant une réponse, un résultat, une décision",
+      "en": "While waiting for an answer, a result, a decision",
+      "de": "Beim Warten auf eine Antwort, ein Ergebnis, eine Entscheidung",
+      "es": "Mientras esperas una respuesta, un resultado, una decisión",
+      "ja": "答えや結果、決定を待っているあいだに",
+      "ko": "답변, 결과, 결정을 기다리는 동안"
+     },
+     "target_minutes": 9,
+     "speech_ratio": 0.9,
+     "target_words": 1215,
+     "technique": "Tolérance à l'incertitude (acceptation + ancrage présent)",
+     "purpose": "Pour les périodes d'attente angoissante (résultats médicaux, réponse d'embauche, situation familiale). Aide à rester avec le « je ne sais pas » sans le combler par des scénarios.",
+     "outline": [
+      "Accueil : attendre est l'une des choses les plus dures",
+      "Ancrage dans le souffle",
+      "Remarquer les scénarios que la tête fabrique",
+      "Les reconnaître comme des tentatives de contrôle",
+      "Phrase : « je ne sais pas encore, et je peux rester avec ça »",
+      "Ce qui est sûr, ici et maintenant",
+      "Une chose utile ou agréable à faire en attendant",
+      "Clôture"
+     ],
+     "image": "guided_breathing_08",
+     "ambience": "rain",
+     "audio_minutes": 12
+    },
+    {
+     "id": "anxiety-worry-release-9",
+     "status": "rewrite",
+     "title": {
+      "fr": "Déposer ses inquiétudes",
+      "en": "Set your worries down",
+      "de": "Sorgen ablegen",
+      "es": "Suelta tus preocupaciones",
+      "ja": "心配ごとを降ろす",
+      "ko": "걱정 내려놓기"
+     },
+     "subtitle": {
+      "fr": "Trier ce qui dépend de toi et lâcher le reste",
+      "en": "Sort what's in your control and let go of the rest",
+      "de": "Sortieren, was du beeinflussen kannst, Rest loslassen",
+      "es": "Separa lo que depende de ti y suelta el resto",
+      "ja": "自分にできることを選び、残りは手放す",
+      "ko": "내가 할 수 있는 것과 없는 것을 나누고 놓아주기"
+     },
+     "target_minutes": 9,
+     "speech_ratio": 0.9,
+     "target_words": 1215,
+     "technique": "Cercles d'influence (contrôle / pas de contrôle)",
+     "purpose": "Trier les inquiétudes entre ce qui dépend de soi (agir) et ce qui n'en dépend pas (lâcher prise), avec une visualisation pour déposer le reste.",
+     "outline": [
+      "Installation, souffle",
+      "Faire venir les inquiétudes du moment",
+      "Deux cercles : ce qui dépend de moi, ce qui n'en dépend pas",
+      "Pour chaque souci, le placer dans un cercle",
+      "Cercle « moi » : une action concrète",
+      "Cercle « pas moi » : visualiser qu'on le dépose",
+      "Respirer dans l'espace libéré",
+      "Clôture"
+     ],
+     "image": "meditation_04",
+     "ambience": "fire",
+     "audio_minutes": 12
+    },
+    {
+     "id": "anxiety-sadness-10",
+     "status": "new",
+     "title": {
+      "fr": "Quand la tristesse est là",
+      "en": "When sadness visits",
+      "de": "Wenn Traurigkeit da ist",
+      "es": "Cuando la tristeza está ahí",
+      "ja": "悲しみが訪れたとき",
+      "ko": "슬픔이 찾아왔을 때"
+     },
+     "subtitle": {
+      "fr": "Lui faire de la place au lieu de la repousser",
+      "en": "Make room for it instead of pushing it away",
+      "de": "Ihr Raum geben, statt sie wegzuschieben",
+      "es": "Hazle sitio en lugar de apartarla",
+      "ja": "押しのけずに、場所をつくる",
+      "ko": "밀어내지 말고 자리를 내어주기"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Accueil de la tristesse + autocompassion",
+     "purpose": "Pour les moments de tristesse, de mélancolie ou de deuil léger. Permission de ressentir, présence au corps, douceur. Mentionne de consulter si la tristesse dure des semaines.",
+     "outline": [
+      "Accueil : tu n'as pas besoin d'aller mieux tout de suite",
+      "Position confortable, couverture si besoin",
+      "Localiser la tristesse : gorge, poitrine, yeux",
+      "Respirer avec elle, la laisser exister",
+      "Image : être assis à côté d'un ami triste",
+      "Main sur le cœur, phrases de soutien",
+      "Ce que cette tristesse dit de ce qui compte pour toi",
+      "Clôture douce ; si la tristesse s'installe durablement, en parler à un professionnel"
+     ],
+     "image": "sound_rain",
+     "ambience": "rain",
+     "audio_minutes": 13
+    },
+    {
+     "id": "anxiety-worry-time-10",
+     "status": "new",
+     "title": {
+      "fr": "Le rendez-vous des soucis",
+      "en": "Worry appointment",
+      "de": "Die Sorgen-Sprechstunde",
+      "es": "La cita con tus preocupaciones",
+      "ja": "心配ごとのための予約時間",
+      "ko": "걱정과의 약속 시간"
+     },
+     "subtitle": {
+      "fr": "Donner un créneau à tes inquiétudes pour qu'elles te lâchent le reste du temps",
+      "en": "Give worries a time slot so they leave you alone the rest of the day",
+      "de": "Sorgen einen festen Termin geben, damit sie dich sonst in Ruhe lassen",
+      "es": "Dale una hora a tus preocupaciones para que te dejen en paz el resto del día",
+      "ja": "心配に時間枠を与えれば、ほかの時間は解放される",
+      "ko": "걱정에 시간을 정해주면 나머지 시간엔 놓아줘요"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Report des soucis (rendez-vous d'inquiétude)",
+     "purpose": "Technique TCC du report des soucis, guidée en temps réel : 10 minutes pour s'inquiéter volontairement, trier, puis fermer la session. À programmer chaque jour à la même heure.",
+     "outline": [
+      "Explication : on va s'inquiéter exprès, pendant un temps limité",
+      "Laisser venir tous les soucis, les lister mentalement (ou sur papier)",
+      "Pour chacun : problème réel actuel ou hypothétique ?",
+      "Réels : une prochaine étape concrète",
+      "Hypothétiques : les reconnaître et les laisser",
+      "Fermer le rendez-vous symboliquement",
+      "Consigne : si un souci revient dans la journée, le reporter au prochain rendez-vous",
+      "Retour au présent par le corps"
+     ],
+     "image": "habit_journal",
+     "ambience": null,
+     "audio_minutes": 13
+    }
+   ]
+  },
+  {
+   "id": "sleep",
+   "is_new": false,
+   "title": {
+    "fr": "Sommeil",
+    "en": "Sleep",
+    "de": "Schlaf",
+    "es": "Sueño",
+    "ja": "睡眠",
+    "ko": "수면"
+   },
+   "subtitle": {
+    "fr": "Lâcher la journée et glisser vers le sommeil",
+    "en": "Let go of the day and drift off",
+    "de": "Den Tag loslassen und hinübergleiten",
+    "es": "Suelta el día y déjate llevar por el sueño",
+    "ja": "一日を手放して、眠りへすべりこむ",
+    "ko": "하루를 내려놓고 잠으로 스며들기"
+   },
+   "rationale": "Thème le plus écouté chez tous les concurrents et lien direct avec le cortisol du soir. On passe de 4 à 12 sessions : différentes portes d'entrée (corps, pensées, comptage, mélange cognitif), réveil nocturne, formats longs (scan 20 min, yoga nidra 30 min) et 3 histoires du soir narratives, format très demandé et absent aujourd'hui. Toutes les sessions se terminent sans « retour » : la voix s'efface pour laisser dormir.",
+   "sessions": [
+    {
+     "id": "sleep-back-to-sleep-8",
+     "status": "rewrite",
+     "title": {
+      "fr": "Réveillé·e à 3 h du matin",
+      "en": "Awake at 3am",
+      "de": "Um 3 Uhr wach",
+      "es": "Despierto a las 3 de la madrugada",
+      "ja": "午前3時に目が覚めたら",
+      "ko": "새벽 3시에 깼을 때"
+     },
+     "subtitle": {
+      "fr": "Sans regarder l'heure, sans pression : on laisse revenir le sommeil",
+      "en": "No clock-watching, no pressure: let sleep come back",
+      "de": "Nicht auf die Uhr schauen, kein Druck – der Schlaf kommt zurück",
+      "es": "Sin mirar la hora, sin presión: deja que vuelva el sueño",
+      "ja": "時計を見ず、焦らず、眠りが戻るのを待つ",
+      "ko": "시계 보지 않고, 부담 없이, 잠이 돌아오게"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.8,
+     "target_words": 960,
+     "technique": "Acceptation + intention paradoxale (réveil nocturne)",
+     "purpose": "Pour le réveil nocturne avec mental en alerte. Retire l'enjeu (« il faut que je dorme »), propose juste de se reposer éveillé, ce qui paradoxalement favorise le retour du sommeil. Voix très basse, phrases très courtes.",
+     "outline": [
+      "Voix chuchotée : tu es réveillé, c'est OK, pas besoin de regarder l'heure",
+      "Le repos éveillé repose déjà",
+      "Pensées de la nuit : elles paraissent plus graves qu'elles ne sont, on les remet au matin",
+      "Sentir la chaleur sous la couette",
+      "Expiration lente, sans compter",
+      "Intention paradoxale : juste rester éveillé tranquillement, yeux fermés",
+      "Silence très long"
+     ],
+     "image": "meditation_01",
+     "ambience": "whitenoise",
+     "audio_minutes": 12
+    },
+    {
+     "id": "sleep-day-review-8",
+     "status": "new",
+     "title": {
+      "fr": "Refermer la journée",
+      "en": "Close the day gently",
+      "de": "Den Tag sanft abschließen",
+      "es": "Cierra el día con suavidad",
+      "ja": "一日をやさしく閉じる",
+      "ko": "하루를 부드럽게 닫기"
+     },
+     "subtitle": {
+      "fr": "Trois bonnes choses, et tu tournes la page",
+      "en": "Three good things, then turn the page",
+      "de": "Drei gute Dinge – dann umblättern",
+      "es": "Tres cosas buenas y pasas página",
+      "ja": "3つのよかったことで、ページをめくる",
+      "ko": "좋았던 세 가지, 그리고 페이지 넘기기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.8,
+     "target_words": 960,
+     "technique": "Bilan bienveillant + trois bonnes choses",
+     "purpose": "À écouter au lit, avant d'éteindre. Repasse la journée sans jugement, retient trois moments positifs et dépose le reste, pour s'endormir sur une note apaisée.",
+     "outline": [
+      "Installation au lit, lumière éteinte ou tamisée",
+      "Quelques souffles lents",
+      "Rembobiner la journée comme un film, sans s'arrêter",
+      "Ce qui a été difficile : le reconnaître, le poser",
+      "Trois bonnes choses, même minuscules, et les savourer",
+      "Un merci adressé à toi-même",
+      "La voix ralentit, le corps s'alourdit, fondu dans le silence"
+     ],
+     "image": "habit_journal",
+     "ambience": "fire",
+     "audio_minutes": 12
+    },
+    {
+     "id": "sleep-countdown-10",
+     "status": "new",
+     "title": {
+      "fr": "Compte à rebours vers le sommeil",
+      "en": "Count down to sleep",
+      "de": "Countdown in den Schlaf",
+      "es": "Cuenta atrás hacia el sueño",
+      "ja": "眠りへのカウントダウン",
+      "ko": "잠을 향한 카운트다운"
+     },
+     "subtitle": {
+      "fr": "De 50 à 1, souffle après souffle : peu de gens arrivent au bout",
+      "en": "From 50 down to 1, breath by breath: few make it to the end",
+      "de": "Von 50 bis 1, Atemzug für Atemzug – kaum jemand kommt an",
+      "es": "De 50 a 1, respiración a respiración: pocos llegan al final",
+      "ja": "50から1まで、ひと呼吸ずつ。最後まで数えられる人はわずか",
+      "ko": "50부터 1까지 한 호흡씩, 끝까지 가는 사람은 드물어요"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.8,
+     "target_words": 1200,
+     "technique": "Comptage à rebours des respirations",
+     "purpose": "Pour les esprits qui ont besoin d'une tâche simple. La voix compte à rebours au rythme du souffle, avec de plus en plus d'espace, jusqu'à laisser l'auditeur continuer seul.",
+     "outline": [
+      "Installation, consigne : si tu perds le fil, reprends où tu veux",
+      "Trois respirations lentes",
+      "La voix compte de 50 à 40 sur chaque expiration",
+      "De 40 à 25, compter un chiffre sur deux, plus d'espace",
+      "Inviter à continuer seul, la voix ne donne que quelques repères",
+      "Images de lourdeur entre les chiffres",
+      "Silence final"
+     ],
+     "image": "sound_night",
+     "ambience": "whitenoise",
+     "audio_minutes": 17
+    },
+    {
+     "id": "sleep-wind-down-10",
+     "status": "rewrite",
+     "title": {
+      "fr": "Décompresser avant de dormir",
+      "en": "Unwind before sleep",
+      "de": "Abschalten vor dem Schlafen",
+      "es": "Desconecta antes de dormir",
+      "ja": "眠る前にほどく",
+      "ko": "잠들기 전 긴장 풀기"
+     },
+     "subtitle": {
+      "fr": "Laisser la journée derrière toi, souffle après souffle",
+      "en": "Leave the day behind, one breath at a time",
+      "de": "Den Tag hinter dir lassen, Atemzug für Atemzug",
+      "es": "Deja atrás el día, respiración a respiración",
+      "ja": "ひと呼吸ずつ、一日を後ろに",
+      "ko": "한 호흡씩 하루를 뒤로하기"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.8,
+     "target_words": 1200,
+     "technique": "Respiration ralentie + relâchement progressif",
+     "purpose": "Le rituel du coucher standard : ralentit le souffle, relâche le corps et met la journée de côté. La porte d'entrée pour qui ne sait pas quoi choisir.",
+     "outline": [
+      "Installation au lit, position confortable",
+      "Laisser la journée derrière soi, image de la porte qui se ferme",
+      "Ralentir l'expiration, sans compter",
+      "Relâcher visage, épaules, mains",
+      "Le corps qui s'enfonce dans le matelas",
+      "Respiration naturelle, longues pauses",
+      "La voix s'efface"
+     ],
+     "image": "habit_sleep_night",
+     "ambience": "rain",
+     "audio_minutes": 15
+    },
+    {
+     "id": "sleep-cognitive-shuffle-12",
+     "status": "new",
+     "title": {
+      "fr": "Le mélange d'images",
+      "en": "Cognitive shuffle",
+      "de": "Bildermischen",
+      "es": "Mezcla de imágenes",
+      "ja": "イメージ・シャッフル",
+      "ko": "이미지 셔플"
+     },
+     "subtitle": {
+      "fr": "Des images au hasard pour court-circuiter les ruminations",
+      "en": "Random images to short-circuit rumination",
+      "de": "Zufällige Bilder gegen das Grübeln",
+      "es": "Imágenes al azar para cortocircuitar la rumiación",
+      "ja": "ランダムなイメージで考えごとを断ち切る",
+      "ko": "무작위 이미지로 반추 끊어내기"
+     },
+     "target_minutes": 12,
+     "speech_ratio": 0.8,
+     "target_words": 1440,
+     "technique": "Mélange cognitif (imagerie aléatoire)",
+     "purpose": "Technique du « cognitive shuffle » : imaginer brièvement des objets sans lien entre eux imite la pensée décousue de l'endormissement. Idéal pour les ruminations logiques.",
+     "outline": [
+      "Installation, explication courte et ludique",
+      "Un mot de départ (ex. « PLAGE »), une lettre à la fois",
+      "Pour chaque lettre, la voix propose des objets à imaginer quelques secondes",
+      "Passer d'un objet à l'autre sans les relier",
+      "Deuxième mot, rythme plus lent",
+      "Inviter à continuer seul avec un mot à soi",
+      "Silence final"
+     ],
+     "image": "guided_breathing_08",
+     "ambience": "rain",
+     "audio_minutes": 19
+    },
+    {
+     "id": "sleep-racing-mind-12",
+     "status": "rewrite",
+     "title": {
+      "fr": "Apaiser les pensées du soir",
+      "en": "Quiet a racing mind",
+      "de": "Kreisende Gedanken beruhigen",
+      "es": "Calma la mente acelerada",
+      "ja": "夜の考えごとを静める",
+      "ko": "밤의 생각 잠재우기"
+     },
+     "subtitle": {
+      "fr": "Quand le mental tourne en boucle au coucher",
+      "en": "When your thoughts keep spinning at bedtime",
+      "de": "Wenn die Gedanken abends kreisen",
+      "es": "Cuando los pensamientos no paran al acostarte",
+      "ja": "寝る前に考えが止まらないときに",
+      "ko": "잠자리에서 생각이 멈추지 않을 때"
+     },
+     "target_minutes": 12,
+     "speech_ratio": 0.8,
+     "target_words": 1440,
+     "technique": "Notation des pensées + ancrage corporel",
+     "purpose": "Quand le mental tourne au moment de se coucher. Apprend à étiqueter les pensées (« planifier », « ressasser ») et à revenir chaque fois au poids du corps.",
+     "outline": [
+      "Accueil : les pensées sont là, inutile de les chasser",
+      "Ancrage dans le poids du corps sur le lit",
+      "Étiqueter : « planification », « souvenir », « inquiétude »",
+      "Image : les pensées comme des voitures au loin, on ne monte pas dedans",
+      "Revenir au contact du drap, de l'oreiller",
+      "Allonger légèrement l'expiration",
+      "Relances de plus en plus rares",
+      "Fondu dans le silence"
+     ],
+     "image": "meditation_08",
+     "ambience": "summerNight",
+     "audio_minutes": 17
+    },
+    {
+     "id": "sleep-body-heavy-15",
+     "status": "rewrite",
+     "title": {
+      "fr": "Corps lourd, esprit calme",
+      "en": "Heavy body, quiet mind",
+      "de": "Schwerer Körper, ruhiger Geist",
+      "es": "Cuerpo pesado, mente en calma",
+      "ja": "重いからだ、静かな心",
+      "ko": "무거운 몸, 고요한 마음"
+     },
+     "subtitle": {
+      "fr": "Lourdeur et chaleur pour glisser vers le sommeil",
+      "en": "Heaviness and warmth to slip into sleep",
+      "de": "Schwere und Wärme, um in den Schlaf zu gleiten",
+      "es": "Pesadez y calor para deslizarte al sueño",
+      "ja": "重さと温かさで眠りへ",
+      "ko": "무거움과 따뜻함으로 잠에 스며들기"
+     },
+     "target_minutes": 15,
+     "speech_ratio": 0.8,
+     "target_words": 1800,
+     "technique": "Training autogène (lourdeur, chaleur)",
+     "purpose": "Formules autogènes de Schultz adaptées : lourdeur puis chaleur dans chaque membre. Pour celles et ceux qui ont le corps tendu au coucher.",
+     "outline": [
+      "Installation allongée",
+      "Formule de calme : « je suis calme »",
+      "Lourdeur : bras droit, bras gauche, jambes",
+      "Chaleur : bras, jambes, ventre",
+      "Respiration qui se fait toute seule",
+      "Front frais, visage détendu",
+      "Corps entier lourd et chaud",
+      "Fondu dans le silence, pas de reprise"
+     ],
+     "image": "situation_dormir",
+     "ambience": "ocean",
+     "audio_minutes": 23
+    },
+    {
+     "id": "sleep-body-scan-20",
+     "status": "new",
+     "title": {
+      "fr": "Scan corporel du soir",
+      "en": "Bedtime body scan",
+      "de": "Bodyscan zum Einschlafen",
+      "es": "Escaneo corporal para dormir",
+      "ja": "眠りのためのボディスキャン",
+      "ko": "잠들기 위한 바디 스캔"
+     },
+     "subtitle": {
+      "fr": "Éteindre le corps zone par zone",
+      "en": "Switch off your body, part by part",
+      "de": "Den Körper Stück für Stück abschalten",
+      "es": "Apaga el cuerpo, zona por zona",
+      "ja": "からだを少しずつオフに",
+      "ko": "몸을 한 부분씩 꺼두기"
+     },
+     "target_minutes": 20,
+     "speech_ratio": 0.8,
+     "target_words": 2400,
+     "technique": "Body scan long pour l'endormissement",
+     "purpose": "Version longue et très lente du body scan, conçue pour s'endormir avant la fin. Plus de silence, aucune consigne de réveil.",
+     "outline": [
+      "Installation allongée, ajustements",
+      "Respiration ralentie",
+      "Pieds, chevilles, mollets : chaque zone « s'éteint »",
+      "Genoux, cuisses, bassin",
+      "Ventre, dos, poitrine",
+      "Mains, bras, épaules",
+      "Nuque, mâchoire, yeux, front",
+      "Corps entier comme une seule masse tranquille",
+      "Silence prolongé, pas de retour"
+     ],
+     "image": "routine_sleep",
+     "ambience": "rain",
+     "audio_minutes": 29
+    },
+    {
+     "id": "sleep-story-lighthouse-20",
+     "status": "new",
+     "title": {
+      "fr": "Le gardien du phare",
+      "en": "The lighthouse keeper",
+      "de": "Der Leuchtturmwärter",
+      "es": "El farero",
+      "ja": "灯台守",
+      "ko": "등대지기"
+     },
+     "subtitle": {
+      "fr": "Une histoire du soir sur une île bretonne, au rythme des vagues",
+      "en": "A bedtime story on a Breton island, to the rhythm of the waves",
+      "de": "Eine Gute-Nacht-Geschichte auf einer bretonischen Insel",
+      "es": "Un cuento para dormir en una isla bretona, al ritmo de las olas",
+      "ja": "ブルターニュの島、波のリズムで聞く眠りの物語",
+      "ko": "브르타뉴 섬에서 파도 리듬으로 듣는 잠자리 이야기"
+     },
+     "target_minutes": 20,
+     "speech_ratio": 1.0,
+     "target_words": 3000,
+     "technique": "Histoire du soir (narration lente, sans intrigue)",
+     "purpose": "Histoire narrative à la deuxième ou troisième personne, sans tension ni rebondissement : la soirée d'un gardien de phare qui accomplit des gestes lents. Le récit ralentit et devient plus descriptif à mesure.",
+     "outline": [
+      "Introduction : installe-toi, tu n'as pas besoin de suivre toute l'histoire",
+      "Arrivée sur l'île en fin de journée, lumière dorée",
+      "La maison du gardien : thé, poêle, gestes lents",
+      "La montée de l'escalier en colimaçon, marche après marche",
+      "Allumer la lampe, le faisceau qui tourne sur la mer",
+      "Observation de la mer la nuit, les bateaux lointains",
+      "Descente, coucher dans la petite chambre, bruit des vagues",
+      "La narration se dissout en descriptions de plus en plus lentes"
+     ],
+     "image": "sound_ocean",
+     "ambience": "ocean",
+     "audio_minutes": 27
+    },
+    {
+     "id": "sleep-story-provence-20",
+     "status": "new",
+     "title": {
+      "fr": "Nuit d'été en Provence",
+      "en": "Summer night in Provence",
+      "de": "Sommernacht in der Provence",
+      "es": "Noche de verano en la Provenza",
+      "ja": "プロヴァンスの夏の夜",
+      "ko": "프로방스의 여름밤"
+     },
+     "subtitle": {
+      "fr": "Lavande, cigales et pierres encore tièdes",
+      "en": "Lavender, cicadas and stones still warm from the sun",
+      "de": "Lavendel, Zikaden und noch warme Steine",
+      "es": "Lavanda, cigarras y piedras aún tibias",
+      "ja": "ラベンダー、セミの声、まだ温かい石",
+      "ko": "라벤더, 매미 소리, 아직 따뜻한 돌"
+     },
+     "target_minutes": 20,
+     "speech_ratio": 1.0,
+     "target_words": 3000,
+     "technique": "Histoire du soir (nature, sensorialité)",
+     "purpose": "Promenade lente dans un mas provençal au crépuscule, très sensorielle (odeurs, températures, sons). Renforce l'identité française de la marque.",
+     "outline": [
+      "Introduction et installation",
+      "Fin d'après-midi, chaleur qui retombe",
+      "Le jardin : lavande, romarin, figuier",
+      "Le chant des cigales qui faiblit",
+      "Dîner simple sous la tonnelle, puis silence",
+      "Allongé sur une chaise longue, les étoiles apparaissent",
+      "Rentrer, volets entrouverts, draps frais",
+      "La narration se dissout"
+     ],
+     "image": "habit_nature_balade",
+     "ambience": "summerNight",
+     "audio_minutes": 26
+    },
+    {
+     "id": "sleep-story-night-train-25",
+     "status": "new",
+     "title": {
+      "fr": "Le train de nuit",
+      "en": "The night train",
+      "de": "Der Nachtzug",
+      "es": "El tren nocturno",
+      "ja": "夜行列車",
+      "ko": "야간열차"
+     },
+     "subtitle": {
+      "fr": "Traverser les Alpes dans une couchette, bercé par les rails",
+      "en": "Cross the Alps in a sleeper, lulled by the tracks",
+      "de": "Im Schlafwagen über die Alpen, gewiegt von den Schienen",
+      "es": "Cruza los Alpes en litera, mecido por las vías",
+      "ja": "寝台車でアルプスを越え、線路に揺られて",
+      "ko": "침대칸에서 알프스를 넘으며 철길에 흔들리기"
+     },
+     "target_minutes": 25,
+     "speech_ratio": 1.0,
+     "target_words": 3750,
+     "technique": "Histoire du soir (voyage, répétition apaisante)",
+     "purpose": "Récit d'un voyage en train de nuit de Paris vers l'Italie. Le roulement régulier et les gares qui défilent créent une répétition hypnotique.",
+     "outline": [
+      "Introduction et installation",
+      "Gare de départ le soir, lumières, quai",
+      "La cabine, les draps frais, la petite lampe",
+      "Le train démarre, la ville s'éloigne",
+      "Campagne dans la nuit, petites gares endormies",
+      "Montée dans les montagnes, neige au clair de lune",
+      "Le roulement des rails comme une berceuse",
+      "La narration se dissout"
+     ],
+     "image": "habit_sleep",
+     "ambience": "whitenoise",
+     "audio_minutes": 34
+    },
+    {
+     "id": "sleep-yoga-nidra-30",
+     "status": "new",
+     "title": {
+      "fr": "Yoga nidra du soir",
+      "en": "Yoga nidra for sleep",
+      "de": "Yoga Nidra zum Einschlafen",
+      "es": "Yoga nidra para dormir",
+      "ja": "眠りのヨガニドラ",
+      "ko": "잠을 위한 요가 니드라"
+     },
+     "subtitle": {
+      "fr": "La pratique longue pour les nuits où rien d'autre ne marche",
+      "en": "The long practice for nights when nothing else works",
+      "de": "Die lange Praxis für Nächte, in denen nichts anderes hilft",
+      "es": "La práctica larga para las noches en que nada funciona",
+      "ja": "何をしても眠れない夜のための長いプラクティス",
+      "ko": "아무것도 듣지 않는 밤을 위한 긴 수련"
+     },
+     "target_minutes": 30,
+     "speech_ratio": 0.8,
+     "target_words": 3600,
+     "technique": "Yoga nidra complet (sankalpa, rotation, sensations opposées, visualisation)",
+     "purpose": "Yoga nidra traditionnel complet, en version sommeil (sans réveil final). Pour les nuits difficiles ou les week-ends où l'on veut une vraie descente profonde.",
+     "outline": [
+      "Installation (savasana), consigne de rester immobile",
+      "Sankalpa : une intention courte au présent",
+      "Rotation de conscience rapide dans tout le corps",
+      "Conscience du souffle, comptage à rebours",
+      "Paires de sensations : lourd/léger, chaud/froid",
+      "Série d'images courtes (visualisation rapide)",
+      "Lieu de repos intérieur",
+      "Rappel du sankalpa",
+      "Fondu dans le silence, sans retour"
+     ],
+     "image": "meditation_01",
+     "ambience": "summerNight",
+     "audio_minutes": 46
+    }
+   ]
+  },
+  {
+   "id": "morning",
+   "is_new": false,
+   "title": {
+    "fr": "Matin & énergie",
+    "en": "Morning & energy",
+    "de": "Morgen & Energie",
+    "es": "Mañana y energía",
+    "ja": "朝とエネルギー",
+    "ko": "아침 & 에너지"
+   },
+   "subtitle": {
+    "fr": "Bien démarrer, sans te lever déjà stressé",
+    "en": "Start well, without waking up stressed",
+    "de": "Gut starten, ohne schon gestresst aufzustehen",
+    "es": "Empieza bien, sin levantarte ya estresado",
+    "ja": "起きた瞬間からのストレスなしに、よいスタートを",
+    "ko": "일어나자마자 스트레스받지 않고 잘 시작하기"
+   },
+   "rationale": "Thème existant. Le cortisol est naturellement au plus haut au réveil : le matin est un moment clé pour la promesse CortiFree. On ajoute le réveil anxieux (très fréquent), le mouvement, la marche méditative, la préparation mentale de la journée et un format week-end, sans doublon avec l'intention et la gratitude existantes.",
+   "sessions": [
+    {
+     "id": "morning-energy-4",
+     "status": "rewrite",
+     "title": {
+      "fr": "Énergie naturelle",
+      "en": "Natural energy",
+      "de": "Natürliche Energie",
+      "es": "Energía natural",
+      "ja": "自然なエネルギー",
+      "ko": "자연스러운 에너지"
+     },
+     "subtitle": {
+      "fr": "Réveiller le corps sans café",
+      "en": "Wake your body up without coffee",
+      "de": "Den Körper ohne Kaffee wecken",
+      "es": "Despierta el cuerpo sin café",
+      "ja": "コーヒーなしでからだを起こす",
+      "ko": "커피 없이 몸 깨우기"
+     },
+     "target_minutes": 4,
+     "speech_ratio": 0.9,
+     "target_words": 540,
+     "technique": "Respiration dynamisante + mouvement",
+     "purpose": "Pour les matins mous : quelques respirations plus toniques (sans hyperventilation) et des mouvements simples pour réveiller le corps.",
+     "outline": [
+      "Debout ou assis au bord du lit",
+      "Trois inspirations vives par le nez, expirations franches",
+      "S'étirer bras vers le ciel",
+      "Tapoter doucement bras, jambes, épaules",
+      "Rotation des épaules et du cou",
+      "Respiration normale, sentir l'énergie qui circule",
+      "Clôture : un premier geste concret pour la journée"
+     ],
+     "image": "routine_energy",
+     "ambience": "forest",
+     "audio_minutes": 6
+    },
+    {
+     "id": "morning-coffee-5",
+     "status": "new",
+     "title": {
+      "fr": "Le premier café",
+      "en": "The first coffee",
+      "de": "Der erste Kaffee",
+      "es": "El primer café",
+      "ja": "朝いちばんのコーヒー",
+      "ko": "아침 첫 커피"
+     },
+     "subtitle": {
+      "fr": "Savourer ta tasse au lieu de l'avaler en lisant tes mails",
+      "en": "Savor your cup instead of gulping it over email",
+      "de": "Die Tasse genießen statt nebenbei Mails zu lesen",
+      "es": "Saborea tu taza en vez de bebértela leyendo correos",
+      "ja": "メールを見ながらではなく、一杯を味わう",
+      "ko": "메일 보며 마시지 말고 한 잔을 음미하기"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Pleine conscience d'une boisson (savourer)",
+     "purpose": "À écouter avec son café, thé ou verre d'eau. Transforme une habitude existante en moment de pleine conscience : le meilleur ancrage pour une pratique quotidienne.",
+     "outline": [
+      "Prendre la tasse à deux mains, sans écran",
+      "Chaleur dans les paumes",
+      "Les arômes, inspirer lentement",
+      "Première gorgée : goût, température, trajet",
+      "Regarder par la fenêtre entre deux gorgées",
+      "Remarquer l'envie de se presser, revenir à la tasse",
+      "Clôture : ce rituel peut ancrer ta pratique chaque matin"
+     ],
+     "image": "habit_water",
+     "ambience": "morning",
+     "audio_minutes": 7
+    },
+    {
+     "id": "morning-gentle-wake-5",
+     "status": "rewrite",
+     "title": {
+      "fr": "Réveil en douceur",
+      "en": "Gentle wake-up",
+      "de": "Sanft aufwachen",
+      "es": "Despertar suave",
+      "ja": "やさしい目覚め",
+      "ko": "부드러운 기상"
+     },
+     "subtitle": {
+      "fr": "Premiers souffles conscients, encore au lit",
+      "en": "First mindful breaths, still in bed",
+      "de": "Erste bewusste Atemzüge, noch im Bett",
+      "es": "Primeras respiraciones conscientes, aún en la cama",
+      "ja": "ベッドの中で、最初の意識的な呼吸",
+      "ko": "아직 침대에서, 첫 의식적인 호흡"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Éveil progressif au lit (souffle + sensations)",
+     "purpose": "Encore au lit, avant le téléphone. Passage progressif du sommeil à l'éveil, souffle et sensations, pour éviter de démarrer en mode alerte.",
+     "outline": [
+      "Avant de prendre le téléphone, reste allongé",
+      "Sentir la chaleur du lit, la lumière derrière les paupières",
+      "Premiers souffles conscients, plus amples",
+      "Bouger doucement doigts et orteils",
+      "S'étirer comme un chat",
+      "Une phrase pour la journée",
+      "S'asseoir lentement, pieds au sol"
+     ],
+     "image": "habit_sleep_morning",
+     "ambience": "morning",
+     "audio_minutes": 7
+    },
+    {
+     "id": "morning-anxious-wake-6",
+     "status": "new",
+     "title": {
+      "fr": "Réveil anxieux",
+      "en": "Waking up anxious",
+      "de": "Mit Unruhe aufwachen",
+      "es": "Despertar con ansiedad",
+      "ja": "不安で目覚めた朝に",
+      "ko": "불안하게 깬 아침"
+     },
+     "subtitle": {
+      "fr": "Le nœud au ventre dès l'ouverture des yeux ? On commence par là",
+      "en": "Knot in your stomach the moment you wake? Start here",
+      "de": "Knoten im Bauch beim Aufwachen? Fang hier an",
+      "es": "¿Nudo en el estómago nada más abrir los ojos? Empieza aquí",
+      "ja": "目覚めた瞬間から胃がきゅっとなるなら、ここから",
+      "ko": "눈뜨자마자 속이 조여 온다면, 여기서 시작해요"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Accueil de l'anxiété matinale + expiration longue + premier pas",
+     "purpose": "Pour les matins où l'on se réveille déjà tendu. Explique simplement le pic hormonal du réveil (sans jargon médical), apaise le corps et ramène à une première action minuscule.",
+     "outline": [
+      "Accueil : se réveiller tendu est fréquent, rien n'est encore arrivé",
+      "Explication simple : le corps se met en route avec un pic d'activation naturel",
+      "Main sur le ventre, expirations longues",
+      "Nommer l'anxiété, la situer dans le corps",
+      "Distinguer : ce qui arrive vraiment aujourd'hui vs ce que la tête imagine",
+      "Choisir la toute première petite action (boire de l'eau, ouvrir la fenêtre)",
+      "Clôture : une chose à la fois"
+     ],
+     "image": "situation_anxiete",
+     "ambience": "morning",
+     "audio_minutes": 8
+    },
+    {
+     "id": "morning-gratitude-6",
+     "status": "rewrite",
+     "title": {
+      "fr": "Gratitude du matin",
+      "en": "Morning gratitude",
+      "de": "Morgendliche Dankbarkeit",
+      "es": "Gratitud matinal",
+      "ja": "朝の感謝",
+      "ko": "아침 감사"
+     },
+     "subtitle": {
+      "fr": "Trois mercis pour colorer la journée",
+      "en": "Three thank-yous to color your day",
+      "de": "Drei Dankesworte für deinen Tag",
+      "es": "Tres gracias para dar color al día",
+      "ja": "3つの「ありがとう」で一日を彩る",
+      "ko": "세 가지 감사로 하루 물들이기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Gratitude détaillée (trois mercis incarnés)",
+     "purpose": "Trois remerciements détaillés et ressentis dans le corps, pour orienter l'attention vers ce qui soutient plutôt que ce qui menace.",
+     "outline": [
+      "Installation, souffle tranquille",
+      "Pourquoi la gratitude : l'attention a tendance à chercher les problèmes",
+      "Merci 1 : quelque chose de simple (lit, eau chaude)",
+      "Merci 2 : une personne, la visualiser",
+      "Merci 3 : quelque chose en toi (une qualité, ton corps)",
+      "Ressentir la gratitude dans la poitrine",
+      "Emporter un merci dans la journée"
+     ],
+     "image": "meditation_05",
+     "ambience": "stream",
+     "audio_minutes": 8
+    },
+    {
+     "id": "morning-day-preview-7",
+     "status": "new",
+     "title": {
+      "fr": "Visualiser ta journée",
+      "en": "Preview your day",
+      "de": "Deinen Tag vorausgehen",
+      "es": "Visualiza tu día",
+      "ja": "今日一日を思い描く",
+      "ko": "오늘 하루 미리 그려보기"
+     },
+     "subtitle": {
+      "fr": "Anticiper le moment difficile et y entrer prêt",
+      "en": "Anticipate the hard moment and walk in ready",
+      "de": "Den schwierigen Moment vorwegnehmen und bereit sein",
+      "es": "Anticipa el momento difícil y llega preparado",
+      "ja": "大変な場面を先取りして、準備して臨む",
+      "ko": "어려운 순간을 미리 그려보고 준비된 채 맞이하기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Répétition mentale + intention de mise en œuvre (si… alors…)",
+     "purpose": "Survol mental de la journée pour repérer le moment potentiellement stressant et préparer une réponse concrète (« si… alors… »). Complète l'intention, plus orientée action.",
+     "outline": [
+      "Installation, quelques respirations",
+      "Dérouler la journée heure par heure, sans détailler",
+      "Repérer le moment qui pourrait être difficile",
+      "Se voir le vivre calmement : posture, souffle",
+      "Formuler un plan : « si je sens la pression, alors je… »",
+      "Repérer aussi un moment agréable à savourer",
+      "Clôture : tu as déjà fait un tour de ta journée"
+     ],
+     "image": "routine_morning",
+     "ambience": "morning",
+     "audio_minutes": 10
+    },
+    {
+     "id": "morning-intention-7",
+     "status": "rewrite",
+     "title": {
+      "fr": "Intention du jour",
+      "en": "Set your intention",
+      "de": "Tagesabsicht",
+      "es": "Intención del día",
+      "ja": "今日の意図",
+      "ko": "오늘의 의도"
+     },
+     "subtitle": {
+      "fr": "Choisir un mot pour guider ta journée",
+      "en": "Choose one word to guide your day",
+      "de": "Ein Wort wählen, das deinen Tag leitet",
+      "es": "Elige una palabra que guíe tu día",
+      "ja": "一日を導くひと言を選ぶ",
+      "ko": "하루를 이끌 한 단어 고르기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Intention + valeurs (un mot pour la journée)",
+     "purpose": "Choisir un mot-intention relié à une valeur (patience, présence, courage) et visualiser un moment de la journée où l'incarner.",
+     "outline": [
+      "Installation assise, souffle",
+      "Se demander : comment veux-tu être aujourd'hui ?",
+      "Laisser venir un mot, ou en choisir un parmi des propositions",
+      "Le ressentir dans le corps",
+      "Visualiser un moment précis où l'utiliser",
+      "Répéter le mot sur trois expirations",
+      "Clôture : un rappel discret (fond d'écran, post-it)"
+     ],
+     "image": "situation_energie",
+     "ambience": "morning",
+     "audio_minutes": 10
+    },
+    {
+     "id": "morning-stretch-8",
+     "status": "new",
+     "title": {
+      "fr": "Étirements en conscience",
+      "en": "Mindful morning stretch",
+      "de": "Achtsames Dehnen am Morgen",
+      "es": "Estiramientos conscientes",
+      "ja": "マインドフル・ストレッチ",
+      "ko": "마음챙김 스트레칭"
+     },
+     "subtitle": {
+      "fr": "Délier le corps doucement, avec le souffle",
+      "en": "Loosen up gently, with your breath",
+      "de": "Den Körper sanft mit dem Atem lösen",
+      "es": "Suelta el cuerpo con suavidad, al ritmo de la respiración",
+      "ja": "呼吸とともに、からだをやさしくほぐす",
+      "ko": "호흡과 함께 부드럽게 몸 풀기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Mouvement conscient doux (étirements debout)",
+     "purpose": "Séquence d'étirements debout très accessibles, synchronisés avec le souffle. Pour ceux qui ont du mal à rester assis ou qui se lèvent raides.",
+     "outline": [
+      "Debout, pieds largeur de bassin, consigne : jamais de douleur",
+      "Bras vers le ciel sur l'inspiration, retour sur l'expiration",
+      "Inclinaisons latérales",
+      "Enroulement doux vers l'avant, genoux souples",
+      "Rotations du buste",
+      "Ouverture de la poitrine, mains dans le dos",
+      "Immobilité : sentir le corps vivant",
+      "Clôture"
+     ],
+     "image": "habit_sport_etirements",
+     "ambience": "forest",
+     "audio_minutes": 11
+    },
+    {
+     "id": "morning-slow-weekend-10",
+     "status": "new",
+     "title": {
+      "fr": "Matin lent du week-end",
+      "en": "Slow weekend morning",
+      "de": "Langsamer Wochenendmorgen",
+      "es": "Mañana lenta de fin de semana",
+      "ja": "週末のゆっくりした朝",
+      "ko": "느긋한 주말 아침"
+     },
+     "subtitle": {
+      "fr": "Rien à faire, nulle part où aller",
+      "en": "Nothing to do, nowhere to be",
+      "de": "Nichts zu tun, nirgends hinzumüssen",
+      "es": "Nada que hacer, ningún sitio adonde ir",
+      "ja": "何もしなくていい、どこにも行かなくていい",
+      "ko": "할 일도, 갈 곳도 없는 아침"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Savourer + présence ouverte",
+     "purpose": "Pour les matins libres : apprendre à ralentir et savourer, sans objectif de productivité. Combat le « mode alerte » qui persiste même le week-end.",
+     "outline": [
+      "Autorisation : aujourd'hui, pas d'urgence",
+      "Remarquer le rythme intérieur encore pressé",
+      "Ralentir le souffle et les gestes",
+      "Savourer les sensations : lumière, chaleur, sons du matin",
+      "Présence ouverte, longues pauses",
+      "Se demander ce qui te ferait du bien aujourd'hui",
+      "Clôture lente"
+     ],
+     "image": "sound_morning",
+     "ambience": "morning",
+     "audio_minutes": 14
+    },
+    {
+     "id": "morning-walk-10",
+     "status": "new",
+     "title": {
+      "fr": "Marche méditative",
+      "en": "Walking meditation",
+      "de": "Gehmeditation",
+      "es": "Meditación caminando",
+      "ja": "歩く瞑想",
+      "ko": "걷기 명상"
+     },
+     "subtitle": {
+      "fr": "Chaque pas comme ancrage, dehors ou dans ton salon",
+      "en": "Every step an anchor, outdoors or in your living room",
+      "de": "Jeder Schritt ein Anker, draußen oder im Wohnzimmer",
+      "es": "Cada paso, un ancla, fuera o en tu salón",
+      "ja": "一歩一歩を錨に。外でも部屋の中でも",
+      "ko": "한 걸음 한 걸음을 닻으로, 밖에서도 거실에서도"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Méditation en marchant",
+     "purpose": "Méditation en marchant pour le trajet du matin à pied, une promenade ou quelques pas chez soi. Ancre l'attention dans les pieds et le mouvement.",
+     "outline": [
+      "Consigne sécurité : yeux ouverts, attention aux traversées",
+      "Debout, sentir le poids réparti sur les pieds",
+      "Commencer lentement : talon, plante, orteils",
+      "Synchroniser souffle et pas",
+      "Élargir : sons, air sur la peau, couleurs",
+      "Revenir aux pieds quand l'esprit part",
+      "Accélérer à un rythme naturel en gardant la présence",
+      "Clôture : continuer à marcher en conscience"
+     ],
+     "image": "habit_nature_randonnee",
+     "ambience": "forest",
+     "audio_minutes": 14
+    }
+   ]
+  },
+  {
+   "id": "bodyRelax",
+   "is_new": false,
+   "title": {
+    "fr": "Corps & détente",
+    "en": "Body & relaxation",
+    "de": "Körper & Entspannung",
+    "es": "Cuerpo y relajación",
+    "ja": "からだとリラックス",
+    "ko": "몸 & 이완"
+   },
+   "subtitle": {
+    "fr": "Là où le stress s'accroche : nuque, ventre, mâchoire… on relâche",
+    "en": "Where stress clings: neck, belly, jaw… let it go",
+    "de": "Wo Stress festsitzt – Nacken, Bauch, Kiefer – loslassen",
+    "es": "Donde se agarra el estrés: cuello, vientre, mandíbula… suéltalo",
+    "ja": "首、お腹、あご…ストレスが居座る場所をゆるめる",
+    "ko": "목, 배, 턱… 스트레스가 붙어 있는 곳을 풀어주기"
+   },
+   "rationale": "Thème existant. On garde PMR, yoga nidra, épaules-mâchoire, et on décline le body scan en trois longueurs (3, 10, 25 min ; la version sommeil 20 min est dans Sommeil). On ajoute des zones ciblées très liées au stress (ventre noué, dos), la respiration diaphragmatique et une pratique active (secouer le stress) pour ceux qui n'arrivent pas à rester immobiles.",
+   "sessions": [
+    {
+     "id": "body-quick-scan-3",
+     "status": "new",
+     "title": {
+      "fr": "Scan express",
+      "en": "Quick body scan",
+      "de": "Kurzer Bodyscan",
+      "es": "Escaneo exprés",
+      "ja": "クイック・ボディスキャン",
+      "ko": "빠른 바디 스캔"
+     },
+     "subtitle": {
+      "fr": "Faire le point sur ton corps en quelques minutes",
+      "en": "Check in with your body in a few minutes",
+      "de": "In wenigen Minuten bei deinem Körper einchecken",
+      "es": "Revisa cómo está tu cuerpo en pocos minutos",
+      "ja": "数分でからだの状態をチェック",
+      "ko": "몇 분 만에 몸 상태 점검하기"
+     },
+     "target_minutes": 3,
+     "speech_ratio": 0.8,
+     "target_words": 360,
+     "technique": "Body scan express",
+     "purpose": "Balayage rapide du corps pour repérer et relâcher les tensions principales. Pratique quotidienne facile, utilisable au bureau.",
+     "outline": [
+      "Arrivée : yeux fermés ou regard bas",
+      "Pieds et jambes",
+      "Bassin et dos",
+      "Ventre et poitrine",
+      "Épaules, bras, mains",
+      "Visage et mâchoire",
+      "Corps entier, une respiration, retour"
+     ],
+     "image": "routine_relaxation",
+     "ambience": null,
+     "audio_minutes": 4
+    },
+    {
+     "id": "body-shoulders-jaw-5",
+     "status": "rewrite",
+     "title": {
+      "fr": "Épaules et mâchoire",
+      "en": "Shoulders and jaw",
+      "de": "Schultern und Kiefer",
+      "es": "Hombros y mandíbula",
+      "ja": "肩とあご",
+      "ko": "어깨와 턱"
+     },
+     "subtitle": {
+      "fr": "Là où le stress se cache, on relâche",
+      "en": "Release where stress likes to hide",
+      "de": "Dort lösen, wo sich Stress versteckt",
+      "es": "Suelta donde se esconde el estrés",
+      "ja": "ストレスが隠れる場所をゆるめる",
+      "ko": "스트레스가 숨는 곳을 풀어주기"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Relâchement ciblé (épaules, nuque, mâchoire)",
+     "purpose": "Cible les trois zones où le stress se fixe le plus : épaules, nuque, mâchoire (serrage, bruxisme). Micro-mouvements et relâchement.",
+     "outline": [
+      "Arrivée, repérer la zone la plus tendue",
+      "Hausser les épaules vers les oreilles, tenir, relâcher",
+      "Inclinaisons lentes de la tête",
+      "Mâchoire : ouvrir grand, bâiller, relâcher",
+      "Langue au palais, espace entre les dents",
+      "Massage doux des tempes et des masséters (optionnel)",
+      "Clôture : un rappel pour vérifier ta mâchoire dans la journée"
+     ],
+     "image": "situation_tendu",
+     "ambience": "ocean",
+     "audio_minutes": 8
+    },
+    {
+     "id": "body-standing-shake-5",
+     "status": "new",
+     "title": {
+      "fr": "Secouer le stress",
+      "en": "Shake off stress",
+      "de": "Den Stress abschütteln",
+      "es": "Sacúdete el estrés",
+      "ja": "ストレスを振り落とす",
+      "ko": "스트레스 털어내기"
+     },
+     "subtitle": {
+      "fr": "Pour quand rester immobile est impossible",
+      "en": "For when sitting still feels impossible",
+      "de": "Wenn Stillsitzen unmöglich scheint",
+      "es": "Para cuando quedarte quieto es imposible",
+      "ja": "じっとしていられないときに",
+      "ko": "가만히 있기 힘들 때"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Secouement (shaking) + immobilité",
+     "purpose": "Pratique active debout : secouer les mains, les bras, tout le corps, puis immobilité et observation des sensations. Évacue l'énergie de la réponse au stress de façon physique.",
+     "outline": [
+      "Debout, genoux souples, consigne de rester dans le confortable",
+      "Secouer les mains, puis les bras",
+      "Rebondir légèrement sur les talons, secouer les jambes",
+      "Tout le corps, en relâchant la mâchoire, un son possible",
+      "Ralentir progressivement",
+      "Immobilité : sentir les picotements, la chaleur",
+      "Respirer dans le calme retrouvé"
+     ],
+     "image": "habit_sport_dance",
+     "ambience": null,
+     "audio_minutes": 7
+    },
+    {
+     "id": "body-belly-breath-6",
+     "status": "new",
+     "title": {
+      "fr": "Respirer avec le ventre",
+      "en": "Belly breathing",
+      "de": "Bauchatmung",
+      "es": "Respiración abdominal",
+      "ja": "お腹で呼吸する",
+      "ko": "배로 숨쉬기"
+     },
+     "subtitle": {
+      "fr": "Réapprendre la respiration que le stress t'a fait oublier",
+      "en": "Relearn the breath stress made you forget",
+      "de": "Die Atmung wiederfinden, die Stress verdrängt hat",
+      "es": "Reaprende la respiración que el estrés te hizo olvidar",
+      "ja": "ストレスで忘れていた呼吸を取り戻す",
+      "ko": "스트레스로 잊어버린 호흡 다시 배우기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Respiration diaphragmatique",
+     "purpose": "Le stress pousse à respirer haut, dans la poitrine. Apprend pas à pas la respiration ventrale, mains posées, comme compétence de base.",
+     "outline": [
+      "Allongé ou assis, une main sur la poitrine, une sur le ventre",
+      "Observer quelle main bouge le plus",
+      "Laisser le ventre se gonfler à l'inspiration",
+      "Expiration : le ventre redescend tout seul",
+      "Ralentir, sans forcer l'amplitude",
+      "Pratique silencieuse avec quelques relances",
+      "Clôture : vérifier ta respiration plusieurs fois par jour"
+     ],
+     "image": "guided_breathing_05",
+     "ambience": "stream",
+     "audio_minutes": 9
+    },
+    {
+     "id": "body-knotted-stomach-7",
+     "status": "new",
+     "title": {
+      "fr": "Ventre noué",
+      "en": "Knotted stomach",
+      "de": "Knoten im Bauch",
+      "es": "Nudo en el estómago",
+      "ja": "胃がきゅっとするとき",
+      "ko": "속이 꽉 막힐 때"
+     },
+     "subtitle": {
+      "fr": "Apaiser le stress qui se loge dans le ventre",
+      "en": "Soothe the stress that settles in your belly",
+      "de": "Stress beruhigen, der sich im Bauch festsetzt",
+      "es": "Calma el estrés que se instala en tu vientre",
+      "ja": "お腹にたまるストレスをなだめる",
+      "ko": "배에 자리 잡은 스트레스 달래기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Attention au ventre + chaleur des mains + respiration",
+     "purpose": "Beaucoup ressentent le stress dans le ventre (boule, crispation). Accueille la sensation avec curiosité, apporte chaleur et souffle. Aucune allégation digestive.",
+     "outline": [
+      "Installation, mains frottées l'une contre l'autre pour les réchauffer",
+      "Mains posées sur le ventre",
+      "Explorer la sensation : forme, taille, mouvement",
+      "Respirer comme pour l'envelopper",
+      "Laisser les muscles du ventre se relâcher à chaque expiration",
+      "Phrase d'accueil : « tu as le droit d'être là »",
+      "Clôture : les mains restent un instant"
+     ],
+     "image": "meditation_02",
+     "ambience": "fire",
+     "audio_minutes": 10
+    },
+    {
+     "id": "body-back-release-8",
+     "status": "new",
+     "title": {
+      "fr": "Relâcher le dos",
+      "en": "Release your back",
+      "de": "Den Rücken entlasten",
+      "es": "Libera la espalda",
+      "ja": "背中をゆるめる",
+      "ko": "등 풀어주기"
+     },
+     "subtitle": {
+      "fr": "Allongé, genoux pliés : laisser le sol porter ton dos",
+      "en": "Lying down, knees bent: let the floor hold your back",
+      "de": "Liegend, Knie angewinkelt – der Boden trägt deinen Rücken",
+      "es": "Tumbado, rodillas dobladas: deja que el suelo sostenga tu espalda",
+      "ja": "膝を立てて横になり、床に背中をあずける",
+      "ko": "무릎 세우고 누워 바닥에 등을 맡기기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Repos constructif (allongé, genoux pliés) + scan du dos",
+     "purpose": "Position de repos constructif (méthode Alexander) et attention au dos, zone qui accumule les tensions des journées assises. Pas une séance de soin, mais un relâchement.",
+     "outline": [
+      "Allongé au sol, genoux pliés, pieds à plat, livre sous la tête si besoin",
+      "Sentir les points d'appui du dos",
+      "Le sacrum lourd, le bas du dos qui s'élargit",
+      "Le long de la colonne, vertèbre par vertèbre",
+      "Omoplates qui s'étalent",
+      "Respirer dans le dos",
+      "Clôture : se relever en roulant sur le côté"
+     ],
+     "image": "habit_sport_renforcement",
+     "ambience": "rain",
+     "audio_minutes": 12
+    },
+    {
+     "id": "body-pmr-8",
+     "status": "rewrite",
+     "title": {
+      "fr": "Relâchement musculaire progressif",
+      "en": "Progressive muscle relaxation",
+      "de": "Progressive Muskelentspannung",
+      "es": "Relajación muscular progresiva",
+      "ja": "漸進的筋弛緩法",
+      "ko": "점진적 근육 이완"
+     },
+     "subtitle": {
+      "fr": "Contracter, puis relâcher, groupe après groupe",
+      "en": "Tense, then release, one muscle group at a time",
+      "de": "Anspannen und loslassen, Muskel für Muskel",
+      "es": "Tensa y suelta, grupo muscular a grupo muscular",
+      "ja": "力を入れて、ゆるめる。部位ごとに",
+      "ko": "긴장시키고, 풀어주기, 근육별로"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Relaxation musculaire progressive (Jacobson)",
+     "purpose": "Contracter puis relâcher les grands groupes musculaires pour sentir la différence. Idéal pour les gens qui « ne savent pas se détendre ».",
+     "outline": [
+      "Installation, consigne : contracter à 50 %, jamais de douleur",
+      "Mains et avant-bras",
+      "Bras et épaules",
+      "Visage (front, yeux, mâchoire)",
+      "Ventre et dos",
+      "Jambes et pieds",
+      "Corps entier relâché, savourer le contraste",
+      "Clôture"
+     ],
+     "image": "meditation_02",
+     "ambience": "fire",
+     "audio_minutes": 12
+    },
+    {
+     "id": "body-scan-10",
+     "status": "rewrite",
+     "title": {
+      "fr": "Scan corporel complet",
+      "en": "Full body scan",
+      "de": "Kompletter Bodyscan",
+      "es": "Escaneo corporal completo",
+      "ja": "全身ボディスキャン",
+      "ko": "전신 바디 스캔"
+     },
+     "subtitle": {
+      "fr": "Des orteils au sommet du crâne, sans jugement",
+      "en": "From toes to crown, without judgment",
+      "de": "Von den Zehen bis zum Scheitel, ohne Urteil",
+      "es": "De los pies a la cabeza, sin juzgar",
+      "ja": "つま先から頭頂まで、評価せずに",
+      "ko": "발끝에서 정수리까지, 판단 없이"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.8,
+     "target_words": 1200,
+     "technique": "Body scan classique",
+     "purpose": "Le body scan de référence, de jour : des orteils au crâne, en observant sans juger. La pratique de base pour développer la conscience corporelle.",
+     "outline": [
+      "Installation assise ou allongée",
+      "Intention : observer, pas changer",
+      "Pieds et jambes",
+      "Bassin, ventre, bas du dos",
+      "Poitrine, haut du dos, épaules",
+      "Bras et mains",
+      "Cou, visage, crâne",
+      "Corps entier, retour"
+     ],
+     "image": "routine_relaxation",
+     "ambience": "rain",
+     "audio_minutes": 14
+    },
+    {
+     "id": "body-yoga-nidra-15",
+     "status": "rewrite",
+     "title": {
+      "fr": "Yoga Nidra anti-stress",
+      "en": "Stress-relief yoga nidra",
+      "de": "Yoga Nidra gegen Stress",
+      "es": "Yoga nidra antiestrés",
+      "ja": "ストレス解消ヨガニドラ",
+      "ko": "스트레스 완화 요가 니드라"
+     },
+     "subtitle": {
+      "fr": "Le sommeil conscient pour un repos profond",
+      "en": "Conscious sleep for deep rest",
+      "de": "Bewusster Schlaf für tiefe Erholung",
+      "es": "Sueño consciente para un descanso profundo",
+      "ja": "意識ある眠りで深い休息を",
+      "ko": "깊은 휴식을 위한 의식적인 잠"
+     },
+     "target_minutes": 15,
+     "speech_ratio": 0.8,
+     "target_words": 1800,
+     "technique": "Yoga nidra de jour (NSDR, avec réveil)",
+     "purpose": "Yoga nidra de récupération en journée (format « NSDR ») : repos profond, puis retour progressif à l'éveil. Pour la sieste qu'on ne peut pas faire.",
+     "outline": [
+      "Installation allongée",
+      "Sankalpa",
+      "Rotation de conscience",
+      "Souffle et comptage",
+      "Sensations opposées",
+      "Visualisation courte",
+      "Rappel du sankalpa",
+      "Retour progressif à l'éveil, frais et reposé"
+     ],
+     "image": "routine_sleep",
+     "ambience": "summerNight",
+     "audio_minutes": 23
+    },
+    {
+     "id": "body-deep-scan-25",
+     "status": "new",
+     "title": {
+      "fr": "Grand scan corporel",
+      "en": "Deep body scan",
+      "de": "Ausführlicher Bodyscan",
+      "es": "Escaneo corporal profundo",
+      "ja": "じっくりボディスキャン",
+      "ko": "깊은 바디 스캔"
+     },
+     "subtitle": {
+      "fr": "La version longue, pour un vrai temps pour toi",
+      "en": "The long version, for real time to yourself",
+      "de": "Die lange Version – echte Zeit für dich",
+      "es": "La versión larga, para darte tiempo de verdad",
+      "ja": "自分のための時間をしっかりと。ロング版",
+      "ko": "나를 위한 진짜 시간, 긴 버전"
+     },
+     "target_minutes": 25,
+     "speech_ratio": 0.8,
+     "target_words": 3000,
+     "technique": "Body scan long (style MBSR)",
+     "purpose": "Body scan détaillé de 25 min, inspiré du MBSR, pour une pratique approfondie (week-end, jour off). Plus de finesse : sensations subtiles, zones neutres, respiration dans chaque zone.",
+     "outline": [
+      "Installation et intention",
+      "Corps entier et respiration",
+      "Pied gauche en détail, puis jambe gauche",
+      "Pied droit, jambe droite",
+      "Bassin, ventre, dos",
+      "Poitrine, cœur, épaules",
+      "Bras et mains",
+      "Cou, visage, crâne",
+      "Corps entier qui respire, retour progressif"
+     ],
+     "image": "meditation_06",
+     "ambience": "stream",
+     "audio_minutes": 37
+    }
+   ]
+  },
+  {
+   "id": "selfCompassion",
+   "is_new": false,
+   "title": {
+    "fr": "Bienveillance",
+    "en": "Kindness",
+    "de": "Selbstmitgefühl",
+    "es": "Bondad contigo",
+    "ja": "セルフ・コンパッション",
+    "ko": "자기 자비"
+   },
+   "subtitle": {
+    "fr": "Être de ton côté, surtout quand c'est dur",
+    "en": "Be on your own side, especially when it's hard",
+    "de": "Auf deiner Seite stehen – gerade wenn es schwer ist",
+    "es": "Estar de tu lado, sobre todo cuando cuesta",
+    "ja": "つらいときこそ、自分の味方に",
+    "ko": "힘들 때일수록 내 편이 되어주기"
+   },
+   "rationale": "Thème existant. L'autocritique est un amplificateur majeur du stress chronique. On garde la pause bienveillante, l'amour bienveillant et la critique intérieure, et on ajoute des situations réelles : après une erreur, le corps, la solitude, les aidants (parents, soignants), la personne difficile, le pardon, la gratitude relationnelle. En anglais, « Kindness » est plus engageant que « Self-compassion » (jargon).",
+   "sessions": [
+    {
+     "id": "compassion-kind-pause-5",
+     "status": "rewrite",
+     "title": {
+      "fr": "Pause bienveillante",
+      "en": "Self-compassion break",
+      "de": "Pause des Selbstmitgefühls",
+      "es": "Pausa de autocompasión",
+      "ja": "セルフ・コンパッションの休憩",
+      "ko": "자기 자비 휴식"
+     },
+     "subtitle": {
+      "fr": "Une main sur le cœur dans un moment difficile",
+      "en": "A hand on your heart in a hard moment",
+      "de": "Eine Hand aufs Herz in schweren Momenten",
+      "es": "Una mano en el corazón en un momento difícil",
+      "ja": "つらいとき、胸に手を当てて",
+      "ko": "힘든 순간, 가슴에 손을 얹고"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Pause d'autocompassion (Kristin Neff)",
+     "purpose": "Les trois étapes de Kristin Neff dans un moment difficile : pleine conscience (« c'est dur »), humanité commune (« je ne suis pas seul »), bienveillance (« que puis-je m'offrir »).",
+     "outline": [
+      "Penser à une difficulté actuelle, modérée",
+      "La ressentir dans le corps",
+      "« C'est un moment difficile »",
+      "« La difficulté fait partie de la vie, d'autres vivent cela »",
+      "Main sur le cœur : « que je sois doux avec moi »",
+      "Trouver ses propres mots",
+      "Clôture"
+     ],
+     "image": "meditation_06",
+     "ambience": "ocean",
+     "audio_minutes": 7
+    },
+    {
+     "id": "compassion-after-mistake-6",
+     "status": "new",
+     "title": {
+      "fr": "Après une erreur",
+      "en": "After a mistake",
+      "de": "Nach einem Fehler",
+      "es": "Después de un error",
+      "ja": "ミスをしたあとで",
+      "ko": "실수한 후에"
+     },
+     "subtitle": {
+      "fr": "Réparer ce qui peut l'être, sans te taper dessus",
+      "en": "Fix what you can without beating yourself up",
+      "de": "Wiedergutmachen, ohne dich fertigzumachen",
+      "es": "Arregla lo que puedas sin machacarte",
+      "ja": "自分を責めずに、できることを立て直す",
+      "ko": "자책하지 않고 바로잡을 수 있는 것 바로잡기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Autocompassion + responsabilité (apprendre sans se flageller)",
+     "purpose": "Après une erreur, un oubli, une parole regrettée. Distingue la culpabilité utile (je répare) de la honte (je suis mauvais), et soutient le passage à l'action.",
+     "outline": [
+      "Accueil : tu t'en veux, c'est que ça compte pour toi",
+      "Sentir la honte ou la culpabilité dans le corps",
+      "Distinguer : « j'ai fait une erreur » vs « je suis une erreur »",
+      "Ce que dirait un ami bienveillant",
+      "Ce qui peut être réparé, une action",
+      "Ce que tu en apprends",
+      "Clôture : tu peux tourner la page"
+     ],
+     "image": "situation_recentrer",
+     "ambience": "stream",
+     "audio_minutes": 8
+    },
+    {
+     "id": "compassion-gratitude-someone-6",
+     "status": "new",
+     "title": {
+      "fr": "Penser à quelqu'un qui compte",
+      "en": "Someone who matters",
+      "de": "Jemand, der dir wichtig ist",
+      "es": "Alguien que te importa",
+      "ja": "大切な人を思う",
+      "ko": "소중한 사람 떠올리기"
+     },
+     "subtitle": {
+      "fr": "Laisser monter la gratitude envers une personne précise",
+      "en": "Let gratitude for one person fill you up",
+      "de": "Dankbarkeit für einen bestimmten Menschen spüren",
+      "es": "Deja crecer la gratitud hacia una persona concreta",
+      "ja": "ひとりの人への感謝を感じる",
+      "ko": "한 사람을 향한 감사 느끼기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Gratitude relationnelle",
+     "purpose": "Visualiser une personne qui nous a soutenu et ressentir la gratitude dans le corps. Renforce le sentiment de lien, puissant tampon contre le stress. Option : lui envoyer un message après.",
+     "outline": [
+      "Installation, souffle",
+      "Faire venir une personne qui t'a aidé",
+      "La voir en détail, son visage, sa voix",
+      "Se rappeler un moment précis où elle a compté",
+      "Ressentir la gratitude dans la poitrine",
+      "Lui adresser intérieurement un merci",
+      "Clôture : et si tu lui disais aujourd'hui ?"
+     ],
+     "image": "habit_social_appel",
+     "ambience": "morning",
+     "audio_minutes": 8
+    },
+    {
+     "id": "compassion-caregiver-7",
+     "status": "new",
+     "title": {
+      "fr": "Pour celles et ceux qui prennent soin",
+      "en": "For those who care for others",
+      "de": "Für alle, die sich um andere kümmern",
+      "es": "Para quienes cuidan de los demás",
+      "ja": "誰かを支えているあなたへ",
+      "ko": "누군가를 돌보는 당신에게"
+     },
+     "subtitle": {
+      "fr": "Parents, soignants, aidants : remplir ta tasse aussi",
+      "en": "Parents, carers, helpers: fill your own cup too",
+      "de": "Eltern, Pflegende, Helfende – auch deine Tasse füllen",
+      "es": "Padres, cuidadores, sanitarios: llena también tu taza",
+      "ja": "親、介護者、支える人へ。自分の器も満たして",
+      "ko": "부모, 간병인, 돌보는 사람: 내 잔도 채우기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Compassion équanime pour aidants",
+     "purpose": "Pour les parents épuisés, les soignants, les aidants familiaux. Reconnaît la charge, équilibre la compassion envers l'autre et envers soi, apaise la culpabilité de ne pas en faire assez.",
+     "outline": [
+      "Accueil : prendre soin des autres use, ce n'est pas une faiblesse de le sentir",
+      "Ressentir la fatigue sans la juger",
+      "Inspirer de la douceur pour soi",
+      "Expirer de la douceur vers la personne aidée",
+      "Phrase d'équanimité : « je fais de mon mieux, je ne peux pas tout contrôler »",
+      "Une petite chose pour toi aujourd'hui",
+      "Clôture"
+     ],
+     "image": "habit_social_cuisiner",
+     "ambience": "fire",
+     "audio_minutes": 10
+    },
+    {
+     "id": "compassion-body-peace-8",
+     "status": "new",
+     "title": {
+      "fr": "Faire la paix avec ton corps",
+      "en": "Make peace with your body",
+      "de": "Frieden mit deinem Körper schließen",
+      "es": "Haz las paces con tu cuerpo",
+      "ja": "からだと仲直りする",
+      "ko": "내 몸과 화해하기"
+     },
+     "subtitle": {
+      "fr": "Remercier ce corps au lieu de le juger",
+      "en": "Thank your body instead of judging it",
+      "de": "Dem Körper danken, statt ihn zu bewerten",
+      "es": "Agradece a tu cuerpo en lugar de juzgarlo",
+      "ja": "からだを評価するかわりに、感謝する",
+      "ko": "몸을 평가하는 대신 고마워하기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Bienveillance envers le corps",
+     "purpose": "Pour qui a une relation difficile à son corps (apparence, maladie, fatigue). Passe du jugement à la gratitude fonctionnelle, avec délicatesse.",
+     "outline": [
+      "Installation confortable",
+      "Remarquer les jugements sur le corps, sans les combattre",
+      "Remercier les pieds qui portent",
+      "Les mains qui font, les bras qui portent",
+      "Le cœur qui bat sans relâche, le souffle",
+      "Une zone difficile : lui envoyer de la douceur",
+      "Clôture : ce corps est ton allié"
+     ],
+     "image": "habit_sport_natation",
+     "ambience": "ocean",
+     "audio_minutes": 11
+    },
+    {
+     "id": "compassion-inner-critic-8",
+     "status": "rewrite",
+     "title": {
+      "fr": "Adoucir la critique intérieure",
+      "en": "Soften your inner critic",
+      "de": "Den inneren Kritiker besänftigen",
+      "es": "Suaviza a tu crítico interior",
+      "ja": "内なる批判の声をやわらげる",
+      "ko": "내면의 비판 목소리 누그러뜨리기"
+     },
+     "subtitle": {
+      "fr": "Te parler comme à un ami cher",
+      "en": "Speak to yourself like a dear friend",
+      "de": "Mit dir sprechen wie mit einem guten Freund",
+      "es": "Háblate como a un buen amigo",
+      "ja": "大切な友人に話すように自分に話す",
+      "ko": "소중한 친구에게 말하듯 나에게 말하기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Dialogue avec la critique intérieure (voix bienveillante)",
+     "purpose": "Repérer la voix critique intérieure, comprendre ce qu'elle tente de protéger et lui répondre avec la voix d'un ami bienveillant.",
+     "outline": [
+      "Installation, souffle",
+      "Faire venir une phrase typique de ta critique intérieure",
+      "Remarquer le ton, l'effet dans le corps",
+      "Que cherche-t-elle à protéger ?",
+      "Lui répondre comme à un ami cher",
+      "Formuler la même idée avec bienveillance",
+      "Clôture : la voix douce est aussi la tienne"
+     ],
+     "image": "meditation_03",
+     "ambience": "fire",
+     "audio_minutes": 11
+    },
+    {
+     "id": "compassion-loneliness-8",
+     "status": "new",
+     "title": {
+      "fr": "Seul·e ce soir",
+      "en": "Lonely tonight",
+      "de": "Einsam heute Abend",
+      "es": "Solo esta noche",
+      "ja": "ひとりぼっちの夜に",
+      "ko": "외로운 오늘 밤"
+     },
+     "subtitle": {
+      "fr": "Tu n'es pas aussi seul·e que tu le crois",
+      "en": "You're less alone than you think",
+      "de": "Du bist weniger allein, als du denkst",
+      "es": "No estás tan solo como crees",
+      "ja": "思っているほど、ひとりじゃない",
+      "ko": "생각만큼 혼자가 아니에요"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Humanité commune + connexion",
+     "purpose": "Pour les soirs de solitude. Reconnaît le manque de lien, rappelle l'humanité commune (des milliers de personnes ressentent cela ce soir) et nourrit un sentiment de connexion.",
+     "outline": [
+      "Accueil : la solitude fait mal, c'est un besoin humain",
+      "Sentir la solitude dans le corps",
+      "Image : ce soir, beaucoup d'autres ressentent la même chose",
+      "Leur envoyer, et s'envoyer, des vœux bienveillants",
+      "Se rappeler un moment de lien, le revivre",
+      "Une petite action de lien pour demain",
+      "Clôture chaleureuse"
+     ],
+     "image": "sound_night",
+     "ambience": "summerNight",
+     "audio_minutes": 11
+    },
+    {
+     "id": "compassion-forgiveness-10",
+     "status": "new",
+     "title": {
+      "fr": "Lâcher une rancune",
+      "en": "Letting go of a grudge",
+      "de": "Groll loslassen",
+      "es": "Soltar el rencor",
+      "ja": "わだかまりを手放す",
+      "ko": "원망 내려놓기"
+     },
+     "subtitle": {
+      "fr": "Pour toi, pas pour l'autre : alléger ce que tu portes",
+      "en": "For you, not them: lighten what you carry",
+      "de": "Für dich, nicht für den anderen – leichter werden",
+      "es": "Por ti, no por el otro: aligera lo que cargas",
+      "ja": "相手のためでなく自分のために、荷を軽く",
+      "ko": "상대가 아닌 나를 위해 짐 덜기"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Lâcher la rancune (pardon intérieur, sans excuser)",
+     "purpose": "Travail sur une rancune qui pèse. Clarifie que pardonner n'est pas excuser ni se réconcilier ; propose d'alléger sa propre charge, à son rythme.",
+     "outline": [
+      "Accueil, précision : pas de situation traumatique, on choisit une rancune légère",
+      "Faire venir la situation, ressentir dans le corps",
+      "Reconnaître la blessure et sa légitimité",
+      "Le prix de garder cette rancune pour toi",
+      "Pardonner n'est pas excuser : c'est déposer le poids",
+      "Phrase au choix, ou simplement l'intention",
+      "Se pardonner aussi sa propre part, si elle existe",
+      "Clôture : c'est un processus, pas un bouton"
+     ],
+     "image": "meditation_08",
+     "ambience": "stream",
+     "audio_minutes": 13
+    },
+    {
+     "id": "compassion-loving-kindness-10",
+     "status": "rewrite",
+     "title": {
+      "fr": "Amour bienveillant",
+      "en": "Loving-kindness",
+      "de": "Liebende Güte",
+      "es": "Bondad amorosa",
+      "ja": "慈悲の瞑想",
+      "ko": "자애 명상"
+     },
+     "subtitle": {
+      "fr": "Envoyer de la douceur à toi et aux autres",
+      "en": "Send warmth to yourself and others",
+      "de": "Wärme an dich und andere senden",
+      "es": "Envía calidez a ti y a los demás",
+      "ja": "自分と他者にやさしさを送る",
+      "ko": "나와 타인에게 따뜻함 보내기"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Metta (amour bienveillant) classique",
+     "purpose": "Metta classique en cercles : soi, une personne aimée, une personne neutre, tous les êtres. Cultive la chaleur et le sentiment de lien.",
+     "outline": [
+      "Installation",
+      "Pour soi : « que je sois en sécurité, en paix… »",
+      "Pour une personne aimée",
+      "Pour une personne neutre (voisin, commerçant)",
+      "Pour tous les êtres",
+      "Repos dans la chaleur",
+      "Clôture"
+     ],
+     "image": "meditation_06",
+     "ambience": "morning",
+     "audio_minutes": 14
+    },
+    {
+     "id": "compassion-difficult-person-12",
+     "status": "new",
+     "title": {
+      "fr": "Une personne difficile",
+      "en": "A difficult person",
+      "de": "Ein schwieriger Mensch",
+      "es": "Una persona difícil",
+      "ja": "苦手な人へ",
+      "ko": "어려운 사람에게"
+     },
+     "subtitle": {
+      "fr": "Desserrer l'étau d'une relation qui te stresse",
+      "en": "Loosen the grip of a relationship that stresses you",
+      "de": "Den Griff einer belastenden Beziehung lockern",
+      "es": "Afloja el nudo de una relación que te estresa",
+      "ja": "ストレスになる関係の締めつけをゆるめる",
+      "ko": "나를 괴롭히는 관계의 압박 풀기"
+     },
+     "target_minutes": 12,
+     "speech_ratio": 0.9,
+     "target_words": 1620,
+     "technique": "Metta envers une personne difficile",
+     "purpose": "Metta étendue à une personne qui nous agace (collègue, voisin, ex). Commence par soi et un proche pour créer une base sûre avant d'aborder la difficulté.",
+     "outline": [
+      "Installation et ancrage",
+      "Metta pour soi (base de sécurité)",
+      "Metta pour un proche",
+      "Faire venir la personne difficile (moyennement, pas la pire)",
+      "Remarquer les réactions dans le corps",
+      "Reconnaître son humanité : elle aussi souffre, veut être heureuse",
+      "Lui adresser des vœux simples, si possible",
+      "Revenir à soi, douceur",
+      "Clôture"
+     ],
+     "image": "guided_breathing_02",
+     "ambience": "fire",
+     "audio_minutes": 17
+    }
+   ]
+  },
+  {
+   "id": "focus",
+   "is_new": false,
+   "title": {
+    "fr": "Concentration & clarté",
+    "en": "Focus & clarity",
+    "de": "Fokus & Klarheit",
+    "es": "Concentración y claridad",
+    "ja": "集中と明晰さ",
+    "ko": "집중 & 명료함"
+   },
+   "subtitle": {
+    "fr": "Entraîner ton attention et voir plus clair",
+    "en": "Train your attention and think more clearly",
+    "de": "Aufmerksamkeit trainieren, klarer denken",
+    "es": "Entrena tu atención y piensa con más claridad",
+    "ja": "注意力を鍛え、もっとクリアに",
+    "ko": "주의력을 기르고 더 맑게 생각하기"
+   },
+   "rationale": "Thème existant élargi à la clarté (décision, valeurs, créativité), car la concentration seule couvre peu de besoins. Diversifie les ancres (souffle compté, son, visuel) et ajoute la présence ouverte longue, la procrastination et les examens (étudiants : cible secondaire importante).",
+   "sessions": [
+    {
+     "id": "focus-before-task-4",
+     "status": "rewrite",
+     "title": {
+      "fr": "Avant une tâche importante",
+      "en": "Before an important task",
+      "de": "Vor einer wichtigen Aufgabe",
+      "es": "Antes de una tarea importante",
+      "ja": "大事な作業の前に",
+      "ko": "중요한 일을 앞두고"
+     },
+     "subtitle": {
+      "fr": "Faire taire le bruit et lancer la première étape",
+      "en": "Quiet the noise and take the first step",
+      "de": "Den Lärm dämpfen und loslegen",
+      "es": "Acalla el ruido y da el primer paso",
+      "ja": "雑念を静め、最初の一歩を踏み出す",
+      "ko": "잡음을 끄고 첫걸음 내딛기"
+     },
+     "target_minutes": 4,
+     "speech_ratio": 0.9,
+     "target_words": 540,
+     "technique": "Ancrage + intention de tâche + première étape",
+     "purpose": "Avant de se lancer dans un travail de concentration. Clarifie la tâche, réduit l'agitation et rend la première étape concrète.",
+     "outline": [
+      "Arrivée, trois respirations",
+      "Couper les distractions (notifications, onglets)",
+      "Définir la tâche en une phrase",
+      "Visualiser la toute première étape",
+      "Intention : « pendant 25 minutes, juste ça »",
+      "Clôture : commence maintenant"
+     ],
+     "image": "routine_focus",
+     "ambience": null,
+     "audio_minutes": 6
+    },
+    {
+     "id": "focus-exam-5",
+     "status": "new",
+     "title": {
+      "fr": "Juste avant l'examen",
+      "en": "Right before an exam",
+      "de": "Kurz vor der Prüfung",
+      "es": "Justo antes del examen",
+      "ja": "試験の直前に",
+      "ko": "시험 직전에"
+     },
+     "subtitle": {
+      "fr": "Retrouver tes moyens quand le stress te vide la tête",
+      "en": "Get your mind back when stress goes blank",
+      "de": "Wieder klar denken, wenn der Kopf leer wird",
+      "es": "Recupera la cabeza cuando el estrés te deja en blanco",
+      "ja": "緊張で頭が真っ白になったときに",
+      "ko": "긴장해서 머리가 하얘질 때"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Respiration + recadrage + ancrage avant un examen",
+     "purpose": "Pour les étudiants et les concours, dans la salle ou juste avant. Calme l'activation sans l'éteindre, rappelle la préparation faite, donne une stratégie si blanc.",
+     "outline": [
+      "Pieds au sol, yeux ouverts possible",
+      "Expirations longues, épaules basses",
+      "Recadrer le cœur qui bat : ton corps se mobilise",
+      "Rappel : tu as révisé, c'est là même si tu ne le sens pas",
+      "Stratégie si blanc : souffler, passer à la question suivante, revenir",
+      "Intention pour l'épreuve",
+      "Clôture : vas-y"
+     ],
+     "image": "habit_journal",
+     "ambience": null,
+     "audio_minutes": 7
+    },
+    {
+     "id": "focus-procrastination-6",
+     "status": "new",
+     "title": {
+      "fr": "Quand tu procrastines",
+      "en": "When you're procrastinating",
+      "de": "Wenn du aufschiebst",
+      "es": "Cuando procrastinas",
+      "ja": "先延ばししてしまうとき",
+      "ko": "미루고 있을 때"
+     },
+     "subtitle": {
+      "fr": "Comprendre ce que tu évites, puis faire deux minutes",
+      "en": "Notice what you're avoiding, then do two minutes",
+      "de": "Verstehen, was du vermeidest – dann zwei Minuten anfangen",
+      "es": "Entiende qué evitas y haz dos minutos",
+      "ja": "避けているものに気づき、2分だけやってみる",
+      "ko": "무엇을 피하는지 알아차리고 2분만 해보기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Curiosité envers l'évitement + plus petit pas",
+     "purpose": "La procrastination est souvent une fuite d'émotion désagréable. Repère l'émotion évitée, la tolère quelques instants, puis propose la règle des deux minutes.",
+     "outline": [
+      "Accueil sans reproche : tout le monde procrastine",
+      "Penser à la tâche évitée, remarquer la réaction dans le corps",
+      "Nommer l'émotion : ennui, peur d'échouer, flou",
+      "Respirer avec, quelques secondes",
+      "Rendre la tâche ridiculement petite",
+      "Engagement : deux minutes, juste après l'écoute",
+      "Clôture"
+     ],
+     "image": "task_journal",
+     "ambience": null,
+     "audio_minutes": 8
+    },
+    {
+     "id": "focus-single-point-6",
+     "status": "rewrite",
+     "title": {
+      "fr": "Point d'attention unique",
+      "en": "Single-point focus",
+      "de": "Ein Punkt der Aufmerksamkeit",
+      "es": "Atención en un solo punto",
+      "ja": "一点集中",
+      "ko": "한 점 집중"
+     },
+     "subtitle": {
+      "fr": "Compter les souffles pour entraîner ton attention",
+      "en": "Count your breaths to train your attention",
+      "de": "Atemzüge zählen, Aufmerksamkeit trainieren",
+      "es": "Cuenta respiraciones para entrenar tu atención",
+      "ja": "呼吸を数えて注意力を鍛える",
+      "ko": "호흡을 세며 주의력 훈련하기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Comptage des respirations (1 à 10)",
+     "purpose": "Compter les respirations de 1 à 10 puis recommencer. Exercice d'attention le plus simple et le plus mesurable.",
+     "outline": [
+      "Installation",
+      "Consigne : compter chaque expiration de 1 à 10",
+      "Si on perd le compte, on recommence à 1 sans jugement",
+      "Pratique guidée sur quelques cycles",
+      "Pratique silencieuse",
+      "Variante : compter uniquement jusqu'à 4",
+      "Clôture"
+     ],
+     "image": "guided_breathing_01",
+     "ambience": "whitenoise",
+     "audio_minutes": 9
+    },
+    {
+     "id": "focus-visual-anchor-6",
+     "status": "new",
+     "title": {
+      "fr": "Ancre visuelle",
+      "en": "Visual anchor",
+      "de": "Visueller Anker",
+      "es": "Ancla visual",
+      "ja": "視覚のアンカー",
+      "ko": "시각 닻"
+     },
+     "subtitle": {
+      "fr": "Méditer les yeux ouverts, le regard posé sur un objet",
+      "en": "Meditate eyes open, gaze resting on one object",
+      "de": "Mit offenen Augen meditieren, den Blick auf einem Objekt",
+      "es": "Medita con los ojos abiertos, la mirada en un objeto",
+      "ja": "目を開けて、ひとつのものに視線を置く",
+      "ko": "눈을 뜨고 한 물건에 시선 두기"
+     },
+     "target_minutes": 6,
+     "speech_ratio": 0.9,
+     "target_words": 810,
+     "technique": "Ancre visuelle (regard posé sur un objet)",
+     "purpose": "Pour ceux que fermer les yeux agite ou endort. Le regard se pose sur un objet simple (tasse, plante, flamme) : ancre stable et utilisable au travail.",
+     "outline": [
+      "Choisir un objet simple devant soi",
+      "Le regarder comme pour la première fois : forme, couleurs",
+      "Détails, ombres, reflets",
+      "Quand l'esprit part, revenir à l'objet",
+      "Élargir le champ de vision sans bouger les yeux",
+      "Revenir à l'objet",
+      "Clôture : fermer les yeux un instant, rouvrir"
+     ],
+     "image": "guided_breathing_07",
+     "ambience": null,
+     "audio_minutes": 8
+    },
+    {
+     "id": "focus-creative-7",
+     "status": "new",
+     "title": {
+      "fr": "Débloquer la créativité",
+      "en": "Unlock creativity",
+      "de": "Kreativität freisetzen",
+      "es": "Desbloquea tu creatividad",
+      "ja": "創造力をひらく",
+      "ko": "창의력 깨우기"
+     },
+     "subtitle": {
+      "fr": "Desserrer le mental pour laisser venir les idées",
+      "en": "Loosen your mind and let ideas come",
+      "de": "Den Kopf lockern und Ideen kommen lassen",
+      "es": "Afloja la mente y deja que lleguen las ideas",
+      "ja": "頭をゆるめて、アイデアを呼び込む",
+      "ko": "생각을 느슨하게 풀고 아이디어 맞이하기"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Présence ouverte + rêverie dirigée",
+     "purpose": "Pour un blocage créatif ou un problème qui résiste. Alterne relâchement, présence ouverte et rêverie libre autour de la question, puis capture des idées.",
+     "outline": [
+      "Installation, souffle",
+      "Formuler la question ou le projet en une phrase",
+      "La lâcher complètement, présence ouverte",
+      "Laisser l'esprit vagabonder librement",
+      "Revenir doucement à la question, voir ce qui émerge",
+      "Accueillir les idées sans les juger",
+      "Clôture : noter tout de suite ce qui est venu"
+     ],
+     "image": "meditation_05",
+     "ambience": "stream",
+     "audio_minutes": 10
+    },
+    {
+     "id": "focus-decision-8",
+     "status": "new",
+     "title": {
+      "fr": "Prendre une décision",
+      "en": "Making a decision",
+      "de": "Eine Entscheidung treffen",
+      "es": "Tomar una decisión",
+      "ja": "決断する",
+      "ko": "결정 내리기"
+     },
+     "subtitle": {
+      "fr": "Écouter ta tête, ton corps et tes valeurs avant de choisir",
+      "en": "Listen to your head, body and values before choosing",
+      "de": "Kopf, Körper und Werte hören, bevor du wählst",
+      "es": "Escucha tu cabeza, tu cuerpo y tus valores antes de elegir",
+      "ja": "選ぶ前に、頭とからだと価値観に耳を傾ける",
+      "ko": "선택하기 전에 머리, 몸, 가치에 귀 기울이기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Clarté décisionnelle (corps + valeurs)",
+     "purpose": "Quand on tourne en rond face à un choix. Calme l'urgence, puis explore chaque option avec le corps et les valeurs, pour une décision plus claire (pas forcément immédiate).",
+     "outline": [
+      "Installation, ralentir le souffle",
+      "Nommer la décision en une phrase",
+      "Option A : se projeter, remarquer les sensations du corps",
+      "Option B : idem",
+      "Quelle option respecte le plus ce qui compte pour toi ?",
+      "Ce qui manque pour décider",
+      "Clôture : pas d'obligation de trancher maintenant"
+     ],
+     "image": "situation_recentrer",
+     "ambience": null,
+     "audio_minutes": 11
+    },
+    {
+     "id": "focus-sound-anchor-8",
+     "status": "new",
+     "title": {
+      "fr": "Méditer dans le bruit",
+      "en": "Meditating amid noise",
+      "de": "Meditieren trotz Lärm",
+      "es": "Meditar entre el ruido",
+      "ja": "騒がしい場所での瞑想",
+      "ko": "시끄러운 곳에서 명상하기"
+     },
+     "subtitle": {
+      "fr": "Faire du bruit ambiant ton point d'appui au lieu d'un ennemi",
+      "en": "Turn background noise into an anchor, not an enemy",
+      "de": "Hintergrundlärm wird zum Anker statt zum Feind",
+      "es": "Convierte el ruido de fondo en un ancla, no en un enemigo",
+      "ja": "周囲の音を敵ではなく、拠りどころに",
+      "ko": "주변 소음을 적이 아닌 닻으로"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Ancrage sur les sons (pour environnements bruyants)",
+     "purpose": "Pour l'open space, les transports, l'appartement bruyant. Les sons deviennent l'objet de méditation : on les reçoit sans les commenter.",
+     "outline": [
+      "Accueil : pas besoin de silence pour méditer",
+      "Écouter les sons les plus forts",
+      "Puis les plus subtils",
+      "Écouter le son pur, sans le nommer ni juger",
+      "Remarquer les réactions (agacement) et revenir",
+      "Le silence entre les sons",
+      "Clôture : le bruit n'est plus un obstacle"
+     ],
+     "image": "sound_whitenoise",
+     "ambience": "whitenoise",
+     "audio_minutes": 12
+    },
+    {
+     "id": "focus-mindful-breath-12",
+     "status": "rewrite",
+     "title": {
+      "fr": "Respiration en pleine conscience",
+      "en": "Mindful breathing",
+      "de": "Achtsames Atmen",
+      "es": "Respiración consciente",
+      "ja": "マインドフルな呼吸",
+      "ko": "마음챙김 호흡"
+     },
+     "subtitle": {
+      "fr": "La pratique classique pour un esprit clair",
+      "en": "The classic practice for a clear mind",
+      "de": "Die klassische Praxis für einen klaren Geist",
+      "es": "La práctica clásica para una mente clara",
+      "ja": "澄んだ心のための基本の瞑想",
+      "ko": "맑은 마음을 위한 기본 수련"
+     },
+     "target_minutes": 12,
+     "speech_ratio": 0.9,
+     "target_words": 1620,
+     "technique": "Pleine conscience de la respiration (classique)",
+     "purpose": "La méditation de pleine conscience de la respiration, format complet : ancrage, retours répétés, approfondissement des sensations fines.",
+     "outline": [
+      "Installation et posture",
+      "Repérer le lieu le plus net du souffle",
+      "Suivre le souffle entier : début, milieu, fin",
+      "Retours après distraction",
+      "Sensations fines : température, pauses",
+      "Longue pratique silencieuse",
+      "Clôture"
+     ],
+     "image": "meditation_05",
+     "ambience": "stream",
+     "audio_minutes": 17
+    },
+    {
+     "id": "focus-values-compass-12",
+     "status": "new",
+     "title": {
+      "fr": "Ta boussole intérieure",
+      "en": "Your inner compass",
+      "de": "Dein innerer Kompass",
+      "es": "Tu brújula interior",
+      "ja": "内なるコンパス",
+      "ko": "내면의 나침반"
+     },
+     "subtitle": {
+      "fr": "Retrouver ce qui compte vraiment quand tout s'accélère",
+      "en": "Reconnect with what truly matters when life speeds up",
+      "de": "Wiederfinden, was wirklich zählt, wenn alles schneller wird",
+      "es": "Reconecta con lo que de verdad importa cuando todo se acelera",
+      "ja": "すべてが加速するとき、本当に大切なものに戻る",
+      "ko": "모든 게 빨라질 때 정말 중요한 것 되찾기"
+     },
+     "target_minutes": 12,
+     "speech_ratio": 0.9,
+     "target_words": 1620,
+     "technique": "Clarification des valeurs (ACT)",
+     "purpose": "Exercice de clarification des valeurs inspiré de l'ACT (fête des 80 ans, moments de fierté). Redonne du sens, antidote au stress du « pilote automatique ».",
+     "outline": [
+      "Installation, souffle",
+      "Se souvenir d'un moment où tu t'es senti pleinement toi-même",
+      "Quelles qualités étaient présentes ?",
+      "Visualisation : tes 80 ans, ce que tu aimerais entendre de tes proches",
+      "En dégager 2 ou 3 valeurs",
+      "Où ta vie actuelle s'en éloigne, sans jugement",
+      "Un petit pas cette semaine",
+      "Clôture"
+     ],
+     "image": "earth",
+     "ambience": "forest",
+     "audio_minutes": 16
+    },
+    {
+     "id": "focus-open-awareness-15",
+     "status": "new",
+     "title": {
+      "fr": "Présence ouverte",
+      "en": "Open awareness",
+      "de": "Offenes Gewahrsein",
+      "es": "Conciencia abierta",
+      "ja": "オープン・アウェアネス",
+      "ko": "열린 알아차림"
+     },
+     "subtitle": {
+      "fr": "Tout accueillir, ne rien retenir",
+      "en": "Welcome everything, hold on to nothing",
+      "de": "Alles willkommen heißen, nichts festhalten",
+      "es": "Acogerlo todo, no retener nada",
+      "ja": "すべてを迎え、何もつかまない",
+      "ko": "모든 것을 맞이하되 붙잡지 않기"
+     },
+     "target_minutes": 15,
+     "speech_ratio": 0.9,
+     "target_words": 2025,
+     "technique": "Présence ouverte (open monitoring)",
+     "purpose": "Pratique avancée : passer d'une ancre unique à une conscience ouverte de tout ce qui apparaît. Pour les pratiquants réguliers (suite naturelle du jour 6 des Premiers pas).",
+     "outline": [
+      "Installation, ancrage au souffle",
+      "Élargir au corps",
+      "Ajouter les sons",
+      "Ajouter les pensées et émotions",
+      "Repos dans la conscience elle-même, très peu de mots",
+      "Relance : si tu es emporté, revenir au souffle, puis réouvrir",
+      "Longue plage silencieuse",
+      "Clôture"
+     ],
+     "image": "guided_breathing_03",
+     "ambience": null,
+     "audio_minutes": 22
+    }
+   ]
+  },
+  {
+   "id": "stressScience",
+   "is_new": true,
+   "title": {
+    "fr": "Le stress décodé",
+    "en": "Stress decoded",
+    "de": "Stress verstehen",
+    "es": "El estrés, descifrado",
+    "ja": "ストレスを知る",
+    "ko": "스트레스 해독"
+   },
+   "subtitle": {
+    "fr": "Comprendre ce qui se passe dans ton corps, et pratiquer",
+    "en": "Understand what's happening in your body, then practice",
+    "de": "Verstehen, was im Körper passiert – und üben",
+    "es": "Entiende lo que pasa en tu cuerpo y practica",
+    "ja": "からだで何が起きているかを知り、実践する",
+    "ko": "몸에서 무슨 일이 일어나는지 이해하고 실천하기"
+   },
+   "rationale": "Nouveau thème qui incarne la promesse unique de CortiFree (cortisol, science) face à Calm/Headspace/Petit Bambou. Format « mini-cours + pratique » : environ 1/3 d'explication accessible, 2/3 de pratique qui l'illustre. Accueille la cohérence cardiaque, très connue en France et absente aujourd'hui. Toutes les explications restent vulgarisées et prudentes (« peut aider », « de nombreuses études suggèrent »), sans allégation médicale. Faire relire les contenus scientifiques.",
+   "sessions": [
+    {
+     "id": "science-micro-recovery-4",
+     "status": "new",
+     "title": {
+      "fr": "Le pouvoir des micro-pauses",
+      "en": "The power of micro-breaks",
+      "de": "Die Kraft der Mikropausen",
+      "es": "El poder de las micropausas",
+      "ja": "マイクロ休憩のちから",
+      "ko": "마이크로 휴식의 힘"
+     },
+     "subtitle": {
+      "fr": "Pourquoi 2 minutes de pause valent mieux qu'une heure à la fin",
+      "en": "Why 2-minute breaks beat one long break at the end",
+      "de": "Warum 2-Minuten-Pausen mehr bringen als eine lange am Ende",
+      "es": "Por qué 2 minutos de pausa valen más que una hora al final",
+      "ja": "最後の1時間より、こまめな2分休憩が効く理由",
+      "ko": "마지막 한 시간보다 2분 휴식이 나은 이유"
+     },
+     "target_minutes": 4,
+     "speech_ratio": 0.9,
+     "target_words": 540,
+     "technique": "Micro-récupération (pause + respiration + regard)",
+     "purpose": "Explique que la récupération se joue dans de petites pauses régulières plutôt qu'une longue pause tardive, puis en fait vivre une.",
+     "outline": [
+      "Idée clé : le stress n'est pas le problème, l'absence de récupération l'est",
+      "Image : l'élastique qu'on relâche souvent garde sa souplesse",
+      "Pratique : regard au loin, épaules, expiration longue",
+      "Trente secondes de silence",
+      "Comment semer 3 micro-pauses dans ta journée",
+      "Clôture"
+     ],
+     "image": "guided_breathing_04",
+     "ambience": null,
+     "audio_minutes": 6
+    },
+    {
+     "id": "science-cardiac-coherence-5",
+     "status": "new",
+     "title": {
+      "fr": "Cohérence cardiaque",
+      "en": "Coherent breathing",
+      "de": "Kohärentes Atmen",
+      "es": "Coherencia cardíaca",
+      "ja": "コヒーレンス呼吸",
+      "ko": "심장 일관성 호흡"
+     },
+     "subtitle": {
+      "fr": "5 minutes à 6 respirations par minute, 3 fois par jour",
+      "en": "5 minutes at 6 breaths per minute, 3 times a day",
+      "de": "5 Minuten, 6 Atemzüge pro Minute, 3-mal täglich",
+      "es": "5 minutos a 6 respiraciones por minuto, 3 veces al día",
+      "ja": "1分間に6回の呼吸を5分、1日3回",
+      "ko": "1분에 6번 호흡을 5분, 하루 3번"
+     },
+     "target_minutes": 5,
+     "speech_ratio": 0.9,
+     "target_words": 675,
+     "technique": "Cohérence cardiaque (6 respirations/min, méthode 365)",
+     "purpose": "La méthode « 365 » (3 fois par jour, 6 respirations par minute, 5 minutes) très populaire en France. Courte explication puis guidage 5 s / 5 s du début à la fin, avec relances régulières.",
+     "outline": [
+      "Explication en 30 secondes : rythme lent et régulier, 6 cycles par minute",
+      "Le rendez-vous 365 : matin, midi, fin d'après-midi",
+      "Posture droite, pieds au sol",
+      "Guidage inspire 5 s / expire 5 s avec comptage vocal",
+      "Comptage qui s'allège, repères à chaque minute",
+      "Dernière minute plus silencieuse",
+      "Clôture : remarquer l'état du corps"
+     ],
+     "image": "guided_breathing_05",
+     "ambience": "ocean",
+     "audio_minutes": 8
+    },
+    {
+     "id": "science-stress-mindset-7",
+     "status": "new",
+     "title": {
+      "fr": "Le stress, ton allié ?",
+      "en": "Stress as an ally?",
+      "de": "Stress als Verbündeter?",
+      "es": "¿El estrés, tu aliado?",
+      "ja": "ストレスを味方に？",
+      "ko": "스트레스가 내 편이라면?"
+     },
+     "subtitle": {
+      "fr": "Changer ton regard sur le stress change ce qu'il te fait",
+      "en": "How you see stress changes what it does to you",
+      "de": "Wie du Stress siehst, verändert seine Wirkung",
+      "es": "Cambiar cómo ves el estrés cambia lo que te hace",
+      "ja": "ストレスの見方が、その影響を変える",
+      "ko": "스트레스를 보는 시각이 그 영향을 바꿔요"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Réévaluation du stress (stress mindset)",
+     "purpose": "Présente les travaux sur la réévaluation du stress (le voir comme une mobilisation d'énergie plutôt qu'une menace) et entraîne ce recadrage sur une situation réelle.",
+     "outline": [
+      "Idée clé : la réaction de stress mobilise de l'énergie pour relever un défi",
+      "Les études suggèrent que le regard porté sur le stress influence la manière dont on le vit",
+      "Penser à une situation stressante à venir",
+      "Remarquer les sensations : cœur, souffle, chaleur",
+      "Les recadrer : « mon corps se prépare »",
+      "Souffle stable, posture ouverte",
+      "Clôture : la phrase à te redire au moment venu"
+     ],
+     "image": "routine_energy",
+     "ambience": null,
+     "audio_minutes": 10
+    },
+    {
+     "id": "science-take-in-good-7",
+     "status": "new",
+     "title": {
+      "fr": "Le biais de négativité",
+      "en": "The negativity bias",
+      "de": "Der Negativitätseffekt",
+      "es": "El sesgo de negatividad",
+      "ja": "ネガティビティ・バイアス",
+      "ko": "부정 편향"
+     },
+     "subtitle": {
+      "fr": "Ton cerveau retient le négatif : apprends à savourer le reste",
+      "en": "Your brain clings to the negative: learn to savor the rest",
+      "de": "Dein Gehirn hält das Negative fest – lerne, den Rest zu genießen",
+      "es": "Tu cerebro se aferra a lo negativo: aprende a saborear lo demás",
+      "ja": "脳は悪いことを覚えがち。よいことを味わう練習を",
+      "ko": "뇌는 부정적인 걸 붙잡아요, 나머지를 음미하는 법"
+     },
+     "target_minutes": 7,
+     "speech_ratio": 0.9,
+     "target_words": 945,
+     "technique": "Savourer le positif (« taking in the good »)",
+     "purpose": "Explique pourquoi le cerveau retient davantage les menaces que les bons moments, puis pratique la méthode qui consiste à prolonger et intégrer une expérience positive (20-30 s).",
+     "outline": [
+      "Idée clé : le cerveau est « velcro » pour le négatif, « téflon » pour le positif",
+      "Ce n'est pas un défaut, c'est un héritage de survie",
+      "Pratique : choisir un petit moment agréable récent",
+      "Le revivre en détail, sensoriellement",
+      "Le prolonger 20-30 secondes, le sentir dans le corps",
+      "Imaginer qu'il s'imprime en toi",
+      "Clôture : refaire cela avec 3 moments par jour"
+     ],
+     "image": "meditation_05",
+     "ambience": "morning",
+     "audio_minutes": 10
+    },
+    {
+     "id": "science-cortisol-rhythm-8",
+     "status": "new",
+     "title": {
+      "fr": "Le rythme du cortisol",
+      "en": "Your cortisol rhythm",
+      "de": "Dein Cortisol-Rhythmus",
+      "es": "El ritmo del cortisol",
+      "ja": "コルチゾールのリズム",
+      "ko": "코르티솔 리듬"
+     },
+     "subtitle": {
+      "fr": "Haut le matin, bas le soir : vivre avec ton horloge interne",
+      "en": "High in the morning, low at night: live with your inner clock",
+      "de": "Morgens hoch, abends niedrig – im Takt der inneren Uhr",
+      "es": "Alto por la mañana, bajo por la noche: vive con tu reloj interno",
+      "ja": "朝は高く、夜は低く。体内時計とともに",
+      "ko": "아침엔 높고 밤엔 낮게: 체내 시계와 함께"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Rythme circadien + rituel de lumière et de ralentissement",
+     "purpose": "Explique le cycle naturel du cortisol sur 24 h et les gestes qui le respectent (lumière du matin, ralentissement le soir, écrans), puis mini-pratique de ralentissement du soir. Ton pédagogique, aucune promesse de « faire baisser » chiffrée.",
+     "outline": [
+      "Idée clé : le cortisol a un rythme naturel, pic au réveil, creux le soir",
+      "Ce qui le dérègle : lumière tardive, stress du soir, horaires irréguliers",
+      "Ce qui l'aide : lumière du matin, pauses, ralentir le soir",
+      "Pratique : faire baisser la lumière, ralentir les gestes",
+      "Expirations longues, corps qui passe en mode soir",
+      "Choisir un geste matin et un geste soir",
+      "Clôture"
+     ],
+     "image": "sound_morning",
+     "ambience": "summerNight",
+     "audio_minutes": 11
+    },
+    {
+     "id": "science-stress-response-8",
+     "status": "new",
+     "title": {
+      "fr": "Ce que le stress fait dans ton corps",
+      "en": "What stress does in your body",
+      "de": "Was Stress in deinem Körper macht",
+      "es": "Lo que el estrés hace en tu cuerpo",
+      "ja": "ストレスがからだに起こすこと",
+      "ko": "스트레스가 몸에서 하는 일"
+     },
+     "subtitle": {
+      "fr": "Cortisol, adrénaline, cœur qui s'emballe : comprendre pour moins subir",
+      "en": "Cortisol, adrenaline, racing heart: understand it, suffer it less",
+      "de": "Cortisol, Adrenalin, Herzrasen – verstehen statt ausgeliefert sein",
+      "es": "Cortisol, adrenalina, corazón acelerado: entiéndelo para sufrirlo menos",
+      "ja": "コルチゾール、アドレナリン、鼓動…知れば振り回されない",
+      "ko": "코르티솔, 아드레날린, 두근거림: 알면 덜 휘둘려요"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Psychoéducation + interoception (observer la réaction de stress)",
+     "purpose": "Le cours d'introduction du thème : la réponse de stress expliquée simplement (alarme, accélérateur et frein), puis pratique d'observation des signaux corporels et d'activation du « frein ».",
+     "outline": [
+      "Idée clé : une alarme ancestrale, utile mais souvent déclenchée pour rien",
+      "Accélérateur : adrénaline puis cortisol, ce que tu ressens",
+      "Frein : la récupération, que tu peux activer",
+      "Pratique : scanner les signaux de stress dans le corps",
+      "Appuyer sur le frein : expiration longue, relâchement",
+      "Observer la différence",
+      "Clôture : reconnaître tes signaux d'alerte personnels"
+     ],
+     "image": "situation_stresse",
+     "ambience": null,
+     "audio_minutes": 11
+    },
+    {
+     "id": "science-tend-befriend-8",
+     "status": "new",
+     "title": {
+      "fr": "Le besoin de lien",
+      "en": "Stress and connection",
+      "de": "Stress und Verbundenheit",
+      "es": "La necesidad de conexión",
+      "ja": "つながりの力",
+      "ko": "연결의 힘"
+     },
+     "subtitle": {
+      "fr": "Le stress pousse aussi à se rapprocher des autres",
+      "en": "Stress also pushes us toward each other",
+      "de": "Stress treibt uns auch zueinander",
+      "es": "El estrés también nos empuja hacia los demás",
+      "ja": "ストレスは人とのつながりも求めさせる",
+      "ko": "스트레스는 서로에게 다가가게도 해요"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Lien social (tend and befriend) + visualisation de soutien",
+     "purpose": "Présente la réponse « tend and befriend » (rechercher et offrir du soutien sous stress), puis pratique de visualisation du cercle de soutien et choix d'une prise de contact.",
+     "outline": [
+      "Idée clé : en plus de « combattre ou fuir », le stress pousse à chercher du lien",
+      "Le lien est l'un des plus puissants tampons du stress",
+      "Visualiser les personnes qui te soutiennent, en cercle autour de toi",
+      "Sentir leur présence, leur chaleur",
+      "Penser à quelqu'un que tu pourrais soutenir aujourd'hui",
+      "Choisir un contact : message, appel, café",
+      "Clôture"
+     ],
+     "image": "habit_social",
+     "ambience": "fire",
+     "audio_minutes": 11
+    },
+    {
+     "id": "science-vagus-hum-8",
+     "status": "new",
+     "title": {
+      "fr": "Le souffle qui fredonne",
+      "en": "The humming breath",
+      "de": "Der summende Atem",
+      "es": "La respiración que tararea",
+      "ja": "ハミング呼吸",
+      "ko": "허밍 호흡"
+     },
+     "subtitle": {
+      "fr": "Le nerf vague, expliqué simplement, et le fredonnement pour l'apaiser",
+      "en": "The vagus nerve, simply explained, and humming to calm it",
+      "de": "Der Vagusnerv, einfach erklärt – und Summen zur Beruhigung",
+      "es": "El nervio vago, explicado fácil, y el tarareo para calmarlo",
+      "ja": "迷走神経をやさしく解説し、ハミングで整える",
+      "ko": "미주신경을 쉽게 설명하고 허밍으로 달래기"
+     },
+     "target_minutes": 8,
+     "speech_ratio": 0.9,
+     "target_words": 1080,
+     "technique": "Fredonnement (bhramari) + expiration prolongée",
+     "purpose": "Présente le nerf vague et le système de récupération (sans promesses), puis guide le fredonnement bouche fermée (respiration de l'abeille) et l'expiration prolongée. À faire dans un endroit où l'on peut faire un peu de bruit.",
+     "outline": [
+      "Idée clé : un nerf qui relie cerveau, cœur et ventre, associé à la récupération",
+      "Ce qui l'implique : expiration lente, voix, sécurité sociale",
+      "Pratique : inspiration par le nez",
+      "Expiration en fredonnant « mmm », bouche fermée",
+      "Sentir la vibration dans le visage et la poitrine",
+      "Plusieurs cycles, de plus en plus lents",
+      "Silence, observer le calme",
+      "Clôture"
+     ],
+     "image": "guided_breathing_06",
+     "ambience": null,
+     "audio_minutes": 12
+    },
+    {
+     "id": "science-window-tolerance-9",
+     "status": "new",
+     "title": {
+      "fr": "Ta fenêtre de tolérance",
+      "en": "Your window of tolerance",
+      "de": "Dein Toleranzfenster",
+      "es": "Tu ventana de tolerancia",
+      "ja": "耐性の窓",
+      "ko": "나의 인내의 창"
+     },
+     "subtitle": {
+      "fr": "Trop tendu ou complètement éteint ? Revenir dans ta zone",
+      "en": "Wired or shut down? Get back in your zone",
+      "de": "Überdreht oder abgeschaltet? Zurück in deine Zone",
+      "es": "¿Acelerado o apagado? Vuelve a tu zona",
+      "ja": "張りつめすぎ？停止状態？自分のゾーンへ戻る",
+      "ko": "너무 곤두섰거나 꺼졌을 때, 내 영역으로 돌아오기"
+     },
+     "target_minutes": 9,
+     "speech_ratio": 0.9,
+     "target_words": 1215,
+     "technique": "Fenêtre de tolérance (régulation haut/bas)",
+     "purpose": "Explique la zone d'activation optimale, la sur-activation (anxiété, colère) et la sous-activation (vide, épuisement), puis donne un outil pour chaque cas.",
+     "outline": [
+      "Idée clé : une zone où l'on pense et ressent bien à la fois",
+      "Au-dessus : agitation, panique, colère",
+      "En dessous : vide, engourdissement, épuisement",
+      "Te situer maintenant, sans jugement",
+      "Si trop haut : expiration longue, pieds lourds",
+      "Si trop bas : regarder autour, bouger, respiration un peu plus tonique",
+      "Revenir au centre, ressentir la zone",
+      "Clôture : repérer tes signaux de sortie de zone"
+     ],
+     "image": "situation_recentrer",
+     "ambience": "forest",
+     "audio_minutes": 13
+    },
+    {
+     "id": "science-stress-cycle-10",
+     "status": "new",
+     "title": {
+      "fr": "Boucler le cycle du stress",
+      "en": "Complete the stress cycle",
+      "de": "Den Stresszyklus abschließen",
+      "es": "Cierra el ciclo del estrés",
+      "ja": "ストレスのサイクルを閉じる",
+      "ko": "스트레스 순환 마무리하기"
+     },
+     "subtitle": {
+      "fr": "Régler la cause ne suffit pas : ton corps a besoin de finir le cycle",
+      "en": "Solving the problem isn't enough: your body needs to finish the cycle",
+      "de": "Das Problem lösen reicht nicht – der Körper muss den Zyklus beenden",
+      "es": "Resolver el problema no basta: tu cuerpo necesita cerrar el ciclo",
+      "ja": "原因を解決しても足りない。からだはサイクルを終えたがっている",
+      "ko": "원인 해결만으론 부족해요, 몸이 순환을 끝내야 해요"
+     },
+     "target_minutes": 10,
+     "speech_ratio": 0.9,
+     "target_words": 1350,
+     "technique": "Compléter le cycle du stress (mouvement, souffle, décharge, apaisement)",
+     "purpose": "Explique la différence entre le stresseur (la cause) et le stress (la réaction dans le corps), puis enchaîne les gestes qui signalent au corps que le danger est passé : mouvement, souffle, détente, sentiment de sécurité.",
+     "outline": [
+      "Idée clé : on peut régler le problème et garder le stress dans le corps",
+      "Ce qui signale au corps que c'est fini : bouger, respirer, rire, lien, pleurer parfois",
+      "Pratique 1 : mouvement debout (marcher sur place, secouer)",
+      "Pratique 2 : respiration lente, expiration longue",
+      "Pratique 3 : relâchement du corps assis",
+      "Pratique 4 : main sur le cœur, sentiment de sécurité",
+      "Remarquer la différence avant/après",
+      "Clôture : tes façons préférées de boucler le cycle chaque jour"
+     ],
+     "image": "habit_sport_courir",
+     "ambience": null,
+     "audio_minutes": 15
+    }
+   ]
+  }
+ ]
+}

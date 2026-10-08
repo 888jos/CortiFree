@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import FirebaseAuth
-import FirebaseFirestore
 import Combine
 
 @MainActor
@@ -18,8 +16,13 @@ class AchievementService: ObservableObject {
     @Published var newlyUnlockedAchievement: Achievement?
     @Published var showAchievementPopup: Bool = false
 
-    private let db = Firestore.firestore()
     private var cancellables = Set<AnyCancellable>()
+
+    private struct AchievementRow: Decodable {
+        let achievementId: String
+        let progress: Int
+        let unlockedAt: Double?
+    }
 
     private init() {
         Task {
@@ -48,24 +51,23 @@ class AchievementService: ObservableObject {
         }
     }
 
-    // MARK: - Load from Firebase
+    // MARK: - Convex persistence
 
     func loadAchievements() async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard Auth.auth().currentUser != nil else { return }
 
         do {
-            let snapshot = try await db.collection("users")
-                .document(userId)
-                .collection("achievements")
-                .getDocuments()
+            let rows: [AchievementRow] = try await ConvexBackend.shared.call(
+                .query, path: "achievements:list"
+            )
 
             var userAchievements = Achievement.allAchievements
 
-            for document in snapshot.documents {
-                let data = document.data()
-                if let achievement = Achievement.fromFirestore(data, id: document.documentID) {
-                    if let index = userAchievements.firstIndex(where: { $0.id == achievement.id }) {
-                        userAchievements[index] = achievement
+            for row in rows {
+                if let index = userAchievements.firstIndex(where: { $0.id == row.achievementId }) {
+                    userAchievements[index].progress = row.progress
+                    userAchievements[index].unlockedAt = row.unlockedAt.map {
+                        Date(timeIntervalSince1970: $0 / 1000)
                     }
                 }
             }
@@ -91,17 +93,20 @@ class AchievementService: ObservableObject {
         }
     }
 
-    // MARK: - Save to Firebase
-
     private func saveAchievement(_ achievement: Achievement) async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard Auth.auth().currentUser != nil else { return }
 
         do {
-            try await db.collection("users")
-                .document(userId)
-                .collection("achievements")
-                .document(achievement.id)
-                .setData(achievement.toFirestore, merge: true)
+            var item: [String: Any] = [
+                "achievementId": achievement.id,
+                "progress": achievement.progress,
+            ]
+            if let date = achievement.unlockedAt {
+                item["unlockedAt"] = date.timeIntervalSince1970 * 1000
+            }
+            let _: JSONValue = try await ConvexBackend.shared.call(
+                .mutation, path: "achievements:upsertMany", args: ["items": [item]]
+            )
         } catch {
             #if DEBUG
             print("❌ Error saving achievement: \(error)")
@@ -155,11 +160,12 @@ class AchievementService: ObservableObject {
             await saveAchievement(achievement)
         }
 
-        // Show popup for first unlocked achievement
+        // Every unlock is celebrated, one after the other (CelebrationCenter queue).
+        for achievement in unlocked {
+            CelebrationCenter.shared.enqueue(.achievement(achievement))
+        }
         if let first = unlocked.first {
             newlyUnlockedAchievement = first
-            showAchievementPopup = true
-            HapticManager.success()
 
             // Request rating on achievement unlock
             AppRatingService.shared.trackAchievementUnlock()
@@ -175,8 +181,7 @@ class AchievementService: ObservableObject {
             await saveAchievement(achievements[index])
 
             newlyUnlockedAchievement = achievements[index]
-            showAchievementPopup = true
-            HapticManager.success()
+            CelebrationCenter.shared.enqueue(.achievement(achievements[index]))
 
             // Request rating on achievement unlock
             AppRatingService.shared.trackAchievementUnlock()
@@ -193,8 +198,7 @@ class AchievementService: ObservableObject {
                 await saveAchievement(achievements[index])
 
                 newlyUnlockedAchievement = achievements[index]
-                showAchievementPopup = true
-                HapticManager.success()
+                CelebrationCenter.shared.enqueue(.achievement(achievements[index]))
 
                 // Request rating on achievement unlock
                 AppRatingService.shared.trackAchievementUnlock()

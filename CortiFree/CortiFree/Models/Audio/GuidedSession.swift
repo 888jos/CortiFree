@@ -35,6 +35,7 @@ struct LocalizedText: Hashable {
 // MARK: - Category
 
 enum AudioSessionCategory: String, CaseIterable, Identifiable, Codable {
+    case firstSteps
     case stressSOS
     case workBreak
     case sleep
@@ -43,50 +44,13 @@ enum AudioSessionCategory: String, CaseIterable, Identifiable, Codable {
     case anxiety
     case selfCompassion
     case focus
+    case stressScience
 
     var id: String { rawValue }
 
-    var title: LocalizedText {
-        switch self {
-        case .stressSOS:
-            return LocalizedText(fr: "Stress SOS", en: "Stress SOS", de: "Stress-SOS", es: "SOS estrés", ja: "ストレスSOS", ko: "스트레스 SOS")
-        case .workBreak:
-            return LocalizedText(fr: "Pause travail", en: "Work break", de: "Arbeitspause", es: "Pausa en el trabajo", ja: "仕事の合間に", ko: "업무 중 휴식")
-        case .sleep:
-            return LocalizedText(fr: "Sommeil", en: "Sleep", de: "Schlaf", es: "Sueño", ja: "睡眠", ko: "수면")
-        case .morning:
-            return LocalizedText(fr: "Matin & énergie", en: "Morning & energy", de: "Morgen & Energie", es: "Mañana y energía", ja: "朝とエネルギー", ko: "아침 & 에너지")
-        case .bodyRelax:
-            return LocalizedText(fr: "Corps & détente", en: "Body & relaxation", de: "Körper & Entspannung", es: "Cuerpo y relajación", ja: "からだとリラックス", ko: "몸 & 이완")
-        case .anxiety:
-            return LocalizedText(fr: "Anxiété & émotions", en: "Anxiety & emotions", de: "Angst & Gefühle", es: "Ansiedad y emociones", ja: "不安と感情", ko: "불안 & 감정")
-        case .selfCompassion:
-            return LocalizedText(fr: "Bienveillance", en: "Self-compassion", de: "Selbstmitgefühl", es: "Autocompasión", ja: "セルフ・コンパッション", ko: "자기 자비")
-        case .focus:
-            return LocalizedText(fr: "Concentration", en: "Focus", de: "Fokus", es: "Concentración", ja: "集中", ko: "집중")
-        }
-    }
-
-    var subtitle: LocalizedText {
-        switch self {
-        case .stressSOS:
-            return LocalizedText(fr: "Retrouver le calme en quelques minutes", en: "Find calm in a few minutes", de: "In wenigen Minuten zur Ruhe kommen", es: "Recupera la calma en pocos minutos", ja: "数分で落ち着きを取り戻す", ko: "몇 분 만에 평온 되찾기")
-        case .workBreak:
-            return LocalizedText(fr: "Des pauses courtes pour souffler au travail", en: "Short breaks to breathe at work", de: "Kurze Pausen zum Durchatmen", es: "Pausas breves para respirar en el trabajo", ja: "仕事中にひと息つく短い休憩", ko: "일하면서 숨 돌리는 짧은 휴식")
-        case .sleep:
-            return LocalizedText(fr: "Lâcher la journée et s'endormir", en: "Let go of the day and fall asleep", de: "Den Tag loslassen und einschlafen", es: "Suelta el día y duérmete", ja: "一日を手放して眠りへ", ko: "하루를 내려놓고 잠들기")
-        case .morning:
-            return LocalizedText(fr: "Commencer la journée du bon pied", en: "Start the day on the right foot", de: "Gut in den Tag starten", es: "Empieza el día con buen pie", ja: "良い一日のスタートを", ko: "기분 좋게 하루 시작하기")
-        case .bodyRelax:
-            return LocalizedText(fr: "Relâcher les tensions du corps", en: "Release tension from the body", de: "Körperliche Spannungen lösen", es: "Libera la tensión del cuerpo", ja: "からだの緊張をほどく", ko: "몸의 긴장 풀기")
-        case .anxiety:
-            return LocalizedText(fr: "Accueillir et apaiser ce que tu ressens", en: "Meet and soothe what you feel", de: "Gefühle annehmen und beruhigen", es: "Acoge y calma lo que sientes", ja: "感じていることを受けとめ、和らげる", ko: "느끼는 감정을 받아들이고 달래기")
-        case .selfCompassion:
-            return LocalizedText(fr: "Être un allié pour toi-même", en: "Be on your own side", de: "Dir selbst ein Freund sein", es: "Sé tu propio aliado", ja: "自分の味方になる", ko: "나 자신의 편이 되기")
-        case .focus:
-            return LocalizedText(fr: "Clarté mentale et attention", en: "Mental clarity and attention", de: "Klarheit und Aufmerksamkeit", es: "Claridad mental y atención", ja: "頭をすっきり、集中力を", ko: "맑은 정신과 집중력")
-        }
-    }
+    /// Theme names and one-line pitches come from catalog_plan.json (GuidedSessionCatalogData.swift).
+    var title: LocalizedText { generatedTitle }
+    var subtitle: LocalizedText { generatedSubtitle }
 
     var symbol: String {
         switch self {
@@ -98,6 +62,8 @@ enum AudioSessionCategory: String, CaseIterable, Identifiable, Codable {
         case .anxiety: return "cloud.sun.fill"
         case .selfCompassion: return "heart.fill"
         case .focus: return "scope"
+        case .firstSteps: return "leaf.fill"
+        case .stressScience: return "brain.head.profile"
         }
     }
 
@@ -111,6 +77,8 @@ enum AudioSessionCategory: String, CaseIterable, Identifiable, Codable {
         case .anxiety: return [Color(hex: "14B8A6"), Color(hex: "6366F1")]
         case .selfCompassion: return [Color(hex: "F472B6"), Color(hex: "A855F7")]
         case .focus: return [Color(hex: "6366F1"), Color(hex: "22D3EE")]
+        case .firstSteps: return [Color(hex: "10B981"), Color(hex: "6366F1")]
+        case .stressScience: return [Color(hex: "8B5CF6"), Color(hex: "14B8A6")]
         }
     }
 }
@@ -200,21 +168,37 @@ struct GuidedSession: Identifiable, Hashable {
     var localizedSubtitle: String { subtitle.localized }
     var durationLabel: String { "\(durationMinutes) min" }
 
-    /// Language used for the narration script / recorded audio. Scripts exist in fr & en;
-    /// other UI languages fall back to English.
+    /// Language used for the narration script / recorded audio: the UI language
+    /// (fr, en, de, es, ja, ko). NarrationLibrary falls back to English if a script is missing.
     static func narrationLanguage(for language: LanguageManager.Language = LanguageManager.shared.currentLanguage) -> String {
-        language == .french ? "fr" : "en"
+        language.rawValue
     }
 
-    /// A professionally recorded file, if one is bundled for this session.
-    /// Lookup order: `<id>_<uiLang>`, `<id>_<narrationLang>`, `<id>` with m4a/mp3, then `remoteAudioURL`.
+    /// A professionally recorded file, if one is bundled for this session
+    /// (Resources/SessionAudio, see scripts/narration/README.md).
+    /// Lookup order: `<id>_<uiLang>`, then the English recording `<id>_en`, then `<id>`,
+    /// then `remoteAudioURL`. A recording in English beats the on-device voice in the UI language.
     func recordedAudioURL(language: LanguageManager.Language = LanguageManager.shared.currentLanguage) -> URL? {
-        let candidates = ["\(id)_\(language.rawValue)", "\(id)_\(Self.narrationLanguage(for: language))", id]
-        for name in candidates {
-            for ext in ["m4a", "mp3", "aac", "wav"] {
-                if let url = Bundle.main.url(forResource: name, withExtension: ext) { return url }
-            }
+        for name in ["\(id)_\(Self.narrationLanguage(for: language))", "\(id)_en", id] {
+            if let url = Self.bundledRecording(named: name) { return url }
         }
         return remoteAudioURL
+    }
+
+    /// Language the listener actually hears, which is also the script shown in the player:
+    /// the recording in the UI language, else the English recording, else the on-device
+    /// voice reading the UI-language script (English when the session has none).
+    var playbackLanguage: String {
+        let language = Self.narrationLanguage()
+        if Self.bundledRecording(named: "\(id)_\(language)") != nil { return language }
+        if Self.bundledRecording(named: "\(id)_en") != nil { return "en" }
+        return NarrationLibrary.shared.hasScript(for: id, language: language) ? language : "en"
+    }
+
+    private static func bundledRecording(named name: String) -> URL? {
+        for ext in ["m4a", "mp3", "aac", "wav"] {
+            if let url = Bundle.main.url(forResource: name, withExtension: ext) { return url }
+        }
+        return nil
     }
 }

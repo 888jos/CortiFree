@@ -32,8 +32,28 @@ struct HabitsQuizView: View {
 
     private let totalQuestions = 12
 
+    /// Q9 (appearance) came from the removed Glow scan and fed nothing but analytics. It stays
+    /// in the answers array (index 8, answer 0) so every other index keeps its meaning for the
+    /// plan generator and Convex, but it is never shown.
+    private static let skippedQuestionIndexes: Set<Int> = [8]
+
+    private var shownQuestionCount: Int { totalQuestions - Self.skippedQuestionIndexes.count }
+
     private var progress: Double {
-        Double(currentQuestionIndex + 1) / Double(totalQuestions)
+        let shownBefore = (0..<currentQuestionIndex).filter { !Self.skippedQuestionIndexes.contains($0) }.count
+        return Double(shownBefore + 1) / Double(shownQuestionCount)
+    }
+
+    private func nextShownIndex(after index: Int) -> Int {
+        var next = index + 1
+        while Self.skippedQuestionIndexes.contains(next) { next += 1 }
+        return next
+    }
+
+    private func previousShownIndex(before index: Int) -> Int {
+        var previous = index - 1
+        while Self.skippedQuestionIndexes.contains(previous) { previous -= 1 }
+        return max(previous, 0)
     }
 
     private var currentQuestionNumber: Int {
@@ -147,7 +167,7 @@ struct HabitsQuizView: View {
 
                     isGoingBack = true
                     withAnimation(.easeInOut(duration: 0.5)) {
-                        currentQuestionIndex -= 1
+                        currentQuestionIndex = previousShownIndex(before: currentQuestionIndex)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         isGoingBack = false
@@ -163,30 +183,8 @@ struct HabitsQuizView: View {
             .opacity(currentQuestionIndex > 0 ? 1.0 : 0.0)
 
             // Progress bar (center)
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    // Background
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(hex: "1D1D1D"))
-                        .frame(height: 8)
-
-                    // Progress fill
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "B794F6"),
-                                    Color(hex: "D4B4FF")
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: geometry.size.width * progress, height: 8)
-                        .animation(.easeInOut(duration: 0.3), value: progress)
-                }
-            }
-            .frame(height: 8)
+            OnboardingProgressBar(progress: progress)
+                .animation(.easeInOut(duration: 0.3), value: progress)
             .padding(.horizontal, 16)
 
             // Language selector button (right)
@@ -275,10 +273,10 @@ struct HabitsQuizView: View {
             isTransitioning = false
             return
         }
-        if currentQuestionIndex < totalQuestions - 1 {
+        if nextShownIndex(after: currentQuestionIndex) < totalQuestions {
             isGoingBack = false
             withAnimation(.easeInOut(duration: 0.5)) {
-                currentQuestionIndex += 1
+                currentQuestionIndex = nextShownIndex(after: currentQuestionIndex)
                 selectedAnswer = nil
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -295,6 +293,7 @@ struct HabitsQuizView: View {
 
     private func calculateAndComplete() {
         let result = HabitsQuizResult(answers: answers)
+        PersonalPlanStore.shared.updateOnboardingDraft { $0.quizAnswers = result.answers }
 
         // Calculate total time spent on quiz
         let totalTime = quizStartTime.map { Date().timeIntervalSince($0) } ?? 0.0

@@ -4,7 +4,7 @@
 //
 //  Created by Claude on 23/10/2025.
 //  Meditations are now guided AUDIO sessions: this entry point (used by the assistant,
-//  lists and legacy flows) opens the audio session page for the mapped session.
+//  lists and legacy flows) opens the full-screen player directly on the mapped session.
 //
 
 import SwiftUI
@@ -14,7 +14,8 @@ struct MeditationSupportView: View {
 
     var body: some View {
         if let session = GuidedSessionCatalog.session(forLegacyID: support.meditationId) {
-            GuidedSessionDetailView(session: session)
+            NowPlayingView()
+                .onAppear { GuidedSessionPlayer.shared.play(session) }
         } else {
             MeditationListView()
         }

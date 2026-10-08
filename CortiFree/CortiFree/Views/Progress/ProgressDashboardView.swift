@@ -57,6 +57,9 @@ struct ProgressDashboardView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskValidated"))) { _ in
             Task { await viewModel.refresh() }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskSkippedAfterValidation"))) { _ in
+            Task { await viewModel.refresh() }
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
             Task { await viewModel.refresh() }
         }

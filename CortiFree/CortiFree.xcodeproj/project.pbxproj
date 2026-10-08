@@ -16,8 +16,6 @@
 		804F1D9B2F4CF13700374D9D /* CortiFreeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		805099B72F4BC34E002841B9 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 805099B62F4BC34E002841B9 /* PostHog */; };
 		80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 80622A4B2F1701B9000C459F /* RevenueCat */; };
-		8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9902EA8CBCA007C9606 /* FirebaseAuth */; };
-		8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8097F9922EA8CBCA007C9606 /* FirebaseFirestore */; };
 		80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 80A000022F4BC34E002841B9 /* AmplitudeSwift */; };
 		80E85E8D2F3762E300E18C4B /* CortiFree.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 80E85E8C2F3762E300E18C4B /* CortiFree.storekit */; };
 		80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */ = {isa = PBXBuildFile; productRef = 80F600D62E85EAA9008F58FB /* SuperwallKit */; };
@@ -132,13 +130,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				803AC4DE2F40CED0007B3B5A /* TikTokBusinessSDK in Frameworks */,
-				8097F9912EA8CBCA007C9606 /* FirebaseAuth in Frameworks */,
 				80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */,
 				8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */,
 				805099B72F4BC34E002841B9 /* PostHog in Frameworks */,
 				80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */,
 				80622A4C2F1701B9000C459F /* RevenueCat in Frameworks */,
-				8097F9932EA8CBCA007C9606 /* FirebaseFirestore in Frameworks */,
 				802C49B12EBBB2340084B356 /* Lottie in Frameworks */,
 				8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */,
 			);
@@ -239,8 +235,6 @@
 			name = CortiFree;
 			packageProductDependencies = (
 				80F600D62E85EAA9008F58FB /* SuperwallKit */,
-				8097F9902EA8CBCA007C9606 /* FirebaseAuth */,
-				8097F9922EA8CBCA007C9606 /* FirebaseFirestore */,
 				802C49B02EBBB2340084B356 /* Lottie */,
 				8021AEC92ED91A0100541E54 /* GoogleSignIn */,
 				8021AECB2ED91A0100541E54 /* GoogleSignInSwift */,
@@ -336,7 +330,6 @@
 			mainGroup = 80F600972E85D4A0008F58FB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				80F600D52E85EAA9008F58FB /* XCRemoteSwiftPackageReference "Superwall-iOS" */,
 				802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
@@ -459,7 +452,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0;
+				MARKETING_VERSION = 3.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree.CortiFreeWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -492,7 +485,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0;
+				MARKETING_VERSION = 3.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.solstys.cortifree.CortiFreeWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -629,6 +622,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				AMPLITUDE_API_KEY = cea46c8db502b00ad059927287d88b08;
+				CONVEX_URL = "https://reliable-oyster-468.convex.cloud";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
@@ -665,6 +659,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				AMPLITUDE_API_KEY = cea46c8db502b00ad059927287d88b08;
+				CONVEX_URL = "https://compassionate-jackal-621.convex.cloud";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
@@ -872,14 +867,6 @@
 				minimumVersion = 1.18.0;
 			};
 		};
-		80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.3.0;
-			};
-		};
 		80F600D52E85EAA9008F58FB /* XCRemoteSwiftPackageReference "Superwall-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/superwall/Superwall-iOS";
@@ -920,16 +907,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
 			productName = RevenueCat;
-		};
-		8097F9902EA8CBCA007C9606 /* FirebaseAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAuth;
-		};
-		8097F9922EA8CBCA007C9606 /* FirebaseFirestore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 80F600CA2E85D5BF008F58FB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestore;
 		};
 		80A000022F4BC34E002841B9 /* AmplitudeSwift */ = {
 			isa = XCSwiftPackageProductDependency;

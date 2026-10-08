@@ -7,8 +7,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
-import FirebaseFirestore
 import SuperwallKit
 
 struct HomeView: View {
@@ -27,6 +25,7 @@ struct HomeView: View {
     @State private var showOnboarding = false
     @State private var showCustomPaywall = false
     @State private var showRatingSocialProofDebug = false
+    @State private var showCelebrationsGalleryDebug = false
     @State private var currentTime = Date() // For countdown updates
     @State private var didInitProgram = false
 
@@ -161,6 +160,11 @@ struct HomeView: View {
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
+                                    Button(action: { showCelebrationsGalleryDebug = true }) {
+                                        Text("🎉 Celebrations gallery")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
                                     Button(action: { showRatingSocialProofDebug = true }) {
                                         Text("⭐ Rating Social Proof")
                                             .font(.system(size: 13, weight: .medium))
@@ -230,6 +234,9 @@ struct HomeView: View {
         // Debug-only: Onboarding preview (excluded from production builds)
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingV2FlowView(enablesLiveActivityWhenAlreadyCompleted: true)
+        }
+        .fullScreenCover(isPresented: $showCelebrationsGalleryDebug) {
+            CelebrationsGalleryView()
         }
         .fullScreenCover(isPresented: $showRatingSocialProofDebug) {
             RatingSocialProofView {

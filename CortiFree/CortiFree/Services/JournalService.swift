@@ -1,180 +1,119 @@
-//
-//  JournalService.swift
-//  CortiFree
-//
-//  Service Firebase pour gérer les entrées de journal
-//
-
 import Foundation
-import FirebaseFirestore
-import FirebaseAuth
 import UIKit
 
-class JournalService {
+@MainActor
+final class JournalService {
     static let shared = JournalService()
-    private let db = Firestore.firestore()
-
     private init() {}
 
-    // MARK: - Photo Upload
+    private struct JournalRow: Decodable {
+        let _id: String
+        let userId: String
+        let content: String
+        let createdAt: Double
+        let mood: Mood?
+        let photoUrl: String?
+        let wordCount: Int?
+        let meditationId: String?
+        let meditationType: String?
+        let prompt: String?
+        let tags: [String]?
+        let isFavorite: Bool?
 
-    /// Convert photo to Base64 string for Firestore storage
+        var model: JournalEntry {
+            JournalEntry(
+                id: _id,
+                content: content,
+                createdAt: Date(timeIntervalSince1970: createdAt / 1000),
+                userId: userId,
+                mood: mood,
+                photoURL: photoUrl,
+                wordCount: wordCount,
+                meditationId: meditationId,
+                meditationType: meditationType,
+                prompt: prompt,
+                tags: tags,
+                isFavorite: isFavorite
+            )
+        }
+    }
+
+    /// Returns the Convex storage id consumed by `saveEntry`.
     func uploadPhoto(_ image: UIImage) async -> String? {
-        // Compress and convert to base64
-        guard let imageData = image.jpegData(compressionQuality: 0.5) else {
+        let prepared: UIImage
+        if image.size.width > 1200 || image.size.height > 1200 {
+            prepared = resizeImage(image, targetSize: CGSize(width: 1200, height: 1200)) ?? image
+        } else {
+            prepared = image
+        }
+        guard let data = prepared.jpegData(compressionQuality: 0.72) else { return nil }
+        do {
+            let uploadURL: String = try await ConvexBackend.shared.call(
+                .mutation, path: "journal:generatePhotoUploadUrl"
+            )
+            return try await ConvexBackend.shared.upload(data, to: uploadURL)
+        } catch {
+            #if DEBUG
+            print("⚠️ Journal photo upload failed: \(error.localizedDescription)")
+            #endif
             return nil
         }
-
-        // Limit image size to avoid Firestore document size limits (1MB)
-        let maxSize: Int = 800 * 1024 // 800KB
-        if imageData.count > maxSize {
-            // Resize image if too large
-            if let resizedImage = resizeImage(image, targetSize: CGSize(width: 800, height: 800)),
-               let resizedData = resizedImage.jpegData(compressionQuality: 0.5) {
-                return resizedData.base64EncodedString()
-            }
-            return nil
-        }
-
-        return imageData.base64EncodedString()
     }
 
-    /// Resize image to fit within target size while maintaining aspect ratio
     private func resizeImage(_ image: UIImage, targetSize: CGSize) -> UIImage? {
-        let size = image.size
-        let widthRatio  = targetSize.width  / size.width
-        let heightRatio = targetSize.height / size.height
-        let ratio = min(widthRatio, heightRatio)
-
-        let newSize = CGSize(width: size.width * ratio, height: size.height * ratio)
-        let rect = CGRect(origin: .zero, size: newSize)
-
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-        image.draw(in: rect)
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        return newImage
+        let ratio = min(targetSize.width / image.size.width, targetSize.height / image.size.height, 1)
+        let size = CGSize(width: image.size.width * ratio, height: image.size.height * ratio)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
     }
 
-    // MARK: - Journal Entry Operations
-
-    // Sauvegarder une entrée de journal
     func saveEntry(_ entry: JournalEntry) async throws {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "JournalService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
-
-        var data: [String: Any] = [
-            "content": entry.content,
-            "createdAt": Timestamp(date: entry.createdAt),
-            "userId": userId,
-            "wordCount": entry.wordCount ?? 0
-        ]
-
-        // Add optional fields
-        if let mood = entry.mood {
-            data["mood"] = mood.rawValue
-        }
-
-        if let photoURL = entry.photoURL {
-            data["photoURL"] = photoURL
-        }
-
-        // Legacy fields (for backward compatibility)
-        if let meditationId = entry.meditationId {
-            data["meditationId"] = meditationId
-        }
-
-        if let meditationType = entry.meditationType {
-            data["meditationType"] = meditationType
-        }
-
-        if let prompt = entry.prompt {
-            data["prompt"] = prompt
-        }
-
-        if let tags = entry.tags {
-            data["tags"] = tags
-        }
-
-        if let isFavorite = entry.isFavorite {
-            data["isFavorite"] = isFavorite
-        }
+        guard Auth.auth().currentUser != nil else { throw ConvexBackendError.signedOut }
+        var fields: [String: Any] = ["content": entry.content]
+        if let mood = entry.mood { fields["mood"] = mood.rawValue }
+        if let value = entry.meditationId { fields["meditationId"] = value }
+        if let value = entry.meditationType { fields["meditationType"] = value }
+        if let value = entry.prompt { fields["prompt"] = value }
+        if let value = entry.tags { fields["tags"] = value }
+        if let value = entry.isFavorite { fields["isFavorite"] = value }
 
         if let id = entry.id {
-            // Update existing entry
-            try await db.collection("users").document(userId)
-                .collection("journalEntries").document(id)
-                .setData(data)
+            fields["id"] = id
+            if let photo = entry.photoURL, !photo.hasPrefix("http") { fields["photoStorageId"] = photo }
+            let _: JSONValue = try await ConvexBackend.shared.call(.mutation, path: "journal:update", args: fields)
         } else {
-            // Create new entry
-            try await db.collection("users").document(userId)
-                .collection("journalEntries")
-                .addDocument(data: data)
+            fields["createdAt"] = entry.createdAt.timeIntervalSince1970 * 1000
+            if let photo = entry.photoURL { fields["photoStorageId"] = photo }
+            let _: String = try await ConvexBackend.shared.call(.mutation, path: "journal:create", args: fields)
         }
     }
 
-    // Charger toutes les entrées pour un type de méditation
     func loadEntries(for meditationId: String) async throws -> [JournalEntry] {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "JournalService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
-
-        let snapshot = try await db.collection("users").document(userId)
-            .collection("journalEntries")
-            .whereField("meditationId", isEqualTo: meditationId)
-            .order(by: "createdAt", descending: true)
-            .getDocuments()
-
-        return snapshot.documents.compactMap { doc in
-            try? doc.data(as: JournalEntry.self)
-        }
+        try await loadFiltered(["meditationId": meditationId])
     }
 
-    // Charger toutes les entrées
     func loadAllEntries() async throws -> [JournalEntry] {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "JournalService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
-
-        let snapshot = try await db.collection("users").document(userId)
-            .collection("journalEntries")
-            .order(by: "createdAt", descending: true)
-            .getDocuments()
-
-        return snapshot.documents.compactMap { doc in
-            try? doc.data(as: JournalEntry.self)
-        }
+        let rows: [JournalRow] = try await ConvexBackend.shared.call(
+            .query, path: "journal:list", args: ["limit": 500]
+        )
+        return rows.map(\.model)
     }
 
-    // Charger les entrées par type
     func loadEntries(byType type: String) async throws -> [JournalEntry] {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            throw NSError(domain: "JournalService", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-        }
-
-        let snapshot = try await db.collection("users").document(userId)
-            .collection("journalEntries")
-            .whereField("meditationType", isEqualTo: type)
-            .order(by: "createdAt", descending: true)
-            .getDocuments()
-
-        return snapshot.documents.compactMap { doc in
-            try? doc.data(as: JournalEntry.self)
-        }
+        try await loadFiltered(["meditationType": type])
     }
 
-    // Supprimer une entrée (photo is stored as base64 in document, so it's deleted automatically)
-    func deleteEntry(_ entry: JournalEntry) async throws {
-        guard let userId = Auth.auth().currentUser?.uid,
-              let entryId = entry.id else {
-            return
-        }
+    private func loadFiltered(_ args: [String: Any]) async throws -> [JournalEntry] {
+        let rows: [JournalRow] = try await ConvexBackend.shared.call(
+            .query, path: "journal:listByMeditation", args: args
+        )
+        return rows.map(\.model)
+    }
 
-        // Delete entry from Firestore (photo base64 is deleted with the document)
-        try await db.collection("users").document(userId)
-            .collection("journalEntries").document(entryId)
-            .delete()
+    func deleteEntry(_ entry: JournalEntry) async throws {
+        guard let id = entry.id else { return }
+        let _: JSONValue = try await ConvexBackend.shared.call(
+            .mutation, path: "journal:remove", args: ["id": id]
+        )
     }
 }

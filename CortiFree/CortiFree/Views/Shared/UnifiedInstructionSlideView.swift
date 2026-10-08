@@ -51,23 +51,19 @@ struct UnifiedInstructionSlideView: View {
     private func parseDuration(_ duration: String?) -> Int {
         guard let duration = duration else { return 0 }
 
-        // Parse "30 sec", "1 min", "2 min 30 sec", etc.
-        let components = duration.lowercased().components(separatedBy: " ")
+        // Parse "30 sec", "1 min", "2 min 30 sec" in every app language
+        // (de "Sekunden"/"Minuten", es "segundos"/"minutos", ja "30秒"/"1分", ko "30초"/"1분").
+        let text = duration.lowercased()
         var totalSeconds = 0
-
-        var i = 0
-        while i < components.count {
-            if let value = Int(components[i]) {
-                if i + 1 < components.count {
-                    let unit = components[i + 1]
-                    if unit.hasPrefix("min") {
-                        totalSeconds += value * 60
-                    } else if unit.hasPrefix("sec") {
-                        totalSeconds += value
-                    }
-                }
+        let pattern = /(\d+)\s*([^\d\s]+)/
+        for match in text.matches(of: pattern) {
+            guard let value = Int(match.1) else { continue }
+            let unit = String(match.2)
+            if unit.hasPrefix("min") || unit.hasPrefix("分") || unit.hasPrefix("분") {
+                totalSeconds += value * 60
+            } else if unit.hasPrefix("s") || unit.hasPrefix("秒") || unit.hasPrefix("초") {
+                totalSeconds += value
             }
-            i += 1
         }
 
         return totalSeconds

@@ -35,6 +35,8 @@ extension AudioSessionCategory {
         case .anxiety: return "situation_anxiete"
         case .selfCompassion: return "situation_epuise"
         case .focus: return "situation_recentrer"
+        case .firstSteps: return "meditation_01"
+        case .stressScience: return "routine_stress"
         }
     }
 
@@ -265,6 +267,18 @@ struct LibrarySessionRow: View {
                                 .font(.system(size: 13))
                                 .foregroundStyle(AudioPalette.secondaryText)
                                 .lineLimit(1)
+                            if !session.hasNarrationInCurrentLanguage {
+                                // Not narrated in the app language yet: say so instead of
+                                // surprising the user with an English voice.
+                                Text("EN")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundStyle(AudioPalette.secondaryText)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 1)
+                                    .overlay(Capsule().stroke(Color.white.opacity(0.3)))
+                                    .accessibilityLabel(libraryText("audio.script.english_narration"))
+                                    .layoutPriority(1)
+                            }
                         }
                     }
                 }
@@ -305,6 +319,54 @@ struct LibrarySessionRow: View {
     }
 }
 
+// MARK: - Download button
+
+/// Download toggle used on rows, cards and the player: arrow, spinner, then a check.
+struct LibraryDownloadButton: View {
+    let state: SessionLibraryStore.DownloadState
+    var size: CGFloat = 20
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            HapticManager.light()
+            action()
+        } label: {
+            Group {
+                switch state {
+                case .downloading:
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(AudioPalette.accent)
+                case .downloaded:
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: size, weight: .medium))
+                        .foregroundStyle(AudioPalette.accent)
+                case .none:
+                    Image(systemName: "arrow.down.circle")
+                        .font(.system(size: size, weight: .medium))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                }
+            }
+            .frame(width: 36, height: 44)
+            .contentShape(Rectangle())
+            .contentTransition(.symbolEffect(.replace))
+        }
+        .buttonStyle(.plain)
+        .disabled(state == .downloading)
+        .sensoryFeedback(.success, trigger: state == .downloaded)
+        .accessibilityLabel(libraryText(Self.labelKey(state)))
+    }
+
+    static func labelKey(_ state: SessionLibraryStore.DownloadState) -> String {
+        switch state {
+        case .none: return "library.download"
+        case .downloading: return "library.downloading"
+        case .downloaded: return "library.downloaded.remove"
+        }
+    }
+}
+
 // MARK: - Breathing row (roller-coaster preview)
 
 struct LibraryBreathingRow: View {
@@ -316,11 +378,9 @@ struct LibraryBreathingRow: View {
         HStack(spacing: 14) {
             Button(action: open) {
                 HStack(spacing: 14) {
-                    BreathingPatternPreview(pattern: pattern)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 10)
+                    LibraryImage(name: PlanArtwork.breathingImage(pattern.category))
                         .frame(width: 84, height: 58)
-                        .background(Color.black.opacity(0.25), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                     VStack(alignment: .leading, spacing: 4) {
                         Text(pattern.localizedTitle)
@@ -386,7 +446,6 @@ struct LibrarySessionListPage: View {
     let emptyMessage: String
     let sessions: () -> [GuidedSession]
     let play: (GuidedSession) -> Void
-    @State private var selected: GuidedSession?
     @ObservedObject private var library = SessionLibraryStore.shared
 
     var body: some View {
@@ -418,7 +477,7 @@ struct LibrarySessionListPage: View {
                         .cfGlass(cornerRadius: LibraryMetrics.cardRadius)
                     } else {
                         ForEach(items) { session in
-                            LibrarySessionRow(session: session, open: { selected = session }, play: { play(session) })
+                            LibrarySessionRow(session: session, open: { play(session) }, play: { play(session) })
                         }
                     }
                 }
@@ -431,7 +490,6 @@ struct LibrarySessionListPage: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar(.visible, for: .navigationBar)
         .toolbarBackground(.hidden, for: .navigationBar)
-        .sheet(item: $selected) { GuidedSessionDetailView(session: $0) }
     }
 }
 

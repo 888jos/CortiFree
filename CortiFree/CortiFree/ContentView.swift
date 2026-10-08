@@ -14,6 +14,7 @@ struct ContentView: View {
     @ObservedObject private var sessionPlayer = GuidedSessionPlayer.shared
     @ObservedObject private var planetSettings = PlanetSettings.shared
     @State private var isScrolling = false
+    @State private var isEditingPlan = false
     @State private var scrollTimer: Timer?
     @State private var isAssistantPresented = false
     @State private var assistantPulse = false
@@ -41,13 +42,13 @@ struct ContentView: View {
                 case .home:
                     HomeView(isScrolling: $isScrolling, scrollTimer: $scrollTimer)
                 case .tasks:
-                    TasksV2View(isScrolling: $isScrolling)
+                    TasksV2View(isScrolling: $isScrolling, isEditingPlan: $isEditingPlan)
                 case .progress:
                     ProgressDashboardView()
                 case .library:
                     LibraryView()
                 case .profile:
-                    ProfileView()
+                    ProfileView(selectedTab: $selectedTab)
                 }
             }
 
@@ -70,8 +71,9 @@ struct ContentView: View {
                     .offset(x: -10, y: isMiniPlayerVisible ? -176 : -104)
                     .animation(.spring(response: 0.4, dampingFraction: 0.85), value: isMiniPlayerVisible)
                     // Out of the way while the content scrolls (it would cover the cards' checkmarks).
-                    .opacity(isScrolling ? 0 : 1)
-                    .allowsHitTesting(!isScrolling)
+                    .opacity(isScrolling || isEditingPlan ? 0 : 1)
+                    .allowsHitTesting(!(isScrolling || isEditingPlan))
+                    .animation(.easeInOut(duration: 0.2), value: isEditingPlan)
                 }
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
@@ -88,11 +90,17 @@ struct ContentView: View {
             }
 
         }
+        // Streak / day-complete banners and unlock screens, one at a time, above every tab.
+        .overlay(alignment: .top) { CelebrationHost() }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: sessionPlayer.currentSession?.id)
         .ignoresSafeArea(.keyboard)
         .fullScreenCover(isPresented: $sessionPlayer.isFullPlayerPresented) {
             NowPlayingView()
                 .presentationBackground(.clear)
+        }
+        // Streak shown on Home / Profile must be right without opening the Plan tab first.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            StreakService.shared.refresh()
         }
         .sheet(isPresented: $isAssistantPresented) {
             AssistantChatView()
@@ -100,6 +108,7 @@ struct ContentView: View {
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
+            StreakService.shared.refresh()
             withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
                 assistantPulse = true
             }
@@ -110,7 +119,11 @@ struct ContentView: View {
             #endif
         }
         .onOpenURL { url in
-            if url.scheme == "cortifree" && url.host == "tasks" {
+            // A PDF or text file shared to CortiFree (« Open in CortiFree »): Milo reads it.
+            if url.isFileURL {
+                MiloImportCenter.shared.receive(url)
+                isAssistantPresented = true
+            } else if url.scheme == "cortifree" && url.host == "tasks" {
                 selectedTab = .tasks
             } else if url.scheme == "cortifree" && url.host == "progress" {
                 selectedTab = .progress

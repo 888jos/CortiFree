@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import FirebaseFirestore
-import FirebaseAuth
 
 @MainActor
 class HabitBadgeService: ObservableObject {
@@ -18,14 +16,21 @@ class HabitBadgeService: ObservableObject {
     @Published var newlyUnlockedBadge: HabitBadge?
     @Published var showBadgePopup: Bool = false
 
-    private let db = Firestore.firestore()
     private var loadedUserID: String?
+
+    private struct BadgeRow: Decodable {
+        let habitId: String
+        let level: HabitBadge.BadgeLevel
+        let requirement: Int
+        let progress: Int
+        let unlockedAt: Double?
+    }
 
     private init() {}
 
     // MARK: - Load Badges
 
-    /// Charge tous les badges d'habitudes depuis Firebase
+    /// Charge tous les badges d'habitudes depuis Convex.
     func loadHabitBadges() async {
         let userId = Auth.auth().currentUser?.uid
         if loadedUserID != userId {
@@ -35,21 +40,18 @@ class HabitBadgeService: ObservableObject {
         guard habitBadges.isEmpty else { return }
 
         do {
-            let snapshot: QuerySnapshot?
-            if let userId {
-                snapshot = try await db.collection("users").document(userId)
-                    .collection("habit_badges")
-                    .getDocuments()
-            } else {
-                snapshot = nil
-            }
-
-            var loadedBadges: [HabitBadge] = []
-
-            for document in snapshot?.documents ?? [] {
-                if let badge = try? document.data(as: HabitBadge.self) {
-                    loadedBadges.append(badge)
-                }
+            let rows: [BadgeRow] = userId == nil ? [] : try await ConvexBackend.shared.call(
+                .query, path: "achievements:listBadges"
+            )
+            let loadedBadges = rows.map { row in
+                HabitBadge(
+                    id: "\(row.habitId)_\(row.level.rawValue)",
+                    habitId: row.habitId,
+                    level: row.level,
+                    requirement: row.requirement,
+                    progress: row.progress,
+                    unlockedAt: row.unlockedAt.map { Date(timeIntervalSince1970: $0 / 1000) }
+                )
             }
 
             if loadedBadges.isEmpty {
@@ -75,7 +77,7 @@ class HabitBadgeService: ObservableObject {
 
     /// Initialise tous les badges (32 badges = 8 habitudes × 4 niveaux)
     private func initializeAllBadges() async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard Auth.auth().currentUser != nil else { return }
 
         var allBadges: [HabitBadge] = []
 
@@ -84,16 +86,10 @@ class HabitBadgeService: ObservableObject {
             allBadges.append(contentsOf: badges)
         }
 
-        // Sauvegarder dans Firebase
-        for badge in allBadges {
-            do {
-                try db.collection("users").document(userId)
-                    .collection("habit_badges")
-                    .document(badge.id ?? "\(badge.habitId)_\(badge.level.rawValue)")
-                    .setData(from: badge)
-            } catch {
-                print("❌ Failed to save badge \(badge.id ?? "unknown")")
-            }
+        do {
+            try await syncBadges(allBadges)
+        } catch {
+            print("❌ Failed to initialize badges: \(error.localizedDescription)")
         }
 
         habitBadges = allBadges
@@ -106,9 +102,9 @@ class HabitBadgeService: ObservableObject {
     func checkHabitBadges(habitId: String, tasksCompleted: Int) async {
         print("🔍 HabitBadgeService: Checking badges for \(habitId) with \(tasksCompleted) tasks completed")
 
-        if habitBadges.isEmpty {
-            habitBadges = HabitBadge.allHabitIds.flatMap(HabitBadge.badgesForHabit)
-        }
+        // Load this account's real badge states first (no-op once loaded for the same uid):
+        // starting from the default catalog re-celebrated badges already earned.
+        await loadHabitBadges()
         let userId = Auth.auth().currentUser?.uid
 
         // Récupérer tous les badges pour cette habitude
@@ -124,13 +120,9 @@ class HabitBadgeService: ObservableObject {
                 badge.unlockedAt = Date()
             }
 
-            if let userId {
+            if userId != nil {
                 do {
-                    try db.collection("users").document(userId)
-                        .collection("habit_badges")
-                        .document(badge.id ?? "\(badge.habitId)_\(badge.level.rawValue)")
-                        .setData(from: badge)
-
+                    try await syncBadges([badge])
                 } catch {
                     print("⚠️ HabitBadgeService: Failed to sync badge - \(error.localizedDescription)")
                 }
@@ -142,10 +134,28 @@ class HabitBadgeService: ObservableObject {
 
             if !wasUnlocked && badge.isUnlocked {
                 newlyUnlockedBadge = badge
-                showBadgePopup = true
+                CelebrationCenter.shared.enqueue(.badge(badge))
                 print("🎉 HabitBadgeService: Badge unlocked - \(HabitBadge.habitDisplayName(habitId)) \(badge.level.displayName)")
             }
         }
+    }
+
+    private func syncBadges(_ badges: [HabitBadge]) async throws {
+        let payload: [[String: Any]] = badges.map { badge in
+            var value: [String: Any] = [
+                "habitId": badge.habitId,
+                "level": badge.level.rawValue,
+                "requirement": badge.requirement,
+                "progress": badge.progress,
+            ]
+            if let date = badge.unlockedAt {
+                value["unlockedAt"] = date.timeIntervalSince1970 * 1000
+            }
+            return value
+        }
+        let _: JSONValue = try await ConvexBackend.shared.call(
+            .mutation, path: "achievements:upsertBadges", args: ["badges": payload]
+        )
     }
 
     private func applyLocalProgress(userID: String?) {

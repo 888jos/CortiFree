@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import FirebaseAuth
 import UIKit
 
 @MainActor
@@ -19,6 +18,7 @@ class JournalViewModel: ObservableObject {
     private let journalService = JournalService.shared
 
     // MARK: - New Simplified Methods
+
 
     /// Save simplified journal entry with optional photo
     func saveEntry(content: String, mood: Mood?, photoURL: String?, wordCount: Int, entryId: String? = nil) async {
@@ -52,6 +52,8 @@ class JournalViewModel: ObservableObject {
 
         do {
             try await journalService.saveEntry(entry)
+            // Credits today's "journal" habit in the plan (PersonalPlanStore).
+            NotificationCenter.default.post(name: .journalEntrySaved, object: nil)
             await loadAllEntries()
         } catch {
             errorMessage = String(format: LanguageManager.shared.localizedString(for: "error.journal.save_failed"), error.localizedDescription)
@@ -168,4 +170,8 @@ class JournalViewModel: ObservableObject {
             errorMessage = String(format: LanguageManager.shared.localizedString(for: "error.journal.delete_failed"), error.localizedDescription)
         }
     }
+}
+
+extension Notification.Name {
+    static let journalEntrySaved = Notification.Name("JournalEntrySaved")
 }

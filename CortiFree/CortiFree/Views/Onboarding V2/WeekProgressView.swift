@@ -10,28 +10,36 @@ import SwiftUI
 import Foundation
 
 struct WeekProgressView: View {
+    /// Quiz result used to start the radar from the user's own domain scores.
+    var habitsQuizResult: HabitsQuizResult? = nil
+    var onBack: (() -> Void)? = nil
     let onContinue: () -> Void
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentWeek: Int = 1
     @State private var screenViewTime: Date?
 
-    // Configuration des semaines avec progrès individuels pour chaque catégorie
-    // Ordre: [Global, Sérénité, Sommeil, Énergie, Focus, Glow]
+    // Weeks 1, 2 and 4 of the 28-day plan. Axis order: [Global, Serenity, Sleep, Energy, Focus, Balance].
+    // Week 1 is the user's own starting point from the quiz; later weeks are an indicative projection.
+    private var startingLevels: [Double] {
+        guard let result = habitsQuizResult else { return [0.25, 0.25, 0.25, 0.25, 0.25, 0.25] }
+        return [result.globalScore, result.serenityScore, result.sleepScore,
+                result.energyScore, result.focusScore, result.balanceScore]
+            .map { min(0.85, max(0.15, Double($0) / 100)) }
+    }
+
+    private func projectedLevels(closingGap fraction: Double) -> [Double] {
+        startingLevels.map { $0 + (0.95 - $0) * fraction }
+    }
+
     private var weekData: [(week: Int, dateRange: String, message: String, color: Color, progress: [Double])] {
         let today = Date()
         let calendar = Calendar.current
 
-        // Week 1: Today to Today + 7 days
-        let week1Start = today
-        let week1End = calendar.date(byAdding: .day, value: 7, to: today)!
-
-        // Week 5: Today + 5 weeks to Today + 5 weeks + 7 days
-        let week5Start = calendar.date(byAdding: .weekOfYear, value: 5, to: today)!
-        let week5End = calendar.date(byAdding: .day, value: 7, to: week5Start)!
-
-        // Week 10: Today + 10 weeks to Today + 10 weeks + 7 days
-        let week10Start = calendar.date(byAdding: .weekOfYear, value: 10, to: today)!
-        let week10End = calendar.date(byAdding: .day, value: 7, to: week10Start)!
+        func range(forWeek week: Int) -> String {
+            let start = calendar.date(byAdding: .day, value: (week - 1) * 7, to: today)!
+            let end = calendar.date(byAdding: .day, value: 6, to: start)!
+            return "\(formatter.string(from: start)) \(toSeparator) \(formatter.string(from: end))"
+        }
 
         let formatter = DateFormatter()
         // Use language-appropriate locale
@@ -42,17 +50,19 @@ struct WeekProgressView: View {
         let toSeparator = "onboarding_v2.week_progress.date_separator".localized
 
         return [
-            (1, "\(formatter.string(from: week1Start)) \(toSeparator) \(formatter.string(from: week1End))", StringKeys.Onboarding.WeekProgress.week1Message, Color(hex: "D32F2F"), [0.18, 0.25, 0.22, 0.15, 0.20, 0.24]),
-            (5, "\(formatter.string(from: week5Start)) \(toSeparator) \(formatter.string(from: week5End))", StringKeys.Onboarding.WeekProgress.week5Message, Color(hex: "E67E22"), [0.52, 0.48, 0.55, 0.45, 0.50, 0.53]),
-            (10, "\(formatter.string(from: week10Start)) \(toSeparator) \(formatter.string(from: week10End))", StringKeys.Onboarding.WeekProgress.week10Message, Color(hex: "27AE60"), [0.95, 0.92, 0.98, 0.90, 0.94, 0.96])
+            (1, range(forWeek: 1), StringKeys.Onboarding.WeekProgress.week1Message, Color(hex: "D32F2F"), startingLevels),
+            (2, range(forWeek: 2), StringKeys.Onboarding.WeekProgress.week5Message, Color(hex: "E67E22"), projectedLevels(closingGap: 0.35)),
+            (4, range(forWeek: 4), StringKeys.Onboarding.WeekProgress.week10Message, Color(hex: "27AE60"), projectedLevels(closingGap: 0.7))
         ]
     }
+
+    private var isLastWeek: Bool { currentWeek == weekData.last?.week }
 
     private var currentWeekData: (week: Int, dateRange: String, message: String, color: Color, progress: [Double]) {
         weekData.first { $0.week == currentWeek } ?? weekData[0]
     }
 
-    // Force week titles to display correctly (Week 1, Week 5, Week 10)
+    // Week title ("Week 1", "Week 2", "Week 4")
     private func getWeekTitle() -> String {
         "onboarding.week_progress.week_number".localized(currentWeek)
     }
@@ -202,11 +212,11 @@ struct WeekProgressView: View {
                             .foregroundColor(.white)
                             .offset(x: -labelOffsets.horizontal, y: labelOffsetsSmall.vertical)
 
-                            // Glow - Top left
+                            // Balance - Top left
                             HStack(spacing: 4) {
-                                Image(systemName: "sparkles")
+                                Image(systemName: "circle.lefthalf.filled")
                                     .font(.system(size: 14))
-                                Text(StringKeys.Common.glow)
+                                Text(StringKeys.Common.balance)
                                     .font(.faroSemiBold(16))
                             }
                             .foregroundColor(.white)
@@ -214,6 +224,12 @@ struct WeekProgressView: View {
                         }
                     }
                     .responsivePadding(.vertical, 48)
+
+                    Text((currentWeek == 1 ? "onboarding_v2.week_progress.start_note" : "onboarding_v2.week_progress.projection_note").localized)
+                        .font(.custom("Poppins-Regular", size: 12))
+                        .foregroundColor(.white.opacity(0.6))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
 
                     // Button
                     Button(action: {
@@ -232,12 +248,12 @@ struct WeekProgressView: View {
                             onContinue()
                         }
                     }) {
-                        HStack(spacing: currentWeek == 10 ? 4 : 8) {
+                        HStack(spacing: isLastWeek ? 4 : 8) {
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 16, weight: .semibold))
 
-                            Text(currentWeek == 10 ? StringKeys.Onboarding.EightHabitsFlow.howHabitsHelp : StringKeys.Common.continueButton)
-                                .font(.custom("Poppins-SemiBold", size: currentWeek == 10 ? 15 : 16))
+                            Text(isLastWeek ? StringKeys.Onboarding.EightHabitsFlow.howHabitsHelp : StringKeys.Common.continueButton)
+                                .font(.custom("Poppins-SemiBold", size: isLastWeek ? 15 : 16))
                                 .lineLimit(1)
                         }
                         .foregroundColor(.white)
@@ -256,6 +272,7 @@ struct WeekProgressView: View {
                 }
             }
         }
+        .onboardingBackButton(onBack)
         .onAppear {
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingWeekProgressViewed()

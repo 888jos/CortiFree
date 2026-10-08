@@ -16,13 +16,14 @@ class NotificationService {
             return
         }
 
-        // Morning notification (9h)
+        // Morning notification (9h by default, time chosen during onboarding)
+        let morning = morningReminderComponents
         scheduleDailyNotification(
             id: "daily_morning_meditation",
             title: LanguageManager.shared.localizedString(for: "inline.notificationservice.00"),
             body: LanguageManager.shared.localizedString(for: "inline.notificationservice.01"),
-            hour: 9,
-            minute: 0
+            hour: morning.hour,
+            minute: morning.minute
         )
 
         // Evening notification (19h)
@@ -38,7 +39,7 @@ class NotificationService {
         AnalyticsManager.shared.track(
             event: "daily_notifications_scheduled",
             properties: [
-                "morning_hour": 9,
+                "morning_hour": morning.hour,
                 "evening_hour": 19
             ]
         )
@@ -69,6 +70,29 @@ class NotificationService {
         )
 
         print("✅ Streak danger notification scheduled (20h)")
+    }
+
+    // MARK: - MORNING REMINDER TIME
+
+    private static let morningReminderKey = "morningReminderMinutes"
+
+    /// Hour and minute of the morning reminder (default 9:00).
+    var morningReminderComponents: (hour: Int, minute: Int) {
+        let stored = UserDefaults.standard.object(forKey: Self.morningReminderKey) as? Int ?? 9 * 60
+        return (stored / 60, stored % 60)
+    }
+
+    /// Today's date at the morning reminder time, for time pickers.
+    var morningReminderDate: Date {
+        let time = morningReminderComponents
+        return Calendar.current.date(bySettingHour: time.hour, minute: time.minute, second: 0, of: Date()) ?? Date()
+    }
+
+    /// Saves the morning reminder time and reschedules the daily reminders.
+    func setMorningReminder(_ date: Date) {
+        let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
+        UserDefaults.standard.set((parts.hour ?? 9) * 60 + (parts.minute ?? 0), forKey: Self.morningReminderKey)
+        scheduleDailyNotifications()
     }
 
     // MARK: - TRIAL NOTIFICATIONS (Day 2 & Day 3)

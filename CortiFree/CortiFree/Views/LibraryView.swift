@@ -23,7 +23,6 @@ struct LibraryView: View {
     @State private var shownBreathing = 4
 
     @State private var path = NavigationPath()
-    @State private var selectedSession: GuidedSession?
     @State private var selectedBreathing: BreathingPattern?
     @State private var runningBreathing: BreathingPattern?
 
@@ -38,6 +37,7 @@ struct LibraryView: View {
 
     private enum Route: Hashable {
         case theme(AudioSessionCategory)
+        case quickStart(AudioSessionCategory)
         case library(SessionLibrary)
         case allThemes
     }
@@ -56,6 +56,18 @@ struct LibraryView: View {
                             sessions: { GuidedSessionCatalog.sessions(in: category) },
                             play: play
                         )
+                    case .quickStart(let category):
+                        LibrarySessionListPage(
+                            title: category.quickStartLabel,
+                            subtitle: category.subtitle.localized,
+                            emptyMessage: t("library.v2.no_results"),
+                            sessions: { quickStartSessions(in: category) },
+                            play: play
+                        )
+                    case .library(.downloads):
+                        LibraryCollectionPage(collection: .downloads, play: play)
+                    case .library(.favorites):
+                        LibraryCollectionPage(collection: .favorites, play: play)
                     case .library(let item):
                         LibrarySessionListPage(
                             title: t(item.titleKey),
@@ -87,7 +99,6 @@ struct LibraryView: View {
             .scrollDismissesKeyboard(.immediately)
             .id(languageManager.refreshID)
         }
-        .sheet(item: $selectedSession) { GuidedSessionDetailView(session: $0) }
         .sheet(item: $selectedBreathing) { BreathingExerciseDetailView(pattern: $0) }
         .fullScreenCover(item: $runningBreathing) { pattern in
             BreathingDetailFlowView(pattern: pattern, duration: TimeInterval(pattern.defaultMinutes * 60)) {
@@ -184,12 +195,14 @@ struct LibraryView: View {
         }
     }
 
-    /// Plays the shortest session of the goal, one the user hasn't just heard if possible.
+    /// Opens the goal's page so the user picks a session instead of starting one directly.
     private func quickStart(_ category: AudioSessionCategory) {
-        let sessions = GuidedSessionCatalog.sessions(in: category).sorted { $0.durationMinutes < $1.durationMinutes }
-        let lastPlayed = GuidedSessionProgressStore.recentSessionIDs.first
-        guard let session = sessions.first(where: { $0.id != lastPlayed }) ?? sessions.first else { return }
-        play(session)
+        path.append(Route.quickStart(category))
+    }
+
+    /// Shortest sessions first, so a quick pick stays at the top of the list.
+    private func quickStartSessions(in category: AudioSessionCategory) -> [GuidedSession] {
+        GuidedSessionCatalog.sessions(in: category).sorted { $0.durationMinutes < $1.durationMinutes }
     }
 
     // MARK: - For you now
@@ -352,7 +365,8 @@ struct LibraryView: View {
     }
 
     private func row(_ session: GuidedSession) -> some View {
-        LibrarySessionRow(session: session, open: { selectedSession = session }, play: { play(session) })
+        // Tapping a session goes straight to the full-screen player (no intermediate detail sheet).
+        LibrarySessionRow(session: session, open: { play(session) }, play: { play(session) })
     }
 
     // MARK: - Breathing
@@ -373,9 +387,7 @@ struct LibraryView: View {
     // MARK: - Sounds
 
     private var soundItems: [(exercise: Exercise, image: String)] {
-        let images = ["rain": "sound_rain", "ocean": "sound_ocean", "fire": "sound_fire", "whitenoise": "sound_whitenoise",
-                      "wind": "sound_morning", "forest": "sound_forest", "stream": "sound_stream", "night": "sound_night"]
-        return viewModel.sounds.map { ($0, images[$0.id] ?? "sound_rain") }
+        viewModel.sounds.map { ($0, $0.soundImageName) }
     }
 
     private var sounds: some View {
@@ -423,6 +435,12 @@ struct LibraryView: View {
         .buttonStyle(PressableCardStyle())
         .accessibilityLabel(exercise.title)
         .accessibilityAddTraits(playing ? .isSelected : [])
+        .overlay(alignment: .topTrailing) {
+            LibraryDownloadButton(state: library.isDownloaded(exercise) ? .downloaded : .none, size: 17) {
+                library.toggleDownload(exercise)
+            }
+            .shadow(color: .black.opacity(0.5), radius: 4)
+        }
     }
 
     // MARK: - Actions

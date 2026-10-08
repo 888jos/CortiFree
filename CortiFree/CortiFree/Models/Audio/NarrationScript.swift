@@ -86,6 +86,9 @@ final class NarrationLibrary {
     private init() {}
 
     /// Script for a session in the requested narration language, falling back to English.
+    /// The fallback is never silent: the UI shows an "English narration" tag
+    /// (`GuidedSession.hasNarrationInCurrentLanguage`), and the English script is always read
+    /// by an English voice (`NarrationScript.language` picks the voice).
     func script(for sessionID: String, language: String) -> NarrationScript? {
         for lang in [language, "en"] {
             if let lines = sessions(for: lang)[sessionID], !lines.isEmpty {
@@ -93,6 +96,11 @@ final class NarrationLibrary {
             }
         }
         return nil
+    }
+
+    /// True when the session has its own script in `language` (no English fallback).
+    func hasScript(for sessionID: String, language: String) -> Bool {
+        !(sessions(for: language)[sessionID]?.isEmpty ?? true)
     }
 
     private func sessions(for language: String) -> [String: [String]] {
@@ -108,5 +116,14 @@ final class NarrationLibrary {
         }
         cache[language] = map
         return map
+    }
+}
+
+extension GuidedSession {
+    /// False when the listener would hear English in another app language (no recording or
+    /// script in that language yet, see `playbackLanguage`). Shown as an "EN" tag in the
+    /// Library and the player.
+    var hasNarrationInCurrentLanguage: Bool {
+        playbackLanguage == GuidedSession.narrationLanguage()
     }
 }

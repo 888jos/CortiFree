@@ -2,15 +2,13 @@
 //  SettingsViewModel.swift
 //  CortiFree
 //
-//  ViewModel for Settings management with Firebase sync
+//  ViewModel for settings management with Convex sync
 //  Created by Claude on 21/11/2025.
 //
 
 import Foundation
 import SwiftUI
 import Combine
-import FirebaseAuth
-import FirebaseFirestore
 import UserNotifications
 
 @MainActor
@@ -56,9 +54,25 @@ class SettingsViewModel: ObservableObject {
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
-    private let db = Firestore.firestore()
     private var userId: String? {
         Auth.auth().currentUser?.uid
+    }
+
+    private struct RemoteSettings: Decodable {
+        struct Slot: Decodable { let enabled: Bool; let time: String }
+        struct Notifications: Decodable {
+            let enabled: Bool
+            let morning: Slot?
+            let afternoon: Slot?
+            let evening: Slot?
+        }
+        struct Experience: Decodable {
+            let defaultSound: String?
+            let voiceGuidance: Bool?
+            let ambientVolume: Double?
+        }
+        let notifications: Notifications?
+        let experience: Experience?
     }
 
     // MARK: - UserDefaults Keys
@@ -140,7 +154,7 @@ class SettingsViewModel: ObservableObject {
         // Load from UserDefaults first (instant)
         loadFromUserDefaults()
 
-        // Then sync from Firebase if enabled
+        // Then sync from Convex if enabled
         if syncEnabled, userId != nil {
             Task {
                 await loadFromFirebase()
@@ -205,10 +219,10 @@ class SettingsViewModel: ObservableObject {
         defaults.synchronize()
     }
 
-    // MARK: - Firebase Sync
+    // MARK: - Convex Sync
 
     func syncToFirebase() {
-        guard syncEnabled, let userId = userId else { return }
+        guard syncEnabled, userId != nil else { return }
 
         Task {
             isSyncing = true
@@ -236,27 +250,22 @@ class SettingsViewModel: ObservableObject {
                         "voiceGuidance": voiceGuidance,
                         "ambientVolume": ambientVolume
                     ],
-                    "privacy": [
-                        "syncEnabled": syncEnabled
-                    ],
-                    "lastUpdated": FieldValue.serverTimestamp()
+                    "privacy": ["syncEnabled": syncEnabled]
                 ]
 
-                try await db.collection("users")
-                    .document(userId)
-                    .collection("settings")
-                    .document("preferences")
-                    .setData(settingsData, merge: true)
+                let _: String = try await ConvexBackend.shared.call(
+                    .mutation, path: "settings:save", args: settingsData
+                )
 
                 lastSyncDate = Date()
                 #if DEBUG
-                print("✅ Settings synced to Firebase")
+                print("✅ Settings synced to Convex")
                 #endif
 
             } catch {
                 syncError = error.localizedDescription
                 #if DEBUG
-                print("❌ Firebase sync error: \(error.localizedDescription)")
+                print("❌ Convex sync error: \(error.localizedDescription)")
                 #endif
             }
 
@@ -265,75 +274,50 @@ class SettingsViewModel: ObservableObject {
     }
 
     private func loadFromFirebase() async {
-        guard let userId = userId else { return }
+        guard userId != nil else { return }
 
         isSyncing = true
 
         do {
-            let snapshot = try await db.collection("users")
-                .document(userId)
-                .collection("settings")
-                .document("preferences")
-                .getDocument()
-
-            guard let data = snapshot.data() else {
+            let data: RemoteSettings? = try await ConvexBackend.shared.call(
+                .query, path: "settings:get"
+            )
+            guard let data else {
                 isSyncing = false
                 return
             }
 
-            // Parse notifications
-            if let notifications = data["notifications"] as? [String: Any] {
-                if let enabled = notifications["enabled"] as? Bool {
-                    self.notificationsEnabled = enabled
+            if let notifications = data.notifications {
+                notificationsEnabled = notifications.enabled
+                if let slot = notifications.morning {
+                    morningRoutineEnabled = slot.enabled
+                    morningTime = parseTime(slot.time)
                 }
-                if let morning = notifications["morning"] as? [String: Any] {
-                    if let enabled = morning["enabled"] as? Bool {
-                        self.morningRoutineEnabled = enabled
-                    }
-                    if let timeStr = morning["time"] as? String {
-                        self.morningTime = parseTime(timeStr)
-                    }
+                if let slot = notifications.afternoon {
+                    afternoonRoutineEnabled = slot.enabled
+                    afternoonTime = parseTime(slot.time)
                 }
-                if let afternoon = notifications["afternoon"] as? [String: Any] {
-                    if let enabled = afternoon["enabled"] as? Bool {
-                        self.afternoonRoutineEnabled = enabled
-                    }
-                    if let timeStr = afternoon["time"] as? String {
-                        self.afternoonTime = parseTime(timeStr)
-                    }
-                }
-                if let evening = notifications["evening"] as? [String: Any] {
-                    if let enabled = evening["enabled"] as? Bool {
-                        self.eveningRoutineEnabled = enabled
-                    }
-                    if let timeStr = evening["time"] as? String {
-                        self.eveningTime = parseTime(timeStr)
-                    }
+                if let slot = notifications.evening {
+                    eveningRoutineEnabled = slot.enabled
+                    eveningTime = parseTime(slot.time)
                 }
             }
 
-            // Parse experience
-            if let experience = data["experience"] as? [String: Any] {
-                if let sound = experience["defaultSound"] as? String {
-                    self.defaultSound = sound
-                }
-                if let voice = experience["voiceGuidance"] as? Bool {
-                    self.voiceGuidance = voice
-                }
-                if let volume = experience["ambientVolume"] as? Double {
-                    self.ambientVolume = volume
-                }
+            if let experience = data.experience {
+                if let sound = experience.defaultSound { defaultSound = sound }
+                if let voice = experience.voiceGuidance { voiceGuidance = voice }
+                if let volume = experience.ambientVolume { ambientVolume = volume }
             }
 
             lastSyncDate = Date()
             #if DEBUG
-            print("✅ Settings loaded from Firebase")
+            print("✅ Settings loaded from Convex")
             #endif
 
         } catch {
             syncError = error.localizedDescription
             #if DEBUG
-            print("❌ Firebase load error: \(error.localizedDescription)")
+            print("❌ Convex load error: \(error.localizedDescription)")
             #endif
         }
 
