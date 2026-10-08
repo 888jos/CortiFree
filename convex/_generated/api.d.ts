@@ -29,6 +29,7 @@ import type * as migration_transform from "../migration/transform.js";
 import type * as plan from "../plan.js";
 import type * as profile from "../profile.js";
 import type * as progress from "../progress.js";
+import type * as recovery from "../recovery.js";
 import type * as settings from "../settings.js";
 import type * as tasks from "../tasks.js";
 import type * as todos from "../todos.js";
@@ -61,6 +62,7 @@ declare const fullApi: ApiFromModules<{
   plan: typeof plan;
   profile: typeof profile;
   progress: typeof progress;
+  recovery: typeof recovery;
   settings: typeof settings;
   tasks: typeof tasks;
   todos: typeof todos;

@@ -20,9 +20,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Set notification delegate
         UNUserNotificationCenter.current().delegate = self
 
-        // Keep the daily reminders scheduled (they used to be set only from Settings).
-        NotificationService.shared.syncDailyNotificationsWithPreference()
-
         // Register custom fonts
         FontManager.registerFonts()
 
@@ -52,6 +49,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             Superwall.shared.setUserAttributes(["gender": gender])
         }
         purchaseController.syncSubscriptionStatus()
+
+        // Keep the daily reminders scheduled (they used to be set only from Settings).
+        // After Superwall.configure: the reminder copy loads LanguageManager, which updates Superwall.
+        NotificationService.shared.syncDailyNotificationsWithPreference()
 
         // Restore the Convex session before linking RevenueCat to an account.
         Task { @MainActor in
@@ -92,14 +93,21 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let notificationId = response.notification.request.identifier
+        let userInfo = response.notification.request.content.userInfo
 
         AnalyticsManager.shared.track(
             event: "notification_clicked",
             properties: [
                 "notification_id": notificationId,
-                "action": response.actionIdentifier
+                "action": response.actionIdentifier,
+                "campaign": userInfo["campaign"] as? String ?? "",
+                "message_id": userInfo["message_id"] as? String ?? "",
+                "segment": userInfo["segment"] as? String ?? ""
             ]
         )
+        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            Task { @MainActor in NotificationRouter.shared.handle(userInfo: userInfo) }
+        }
 
         #if DEBUG
         print("🔔 Notification clicked: \(notificationId)")
@@ -125,6 +133,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         #if DEBUG
         print("🔔 Notification received (foreground): \(notificationId)")
         #endif
+
+        // Recovery notifications ask the user to come back: pointless while they're here.
+        if notificationId.hasPrefix("recovery_") {
+            completionHandler([])
+            return
+        }
 
         // Show notification banner and play sound even when app is in foreground
         completionHandler([.banner, .sound])
@@ -358,6 +372,10 @@ struct CortiFreeApp: App {
             #endif
             }
             .onOpenURL(perform: handleIncomingURL)
+            .onReceive(NotificationRouter.shared.$pendingURL.compactMap { $0 }) { url in
+                NotificationRouter.shared.pendingURL = nil
+                handleIncomingURL(url)
+            }
             .onAppear {
                 presentDailyCheckInIfNeeded()
             }
@@ -386,11 +404,12 @@ struct CortiFreeApp: App {
         case .background:
             // User left the app - schedule re-engagement notifications if onboarding incomplete
             startOnboardingDropOffLiveActivityIfNeeded()
-            scheduleReengagementIfNeeded()
+            RecoveryScheduler.shared.appDidEnterBackground()
 
         case .active:
             // Efface la pastille rouge dès que l'app est ouverte
             UNUserNotificationCenter.current().setBadgeCount(0)
+            RecoveryScheduler.shared.appDidBecomeActive()
             #if DEBUG
             print("📱 App became active")
             #endif
@@ -438,7 +457,23 @@ struct CortiFreeApp: App {
     }
 
     private func handleIncomingURL(_ url: URL) {
-        guard url.scheme == "cortifree", url.host == SuperwallPlacement.liveGift else { return }
+        guard url.scheme == "cortifree" else { return }
+        let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        let messageID = query.first { $0.name == "message_id" }?.value ?? ""
+        switch url.host {
+        case "paywall":
+            let requested = query.first { $0.name == "placement" }?.value ?? SuperwallPlacement.onboarding
+            presentRecoveryPaywall(requested: requested, messageID: messageID)
+            return
+        case "onboarding":
+            // The onboarding resumes from its saved checkpoint on its own.
+            AnalyticsManager.shared.track(event: "recovery_onboarding_resumed", properties: ["message_id": messageID])
+            return
+        case SuperwallPlacement.liveGift:
+            break
+        default:
+            return
+        }
 
         let revenueCat = RevenueCatManager.shared
         guard revenueCat.isPremiumStatusReady else {
@@ -482,19 +517,39 @@ struct CortiFreeApp: App {
         )
     }
 
-    private func scheduleReengagementIfNeeded() {
-        // Only schedule if onboarding is NOT complete
-        let onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingV2Completed")
+    /// Paywall opened from a recovery notification. Expired offers and placements missing
+    /// from the Superwall dashboard fall back to the main paywall.
+    private func presentRecoveryPaywall(requested: String, messageID: String) {
+        Task { @MainActor in
+            let revenueCat = RevenueCatManager.shared
+            if !revenueCat.isPremiumStatusReady {
+                await revenueCat.refreshCustomerInfo(forceServerFetch: true)
+            }
+            guard revenueCat.isPremiumStatusReady, !revenueCat.hasPremiumEntitlement else { return }
 
-        if !onboardingCompleted {
-            NotificationService.shared.scheduleOnboardingReengagementNotifications()
-            #if DEBUG
-            print("📱 App went to background - re-engagement notifications scheduled")
-            #endif
-        } else {
-            #if DEBUG
-            print("📱 App went to background - onboarding complete, no re-engagement needed")
-            #endif
+            let placement = RecoveryScheduler.shared.placementToPresent(for: requested)
+            AnalyticsManager.shared.track(event: "recovery_paywall_opened", properties: [
+                "requested_placement": requested, "placement": placement, "message_id": messageID
+            ])
+            registerRecoveryPlacement(placement, messageID: messageID)
         }
+    }
+
+    private func registerRecoveryPlacement(_ placement: String, messageID: String) {
+        let handler = PaywallPresentationHandler()
+        handler.onSkip { reason in
+            guard placement != SuperwallPlacement.onboarding else { return }
+            switch reason {
+            case .placementNotFound, .noAudienceMatch:
+                Task { @MainActor in registerRecoveryPlacement(SuperwallPlacement.onboarding, messageID: messageID) }
+            default:
+                break
+            }
+        }
+        Superwall.shared.register(
+            placement: placement,
+            params: ["source": "recovery_notification", "message_id": messageID],
+            handler: handler
+        )
     }
 }

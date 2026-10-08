@@ -11,6 +11,7 @@ struct NotificationPermissionsView: View {
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var isRequestingPermission = false
     @State private var reminderTime = NotificationService.shared.morningReminderDate
+    @State private var acceptsOffers = true
 
     var body: some View {
         ZStack {
@@ -19,7 +20,7 @@ struct NotificationPermissionsView: View {
 
             VStack(spacing: 0) {
                 OnboardingMascotDialogueView(
-                    message: "onboarding_v2.notifications.mascot_message".localized,
+                    message: "onboarding_v2.notifications.mascot_message_trial".localized,
                     prominent: false
                 )
                 .padding(.horizontal, 24)
@@ -48,7 +49,19 @@ struct NotificationPermissionsView: View {
                     .foregroundStyle(.white.opacity(0.62))
                     .buttonStyle(.plain)
                     .padding(.top, 16)
-                    .padding(.bottom, 32)
+
+                // Consent for promotional notifications (App Store guideline 4.5.4).
+                Toggle(isOn: $acceptsOffers) {
+                    Text("onboarding_v2.notifications.offers_consent".localized)
+                        .font(.poppinsRegular(12))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .toggleStyle(.switch)
+                .tint(Color(hex: "B794F6"))
+                .padding(.horizontal, 28)
+                .padding(.top, 14)
+                .padding(.bottom, 24)
             }
         }
         .onAppear {
@@ -89,6 +102,19 @@ struct NotificationPermissionsView: View {
             .padding(14)
             .glassCard(cornerRadius: 22)
 
+            HStack(spacing: 10) {
+                Image(systemName: "bell.badge.fill")
+                    .foregroundStyle(Color(hex: "B794F6"))
+                Text("onboarding_v2.notifications.trial_reminder".localized)
+                    .font(.poppinsMedium(14))
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .glassCard(cornerRadius: 16)
+
             HStack {
                 Text("onboarding_v2.notifications.time_label".localized)
                     .font(.poppinsMedium(15))
@@ -105,6 +131,7 @@ struct NotificationPermissionsView: View {
     }
 
     private func skipPermission() {
+        RecoveryScheduler.shared.offersOptIn = acceptsOffers
         AnalyticsManager.shared.trackOnboardingNotificationPermissionsGranted(granted: false)
         onContinue()
     }
@@ -121,11 +148,12 @@ struct NotificationPermissionsView: View {
 
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             switch settings.authorizationStatus {
-            case .notDetermined:
+            case .notDetermined, .provisional:
+                // Provisional (quiet) authorization is upgraded to real alerts by the system prompt.
                 NotificationService.shared.requestNotificationPermission { granted in
                     finishPermissionRequest(granted: granted)
                 }
-            case .authorized, .provisional, .ephemeral:
+            case .authorized, .ephemeral:
                 finishPermissionRequest(granted: true)
             default:
                 finishPermissionRequest(granted: false)
@@ -134,6 +162,7 @@ struct NotificationPermissionsView: View {
     }
 
     private func finishPermissionRequest(granted: Bool) {
+        DispatchQueue.main.async { RecoveryScheduler.shared.offersOptIn = acceptsOffers }
         UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
         NotificationService.shared.setMorningReminder(reminderTime)
         AnalyticsManager.shared.trackOnboardingNotificationPermissionsGranted(granted: granted)

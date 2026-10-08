@@ -19,6 +19,7 @@ struct OnboardingCompletionView: View {
     @State private var hasTrackedCompletion = false
     @State private var hasCompletedOnboarding = false // Prevent double completion
     @State private var restoreMessage: String?
+    @ObservedObject private var revenueCat = RevenueCatManager.shared
 
     // DEBUG: Set to true to bypass paywall during development
     // Change to false before shipping to App Store!
@@ -57,6 +58,13 @@ struct OnboardingCompletionView: View {
             isPresented: Binding(get: { restoreMessage != nil }, set: { if !$0 { restoreMessage = nil } })
         ) {
             Button("common.ok".localized, role: .cancel) {}
+        }
+        .onChange(of: revenueCat.hasPremiumEntitlement) { _, isPremium in
+            // Trial started from a paywall opened elsewhere (recovery notification, Live Activity).
+            guard isPremium, !hasCompletedOnboarding else { return }
+            hasCompletedOnboarding = true
+            trackOnboardingCompletion()
+            onViewPlan()
         }
         .onAppear {
             // Track completion screen viewed

@@ -194,6 +194,15 @@ class RevenueCatManager: ObservableObject {
 
         if hasPremiumEntitlement {
             OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
+            RecoveryScheduler.shared.cancelAll(reason: "subscribed")
+        }
+
+        // Reminder promised on the paywall, 2 days before the trial converts.
+        if let pro = customerInfo.entitlements[entitlementID], pro.isActive, pro.periodType == .trial,
+           pro.willRenew, let trialEnd = pro.expirationDate {
+            NotificationService.shared.scheduleTrialNotifications(trialEndsAt: trialEnd)
+        } else {
+            NotificationService.shared.cancelTrialEndingReminder()
         }
 
         // Mark that we've received a definitive answer from RevenueCat

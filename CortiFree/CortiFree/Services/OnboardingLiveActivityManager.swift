@@ -168,11 +168,11 @@ final class OnboardingLiveActivityManager {
     private func title(currentStep: Int, totalSteps: Int) -> String {
         switch Double(progressPercentage(currentStep: currentStep, totalSteps: totalSteps)) / 100 {
         case 0..<0.35:
-            return "Starting your plan"
+            return LanguageManager.shared.localizedString(for: "live_activity.title.starting")
         case 0.35..<0.7:
-            return "Building your plan"
+            return LanguageManager.shared.localizedString(for: "live_activity.title.building")
         default:
-            return "Almost ready"
+            return LanguageManager.shared.localizedString(for: "live_activity.title.almost_ready")
         }
     }
 

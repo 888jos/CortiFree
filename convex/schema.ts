@@ -186,6 +186,19 @@ export default defineSchema({
         updatedAt: v.number(),
       })
     ),
+    // Trial recovery (recovery.ts): where the user stopped before starting the trial
+    recovery: v.optional(
+      v.object({
+        step: v.optional(v.string()),
+        stepAt: v.optional(v.number()),
+        paywallSeenAt: v.optional(v.number()),
+        goal: v.optional(v.string()),
+        offersOptIn: v.optional(v.boolean()),
+        holdout: v.optional(v.boolean()),
+        timezone: v.optional(v.string()),
+        updatedAt: v.number(),
+      })
+    ),
     // Anti-stress quick access
     lastSituation: v.optional(v.string()),
     lastSituationAt: v.optional(v.number()),

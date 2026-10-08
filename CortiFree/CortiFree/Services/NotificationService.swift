@@ -97,9 +97,41 @@ class NotificationService {
 
     // MARK: - TRIAL NOTIFICATIONS (Day 2 & Day 3)
 
-    /// Schedule trial-specific notifications (disabled)
-    func scheduleTrialNotifications() {
-        // Disabled — Apple's native trial reminder handles this automatically
+    private static let trialEndingID = "trial_ending_reminder"
+
+    /// Keeps the promise made on the paywall: a reminder 2 days before the trial converts
+    /// (at least 2 hours ahead for very short trials), at 10:00 local time when possible.
+    func scheduleTrialNotifications(trialEndsAt: Date, now: Date = Date()) {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [Self.trialEndingID])
+
+        let calendar = Calendar.current
+        let twoDaysBefore = trialEndsAt.addingTimeInterval(-2 * 86_400)
+        var fireDate = calendar.date(bySettingHour: 10, minute: 0, second: 0, of: twoDaysBefore) ?? twoDaysBefore
+        if fireDate <= now { fireDate = trialEndsAt.addingTimeInterval(-24 * 3600) }
+        guard fireDate > now.addingTimeInterval(60), fireDate < trialEndsAt.addingTimeInterval(-2 * 3600) else { return }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: LanguageManager.shared.currentLanguage.rawValue)
+        formatter.setLocalizedDateFormatFromTemplate("EEEEdMMMM")
+
+        let content = UNMutableNotificationContent()
+        content.title = LanguageManager.shared.localizedString(for: "recovery.trial_ending.title")
+        content.body = String(format: LanguageManager.shared.localizedString(for: "recovery.trial_ending.body"),
+                              formatter.string(from: trialEndsAt))
+        content.sound = .default
+        content.userInfo = ["campaign": "trial_ending"]
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: fireDate.timeIntervalSince(now), repeats: false)
+        let request = UNNotificationRequest(identifier: Self.trialEndingID, content: content, trigger: trigger)
+        center.getNotificationSettings { settings in
+            guard [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus) else { return }
+            center.add(request)
+        }
+    }
+
+    func cancelTrialEndingReminder() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [Self.trialEndingID])
     }
 
     // MARK: - MILESTONE NOTIFICATIONS (Streaks, Badges)
@@ -290,7 +322,9 @@ class NotificationService {
     /// they match the Settings toggle and the real system permission.
     func syncDailyNotificationsWithPreference() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let authorized = [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus)
+            // Provisional (quiet) authorization is reserved for the trial recovery notifications
+            // until the user answers the real prompt.
+            let authorized = [.authorized, .ephemeral].contains(settings.authorizationStatus)
             if authorized && !self.userDisabledNotifications {
                 // Hop off the callback queue: scheduleDailyNotifications() waits on another settings callback.
                 DispatchQueue.global(qos: .utility).async { self.scheduleDailyNotifications() }
@@ -355,226 +389,13 @@ class NotificationService {
         }
     }
 
-    /// Schedule a notification X days from now at specific time
-    private func scheduleNotificationFromNow(
-        id: String,
-        title: String,
-        body: String,
-        daysFromNow: Int,
-        hour: Int,
-        minute: Int
-    ) {
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
-        content.sound = .default
-        content.badge = 1
-
-        // Add days via Calendar so month/year rollover yields a real date (e.g. Jan 30 + 7 → Feb 6).
-        let calendar = Calendar.current
-        let targetDay = calendar.date(byAdding: .day, value: daysFromNow, to: Date()) ?? Date()
-        var dateComponents = calendar.dateComponents([.year, .month, .day], from: targetDay)
-        dateComponents.hour = hour
-        dateComponents.minute = minute
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
-
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("❌ Notification scheduling error (\(id)): \(error.localizedDescription)")
-            } else {
-                print("✅ Scheduled: \(id) for +\(daysFromNow) days at \(hour):\(String(format: "%02d", minute))")
-            }
-        }
-    }
-
     // MARK: - RE-ENGAGEMENT NOTIFICATIONS (Onboarding Incomplete)
 
-    /// Schedule re-engagement notifications for users who quit onboarding
-    /// Combines 3 strategies with anti-spam logic
-    func scheduleOnboardingReengagementNotifications() {
-        guard hasNotificationPermission() else {
-            print("⚠️ No notification permission - skipping re-engagement notifications")
-            return
-        }
-
-        // Check if user already completed onboarding
-        if UserDefaults.standard.bool(forKey: "onboardingV2Completed") {
-            print("⚠️ Onboarding already completed - skipping re-engagement")
-            return
-        }
-
-        // Get last checkpoint
-        let lastCheckpoint = UserDefaults.standard.string(forKey: "last_onboarding_checkpoint") ?? "unknown"
-        let sawPaywall = UserDefaults.standard.bool(forKey: "saw_paywall_without_accepting")
-        let isAuthenticated = UserDefaults.standard.bool(forKey: "user_is_authenticated")
-
-        // STRATEGY 1: Checkpoint-based (2h, 24h, 48h)
-        if lastCheckpoint != "unknown" && lastCheckpoint != "completed" {
-            scheduleCheckpointBasedNotifications(checkpoint: lastCheckpoint)
-        }
-
-        // STRATEGY 2: Paywall-focused (1h, 6h, 24h)
-        if sawPaywall {
-            schedulePaywallReengagementNotifications()
-        }
-
-        // STRATEGY 3: Auth-based (12h, 48h, 7d)
-        if isAuthenticated {
-            scheduleAuthBasedNotifications()
-        }
-
-        // Track scheduling
-        AnalyticsManager.shared.track(
-            event: "reengagement_notifications_scheduled",
-            properties: [
-                "last_checkpoint": lastCheckpoint,
-                "saw_paywall": sawPaywall,
-                "is_authenticated": isAuthenticated
-            ]
-        )
-
-        print("✅ Re-engagement notifications scheduled")
-    }
-
-    /// Strategy 1: Checkpoint-based notifications
-    private func scheduleCheckpointBasedNotifications(checkpoint: String) {
-        // 2 hours after quitting — curiosity gap
-        scheduleNotificationFromNow(
-            id: "reengagement_checkpoint_2h",
-            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.06"),
-            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.07"),
-            daysFromNow: 0,
-            hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(2 * 3600)),
-            minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(2 * 3600))
-        )
-
-        // 24 hours — emotional pull
-        scheduleNotificationFromNow(
-            id: "reengagement_checkpoint_24h",
-            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.08"),
-            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.09"),
-            daysFromNow: 1,
-            hour: 10,
-            minute: 0
-        )
-
-        // 48 hours — urgency + loss aversion
-        scheduleNotificationFromNow(
-            id: "reengagement_checkpoint_48h",
-            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.10"),
-            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.11"),
-            daysFromNow: 2,
-            hour: 18,
-            minute: 0
-        )
-
-        print("✅ Checkpoint-based notifications scheduled (2h, 24h, 48h)")
-    }
-
-    /// Strategy 2: Paywall-focused notifications
-    private func schedulePaywallReengagementNotifications() {
-        // Cancel checkpoint notifications to avoid spam
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [
-            "reengagement_checkpoint_2h",
-            "reengagement_checkpoint_24h",
-            "reengagement_checkpoint_48h"
-        ])
-
-        // 1 hour — remind of value, zero risk
-        scheduleNotificationFromNow(
-            id: "reengagement_paywall_1h",
-            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.12"),
-            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.13"),
-            daysFromNow: 0,
-            hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(3600)),
-            minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(3600))
-        )
-
-        // 6 hours — future self visualization
-        scheduleNotificationFromNow(
-            id: "reengagement_paywall_6h",
-            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.14"),
-            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.15"),
-            daysFromNow: 0,
-            hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(6 * 3600)),
-            minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(6 * 3600))
-        )
-
-        // 24 hours — personal + scientific credibility
-        scheduleNotificationFromNow(
-            id: "reengagement_paywall_24h",
-            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.16"),
-            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.17"),
-            daysFromNow: 1,
-            hour: 11,
-            minute: 0
-        )
-
-        print("✅ Paywall-focused notifications scheduled (1h, 6h, 24h)")
-    }
-
-    /// Strategy 3: Auth-based notifications (less aggressive)
-    private func scheduleAuthBasedNotifications() {
-        // Only schedule if no paywall notifications
-        if !UserDefaults.standard.bool(forKey: "saw_paywall_without_accepting") {
-            // 12 hours — gentle reminder
-            scheduleNotificationFromNow(
-                id: "reengagement_auth_12h",
-                title: LanguageManager.shared.localizedString(for: "inline.notificationservice.18"),
-                body: LanguageManager.shared.localizedString(for: "inline.notificationservice.19"),
-                daysFromNow: 0,
-                hour: Calendar.current.component(.hour, from: Date().addingTimeInterval(12 * 3600)),
-                minute: Calendar.current.component(.minute, from: Date().addingTimeInterval(12 * 3600))
-            )
-
-            // 48 hours — emotional
-            scheduleNotificationFromNow(
-                id: "reengagement_auth_48h",
-                title: LanguageManager.shared.localizedString(for: "inline.notificationservice.20"),
-                body: LanguageManager.shared.localizedString(for: "inline.notificationservice.21"),
-                daysFromNow: 2,
-                hour: 14,
-                minute: 0
-            )
-
-            // 7 days — last chance
-            scheduleNotificationFromNow(
-                id: "reengagement_auth_7d",
-                title: LanguageManager.shared.localizedString(for: "inline.notificationservice.22"),
-                body: LanguageManager.shared.localizedString(for: "inline.notificationservice.23"),
-                daysFromNow: 7,
-                hour: 10,
-                minute: 0
-            )
-
-            print("✅ Auth-based notifications scheduled (12h, 48h, 7d)")
-        } else {
-            print("⚠️ Skipping auth-based notifications (paywall already shown)")
-        }
-    }
-
-    /// Cancel all re-engagement notifications (when user completes onboarding)
+    /// Re-engagement before the trial now lives in RecoveryScheduler.
     func cancelReengagementNotifications() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [
-            "reengagement_checkpoint_2h",
-            "reengagement_checkpoint_24h",
-            "reengagement_checkpoint_48h",
-            "reengagement_paywall_1h",
-            "reengagement_paywall_6h",
-            "reengagement_paywall_24h",
-            "reengagement_auth_12h",
-            "reengagement_auth_48h",
-            "reengagement_auth_7d"
-        ])
-
-        print("✅ Re-engagement notifications cancelled")
-
-        AnalyticsManager.shared.track(
-            event: "reengagement_notifications_cancelled",
-            properties: [:]
-        )
+        Task { @MainActor in
+            RecoveryScheduler.shared.cancelAll(reason: "onboarding_completed")
+        }
     }
 
     // MARK: - MILESTONE CONTENT

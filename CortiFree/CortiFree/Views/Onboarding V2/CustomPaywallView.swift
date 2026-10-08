@@ -154,6 +154,7 @@ struct CustomPaywallView: View {
                 handler.onPresent { _ in
                     UserDefaults.standard.set(true, forKey: "hasSeenPaywall")
                     UserDefaults.standard.set(true, forKey: "saw_paywall_without_accepting")
+                    RecoveryScheduler.shared.markPaywallSeen()
                     OnboardingLiveActivityManager.shared.prepareLiveGiftOffer()
                 }
                 handler.onDismiss { _, result in

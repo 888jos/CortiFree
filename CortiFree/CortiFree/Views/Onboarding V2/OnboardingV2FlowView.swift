@@ -51,7 +51,10 @@ struct OnboardingDebugHomeButton: View {
 extension View {
     func onboardingDebugHomeButton() -> some View {
         overlay(alignment: .topTrailing) {
-            OnboardingDebugHomeButton()
+            VStack(spacing: 10) {
+                OnboardingDebugHomeButton()
+                RecoveryDebugButton()
+            }
                 .padding(.top, 54)
                 .padding(.trailing, 12)
                 .zIndex(10_000)
@@ -119,9 +122,9 @@ struct OnboardingV2FlowView: View {
                 return .sixtyDayExplanation
             case .authentication, .loading:
                 return .authentication
-            case .eightHabitsIntro, .weekProgress:
+            case .notificationPermissions, .eightHabitsIntro, .weekProgress:
                 return .eightHabitsIntro
-            case .eightHabits, .notificationPermissions, .habitsProgress, .commitmentPledge:
+            case .eightHabits, .habitsProgress, .commitmentPledge:
                 return .eightHabits
             case .complete:
                 return .complete
@@ -151,6 +154,8 @@ struct OnboardingV2FlowView: View {
             // Resume from checkpoint or paywall if applicable
             resumeFromCheckpoint()
             markOnboardingSessionActive()
+            // Quiet notifications from the first screen, so early drop-offs can be reached.
+            RecoveryScheduler.shared.requestProvisionalAuthorizationIfNeeded()
             trackOnboardingScreen(currentStep)
         }
         .onChange(of: currentStep) { _, newStep in
@@ -170,8 +175,11 @@ struct OnboardingV2FlowView: View {
         }
         #if DEBUG
         .overlay(alignment: .topTrailing) {
-            OnboardingDebugHomeButton {
-                suppressDropOffLiveActivity = true
+            VStack(spacing: 10) {
+                OnboardingDebugHomeButton {
+                    suppressDropOffLiveActivity = true
+                }
+                RecoveryDebugButton()
             }
             .padding(.top, 54)
             .padding(.trailing, 12)
@@ -258,6 +266,7 @@ struct OnboardingV2FlowView: View {
 
         // Save checkpoint for re-engagement notifications
         UserDefaults.standard.set(step.rawValue, forKey: "last_onboarding_checkpoint")
+        RecoveryScheduler.shared.syncToServer()
 
         #if DEBUG
         print("💾 Saved checkpoint: \(step.rawValue)")
@@ -414,7 +423,8 @@ struct OnboardingV2FlowView: View {
                 habitsQuizResult: habitsQuizResult,
                 selectedSymptoms: selectedSymptoms,
                 onComplete: {
-                    currentStep = .eightHabitsIntro
+                    // The plan is ready: best moment to ask for notifications.
+                    continueAfterNotificationPermissionCheck()
                 }
             )
 
@@ -432,18 +442,12 @@ struct OnboardingV2FlowView: View {
 
         case .eightHabits:
             EightHabitsFlowView(onBack: { currentStep = .weekProgress }, onComplete: {
-                #if DEBUG
-                print("✅ OnboardingV2FlowView: Checking notification permission")
-                #endif
-                continueAfterNotificationPermissionCheck()
+                currentStep = .habitsProgress
             })
 
         case .notificationPermissions:
             NotificationPermissionsView(onContinue: {
-                #if DEBUG
-                print("✅ OnboardingV2FlowView: Transition .notificationPermissions → .habitsProgress")
-                #endif
-                currentStep = .habitsProgress
+                currentStep = .eightHabitsIntro
             })
 
         case .habitsProgress:
@@ -487,28 +491,24 @@ struct OnboardingV2FlowView: View {
         }
     }
 
+    /// After the analysis: shows the notification screen unless iOS already has a definitive answer.
+    /// Quiet (provisional) authorization still gets the screen, to ask for real alerts.
     private func continueAfterNotificationPermissionCheck() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let next: OnboardingStep
             switch settings.authorizationStatus {
-            case .authorized, .provisional, .ephemeral:
-                DispatchQueue.main.async {
-                    currentStep = .habitsProgress
-                }
-            case .notDetermined:
-                DispatchQueue.main.async {
-                    currentStep = .notificationPermissions
-                }
+            case .notDetermined, .provisional:
+                next = .notificationPermissions
             case .denied:
                 // A previous denial is handled later in the main app, not by
                 // repeatedly interrupting the onboarding flow.
                 UserDefaults.standard.set(false, forKey: "notificationsEnabled")
-                DispatchQueue.main.async {
-                    currentStep = .habitsProgress
-                }
-            @unknown default:
-                DispatchQueue.main.async {
-                    currentStep = .habitsProgress
-                }
+                next = .eightHabitsIntro
+            default:
+                next = .eightHabitsIntro
+            }
+            DispatchQueue.main.async {
+                currentStep = next
             }
         }
     }

@@ -401,7 +401,10 @@ export const deleteMyAccount = action({
     }
     for (let i = 0; i < 1000; i += 1) {
       const { done } = await ctx.runMutation(internal.account.deleteUserDataBatch, { userId });
-      if (done) return { deleted: true, appleTokenRevoked };
+      if (done) {
+        await ctx.scheduler.runAfter(0, internal.recovery.removeFromOneSignal, { userId });
+        return { deleted: true, appleTokenRevoked };
+      }
     }
     throw new ConvexError("Account deletion did not finish, please retry");
   },

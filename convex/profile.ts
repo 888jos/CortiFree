@@ -1,5 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 import { onboardingProfile } from "./schema";
 import { definedOnly, requireUser } from "./lib/session";
@@ -166,6 +167,8 @@ export const setSubscriptionStatus = mutation({
         updatedAt: number;
       },
     });
+    // Subscribers leave the OneSignal recovery emails.
+    if (user.recovery) await ctx.scheduler.runAfter(0, internal.recovery.pushToOneSignal, { userId: user._id });
   },
 });
 

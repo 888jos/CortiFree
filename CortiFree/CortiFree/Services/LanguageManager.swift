@@ -27,7 +27,9 @@ class LanguageManager: ObservableObject {
             UserDefaults.standard.synchronize()
 
             // Sync Superwall paywall language immediately
-            Superwall.shared.localeIdentifier = currentLanguage.superwallLocaleIdentifier
+            if Superwall.isInitialized {
+                Superwall.shared.localeIdentifier = currentLanguage.superwallLocaleIdentifier
+            }
 
             // Post notification
             NotificationCenter.default.post(name: Self.languageDidChangeNotification, object: nil)
