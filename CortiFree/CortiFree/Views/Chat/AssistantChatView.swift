@@ -319,47 +319,10 @@ struct AssistantChatView: View {
                 }
             }
 
-            pulseBanner
             decodeBanner
             importBanner
         }
         .padding(.bottom, 8)
-    }
-
-    /// Entry point to the pulse check (Apple Watch or flash).
-    private var pulseBanner: some View {
-        Button {
-            HapticManager.light()
-            showPulse = true
-        } label: {
-            HStack(spacing: 14) {
-                Image(systemName: "heart.fill")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(Color(hex: "FF6B8A"))
-                    .frame(width: 40, height: 40)
-                    .background(Color(hex: "FF6B8A").opacity(0.16), in: Circle())
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(t("milo.pulse.banner.title"))
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .multilineTextAlignment(.leading)
-                    Text(t("milo.pulse.banner.subtitle"))
-                        .font(.system(size: 13))
-                        .foregroundStyle(AudioPalette.secondaryText)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(AudioPalette.secondaryText)
-            }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .cfGlass(cornerRadius: 20)
-        }
-        .buttonStyle(PressableCardStyle())
-        .disabled(isLoading)
     }
 
     private var measureAgainButton: some View {
