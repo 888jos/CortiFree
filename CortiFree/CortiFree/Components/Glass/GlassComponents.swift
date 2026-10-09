@@ -34,7 +34,9 @@ extension View {
     func glassCard(cornerRadius: CGFloat = GlassTokens.cardRadius, tint: Color? = nil, interactive: Bool = false) -> some View {
         if #available(iOS 26, *) {
             let base: Glass = tint.map { Glass.regular.tint($0.opacity(0.20)) } ?? Glass.regular
-            self.glassEffect(interactive ? base.interactive() : base,
+            // The glass doesn't receive touches: make the whole card tappable, not just its content.
+            self.contentShape(.rect(cornerRadius: cornerRadius, style: .continuous))
+                .glassEffect(interactive ? base.interactive() : base,
                              in: .rect(cornerRadius: cornerRadius, style: .continuous))
         } else {
             self
@@ -57,6 +59,7 @@ extension View {
                         )
                 )
                 .shadow(color: .black.opacity(0.22), radius: 14, x: 0, y: 6)
+                .contentShape(.rect(cornerRadius: cornerRadius, style: .continuous))
         }
     }
 
@@ -65,7 +68,8 @@ extension View {
     func glassCapsule(tint: Color? = nil, interactive: Bool = false) -> some View {
         if #available(iOS 26, *) {
             let base: Glass = tint.map { Glass.regular.tint($0.opacity(0.35)) } ?? Glass.regular
-            self.glassEffect(interactive ? base.interactive() : base, in: .capsule)
+            self.contentShape(.capsule)
+                .glassEffect(interactive ? base.interactive() : base, in: .capsule)
         } else {
             self
                 .background {
@@ -83,7 +87,8 @@ extension View {
     func glassCircle(tint: Color? = nil, interactive: Bool = false) -> some View {
         if #available(iOS 26, *) {
             let base: Glass = tint.map { Glass.regular.tint($0.opacity(0.35)) } ?? Glass.regular
-            self.glassEffect(interactive ? base.interactive() : base, in: .circle)
+            self.contentShape(.circle)
+                .glassEffect(interactive ? base.interactive() : base, in: .circle)
         } else {
             self
                 .background {
