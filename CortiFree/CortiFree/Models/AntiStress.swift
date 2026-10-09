@@ -187,7 +187,29 @@ struct ExerciseRecommendation: Identifiable {
 // MARK: - Recommendation Engine
 
 class AntiStressRecommendationEngine {
-    static func recommendations(for situation: StressSituation) -> [ExerciseRecommendation] {
+    /// Recommendations for the situation, adjusted by the user's end-of-session ratings: liked
+    /// exercises move up a little, badly rated ones (average < 2) drop to the bottom.
+    static func recommendations(
+        for situation: StressSituation,
+        ratings: (RatedContentType, String) -> Double? = SessionRatingStore.averageRating(for:id:)
+    ) -> [ExerciseRecommendation] {
+        let adjusted = baseRecommendations(for: situation).map { recommendation -> ExerciseRecommendation in
+            var match = recommendation.matchPercentage
+            if let average = ratings(.exercise, recommendation.exerciseType.rawValue) {
+                let bonus = Int(((average - 3) * 4).rounded())
+                match += average < SessionRatingStore.dislikedBelow ? -40 : bonus
+            }
+            return ExerciseRecommendation(exerciseType: recommendation.exerciseType, matchPercentage: min(max(match, 1), 99))
+        }
+        // Stable: equal matches keep the editorial order.
+        let order = Dictionary(uniqueKeysWithValues: adjusted.enumerated().map { ($1.id, $0) })
+        return adjusted.sorted { lhs, rhs in
+            if lhs.matchPercentage != rhs.matchPercentage { return lhs.matchPercentage > rhs.matchPercentage }
+            return order[lhs.id, default: 0] < order[rhs.id, default: 0]
+        }
+    }
+
+    private static func baseRecommendations(for situation: StressSituation) -> [ExerciseRecommendation] {
         switch situation {
         case .overwhelmed:
             return [

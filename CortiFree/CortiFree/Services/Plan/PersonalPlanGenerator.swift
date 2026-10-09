@@ -45,6 +45,8 @@ struct PlanAnalysis {
     var retiredHabits: Set<String> = []
     /// Cycle theme (Apaiser, Ancrer, Autonomie, Entretien).
     var cycleTheme: PlanCycleTheme = .soothe
+    /// End-of-session ratings (average 0–5, nil = never rated): liked content comes back more.
+    var ratings: (RatedContentType, String) -> Double? = SessionRatingStore.averageRating(for:id:)
 }
 
 enum PersonalPlanGenerator {
@@ -63,13 +65,15 @@ enum PersonalPlanGenerator {
         cycle: Int = 1,
         excluded: Set<String> = [],
         variation: Int = 0,
-        options: PlanCycleOptions = PlanCycleOptions()
+        options: PlanCycleOptions = PlanCycleOptions(),
+        ratings: @escaping (RatedContentType, String) -> Double? = SessionRatingStore.averageRating(for:id:)
     ) -> PersonalPlan {
         var analysis = analyze(profile, overrideGoal: overrideGoal, anxiety: anxiety)
         analysis.excluded = excluded
         analysis.avoid = options.avoidRefIDs
         analysis.retiredHabits = options.retiredHabits
         analysis.cycleTheme = PlanCycleTheme.forCycle(cycle)
+        analysis.ratings = ratings
         if options.gentle { analysis.gentle = true }
         let seedString = "\(fingerprint(profile))|\(analysis.primary.rawValue)|\(analysis.secondary.rawValue)|\(cycle)|\(anxiety?.rawValue ?? "-")" + (variation > 0 ? "|v\(variation)" : "")
         var rng = SeededGenerator(seed: seedString)
@@ -302,6 +306,19 @@ enum PersonalPlanGenerator {
         (analysis.avoid.contains(id) ? -avoidPenalty : 0) + (priorityRefIDs.contains(id) ? 1.5 : 0)
     }
 
+    /// Disliked content (rating average < 2) is only proposed when nothing else fits. Pickers skip it
+    /// after drawing its random jitter, so the shared random stream (and the habits) stay unchanged.
+    private static func isDisliked(_ type: RatedContentType, _ id: String, analysis: PlanAnalysis) -> Bool {
+        (analysis.ratings(type, id) ?? 3) < SessionRatingStore.dislikedBelow
+    }
+
+    /// Ratings bonus: liked content comes back more often, disliked content sinks. Unrated content is neutral.
+    private static func ratingBonus(_ type: RatedContentType, _ id: String, analysis: PlanAnalysis, scale: Double, dislikedPenalty: Double) -> Double {
+        guard let average = analysis.ratings(type, id) else { return 0 }
+        if average < SessionRatingStore.dislikedBelow { return -dislikedPenalty }
+        return (average - 3) * scale
+    }
+
     // MARK: - Breathing
 
     private static func breathingWeights(goal: PlanGoal, theme: PlanWeekTheme, analysis: PlanAnalysis) -> [BreathingCategory: Double] {
@@ -326,15 +343,18 @@ enum PersonalPlanGenerator {
         let candidates = BreathingPattern.allPatterns
             .filter { !(excludeIntense && $0.key == "kapalabhati") && !analysis.excluded.contains($0.key) }
             .sorted { $0.key < $1.key }
+        let skipDisliked = candidates.contains { (weights[$0.category] ?? 0) > 0 && !isDisliked(.breathing, $0.key, analysis: analysis) }
 
         var bestPattern: BreathingPattern?
         var bestScore = -Double.infinity
         for pattern in candidates {
             let base = weights[pattern.category] ?? 0
             guard base > 0 else { continue }
+            if skipDisliked && isDisliked(.breathing, pattern.key, analysis: analysis) { _ = rng.nextUnit(); continue }
             var score = base + history.penalty(pattern.key, day: day, recentWindow: 3, recentPenalty: 3, countPenalty: 0.35)
             // Anchor cycle: new breathing techniques first.
             score += freshness(pattern.key, analysis: analysis, avoidPenalty: analysis.cycleTheme == .anchor ? 2 : 1)
+            score += ratingBonus(.breathing, pattern.key, analysis: analysis, scale: 0.4, dislikedPenalty: 5)
             score += rng.nextUnit() * 0.8
             if score > bestScore { bestScore = score; bestPattern = pattern }
         }
@@ -394,16 +414,25 @@ enum PersonalPlanGenerator {
                 .prefix(3).map { $0 }
         }
 
+        let skipDisliked = fitting.contains { !isDisliked(.meditation, $0.id, analysis: analysis) }
         var best: GuidedSession?
         var bestScore = -Double.infinity
         for session in fitting {
+            if skipDisliked && isDisliked(.meditation, session.id, analysis: analysis) { _ = rng.nextUnit(); continue }
             var score = weights[session.category] ?? 0
             // Ramp: prefer sessions close to this week's cap.
             score += 1.5 * Double(session.durationMinutes) / Double(max(cap, 1))
             score += history.penalty(session.id, day: day, recentWindow: 6, recentPenalty: 6, countPenalty: 2)
             score += freshness(session.id, analysis: analysis, avoidPenalty: 3)
+            score += ratingBonus(.meditation, session.id, analysis: analysis, scale: 0.5, dislikedPenalty: 8)
             score += rng.nextUnit() * 0.6
             if score > bestScore { bestScore = score; best = session }
+        }
+        // Only disliked sessions fit the cap: a slightly longer one the user didn't dislike instead.
+        if let picked = best, isDisliked(.meditation, picked.id, analysis: analysis),
+           let liked = catalog.filter({ $0.id != excluding && (weights[$0.category] ?? 0) > 0 && !isDisliked(.meditation, $0.id, analysis: analysis) })
+               .min(by: { $0.durationMinutes != $1.durationMinutes ? $0.durationMinutes < $1.durationMinutes : $0.id < $1.id }) {
+            best = liked
         }
         let session = best ?? GuidedSessionCatalog.session(id: "sos-reset-3") ?? catalog.first
         let id = session?.id ?? "sos-reset-3"
@@ -458,9 +487,11 @@ enum PersonalPlanGenerator {
         var fitting = candidates.filter { $0.durationMinutes <= cap }
         if fitting.isEmpty { fitting = Array(candidates.sorted { $0.durationMinutes < $1.durationMinutes }.prefix(1)) }
 
+        let skipDisliked = fitting.contains { !isDisliked(.meditation, $0.id, analysis: analysis) }
         var best: GuidedSession?
         var bestScore = -Double.infinity
         for session in fitting {
+            if skipDisliked && isDisliked(.meditation, session.id, analysis: analysis) { _ = rng.nextUnit(); continue }
             var score: Double = session.category == .sleep ? 3 : 1.5
             if session.id == "sleep-racing-mind-12" && analysis.racingMind { score += 1 }
             if session.id == "sleep-back-to-sleep-8" && analysis.nightWaking { score += 1 }
@@ -468,8 +499,15 @@ enum PersonalPlanGenerator {
             score += 1.0 * Double(session.durationMinutes) / Double(cap)
             score += history.penalty(session.id, day: day, recentWindow: 2, recentPenalty: 4, countPenalty: 0.6)
             score += freshness(session.id, analysis: analysis, avoidPenalty: 1.5)
+            score += ratingBonus(.meditation, session.id, analysis: analysis, scale: 0.4, dislikedPenalty: 5)
             score += rng.nextUnit() * 0.6
             if score > bestScore { bestScore = score; best = session }
+        }
+        // Only disliked sessions fit the cap: a slightly longer one the user didn't dislike instead.
+        if let picked = best, isDisliked(.meditation, picked.id, analysis: analysis),
+           let liked = candidates.filter({ !isDisliked(.meditation, $0.id, analysis: analysis) })
+               .min(by: { $0.durationMinutes != $1.durationMinutes ? $0.durationMinutes < $1.durationMinutes : $0.id < $1.id }) {
+            best = liked
         }
         let id = best?.id ?? "sleep-wind-down-10"
         history.use(id, day: day)
@@ -577,10 +615,12 @@ enum PersonalPlanGenerator {
     /// Replacement candidates for one item of a day, best first: same kind, suited to the
     /// plan's goal, not already in the day, not excluded by the user. The returned items keep
     /// the slot id (so completion keys stay stable), except habits which are keyed by habit.
-    static func alternatives(for item: PlanItem, in plan: PersonalPlan, dayNumber: Int, anxiety: AnxietySeverity? = nil, limit: Int = 5) -> [PlanItem] {
+    static func alternatives(for item: PlanItem, in plan: PersonalPlan, dayNumber: Int, anxiety: AnxietySeverity? = nil, limit: Int = 5,
+                             ratings: @escaping (RatedContentType, String) -> Double? = SessionRatingStore.averageRating(for:id:)) -> [PlanItem] {
         guard let day = plan.day(dayNumber) else { return [] }
         var analysis = analyze(plan.profile, overrideGoal: plan.goal, anxiety: anxiety)
         analysis.excluded = plan.excludedRefIDs
+        analysis.ratings = ratings
         let theme = PlanWeekTheme.forWeek(day.week)
         let usedRefs = Set(day.items.map(\.refID))
 
@@ -592,7 +632,8 @@ enum PersonalPlanGenerator {
                 .filter { !usedRefs.contains($0.key) && !analysis.excluded.contains($0.key) }
                 .filter { !(excludeIntense && $0.key == "kapalabhati") }
                 .sorted { a, b in
-                    let wa = weights[a.category] ?? 0, wb = weights[b.category] ?? 0
+                    let wa = (weights[a.category] ?? 0) + ratingBonus(.breathing, a.key, analysis: analysis, scale: 0.4, dislikedPenalty: 5)
+                    let wb = (weights[b.category] ?? 0) + ratingBonus(.breathing, b.key, analysis: analysis, scale: 0.4, dislikedPenalty: 5)
                     return wa != wb ? wa > wb : a.key < b.key
                 }
                 .prefix(limit)
@@ -619,9 +660,11 @@ enum PersonalPlanGenerator {
             return pool
                 .filter { !usedRefs.contains($0.id) && !analysis.excluded.contains($0.id) && (weights[$0.category] ?? 0) > 0 }
                 .sorted { a, b in
-                    // Relevance first, then closest to the replaced session's length.
+                    // Relevance (and ratings) first, then closest to the replaced session's length.
                     let sa = (weights[a.category] ?? 0) - (a.durationMinutes > cap ? 2 : 0) - Double(abs(a.durationMinutes - item.minutes)) * 0.15
+                        + ratingBonus(.meditation, a.id, analysis: analysis, scale: 0.4, dislikedPenalty: 5)
                     let sb = (weights[b.category] ?? 0) - (b.durationMinutes > cap ? 2 : 0) - Double(abs(b.durationMinutes - item.minutes)) * 0.15
+                        + ratingBonus(.meditation, b.id, analysis: analysis, scale: 0.4, dislikedPenalty: 5)
                     return sa != sb ? sa > sb : a.id < b.id
                 }
                 .prefix(limit)

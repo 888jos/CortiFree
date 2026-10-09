@@ -718,15 +718,21 @@ struct AssistantChatView: View {
             guard let sound = sounds[safe: index % max(1, sounds.count)] else { return nil }
             return .init(kind: .sound(sound))
         case .breathing(let slow):
-            let patterns = BreathingPattern.allPatterns
+            // Techniques the user rated badly (average < 2) are never proposed first.
+            let all = BreathingPattern.allPatterns
+            let liked = all.filter { !SessionRatingStore.isDisliked(.breathing, id: $0.key) }
+            let patterns = liked.isEmpty ? all : liked
             let pattern = slow
                 ? patterns.first { $0.name.lowercased().contains("slow") || $0.category == .sleep }
                 : patterns[safe: index % max(1, patterns.count)]
             guard let pattern = pattern ?? patterns.first else { return nil }
             return .init(kind: .breathing(pattern))
         case .session(let category):
-            // Sessions not finished yet first, then the shortest, rotating between replies.
+            // Badly rated sessions last, then sessions not finished yet first, then the shortest,
+            // rotating between replies.
             let sessions = GuidedSessionCatalog.sessions(in: category).sorted { lhs, rhs in
+                let ld = SessionRatingStore.isDisliked(.meditation, id: lhs.id), rd = SessionRatingStore.isDisliked(.meditation, id: rhs.id)
+                if ld != rd { return !ld }
                 let l = GuidedSessionProgressStore.isCompleted(lhs.id), r = GuidedSessionProgressStore.isCompleted(rhs.id)
                 return l == r ? lhs.durationMinutes < rhs.durationMinutes : !l
             }
