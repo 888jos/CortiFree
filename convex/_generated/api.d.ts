@@ -14,6 +14,7 @@ import type * as assistant from "../assistant.js";
 import type * as auth from "../auth.js";
 import type * as baseline from "../baseline.js";
 import type * as checkins from "../checkins.js";
+import type * as faceScan from "../faceScan.js";
 import type * as feedback from "../feedback.js";
 import type * as habits from "../habits.js";
 import type * as http from "../http.js";
@@ -47,6 +48,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   baseline: typeof baseline;
   checkins: typeof checkins;
+  faceScan: typeof faceScan;
   feedback: typeof feedback;
   habits: typeof habits;
   http: typeof http;
