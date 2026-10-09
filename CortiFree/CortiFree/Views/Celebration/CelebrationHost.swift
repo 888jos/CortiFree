@@ -37,7 +37,7 @@ struct CelebrationHost: View {
                     .transition(.opacity)
             case .habitAcquired(let habitID):
                 ZStack(alignment: .top) {
-                    Color.clear.confetti(isActive: true)
+                    FullScreenConfetti()
                     CelebrationBanner(kind: .habitAcquired(habitID: habitID)) { center.dismissCurrent() }
                 }
                 .transition(.move(edge: .top).combined(with: .opacity))
