@@ -30,7 +30,27 @@ final class PersonalPlanStore: ObservableObject {
         plan = loadLocalPlan()
         observeAudioCompletion()
         observeJournal()
+        #if DEBUG
+        // Simulator checks of the end of a cycle: CORTIFREE_DEBUG_PLAN_DAY=29 moves the plan's start
+        // date so that today is that plan day (same profile, goal and cycle).
+        if let raw = ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_PLAN_DAY"], let day = Int(raw) {
+            debugMovePlan(toDay: day)
+        }
+        #endif
     }
+
+    #if DEBUG
+    func debugMovePlan(toDay day: Int) {
+        let start = Calendar.current.date(byAdding: .day, value: -(day - 1), to: Calendar.current.startOfDay(for: Date())) ?? Date()
+        let profile = plan?.profile ?? storedOnboardingProfile() ?? PlanProfile()
+        var moved = PersonalPlanGenerator.generate(profile: profile, overrideGoal: plan?.goalChosenByUser == true ? plan?.goal : nil,
+                                                   anxiety: anxiety, startDate: start, cycle: plan?.cycle ?? 1,
+                                                   excluded: plan?.excludedRefIDs ?? [], options: plan?.cycleOptions ?? PlanCycleOptions())
+        moved.preferences = plan?.preferences
+        plan = moved
+        saveLocal(moved)
+    }
+    #endif
 
     // MARK: - Plan audio completion
 

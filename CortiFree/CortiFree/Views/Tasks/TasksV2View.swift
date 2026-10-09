@@ -409,7 +409,10 @@ struct TasksV2View: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(String(format: "plan.header.cycle_day".localized, plan.cycle, displayedDay) + " · " + themeTitle)
+                // Follow-up cycles: the cycle theme is on the progress card; the week's own theme only
+                // shows for maintenance weeks (Apaiser… would contradict « Cycle 2 · Ancrer »).
+                Text(String(format: "plan.header.cycle_day".localized, plan.cycle, displayedDay)
+                     + (plan.cycle == 1 || maintenance != nil ? " · " + themeTitle : ""))
                     .font(Font.Poppins.custom(.semiBold, size: 12))
                     .foregroundStyle(PlanPalette.accent)
                     .textCase(.uppercase)
