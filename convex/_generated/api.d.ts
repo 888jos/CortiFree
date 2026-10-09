@@ -9,8 +9,8 @@
  */
 
 import type * as account from "../account.js";
-import type * as aiAccess from "../aiAccess.js";
 import type * as achievements from "../achievements.js";
+import type * as aiAccess from "../aiAccess.js";
 import type * as assistant from "../assistant.js";
 import type * as auth from "../auth.js";
 import type * as baseline from "../baseline.js";
@@ -45,8 +45,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   account: typeof account;
-  aiAccess: typeof aiAccess;
   achievements: typeof achievements;
+  aiAccess: typeof aiAccess;
   assistant: typeof assistant;
   auth: typeof auth;
   baseline: typeof baseline;
