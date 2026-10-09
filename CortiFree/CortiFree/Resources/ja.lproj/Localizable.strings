@@ -5604,11 +5604,10 @@
 "calm.pause.shield.use_shortcuts" = "代わりにショートカットを使う";
 "calm.pause.shield.denied" = "スクリーンタイムへのアクセスが拒否されました。設定 → スクリーンタイムで許可するか、ショートカットを使ってください。";
 
-/* Onboarding — first name + card unlocked */
-"onboarding_v2.first_name.question" = "まずは…お名前は？";
-"onboarding_v2.first_name.placeholder" = "名前";
-"onboarding_v2.first_name.cta" = "続ける";
-"onboarding_v2.first_name.skip" = "スキップ";
-"onboarding_v2.first_name.unlocked_title" = "CortiFreeカードがアンロックされました！";
-"onboarding_v2.first_name.unlocked_subtitle" = "ようこそ、%@さん。プランと一緒に毎日埋まっていきます。";
-"onboarding_v2.first_name.unlocked_cta" = "はじめよう";
+/* Onboarding — first name on the avatar card */
+"onboarding_v2.first_name.title" = "はじめましょう！";
+"onboarding_v2.first_name.subtitle" = "CortiFreeへようこそ。";
+"onboarding_v2.first_name.label" = "名前（任意）";
+"onboarding_v2.first_name.placeholder" = "名前を入力";
+"onboarding_v2.first_name.continue" = "続ける";
+"onboarding_v2.first_name.skip" = "名前を入力せずに続ける";

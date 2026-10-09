@@ -5601,11 +5601,10 @@
 "calm.pause.shield.use_shortcuts" = "Stattdessen Kurzbefehle nutzen";
 "calm.pause.shield.denied" = "Zugriff auf Bildschirmzeit verweigert. Du kannst ihn in Einstellungen → Bildschirmzeit erlauben oder Kurzbefehle nutzen.";
 
-/* Onboarding — first name + card unlocked */
-"onboarding_v2.first_name.question" = "Zuerst… wie heißt du?";
-"onboarding_v2.first_name.placeholder" = "Dein Vorname";
-"onboarding_v2.first_name.cta" = "Weiter";
-"onboarding_v2.first_name.skip" = "Überspringen";
-"onboarding_v2.first_name.unlocked_title" = "Deine CortiFree-Karte ist freigeschaltet!";
-"onboarding_v2.first_name.unlocked_subtitle" = "Willkommen %@. Sie füllt sich Tag für Tag mit deinem Plan.";
-"onboarding_v2.first_name.unlocked_cta" = "Los geht's";
+/* Onboarding — first name on the avatar card */
+"onboarding_v2.first_name.title" = "Los geht's!";
+"onboarding_v2.first_name.subtitle" = "Willkommen bei CortiFree.";
+"onboarding_v2.first_name.label" = "Dein Vorname (optional)";
+"onboarding_v2.first_name.placeholder" = "Gib deinen Vornamen ein";
+"onboarding_v2.first_name.continue" = "Weiter";
+"onboarding_v2.first_name.skip" = "Ohne Namen weiter";

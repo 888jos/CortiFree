@@ -2,9 +2,10 @@
 //  OnboardingFirstNameView.swift
 //  CortiFree
 //
-//  First onboarding question: Milo asks the first name (skippable: Sign in with Apple gives it
-//  later). Once it is entered, the home avatar card is « unlocked » with the name bottom right:
-//  the first celebration of the app.
+//  First onboarding screen after the welcome, all on one page: the home avatar card rises
+//  from the bottom, the first name field appears under it and the name is written live
+//  bottom right of the card. Validating with a name throws confetti; the name is optional
+//  (Sign in with Apple fills it later), the arrow goes on without one.
 //
 
 import SwiftUI
@@ -12,171 +13,123 @@ import SwiftUI
 struct OnboardingFirstNameView: View {
     let onContinue: () -> Void
 
-    private enum Stage { case ask, unlocked }
-
-    @State private var stage: Stage = .ask
     @State private var name = UserPersistence.userFirstName ?? ""
-    @State private var cardRevealed = false
+    @State private var cardAppeared = false
+    @State private var fieldVisible = false
+    @State private var celebrating = false
     @FocusState private var fieldFocused: Bool
 
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var hasName: Bool { !trimmedName.isEmpty }
+    /// The keyboard takes half the screen: the card shrinks while the name is typed.
+    private var cardScale: CGFloat { fieldFocused ? 0.72 : 1.12 }
 
     var body: some View {
         ZStack {
             GalaxyBackgroundView(intensity: 1.0)
                 .ignoresSafeArea()
 
-            switch stage {
-            case .ask: askStage.transition(.opacity)
-            case .unlocked: unlockedStage.transition(.opacity)
-            }
-        }
-        .animation(.easeInOut(duration: 0.35), value: stage)
-        .onAppear {
-            AnalyticsManager.shared.track(event: "onboarding_first_name_viewed", properties: [:])
-        }
-    }
-
-    // MARK: Ask
-
-    private var askStage: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                LanguageSelectorButton()
-                    .padding(.trailing, 30)
-            }
-            .frame(height: 20)
-            .padding(.top, 12)
-
-            OnboardingMascotDialogueView(message: "onboarding_v2.first_name.question".localized)
-                .padding(.horizontal, 24)
-                .padding(.top, 18)
-                .padding(.bottom, 28)
-
-            TextField("", text: $name, prompt: Text("onboarding_v2.first_name.placeholder".localized)
-                .foregroundColor(.white.opacity(0.4)))
-                .font(.poppinsSemiBold(20))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .textContentType(.givenName)
-                .textInputAutocapitalization(.words)
-                .autocorrectionDisabled()
-                .submitLabel(.done)
-                .focused($fieldFocused)
-                .onSubmit(validate)
-                .onChange(of: name) { _, value in
-                    if value.count > 24 { name = String(value.prefix(24)) }
-                }
-                .frame(height: 58)
-                .glassCard(cornerRadius: 29, tint: nil, interactive: true)
-                .padding(.horizontal, 34)
-
-            Spacer()
-
-            VStack(spacing: 10) {
-                Button(action: validate) {
-                    Text("onboarding_v2.first_name.cta".localized)
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .contentShape(Capsule())
-                }
-                .buttonStyle(.glassPrimary)
-                .disabled(trimmedName.isEmpty)
-                .opacity(trimmedName.isEmpty ? 0.5 : 1)
-
-                Button("onboarding_v2.first_name.skip".localized, action: skip)
-                    .font(.poppinsMedium(14))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .buttonStyle(.plain)
-                    .frame(minHeight: 40)
-            }
-            .padding(.horizontal, 34)
-            .padding(.bottom, 20)
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { fieldFocused = true }
-        }
-    }
-
-    // MARK: Unlocked
-
-    private var unlockedStage: some View {
-        ZStack {
             VStack(spacing: 0) {
-                Spacer(minLength: 24)
-
-                Text("onboarding_v2.first_name.unlocked_title".localized)
-                    .font(.faroBold(26))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 30)
-
-                Text(String(format: "onboarding_v2.first_name.unlocked_subtitle".localized, trimmedName))
-                    .font(.poppinsRegular(15))
-                    .foregroundStyle(.white.opacity(0.75))
-                    .multilineTextAlignment(.center)
-                    .balancedLines()
-                    .padding(.horizontal, 34)
-                    .padding(.top, 10)
-
-                AvatarCardFront(firstName: trimmedName, startDate: Date(), currentDay: 0)
-                    .shadow(color: Color(hex: "B794F6").opacity(cardRevealed ? 0.55 : 0), radius: 30)
-                    .rotation3DEffect(.degrees(cardRevealed ? 0 : 90), axis: (x: 0, y: 1, z: 0))
-                    .scaleEffect(cardRevealed ? 1 : 0.6)
-                    .opacity(cardRevealed ? 1 : 0)
-                    .padding(.top, 30)
-                    .accessibilityLabel(String(format: "onboarding_v2.first_name.unlocked_subtitle".localized, trimmedName))
-
-                Spacer()
-
-                Button(action: finish) {
-                    Text("onboarding_v2.first_name.unlocked_cta".localized)
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .contentShape(Capsule())
+                VStack(spacing: fieldFocused ? 2 : 8) {
+                    Text("onboarding_v2.first_name.title".localized)
+                        .font(.faroBold(fieldFocused ? 22 : 28))
+                        .foregroundStyle(.white)
+                    if !fieldFocused {
+                        Text("onboarding_v2.first_name.subtitle".localized)
+                            .font(.poppinsRegular(15))
+                            .foregroundStyle(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
                 }
-                .buttonStyle(.glassPrimary)
-                .padding(.horizontal, 34)
-                .padding(.bottom, 20)
-            }
+                .padding(.top, fieldFocused ? 8 : 28)
+                .padding(.bottom, fieldFocused ? 8 : 18)
 
-            if cardRevealed {
+                AvatarCardFront(firstName: trimmedName, startDate: Date(), currentDay: 1)
+                    .scaleEffect(cardScale)
+                    .frame(width: 216 * cardScale, height: 320 * cardScale)
+                    .shadow(color: Color(hex: "B794F6").opacity(celebrating ? 0.6 : 0.25), radius: 28)
+                    .offset(y: cardAppeared ? 0 : 520)
+                    .opacity(cardAppeared ? 1 : 0)
+                    .accessibilityHidden(true)
+
+                Spacer(minLength: 10)
+
+                nameField
+                    .opacity(fieldVisible ? 1 : 0)
+                    .offset(y: fieldVisible ? 0 : 14)
+                    .allowsHitTesting(fieldVisible && !celebrating)
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 16)
+
+            if celebrating {
                 FullScreenConfetti()
             }
         }
+        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: fieldFocused)
+        .animation(.easeOut(duration: 0.22), value: hasName)
         .onAppear {
-            withAnimation(.spring(response: 0.7, dampingFraction: 0.65).delay(0.25)) {
-                cardRevealed = true
+            AnalyticsManager.shared.track(event: "onboarding_first_name_viewed", properties: [:])
+            withAnimation(.spring(response: 0.86, dampingFraction: 0.88)) { cardAppeared = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+                withAnimation(.easeOut(duration: 0.28)) { fieldVisible = true }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { HapticManager.success() }
         }
     }
 
-    // MARK: Actions
+    private var nameField: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("onboarding_v2.first_name.label".localized)
+                .font(.poppinsMedium(13))
+                .foregroundStyle(.white.opacity(0.85))
+
+            HStack(spacing: 10) {
+                TextField("", text: $name, prompt: Text("onboarding_v2.first_name.placeholder".localized)
+                    .foregroundColor(.white.opacity(0.4)))
+                    .font(.poppinsSemiBold(17))
+                    .foregroundStyle(.white)
+                    .textContentType(.givenName)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                    .submitLabel(.done)
+                    .focused($fieldFocused)
+                    .onSubmit(validate)
+                    .onChange(of: name) { _, value in
+                        if value.count > 24 { name = String(value.prefix(24)) }
+                    }
+                    .padding(.horizontal, 18)
+                    .frame(height: 56)
+                    .glassCard(cornerRadius: 18, tint: hasName ? Color(hex: "B794F6") : nil, interactive: true)
+
+                Button(action: validate) {
+                    Image(systemName: hasName ? "checkmark" : "arrow.right")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 56, height: 56)
+                        .background(Color(hex: "9B7FD4"), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                }
+                .buttonStyle(PressableCardStyle())
+                .accessibilityLabel((hasName ? "onboarding_v2.first_name.continue" : "onboarding_v2.first_name.skip").localized)
+            }
+        }
+    }
 
     private func validate() {
-        guard !trimmedName.isEmpty else { return }
-        HapticManager.light()
+        guard !celebrating else { return }
         fieldFocused = false
+        guard hasName else {
+            HapticManager.light()
+            AnalyticsManager.shared.track(event: "onboarding_first_name_skipped", properties: [:])
+            onContinue()
+            return
+        }
         UserPersistence.userFirstName = trimmedName
         NotificationCenter.default.post(name: NSNotification.Name("ProfileUpdated"), object: nil)
         AnalyticsManager.shared.track(event: "onboarding_first_name_entered", properties: [:])
-        stage = .unlocked
-    }
-
-    private func skip() {
-        HapticManager.light()
-        fieldFocused = false
-        AnalyticsManager.shared.track(event: "onboarding_first_name_skipped", properties: [:])
-        onContinue()
-    }
-
-    private func finish() {
-        HapticManager.medium()
-        onContinue()
+        HapticManager.success()
+        celebrating = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) { onContinue() }
     }
 }
 

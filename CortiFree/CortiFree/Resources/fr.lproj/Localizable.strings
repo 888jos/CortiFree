@@ -5599,11 +5599,10 @@
 "calm.pause.shield.use_shortcuts" = "Utiliser Raccourcis à la place";
 "calm.pause.shield.denied" = "Accès Temps d'écran refusé. Tu peux l'autoriser dans Réglages → Temps d'écran, ou utiliser Raccourcis.";
 
-/* Onboarding — first name + card unlocked */
-"onboarding_v2.first_name.question" = "Avant tout… comment tu t'appelles ?";
-"onboarding_v2.first_name.placeholder" = "Ton prénom";
-"onboarding_v2.first_name.cta" = "Continuer";
-"onboarding_v2.first_name.skip" = "Passer";
-"onboarding_v2.first_name.unlocked_title" = "Ta carte CortiFree est débloquée !";
-"onboarding_v2.first_name.unlocked_subtitle" = "Bienvenue %@. Elle se remplira jour après jour avec ton plan.";
-"onboarding_v2.first_name.unlocked_cta" = "C'est parti";
+/* Onboarding — first name on the avatar card */
+"onboarding_v2.first_name.title" = "C'est parti !";
+"onboarding_v2.first_name.subtitle" = "Bienvenue sur CortiFree.";
+"onboarding_v2.first_name.label" = "Ton prénom (facultatif)";
+"onboarding_v2.first_name.placeholder" = "Entre ton prénom";
+"onboarding_v2.first_name.continue" = "Continuer";
+"onboarding_v2.first_name.skip" = "Continuer sans prénom";

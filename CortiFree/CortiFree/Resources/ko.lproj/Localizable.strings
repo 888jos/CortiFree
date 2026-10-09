@@ -5604,11 +5604,10 @@
 "calm.pause.shield.use_shortcuts" = "대신 단축어 사용";
 "calm.pause.shield.denied" = "스크린 타임 접근이 거부되었어요. 설정 → 스크린 타임에서 허용하거나 단축어를 사용하세요.";
 
-/* Onboarding — first name + card unlocked */
-"onboarding_v2.first_name.question" = "먼저… 이름이 뭐예요?";
-"onboarding_v2.first_name.placeholder" = "이름";
-"onboarding_v2.first_name.cta" = "계속";
-"onboarding_v2.first_name.skip" = "건너뛰기";
-"onboarding_v2.first_name.unlocked_title" = "CortiFree 카드가 잠금 해제됐어요!";
-"onboarding_v2.first_name.unlocked_subtitle" = "환영해요, %@님. 플랜과 함께 하루하루 채워질 거예요.";
-"onboarding_v2.first_name.unlocked_cta" = "시작하기";
+/* Onboarding — first name on the avatar card */
+"onboarding_v2.first_name.title" = "시작해요!";
+"onboarding_v2.first_name.subtitle" = "CortiFree에 오신 걸 환영해요.";
+"onboarding_v2.first_name.label" = "이름(선택)";
+"onboarding_v2.first_name.placeholder" = "이름을 입력하세요";
+"onboarding_v2.first_name.continue" = "계속";
+"onboarding_v2.first_name.skip" = "이름 없이 계속";
