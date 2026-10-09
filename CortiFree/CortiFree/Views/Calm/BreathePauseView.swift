@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct BreathePauseView: View {
-    let app: PauseApp
+    let app: PauseTarget
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var start = Date()
@@ -21,12 +21,26 @@ struct BreathePauseView: View {
 
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
+    private var headline: String {
+        switch app {
+        case .app(let app): return String(format: t("calm.pause.about_to_open"), app.name)
+        case .shielded: return t("calm.pause.shield.about_to_open")
+        }
+    }
+
+    private var openTitle: String {
+        switch app {
+        case .app(let app): return String(format: t("calm.pause.open_anyway"), app.name)
+        case .shielded: return t("calm.pause.shield.unlock")
+        }
+    }
+
     var body: some View {
         ZStack {
             GalaxyBackgroundView(intensity: 0.85, isAnimated: false).ignoresSafeArea()
 
             VStack(spacing: 24) {
-                Text(String(format: t("calm.pause.about_to_open"), app.name))
+                Text(headline)
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(AudioPalette.secondaryText)
                     .padding(.top, 40)
@@ -89,7 +103,7 @@ struct BreathePauseView: View {
                                 .background(AudioPalette.accent, in: Capsule())
                         }
                         .buttonStyle(PressableCardStyle())
-                        Button(String(format: t("calm.pause.open_anyway"), app.name)) {
+                        Button(openTitle) {
                             BreathePauseCenter.shared.finish(app, openApp: true)
                         }
                         .font(.system(size: 15, weight: .medium))

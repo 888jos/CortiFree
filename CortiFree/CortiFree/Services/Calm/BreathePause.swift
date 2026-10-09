@@ -78,13 +78,36 @@ struct CortiFreeAppShortcuts: AppShortcutsProvider {
     }
 }
 
+/// What the pause stands in front of: an app named by the Shortcuts automation, or one of the
+/// apps behind the Screen Time shield (opaque tokens: we do not know which one).
+enum PauseTarget: Identifiable, Hashable {
+    case app(PauseApp)
+    case shielded
+
+    var id: String {
+        switch self {
+        case .app(let app): return app.rawValue
+        case .shielded: return "shielded"
+        }
+    }
+
+    var analyticsName: String { id }
+}
+
 @MainActor
 final class BreathePauseCenter: ObservableObject {
     static let shared = BreathePauseCenter()
-    private init() {}
+    private init() {
+        guard ScreenTimeShield.isEnabled else { return }
+        // Safety net if iOS refused the re-lock schedule: re-shield when the app comes back.
+        ScreenTimeShield.endPassIfExpired()
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
+            ScreenTimeShield.endPassIfExpired()
+        }
+    }
 
     /// The pause to show (ContentView presents it full screen).
-    @Published var pending: PauseApp?
+    @Published var pending: PauseTarget?
 
     /// After a pause, openings within this window go straight to the app (no loop).
     private let passWindow: TimeInterval = 10 * 60
@@ -96,15 +119,28 @@ final class BreathePauseCenter: ObservableObject {
             UIApplication.shared.open(app.openURL)
             return
         }
-        pending = app
+        pending = .app(app)
         AnalyticsManager.shared.track(event: "breathe_pause_shown", properties: ["app": app.rawValue])
     }
 
+    /// Opened from the Screen Time shield's notification.
+    func requestShielded() {
+        guard ScreenTimeShield.isEnabled else { return }
+        pending = .shielded
+        AnalyticsManager.shared.track(event: "breathe_pause_shown", properties: ["app": "shielded"])
+    }
+
     /// The pause is over: let the next openings through, optionally open the app now.
-    func finish(_ app: PauseApp, openApp: Bool) {
-        UserDefaults.standard.set(Date().timeIntervalSince1970 + passWindow, forKey: key(app))
+    /// Behind the shield we cannot open the app itself: it is unlocked, the user goes back to it.
+    func finish(_ target: PauseTarget, openApp: Bool) {
         pending = nil
-        AnalyticsManager.shared.track(event: "breathe_pause_finished", properties: ["app": app.rawValue, "opened": openApp])
-        if openApp { UIApplication.shared.open(app.openURL) }
+        AnalyticsManager.shared.track(event: "breathe_pause_finished", properties: ["app": target.analyticsName, "opened": openApp])
+        switch target {
+        case .app(let app):
+            UserDefaults.standard.set(Date().timeIntervalSince1970 + passWindow, forKey: key(app))
+            if openApp { UIApplication.shared.open(app.openURL) }
+        case .shielded:
+            if openApp { ScreenTimeShield.startPass() }
+        }
     }
 }

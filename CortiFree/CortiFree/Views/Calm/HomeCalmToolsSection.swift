@@ -37,7 +37,12 @@ struct HomeCalmToolsSection: View {
         .task { await refresh() }
         .fullScreenCover(isPresented: $showPulse) { PulseCheckView() }
         .fullScreenCover(isPresented: $showReset) { NervousResetView() }
-        .sheet(isPresented: $showPauseSetup) { BreathePauseSetupView().presentationDetents([.large]) }
+        .sheet(isPresented: $showPauseSetup) {
+            Group {
+                if ScreenTimeShield.isEnabled { ScreenTimePauseSetupView() } else { BreathePauseSetupView() }
+            }
+            .presentationDetents([.large])
+        }
         .fullScreenCover(isPresented: $showFaceScan) { FaceScanView() }
     }
 

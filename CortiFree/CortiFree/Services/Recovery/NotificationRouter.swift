@@ -21,6 +21,11 @@ final class NotificationRouter: ObservableObject {
 
     func handle(userInfo: [AnyHashable: Any]) {
         guard let link = userInfo["deeplink"] as? String, let url = URL(string: link) else { return }
+        // Screen Time shield → « Breathe first »: the pause, shown full screen by ContentView.
+        if userInfo["campaign"] as? String == ScreenTimeShield.campaign {
+            BreathePauseCenter.shared.requestShielded()
+            return
+        }
         if userInfo["campaign"] as? String == PlanReminderScheduler.campaign {
             pendingAppLink = url
         } else {

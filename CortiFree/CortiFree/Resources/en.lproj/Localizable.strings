@@ -5589,3 +5589,14 @@
 "milo.pulse.no_watch" = "I don't have an Apple Watch";
 "profile.v2.more.watch" = "Apple Watch";
 "profile.v2.more.watch_sub" = "Heart rate from your watch instead of the flash";
+
+/* Breathe before TikTok — Screen Time shield */
+"calm.pause.shield.about_to_open" = "You were about to open an app you chose to slow down";
+"calm.pause.shield.unlock" = "Unlock for 10 min";
+"calm.pause.shield.subtitle" = "Pick TikTok, Instagram… When you open them, CortiFree offers 30 seconds of breathing first. No shortcut to build.";
+"calm.pause.shield.active" = "All set: the apps you picked show « Breathe first » when you open them.";
+"calm.pause.shield.choose_apps" = "Choose apps";
+"calm.pause.shield.change_apps" = "Change apps";
+"calm.pause.shield.turn_off" = "Turn off";
+"calm.pause.shield.use_shortcuts" = "Use Shortcuts instead";
+"calm.pause.shield.denied" = "Screen Time access was denied. You can allow it in Settings → Screen Time, or use Shortcuts.";

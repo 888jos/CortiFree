@@ -5592,3 +5592,14 @@
 "milo.pulse.no_watch" = "Apple Watchを持っていません";
 "profile.v2.more.watch" = "Apple Watch";
 "profile.v2.more.watch_sub" = "フラッシュの代わりにウォッチで心拍を取得";
+
+/* Breathe before TikTok — Screen Time shield */
+"calm.pause.shield.about_to_open" = "ブレーキをかけると決めたアプリを開こうとしていました";
+"calm.pause.shield.unlock" = "10分間ロック解除";
+"calm.pause.shield.subtitle" = "TikTokやInstagramなどを選んでください。開くと、CortiFreeがまず30秒の呼吸を提案します。ショートカットの作成は不要です。";
+"calm.pause.shield.active" = "設定完了：選んだアプリを開くと「まず呼吸」が表示されます。";
+"calm.pause.shield.choose_apps" = "アプリを選ぶ";
+"calm.pause.shield.change_apps" = "アプリを変更";
+"calm.pause.shield.turn_off" = "オフにする";
+"calm.pause.shield.use_shortcuts" = "代わりにショートカットを使う";
+"calm.pause.shield.denied" = "スクリーンタイムへのアクセスが拒否されました。設定 → スクリーンタイムで許可するか、ショートカットを使ってください。";
