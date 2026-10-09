@@ -19,9 +19,6 @@ struct AvatarProgressCard: View {
     @State private var didLoadProgress: Bool = false
 
     private let totalDays = PersonalPlan.length
-    private let columns = 7   // une ligne par semaine du plan
-    private let cellSize: CGFloat = 20
-    private let cellSpacing: CGFloat = 5
 
     /// Jour du plan (1...28), même source que l'onglet Plan.
     private var currentProgramDay: Int { min(planStore.todayIndex, totalDays) }
@@ -76,58 +73,11 @@ struct AvatarProgressCard: View {
     // MARK: - Front Card (Recto)
 
     private var frontCard: some View {
-        ZStack(alignment: .bottom) {
-            // Avatar image
-            Image("profile_avatar")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 216)
-                .frame(height: 320)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-
-            // Grid overlay INSIDE the image, in the last quarter
-            VStack(spacing: 0) {
-                // Grid of the plan days (no animation)
-                LazyVGrid(columns: Array(repeating: GridItem(.fixed(cellSize), spacing: cellSpacing), count: columns), spacing: cellSpacing) {
-                    ForEach(0..<totalDays, id: \.self) { day in
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(dayColor(for: day))
-                            .frame(width: cellSize, height: cellSize)
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, 12)
-
-                // Date and username row
-                HStack {
-                    Text(formatStartDate(startDate))
-                        .font(.custom("Poppins-Medium", size: 10))
-                        .foregroundColor(.white.opacity(0.8))
-
-                    Spacer()
-
-                    if !(firstName.isEmpty ? getUserFirstName() : firstName).isEmpty {
-                        Text(firstName.isEmpty ? getUserFirstName() : firstName)
-                            .font(.custom("Poppins-SemiBold", size: 10))
-                            .foregroundColor(.white.opacity(0.9))
-                    }
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-            }
-            .padding(.bottom, 8)
-        }
-        .frame(width: 216, height: 320)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(
-                    LinearGradient(colors: [.white.opacity(0.55), .white.opacity(0.12)],
-                                   startPoint: .topLeading, endPoint: .bottomTrailing),
-                    lineWidth: 1
-                )
+        AvatarCardFront(
+            firstName: firstName.isEmpty ? getUserFirstName() : firstName,
+            startDate: startDate,
+            currentDay: currentProgramDay
         )
-        .shadow(color: .black.opacity(0.3), radius: 16, x: 0, y: 8)
     }
 
     // MARK: - Back Card (Verso) - Redesigned
@@ -246,23 +196,6 @@ struct AvatarProgressCard: View {
         .glassCard(cornerRadius: 14, tint: Color(hex: "B794F6"))
     }
 
-    private func dayColor(for day: Int) -> Color {
-        // day is 0-indexed, currentProgramDay is 1-indexed
-        // - Past days: day < currentProgramDay - 1
-        // - Current day: day == currentProgramDay - 1
-        // - Future days: day > currentProgramDay - 1
-        if day < currentProgramDay - 1 {
-            // Jours terminés - Violet plein
-            return Color(hex: "B794F6")
-        } else if day == currentProgramDay - 1 {
-            // Jour en cours - Violet à 50% d'opacité
-            return Color(hex: "B794F6").opacity(0.5)
-        } else {
-            // Jours à venir - Gris
-            return Color.white.opacity(0.2)
-        }
-    }
-
     private func loadProgress() {
         // Le plan est déjà chargé par l'onglet Plan ; on s'assure qu'il existe si l'accueil s'ouvre en premier.
         Task { await planStore.ensurePlan() }
@@ -282,12 +215,6 @@ struct AvatarProgressCard: View {
             }
         }
         return ""
-    }
-
-    private func formatStartDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM"
-        return formatter.string(from: date)
     }
 
     private func formatFullDate(_ date: Date) -> String {
@@ -570,5 +497,90 @@ struct AvatarProgressCard_Previews: PreviewProvider {
                 .padding()
                 .frame(height: 300)
         }
+    }
+}
+
+/// Front of the home avatar card: the avatar, the 28 plan days (one row per week), the plan
+/// start date and the first name bottom right. Also shown when the card is unlocked in the onboarding.
+struct AvatarCardFront: View {
+    let firstName: String
+    let startDate: Date
+    /// Plan day (1...28); 0 = nothing started yet, every cell grey.
+    let currentDay: Int
+
+    private let totalDays = PersonalPlan.length
+    private let columns = 7
+    private let cellSize: CGFloat = 20
+    private let cellSpacing: CGFloat = 5
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            // Avatar image
+            Image("profile_avatar")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 216)
+                .frame(height: 320)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+
+            // Grid overlay INSIDE the image, in the last quarter
+            VStack(spacing: 0) {
+                // Grid of the plan days (no animation)
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(cellSize), spacing: cellSpacing), count: columns), spacing: cellSpacing) {
+                    ForEach(0..<totalDays, id: \.self) { day in
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(dayColor(for: day))
+                            .frame(width: cellSize, height: cellSize)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
+
+                // Date and username row
+                HStack {
+                    Text(formatStartDate(startDate))
+                        .font(.custom("Poppins-Medium", size: 10))
+                        .foregroundColor(.white.opacity(0.8))
+
+                    Spacer()
+
+                    if !firstName.isEmpty {
+                        Text(firstName)
+                            .font(.custom("Poppins-SemiBold", size: 10))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+            }
+            .padding(.bottom, 8)
+        }
+        .frame(width: 216, height: 320)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(colors: [.white.opacity(0.55), .white.opacity(0.12)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: .black.opacity(0.3), radius: 16, x: 0, y: 8)
+    }
+
+    private func dayColor(for day: Int) -> Color {
+        if day < currentDay - 1 {
+            return Color(hex: "B794F6")              // done
+        } else if day == currentDay - 1 {
+            return Color(hex: "B794F6").opacity(0.5) // today
+        } else {
+            return Color.white.opacity(0.2)          // to come
+        }
+    }
+
+    private func formatStartDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM"
+        return formatter.string(from: date)
     }
 }

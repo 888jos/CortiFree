@@ -5600,3 +5600,12 @@
 "calm.pause.shield.turn_off" = "Ausschalten";
 "calm.pause.shield.use_shortcuts" = "Stattdessen Kurzbefehle nutzen";
 "calm.pause.shield.denied" = "Zugriff auf Bildschirmzeit verweigert. Du kannst ihn in Einstellungen → Bildschirmzeit erlauben oder Kurzbefehle nutzen.";
+
+/* Onboarding — first name + card unlocked */
+"onboarding_v2.first_name.question" = "Zuerst… wie heißt du?";
+"onboarding_v2.first_name.placeholder" = "Dein Vorname";
+"onboarding_v2.first_name.cta" = "Weiter";
+"onboarding_v2.first_name.skip" = "Überspringen";
+"onboarding_v2.first_name.unlocked_title" = "Deine CortiFree-Karte ist freigeschaltet!";
+"onboarding_v2.first_name.unlocked_subtitle" = "Willkommen %@. Sie füllt sich Tag für Tag mit deinem Plan.";
+"onboarding_v2.first_name.unlocked_cta" = "Los geht's";

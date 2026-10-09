@@ -92,6 +92,7 @@ struct OnboardingV2FlowView: View {
 
     enum OnboardingStep: String, CaseIterable {
         case welcome
+        case firstName
         case overall
         case reassurance
         case habitsQuiz
@@ -114,7 +115,7 @@ struct OnboardingV2FlowView: View {
         // These are steps that make sense to restart from
         var checkpoint: OnboardingStep {
             switch self {
-            case .welcome, .overall:
+            case .welcome, .firstName, .overall:
                 return .welcome
             case .reassurance, .habitsQuiz, .stressPatternValidation, .symptomChecker:
                 return .reassurance
@@ -322,7 +323,7 @@ struct OnboardingV2FlowView: View {
         switch currentStep {
         case .welcome:
             FirstLaunchWelcomeView(
-                onContinue: { currentStep = .overall },
+                onContinue: { currentStep = .firstName },
                 onSignIn: { showReturningUserSignIn = true }
             )
             .fullScreenCover(isPresented: $showReturningUserSignIn) {
@@ -336,6 +337,9 @@ struct OnboardingV2FlowView: View {
                     }
                 }
             }
+
+        case .firstName:
+            OnboardingFirstNameView(onContinue: { currentStep = .overall })
 
         case .overall:
             OverallQuizView(onComplete: { data in

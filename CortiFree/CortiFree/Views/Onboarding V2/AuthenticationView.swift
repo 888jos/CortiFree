@@ -67,9 +67,11 @@ func completeAppleSignIn(credential: ASAuthorizationAppleIDCredential, nonce: St
           let idToken = String(data: tokenData, encoding: .utf8) else {
         throw URLError(.userAuthenticationRequired)
     }
-    let firstName = credential.fullName?.givenName
+    // The first name typed at the start of the onboarding wins over the Apple one.
+    let typedName = UserPersistence.userFirstName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let firstName = typedName.isEmpty ? credential.fullName?.givenName : typedName
     let user = try await Auth.auth().signInWithApple(identityToken: idToken, rawNonce: nonce, firstName: firstName)
-    if let firstName, !firstName.isEmpty {
+    if typedName.isEmpty, let firstName, !firstName.isEmpty {
         UserDefaults.standard.set(firstName, forKey: "userFirstName")
     }
     if user.onboardingCompleted {

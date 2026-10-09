@@ -5600,3 +5600,12 @@
 "calm.pause.shield.turn_off" = "Turn off";
 "calm.pause.shield.use_shortcuts" = "Use Shortcuts instead";
 "calm.pause.shield.denied" = "Screen Time access was denied. You can allow it in Settings → Screen Time, or use Shortcuts.";
+
+/* Onboarding — first name + card unlocked */
+"onboarding_v2.first_name.question" = "First things first… what's your name?";
+"onboarding_v2.first_name.placeholder" = "Your first name";
+"onboarding_v2.first_name.cta" = "Continue";
+"onboarding_v2.first_name.skip" = "Skip";
+"onboarding_v2.first_name.unlocked_title" = "Your CortiFree card is unlocked!";
+"onboarding_v2.first_name.unlocked_subtitle" = "Welcome %@. It will fill up day after day with your plan.";
+"onboarding_v2.first_name.unlocked_cta" = "Let's go";

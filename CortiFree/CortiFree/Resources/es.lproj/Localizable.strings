@@ -5600,3 +5600,12 @@
 "calm.pause.shield.turn_off" = "Desactivar";
 "calm.pause.shield.use_shortcuts" = "Usar Atajos en su lugar";
 "calm.pause.shield.denied" = "Acceso a Tiempo de uso denegado. Puedes permitirlo en Ajustes → Tiempo de uso, o usar Atajos.";
+
+/* Onboarding — first name + card unlocked */
+"onboarding_v2.first_name.question" = "Antes de nada… ¿cómo te llamas?";
+"onboarding_v2.first_name.placeholder" = "Tu nombre";
+"onboarding_v2.first_name.cta" = "Continuar";
+"onboarding_v2.first_name.skip" = "Omitir";
+"onboarding_v2.first_name.unlocked_title" = "¡Tu tarjeta CortiFree está desbloqueada!";
+"onboarding_v2.first_name.unlocked_subtitle" = "Bienvenido/a %@. Se irá llenando día a día con tu plan.";
+"onboarding_v2.first_name.unlocked_cta" = "¡Vamos!";
