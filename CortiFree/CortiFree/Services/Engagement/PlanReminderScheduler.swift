@@ -4,9 +4,13 @@
 //
 //  Local notifications for subscribers following their plan (RecoveryScheduler handles the
 //  people without a subscription; identifiers never overlap).
-//  - daily reminder naming today's plan session (replaces the generic morning reminder)
+//  - daily reminder naming today's plan session, at the user's usual practice time
+//    (replaces the generic morning reminder)
 //  - cycle transition: day 26, day 28 evening (review ready), day 29 morning (next cycle)
-//  Spec: docs/app-notes/RETENTION_POST_28_DAYS_PLAN.md (0.4).
+//  - streak at risk at 20:00 when nothing is done yet
+//  - weekly summary on Sunday evening
+//  - inactive users: day +2, +4, +7 without opening, then nothing until the next open
+//  Spec: docs/app-notes/RETENTION_POST_28_DAYS_PLAN.md (0.4, 2.1).
 //
 //  Same rules as the recovery notifications: fixed identifiers, idempotent rescheduling on every
 //  app open / plan change / completion, nothing during quiet hours (21:30 → 8:00).
@@ -17,7 +21,7 @@ import UIKit
 import UserNotifications
 
 struct PlanReminder: Equatable {
-    enum Kind: String { case daily, transition }
+    enum Kind: String { case daily, transition, streak, weekly, inactive }
 
     /// Stable id (notification identifier suffix, analytics).
     let id: String
@@ -40,6 +44,11 @@ struct PlanReminderContext {
     let nextCycleFirstSession: String?
     let reminderTime: (hour: Int, minute: Int)
     let doneToday: Bool
+    /// Current streak (including today when something is done).
+    var streak: Int = 0
+    /// Breathing / guided sessions done since Monday, and their minutes.
+    var weekSessions: Int = 0
+    var weekMinutes: Int = 0
 }
 
 // MARK: - Planner (pure, unit-tested)
@@ -48,7 +57,15 @@ enum PlanReminderPlanner {
     static let identifierPrefix = "plan_reminder_"
     static let dailyIDs = ["daily_0", "daily_1"]
     static let transitionIDs = ["j26", "j28", "j29"]
-    static var allIDs: [String] { dailyIDs + transitionIDs }
+    static let streakIDs = ["streak_0", "streak_1"]
+    static let weeklyID = "weekly"
+    /// Days without opening the app after which we nudge (3 messages, then silence).
+    static let inactiveDays = [2, 4, 7]
+    static var inactiveIDs: [String] { inactiveDays.map { "inactive_\($0)" } }
+    static var allIDs: [String] { dailyIDs + transitionIDs + streakIDs + [weeklyID] + inactiveIDs }
+
+    static let streakTime = (hour: 20, minute: 0)
+    static let weeklyTime = (hour: 19, minute: 0)
 
     static let reviewTime = (hour: 19, minute: 30)
     /// The day-29 message is a morning one, even when the usual reminder is later.
@@ -92,9 +109,79 @@ enum PlanReminderPlanner {
                                        args: [title].compactMap { $0 }, link: planLink))
         }
 
+        // Inactive: the plan reminders stop after tomorrow; three nudges follow, then silence until
+        // the next open (every open reschedules from scratch).
+        let contentDays = Set(result.map { planDay(of: $0.date, start: context.planStart, calendar: calendar) })
+        for (index, offset) in inactiveDays.enumerated() {
+            let day = today + offset
+            guard !contentDays.contains(day),
+                  let date = fireDate(planDay: day, time: context.reminderTime, start: context.planStart, calendar: calendar) else { continue }
+            let title = index == 0 ? context.sessionTitles[day] : nil
+            let key = index == 0 && title == nil ? "plan_reminder.inactive_generic.1" : "plan_reminder.inactive.\(index + 1)"
+            result.append(PlanReminder(id: "inactive_\(offset)", kind: .inactive, date: date, key: key,
+                                       args: [title].compactMap { $0 }, link: planLink))
+        }
+
+        // Streak at risk: tonight if nothing is done yet, tomorrow night if today is done (the
+        // reminder is removed as soon as something gets validated).
+        if context.streak >= 1 {
+            let offset = context.doneToday ? 1 : 0
+            if let date = fireDate(planDay: today + offset, time: streakTime, start: context.planStart, calendar: calendar),
+               date > context.now.addingTimeInterval(60) {
+                result.append(PlanReminder(id: streakIDs[offset], kind: .streak, date: date, key: "plan_reminder.streak",
+                                           args: ["\(context.streak)"], link: planLink))
+            }
+        }
+
+        // Weekly summary, Sunday evening of the current week.
+        if context.weekSessions > 0, let sunday = upcomingSunday(after: context.now, calendar: calendar),
+           let date = calendar.date(bySettingHour: weeklyTime.hour, minute: weeklyTime.minute, second: 0, of: sunday),
+           date > context.now.addingTimeInterval(60) {
+            result.append(PlanReminder(id: weeklyID, kind: .weekly, date: date, key: "plan_reminder.weekly",
+                                       args: ["\(context.weekSessions)", "\(context.weekMinutes)"], link: planLink))
+        }
+
         return result
             .filter { !RecoveryPlanner.isQuiet($0.date, calendar: calendar) }
             .sorted { $0.date < $1.date }
+    }
+
+    /// Sunday of the week containing `date` (weeks start on Monday), at midnight.
+    static func upcomingSunday(after date: Date, calendar: Calendar = .current) -> Date? {
+        let weekday = calendar.component(.weekday, from: date) // 1 = Sunday
+        let daysToSunday = weekday == 1 ? 0 : 8 - weekday
+        return calendar.date(byAdding: .day, value: daysToSunday, to: calendar.startOfDay(for: date))
+    }
+
+    /// Monday 00:00 of the week containing `date`.
+    static func startOfWeek(_ date: Date, calendar: Calendar = .current) -> Date {
+        let weekday = calendar.component(.weekday, from: date)
+        let back = (weekday + 5) % 7 // Monday → 0, Sunday → 6
+        return calendar.date(byAdding: .day, value: -back, to: calendar.startOfDay(for: date)) ?? date
+    }
+
+    /// Usual practice time: average time of the first completion of each of the last 7 days,
+    /// rounded to 5 minutes. Needs at least 2 days of practice.
+    static func usualPracticeTime(_ completions: [Date], now: Date, calendar: Calendar = .current) -> (hour: Int, minute: Int)? {
+        let since = calendar.date(byAdding: .day, value: -7, to: calendar.startOfDay(for: now)) ?? now
+        var firstOfDay: [Date: Int] = [:]
+        for date in completions where date >= since && date <= now {
+            let parts = calendar.dateComponents([.hour, .minute], from: date)
+            let minutes = (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
+            let day = calendar.startOfDay(for: date)
+            firstOfDay[day] = min(firstOfDay[day] ?? .max, minutes)
+        }
+        guard firstOfDay.count >= 2 else { return nil }
+        let average = Double(firstOfDay.values.reduce(0, +)) / Double(firstOfDay.count)
+        let rounded = Int((average / 5).rounded()) * 5
+        return (rounded / 60, rounded % 60)
+    }
+
+    /// Sessions (breathing + guided) and minutes since Monday.
+    static func weekSummary(_ completions: [LocalProgressStore.Completion], now: Date, calendar: Calendar = .current) -> (sessions: Int, minutes: Int) {
+        let monday = startOfWeek(now, calendar: calendar)
+        let practice = completions.filter { $0.completedAt >= monday && $0.completedAt <= now && ["breathing", "meditation"].contains($0.habitID) }
+        return (practice.count, practice.reduce(0) { $0 + $1.durationSeconds } / 60)
     }
 
     /// 1-based plan day of a date (like PersonalPlan.dayIndex, without the clamp at 1).
@@ -171,7 +258,8 @@ final class PlanReminderScheduler {
             return
         }
 
-        let reminders = PlanReminderPlanner.reminders(context(for: plan, now: now))
+        let reminderContext = context(for: plan, now: now)
+        let reminders = PlanReminderPlanner.reminders(reminderContext)
         UserDefaults.standard.set(true, forKey: Self.activeKey)
         // The generic morning reminder is replaced by the plan one.
         center.removePendingNotificationRequests(withIdentifiers: ["daily_morning_meditation"])
@@ -179,6 +267,7 @@ final class PlanReminderScheduler {
         for reminder in reminders { add(reminder) }
         AnalyticsManager.shared.track(event: "plan_reminders_scheduled", properties: [
             "ids": reminders.map(\.id).joined(separator: ","), "count": reminders.count,
+            "reminder_time": String(format: "%02d:%02d", reminderContext.reminderTime.hour, reminderContext.reminderTime.minute),
             "cycle": plan.cycle, "plan_day": plan.dayIndex(on: now)
         ])
     }
@@ -205,12 +294,20 @@ final class PlanReminderScheduler {
         if today <= PersonalPlan.length, let start = Calendar.current.date(byAdding: .day, value: PersonalPlan.length, to: plan.startDate) {
             nextFirst = Self.mainSessionTitle(PersonalPlanStore.shared.nextCyclePlan(startDate: start).day(1))
         }
-        let morning = NotificationService.shared.morningReminderComponents
+        for offset in PlanReminderPlanner.inactiveDays where today + offset <= PersonalPlan.length {
+            titles[today + offset] = Self.mainSessionTitle(plan.day(today + offset))
+        }
+        let completions = Self.completions()
+        // The user's own rhythm first; the morning reminder setting until there is one.
+        let usual = PlanReminderPlanner.usualPracticeTime(completions.map(\.completedAt), now: now)
+        let week = PlanReminderPlanner.weekSummary(completions, now: now)
         return PlanReminderContext(
             now: now, planStart: plan.startDate, cycle: plan.cycle, sessionTitles: titles,
             nextCycleFirstSession: nextFirst,
-            reminderTime: PlanReminderPlanner.clamped(morning),
-            doneToday: Self.hasCompletion(on: now)
+            reminderTime: PlanReminderPlanner.clamped(usual ?? NotificationService.shared.morningReminderComponents),
+            doneToday: completions.contains { Calendar.current.isDate($0.completedAt, inSameDayAs: now) },
+            streak: UserDefaults.standard.integer(forKey: "streakDays"),
+            weekSessions: week.sessions, weekMinutes: week.minutes
         )
     }
 
@@ -223,10 +320,6 @@ final class PlanReminderScheduler {
 
     static func completions() -> [LocalProgressStore.Completion] {
         LocalProgressStore.load(for: Auth.auth().currentUser?.uid ?? UserPersistence.localUserID)
-    }
-
-    static func hasCompletion(on date: Date) -> Bool {
-        completions().contains { Calendar.current.isDate($0.completedAt, inSameDayAs: date) }
     }
 
     // MARK: Notification

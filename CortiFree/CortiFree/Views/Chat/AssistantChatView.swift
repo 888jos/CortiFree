@@ -91,6 +91,11 @@ struct AssistantChatView: View {
         .onAppear {
             refreshDailyQuotaIfNeeded()
             store.reload()
+            // Weekly check-in from the Plan tab: Milo opens with the question of the week.
+            if let opener = MiloWeeklyCheckIn.shared.consumeOpener() {
+                if !messages.isEmpty { newConversation() }
+                messages.append(DeepSeekChatMessage(role: "assistant", content: opener))
+            }
             consumeSharedDocument()
         }
         .onChange(of: importCenter.pendingDocument) { _, _ in consumeSharedDocument() }

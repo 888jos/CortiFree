@@ -675,3 +675,51 @@ struct PlanCycleBanner: View {
         .planGlass(cornerRadius: 20, tint: PlanPalette.accent)
     }
 }
+
+// MARK: - Milo weekly check-in
+
+/// Once a week: talk the week over with Milo (MiloWeeklyCheckIn).
+struct PlanMiloCheckInCard: View {
+    let onStart: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image("cortifree_assistant_avatar")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 44, height: 44)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("plan.milo_checkin.title".localized)
+                    .font(Font.Poppins.custom(.semiBold, size: 15))
+                    .foregroundStyle(.white)
+                Text("plan.milo_checkin.subtitle".localized)
+                    .font(Font.Poppins.custom(.regular, size: 13))
+                    .foregroundStyle(PlanPalette.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button {
+                    HapticManager.light()
+                    onStart()
+                } label: {
+                    Text("plan.milo_checkin.start".localized)
+                        .font(Font.Poppins.custom(.semiBold, size: 14))
+                        .padding(.horizontal, 6)
+                }
+                .planGlassButtonStyle(prominent: true)
+                .padding(.top, 2)
+            }
+            Spacer(minLength: 0)
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .frame(width: 30, height: 30)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("plan.close".localized)
+        }
+        .padding(16)
+        .planGlass(cornerRadius: 22, tint: PlanPalette.accent)
+    }
+}

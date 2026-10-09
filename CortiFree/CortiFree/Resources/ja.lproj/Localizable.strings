@@ -5191,3 +5191,24 @@
 "plan.bilan.acquired.next" = "%@は身につきました。新しい習慣に入れ替わります。";
 "celebration.habit_acquired.title" = "習慣が身につきました！";
 "celebration.habit_acquired.subtitle" = "%@：サイクルの80%%以上を達成";
+
+/* Retention: smart reminders, Milo weekly check-in */
+"plan_reminder.streak.title" = "連続記録が待っています 🔥";
+"plan_reminder.streak.body" = "%@日連続。2分で記録を守れます。";
+"plan_reminder.weekly.title" = "CortiFreeでの1週間";
+"plan_reminder.weekly.body" = "今週：%@セッション、%@分。よくがんばりました。";
+"plan_reminder.inactive.1.title" = "セッションを取っておきました";
+"plan_reminder.inactive.1.body" = "今日：%@。5分で再開できます。";
+"plan_reminder.inactive_generic.1.title" = "セッションを取っておきました";
+"plan_reminder.inactive_generic.1.body" = "5分で再開できます。";
+"plan_reminder.inactive.2.title" = "調子はどうですか？";
+"plan_reminder.inactive.2.body" = "忙しい1週間？3分の呼吸で変わります。";
+"plan_reminder.inactive.3.title" = "プランはいつでもここに";
+"plan_reminder.inactive.3.body" = "自分のペースで、続きから再開しましょう。";
+"plan.milo_checkin.title" = "Miloと1週間をふりかえる";
+"plan.milo_checkin.subtitle" = "2分で今週をふりかえり、次を調整しましょう。";
+"plan.milo_checkin.start" = "Miloと話す";
+"milo.weekly.question.1" = "今週はどうでしたか？いちばん大変だったこと、前よりうまくできたことは？";
+"milo.weekly.question.2" = "今週をふりかえって、プランのどの時間がいちばん助けになりましたか？";
+"milo.weekly.question.3" = "今週ストレスを感じたことは？そのとき体はどう反応しましたか？";
+"milo.weekly.question.4" = "来週を少し軽くできるとしたら、まず何を変えますか？";

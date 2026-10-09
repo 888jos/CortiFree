@@ -5186,3 +5186,24 @@
 "plan.bilan.acquired.next" = "%@ est acquise : elle laisse la place à une nouvelle habitude.";
 "celebration.habit_acquired.title" = "Habitude acquise !";
 "celebration.habit_acquired.subtitle" = "%@ : tenue plus de 80 %% du cycle";
+
+/* Retention: smart reminders, Milo weekly check-in */
+"plan_reminder.streak.title" = "Ta série t'attend 🔥";
+"plan_reminder.streak.body" = "%@ jours d'affilée : 2 minutes suffisent pour la garder.";
+"plan_reminder.weekly.title" = "Ta semaine avec CortiFree";
+"plan_reminder.weekly.body" = "Cette semaine : %@ séances, %@ min pour toi. Bravo.";
+"plan_reminder.inactive.1.title" = "On t'a gardé ta séance";
+"plan_reminder.inactive.1.body" = "Aujourd'hui : %@. 5 minutes suffisent pour reprendre.";
+"plan_reminder.inactive_generic.1.title" = "On t'a gardé ta séance";
+"plan_reminder.inactive_generic.1.body" = "5 minutes suffisent pour reprendre.";
+"plan_reminder.inactive.2.title" = "Comment tu vas ?";
+"plan_reminder.inactive.2.body" = "Semaine chargée ? Une pause respiration de 3 minutes peut tout changer.";
+"plan_reminder.inactive.3.title" = "Ton plan est toujours là";
+"plan_reminder.inactive.3.body" = "Reprends là où tu t'es arrêté·e, à ton rythme.";
+"plan.milo_checkin.title" = "Ta semaine avec Milo";
+"plan.milo_checkin.subtitle" = "Deux minutes pour faire le point sur ta semaine et ajuster la suite.";
+"plan.milo_checkin.start" = "Parler à Milo";
+"milo.weekly.question.1" = "Comment s'est passée ta semaine ? Qu'est-ce qui a été le plus dur, et qu'est-ce que tu as mieux géré qu'avant ?";
+"milo.weekly.question.2" = "En repensant à ta semaine : quel moment de ton plan t'a le plus aidé ?";
+"milo.weekly.question.3" = "Qu'est-ce qui t'a stressé cette semaine, et comment ton corps a-t-il réagi ?";
+"milo.weekly.question.4" = "Si la semaine prochaine pouvait être un peu plus légère, qu'est-ce que tu changerais en premier ?";

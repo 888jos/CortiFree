@@ -5191,3 +5191,24 @@
 "plan.bilan.acquired.next" = "%@은(는) 이제 습관이 됐어요. 새 습관에 자리를 내줘요.";
 "celebration.habit_acquired.title" = "습관 완성!";
 "celebration.habit_acquired.subtitle" = "%@: 사이클의 80%% 이상 실천";
+
+/* Retention: smart reminders, Milo weekly check-in */
+"plan_reminder.streak.title" = "연속 기록이 기다려요 🔥";
+"plan_reminder.streak.body" = "%@일 연속이에요. 2분이면 지킬 수 있어요.";
+"plan_reminder.weekly.title" = "CortiFree와 함께한 한 주";
+"plan_reminder.weekly.body" = "이번 주: 세션 %@회, 나를 위한 %@분. 잘했어요.";
+"plan_reminder.inactive.1.title" = "세션을 남겨 두었어요";
+"plan_reminder.inactive.1.body" = "오늘: %@. 5분이면 다시 시작할 수 있어요.";
+"plan_reminder.inactive_generic.1.title" = "세션을 남겨 두었어요";
+"plan_reminder.inactive_generic.1.body" = "5분이면 다시 시작할 수 있어요.";
+"plan_reminder.inactive.2.title" = "요즘 어때요?";
+"plan_reminder.inactive.2.body" = "바쁜 한 주인가요? 3분 호흡이 큰 차이를 만들어요.";
+"plan_reminder.inactive.3.title" = "플랜은 그대로 있어요";
+"plan_reminder.inactive.3.body" = "멈춘 곳에서 내 속도로 다시 시작해요.";
+"plan.milo_checkin.title" = "Milo와 한 주 돌아보기";
+"plan.milo_checkin.subtitle" = "2분 동안 한 주를 돌아보고 다음을 조정해요.";
+"plan.milo_checkin.start" = "Milo와 이야기하기";
+"milo.weekly.question.1" = "이번 주는 어땠어요? 가장 힘들었던 것과 전보다 잘 해낸 것은 뭐였나요?";
+"milo.weekly.question.2" = "이번 주를 돌아보면, 플랜의 어떤 순간이 가장 도움이 됐나요?";
+"milo.weekly.question.3" = "이번 주에 무엇이 스트레스였고, 몸은 어떻게 반응했나요?";
+"milo.weekly.question.4" = "다음 주를 조금 더 가볍게 만들 수 있다면, 무엇부터 바꾸고 싶나요?";

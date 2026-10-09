@@ -154,7 +154,7 @@ struct PlanCycleTests {
 
     @Test func transitionsReplaceTheDailyReminder() {
         let reminders = PlanReminderPlanner.reminders(context(today: 28, hour: 8), calendar: calendar)
-        #expect(reminders.map(\.id) == ["daily_0", "j28", "j29"])
+        #expect(reminders.filter { $0.kind == .daily || $0.kind == .transition }.map(\.id) == ["daily_0", "j28", "j29"])
         let j28 = reminders.first { $0.id == "j28" }!
         #expect(j28.date == date(28, 19, 30))
         #expect(j28.link == PlanReminderPlanner.reviewLink)
@@ -174,5 +174,91 @@ struct PlanCycleTests {
         #expect(early.hour == 8 && early.minute == 30)
         #expect(late.hour == 21 && late.minute == 0)
         #expect(day.hour == 13 && day.minute == 5)
+    }
+
+    // MARK: Smart reminders (phase 2)
+
+    @Test func usualPracticeTimeAveragesTheFirstCompletionOfEachDay() {
+        let now = date(10, 21)
+        let times = [date(8, 18, 10), date(8, 21), date(9, 18, 40), date(1, 7)] // Oct 1st: too old
+        let usual = PlanReminderPlanner.usualPracticeTime(times, now: now, calendar: calendar)
+        #expect(usual?.hour == 18 && usual?.minute == 25)
+        #expect(PlanReminderPlanner.usualPracticeTime([date(9, 18)], now: now, calendar: calendar) == nil)
+    }
+
+    @Test func streakAtRiskOnlyWhenNothingDone() {
+        var ctx = context(today: 10, hour: 12)
+        ctx.streak = 4
+        let risky = PlanReminderPlanner.reminders(ctx, calendar: calendar).filter { $0.kind == .streak }
+        #expect(risky.map(\.id) == ["streak_0"])
+        #expect(risky.first?.date == date(10, 20))
+        #expect(risky.first?.args == ["4"])
+
+        var done = context(today: 10, hour: 12, doneToday: true)
+        done.streak = 5
+        let tomorrow = PlanReminderPlanner.reminders(done, calendar: calendar).filter { $0.kind == .streak }
+        #expect(tomorrow.map(\.id) == ["streak_1"])
+        #expect(tomorrow.first?.date == date(11, 20))
+
+        #expect(PlanReminderPlanner.reminders(context(today: 10, hour: 12), calendar: calendar).allSatisfy { $0.kind != .streak })
+    }
+
+    @Test func inactiveNudgesStopAfterThree() {
+        let reminders = PlanReminderPlanner.reminders(context(today: 5), calendar: calendar).filter { $0.kind == .inactive }
+        #expect(reminders.map(\.id) == ["inactive_2", "inactive_4", "inactive_7"])
+        #expect(reminders.map(\.date) == [date(7, 9), date(9, 9), date(12, 9)])
+    }
+
+    @Test func inactiveNudgeGivesWayToTransitions() {
+        // Day 24: +2 = day 26 and +4 = day 28 already have a transition message → no nudge those days.
+        let ids = PlanReminderPlanner.reminders(context(today: 24), calendar: calendar).map(\.id)
+        #expect(ids.contains("j26") && ids.contains("j28"))
+        #expect(!ids.contains("inactive_2") && !ids.contains("inactive_4"))
+        #expect(ids.contains("inactive_7"))
+    }
+
+    @Test func weeklySummaryOnSundayEvening() {
+        // October 7th 2026 is a Wednesday.
+        var ctx = context(today: 7)
+        ctx.weekSessions = 5
+        ctx.weekMinutes = 42
+        let weekly = PlanReminderPlanner.reminders(ctx, calendar: calendar).first { $0.kind == .weekly }
+        #expect(weekly?.date == date(11, 19))
+        #expect(weekly?.args == ["5", "42"])
+        #expect(PlanReminderPlanner.reminders(context(today: 7), calendar: calendar).allSatisfy { $0.kind != .weekly })
+    }
+
+    @Test func weekSummaryCountsPracticeSinceMonday() {
+        let now = date(7, 20) // Wednesday
+        func completion(_ habit: String, _ at: Date, _ seconds: Int) -> LocalProgressStore.Completion {
+            LocalProgressStore.Completion(taskID: "plan_\(habit)", habitID: habit, programDay: 1, completedAt: at, durationSeconds: seconds)
+        }
+        let list = [completion("breathing", date(5, 9), 180), completion("meditation", date(6, 9), 600),
+                    completion("water", date(6, 10), 0), completion("breathing", date(4, 9), 300)] // Sunday before
+        let summary = PlanReminderPlanner.weekSummary(list, now: now, calendar: calendar)
+        #expect(summary.sessions == 2)
+        #expect(summary.minutes == 13)
+    }
+
+    @Test func remindersNeverFireInQuietHours() {
+        var ctx = context(today: 3, hour: 7, reminder: (21, 0))
+        ctx.streak = 2
+        ctx.weekSessions = 1
+        for reminder in PlanReminderPlanner.reminders(ctx, calendar: calendar) {
+            #expect(!RecoveryPlanner.isQuiet(reminder.date, calendar: calendar))
+        }
+    }
+
+    // MARK: Milo weekly check-in
+
+    @Test func miloCheckInIsWeekly() {
+        let wednesday = date(7, 10), sunday = date(11, 10)
+        #expect(!MiloWeeklyCheckIn.isDue(planDay: 5, now: sunday, lastHandled: nil, calendar: calendar))
+        #expect(MiloWeeklyCheckIn.isDue(planDay: 7, now: wednesday, lastHandled: nil, calendar: calendar))
+        #expect(!MiloWeeklyCheckIn.isDue(planDay: 8, now: wednesday, lastHandled: nil, calendar: calendar))
+        #expect(MiloWeeklyCheckIn.isDue(planDay: 9, now: sunday, lastHandled: nil, calendar: calendar))
+        #expect(!MiloWeeklyCheckIn.isDue(planDay: 14, now: sunday, lastHandled: date(9, 10), calendar: calendar))
+        #expect(MiloWeeklyCheckIn.questionKey(week: 1) == "milo.weekly.question.1")
+        #expect(MiloWeeklyCheckIn.questionKey(week: 5) == "milo.weekly.question.1")
     }
 }

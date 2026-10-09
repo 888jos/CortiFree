@@ -47,6 +47,7 @@ struct TasksV2View: View {
     @ObservedObject private var achievementService = AchievementService.shared
     @ObservedObject private var habitBadgeService = HabitBadgeService.shared
     @ObservedObject private var anxietyChecks = AnxietyCheckStore.shared
+    @ObservedObject private var miloCheckIn = MiloWeeklyCheckIn.shared
 
     @State private var userSettings: UserSettings?
     @State private var habitTracking: [String: HabitTracking] = [:]
@@ -162,6 +163,16 @@ struct TasksV2View: View {
                                 onStart: { anxietyCheckLaunch = AnxietyCheckLaunch(checkpoint: checkpoint) },
                                 onLater: {
                                     withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { anxietyChecks.snoozeForToday() }
+                                }
+                            )
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
+
+                        if isShowingCurrentDay, !plan.isFinished, miloCheckIn.isDue(planDay: todayIndex) {
+                            PlanMiloCheckInCard(
+                                onStart: { miloCheckIn.start(planDay: todayIndex, cycle: plan.cycle, source: "plan_card") },
+                                onDismiss: {
+                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { miloCheckIn.dismiss(planDay: todayIndex) }
                                 }
                             )
                             .transition(.opacity.combined(with: .move(edge: .top)))
