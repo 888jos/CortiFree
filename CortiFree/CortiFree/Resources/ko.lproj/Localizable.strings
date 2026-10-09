@@ -3318,7 +3318,7 @@
 "onboarding_v2.auth.enter_credentials" = "로그인 정보를 입력하세요";
 "onboarding_v2.auth.first_name_label" = "이름";
 "onboarding_v2.auth.password_label" = "비밀번호";
-"onboarding_v2.auth.password_min_chars" = "최소 6자";
+"onboarding_v2.auth.password_min_chars" = "최소 8자";
 "onboarding_v2.auth.confirm_password_label" = "비밀번호 확인";
 "onboarding_v2.auth.confirm_placeholder" = "확인";
 
@@ -4801,7 +4801,7 @@
 "auth.enter_credentials" = "로그인 정보를 입력해 주세요";
 "auth.first_name_placeholder" = "이름을 입력하세요";
 "auth.email_placeholder" = "your@email.com";
-"auth.password_placeholder" = "6자 이상";
+"auth.password_placeholder" = "최소 8자";
 "auth.confirm_placeholder" = "다시 입력";
 "auth.other_method" = "다른 방법";
 "auth.google_title" = "Google 로그인";
@@ -4817,8 +4817,8 @@
 "auth.default_user_name" = "사용자";
 "auth.reset.email_sent_title" = "이메일을 보냈어요!";
 "auth.reset.email_sent_message" = "받은편지함을 확인하고 안내에 따라 비밀번호를 재설정해 주세요.";
-"auth.reset.instructions" = "이메일을 입력하시면 비밀번호 재설정 링크를 보내 드려요.";
-"auth.reset.send_link" = "링크 보내기";
+"auth.reset.instructions" = "이메일을 입력하면 비밀번호 재설정 코드를 보내드려요.";
+"auth.reset.send_link" = "코드 보내기";
 "onboarding_v2.breath_demo.nice_work" = "잘했어요";
 "onboarding_v2.breath_demo.take_a_breath" = "숨을 한번 쉬어 봐요";
 "onboarding_v2.breath_demo.ready" = "준비됐나요?";
@@ -4935,7 +4935,7 @@
 "paywall_custom.feature_library_desc" = "100개 이상의 가이드 명상, 호흡 운동, 편안한 사운드.";
 "paywall_custom.feature_milo_title" = "나의 어시스턴트 Milo";
 "paywall_custom.feature_milo_desc" = "언제든 물어보세요. 플랜을 알고 맞는 운동을 추천해 줘요.";
-"onboarding_v2.auth.generic_error" = "로그인하지 못했어요. 이메일과 비밀번호를 확인한 뒤 다시 시도해 주세요.";
+"onboarding_v2.auth.generic_error" = "문제가 발생했어요. 잠시 후 다시 시도해 주세요.";
 "first_launch.have_account" = "이미 계정이 있어요";
 "onboarding_v2.reassurance.support" = "지금 정말 힘들다면 혼자 감당하지 않아도 돼요. 믿을 수 있는 사람이나 의사와 이야기하거나 상담 전화에 연락해 보세요. 위급할 때는 119에 전화하세요.";
 "onboarding_v2.notifications.time_label" = "알림 시간";
@@ -5094,3 +5094,19 @@
 "live_activity.title.starting" = "플랜을 시작하는 중";
 "live_activity.title.building" = "플랜을 만드는 중";
 "live_activity.title.almost_ready" = "거의 완성됐어요";
+
+/* Convex auth (errors, password reset with code) */
+"auth.error.invalid_credentials" = "이메일 또는 비밀번호가 올바르지 않아요.";
+"auth.error.email_exists" = "이 이메일로 된 계정이 이미 있어요. 로그인해 주세요.";
+"auth.error.password_too_short" = "비밀번호는 8자 이상이어야 해요.";
+"auth.error.invalid_email" = "이메일 주소가 올바르지 않아요.";
+"auth.error.too_many_attempts" = "시도 횟수가 너무 많아요. 몇 분 후 다시 시도해 주세요.";
+"auth.error.network" = "서버에 연결할 수 없어요. 연결 상태를 확인하고 다시 시도해 주세요.";
+"auth.reset.invalid_code" = "코드가 잘못되었거나 만료되었어요.";
+"auth.reset.code_message" = "%@ 계정이 있다면 8자리 코드를 보냈어요 (15분간 유효).";
+"auth.reset.code_label" = "이메일로 받은 코드";
+"auth.reset.new_password_label" = "새 비밀번호";
+"auth.reset.confirm_button" = "비밀번호 변경";
+"auth.reset.resend_code" = "코드 다시 보내기";
+"auth.reset.success_title" = "비밀번호가 변경되었어요";
+"auth.reset.success_message" = "새 비밀번호로 로그인되었어요.";

@@ -415,7 +415,7 @@ struct AuthEmailFormView: View {
 
     private var isFormValid: Bool {
         if isSignUp {
-            return !username.isEmpty && !email.isEmpty && !password.isEmpty && password.count >= 6 && passwordsMatch
+            return !username.isEmpty && !email.isEmpty && !password.isEmpty && password.count >= convexMinimumPasswordLength && passwordsMatch
         } else {
             return !email.isEmpty && !password.isEmpty
         }

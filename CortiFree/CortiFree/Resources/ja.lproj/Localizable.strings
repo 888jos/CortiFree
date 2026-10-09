@@ -3318,7 +3318,7 @@
 "onboarding_v2.auth.enter_credentials" = "ログイン情報を入力してください";
 "onboarding_v2.auth.first_name_label" = "名前";
 "onboarding_v2.auth.password_label" = "パスワード";
-"onboarding_v2.auth.password_min_chars" = "6文字以上";
+"onboarding_v2.auth.password_min_chars" = "8文字以上";
 "onboarding_v2.auth.confirm_password_label" = "パスワードの確認";
 "onboarding_v2.auth.confirm_placeholder" = "確認";
 
@@ -4801,7 +4801,7 @@
 "auth.enter_credentials" = "ログイン情報を入力してください";
 "auth.first_name_placeholder" = "お名前";
 "auth.email_placeholder" = "your@email.com";
-"auth.password_placeholder" = "6文字以上";
+"auth.password_placeholder" = "8文字以上";
 "auth.confirm_placeholder" = "もう一度入力";
 "auth.other_method" = "別の方法";
 "auth.google_title" = "Googleでログイン";
@@ -4817,8 +4817,8 @@
 "auth.default_user_name" = "ユーザー";
 "auth.reset.email_sent_title" = "メールを送信しました！";
 "auth.reset.email_sent_message" = "受信トレイを確認し、案内に沿ってパスワードを再設定してください。";
-"auth.reset.instructions" = "メールアドレスを入力すると、パスワード再設定用のリンクをお送りします。";
-"auth.reset.send_link" = "リンクを送信";
+"auth.reset.instructions" = "メールアドレスを入力すると、パスワード再設定用のコードをお送りします。";
+"auth.reset.send_link" = "コードを送信";
 "onboarding_v2.breath_demo.nice_work" = "よくできました";
 "onboarding_v2.breath_demo.take_a_breath" = "ひと呼吸しましょう";
 "onboarding_v2.breath_demo.ready" = "準備はいいですか？";
@@ -4935,7 +4935,7 @@
 "paywall_custom.feature_library_desc" = "100以上のガイド瞑想、呼吸エクササイズ、癒やしのサウンド。";
 "paywall_custom.feature_milo_title" = "アシスタントのMilo";
 "paywall_custom.feature_milo_desc" = "いつでも質問できます。プランを把握して、ぴったりのエクササイズを提案します。";
-"onboarding_v2.auth.generic_error" = "ログインできませんでした。メールアドレスとパスワードを確認して、もう一度お試しください。";
+"onboarding_v2.auth.generic_error" = "問題が発生しました。しばらくしてからもう一度お試しください。";
 "first_launch.have_account" = "アカウントをお持ちの方";
 "onboarding_v2.reassurance.support" = "いまが本当につらいときは、ひとりで抱えこまないでください。信頼できる人や医師に話す、または相談窓口に連絡しましょう。緊急のときは119に電話してください。";
 "onboarding_v2.notifications.time_label" = "リマインダーの時刻";
@@ -5094,3 +5094,19 @@
 "live_activity.title.starting" = "プラン作成スタート";
 "live_activity.title.building" = "プランを作成中";
 "live_activity.title.almost_ready" = "もうすぐ完成";
+
+/* Convex auth (errors, password reset with code) */
+"auth.error.invalid_credentials" = "メールアドレスまたはパスワードが正しくありません。";
+"auth.error.email_exists" = "このメールアドレスのアカウントは既に存在します。ログインしてください。";
+"auth.error.password_too_short" = "パスワードは8文字以上にしてください。";
+"auth.error.invalid_email" = "メールアドレスの形式が正しくありません。";
+"auth.error.too_many_attempts" = "試行回数が多すぎます。数分待ってからもう一度お試しください。";
+"auth.error.network" = "サーバーに接続できません。通信環境を確認してもう一度お試しください。";
+"auth.reset.invalid_code" = "コードが間違っているか、有効期限が切れています。";
+"auth.reset.code_message" = "%@ のアカウントが存在する場合、8桁のコードを送信しました（有効期限15分）。";
+"auth.reset.code_label" = "メールで届いたコード";
+"auth.reset.new_password_label" = "新しいパスワード";
+"auth.reset.confirm_button" = "パスワードを変更";
+"auth.reset.resend_code" = "コードを再送信";
+"auth.reset.success_title" = "パスワードを変更しました";
+"auth.reset.success_message" = "新しいパスワードでログインしました。";

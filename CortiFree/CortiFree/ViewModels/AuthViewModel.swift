@@ -34,8 +34,8 @@ final class AuthViewModel: ObservableObject {
             errorMessage = LanguageManager.shared.localizedString(for: "error.validation.missing_field")
             return
         }
-        guard password.count >= 8 else {
-            errorMessage = LanguageManager.shared.localizedString(for: "error.auth.weak_password")
+        guard password.count >= convexMinimumPasswordLength else {
+            errorMessage = AuthFailure.passwordTooShort.localizedMessage
             return
         }
         await runAuthOperation {
@@ -106,7 +106,7 @@ final class AuthViewModel: ObservableObject {
 
     private func handle(_ error: Error, context: String) {
         let coreError = CoreError.from(error)
-        errorMessage = coreError.errorDescription ?? error.localizedDescription
+        errorMessage = AuthFailure(error).localizedMessage
         ErrorHandler.shared.handle(coreError, context: context, showToUser: false)
     }
 }

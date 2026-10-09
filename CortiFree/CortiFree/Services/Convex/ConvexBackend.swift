@@ -4,18 +4,85 @@ import Security
 enum ConvexBackendError: LocalizedError {
     case invalidConfiguration
     case invalidResponse
+    /// `message` is the function's error (ConvexError data when present, else the raw message).
     case server(String)
     case signedOut
+    /// HTTP 401: the access token was rejected.
+    case unauthorized
 
     var errorDescription: String? {
         switch self {
         case .invalidConfiguration: return "Convex is not configured."
         case .invalidResponse: return "Invalid response from Convex."
         case .server(let message): return message
-        case .signedOut: return "Authentication required."
+        case .signedOut, .unauthorized: return "Authentication required."
         }
     }
 }
+
+/// User-facing reason for an auth failure, derived from Convex Auth's error strings.
+enum AuthFailure: Equatable {
+    case invalidCredentials, emailInUse, passwordTooShort, invalidEmail, tooManyAttempts
+    case invalidCode, network, unknown
+
+    init(_ error: Error) {
+        var error = error
+        if case .unknown(let wrapped) = error as? CoreError { error = wrapped }
+        if let core = error as? CoreError {
+            switch core {
+            case .invalidCredentials, .userNotFound: self = .invalidCredentials
+            case .emailAlreadyInUse: self = .emailInUse
+            case .weakPassword: self = .passwordTooShort
+            case .networkUnavailable, .timeout, .serverError: self = .network
+            default: self = .unknown
+            }
+            return
+        }
+        if error is URLError || (error as NSError).domain == NSURLErrorDomain {
+            self = .network
+            return
+        }
+        guard case .server(let raw) = error as? ConvexBackendError else {
+            self = .unknown
+            return
+        }
+        let message = raw.lowercased()
+        if message.contains("invalidaccountid") || message.contains("invalidsecret")
+            || message.contains("invalid credentials") || message.contains("invalid password") {
+            self = .invalidCredentials
+        } else if message.contains("already exists") {
+            self = .emailInUse
+        } else if message.contains("password must contain") {
+            self = .passwordTooShort
+        } else if message.contains("invalid email") || message.contains("missing email") {
+            self = .invalidEmail
+        } else if message.contains("toomanyfailedattempts") {
+            self = .tooManyAttempts
+        } else if message.contains("invalid code") || message.contains("could not verify code") {
+            self = .invalidCode
+        } else if message.contains("timed out") {
+            self = .network
+        } else {
+            self = .unknown
+        }
+    }
+
+    var localizedMessage: String {
+        switch self {
+        case .invalidCredentials: return "auth.error.invalid_credentials".localized
+        case .emailInUse: return "auth.error.email_exists".localized
+        case .passwordTooShort: return "auth.error.password_too_short".localized
+        case .invalidEmail: return "auth.error.invalid_email".localized
+        case .tooManyAttempts: return "auth.error.too_many_attempts".localized
+        case .invalidCode: return "auth.reset.invalid_code".localized
+        case .network: return "auth.error.network".localized
+        case .unknown: return "onboarding_v2.auth.generic_error".localized
+        }
+    }
+}
+
+/// Minimum password length enforced by `convex/auth.ts`.
+let convexMinimumPasswordLength = 8
 
 struct ConvexUser: Codable, Identifiable, Sendable {
     struct Provider: Codable, Sendable { let providerID: String }
@@ -37,10 +104,15 @@ enum Auth {
     static func auth() -> AuthModule { UnifiedFirebaseService.shared.auth }
 }
 
-private struct ConvexEnvelope<Value: Decodable>: Decodable {
+/// `value` is only present on success, so it is decoded separately (see `perform`).
+private struct ConvexStatus: Decodable {
     let status: String
-    let value: Value
     let errorMessage: String?
+    let errorData: JSONValue?
+}
+
+private struct ConvexEnvelope<Value: Decodable>: Decodable {
+    let value: Value
 }
 
 private struct AuthTokens: Codable, Sendable {
@@ -101,7 +173,17 @@ private enum SessionKeychain {
         return try? JSONDecoder().decode(AuthTokens.self, from: data)
     }
 
-    static func save(_ tokens: AuthTokens) throws {
+    /// Never fails the sign-in: if the Keychain refuses the item (e.g. an unsigned
+    /// simulator build), the session simply lives in memory for this launch.
+    static func save(_ tokens: AuthTokens) {
+        do { try write(tokens) } catch {
+            #if DEBUG
+            print("⚠️ SessionKeychain: \(error)")
+            #endif
+        }
+    }
+
+    private static func write(_ tokens: AuthTokens) throws {
         let data = try JSONEncoder().encode(tokens)
         let base: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -116,11 +198,12 @@ private enum SessionKeychain {
         if status == errSecItemNotFound {
             var insert = base
             attributes.forEach { insert[$0.key] = $0.value }
-            guard SecItemAdd(insert as CFDictionary, nil) == errSecSuccess else {
-                throw ConvexBackendError.invalidResponse
+            let addStatus = SecItemAdd(insert as CFDictionary, nil)
+            guard addStatus == errSecSuccess else {
+                throw NSError(domain: NSOSStatusErrorDomain, code: Int(addStatus))
             }
         } else if status != errSecSuccess {
-            throw ConvexBackendError.invalidResponse
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
         }
     }
 
@@ -134,12 +217,35 @@ private enum SessionKeychain {
     }
 }
 
+/// Last known profile, so a signed-in user lands in the app immediately at launch
+/// (and stays signed in offline) while the session is refreshed in the background.
+private enum SessionUserCache {
+    private static let key = "convex.cachedUser"
+
+    static func load() -> ConvexUser? {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(ConvexUser.self, from: data)
+    }
+
+    static func save(_ user: ConvexUser) {
+        if let data = try? JSONEncoder().encode(user) { UserDefaults.standard.set(data, forKey: key) }
+    }
+
+    static func clear() { UserDefaults.standard.removeObject(forKey: key) }
+}
+
 actor ConvexBackend {
     static let shared = ConvexBackend()
 
     private let session = URLSession(configuration: .default)
     private var tokens = SessionKeychain.load()
     private var refreshTask: Task<AuthTokens, Error>?
+
+    /// Cached profile of the stored session, readable synchronously at launch.
+    nonisolated static func cachedUserForLaunch() -> ConvexUser? {
+        guard SessionKeychain.load() != nil else { return nil }
+        return SessionUserCache.load()
+    }
 
     private var deploymentURL: URL {
         if let value = Bundle.main.object(forInfoDictionaryKey: "CONVEX_URL") as? String,
@@ -179,39 +285,70 @@ actor ConvexBackend {
         return try await authenticate(provider: "google-native", params: params)
     }
 
+    /// Emails an 8-digit code (15 min). An unknown address is reported as success so the
+    /// screen never reveals whether an account exists.
     func requestPasswordReset(email: String) async throws {
-        let _: SignInResult = try await call(
-            .action, path: "auth:signIn",
-            args: ["provider": "password", "params": ["flow": "reset", "email": email.lowercased()]],
-            authenticated: false
-        )
+        do {
+            let _: SignInResult = try await call(
+                .action, path: "auth:signIn",
+                args: ["provider": "password", "params": ["flow": "reset", "email": Self.normalized(email)]],
+                authenticated: false
+            )
+        } catch let error as ConvexBackendError {
+            if case .server(let message) = error, message.contains("InvalidAccountId") { return }
+            throw error
+        }
     }
 
+    /// Second step of the reset: sets the new password and signs the user in.
+    func confirmPasswordReset(email: String, code: String, newPassword: String) async throws -> ConvexUser {
+        try await authenticate(provider: "password", params: [
+            "flow": "reset-verification", "email": Self.normalized(email),
+            "code": code.trimmingCharacters(in: .whitespacesAndNewlines), "newPassword": newPassword,
+        ])
+    }
+
+    /// Resumes the stored session. Throws `.signedOut` only when the server rejected it;
+    /// network failures are rethrown as-is and keep the stored session.
     func restoreSession() async throws -> ConvexUser {
-        _ = try await refreshTokens()
+        guard tokens != nil else { throw ConvexBackendError.signedOut }
         return try await loadCurrentUser()
     }
 
     func loadCurrentUser() async throws -> ConvexUser {
         let profile: ProfileResult? = try await call(.query, path: "profile:me")
-        guard let profile else { throw ConvexBackendError.signedOut }
-        return profile.user
+        guard let profile else {
+            // The account no longer exists (deleted on another device).
+            clearSession()
+            throw ConvexBackendError.signedOut
+        }
+        let user = profile.user
+        SessionUserCache.save(user)
+        return user
     }
 
     func signOut() async {
         if tokens != nil {
             let _: JSONValue? = try? await call(.action, path: "auth:signOut")
         }
-        tokens = nil
-        SessionKeychain.clear()
+        clearSession()
     }
 
     func deleteAccount(appleAuthorizationCode: String? = nil) async throws {
         var args: [String: Any] = [:]
         if let appleAuthorizationCode { args["appleAuthorizationCode"] = appleAuthorizationCode }
         let _: JSONValue = try await call(.action, path: "account:deleteMyAccount", args: args)
+        clearSession()
+    }
+
+    private func clearSession() {
         tokens = nil
         SessionKeychain.clear()
+        SessionUserCache.clear()
+    }
+
+    private static func normalized(_ email: String) -> String {
+        email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
     func upload(_ data: Data, to uploadURL: String, contentType: String = "image/jpeg") async throws -> String {
@@ -237,13 +374,18 @@ actor ConvexBackend {
         args: [String: Any] = [:],
         authenticated: Bool = true
     ) async throws -> T {
-        var accessToken: String?
-        if authenticated {
-            guard tokens != nil else { throw ConvexBackendError.signedOut }
-            if accessTokenExpiresSoon(tokens?.token) { _ = try await refreshTokens() }
-            accessToken = tokens?.token
+        guard authenticated else {
+            return try await perform(kind, path: path, args: args, accessToken: nil)
         }
-        return try await perform(kind, path: path, args: args, accessToken: accessToken)
+        guard tokens != nil else { throw ConvexBackendError.signedOut }
+        if accessTokenExpiresSoon(tokens?.token) { _ = try await refreshTokens() }
+        do {
+            return try await perform(kind, path: path, args: args, accessToken: tokens?.token)
+        } catch ConvexBackendError.unauthorized {
+            // Token rejected before its expiry (clock skew, key rotation): refresh once and retry.
+            let fresh = try await refreshTokens()
+            return try await perform(kind, path: path, args: args, accessToken: fresh.token)
+        }
     }
 
     private func authenticate(provider: String, params: [String: Any]) async throws -> ConvexUser {
@@ -252,10 +394,45 @@ actor ConvexBackend {
         )
         guard let fresh = result.tokens else { throw ConvexBackendError.signedOut }
         tokens = fresh
-        try SessionKeychain.save(fresh)
+        SessionKeychain.save(fresh)
         let _: JSONValue? = try? await call(.mutation, path: "profile:recordLogin", args: [:])
         let _: JSONValue? = try? await call(.mutation, path: "account:claimLegacyData", args: [:])
-        return try await loadCurrentUser()
+        // The session exists from here on: a slow profile read must not report the
+        // sign-in as failed (retrying a sign-up would then hit "already exists").
+        for delay in [0.4, 1.2] {
+            do { return try await loadCurrentUser() } catch ConvexBackendError.signedOut {
+                throw ConvexBackendError.signedOut
+            } catch {
+                try? await Task.sleep(for: .seconds(delay))
+            }
+        }
+        if let user = try? await loadCurrentUser() { return user }
+        guard let userId = Self.userId(fromAccessToken: fresh.token) else { throw ConvexBackendError.invalidResponse }
+        let email = params["email"] as? String
+        let firstName = params["firstName"] as? String
+        // Minimal profile until the next restoreSession() fills in the rest.
+        let user = ConvexUser(
+            id: userId, email: email, displayName: firstName, firstName: firstName, photoURL: nil,
+            onboardingCompleted: false,
+            providerData: [.init(providerID: provider == "apple-native" ? "apple.com" : provider == "google-native" ? "google.com" : "password")]
+        )
+        SessionUserCache.save(user)
+        return user
+    }
+
+    /// Convex Auth access tokens carry `sub = "<userId>|<sessionId>"`.
+    private static func userId(fromAccessToken token: String) -> String? {
+        guard let payload = jwtPayload(token), let sub = payload["sub"] as? String else { return nil }
+        return sub.split(separator: "|").first.map(String.init)
+    }
+
+    private static func jwtPayload(_ token: String) -> [String: Any]? {
+        let parts = token.split(separator: ".")
+        guard parts.count == 3 else { return nil }
+        var base64 = String(parts[1]).replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        base64 += String(repeating: "=", count: (4 - base64.count % 4) % 4)
+        guard let data = Data(base64Encoded: base64) else { return nil }
+        return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
     }
 
     private func refreshTokens() async throws -> AuthTokens {
@@ -273,13 +450,14 @@ actor ConvexBackend {
         do {
             let fresh = try await task.value
             tokens = fresh
-            try SessionKeychain.save(fresh)
+            SessionKeychain.save(fresh)
             return fresh
-        } catch {
-            tokens = nil
-            SessionKeychain.clear()
-            throw error
+        } catch ConvexBackendError.signedOut {
+            // The server rejected the refresh token: the session is really over.
+            clearSession()
+            throw ConvexBackendError.signedOut
         }
+        // Any other failure (offline, timeout) keeps the session for the next attempt.
     }
 
     private func perform<T: Decodable>(
@@ -295,25 +473,20 @@ actor ConvexBackend {
         if let accessToken { request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization") }
         request.httpBody = try JSONSerialization.data(withJSONObject: ["path": path, "args": args, "format": "json"])
         let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw ConvexBackendError.invalidResponse
+        guard let http = response as? HTTPURLResponse else { throw ConvexBackendError.invalidResponse }
+        if http.statusCode == 401 { throw ConvexBackendError.unauthorized }
+        guard (200..<300).contains(http.statusCode) else { throw ConvexBackendError.invalidResponse }
+        let status = try JSONDecoder().decode(ConvexStatus.self, from: data)
+        guard status.status == "success" else {
+            // ConvexError payloads carry the readable message in errorData.
+            if case .string(let message)? = status.errorData { throw ConvexBackendError.server(message) }
+            throw ConvexBackendError.server(status.errorMessage ?? "Convex request failed")
         }
-        let envelope = try JSONDecoder().decode(ConvexEnvelope<T>.self, from: data)
-        guard envelope.status == "success" else {
-            throw ConvexBackendError.server(envelope.errorMessage ?? "Convex request failed")
-        }
-        return envelope.value
+        return try JSONDecoder().decode(ConvexEnvelope<T>.self, from: data).value
     }
 
     private func accessTokenExpiresSoon(_ token: String?) -> Bool {
-        guard let token else { return true }
-        let parts = token.split(separator: ".")
-        guard parts.count == 3 else { return true }
-        var base64 = String(parts[1]).replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
-        base64 += String(repeating: "=", count: (4 - base64.count % 4) % 4)
-        guard let data = Data(base64Encoded: base64),
-              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let exp = payload["exp"] as? TimeInterval else { return true }
+        guard let token, let exp = Self.jwtPayload(token)?["exp"] as? TimeInterval else { return true }
         return exp - Date().timeIntervalSince1970 < 300
     }
 }

@@ -3318,7 +3318,7 @@
 "onboarding_v2.auth.enter_credentials" = "Entre tes identifiants";
 "onboarding_v2.auth.first_name_label" = "Prénom";
 "onboarding_v2.auth.password_label" = "Mot de passe";
-"onboarding_v2.auth.password_min_chars" = "Min. 6 caractères";
+"onboarding_v2.auth.password_min_chars" = "Min. 8 caractères";
 "onboarding_v2.auth.confirm_password_label" = "Confirmer le mot de passe";
 "onboarding_v2.auth.confirm_placeholder" = "Confirme";
 
@@ -4798,7 +4798,7 @@
 "auth.enter_credentials" = "Entrez vos identifiants";
 "auth.first_name_placeholder" = "Votre prénom";
 "auth.email_placeholder" = "votre@email.com";
-"auth.password_placeholder" = "Min. 6 caractères";
+"auth.password_placeholder" = "Min. 8 caractères";
 "auth.confirm_placeholder" = "Confirmez";
 "auth.forgot_password" = "Mot de passe oublié ?";
 "auth.other_method" = "Autre méthode";
@@ -4815,8 +4815,8 @@
 "auth.default_user_name" = "Utilisateur";
 "auth.reset.email_sent_title" = "Email envoyé !";
 "auth.reset.email_sent_message" = "Vérifiez votre boîte mail et suivez les instructions pour réinitialiser votre mot de passe.";
-"auth.reset.instructions" = "Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe.";
-"auth.reset.send_link" = "Envoyer le lien";
+"auth.reset.instructions" = "Saisis ton e-mail et nous t'enverrons un code pour réinitialiser ton mot de passe.";
+"auth.reset.send_link" = "Envoyer le code";
 "common.done" = "Terminé";
 "common.retry" = "Réessayer";
 "onboarding_v2.breath_demo.nice_work" = "Bien joué";
@@ -4930,7 +4930,7 @@
 "paywall_custom.feature_library_desc" = "Plus de 100 méditations guidées, des exercices de respiration et des sons apaisants.";
 "paywall_custom.feature_milo_title" = "Milo, ton assistant";
 "paywall_custom.feature_milo_desc" = "Pose-lui une question à tout moment : il connaît ton plan et te propose l'exercice adapté.";
-"onboarding_v2.auth.generic_error" = "La connexion n'a pas abouti. Vérifie ton e-mail et ton mot de passe, puis réessaie.";
+"onboarding_v2.auth.generic_error" = "Un problème est survenu. Réessaie dans un instant.";
 "first_launch.have_account" = "J'ai déjà un compte";
 "onboarding_v2.reassurance.support" = "Si c'est vraiment difficile en ce moment, tu n'as pas à gérer ça seul(e) : parles-en à un proche ou à un médecin, ou appelle le 3114 (gratuit, 24 h/24). En cas d'urgence, compose le 112.";
 "onboarding_v2.notifications.time_label" = "Heure de ton rappel";
@@ -5089,3 +5089,19 @@
 "live_activity.title.starting" = "Ton plan démarre";
 "live_activity.title.building" = "Ton plan se construit";
 "live_activity.title.almost_ready" = "Presque prêt";
+
+/* Convex auth (errors, password reset with code) */
+"auth.error.invalid_credentials" = "E-mail ou mot de passe incorrect.";
+"auth.error.email_exists" = "Un compte existe déjà avec cet e-mail. Connecte-toi plutôt.";
+"auth.error.password_too_short" = "Ton mot de passe doit contenir au moins 8 caractères.";
+"auth.error.invalid_email" = "Cette adresse e-mail ne semble pas valide.";
+"auth.error.too_many_attempts" = "Trop de tentatives. Attends quelques minutes puis réessaie.";
+"auth.error.network" = "Impossible de joindre le serveur. Vérifie ta connexion et réessaie.";
+"auth.reset.invalid_code" = "Ce code est incorrect ou a expiré.";
+"auth.reset.code_message" = "Si un compte existe pour %@, nous lui avons envoyé un code à 8 chiffres (valable 15 minutes).";
+"auth.reset.code_label" = "Code reçu par e-mail";
+"auth.reset.new_password_label" = "Nouveau mot de passe";
+"auth.reset.confirm_button" = "Changer mon mot de passe";
+"auth.reset.resend_code" = "Renvoyer un code";
+"auth.reset.success_title" = "Mot de passe modifié";
+"auth.reset.success_message" = "Tu es connecté avec ton nouveau mot de passe.";

@@ -3318,7 +3318,7 @@
 "onboarding_v2.auth.enter_credentials" = "Gib deine Anmeldedaten ein";
 "onboarding_v2.auth.first_name_label" = "Vorname";
 "onboarding_v2.auth.password_label" = "Passwort";
-"onboarding_v2.auth.password_min_chars" = "Mindestens 6 Zeichen";
+"onboarding_v2.auth.password_min_chars" = "Mind. 8 Zeichen";
 "onboarding_v2.auth.confirm_password_label" = "Passwort bestätigen";
 "onboarding_v2.auth.confirm_placeholder" = "Bestätigen";
 
@@ -4795,7 +4795,7 @@
 "auth.enter_credentials" = "Gib deine Zugangsdaten ein";
 "auth.first_name_placeholder" = "Dein Vorname";
 "auth.email_placeholder" = "deine@email.com";
-"auth.password_placeholder" = "Mind. 6 Zeichen";
+"auth.password_placeholder" = "Mind. 8 Zeichen";
 "auth.confirm_placeholder" = "Bestätigen";
 "auth.forgot_password" = "Passwort vergessen?";
 "auth.other_method" = "Andere Methode";
@@ -4812,8 +4812,8 @@
 "auth.default_user_name" = "Nutzer";
 "auth.reset.email_sent_title" = "E-Mail gesendet!";
 "auth.reset.email_sent_message" = "Sieh in deinem Postfach nach und folge den Anweisungen, um dein Passwort zurückzusetzen.";
-"auth.reset.instructions" = "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen deines Passworts.";
-"auth.reset.send_link" = "Link senden";
+"auth.reset.instructions" = "Gib deine E-Mail ein und wir senden dir einen Code, um dein Passwort zurückzusetzen.";
+"auth.reset.send_link" = "Code senden";
 "common.done" = "Fertig";
 "common.retry" = "Erneut versuchen";
 "onboarding_v2.breath_demo.nice_work" = "Gut gemacht";
@@ -4932,7 +4932,7 @@
 "paywall_custom.feature_library_desc" = "Über 100 geführte Meditationen, Atemübungen und beruhigende Klänge.";
 "paywall_custom.feature_milo_title" = "Milo, dein Assistent";
 "paywall_custom.feature_milo_desc" = "Frag ihn jederzeit: Er kennt deinen Plan und schlägt die passende Übung vor.";
-"onboarding_v2.auth.generic_error" = "Die Anmeldung hat nicht geklappt. Prüfe E-Mail und Passwort und versuche es erneut.";
+"onboarding_v2.auth.generic_error" = "Etwas ist schiefgelaufen. Bitte versuche es gleich noch einmal.";
 "first_launch.have_account" = "Ich habe schon ein Konto";
 "onboarding_v2.reassurance.support" = "Wenn es gerade wirklich schwer ist, musst du das nicht allein schaffen: Sprich mit einer Vertrauensperson oder einer Ärztin bzw. einem Arzt oder wende dich an eine Beratungsstelle. Im Notfall wähle die 112.";
 "onboarding_v2.notifications.time_label" = "Uhrzeit der Erinnerung";
@@ -5091,3 +5091,19 @@
 "live_activity.title.starting" = "Dein Plan startet";
 "live_activity.title.building" = "Dein Plan entsteht";
 "live_activity.title.almost_ready" = "Fast fertig";
+
+/* Convex auth (errors, password reset with code) */
+"auth.error.invalid_credentials" = "E-Mail oder Passwort ist falsch.";
+"auth.error.email_exists" = "Mit dieser E-Mail gibt es bereits ein Konto. Melde dich stattdessen an.";
+"auth.error.password_too_short" = "Dein Passwort braucht mindestens 8 Zeichen.";
+"auth.error.invalid_email" = "Diese E-Mail-Adresse scheint ungültig zu sein.";
+"auth.error.too_many_attempts" = "Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.";
+"auth.error.network" = "Server nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.";
+"auth.reset.invalid_code" = "Dieser Code ist falsch oder abgelaufen.";
+"auth.reset.code_message" = "Falls es ein Konto für %@ gibt, haben wir einen 8-stelligen Code gesendet (15 Minuten gültig).";
+"auth.reset.code_label" = "Code aus der E-Mail";
+"auth.reset.new_password_label" = "Neues Passwort";
+"auth.reset.confirm_button" = "Passwort ändern";
+"auth.reset.resend_code" = "Neuen Code senden";
+"auth.reset.success_title" = "Passwort geändert";
+"auth.reset.success_message" = "Du bist mit deinem neuen Passwort angemeldet.";

@@ -255,7 +255,9 @@ struct AuthenticationView: View {
                     onComplete()
                 } catch {
                     isLoading = false
-                    errorMessage = "onboarding_v2.auth.apple_error".localized
+                    errorMessage = AuthFailure(error) == .network
+                        ? AuthFailure.network.localizedMessage
+                        : "onboarding_v2.auth.apple_error".localized
                 }
             }
         case .failure(let error):
@@ -281,6 +283,7 @@ struct EmailAuthView: View {
     @State private var errorMessage: String?
     @State private var showPassword = false
     @State private var showAppleAuth = false
+    @State private var showResetPassword = false
     @FocusState private var focusedField: Field?
 
     enum Field {
@@ -301,7 +304,7 @@ struct EmailAuthView: View {
 
     private var isFormValid: Bool {
         if isSignUp {
-            return !username.isEmpty && !email.isEmpty && !password.isEmpty && password.count >= 6 && passwordsMatch
+            return !username.isEmpty && !email.isEmpty && !password.isEmpty && password.count >= convexMinimumPasswordLength && passwordsMatch
         } else {
             return !email.isEmpty && !password.isEmpty
         }
@@ -421,7 +424,7 @@ struct EmailAuthView: View {
                                             .font(.custom("Poppins-Regular", size: 16))
                                             .foregroundColor(.white)
                                             .textInputAutocapitalization(.never)
-                                            .textContentType(.oneTimeCode)
+                                            .textContentType(isSignUp ? .oneTimeCode : .password)
                                             .focused($focusedField, equals: .password)
                                     }
 
@@ -519,6 +522,15 @@ struct EmailAuthView: View {
                         .padding(.horizontal, 32)
                         .disabled(isLoading || !isFormValid)
 
+                        if !isSignUp {
+                            Button(action: { showResetPassword = true }) {
+                                Text("auth.forgot_password".localized)
+                                    .font(.custom("Poppins-Regular", size: 14))
+                                    .foregroundColor(.white.opacity(0.8))
+                                    .underline()
+                            }
+                        }
+
                         // Toggle sign up/in
                         Button(action: {
                             isSignUp.toggle()
@@ -587,6 +599,18 @@ struct EmailAuthView: View {
             .onboardingDebugHomeButton()
             #endif
         }
+        .sheet(isPresented: $showResetPassword) {
+            ResetPasswordView(initialEmail: email) { user in
+                Task {
+                    await RevenueCatManager.shared.identifyUser(userId: user.uid)
+                    if user.onboardingCompleted {
+                        UserDefaults.standard.set(true, forKey: "onboardingV2Completed")
+                    }
+                    showResetPassword = false
+                    onComplete()
+                }
+            }
+        }
     }
 
     private func handleAuth() {
@@ -606,6 +630,11 @@ struct EmailAuthView: View {
 
             guard password == confirmPassword else {
                 errorMessage = "onboarding_v2.auth.passwords_dont_match".localized
+                return
+            }
+
+            guard password.count >= convexMinimumPasswordLength else {
+                errorMessage = AuthFailure.passwordTooShort.localizedMessage
                 return
             }
         }
@@ -634,7 +663,7 @@ struct EmailAuthView: View {
             } catch {
                 await MainActor.run {
                     isLoading = false
-                    errorMessage = "onboarding_v2.auth.generic_error".localized
+                    errorMessage = AuthFailure(error).localizedMessage
                 }
             }
         }
@@ -836,7 +865,9 @@ struct AppleAuthView: View {
                     onComplete()
                 } catch {
                     isLoading = false
-                    errorMessage = "onboarding_v2.auth.apple_error".localized
+                    errorMessage = AuthFailure(error) == .network
+                        ? AuthFailure.network.localizedMessage
+                        : "onboarding_v2.auth.apple_error".localized
                 }
             }
 

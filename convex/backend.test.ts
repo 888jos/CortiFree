@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import { convexTest } from "convex-test";
-import { describe, expect, test } from "vitest";
+import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { api, internal } from "./_generated/api";
 import schema from "./schema";
 
@@ -168,5 +169,46 @@ describe("app functions", () => {
     });
     const result = await as.mutation(api.account.claimLegacyData, {});
     expect(result).toEqual({ status: "nothing_to_claim", needsEmailVerification: true });
+  });
+});
+
+describe("password auth", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  test("sign-up, wrong password, duplicate sign-up, reset with the emailed code", async () => {
+    const keys = await generateKeyPair("RS256", { extractable: true });
+    process.env.JWT_PRIVATE_KEY = (await exportPKCS8(keys.privateKey)).trimEnd().replace(/\n/g, " ");
+    process.env.JWKS = JSON.stringify({ keys: [{ use: "sig", ...(await exportJWK(keys.publicKey)) }] });
+    process.env.CONVEX_SITE_URL = "https://test.convex.site";
+    process.env.SITE_URL = "https://cortifree.app";
+    process.env.RESEND_API_KEY = "re_test";
+    const sent: string[] = [];
+    vi.stubGlobal("fetch", async (_url: string, init: RequestInit) => {
+      sent.push(String(init.body));
+      return new Response(JSON.stringify({ id: "email" }), { status: 200 });
+    });
+
+    const t = convexTest(schema, modules);
+    const signIn = (params: Record<string, unknown>) =>
+      t.action(api.auth.signIn, { provider: "password", params });
+
+    const created = await signIn({ flow: "signUp", email: " Reset@Example.test ", password: "firstPass123", firstName: "Ana" });
+    expect(created.tokens?.token).toBeTruthy();
+    await expect(signIn({ flow: "signUp", email: "reset@example.test", password: "otherPass123" })).rejects.toThrow(/already exists/);
+    await expect(signIn({ flow: "signUp", email: "short@example.test", password: "short" })).rejects.toThrow(/at least 8/);
+    await expect(signIn({ flow: "signIn", email: "reset@example.test", password: "wrongPass123" })).rejects.toThrow(/InvalidSecret/);
+    await expect(signIn({ flow: "signIn", email: "nobody@example.test", password: "wrongPass123" })).rejects.toThrow(/InvalidAccountId/);
+    expect((await signIn({ flow: "signIn", email: "RESET@example.test", password: "firstPass123" })).tokens).toBeTruthy();
+
+    expect((await signIn({ flow: "reset", email: "reset@example.test" })).tokens).toBeNull();
+    const code = /: (\d{8})/.exec(JSON.parse(sent.at(-1)!).text)?.[1];
+    expect(code).toMatch(/^\d{8}$/);
+    await expect(
+      signIn({ flow: "reset-verification", email: "reset@example.test", code: "00000000", newPassword: "secondPass123" })
+    ).rejects.toThrow(/Invalid code|Could not verify/);
+    const reset = await signIn({ flow: "reset-verification", email: "reset@example.test", code, newPassword: "secondPass123" });
+    expect(reset.tokens?.token).toBeTruthy();
+    await expect(signIn({ flow: "signIn", email: "reset@example.test", password: "firstPass123" })).rejects.toThrow(/InvalidSecret/);
+    expect((await signIn({ flow: "signIn", email: "reset@example.test", password: "secondPass123" })).tokens).toBeTruthy();
   });
 });

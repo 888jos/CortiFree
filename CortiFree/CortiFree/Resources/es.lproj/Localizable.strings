@@ -3318,7 +3318,7 @@
 "onboarding_v2.auth.enter_credentials" = "Introduce tus credenciales";
 "onboarding_v2.auth.first_name_label" = "Nombre";
 "onboarding_v2.auth.password_label" = "Contraseña";
-"onboarding_v2.auth.password_min_chars" = "Mín. 6 caracteres";
+"onboarding_v2.auth.password_min_chars" = "Mín. 8 caracteres";
 "onboarding_v2.auth.confirm_password_label" = "Confirmar contraseña";
 "onboarding_v2.auth.confirm_placeholder" = "Confirma";
 
@@ -4795,7 +4795,7 @@
 "auth.enter_credentials" = "Introduce tus credenciales";
 "auth.first_name_placeholder" = "Tu nombre";
 "auth.email_placeholder" = "tu@email.com";
-"auth.password_placeholder" = "Mín. 6 caracteres";
+"auth.password_placeholder" = "Mín. 8 caracteres";
 "auth.confirm_placeholder" = "Confirma";
 "auth.forgot_password" = "¿Olvidaste tu contraseña?";
 "auth.other_method" = "Otro método";
@@ -4812,8 +4812,8 @@
 "auth.default_user_name" = "Usuario";
 "auth.reset.email_sent_title" = "¡Correo enviado!";
 "auth.reset.email_sent_message" = "Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.";
-"auth.reset.instructions" = "Introduce tu correo y te enviaremos un enlace para restablecer tu contraseña.";
-"auth.reset.send_link" = "Enviar enlace";
+"auth.reset.instructions" = "Introduce tu correo y te enviaremos un código para restablecer tu contraseña.";
+"auth.reset.send_link" = "Enviar código";
 "common.done" = "Listo";
 "common.retry" = "Reintentar";
 "onboarding_v2.breath_demo.nice_work" = "Buen trabajo";
@@ -4932,7 +4932,7 @@
 "paywall_custom.feature_library_desc" = "Más de 100 meditaciones guiadas, ejercicios de respiración y sonidos relajantes.";
 "paywall_custom.feature_milo_title" = "Milo, tu asistente";
 "paywall_custom.feature_milo_desc" = "Pregúntale cuando quieras: conoce tu plan y te propone el ejercicio adecuado.";
-"onboarding_v2.auth.generic_error" = "No se pudo iniciar sesión. Revisa tu correo y tu contraseña, y vuelve a intentarlo.";
+"onboarding_v2.auth.generic_error" = "Algo salió mal. Inténtalo de nuevo en un momento.";
 "first_launch.have_account" = "Ya tengo una cuenta";
 "onboarding_v2.reassurance.support" = "Si ahora mismo es muy difícil, no tienes por qué afrontarlo solo/a: habla con alguien de confianza o con un médico, o contacta con una línea de ayuda. En caso de emergencia, llama al número de emergencias local.";
 "onboarding_v2.notifications.time_label" = "Hora del recordatorio";
@@ -5091,3 +5091,19 @@
 "live_activity.title.starting" = "Tu plan empieza";
 "live_activity.title.building" = "Creando tu plan";
 "live_activity.title.almost_ready" = "Casi listo";
+
+/* Convex auth (errors, password reset with code) */
+"auth.error.invalid_credentials" = "Correo o contraseña incorrectos.";
+"auth.error.email_exists" = "Ya existe una cuenta con este correo. Inicia sesión.";
+"auth.error.password_too_short" = "Tu contraseña necesita al menos 8 caracteres.";
+"auth.error.invalid_email" = "Este correo no parece válido.";
+"auth.error.too_many_attempts" = "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.";
+"auth.error.network" = "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.";
+"auth.reset.invalid_code" = "Este código es incorrecto o ha caducado.";
+"auth.reset.code_message" = "Si existe una cuenta para %@, le enviamos un código de 8 dígitos (válido 15 minutos).";
+"auth.reset.code_label" = "Código recibido por correo";
+"auth.reset.new_password_label" = "Nueva contraseña";
+"auth.reset.confirm_button" = "Cambiar mi contraseña";
+"auth.reset.resend_code" = "Enviar un nuevo código";
+"auth.reset.success_title" = "Contraseña cambiada";
+"auth.reset.success_message" = "Has iniciado sesión con tu nueva contraseña.";

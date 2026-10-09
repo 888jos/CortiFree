@@ -8,20 +8,36 @@
 
 import SwiftUI
 
+/// Password reset in two steps: request an 8-digit code by email, then enter it with a
+/// new password. A successful reset signs the user in (`onSignedIn`).
 struct ResetPasswordView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.dismiss) var dismiss
 
-    @State private var email = ""
-    @State private var emailSent = false
+    var onSignedIn: ((ConvexUser) -> Void)?
+
+    @State private var email: String
+    @State private var code = ""
+    @State private var newPassword = ""
+    @State private var step: Step = .email
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    @State private var signedInUser: ConvexUser?
+
+    private enum Step { case email, code, done }
+
+    init(initialEmail: String = "", onSignedIn: ((ConvexUser) -> Void)? = nil) {
+        _email = State(initialValue: initialEmail.trimmingCharacters(in: .whitespacesAndNewlines))
+        self.onSignedIn = onSignedIn
+    }
+
+    private var trimmedEmail: String { email.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var trimmedCode: String { code.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     var body: some View {
         ZStack {
-            // Galaxy background
             GalaxyBackgroundView(intensity: 0.8)
 
             VStack(spacing: 32) {
-                // Header
                 HStack {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark")
@@ -40,152 +56,229 @@ struct ResetPasswordView: View {
 
                 Spacer()
 
-                if emailSent {
-                    // Success state
-                    VStack(spacing: 24) {
-                        Image(systemName: "envelope.badge.fill")
-                            .font(.system(size: 70))
-                            .foregroundColor(Color.appTheme)
-
-                        VStack(spacing: 12) {
-                            Text("auth.reset.email_sent_title".localized)
-                                .font(.custom("Poppins-Bold", size: 28))
-                                .foregroundColor(.white)
-
-                            Text("auth.reset.email_sent_message".localized)
-                                .font(.custom("Poppins-Regular", size: 16))
-                                .foregroundColor(Color.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 40)
-                        }
-
-                        Button(action: { dismiss() }) {
-                            Text("common.close".localized)
-                                .font(.custom("Poppins-SemiBold", size: 16))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .contentShape(Capsule())
-                        }
-                        .buttonStyle(.glassPrimary(tint: Color.appTheme))
-                        .padding(.horizontal, 24)
-                        .padding(.top, 16)
-                    }
-                } else {
-                    // Form state
-                    VStack(spacing: 28) {
-                        // Icon and title
-                        VStack(spacing: 16) {
-                            Image(systemName: "lock.rotation")
-                                .font(.system(size: 60))
-                                .foregroundColor(Color.appTheme)
-
-                            Text("auth.forgot_password".localized)
-                                .font(.custom("Poppins-Bold", size: 26))
-                                .foregroundColor(.white)
-
-                            Text("auth.reset.instructions".localized)
-                                .font(.custom("Poppins-Regular", size: 15))
-                                .foregroundColor(Color.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 24)
-                        }
-
-                        // Email field
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("auth.email".localized)
-                                .font(.custom("Poppins-Medium", size: 14))
-                                .foregroundColor(.white)
-
-                            HStack(spacing: 12) {
-                                Image(systemName: "envelope.fill")
-                                    .foregroundColor(Color.appTheme)
-                                    .frame(width: 20)
-
-                                TextField("", text: $email)
-                                    .font(.custom("Poppins-Regular", size: 16))
-                                    .foregroundColor(.white)
-                                    .textInputAutocapitalization(.never)
-                                    .keyboardType(.emailAddress)
-                                    .overlay(
-                                        Text(email.isEmpty ? "auth.email_placeholder".localized : "")
-                                            .font(.custom("Poppins-Regular", size: 16))
-                                            .foregroundColor(Color.white.opacity(0.4))
-                                            .allowsHitTesting(false)
-                                        , alignment: .leading
-                                    )
-                            }
-                            .padding(16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color.white.opacity(0.06))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-                                    )
-                            )
-                        }
-                        .padding(.horizontal, 24)
-
-                        // Error message
-                        if let errorMessage = authViewModel.errorMessage {
-                            HStack(spacing: 8) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(Color(hex: "FF6B9D"))
-                                Text(errorMessage)
-                                    .font(.custom("Poppins-Regular", size: 14))
-                                    .foregroundColor(.white)
-                            }
-                            .padding(12)
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(hex: "FF6B9D").opacity(0.2))
-                            )
-                            .padding(.horizontal, 24)
-                        }
-
-                        // Send button
-                        Button(action: {
-                            Task {
-                                await authViewModel.resetPassword(email: email)
-                                if authViewModel.errorMessage == nil {
-                                    emailSent = true
-                                }
-                            }
-                        }) {
-                            HStack(spacing: 12) {
-                                if authViewModel.isLoading {
-                                    ProgressView()
-                                        .tint(.white)
-                                } else {
-                                    Image(systemName: "paperplane.fill")
-                                        .font(.system(size: 18))
-                                    Text("auth.reset.send_link".localized)
-                                        .font(.custom("Poppins-SemiBold", size: 16))
-                                }
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 50)
-                            .contentShape(Capsule())
-                        }
-                        .buttonStyle(.glassPrimary(tint: Color.appTheme))
-                        .disabled(authViewModel.isLoading || email.isEmpty)
-                        .padding(.horizontal, 24)
-                    }
+                switch step {
+                case .email: emailStep
+                case .code: codeStep
+                case .done: doneStep
                 }
 
                 Spacer()
             }
         }
-        .onAppear {
-            authViewModel.clearMessages()
+    }
+
+    // MARK: - Steps
+
+    private var emailStep: some View {
+        VStack(spacing: 28) {
+            header(icon: "lock.rotation", title: "auth.forgot_password".localized, message: "auth.reset.instructions".localized)
+
+            field(
+                label: "auth.email".localized, icon: "envelope.fill", text: $email,
+                placeholder: "auth.email_placeholder".localized, keyboard: .emailAddress, contentType: .emailAddress
+            )
+
+            errorBanner
+
+            primaryButton(title: "auth.reset.send_link".localized, icon: "paperplane.fill",
+                          disabled: trimmedEmail.isEmpty, action: sendCode)
         }
+    }
+
+    private var codeStep: some View {
+        VStack(spacing: 24) {
+            header(icon: "envelope.badge.fill", title: "auth.reset.email_sent_title".localized,
+                   message: String(format: "auth.reset.code_message".localized, trimmedEmail))
+
+            field(
+                label: "auth.reset.code_label".localized, icon: "number", text: $code,
+                placeholder: "12345678", keyboard: .numberPad, contentType: .oneTimeCode
+            )
+
+            field(
+                label: "auth.reset.new_password_label".localized, icon: "lock.fill", text: $newPassword,
+                placeholder: "onboarding_v2.auth.password_min_chars".localized, secure: true, contentType: .newPassword
+            )
+
+            errorBanner
+
+            primaryButton(title: "auth.reset.confirm_button".localized, icon: "checkmark",
+                          disabled: trimmedCode.isEmpty || newPassword.count < convexMinimumPasswordLength,
+                          action: confirmReset)
+
+            Button(action: sendCode) {
+                Text("auth.reset.resend_code".localized)
+                    .font(.custom("Poppins-Regular", size: 14))
+                    .foregroundColor(.white.opacity(0.8))
+                    .underline()
+            }
+            .disabled(isLoading)
+        }
+    }
+
+    private var doneStep: some View {
+        VStack(spacing: 24) {
+            header(icon: "checkmark.seal.fill", title: "auth.reset.success_title".localized,
+                   message: "auth.reset.success_message".localized)
+
+            primaryButton(title: "common.continue".localized, icon: "arrow.right", disabled: false) {
+                if let signedInUser, let onSignedIn {
+                    onSignedIn(signedInUser)
+                } else {
+                    dismiss()
+                }
+            }
+        }
+    }
+
+    // MARK: - Actions
+
+    private func sendCode() {
+        errorMessage = nil
+        isLoading = true
+        Task { @MainActor in
+            defer { isLoading = false }
+            do {
+                try await UnifiedFirebaseService.shared.auth.resetPassword(email: trimmedEmail)
+                code = ""
+                step = .code
+            } catch {
+                errorMessage = AuthFailure(error).localizedMessage
+            }
+        }
+    }
+
+    private func confirmReset() {
+        errorMessage = nil
+        guard newPassword.count >= convexMinimumPasswordLength else {
+            errorMessage = AuthFailure.passwordTooShort.localizedMessage
+            return
+        }
+        isLoading = true
+        Task { @MainActor in
+            defer { isLoading = false }
+            do {
+                signedInUser = try await UnifiedFirebaseService.shared.auth.confirmPasswordReset(
+                    email: trimmedEmail, code: trimmedCode, newPassword: newPassword
+                )
+                await RevenueCatManager.shared.identifyUser(userId: signedInUser?.uid ?? "")
+                HapticManager.success()
+                step = .done
+            } catch {
+                let failure = AuthFailure(error)
+                // A wrong or expired code surfaces as invalid credentials from Convex Auth.
+                errorMessage = (failure == .invalidCredentials ? AuthFailure.invalidCode : failure).localizedMessage
+            }
+        }
+    }
+
+    // MARK: - Building blocks
+
+    private func header(icon: String, title: String, message: String) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.system(size: 60))
+                .foregroundColor(Color.appTheme)
+
+            Text(title)
+                .font(.custom("Poppins-Bold", size: 26))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+
+            Text(message)
+                .font(.custom("Poppins-Regular", size: 15))
+                .foregroundColor(Color.white.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+        }
+    }
+
+    private func field(
+        label: String, icon: String, text: Binding<String>, placeholder: String,
+        keyboard: UIKeyboardType = .default, secure: Bool = false, contentType: UITextContentType? = nil
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.custom("Poppins-Medium", size: 14))
+                .foregroundColor(.white)
+
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .foregroundColor(Color.appTheme)
+                    .frame(width: 20)
+
+                Group {
+                    if secure {
+                        SecureField("", text: text, prompt: Text(placeholder).foregroundColor(.white.opacity(0.4)))
+                    } else {
+                        TextField("", text: text, prompt: Text(placeholder).foregroundColor(.white.opacity(0.4)))
+                            .keyboardType(keyboard)
+                    }
+                }
+                .font(.custom("Poppins-Regular", size: 16))
+                .foregroundColor(.white)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .textContentType(contentType)
+                .tint(.white)
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.white.opacity(0.06))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                    )
+            )
+        }
+        .padding(.horizontal, 24)
+    }
+
+    @ViewBuilder
+    private var errorBanner: some View {
+        if let errorMessage {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(Color(hex: "FF6B9D"))
+                Text(errorMessage)
+                    .font(.custom("Poppins-Regular", size: 14))
+                    .foregroundColor(.white)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(hex: "FF6B9D").opacity(0.2))
+            )
+            .padding(.horizontal, 24)
+        }
+    }
+
+    private func primaryButton(title: String, icon: String, disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                if isLoading {
+                    ProgressView()
+                        .tint(.white)
+                } else {
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                    Text(title)
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                }
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.glassPrimary(tint: Color.appTheme))
+        .disabled(isLoading || disabled)
+        .padding(.horizontal, 24)
     }
 }
 
 #Preview {
     ResetPasswordView()
-        .environmentObject(AuthViewModel())
 }

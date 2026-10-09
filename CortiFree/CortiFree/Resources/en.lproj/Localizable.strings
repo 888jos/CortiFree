@@ -3318,7 +3318,7 @@
 "onboarding_v2.auth.enter_credentials" = "Enter your credentials";
 "onboarding_v2.auth.first_name_label" = "First name";
 "onboarding_v2.auth.password_label" = "Password";
-"onboarding_v2.auth.password_min_chars" = "Min. 6 characters";
+"onboarding_v2.auth.password_min_chars" = "Min. 8 characters";
 "onboarding_v2.auth.confirm_password_label" = "Confirm password";
 "onboarding_v2.auth.confirm_placeholder" = "Confirm";
 
@@ -4795,7 +4795,7 @@
 "auth.enter_credentials" = "Enter your credentials";
 "auth.first_name_placeholder" = "Your first name";
 "auth.email_placeholder" = "your@email.com";
-"auth.password_placeholder" = "Min. 6 characters";
+"auth.password_placeholder" = "Min. 8 characters";
 "auth.confirm_placeholder" = "Confirm";
 "auth.forgot_password" = "Forgot password?";
 "auth.other_method" = "Other method";
@@ -4812,8 +4812,8 @@
 "auth.default_user_name" = "User";
 "auth.reset.email_sent_title" = "Email sent!";
 "auth.reset.email_sent_message" = "Check your inbox and follow the instructions to reset your password.";
-"auth.reset.instructions" = "Enter your email and we'll send you a link to reset your password.";
-"auth.reset.send_link" = "Send link";
+"auth.reset.instructions" = "Enter your email and we'll send you a code to reset your password.";
+"auth.reset.send_link" = "Send code";
 "common.done" = "Done";
 "common.retry" = "Retry";
 "onboarding_v2.breath_demo.nice_work" = "Nice work";
@@ -4932,7 +4932,7 @@
 "paywall_custom.feature_library_desc" = "100+ guided meditations, breathing exercises and calming sounds.";
 "paywall_custom.feature_milo_title" = "Milo, your assistant";
 "paywall_custom.feature_milo_desc" = "Ask him anything, anytime: he knows your plan and suggests the right exercise.";
-"onboarding_v2.auth.generic_error" = "Sign-in didn't work. Check your email and password, then try again.";
+"onboarding_v2.auth.generic_error" = "Something went wrong. Please try again in a moment.";
 "first_launch.have_account" = "I already have an account";
 "onboarding_v2.reassurance.support" = "If things feel really hard right now, you don't have to handle it alone: talk to someone you trust or a doctor, or contact a local helpline. In an emergency, call your local emergency number.";
 "onboarding_v2.notifications.time_label" = "Reminder time";
@@ -5091,3 +5091,19 @@
 "live_activity.title.starting" = "Starting your plan";
 "live_activity.title.building" = "Building your plan";
 "live_activity.title.almost_ready" = "Almost ready";
+
+/* Convex auth (errors, password reset with code) */
+"auth.error.invalid_credentials" = "Incorrect email or password.";
+"auth.error.email_exists" = "An account already exists with this email. Sign in instead.";
+"auth.error.password_too_short" = "Your password needs at least 8 characters.";
+"auth.error.invalid_email" = "This email address doesn't look valid.";
+"auth.error.too_many_attempts" = "Too many attempts. Wait a few minutes and try again.";
+"auth.error.network" = "Couldn't reach the server. Check your connection and try again.";
+"auth.reset.invalid_code" = "This code is wrong or has expired.";
+"auth.reset.code_message" = "If an account exists for %@, we sent it an 8-digit code (valid 15 minutes).";
+"auth.reset.code_label" = "Code received by email";
+"auth.reset.new_password_label" = "New password";
+"auth.reset.confirm_button" = "Change my password";
+"auth.reset.resend_code" = "Send a new code";
+"auth.reset.success_title" = "Password changed";
+"auth.reset.success_message" = "You're signed in with your new password.";
