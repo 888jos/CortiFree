@@ -1,12 +1,13 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { ConvexError, v } from "convex/values";
 import { action } from "./_generated/server";
-import { v } from "convex/values";
+import { reserveAiCall } from "./aiAccess";
 
 /**
  * Weekly face check: describes visible signs of tiredness on a selfie (puffiness, dark
  * circles, jaw tension, dull skin). Wellness only: no cortisol, no diagnosis.
  * The photo is forwarded to OpenAI for this single request and never stored by CortiFree.
  * Needs the Convex secret OPENAI_API_KEY (optional OPENAI_FACE_MODEL, default gpt-5-mini).
+ * Gated by the server-verified subscription and a daily quota (aiAccess.ts).
  */
 const maxImageLength = 900_000; // base64 JPEG, ~650 KB
 
@@ -22,53 +23,60 @@ If there is no clearly visible face, or several faces, or the photo is too dark 
 export const analyze = action({
   args: { image: v.string(), language: v.string() },
   handler: async (ctx, { image, language }) => {
-    if ((await getAuthUserId(ctx)) === null) {
-      throw new Error("Authentication required");
-    }
-    if (!image || image.length > maxImageLength) {
-      throw new Error("Invalid image");
+    if (!image || image.length > maxImageLength || !/^[A-Za-z0-9+/=]+$/.test(image)) {
+      throw new ConvexError("Invalid image");
     }
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("Face check is not configured");
     const model = process.env.OPENAI_FACE_MODEL || "gpt-5-mini";
 
-    const upstream = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        response_format: { type: "json_object" },
-        max_completion_tokens: 600,
-        messages: [
-          { role: "system", content: prompt(language.slice(0, 40) || "English") },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: "Here is my weekly selfie." },
-              { type: "image_url", image_url: { url: `data:image/jpeg;base64,${image}`, detail: "low" } },
-            ],
-          },
-        ],
-      }),
-    });
-
-    if (!upstream.ok) throw new Error("Face check unavailable");
-    const result: unknown = await upstream.json();
-    if (
-      typeof result !== "object" ||
-      result === null ||
-      !("choices" in result) ||
-      !Array.isArray(result.choices)
-    ) {
-      throw new Error("Invalid face check response");
+    const reservation = await reserveAiCall(ctx, "faceScan");
+    try {
+      return { ...(await requestAnalysis(apiKey, model, image, language)), remaining: reservation.remaining };
+    } catch (error) {
+      await reservation.refund();
+      throw error;
     }
-    const content = result.choices[0]?.message?.content;
-    if (typeof content !== "string" || !content.trim()) {
-      throw new Error("Invalid face check response");
-    }
-    return { content: content.trim() };
   },
 });
+
+async function requestAnalysis(apiKey: string, model: string, image: string, language: string) {
+  const upstream = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      response_format: { type: "json_object" },
+      max_completion_tokens: 600,
+      messages: [
+        { role: "system", content: prompt(language.replace(/[^\p{L}\p{M} ()-]/gu, "").trim().slice(0, 40) || "English") },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Here is my weekly selfie." },
+            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${image}`, detail: "low" } },
+          ],
+        },
+      ],
+    }),
+  });
+
+  if (!upstream.ok) throw new Error("Face check unavailable");
+  const result: unknown = await upstream.json();
+  if (
+    typeof result !== "object" ||
+    result === null ||
+    !("choices" in result) ||
+    !Array.isArray(result.choices)
+  ) {
+    throw new Error("Invalid face check response");
+  }
+  const content = result.choices[0]?.message?.content;
+  if (typeof content !== "string" || !content.trim()) {
+    throw new Error("Invalid face check response");
+  }
+  return { content: content.trim() };
+}

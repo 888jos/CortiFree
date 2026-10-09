@@ -22,15 +22,7 @@ struct PlanAssistantProposal: Equatable {
     let summary: String
     let reason: String?
 
-    /// Instructions appended to Milo's context: when and how to propose a change.
-    static let instructions = """
-    You can propose ONE change to the user's plan when they clearly ask for it or agree to it (an exercise they dislike, a day that is too heavy, a different goal, a fresh plan). Never propose one unprompted. Only today and the days ahead can change. To propose it, write your normal reply saying what you suggest, then end with exactly one tag on its own, using item ids from the plan above:
-    <plan_action>{"type":"swap","day":5,"item":"breathing","avoid":false}</plan_action> replaces that item by another of the same kind (avoid=true if the user never wants the old one again).
-    <plan_action>{"type":"remove","day":5,"item":"habit_water","avoid":false}</plan_action> removes it.
-    <plan_action>{"type":"add","day":5,"kind":"breathing"}</plan_action> adds an exercise; kind is breathing, meditation or habit.
-    <plan_action>{"type":"regenerate","goal":"sleep"}</plan_action> rebuilds the plan from today; goal is stress, sleep, energy, focus or emotional, or omit it to keep the goal.
-    Add "reason" with a few words in English. The app shows the user a card to apply it, so say "I can…" or "Want me to…", never claim it is already done. Never write the tag in any other situation.
-    """
+    // The matching instructions for the model live on the server (convex/assistant.ts, planInstructions).
 
     // MARK: - Parsing
 

@@ -46,18 +46,7 @@ struct AssistantChatView: View {
     private let dailyLimit = 12
     private let moment = MiloMoment.current
 
-    private var systemPrompt: String {
-        let length = store.replyLength == .detailed
-            ? "Keep replies to four or five sentences of plain prose"
-            : "Keep replies to two or three short sentences of plain prose"
-        let prompt = Self.basePrompt.replacingOccurrences(of: "{LENGTH}", with: length)
-        // Plan changes go through a card the user confirms (see PlanAssistantProposal).
-        return planStore.plan == nil ? prompt : prompt + "\n\n" + PlanAssistantProposal.instructions
-    }
-
-    private static let basePrompt = """
-    You are Milo, the calm companion inside the CortiFree app. Talk like a thoughtful friend who knows breathing, meditation and sleep well, not like a chatbot or a customer-service assistant. Always reply in the user's language. {LENGTH}: no lists, no markdown, no emojis, no headings. Never open with filler such as "Great question", "I understand", "Absolutely", "I'm here for you" or a restatement of the request. Acknowledge what the user feels in a few words, then give one concrete, specific thing to do. Ask at most one question, and only when it genuinely helps. Fit the advice to the user's local time given in the context. Help with general everyday questions too; do not reject a safe request just because it is outside wellbeing. Never invent exercises or pretend to see data that was not provided; the app shows exercise cards itself. For health topics, offer general information, not a diagnosis, treatment decision, or medication dosage; be clear about uncertainty and suggest a qualified professional for personal medical concerns. Never claim the app measures cortisol or diagnoses a condition. If the user may be in immediate danger, expresses intent to self-harm, or reports emergency symptoms such as chest pain or severe trouble breathing, respond empathetically and direct them to local emergency services or an appropriate crisis service. Do not provide instructions that facilitate self-harm, violence, or dangerous wrongdoing; offer a safer alternative. Avoid requesting sensitive personal information.
-    """
+    // Milo's system prompts are built on the server (convex/assistant.ts).
 
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
@@ -134,10 +123,7 @@ struct AssistantChatView: View {
             MiloDecodeView(
                 initialDocument: request.document,
                 isQuotaReached: assistantDailyUsage >= dailyLimit,
-                onAnalyzed: {
-                    refreshDailyQuotaIfNeeded()
-                    assistantDailyUsage += 1
-                },
+                onAnalyzed: syncDailyUsageFromServer,
                 onBreathe: startQuickReset,
                 onTalk: decodeDiscussed
             )
@@ -154,10 +140,7 @@ struct AssistantChatView: View {
                 initialDocument: request.document,
                 initialLink: request.link,
                 isQuotaReached: assistantDailyUsage >= dailyLimit,
-                onAnalyzed: {
-                    refreshDailyQuotaIfNeeded()
-                    assistantDailyUsage += 1
-                },
+                onAnalyzed: syncDailyUsageFromServer,
                 onFinish: insightKept
             )
             .presentationDetents([.large])
@@ -693,16 +676,15 @@ struct AssistantChatView: View {
 
         Task {
             do {
-                let requestMessages = [
-                    DeepSeekChatMessage(role: "system", content: systemPrompt),
-                    DeepSeekChatMessage(role: "system", content: appContext),
-                    DeepSeekChatMessage(role: "system", content: cardContext(card))
-                ] + messages
-                let response = try await DeepSeekChatService.shared.reply(to: requestMessages)
+                let request = MiloRequestKind.chat(
+                    context: appContext,
+                    replyLength: store.replyLength,
+                    hasPlan: planStore.plan != nil,
+                    card: card.map { (title: $0.title, kind: $0.kindLabel, meta: $0.meta) }
+                )
+                let response = try await DeepSeekChatService.shared.reply(request, messages: messages)
                 await MainActor.run {
-                    // Only successful replies count; the server keeps the authoritative quota.
-                    refreshDailyQuotaIfNeeded()
-                    assistantDailyUsage += 1
+                    syncDailyUsageFromServer()
                     // The user may have started or opened another conversation meanwhile.
                     guard currentID == conversationID else { isLoading = false; return }
                     let responseIndex = messages.count
@@ -715,7 +697,10 @@ struct AssistantChatView: View {
                 }
             } catch DeepSeekChatError.quotaExceeded {
                 await MainActor.run {
+                    // Server quota (12/day per account, UTC day): Milo says so instead of an error banner.
+                    refreshDailyQuotaIfNeeded()
                     assistantDailyUsage = dailyLimit
+                    guard currentID == conversationID else { isLoading = false; return }
                     messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.quota.reached")))
                     isLoading = false
                 }
@@ -891,14 +876,6 @@ struct AssistantChatView: View {
         newConversation()
     }
 
-    /// Tells the model which card the app shows under its reply, so both say the same thing.
-    private func cardContext(_ card: AssistantRecommendation?) -> String {
-        guard let card else {
-            return "No exercise card is shown under this reply. Do not name a specific CortiFree exercise unless the user asks for one."
-        }
-        return "The app shows this card right under your reply: \"\(card.title)\" (\(card.kindLabel), \(card.meta)). Point to it in one natural sentence as the thing to try now, without describing the card itself, and do not suggest any other exercise."
-    }
-
     private func isEmergency(_ text: String) -> Bool {
         let normalized = text.lowercased()
             .replacingOccurrences(of: "’", with: "'")
@@ -936,6 +913,16 @@ struct AssistantChatView: View {
         "죽고 싶", "죽고싶", "자살", "목숨을 끊", "살고 싶지 않", "살고싶지않", "사라지고 싶", "자해", "나를 해치", "손목을 긋",
         "과다복용", "약을 너무 많이", "가슴이 아파", "가슴 통증", "흉통", "심장마비", "뇌졸중", "숨을 못 쉬", "숨을 쉴 수 없", "숨이 안 쉬어", "호흡곤란"
     ]
+
+    /// The local counter only drives the UI; the server enforces the quota and returns what is left.
+    private func syncDailyUsageFromServer() {
+        refreshDailyQuotaIfNeeded()
+        if let remaining = DeepSeekChatService.shared.remainingToday {
+            assistantDailyUsage = max(0, dailyLimit - remaining)
+        } else {
+            assistantDailyUsage += 1
+        }
+    }
 
     private func refreshDailyQuotaIfNeeded() {
         let today = Self.dateKeyFormatter.string(from: Date())

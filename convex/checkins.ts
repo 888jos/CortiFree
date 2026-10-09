@@ -3,8 +3,10 @@ import { mutation, query } from "./_generated/server";
 import { mood } from "./schema";
 import { assertDateKey, boundedLimit, requireUser } from "./lib/session";
 
-function clamp15(value: number): number {
-  return Math.min(5, Math.max(1, Math.round(value)));
+/** Ratings are 0-5 (0 = not rated / none). */
+function clampRating(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(5, Math.max(0, Math.round(value)));
 }
 
 function wordCount(text: string): number {
@@ -14,7 +16,8 @@ function wordCount(text: string): number {
 /**
  * DailyCheckInService.save: upserts daily_checkins/{date} and daily_moods/{date}
  * in one transaction; if `note` is not empty and `journalPrompt` is given, also
- * creates the "daily_checkin" journal entry (the client must NOT create it).
+ * writes the "daily_checkin" journal entry (the client must NOT create it). A
+ * resubmission the same day updates that entry instead of adding another one.
  */
 export const submit = mutation({
   args: {
@@ -37,9 +40,9 @@ export const submit = mutation({
     const checkin = {
       dayStartAt: args.dayStartAt,
       mood: args.mood,
-      stress: clamp15(args.stress),
-      sleep: clamp15(args.sleep),
-      energy: clamp15(args.energy),
+      stress: clampRating(args.stress),
+      sleep: clampRating(args.sleep),
+      energy: clampRating(args.energy),
       note,
       updatedAt: now,
     };
@@ -72,18 +75,33 @@ export const submit = mutation({
 
     let journalEntryId = null;
     if (note) {
-      journalEntryId = await ctx.db.insert("journalEntries", {
-        userId: user._id,
+      const entry = {
         content: note,
         wordCount: wordCount(note),
         mood: args.mood,
-        meditationType: "daily_checkin",
-        prompt: args.journalPrompt,
-        tags: ["daily_checkin"],
-        isFavorite: false,
-        createdAt: args.dayStartAt,
+        ...(args.journalPrompt !== undefined ? { prompt: args.journalPrompt } : {}),
         updatedAt: now,
-      });
+      };
+      // The entry of this day is keyed by its createdAt (the day start).
+      const sameDay = await ctx.db
+        .query("journalEntries")
+        .withIndex("by_user_meditationType", (q) =>
+          q.eq("userId", user._id).eq("meditationType", "daily_checkin").eq("createdAt", args.dayStartAt)
+        )
+        .first();
+      if (sameDay) {
+        await ctx.db.patch(sameDay._id, entry);
+        journalEntryId = sameDay._id;
+      } else {
+        journalEntryId = await ctx.db.insert("journalEntries", {
+          userId: user._id,
+          ...entry,
+          meditationType: "daily_checkin",
+          tags: ["daily_checkin"],
+          isFavorite: false,
+          createdAt: args.dayStartAt,
+        });
+      }
     }
     return { journalEntryId };
   },

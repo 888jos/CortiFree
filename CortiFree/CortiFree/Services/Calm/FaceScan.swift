@@ -35,11 +35,14 @@ struct FaceScanRecord: Codable, Equatable, Identifiable {
 
 enum FaceScanError: LocalizedError {
     case noFace, unavailable, unreadable
+    /// Server daily quota (3 face checks per account per UTC day).
+    case quotaReached
     var errorDescription: String? {
         let key: String
         switch self {
         case .noFace: key = "calm.face.error.no_face"
         case .unavailable: key = "calm.face.error.unavailable"
+        case .quotaReached: key = "assistant.quota.reached"
         case .unreadable: key = "milo.import.error.unreadable"
         }
         return LanguageManager.shared.localizedString(for: key)
@@ -76,6 +79,8 @@ enum FaceScanAnalyzer {
                 .action, path: "faceScan:analyze",
                 args: ["image": jpeg.base64EncodedString(), "language": language]
             )
+        } catch ConvexBackendError.server(let message) where message == "quota_exceeded" {
+            throw FaceScanError.quotaReached
         } catch {
             throw FaceScanError.unavailable
         }

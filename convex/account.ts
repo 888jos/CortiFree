@@ -242,6 +242,7 @@ const USER_TABLES: ReadonlyArray<[TableNames, string]> = [
   ["bugReports", "by_user"],
   ["archivedRecords", "by_user"],
   ["emailVerificationCodes", "by_user"],
+  ["aiUsage", "by_user_feature_day"],
 ];
 
 const DELETE_BATCH = 200;

@@ -9,6 +9,7 @@
  */
 
 import type * as account from "../account.js";
+import type * as aiAccess from "../aiAccess.js";
 import type * as achievements from "../achievements.js";
 import type * as assistant from "../assistant.js";
 import type * as auth from "../auth.js";
@@ -32,6 +33,7 @@ import type * as profile from "../profile.js";
 import type * as progress from "../progress.js";
 import type * as recovery from "../recovery.js";
 import type * as settings from "../settings.js";
+import type * as subscriptions from "../subscriptions.js";
 import type * as tasks from "../tasks.js";
 import type * as todos from "../todos.js";
 
@@ -43,6 +45,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   account: typeof account;
+  aiAccess: typeof aiAccess;
   achievements: typeof achievements;
   assistant: typeof assistant;
   auth: typeof auth;
@@ -66,6 +69,7 @@ declare const fullApi: ApiFromModules<{
   progress: typeof progress;
   recovery: typeof recovery;
   settings: typeof settings;
+  subscriptions: typeof subscriptions;
   tasks: typeof tasks;
   todos: typeof todos;
 }>;

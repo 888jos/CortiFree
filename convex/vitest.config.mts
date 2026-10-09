@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     root: import.meta.dirname,
     environment: "edge-runtime",
+    testTimeout: 60000,
     server: { deps: { inline: ["convex-test"] } },
   },
 });

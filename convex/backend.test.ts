@@ -65,10 +65,20 @@ describe("app functions", () => {
     });
     const checkins = await as.query(api.checkins.listCheckins, { fromDate: "2026-10-01" });
     expect(checkins[0].stress).toBe(5);
-    expect(checkins[0].energy).toBe(1);
+    expect(checkins[0].energy).toBe(0);
+    // Resubmitting the same day updates the journal entry instead of adding one.
+    await as.mutation(api.checkins.submit, {
+      date: "2026-10-07",
+      dayStartAt: Date.UTC(2026, 9, 7),
+      mood: "good",
+      stress: 2,
+      sleep: 3,
+      energy: 4,
+      note: "hello again world",
+    });
     const journal = await as.query(api.journal.list, {});
     expect(journal).toHaveLength(1);
-    expect(journal[0].wordCount).toBe(2);
+    expect(journal[0].wordCount).toBe(3);
 
     const snapshot = await as.query(api.progress.analyticsSnapshot, { since: 0, sinceDate: "2026-01-01" });
     expect(snapshot.moods).toHaveLength(1);

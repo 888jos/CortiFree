@@ -22,7 +22,10 @@ Variables d'environnement (dev **et** prod) : `JWT_PRIVATE_KEY`, `JWKS`, `SITE_U
 (`NQL8HJ633Q`), `APPLE_PRIVATE_KEY`, `RESEND_API_KEY` (clé Resend « sending only » limitée à
 `driftstudio.app`), `AUTH_EMAIL_FROM` (`CortiFree <noreply@driftstudio.app>`) sont en place
 et `ONESIGNAL_REST_API_KEY` (relances d'essai, `recovery.ts` ; `ONESIGNAL_APP_ID` a une valeur
-par défaut) sont en place (clés JWT distinctes par déploiement). Rien ne manque.
+par défaut) sont en place (clés JWT distinctes par déploiement).
+**À ajouter avant la release (dev et prod)** : `OPENAI_API_KEY` (bilan visage),
+`REVENUECAT_WEBHOOK_AUTH` (webhook abonnement) et, recommandé, `REVENUECAT_SECRET_API_KEY`
+— sans abonnement vérifié côté serveur, Milo et le bilan visage refusent tout appel (§4.1).
 
 ---
 
@@ -174,7 +177,11 @@ les nombres Convex `v.number()` sont des `Double` ; les ids sont des `String`.
 | `RESEND_API_KEY` | ❌ à fournir | à fournir | emails (reset mot de passe, vérification email) |
 | `AUTH_EMAIL_FROM` | ❌ optionnel | à fournir | ex. `CortiFree <no-reply@cortifree.app>` (domaine vérifié chez Resend) |
 | `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY` | ❌ à fournir | à fournir | révocation du token Apple à la suppression de compte (clé `.p8` « Sign in with Apple ») |
-| `DEEPSEEK_API_KEY` | ❌ | ❌ | seulement si `assistant:chat` remplace le Worker Cloudflare actuel |
+| `DEEPSEEK_API_KEY` | ✅ | à fournir | Milo (`assistant:chat`) |
+| `OPENAI_API_KEY` | à fournir | **à fournir** | bilan visage hebdomadaire (`faceScan:analyze`) ; `OPENAI_FACE_MODEL` optionnel (défaut `gpt-5-mini`) |
+| `REVENUECAT_WEBHOOK_AUTH` | à fournir | **à fournir** | secret du webhook RevenueCat : valeur exacte de l'en-tête `Authorization` configurée dans RevenueCat (`Bearer <secret>` ou `<secret>`) |
+| `REVENUECAT_SECRET_API_KEY` | recommandé | **recommandé** | clé secrète API v1 RevenueCat (`sk_…`) : vérifie l'abonnement quand le webhook n'est pas encore arrivé (achat à l'instant, abonnés antérieurs au webhook) |
+| `REVENUECAT_ENTITLEMENT_ID` | optionnel | optionnel | défaut `pro` |
 | `CONVEX_SITE_URL` | automatique | automatique | fourni par Convex |
 
 Générer les clés JWT (méthode recommandée par Convex Auth : `npx @convex-dev/auth`, ou ce
@@ -195,6 +202,33 @@ npx convex env set --prod APPLE_BUNDLE_ID com.solstys.cortifree
 npx convex env set --prod GOOGLE_CLIENT_IDS 559047783915-cmbhjkc2ceuitt2p1o3pia84d56l2jvb.apps.googleusercontent.com
 npx convex env set --prod RESEND_API_KEY re_...
 ```
+
+```bash
+npx convex env set --prod OPENAI_API_KEY sk-...
+npx convex env set --prod REVENUECAT_WEBHOOK_AUTH "$(openssl rand -hex 32)"
+npx convex env set --prod REVENUECAT_SECRET_API_KEY sk_...
+```
+
+### 4.1 Abonnement et quotas IA
+
+- **Webhook RevenueCat** : `POST https://<déploiement>.convex.site/revenuecat/webhook`
+  (prod : `https://compassionate-jackal-621.convex.site/revenuecat/webhook`). Dans RevenueCat →
+  Integrations → Webhooks, mettre en *Authorization header* la valeur de
+  `REVENUECAT_WEBHOOK_AUTH` (un webhook par déploiement ; événements sandbox inclus pour le dev).
+  Il écrit `users.entitlement` (`subscriptions.ts`), seule source de vérité serveur ;
+  `users.subscription` (`profile:setSubscriptionStatus`) est déclaré par l'app et n'est jamais
+  utilisé pour autoriser quoi que ce soit. L'`app_user_id` RevenueCat est l'id Convex de
+  l'utilisateur (`Purchases.logIn(user.uid)`).
+- **Repli REST** : si l'utilisateur n'a pas d'entitlement actif, le serveur interroge
+  `GET /v1/subscribers/{id}` (au plus une fois par minute et par utilisateur) quand
+  `REVENUECAT_SECRET_API_KEY` est défini.
+- **Quotas** (`aiAccess.ts`, table `aiUsage`, jour UTC) : 12 appels/jour pour Milo (chat,
+  « décoder un message » et import partagent le compteur), 3 bilans visage/jour. Un appel
+  dont le fournisseur échoue est rendu. Erreurs `ConvexError` : `"subscription_required"`,
+  `"quota_exceeded"` ; les réponses renvoient `remaining`.
+- **Prompts** : les prompts système de Milo sont construits côté serveur (`assistant.ts`) ;
+  le client envoie `{kind: "chat"|"decode"|"import", messages: [{role: "user"|"assistant",
+  content}], language?, replyLength?, hasPlan?, card?, context?}` et le rôle `system` est refusé.
 
 Changer `JWT_PRIVATE_KEY`/`JWKS` invalide tous les JWT en cours (les refresh tokens restent
 valides : le client se reconnecte via `loginFromCache`).
@@ -287,7 +321,8 @@ supprimés (contrairement à Firestore).
 | `SettingsView` (bug report) | `feedback:generateScreenshotUploadUrl` (M) → POST JPEG → `feedback:submitBugReport` (M) |
 | `DailyTodoService` (UI morte) | `todos:listActive` (Q), `todos:create`, `todos:setCompleted`, `todos:rename`, `todos:archive` (M) |
 | `AccountDeletionService` | `account:deleteMyAccount` (A) `{appleAuthorizationCode?}` |
-| Assistant Milo (`DeepSeekChatService`, Worker Cloudflare aujourd'hui) | optionnel : `assistant:chat` (A) `{messages}` |
+| Assistant Milo (`DeepSeekChatService`) | `assistant:chat` (A) `{kind, messages, …}` (§4.1) |
+| Bilan visage (`FaceScanAnalyzer`) | `faceScan:analyze` (A) `{image, language}` (§4.1) |
 
 Upload de fichier : `POST <uploadUrl>` avec `Content-Type: image/jpeg` et le corps binaire,
 réponse `{"storageId": "..."}`. Les URLs de lecture (`avatarUrl`, `photoUrl`) sont renvoyées

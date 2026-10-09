@@ -178,7 +178,7 @@ export default defineSchema({
     onboardingCompletedAt: v.optional(v.number()),
     onboarding: v.optional(onboardingProfile),
     hasBaseline: v.optional(v.boolean()),
-    // Subscription mirror (RevenueCat stays the source of truth)
+    // Subscription mirror reported by the app: informative only, never trusted.
     subscription: v.optional(
       v.object({
         isPaid: v.boolean(),
@@ -186,6 +186,21 @@ export default defineSchema({
         updatedAt: v.number(),
       })
     ),
+    // Server-verified RevenueCat entitlement (webhook or REST API, see subscriptions.ts).
+    // Active while expiresAt is null (lifetime) or in the future. Gates the AI features.
+    entitlement: v.optional(
+      v.object({
+        expiresAt: v.union(v.number(), v.null()),
+        productId: v.optional(v.string()),
+        store: v.optional(v.string()),
+        environment: v.optional(v.string()),
+        source: v.union(v.literal("webhook"), v.literal("api")),
+        eventAt: v.number(),
+        updatedAt: v.number(),
+      })
+    ),
+    // Last RevenueCat REST lookup (throttles the fallback in subscriptions.ts).
+    entitlementCheckedAt: v.optional(v.number()),
     // Trial recovery (recovery.ts): where the user stopped before starting the trial
     recovery: v.optional(
       v.object({
@@ -212,6 +227,15 @@ export default defineSchema({
     .index("by_appleSub", ["appleSub"])
     .index("by_googleSub", ["googleSub"])
     .index("by_legacyFirebaseUid", ["legacyFirebaseUid"]),
+
+  /** Per-user daily counters of paid AI calls (aiAccess.ts). `day` is the UTC day key. */
+  aiUsage: defineTable({
+    userId: v.id("users"),
+    feature: v.union(v.literal("assistant"), v.literal("faceScan")),
+    day: v.string(),
+    count: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user_feature_day", ["userId", "feature", "day"]),
 
   /** Email ownership proof for password accounts (needed to claim legacy data by email). */
   emailVerificationCodes: defineTable({
