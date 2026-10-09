@@ -106,6 +106,7 @@ final class AccountDeletionService {
             "daily_check_in_last_prompted_day", "daily_check_in_last_completed_day",
             "personalPlan.onboardingProfile.v1", "plan.shortModeDay"
         ].forEach { defaults.removeObject(forKey: $0) }
+        SessionRatingStore.clear()
         if HealthKitService.shared.isEnabled { HealthKitService.shared.disable() }
         WidgetDataStore.sharedDefaults?.removePersistentDomain(forName: WidgetDataStore.appGroupID)
     }

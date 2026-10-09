@@ -293,8 +293,8 @@
 "progress.journey.score" = "Puntuación CortiFree";
 "progress.journey.day_one" = "Día 1";
 "progress.journey.today" = "Hoy";
-"progress.journey.program" = "Viaje de 66 días";
-"progress.journey.day_count" = "Día %d de 66";
+"progress.journey.program" = "Tu recorrido";
+"progress.journey.day_count" = "Día %d";
 "progress.journey.empty" = "Completa actividades y check-ins para empezar a medir tu puntuación.";
 "progress.journey.chart_accessibility" = "Evolución de la puntuación CortiFree desde el primer día";
 "progress.journey.domains_title" = "Progreso por área desde el día 1";
@@ -339,14 +339,14 @@
 
 // MARK: - Tasks
 "tasks.day" = "Día";
-"tasks.day_format" = "Día %d/66";
+"tasks.day_format" = "Día %d";
 "tasks.day_format_ongoing" = "Día %d";
 "tasks.of" = "/";
 "tasks.encouragement" = "Lo estás haciendo genial. ¡Sigue!";
 "tasks.todo" = "Por hacer";
 "tasks.done" = "Hecho";
 "tasks.skipped" = "Omitida";
-"tasks.day_counter" = "Día %d/66";
+"tasks.day_counter" = "Día %d";
 "tasks.day_counter_extended" = "Día %d";
 "tasks.error_loading" = "Error de carga";
 "tasks.retry" = "Reintentar";
@@ -465,7 +465,7 @@
 "profile.cortifree_score" = "Puntuación CortiFree";
 "profile.habits" = "Hábitos";
 "profile.current" = "Actual";
-"profile.potential_d66" = "Potencial (D66)";
+"profile.potential_d66" = "Potencial";
 "profile.settings" = "Ajustes";
 "profile.logout" = "Cerrar sesión";
 
@@ -595,7 +595,7 @@
 "loading.personalizing_journey" = "Personalizando tu recorrido";
 "loading.creating_plan" = "Creando el plan";
 "loading.finalizing_recommendations" = "Finalizando recomendaciones";
-"loading.view_66day_plan" = "Ver mi plan de 66 días";
+"loading.view_66day_plan" = "Ver mi plan";
 
 // MARK: - Progress
 "progress.each_week_tasks" = "Cada semana, tus tareas se vuelven";
@@ -746,7 +746,7 @@
 "common.streak" = "racha";
 "common.global" = "Global";
 "common.current" = "Actual";
-"common.potential" = "Potencial (D66)";
+"common.potential" = "Potencial";
 
 // MARK: - Home Extended
 "home.congratulations" = "Felicidades %@,";
@@ -758,9 +758,9 @@
 "home.breathe_in" = "Inspira...";
 "home.breathe_out" = "Espira...";
 "home.neuroplasticity" = "Neuroplasticidad cerebral";
-"home.neuroplasticity_desc" = "La neuroplasticidad es la capacidad del cerebro para crear, deshacer o reorganizar redes neuronales. Con una práctica regular durante 66 días, podemos literalmente reconfigurar nuestro cerebro para reducir de forma natural el estrés y la ansiedad.";
-"home.why_66_days" = "¿Por qué 66 días?";
-"home.why_66_days_desc" = "Según el estudio de la Dra. Phillippa Lally del University College London, se necesitan de media 66 días para que un nuevo comportamiento se vuelva automático. Es el tiempo que necesita tu cerebro para crear nuevas conexiones duraderas.";
+"home.neuroplasticity_desc" = "La neuroplasticidad es la capacidad del cerebro para crear, deshacer o reorganizar sus redes neuronales. Con una práctica regular, puedes literalmente reconfigurar tu cerebro para reducir de forma natural el estrés y la ansiedad.";
+"home.why_66_days" = "Por qué importa la constancia";
+"home.why_66_days_desc" = "Un estudio del University College London muestra que un nuevo hábito tarda varias semanas en volverse automático. Por eso tu plan avanza en ciclos de 28 días: lo bastante cortos para mantenerlos y lo bastante largos para que tu cerebro cree conexiones duraderas.";
 "home.scientific_evidence" = "La evidencia científica";
 "home.scientific_evidence_desc" = "Los estudios de neurociencia muestran que los ejercicios de meditación y respiración modifican físicamente la estructura cerebral, reduciendo la amígdala (centro de miedo) y fortaleciendo la corteza prefrontal (control emocional).";
 
@@ -805,7 +805,7 @@
 // MARK: - Profile Extended
 "profile.score_cortifree" = "Puntuación CortiFree";
 "profile.habits_title" = "Hábitos";
-"profile.day_progress" = "Día %d/66";
+"profile.day_progress" = "Día %d";
 "profile.habit.meditation" = "Meditación";
 "profile.habit.breathing" = "Respiración";
 "profile.habit.journal" = "Diario";
@@ -830,7 +830,7 @@
 // Score Section
 "profile.score.title" = "Puntuación CortiFree";
 "profile.score.current" = "Actual";
-"profile.score.potential" = "Potencial (D66)";
+"profile.score.potential" = "Potencial";
 "profile.score.global" = "Global";
 
 // Achievements Section
@@ -969,7 +969,7 @@
 "avatar.badge.master" = "Maestro";
 
 // MARK: - Tasks Extended
-"tasks.day_progress" = "Día %d/66";
+"tasks.day_progress" = "Día %d";
 "tasks.breathe_consciously" = "Respiración consciente";
 "tasks.meditate_mindfully" = "Meditación consciente";
 "tasks.drink_water" = "Bebe al menos %@ de agua";
@@ -1105,7 +1105,7 @@
 "achievement.streak_40.description" = "Mantén una racha de 40 días";
 "achievement.streak_50.description" = "Mantén una racha de 50 días";
 "achievement.streak_60.description" = "Mantén una racha de 60 días";
-"achievement.streak_66.description" = "Mantén una racha de 66 días - ¡Programa completo!";
+"achievement.streak_66.description" = "Mantén una racha de 66 días";
 
 // MARK: - Achievement Unlock Popup
 "achievement.unlocked" = "¡Logro desbloqueado!";
@@ -1210,7 +1210,7 @@
 // MARK: - Onboarding V2 - Rating View
 "onboarding.rating.current_title" = "Tu evaluación actual";
 "onboarding.rating.potential_title" = "Tu evaluación potencial";
-"onboarding.rating.potential_subtitle" = "después de 66 días";
+"onboarding.rating.potential_subtitle" = "con tu plan";
 "onboarding.rating.see_potential" = "Ver potencial";
 
 // MARK: - Onboarding V2 - Eight Habits Intro
@@ -1334,7 +1334,7 @@
 
 "onboarding.testimonials.testimonial_3_name" = "Sophie M.";
 "onboarding.testimonials.testimonial_3_age" = "45 años";
-"onboarding.testimonials.testimonial_3_text" = "El diario de gratitud me ayudó a ver las cosas de forma positiva. Después de 66 días, se convirtió en un hábito natural.";
+"onboarding.testimonials.testimonial_3_text" = "El diario de gratitud me ayudó a ver las cosas de forma positiva. Al cabo de unas semanas, se convirtió en un hábito natural.";
 
 "onboarding.testimonials.testimonial_4_name" = "Lucas B.";
 "onboarding.testimonials.testimonial_4_age" = "35 años";
@@ -2578,16 +2578,16 @@
 "learning.card.meditation_science.section3.content" = "Los cambios cerebrales visibles aparecen después de sólo 8 semanas de práctica diaria durante 10-15 minutos.\n\n¡Ya estás en el camino correcto con CortiFree!";
 
 // MARK: - Learning Card 3: 66 days
-"learning.card.66days.title" = "Los 66 días para formar un hábito";
-"learning.card.66days.description" = "Por qué el programa dura 66 días";
+"learning.card.66days.title" = "¿Cuánto tarda un hábito?";
+"learning.card.66days.description" = "Lo que dice la ciencia y por qué tu plan avanza en ciclos de 28 días";
 "learning.card.66days.section1.title" = "El estudio de referencia";
-"learning.card.66days.section1.content" = "• University College London (2009)\n• 66 días = tiempo promedio para automatizar un hábito\n• Rango de 18 a 254 días dependiendo de la complejidad";
+"learning.card.66days.section1.content" = "• University College London (2009)\n• Un comportamiento diario tardó de 18 a 254 días en volverse automático\n• Depende de la persona y de lo complejo que sea el hábito";
 "learning.card.66days.section2.title" = "Las 3 fases";
 "learning.card.66days.section2.content" = "1. Semanas 1-3: Período de esfuerzo consciente\n2. Semanas 4-7: Inicio de la automatización\n3. Semanas 8-10: Hábito anclado";
 "learning.card.66days.section3.title" = "Por qué funciona";
 "learning.card.66days.section3.content" = "• Creación de nuevas conexiones neuronales\n• Refuerzo progresivo\n• Transformación en reflejo automático";
 "learning.card.66days.section4.title" = "Tu objetivo";
-"learning.card.66days.section4.content" = "¡Al final de los 66 días, tus nuevos hábitos antiestrés serán parte integral de tu vida!";
+"learning.card.66days.section4.content" = "¡Ciclo tras ciclo, tus nuevos hábitos antiestrés pasan a formar parte de tu vida!";
 
 // MARK: - Learning Card 4: Neuroplasticity
 "learning.card.neuroplasticity.title" = "Neuroplasticidad: tu cerebro puede cambiar";
@@ -3476,10 +3476,10 @@
 "onboarding_v2.scientific.harvard_quote" = "Los hábitos se forman mediante acciones repetidas en contextos estables, y hacen falta semanas, incluso meses, para que se vuelvan automáticos.";
 "onboarding_v2.scientific.harvard_highlight" = "acciones repetidas en contextos estables";
 "onboarding_v2.scientific.harvard_source" = "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology,";
-"onboarding_v2.scientific.ucl_quote" = "96 participantes adoptaron un comportamiento diario, y según el modelo la automaticidad alcanzó una meseta en un promedio de 66 días, con un rango de 18 a 254 días.";
-"onboarding_v2.scientific.ucl_highlight" = "promedio de 66 días, con un rango de 18 a 254 días";
+"onboarding_v2.scientific.ucl_quote" = "96 participantes adoptaron un comportamiento diario: según la persona, tardó de 18 a 254 días en volverse automático.";
+"onboarding_v2.scientific.ucl_highlight" = "de 18 a 254 días";
 "onboarding_v2.scientific.ucl_source" = "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology.";
-"onboarding_v2.scientific.atomic_quote" = "En promedio, hacen falta más de dos meses para que un nuevo comportamiento se vuelva automático: 66 días, para ser exactos.";
+"onboarding_v2.scientific.atomic_quote" = "En promedio, hacen falta más de dos meses para que un nuevo comportamiento se vuelva automático.";
 "onboarding_v2.scientific.atomic_highlight" = "más de dos meses";
 "onboarding_v2.scientific.atomic_source" = "Clear, J. (2018). Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones. Avery.";
 
@@ -3631,7 +3631,7 @@
 "editprofile.section.personal_info" = "Información personal";
 "editprofile.first_name" = "Nombre";
 "editprofile.email" = "Correo electrónico";
-"editprofile.section.goals" = "Objetivos después de 66 días";
+"editprofile.section.goals" = "Mis objetivos";
 "editprofile.section.account" = "Gestión de cuentas";
 "editprofile.restart_program" = "Reiniciar programa";
 "editprofile.logout" = "Cerrar sesión";
@@ -4177,10 +4177,10 @@
 "inline.notificationservice.28" = "¡2 semanas de racha! ⭐";
 "inline.notificationservice.29" = "El hábito empieza a afianzarse. ¡No pares!";
 "inline.notificationservice.30" = "¡30 días seguidos! 🚀";
-"inline.notificationservice.31" = "Ya llevas la mitad del camino hacia los 66 días. ¡Lo estás logrando!";
-"inline.notificationservice.32" = "¡66 DÍAS! ¡LO LOGRASTE! 🏆";
+"inline.notificationservice.31" = "Un mes entero sin rendirte. ¡Campeón/a!";
+"inline.notificationservice.32" = "¡66 DÍAS SEGUIDOS! 🏆";
 "inline.notificationservice.33" = "¡El hábito está arraigado! Eres todo un ejemplo de bienestar";
-"inline.notificationservice.34" = "¡Sigue avanzando hacia los 66 días!";
+"inline.notificationservice.34" = "¡Sigue con este ritmo!";
 "inline.onboardingliveactivitymanager.00" = "Un regalo te espera";
 "inline.onboardingliveactivitymanager.01" = "Tu oferta personalizada caduca pronto.";
 "inline.onboardingliveactivitymanager.02" = "Abrir mi regalo";
@@ -5209,3 +5209,18 @@
 "milo.weekly.question.2" = "Pensando en tu semana: ¿qué momento de tu plan te ayudó más?";
 "milo.weekly.question.3" = "¿Qué te estresó esta semana y cómo reaccionó tu cuerpo?";
 "milo.weekly.question.4" = "Si la próxima semana pudiera ser un poco más ligera, ¿qué cambiarías primero?";
+
+/* Celebrations + end-of-session rating */
+"celebration.streak.subtitle_first" = "Primer ejercicio del día hecho. Vuelve mañana para que tu racha crezca.";
+"celebration.streak.subtitle_next" = "Tu racha sigue. Vuelve mañana para llegar a %d días.";
+"session.rating.title" = "¿Qué tal ha ido?";
+"session.rating.hint" = "Desliza para valorar";
+"session.rating.low" = "No muy bien";
+"session.rating.high" = "Muy bien";
+"session.rating.level.0" = "Nada bien";
+"session.rating.level.1" = "Regular";
+"session.rating.level.2" = "Normal";
+"session.rating.level.3" = "No está mal";
+"session.rating.level.4" = "Bien";
+"session.rating.level.5" = "Muy bien";
+"session.end.meditation.title" = "Sesión terminada";

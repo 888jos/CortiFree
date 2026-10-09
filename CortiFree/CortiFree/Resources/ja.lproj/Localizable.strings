@@ -293,8 +293,8 @@
 "progress.journey.score" = "CortiFreeスコア";
 "progress.journey.day_one" = "1日目";
 "progress.journey.today" = "今日";
-"progress.journey.program" = "66日間の旅";
-"progress.journey.day_count" = "66日中%d日目";
+"progress.journey.program" = "あなたの歩み";
+"progress.journey.day_count" = "%d日目";
 "progress.journey.empty" = "アクティビティとチェックインを完了すると、スコアの測定が始まります。";
 "progress.journey.chart_accessibility" = "1日目からのCortiFreeスコアの推移";
 "progress.journey.domains_title" = "1日目からの分野別の進捗";
@@ -339,14 +339,14 @@
 
 // MARK: - Tasks
 "tasks.day" = "日目";
-"tasks.day_format" = "%d/66日目";
+"tasks.day_format" = "%d日目";
 "tasks.day_format_ongoing" = "%d日目";
 "tasks.of" = "/";
 "tasks.encouragement" = "その調子です。この調子で続けましょう！";
 "tasks.todo" = "未完了";
 "tasks.done" = "完了";
 "tasks.skipped" = "スキップ済み";
-"tasks.day_counter" = "%d/66日目";
+"tasks.day_counter" = "%d日目";
 "tasks.day_counter_extended" = "%d日目";
 "tasks.error_loading" = "読み込みエラー";
 "tasks.retry" = "再試行";
@@ -465,7 +465,7 @@
 "profile.cortifree_score" = "CortiFreeスコア";
 "profile.habits" = "習慣";
 "profile.current" = "現在";
-"profile.potential_d66" = "可能性（66日目）";
+"profile.potential_d66" = "ポテンシャル";
 "profile.settings" = "設定";
 "profile.logout" = "ログアウト";
 
@@ -595,7 +595,7 @@
 "loading.personalizing_journey" = "プログラムをパーソナライズ中";
 "loading.creating_plan" = "プランを作成中";
 "loading.finalizing_recommendations" = "おすすめを最終調整中";
-"loading.view_66day_plan" = "66日間のプランを見る";
+"loading.view_66day_plan" = "プランを見る";
 
 // MARK: - Progress
 "progress.each_week_tasks" = "毎週、タスクは";
@@ -746,7 +746,7 @@
 "common.streak" = "連続記録";
 "common.global" = "総合";
 "common.current" = "現在";
-"common.potential" = "可能性（66日目）";
+"common.potential" = "ポテンシャル";
 
 // MARK: - Home Extended
 "home.congratulations" = "おめでとうございます、%@さん";
@@ -758,9 +758,9 @@
 "home.breathe_in" = "吸って…";
 "home.breathe_out" = "吐いて…";
 "home.neuroplasticity" = "脳の神経可塑性";
-"home.neuroplasticity_desc" = "神経可塑性とは、脳が神経ネットワークを作ったり、解いたり、組み替えたりする能力のことです。66日間定期的に実践することで、ストレスや不安を自然に減らせるよう、文字どおり脳を再配線できます。";
-"home.why_66_days" = "なぜ66日なの？";
-"home.why_66_days_desc" = "ユニバーシティ・カレッジ・ロンドンのフィリッパ・ラリー博士の研究によると、新しい行動が自動化されるまでには平均66日かかります。これは、脳が持続する新しいつながりを作るのに必要な期間です。";
+"home.neuroplasticity_desc" = "神経可塑性とは、脳が神経ネットワークを作り、解き、組み替える力のことです。定期的に実践することで、脳を文字どおり再配線し、ストレスや不安を自然に減らすことができます。";
+"home.why_66_days" = "なぜ継続が大切？";
+"home.why_66_days_desc" = "ユニバーシティ・カレッジ・ロンドンの研究によると、新しい習慣が自動化するまでには数週間かかります。だからプランは28日サイクルで進みます。続けやすく、脳が持続的なつながりを作るのに十分な長さです。";
 "home.scientific_evidence" = "科学的証拠";
 "home.scientific_evidence_desc" = "神経科学の研究によると、瞑想や呼吸エクササイズは脳の構造を物理的に変化させ、扁桃体（恐怖の中枢）を縮小させ、前頭前皮質（感情のコントロール）を強化します。";
 
@@ -805,7 +805,7 @@
 // MARK: - Profile Extended
 "profile.score_cortifree" = "CortiFreeスコア";
 "profile.habits_title" = "習慣";
-"profile.day_progress" = "%d/66日目";
+"profile.day_progress" = "%d日目";
 "profile.habit.meditation" = "瞑想";
 "profile.habit.breathing" = "呼吸";
 "profile.habit.journal" = "ジャーナル";
@@ -830,7 +830,7 @@
 // Score Section
 "profile.score.title" = "CortiFreeスコア";
 "profile.score.current" = "現在";
-"profile.score.potential" = "可能性（66日目）";
+"profile.score.potential" = "ポテンシャル";
 "profile.score.global" = "総合";
 
 // Achievements Section
@@ -969,7 +969,7 @@
 "avatar.badge.master" = "マスター";
 
 // MARK: - Tasks Extended
-"tasks.day_progress" = "%d/66日目";
+"tasks.day_progress" = "%d日目";
 "tasks.breathe_consciously" = "意識的な呼吸";
 "tasks.meditate_mindfully" = "マインドフルな瞑想";
 "tasks.drink_water" = "水を%@以上飲む";
@@ -1105,7 +1105,7 @@
 "achievement.streak_40.description" = "40日間連続で続ける";
 "achievement.streak_50.description" = "50日間連続で続ける";
 "achievement.streak_60.description" = "60日間連続で続ける";
-"achievement.streak_66.description" = "66日間連続で続ける — プログラム完了！";
+"achievement.streak_66.description" = "66日連続を達成";
 
 // MARK: - Achievement Unlock Popup
 "achievement.unlocked" = "実績を解除しました！";
@@ -1210,7 +1210,7 @@
 // MARK: - Onboarding V2 - Rating View
 "onboarding.rating.current_title" = "現在の評価";
 "onboarding.rating.potential_title" = "目指せる評価";
-"onboarding.rating.potential_subtitle" = "66日後";
+"onboarding.rating.potential_subtitle" = "プランを続けると";
 "onboarding.rating.see_potential" = "目指せる評価を見る";
 
 // MARK: - Onboarding V2 - Eight Habits Intro
@@ -1334,7 +1334,7 @@
 
 "onboarding.testimonials.testimonial_3_name" = "Sophie M.";
 "onboarding.testimonials.testimonial_3_age" = "45歳";
-"onboarding.testimonials.testimonial_3_text" = "感謝ジャーナルのおかげで、物事を前向きに見られるようになりました。66日後には、自然な習慣になっていました。";
+"onboarding.testimonials.testimonial_3_text" = "感謝日記のおかげで物事を前向きに見られるようになりました。数週間で自然な習慣になりました。";
 
 "onboarding.testimonials.testimonial_4_name" = "Lucas B.";
 "onboarding.testimonials.testimonial_4_age" = "35歳";
@@ -2578,16 +2578,16 @@
 "learning.card.meditation_science.section3.content" = "毎日10〜15分の練習を続けると、わずか8週間で脳に目に見える変化が現れます。\n\nCortiFreeで、もう正しい道を歩んでいますよ！";
 
 // MARK: - Learning Card 3: 66 days
-"learning.card.66days.title" = "習慣が身につくまでの66日";
-"learning.card.66days.description" = "プログラムが66日間である理由";
+"learning.card.66days.title" = "習慣になるまでどれくらい？";
+"learning.card.66days.description" = "科学が示すこと、そしてプランが28日サイクルで進む理由";
 "learning.card.66days.section1.title" = "基になった研究";
-"learning.card.66days.section1.content" = "• ユニバーシティ・カレッジ・ロンドン（2009年）\n• 66日 = 習慣が自動化するまでの平均期間\n• 難しさによって18〜254日の幅がある";
+"learning.card.66days.section1.content" = "• ユニバーシティ・カレッジ・ロンドン（2009年）\n• 毎日の行動が自動化するまでに18〜254日かかった\n• 人や習慣の複雑さによって異なる";
 "learning.card.66days.section2.title" = "3つの段階";
 "learning.card.66days.section2.content" = "1. 1〜3週目：意識して努力する期間\n2. 4〜7週目：自動化の始まり\n3. 8〜10週目：習慣が定着";
 "learning.card.66days.section3.title" = "うまくいく理由";
 "learning.card.66days.section3.content" = "• 新しい神経回路がつくられる\n• 少しずつ強化されていく\n• 自動的な反射へと変わる";
 "learning.card.66days.section4.title" = "目指すゴール";
-"learning.card.66days.section4.content" = "66日後には、新しいストレス対策の習慣が生活の一部になっています！";
+"learning.card.66days.section4.content" = "サイクルを重ねるごとに、新しいストレス対策の習慣が生活の一部になります！";
 
 // MARK: - Learning Card 4: Neuroplasticity
 "learning.card.neuroplasticity.title" = "神経可塑性：脳は変われる";
@@ -3476,10 +3476,10 @@
 "onboarding_v2.scientific.harvard_quote" = "習慣は安定した状況で繰り返される行動によって形成され、自動化されるまでには数週間、さらには数か月かかります。";
 "onboarding_v2.scientific.harvard_highlight" = "安定した状況で繰り返される行動";
 "onboarding_v2.scientific.harvard_source" = "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology,";
-"onboarding_v2.scientific.ucl_quote" = "96人の参加者が毎日の行動を取り入れ、自動化の度合いは平均66日（18〜254日の幅）で頭打ちに達するとモデル化されました。";
-"onboarding_v2.scientific.ucl_highlight" = "平均66日（18〜254日の幅）";
+"onboarding_v2.scientific.ucl_quote" = "96人の参加者が毎日の行動を取り入れ、人によって18〜254日で自動化しました。";
+"onboarding_v2.scientific.ucl_highlight" = "18〜254日";
 "onboarding_v2.scientific.ucl_source" = "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology.";
-"onboarding_v2.scientific.atomic_quote" = "新しい行動が自動化されるまでには、平均して2か月以上、正確には66日かかります。";
+"onboarding_v2.scientific.atomic_quote" = "新しい行動が自動化されるまでには、平均して2か月以上かかります。";
 "onboarding_v2.scientific.atomic_highlight" = "2か月以上";
 "onboarding_v2.scientific.atomic_source" = "Clear, J. (2018). Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones. Avery.";
 
@@ -3631,7 +3631,7 @@
 "editprofile.section.personal_info" = "個人情報";
 "editprofile.first_name" = "ファーストネーム";
 "editprofile.email" = "メールアドレス";
-"editprofile.section.goals" = "66日後の目標";
+"editprofile.section.goals" = "目標";
 "editprofile.section.account" = "アカウント管理";
 "editprofile.restart_program" = "プログラムをやり直す";
 "editprofile.logout" = "ログアウト";
@@ -4177,10 +4177,10 @@
 "inline.notificationservice.28" = "2週間連続！⭐";
 "inline.notificationservice.29" = "習慣が定着し始めています。続けましょう！";
 "inline.notificationservice.30" = "30日連続！🚀";
-"inline.notificationservice.31" = "66日の折り返し地点です。すごい！";
-"inline.notificationservice.32" = "66日達成！やりましたね！🏆";
+"inline.notificationservice.31" = "丸1か月、続けられました。チャンピオン！";
+"inline.notificationservice.32" = "66日連続！🏆";
 "inline.notificationservice.33" = "習慣が身につきました！本当によくがんばりましたね";
-"inline.notificationservice.34" = "66日に向けて進み続けましょう！";
+"inline.notificationservice.34" = "この調子で続けよう！";
 "inline.onboardingliveactivitymanager.00" = "プレゼントが届いています";
 "inline.onboardingliveactivitymanager.01" = "あなた専用のオファーはまもなく終了します。";
 "inline.onboardingliveactivitymanager.02" = "プレゼントを開く";
@@ -5212,3 +5212,18 @@
 "milo.weekly.question.2" = "今週をふりかえって、プランのどの時間がいちばん助けになりましたか？";
 "milo.weekly.question.3" = "今週ストレスを感じたことは？そのとき体はどう反応しましたか？";
 "milo.weekly.question.4" = "来週を少し軽くできるとしたら、まず何を変えますか？";
+
+/* Celebrations + end-of-session rating */
+"celebration.streak.subtitle_first" = "今日最初のエクササイズ完了。明日も続けて連続記録を伸ばそう。";
+"celebration.streak.subtitle_next" = "連続記録は続いています。明日で%d日になります。";
+"session.rating.title" = "いかがでしたか？";
+"session.rating.hint" = "スライドして評価";
+"session.rating.low" = "いまいち";
+"session.rating.high" = "とても良い";
+"session.rating.level.0" = "全然だめ";
+"session.rating.level.1" = "いまいち";
+"session.rating.level.2" = "ふつう";
+"session.rating.level.3" = "まあまあ";
+"session.rating.level.4" = "良い";
+"session.rating.level.5" = "とても良い";
+"session.end.meditation.title" = "セッション完了";

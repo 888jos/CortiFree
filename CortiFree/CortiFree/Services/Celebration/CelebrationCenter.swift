@@ -51,6 +51,12 @@ final class CelebrationCenter: ObservableObject {
     /// How long a moment banner stays on screen.
     static let momentDuration: Duration = .seconds(2.8)
 
+    /// The streak card plays its week animation first, so it stays a bit longer.
+    static func duration(of celebration: Celebration) -> Duration {
+        if case .streak = celebration { return .seconds(4.2) }
+        return momentDuration
+    }
+
     #if DEBUG
     /// Celebrations gallery: keep banners on screen until tapped, to inspect them.
     var holdsMomentsForPreview = false
@@ -91,7 +97,7 @@ final class CelebrationCenter: ObservableObject {
             if holdsMomentsForPreview { return }
             #endif
             autoDismissTask = Task {
-                try? await Task.sleep(for: Self.momentDuration)
+                try? await Task.sleep(for: Self.duration(of: next))
                 guard !Task.isCancelled else { return }
                 dismissCurrent()
             }

@@ -36,13 +36,13 @@ struct CelebrationsGalleryView: View {
         ]),
         ("Avant · Plan validation", [
             Entry(demo: .checkmark, title: "Coche de validation", detail: "Chaque exercice validé · SuccessCheckmarkView"),
-            Entry(demo: .flame, title: "Streak +1 (flamme)", detail: "1er exercice du jour · FlameStreakAnimation"),
-            Entry(demo: .firstOfDay, title: "Séquence réelle : 1er exercice du jour", detail: "Coche + flamme affichées en même temps"),
+            Entry(demo: .flame, title: "Streak +1 (flamme)", detail: "Carte centrée · semaine comme sur l'accueil · StreakCelebrationCard"),
+            Entry(demo: .firstOfDay, title: "Séquence réelle : 1er exercice du jour", detail: "Coche puis carte de série (jour 1)"),
             Entry(demo: .confetti, title: "Confettis", detail: "Tous les exercices du jour faits · .confetti(isActive:)"),
             Entry(demo: .dayComplete, title: "Séquence réelle : journée bouclée", detail: "Coche + confettis + carte « Journée bouclée »")
         ]),
         ("Récompenses", [
-            Entry(demo: .achievement, title: "Succès débloqué", detail: "Série de 7 jours · AchievementUnlockView"),
+            Entry(demo: .achievement, title: "Succès débloqué", detail: "Série de 7 jours · AchievementCelebrationView"),
             Entry(demo: .badgeBronze, title: "Badge habitude · Bronze", detail: "BadgeEvolutionView"),
             Entry(demo: .badgeSilver, title: "Badge habitude · Argent", detail: "BadgeEvolutionView"),
             Entry(demo: .badgeGold, title: "Badge habitude · Or", detail: "BadgeEvolutionView"),
@@ -126,7 +126,7 @@ struct CelebrationsGalleryView: View {
         case .dayComplete:
             SequenceDemo(withFlame: false, withConfetti: true)
         case .achievement:
-            AchievementUnlockView(achievement: Self.sampleAchievement, onDismiss: close)
+            AchievementCelebrationView(achievement: Self.sampleAchievement, onContinue: close)
         case .badgeBronze:
             BadgeDemo(level: 0, onDone: close)
         case .badgeSilver:
@@ -138,7 +138,11 @@ struct CelebrationsGalleryView: View {
         case .breathingEnd:
             BreathingSessionEndView(pattern: .physiologicalSigh, breathedSeconds: 180, cycles: 12, onDone: close, onRestart: {})
         case .exerciseCompletion:
-            CompletionOverlay(onDismiss: close)
+            CompletionOverlay(
+                content: RatedContent(type: .exercise, id: AntiStressExerciseType.grounding5Senses.rawValue,
+                                      title: AntiStressExerciseType.grounding5Senses.displayName),
+                onDismiss: close
+            )
         case .commitment:
             CommitmentPledgeView(onContinue: close)
         case .planReady:
@@ -278,7 +282,7 @@ private struct FlameDemo: View {
     var body: some View {
         ZStack {
             if show {
-                FlameStreakAnimation(isShowing: $show)
+                StreakCelebrationCard(days: 5) { show = false }
             } else {
                 ReplayButton { show = true }
             }
@@ -328,8 +332,8 @@ private struct SequenceDemo: View {
                     .transition(.scale.combined(with: .opacity))
             }
             if flame {
-                FlameStreakAnimation(isShowing: $flame)
-                    .transition(.scale.combined(with: .opacity))
+                StreakCelebrationCard(days: 1) { flame = false }
+                    .transition(.opacity)
             }
         }
         .confetti(isActive: confetti)
@@ -339,7 +343,8 @@ private struct SequenceDemo: View {
     private func replay() {
         HapticManager.success()
         withAnimation { checkmark = true }
-        if withFlame { flame = true }
+        // In the app the streak card comes from the celebration queue, after the check mark.
+        if withFlame { DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { withAnimation { flame = true } } }
         if withConfetti {
             confetti = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { confetti = false }

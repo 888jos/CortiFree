@@ -293,8 +293,8 @@
 "progress.journey.score" = "CortiFree score";
 "progress.journey.day_one" = "Day 1";
 "progress.journey.today" = "Today";
-"progress.journey.program" = "66-day journey";
-"progress.journey.day_count" = "Day %d of 66";
+"progress.journey.program" = "Your journey";
+"progress.journey.day_count" = "Day %d";
 "progress.journey.empty" = "Complete activities and check-ins to start measuring your score.";
 "progress.journey.chart_accessibility" = "CortiFree score evolution since day one";
 "progress.journey.domains_title" = "Domain progress since day 1";
@@ -339,14 +339,14 @@
 
 // MARK: - Tasks
 "tasks.day" = "Day";
-"tasks.day_format" = "Day %d/66";
+"tasks.day_format" = "Day %d";
 "tasks.day_format_ongoing" = "Day %d";
 "tasks.of" = "/";
 "tasks.encouragement" = "You're doing great. Keep it up!";
 "tasks.todo" = "To do";
 "tasks.done" = "Done";
 "tasks.skipped" = "Skipped";
-"tasks.day_counter" = "Day %d/66";
+"tasks.day_counter" = "Day %d";
 "tasks.day_counter_extended" = "Day %d";
 "tasks.error_loading" = "Loading error";
 "tasks.retry" = "Retry";
@@ -465,7 +465,7 @@
 "profile.cortifree_score" = "CortiFree Score";
 "profile.habits" = "Habits";
 "profile.current" = "Current";
-"profile.potential_d66" = "Potential (D66)";
+"profile.potential_d66" = "Potential";
 "profile.settings" = "Settings";
 "profile.logout" = "Logout";
 
@@ -595,7 +595,7 @@
 "loading.personalizing_journey" = "Personalizing journey";
 "loading.creating_plan" = "Creating plan";
 "loading.finalizing_recommendations" = "Finalizing recommendations";
-"loading.view_66day_plan" = "View my 66-day plan";
+"loading.view_66day_plan" = "See my plan";
 
 // MARK: - Progress
 "progress.each_week_tasks" = "Each week, your tasks become";
@@ -746,7 +746,7 @@
 "common.streak" = "streak";
 "common.global" = "Global";
 "common.current" = "Current";
-"common.potential" = "Potential (D66)";
+"common.potential" = "Potential";
 
 // MARK: - Home Extended
 "home.congratulations" = "Congratulations %@,";
@@ -758,9 +758,9 @@
 "home.breathe_in" = "Breathe in...";
 "home.breathe_out" = "Breathe out...";
 "home.neuroplasticity" = "Brain neuroplasticity";
-"home.neuroplasticity_desc" = "Neuroplasticity is the brain's ability to create, undo, or reorganize neural networks. Through regular practice over 66 days, we can literally rewire our brain to naturally reduce stress and anxiety.";
-"home.why_66_days" = "Why 66 days?";
-"home.why_66_days_desc" = "Based on Dr. Phillippa Lally's study from University College London, it takes an average of 66 days for a new behavior to become automatic. This is the time needed for your brain to create lasting new connections.";
+"home.neuroplasticity_desc" = "Neuroplasticity is the brain's ability to create, undo or reorganise its neural networks. With regular practice, you can literally rewire your brain to naturally reduce stress and anxiety.";
+"home.why_66_days" = "Why consistency matters";
+"home.why_66_days_desc" = "A University College London study shows a new habit takes several weeks to become automatic. That's why your plan moves in 28-day cycles: short enough to stick with, long enough for your brain to build lasting connections.";
 "home.scientific_evidence" = "The scientific evidence";
 "home.scientific_evidence_desc" = "Neuroscience studies show that meditation and breathing exercises physically modify brain structure, reducing the amygdala (fear center) and strengthening the prefrontal cortex (emotional control).";
 
@@ -805,7 +805,7 @@
 // MARK: - Profile Extended
 "profile.score_cortifree" = "CortiFree Score";
 "profile.habits_title" = "Habits";
-"profile.day_progress" = "Day %d/66";
+"profile.day_progress" = "Day %d";
 "profile.habit.meditation" = "Meditation";
 "profile.habit.breathing" = "Breathing";
 "profile.habit.journal" = "Journal";
@@ -830,7 +830,7 @@
 // Score Section
 "profile.score.title" = "CortiFree Score";
 "profile.score.current" = "Current";
-"profile.score.potential" = "Potential (D66)";
+"profile.score.potential" = "Potential";
 "profile.score.global" = "Global";
 
 // Achievements Section
@@ -969,7 +969,7 @@
 "avatar.badge.master" = "Master";
 
 // MARK: - Tasks Extended
-"tasks.day_progress" = "Day %d/66";
+"tasks.day_progress" = "Day %d";
 "tasks.breathe_consciously" = "Conscious breathing";
 "tasks.meditate_mindfully" = "Mindful meditation";
 "tasks.drink_water" = "Drink at least %@ of water";
@@ -1105,7 +1105,7 @@
 "achievement.streak_40.description" = "Maintain a 40-day streak";
 "achievement.streak_50.description" = "Maintain a 50-day streak";
 "achievement.streak_60.description" = "Maintain a 60-day streak";
-"achievement.streak_66.description" = "Maintain a 66-day streak - Full program!";
+"achievement.streak_66.description" = "Keep a 66-day streak";
 
 // MARK: - Achievement Unlock Popup
 "achievement.unlocked" = "Achievement Unlocked!";
@@ -1210,7 +1210,7 @@
 // MARK: - Onboarding V2 - Rating View
 "onboarding.rating.current_title" = "Your current assessment";
 "onboarding.rating.potential_title" = "Your potential assessment";
-"onboarding.rating.potential_subtitle" = "after 66 days";
+"onboarding.rating.potential_subtitle" = "with your plan";
 "onboarding.rating.see_potential" = "See potential";
 
 // MARK: - Onboarding V2 - Eight Habits Intro
@@ -1334,7 +1334,7 @@
 
 "onboarding.testimonials.testimonial_3_name" = "Sophie M.";
 "onboarding.testimonials.testimonial_3_age" = "45 years old";
-"onboarding.testimonials.testimonial_3_text" = "The gratitude journal helped me see things positively. After 66 days, it became a natural habit.";
+"onboarding.testimonials.testimonial_3_text" = "The gratitude journal helped me see things more positively. After a few weeks, it became a natural habit.";
 
 "onboarding.testimonials.testimonial_4_name" = "Lucas B.";
 "onboarding.testimonials.testimonial_4_age" = "35 years old";
@@ -2578,16 +2578,16 @@
 "learning.card.meditation_science.section3.content" = "Visible brain changes appear after just 8 weeks of daily practice for 10-15 minutes.\n\nYou're already on the right track with CortiFree!";
 
 // MARK: - Learning Card 3: 66 days
-"learning.card.66days.title" = "The 66 days to form a habit";
-"learning.card.66days.description" = "Why the program lasts 66 days";
+"learning.card.66days.title" = "How long does a habit take?";
+"learning.card.66days.description" = "What science says, and why your plan moves in 28-day cycles";
 "learning.card.66days.section1.title" = "The reference study";
-"learning.card.66days.section1.content" = "• University College London (2009)\n• 66 days = average time to automate a habit\n• Ranges from 18 to 254 days depending on complexity";
+"learning.card.66days.section1.content" = "• University College London (2009)\n• A daily behaviour took from 18 to 254 days to become automatic\n• It depends on the person and on how complex the habit is";
 "learning.card.66days.section2.title" = "The 3 phases";
 "learning.card.66days.section2.content" = "1. Weeks 1-3: Period of conscious effort\n2. Weeks 4-7: Beginning of automation\n3. Weeks 8-10: Habit anchored";
 "learning.card.66days.section3.title" = "Why it works";
 "learning.card.66days.section3.content" = "• Creation of new neural connections\n• Progressive reinforcement\n• Transformation into automatic reflex";
 "learning.card.66days.section4.title" = "Your goal";
-"learning.card.66days.section4.content" = "At the end of 66 days, your new anti-stress habits will be an integral part of your life!";
+"learning.card.66days.section4.content" = "Cycle after cycle, your new anti-stress habits become part of your life!";
 
 // MARK: - Learning Card 4: Neuroplasticity
 "learning.card.neuroplasticity.title" = "Neuroplasticity: your brain can change";
@@ -3476,10 +3476,10 @@
 "onboarding_v2.scientific.harvard_quote" = "Habits are formed through repeated actions in stable contexts, and it takes weeks, even months, for them to become automatic.";
 "onboarding_v2.scientific.harvard_highlight" = "repeated actions in stable contexts";
 "onboarding_v2.scientific.harvard_source" = "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology,";
-"onboarding_v2.scientific.ucl_quote" = "96 participants adopted a daily behavior, and automaticity was modeled to reach a plateau at an average of 66 days, with a range of 18 to 254 days.";
-"onboarding_v2.scientific.ucl_highlight" = "average of 66 days, with a range of 18 to 254 days";
+"onboarding_v2.scientific.ucl_quote" = "96 participants adopted a daily behaviour: depending on the person, it took from 18 to 254 days to become automatic.";
+"onboarding_v2.scientific.ucl_highlight" = "from 18 to 254 days";
 "onboarding_v2.scientific.ucl_source" = "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology.";
-"onboarding_v2.scientific.atomic_quote" = "On average, it takes more than two months before a new behavior becomes automatic — 66 days to be exact.";
+"onboarding_v2.scientific.atomic_quote" = "On average, it takes more than two months before a new behavior becomes automatic.";
 "onboarding_v2.scientific.atomic_highlight" = "more than two months";
 "onboarding_v2.scientific.atomic_source" = "Clear, J. (2018). Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones. Avery.";
 
@@ -3631,7 +3631,7 @@
 "editprofile.section.personal_info" = "Personal Information";
 "editprofile.first_name" = "First Name";
 "editprofile.email" = "Email";
-"editprofile.section.goals" = "Goals after 66 days";
+"editprofile.section.goals" = "My goals";
 "editprofile.section.account" = "Account Management";
 "editprofile.restart_program" = "Restart program";
 "editprofile.logout" = "Log out";
@@ -4177,10 +4177,10 @@
 "inline.notificationservice.28" = "2-week streak! ⭐";
 "inline.notificationservice.29" = "The habit is starting to stick — keep going!";
 "inline.notificationservice.30" = "30 days straight! 🚀";
-"inline.notificationservice.31" = "You're halfway to 66 days. Champion!";
-"inline.notificationservice.32" = "66 DAYS! YOU DID IT! 🏆";
+"inline.notificationservice.31" = "A whole month without letting go. Champion!";
+"inline.notificationservice.32" = "66 DAYS IN A ROW! 🏆";
 "inline.notificationservice.33" = "The habit is ingrained! You're a wellness champion";
-"inline.notificationservice.34" = "Keep progressing towards 66 days!";
+"inline.notificationservice.34" = "Keep the momentum going!";
 "inline.onboardingliveactivitymanager.00" = "A gift is waiting for you";
 "inline.onboardingliveactivitymanager.01" = "Your personalized offer expires soon.";
 "inline.onboardingliveactivitymanager.02" = "Open my gift";
@@ -5209,3 +5209,18 @@
 "milo.weekly.question.2" = "Looking back at this week: which moment of your plan helped you most?";
 "milo.weekly.question.3" = "What stressed you out this week, and how did your body react?";
 "milo.weekly.question.4" = "If next week could be a little lighter, what would you change first?";
+
+/* Celebrations + end-of-session rating */
+"celebration.streak.subtitle_first" = "First exercise of the day done. Come back tomorrow to grow your streak.";
+"celebration.streak.subtitle_next" = "Your streak goes on. Come back tomorrow to reach %d days.";
+"session.rating.title" = "How was it?";
+"session.rating.hint" = "Slide to rate";
+"session.rating.low" = "Not great";
+"session.rating.high" = "Really good";
+"session.rating.level.0" = "Not great at all";
+"session.rating.level.1" = "Meh";
+"session.rating.level.2" = "So-so";
+"session.rating.level.3" = "Not bad";
+"session.rating.level.4" = "Good";
+"session.rating.level.5" = "Really good";
+"session.end.meditation.title" = "Session complete";

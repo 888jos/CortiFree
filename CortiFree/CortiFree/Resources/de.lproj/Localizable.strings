@@ -293,8 +293,8 @@
 "progress.journey.score" = "CortiFree Score";
 "progress.journey.day_one" = "Tag 1";
 "progress.journey.today" = "Heute";
-"progress.journey.program" = "66-tägige Reise";
-"progress.journey.day_count" = "Tag %d von 66";
+"progress.journey.program" = "Deine Reise";
+"progress.journey.day_count" = "Tag %d";
 "progress.journey.empty" = "Schließe Aktivitäten und Check-ins ab, um deinen Score zu messen.";
 "progress.journey.chart_accessibility" = "Entwicklung des CortiFree Scores seit dem ersten Tag";
 "progress.journey.domains_title" = "Fortschritt der Bereiche seit Tag 1";
@@ -339,14 +339,14 @@
 
 // MARK: - Tasks
 "tasks.day" = "Tag";
-"tasks.day_format" = "Tag %d/66";
+"tasks.day_format" = "Tag %d";
 "tasks.day_format_ongoing" = "Tag %d";
 "tasks.of" = "/";
 "tasks.encouragement" = "Du machst das super. Weiter so!";
 "tasks.todo" = "Zu tun";
 "tasks.done" = "Erledigt";
 "tasks.skipped" = "Übersprungen";
-"tasks.day_counter" = "Tag %d/66";
+"tasks.day_counter" = "Tag %d";
 "tasks.day_counter_extended" = "Tag %d";
 "tasks.error_loading" = "Ladefehler";
 "tasks.retry" = "Erneut versuchen";
@@ -465,7 +465,7 @@
 "profile.cortifree_score" = "CortiFree Score";
 "profile.habits" = "Gewohnheiten";
 "profile.current" = "Aktuell";
-"profile.potential_d66" = "Potenzial (T66)";
+"profile.potential_d66" = "Potenzial";
 "profile.settings" = "Einstellungen";
 "profile.logout" = "Abmelden";
 
@@ -595,7 +595,7 @@
 "loading.personalizing_journey" = "Reise wird personalisiert";
 "loading.creating_plan" = "Plan wird erstellt";
 "loading.finalizing_recommendations" = "Empfehlungen werden fertiggestellt";
-"loading.view_66day_plan" = "Meinen 66-Tage-Plan ansehen";
+"loading.view_66day_plan" = "Meinen Plan ansehen";
 
 // MARK: - Progress
 "progress.each_week_tasks" = "Jede Woche werden deine Aufgaben";
@@ -746,7 +746,7 @@
 "common.streak" = "Serie";
 "common.global" = "Global";
 "common.current" = "Aktuell";
-"common.potential" = "Potenzial (T66)";
+"common.potential" = "Potenzial";
 
 // MARK: - Home Extended
 "home.congratulations" = "Herzlichen Glückwunsch %@,";
@@ -758,9 +758,9 @@
 "home.breathe_in" = "Atme ein...";
 "home.breathe_out" = "Atme aus...";
 "home.neuroplasticity" = "Neuroplastizität des Gehirns";
-"home.neuroplasticity_desc" = "Neuroplastizität ist die Fähigkeit des Gehirns, neuronale Netze zu erzeugen, rückgängig zu machen oder zu reorganisieren. Durch regelmäßiges Üben über 66 Tage können wir unser Gehirn buchstäblich neu verkabeln, um Stress und Angst auf natürliche Weise zu reduzieren.";
-"home.why_66_days" = "Warum 66 Tage?";
-"home.why_66_days_desc" = "Laut der Studie von Dr. Phillippa Lally vom University College London dauert es durchschnittlich 66 Tage, bis ein neues Verhalten automatisch wird. So lange braucht dein Gehirn, um dauerhafte neue Verbindungen herzustellen.";
+"home.neuroplasticity_desc" = "Neuroplastizität ist die Fähigkeit des Gehirns, neuronale Netze zu bilden, aufzulösen oder neu zu ordnen. Mit regelmäßiger Übung kannst du dein Gehirn buchstäblich neu verdrahten und Stress und Angst auf natürliche Weise verringern.";
+"home.why_66_days" = "Warum Regelmäßigkeit zählt";
+"home.why_66_days_desc" = "Eine Studie des University College London zeigt: Eine neue Gewohnheit braucht mehrere Wochen, bis sie automatisch wird. Deshalb läuft dein Plan in 28-Tage-Zyklen – kurz genug zum Durchhalten, lang genug für dauerhafte Verbindungen im Gehirn.";
 "home.scientific_evidence" = "Die wissenschaftlichen Beweise";
 "home.scientific_evidence_desc" = "Neurowissenschaftliche Studien zeigen, dass Meditation und Atemübungen die Gehirnstruktur physisch verändern, die Amygdala (Angstzentrum) reduzieren und den präfrontalen Kortex (emotionale Kontrolle) stärken.";
 
@@ -805,7 +805,7 @@
 // MARK: - Profile Extended
 "profile.score_cortifree" = "CortiFree Score";
 "profile.habits_title" = "Gewohnheiten";
-"profile.day_progress" = "Tag %d/66";
+"profile.day_progress" = "Tag %d";
 "profile.habit.meditation" = "Meditation";
 "profile.habit.breathing" = "Atmung";
 "profile.habit.journal" = "Journal";
@@ -830,7 +830,7 @@
 // Score Section
 "profile.score.title" = "CortiFree Score";
 "profile.score.current" = "Aktuell";
-"profile.score.potential" = "Potenzial (T66)";
+"profile.score.potential" = "Potenzial";
 "profile.score.global" = "Global";
 
 // Achievements Section
@@ -969,7 +969,7 @@
 "avatar.badge.master" = "Meister";
 
 // MARK: - Tasks Extended
-"tasks.day_progress" = "Tag %d/66";
+"tasks.day_progress" = "Tag %d";
 "tasks.breathe_consciously" = "Bewusste Atmung";
 "tasks.meditate_mindfully" = "Achtsame Meditation";
 "tasks.drink_water" = "Trinke mindestens %@ Wasser";
@@ -1105,7 +1105,7 @@
 "achievement.streak_40.description" = "Halte eine Serie von 40 Tagen";
 "achievement.streak_50.description" = "Halte eine Serie von 50 Tagen";
 "achievement.streak_60.description" = "Halte eine Serie von 60 Tagen";
-"achievement.streak_66.description" = "Halte eine Serie von 66 Tagen - das ganze Programm!";
+"achievement.streak_66.description" = "Halte eine Serie von 66 Tagen";
 
 // MARK: - Achievement Unlock Popup
 "achievement.unlocked" = "Erfolg freigeschaltet!";
@@ -1210,7 +1210,7 @@
 // MARK: - Onboarding V2 - Rating View
 "onboarding.rating.current_title" = "Deine aktuelle Einschätzung";
 "onboarding.rating.potential_title" = "Dein Potenzial";
-"onboarding.rating.potential_subtitle" = "nach 66 Tagen";
+"onboarding.rating.potential_subtitle" = "mit deinem Plan";
 "onboarding.rating.see_potential" = "Potenzial ansehen";
 
 // MARK: - Onboarding V2 - Eight Habits Intro
@@ -1334,7 +1334,7 @@
 
 "onboarding.testimonials.testimonial_3_name" = "Sophie M.";
 "onboarding.testimonials.testimonial_3_age" = "45 Jahre alt";
-"onboarding.testimonials.testimonial_3_text" = "Das Dankbarkeitstagebuch hat mir geholfen, die Dinge positiver zu sehen. Nach 66 Tagen ist es zu einer ganz natürlichen Gewohnheit geworden.";
+"onboarding.testimonials.testimonial_3_text" = "Das Dankbarkeitstagebuch hat mir geholfen, die Dinge positiver zu sehen. Nach ein paar Wochen war es eine ganz natürliche Gewohnheit.";
 
 "onboarding.testimonials.testimonial_4_name" = "Lucas B.";
 "onboarding.testimonials.testimonial_4_age" = "35 Jahre alt";
@@ -2578,16 +2578,16 @@
 "learning.card.meditation_science.section3.content" = "Sichtbare Gehirnveränderungen treten nach nur 8 Wochen täglicher Übung für 10-15 Minuten auf.\n\nSie sind mit CortiFree bereits auf dem richtigen Weg!";
 
 // MARK: - Learning Card 3: 66 days
-"learning.card.66days.title" = "Die 66 Tage, um eine Gewohnheit zu bilden";
-"learning.card.66days.description" = "Warum das Programm 66 Tage dauert";
+"learning.card.66days.title" = "Wie lange dauert eine Gewohnheit?";
+"learning.card.66days.description" = "Was die Wissenschaft sagt und warum dein Plan in 28-Tage-Zyklen läuft";
 "learning.card.66days.section1.title" = "Die Referenzstudie";
-"learning.card.66days.section1.content" = "• University College London (2009)\n• 66 Tage = durchschnittliche Zeit, bis eine Gewohnheit automatisch wird\n• Je nach Komplexität zwischen 18 und 254 Tagen";
+"learning.card.66days.section1.content" = "• University College London (2009)\n• Ein tägliches Verhalten brauchte 18 bis 254 Tage, um automatisch zu werden\n• Das hängt von der Person und der Komplexität der Gewohnheit ab";
 "learning.card.66days.section2.title" = "Die 3 Phasen";
 "learning.card.66days.section2.content" = "1. Wochen 1-3: Periode bewusster Anstrengung\n2. Wochen 4-7: Beginn der Automatisierung\n3. Wochen 8-10: Gewohnheit verankert";
 "learning.card.66days.section3.title" = "Warum es funktioniert";
 "learning.card.66days.section3.content" = "• Schaffung neuer neuronaler Verbindungen\n• Progressive Verstärkung\n• Transformation in automatischen Reflex";
 "learning.card.66days.section4.title" = "Dein Ziel";
-"learning.card.66days.section4.content" = "Am Ende der 66 Tage werden deine neuen Anti-Stress-Gewohnheiten ein fester Bestandteil deines Lebens sein!";
+"learning.card.66days.section4.content" = "Zyklus für Zyklus werden deine neuen Anti-Stress-Gewohnheiten Teil deines Lebens!";
 
 // MARK: - Learning Card 4: Neuroplasticity
 "learning.card.neuroplasticity.title" = "Neuroplastizität: Dein Gehirn kann sich verändern";
@@ -3476,10 +3476,10 @@
 "onboarding_v2.scientific.harvard_quote" = "Gewohnheiten werden durch wiederholte Handlungen in stabilen Kontexten gebildet, und es dauert Wochen, sogar Monate, bis sie automatisch werden.";
 "onboarding_v2.scientific.harvard_highlight" = "wiederholte Handlungen in stabilen Kontexten";
 "onboarding_v2.scientific.harvard_source" = "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology,";
-"onboarding_v2.scientific.ucl_quote" = "96 Teilnehmer übernahmen ein tägliches Verhalten, und laut Modell erreichte die Automatisierung nach durchschnittlich 66 Tagen, mit einer Spanne von 18 bis 254 Tagen, ein Plateau.";
-"onboarding_v2.scientific.ucl_highlight" = "durchschnittlich 66 Tagen, mit einer Spanne von 18 bis 254 Tagen";
+"onboarding_v2.scientific.ucl_quote" = "96 Teilnehmende übernahmen ein tägliches Verhalten: Je nach Person dauerte es 18 bis 254 Tage, bis es automatisch wurde.";
+"onboarding_v2.scientific.ucl_highlight" = "18 bis 254 Tage";
 "onboarding_v2.scientific.ucl_source" = "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology.";
-"onboarding_v2.scientific.atomic_quote" = "Im Durchschnitt dauert es mehr als zwei Monate, bis ein neues Verhalten automatisch wird – 66 Tage, um genau zu sein.";
+"onboarding_v2.scientific.atomic_quote" = "Im Durchschnitt dauert es mehr als zwei Monate, bis ein neues Verhalten automatisch wird.";
 "onboarding_v2.scientific.atomic_highlight" = "mehr als zwei Monate";
 "onboarding_v2.scientific.atomic_source" = "Clear, J. (2018). Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones. Avery.";
 
@@ -3631,7 +3631,7 @@
 "editprofile.section.personal_info" = "Persönliche Informationen";
 "editprofile.first_name" = "Vorname";
 "editprofile.email" = "E-Mail";
-"editprofile.section.goals" = "Ziele nach 66 Tagen";
+"editprofile.section.goals" = "Meine Ziele";
 "editprofile.section.account" = "Kontoverwaltung";
 "editprofile.restart_program" = "Programm neu starten";
 "editprofile.logout" = "Abmelden";
@@ -4177,10 +4177,10 @@
 "inline.notificationservice.28" = "2-Wochen-Serie! ⭐";
 "inline.notificationservice.29" = "Die Gewohnheit beginnt sich zu festigen – mach weiter!";
 "inline.notificationservice.30" = "30 Tage am Stück! 🚀";
-"inline.notificationservice.31" = "Du hast die Hälfte der 66 Tage geschafft. Großartig!";
-"inline.notificationservice.32" = "66 TAGE! DU HAST ES GESCHAFFT! 🏆";
+"inline.notificationservice.31" = "Ein ganzer Monat ohne aufzugeben. Champion!";
+"inline.notificationservice.32" = "66 TAGE AM STÜCK! 🏆";
 "inline.notificationservice.33" = "Die Gewohnheit ist verankert! Du bist ein echtes Wellness-Vorbild";
-"inline.notificationservice.34" = "Mach weiter in Richtung 66 Tage!";
+"inline.notificationservice.34" = "Bleib dran!";
 "inline.onboardingliveactivitymanager.00" = "Ein Geschenk wartet auf dich";
 "inline.onboardingliveactivitymanager.01" = "Dein persönliches Angebot läuft bald ab.";
 "inline.onboardingliveactivitymanager.02" = "Mein Geschenk öffnen";
@@ -5209,3 +5209,18 @@
 "milo.weekly.question.2" = "Wenn du auf die Woche zurückblickst: Welcher Moment deines Plans hat dir am meisten geholfen?";
 "milo.weekly.question.3" = "Was hat dich diese Woche gestresst, und wie hat dein Körper reagiert?";
 "milo.weekly.question.4" = "Wenn die nächste Woche etwas leichter sein könnte, was würdest du zuerst ändern?";
+
+/* Celebrations + end-of-session rating */
+"celebration.streak.subtitle_first" = "Erste Übung des Tages geschafft. Komm morgen wieder, damit deine Serie wächst.";
+"celebration.streak.subtitle_next" = "Deine Serie geht weiter. Komm morgen wieder für %d Tage.";
+"session.rating.title" = "Wie war es?";
+"session.rating.hint" = "Zum Bewerten schieben";
+"session.rating.low" = "Nicht so toll";
+"session.rating.high" = "Sehr gut";
+"session.rating.level.0" = "Gar nicht gut";
+"session.rating.level.1" = "Na ja";
+"session.rating.level.2" = "Mittelmäßig";
+"session.rating.level.3" = "Nicht schlecht";
+"session.rating.level.4" = "Gut";
+"session.rating.level.5" = "Sehr gut";
+"session.end.meditation.title" = "Sitzung beendet";

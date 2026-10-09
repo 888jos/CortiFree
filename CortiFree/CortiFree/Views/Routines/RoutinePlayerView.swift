@@ -466,81 +466,21 @@ struct RoutinePlayerView: View {
 }
 
 // MARK: - Completion Overlay
+/// End of a routine: the shared rated end screen, tinted with the routine colour.
 struct RoutineCompletionOverlay: View {
     let routine: Routine
     let onDismiss: () -> Void
 
     var body: some View {
-        ZStack {
-            Color.black.opacity(0.85)
-                .ignoresSafeArea()
-
-            VStack(spacing: 24) {
-                // Success icon
-                ZStack {
-                    Circle()
-                        .fill(Color(hex: routine.color).opacity(0.2))
-                        .frame(width: 120, height: 120)
-
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 80))
-                        .foregroundColor(Color(hex: routine.color))
-                }
-
-                VStack(spacing: 8) {
-                    Text(LanguageManager.shared.localizedString(for: "routines.completed.title"))
-                        .font(.faroBold(28))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-
-                    Text(routine.localizedName)
-                        .font(.custom("Poppins-Medium", size: 18))
-                        .foregroundColor(Color(hex: routine.color))
-                }
-
-                // Stats
-                HStack(spacing: 24) {
-                    VStack(spacing: 4) {
-                        Text(routine.formattedDuration)
-                            .font(.faroBold(20))
-                            .foregroundColor(.white)
-                        Text(LanguageManager.shared.localizedString(for: "routines.completed.duration"))
-                            .font(.custom("Poppins-Regular", size: 12))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-
-                    Rectangle()
-                        .fill(Color.white.opacity(0.2))
-                        .frame(width: 1, height: 40)
-
-                    VStack(spacing: 4) {
-                        Text("\(routine.steps.count)")
-                            .font(.faroBold(20))
-                            .foregroundColor(.white)
-                        Text(LanguageManager.shared.localizedString(for: "routines.completed.steps"))
-                            .font(.custom("Poppins-Regular", size: 12))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-                }
-                .padding(.vertical, 16)
-                .padding(.horizontal, 32)
-                .glassCard(cornerRadius: 18)
-
-                // Continue button
-                Button(action: onDismiss) {
-                    Text(LanguageManager.shared.localizedString(for: "routines.completed.continue"))
-                        .font(.custom("Poppins-Bold", size: 18))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 60)
-                        .contentShape(Capsule())
-                }
-                .buttonStyle(.glassPrimary(tint: Color(hex: routine.color)))
-                .padding(.horizontal, 40)
-                .padding(.top, 8)
-            }
-            .padding(40)
-        }
+        SessionEndView(
+            content: RatedContent(type: .routine, id: routine.id, title: routine.localizedName),
+            title: LanguageManager.shared.localizedString(for: "routines.completed.title"),
+            summary: "\(routine.localizedName) · \(routine.formattedDuration) · \(routine.steps.count) "
+                + LanguageManager.shared.localizedString(for: "routines.completed.steps"),
+            durationSeconds: routine.totalDuration,
+            accent: Color(hex: routine.color),
+            onDone: onDismiss
+        )
     }
 }
 

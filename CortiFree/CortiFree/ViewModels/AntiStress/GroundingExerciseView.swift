@@ -215,6 +215,11 @@ struct GroundingExerciseView: View {
             // Completion overlay
             if showCompletion {
                 CompletionOverlay(
+                    content: RatedContent(
+                        type: .exercise,
+                        id: AntiStressExerciseType.grounding5Senses.rawValue,
+                        title: AntiStressExerciseType.grounding5Senses.displayName
+                    ),
                     onDismiss: {
                         dismiss()
                     }

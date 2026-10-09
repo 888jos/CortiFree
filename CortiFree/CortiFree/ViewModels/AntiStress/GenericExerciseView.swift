@@ -119,6 +119,7 @@ struct GenericExerciseView: View {
             // Completion overlay
             if showCompletion {
                 CompletionOverlay(
+                    content: RatedContent(type: .exercise, id: exerciseType.rawValue, title: exerciseType.displayName),
                     onDismiss: {
                         dismiss()
                     }

@@ -18,6 +18,7 @@ struct InstructionExerciseView: View {
         UnifiedInstructionSlideView(
             steps: exerciseType.instructionSteps.map { $0.toUnified() },
             exerciseTitle: exerciseType.displayName,
+            exerciseID: exerciseType.rawValue,
             onComplete: {
                 Task {
                     await viewModel.completeExercise()

@@ -32,6 +32,8 @@ struct UnifiedInstructionStep {
 struct UnifiedInstructionSlideView: View {
     let steps: [UnifiedInstructionStep]
     let exerciseTitle: String
+    /// Stable id for the end-of-exercise rating (defaults to a slug of the title).
+    var exerciseID: String? = nil
     let onComplete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -150,6 +152,11 @@ struct UnifiedInstructionSlideView: View {
             // Completion overlay
             if showCompletion {
                 CompletionOverlay(
+                    content: RatedContent(
+                        type: .exercise,
+                        id: exerciseID ?? exerciseTitle.lowercased().replacingOccurrences(of: " ", with: "_"),
+                        title: exerciseTitle
+                    ),
                     onDismiss: {
                         onComplete()
                         dismiss()
@@ -492,57 +499,21 @@ struct UnifiedInstructionSlideView: View {
 
 // MARK: - Completion Overlay
 
+/// End of an exercise: the shared rated end screen (0–5 rating sent to Amplitude).
 struct CompletionOverlay: View {
+    let content: RatedContent
+    var durationSeconds: Int?
     let onDismiss: () -> Void
 
     var body: some View {
-        ZStack {
-            Color.black.opacity(0.8)
-                .ignoresSafeArea()
-
-            VStack(spacing: 24) {
-                // Success icon
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 80))
-                    .foregroundColor(Color(hex: "B794F6"))
-
-                // Message
-                Text(LanguageManager.shared.localizedString(for: "exercise.completion.title"))
-                    .font(.custom("Poppins-SemiBold", size: 28))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-
-                Image(systemName: "figure.mind.and.body")
-                    .font(.system(size: 60))
-                    .foregroundColor(Color(hex: "B794F6"))
-
-                // Continue button
-                Button(action: {
-                    HapticManager.light()
-                    onDismiss()
-                }) {
-                    Text(LanguageManager.shared.localizedString(for: "exercise.completion.continue"))
-                        .font(.custom("Poppins-SemiBold", size: 18))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "B794F6"),
-                                    Color(hex: "D4B4FF")
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .padding(.horizontal, 40)
-                .padding(.top, 8)
-            }
-            .padding(40)
-        }
+        SessionEndView(
+            content: content,
+            title: LanguageManager.shared.localizedString(for: "exercise.completion.title"),
+            summary: content.title,
+            durationSeconds: durationSeconds,
+            onDone: onDismiss
+        )
+        .transition(.opacity)
     }
 }
 

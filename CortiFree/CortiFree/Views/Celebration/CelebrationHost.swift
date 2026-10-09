@@ -15,20 +15,24 @@ struct CelebrationHost: View {
         ZStack(alignment: .top) {
             switch center.current {
             case .streak(let days):
-                CelebrationBanner(kind: .streak(days: days)) { center.dismissCurrent() }
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                // Centered card over a dimmed backdrop (not full screen), see StreakCelebrationCard.
+                StreakCelebrationCard(days: days) { center.dismissCurrent() }
+                    .transition(.opacity)
             case .dayComplete(let items, let minutes):
                 ZStack(alignment: .top) {
-                    Color.clear.confetti(isActive: true)
+                    FullScreenConfetti()
                     CelebrationBanner(kind: .dayComplete(items: items, minutes: minutes)) { center.dismissCurrent() }
                 }
                 .transition(.move(edge: .top).combined(with: .opacity))
             case .achievement(let achievement):
-                MilestoneCelebrationView(content: .achievement(achievement)) { center.dismissCurrent() }
+                AchievementCelebrationView(achievement: achievement) { center.dismissCurrent() }
                     .id(achievement.id)
                     .transition(.opacity)
             case .badge(let badge):
-                MilestoneCelebrationView(content: .badge(badge)) { center.dismissCurrent() }
+                BadgeEvolutionView(badge: badge, isPresented: Binding(
+                    get: { true },
+                    set: { if !$0 { center.dismissCurrent() } }
+                ))
                     .id(badge.id)
                     .transition(.opacity)
             case .habitAcquired(let habitID):

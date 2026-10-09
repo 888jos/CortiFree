@@ -49,6 +49,20 @@ EVENT_NAMES = {
 }
 
 
+def open_json(request, attempts=4):
+    """GET a Dashboard REST API URL, waiting and retrying when Amplitude rate-limits (429)."""
+    import time
+    for attempt in range(attempts):
+        try:
+            with urlopen(request, timeout=30, context=TLS_CONTEXT) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except HTTPError as error:
+            if error.code != 429 or attempt == attempts - 1:
+                raise
+            retry_after = error.headers.get("Retry-After") if error.headers else None
+            time.sleep(float(retry_after) if retry_after and retry_after.isdigit() else 1.5 * (attempt + 1))
+
+
 def load_local_env():
     values = {}
     path = os.path.join(ROOT, ".env.local")
@@ -101,9 +115,11 @@ def amplitude_funnel(start, end):
         }
 
     def query_event(name):
-        # Custom events use the ce: prefix in Amplitude's Dashboard REST API.
+        # Events sent by the Swift SDK are listed under their plain name; older
+        # custom events may only exist with the ce: prefix.
+        event_type = name if name in visible_events else f"ce:{name}"
         params = urlencode({
-            "e": json.dumps({"event_type": f"ce:{name}"}, separators=(",", ":")),
+            "e": json.dumps({"event_type": event_type}, separators=(",", ":")),
             "start": start,
             "end": end,
             "m": "uniques",
@@ -113,9 +129,7 @@ def amplitude_funnel(start, end):
         url = f"{base_url.rstrip('/')}/api/2/events/segmentation?{params}"
         request = Request(url, headers={"Authorization": f"Basic {credentials}", "Accept": "application/json"})
         try:
-            with urlopen(request, timeout=30, context=TLS_CONTEXT) as response:
-                result = json.loads(response.read().decode("utf-8"))
-            data = result.get("data", {})
+            data = open_json(request).get("data", {})
             collapsed = data.get("seriesCollapsed") or []
             if collapsed and isinstance(collapsed[0], list) and collapsed[0]:
                 value = collapsed[0][0].get("value", 0)
@@ -129,7 +143,8 @@ def amplitude_funnel(start, end):
             raise
 
     counts = {}
-    with ThreadPoolExecutor(max_workers=5) as pool:
+    # Amplitude allows few concurrent Dashboard API queries; more just returns 429.
+    with ThreadPoolExecutor(max_workers=2) as pool:
         futures = [pool.submit(query_event, name) for name in sorted(available_names)]
         for future in as_completed(futures):
             name, count = future.result()
@@ -152,25 +167,28 @@ def amplitude_daily(event_name, start, end):
         raise RuntimeError("AMPLITUDE_SECRET_KEY is not configured")
     base_url = config_value("AMPLITUDE_API_BASE_URL", env) or "https://amplitude.com"
     credentials = base64.b64encode(f"{api_key}:{secret}".encode()).decode()
-    params = urlencode({
-        "e": json.dumps({"event_type": f"ce:{event_name}"}, separators=(",", ":")),
-        "start": start,
-        "end": end,
-        "m": "uniques",
-        "n": "any",
-        "i": 1,
-    })
-    request = Request(
-        f"{base_url.rstrip('/')}/api/2/events/segmentation?{params}",
-        headers={"Authorization": f"Basic {credentials}", "Accept": "application/json"},
-    )
-    try:
-        with urlopen(request, timeout=30, context=TLS_CONTEXT) as response:
-            result = json.loads(response.read().decode("utf-8"))
-    except HTTPError as error:
-        if error.code == 400:
-            return {"source": "amplitude", "daily": {}}
-        raise
+    result = None
+    for event_type in (event_name, f"ce:{event_name}"):
+        params = urlencode({
+            "e": json.dumps({"event_type": event_type}, separators=(",", ":")),
+            "start": start,
+            "end": end,
+            "m": "uniques",
+            "n": "any",
+            "i": 1,
+        })
+        request = Request(
+            f"{base_url.rstrip('/')}/api/2/events/segmentation?{params}",
+            headers={"Authorization": f"Basic {credentials}", "Accept": "application/json"},
+        )
+        try:
+            result = open_json(request)
+            break
+        except HTTPError as error:
+            if error.code != 400:
+                raise
+    if result is None:
+        return {"source": "amplitude", "daily": {}}
     data = result.get("data", {})
     labels = data.get("xValues") or []
     series = data.get("series") or []
@@ -183,6 +201,105 @@ def amplitude_daily(event_name, start, end):
             key = str(label)[:10]
         daily[key] = int(value or 0)
     return {"source": "amplitude", "daily": daily}
+
+
+RATING_EVENT = "session_rated"
+RATING_TYPES = ("meditation", "breathing", "exercise", "routine")
+
+
+def amplitude_ratings(start, end):
+    """Average 0-5 end-of-session rating per content and per content type.
+
+    Amplitude counts `session_rated` events grouped by (content_key, rating); the
+    averages are computed here so no numeric-property chart is needed.
+    """
+    env = load_local_env()
+    api_key = config_value("AMPLITUDE_API_KEY", env) or DEFAULT_API_KEY
+    secret = config_value("AMPLITUDE_SECRET_KEY", env)
+    if not secret:
+        raise RuntimeError("AMPLITUDE_SECRET_KEY is not configured")
+    base_url = config_value("AMPLITUDE_API_BASE_URL", env) or "https://amplitude.com"
+    credentials = base64.b64encode(f"{api_key}:{secret}".encode()).decode()
+
+    def grouped_totals(second_property):
+        data = None
+        for event_type in (RATING_EVENT, f"ce:{RATING_EVENT}"):
+            event = {
+                "event_type": event_type,
+                "group_by": [{"type": "event", "value": "content_key"}, {"type": "event", "value": second_property}],
+            }
+            params = urlencode({
+                "e": json.dumps(event, separators=(",", ":")),
+                "start": start, "end": end, "m": "totals", "i": 30, "limit": 1000,
+            })
+            request = Request(
+                f"{base_url.rstrip('/')}/api/2/events/segmentation?{params}",
+                headers={"Authorization": f"Basic {credentials}", "Accept": "application/json"},
+            )
+            try:
+                data = open_json(request).get("data", {})
+                break
+            except HTTPError as error:
+                if error.code != 400:  # 400: event not seen yet under this name
+                    raise
+        if data is None:
+            return []
+        rows = []
+        for label, collapsed in zip(data.get("seriesLabels") or [], data.get("seriesCollapsed") or []):
+            text = label[-1] if isinstance(label, list) else str(label)
+            parts = [part.strip() for part in str(text).split(";")]
+            if len(parts) < 2:
+                continue
+            value = collapsed[0].get("value", 0) if collapsed and isinstance(collapsed[0], dict) else 0
+            rows.append((parts[0], ";".join(parts[1:]).strip(), int(value or 0)))
+        return rows
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        ratings_future = pool.submit(grouped_totals, "rating")
+        titles_future = pool.submit(grouped_totals, "content_title")
+        rating_rows, title_rows = ratings_future.result(), titles_future.result()
+
+    titles = {}
+    for key, title, count in title_rows:
+        if key and title and title != "(none)" and count >= titles.get(key, ("", -1))[1]:
+            titles[key] = (title, count)
+
+    contents = {}
+    for key, rating_text, count in rating_rows:
+        try:
+            rating = int(float(rating_text))
+        except ValueError:
+            continue
+        if not key or key == "(none)" or not 0 <= rating <= 5 or count <= 0:
+            continue
+        entry = contents.setdefault(key, {"count": 0, "sum": 0, "distribution": {str(n): 0 for n in range(6)}})
+        entry["count"] += count
+        entry["sum"] += rating * count
+        entry["distribution"][str(rating)] += count
+
+    content_list, types = [], {}
+    for key, entry in contents.items():
+        content_type, _, content_id = key.partition(":")
+        average = entry["sum"] / entry["count"]
+        content_list.append({
+            "key": key, "type": content_type, "id": content_id,
+            "title": titles.get(key, (content_id, 0))[0],
+            "count": entry["count"], "average": round(average, 2), "distribution": entry["distribution"],
+        })
+        bucket = types.setdefault(content_type, {"count": 0, "sum": 0})
+        bucket["count"] += entry["count"]
+        bucket["sum"] += entry["sum"]
+    content_list.sort(key=lambda item: (-item["count"], -item["average"]))
+    return {
+        "source": "amplitude",
+        "range": {"start": start, "end": end},
+        "types": [
+            {"type": name, "count": types.get(name, {}).get("count", 0),
+             "average": round(types[name]["sum"] / types[name]["count"], 2) if types.get(name, {}).get("count") else None}
+            for name in RATING_TYPES
+        ],
+        "contents": content_list,
+    }
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -218,6 +335,23 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json(502, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
             except ValueError as error:
                 self.send_json(400, {"error": str(error)})
+            except Exception as error:
+                self.send_json(500, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
+            return
+        if parsed.path == "/api/amplitude/ratings":
+            query = parse_qs(parsed.query)
+            now = datetime.now(timezone.utc)
+            start_dt = date_param(query.get("start", [None])[0], now.replace(day=1, hour=0, minute=0, second=0, microsecond=0))
+            end_dt = date_param(query.get("end", [None])[0], now)
+            if end_dt < start_dt:
+                self.send_json(400, {"error": "end must be after start"})
+                return
+            try:
+                self.send_json(200, amplitude_ratings(start_dt.strftime("%Y%m%d"), end_dt.strftime("%Y%m%d")))
+            except HTTPError as error:
+                self.send_json(error.code, {"error": f"Amplitude request failed ({error.code})"})
+            except (URLError, TimeoutError, json.JSONDecodeError) as error:
+                self.send_json(502, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
             except Exception as error:
                 self.send_json(500, {"error": f"Amplitude data unavailable: {type(error).__name__}"})
             return

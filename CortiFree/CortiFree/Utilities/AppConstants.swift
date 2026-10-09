@@ -124,8 +124,9 @@ enum AppConstants {
 
     // MARK: - Routine
     enum Routine {
-        static let totalDays: Int = 66 // Programme de 66 jours
-        static let weeksCount: Int = 10 // 10 semaines (environ)
+        /// One plan cycle (the 66-day programme was replaced by 28-day cycles).
+        static let totalDays: Int = PersonalPlan.length
+        static let weeksCount: Int = PersonalPlan.length / 7
     }
 
     // MARK: - Thresholds
@@ -218,7 +219,7 @@ enum AppConstants {
 
     // MARK: - Program Configuration
     enum Program {
-        static let totalDays: Int = 66
+        static let totalDays: Int = PersonalPlan.length
         static let totalWeeks: Int = 10
         static let daysPerWeek: Int = 7
     }

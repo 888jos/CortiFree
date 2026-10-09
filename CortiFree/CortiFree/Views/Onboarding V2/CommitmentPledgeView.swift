@@ -31,14 +31,12 @@ struct CommitmentPledgeView: View {
         case oneWeek = "1_week"
         case twoWeeks = "2_weeks"
         case fourWeeks = "4_weeks"
-        case sixtySixDays = "66_days"
 
         var icon: String {
             switch self {
             case .oneWeek: return "flame"
             case .twoWeeks: return "bolt.fill"
             case .fourWeeks: return "star.fill"
-            case .sixtySixDays: return "crown.fill"
             }
         }
 

@@ -18,6 +18,10 @@ struct NowPlayingView: View {
     @State private var scrubValue: Double?
     @State private var showScript = false
     @State private var showAmbienceSheet = false
+    /// End-of-session rating, asked once per finished playback.
+    @State private var showRating = false
+    /// Survives the player being closed and reopened on the same finished playback.
+    private static var promptedSessionID: String?
 
     private func t(_ key: String) -> String { languageManager.localizedString(for: key) }
 
@@ -78,6 +82,34 @@ struct NowPlayingView: View {
         .onChange(of: player.currentSession == nil) { _, isEmpty in
             if isEmpty { dismiss() }
         }
+        .onChange(of: player.didFinish) { _, finished in
+            if finished { askRatingIfNeeded() } else { Self.promptedSessionID = nil }
+        }
+        .onAppear { if player.didFinish { askRatingIfNeeded() } }
+        .fullScreenCover(isPresented: $showRating) {
+            if let session = player.currentSession {
+                SessionEndView(
+                    content: RatedContent(type: .meditation, id: session.id, title: session.localizedTitle),
+                    title: t("session.end.meditation.title"),
+                    summary: "\(session.localizedTitle) · \(session.durationLabel)",
+                    durationSeconds: Int(player.duration),
+                    secondaryAction: (t("breathing.v2.again"), "arrow.counterclockwise", {
+                        showRating = false
+                        player.play(session)
+                    }),
+                    onDone: {
+                        showRating = false
+                        dismiss()
+                    }
+                )
+            }
+        }
+    }
+
+    private func askRatingIfNeeded() {
+        guard let session = player.currentSession, Self.promptedSessionID != session.id else { return }
+        Self.promptedSessionID = session.id
+        showRating = true
     }
 
     // MARK: - Background

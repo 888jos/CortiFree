@@ -22,9 +22,9 @@ struct BadgeEvolutionView: View {
             GalaxyBackgroundView()
                 .ignoresSafeArea()
 
-            // Confetti
+            // Confetti over the whole screen
             if showConfetti {
-                ConfettiAnimation(trigger: showConfetti)
+                FullScreenConfetti()
             }
 
             VStack(spacing: 24) {

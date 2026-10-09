@@ -729,7 +729,7 @@ struct RoutineDetailsView: View {
             ),
             (
                 title: "Réduction du cortisol",
-                description: "Une pratique quotidienne de 10-20 minutes peut réduire les niveaux de cortisol de 25-30% en moyenne après 66 jours, selon une méta-analyse de 2019."
+                description: "Une pratique quotidienne de 10-20 minutes peut réduire les niveaux de cortisol en quelques semaines, selon une méta-analyse de 2019."
             ),
             (
                 title: "Amélioration du système nerveux",
@@ -737,7 +737,7 @@ struct RoutineDetailsView: View {
             ),
             (
                 title: "Effets durables",
-                description: "Les bénéfices d'un programme de 66 jours persistent jusqu'à 6 mois après, créant de nouvelles habitudes neuronales automatiques."
+                description: "Les bénéfices d'une pratique régulière durent plusieurs mois et créent de nouvelles habitudes neuronales automatiques."
             )
         ]
     }

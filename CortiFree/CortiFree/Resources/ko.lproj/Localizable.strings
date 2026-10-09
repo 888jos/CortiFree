@@ -293,8 +293,8 @@
 "progress.journey.score" = "CortiFree 점수";
 "progress.journey.day_one" = "1일차";
 "progress.journey.today" = "오늘";
-"progress.journey.program" = "66일 여정";
-"progress.journey.day_count" = "66일 중 %d일차";
+"progress.journey.program" = "나의 여정";
+"progress.journey.day_count" = "%d일차";
 "progress.journey.empty" = "활동과 체크인을 완료하면 점수 측정이 시작돼요.";
 "progress.journey.chart_accessibility" = "1일차부터의 CortiFree 점수 변화";
 "progress.journey.domains_title" = "1일차부터의 영역별 진행";
@@ -339,14 +339,14 @@
 
 // MARK: - Tasks
 "tasks.day" = "일차";
-"tasks.day_format" = "%d/66일차";
+"tasks.day_format" = "%d일차";
 "tasks.day_format_ongoing" = "%d일차";
 "tasks.of" = "/";
 "tasks.encouragement" = "잘하고 있어요. 계속 이렇게 해 봐요!";
 "tasks.todo" = "할 일";
 "tasks.done" = "완료";
 "tasks.skipped" = "건너뜀";
-"tasks.day_counter" = "%d/66일차";
+"tasks.day_counter" = "%d일차";
 "tasks.day_counter_extended" = "%d일차";
 "tasks.error_loading" = "불러오기 오류";
 "tasks.retry" = "다시 시도";
@@ -465,7 +465,7 @@
 "profile.cortifree_score" = "CortiFree 점수";
 "profile.habits" = "습관";
 "profile.current" = "현재";
-"profile.potential_d66" = "잠재력 (66일차)";
+"profile.potential_d66" = "잠재력";
 "profile.settings" = "설정";
 "profile.logout" = "로그아웃";
 
@@ -595,7 +595,7 @@
 "loading.personalizing_journey" = "여정을 맞춤 설정하는 중";
 "loading.creating_plan" = "플랜을 만드는 중";
 "loading.finalizing_recommendations" = "추천을 마무리하는 중";
-"loading.view_66day_plan" = "내 66일 플랜 보기";
+"loading.view_66day_plan" = "내 플랜 보기";
 
 // MARK: - Progress
 "progress.each_week_tasks" = "매주 작업이";
@@ -746,7 +746,7 @@
 "common.streak" = "연속 기록";
 "common.global" = "전체";
 "common.current" = "현재";
-"common.potential" = "잠재력 (66일차)";
+"common.potential" = "잠재력";
 
 // MARK: - Home Extended
 "home.congratulations" = "축하해요, %@님,";
@@ -758,9 +758,9 @@
 "home.breathe_in" = "들이쉬세요...";
 "home.breathe_out" = "내쉬세요...";
 "home.neuroplasticity" = "뇌의 신경가소성";
-"home.neuroplasticity_desc" = "신경가소성은 뇌가 신경망을 만들고, 해체하고, 재구성하는 능력이에요. 66일 동안 꾸준히 연습하면 말 그대로 뇌를 다시 연결해 스트레스와 불안을 자연스럽게 줄일 수 있어요.";
-"home.why_66_days" = "왜 66일일까요?";
-"home.why_66_days_desc" = "University College London의 Phillippa Lally 박사 연구에 따르면, 새로운 행동이 자동화되기까지 평균 66일이 걸려요. 뇌가 오래 지속되는 새로운 연결을 만드는 데 필요한 시간이에요.";
+"home.neuroplasticity_desc" = "신경가소성은 뇌가 신경망을 만들고, 풀고, 재구성하는 능력이에요. 꾸준히 연습하면 뇌를 말 그대로 다시 연결해 스트레스와 불안을 자연스럽게 줄일 수 있어요.";
+"home.why_66_days" = "왜 꾸준함이 중요할까요?";
+"home.why_66_days_desc" = "유니버시티 칼리지 런던의 연구에 따르면 새로운 습관이 자동화되기까지 몇 주가 걸려요. 그래서 플랜은 28일 주기로 진행돼요. 지키기엔 짧고, 뇌가 지속적인 연결을 만들기엔 충분히 길어요.";
 "home.scientific_evidence" = "과학적 증거";
 "home.scientific_evidence_desc" = "신경과학 연구에 따르면 명상과 호흡 운동은 뇌 구조를 물리적으로 바꿔, 편도체(공포 중추)를 줄이고 전전두엽 피질(감정 조절)을 강화해요.";
 
@@ -805,7 +805,7 @@
 // MARK: - Profile Extended
 "profile.score_cortifree" = "CortiFree 점수";
 "profile.habits_title" = "습관";
-"profile.day_progress" = "%d/66일차";
+"profile.day_progress" = "%d일차";
 "profile.habit.meditation" = "명상";
 "profile.habit.breathing" = "호흡";
 "profile.habit.journal" = "일기";
@@ -830,7 +830,7 @@
 // Score Section
 "profile.score.title" = "CortiFree 점수";
 "profile.score.current" = "현재";
-"profile.score.potential" = "잠재력 (66일차)";
+"profile.score.potential" = "잠재력";
 "profile.score.global" = "전체";
 
 // Achievements Section
@@ -969,7 +969,7 @@
 "avatar.badge.master" = "마스터";
 
 // MARK: - Tasks Extended
-"tasks.day_progress" = "%d/66일차";
+"tasks.day_progress" = "%d일차";
 "tasks.breathe_consciously" = "의식적인 호흡";
 "tasks.meditate_mindfully" = "마음챙김 명상";
 "tasks.drink_water" = "물 %@ 이상 마시기";
@@ -1105,7 +1105,7 @@
 "achievement.streak_40.description" = "40일 연속으로 실천하기";
 "achievement.streak_50.description" = "50일 연속으로 실천하기";
 "achievement.streak_60.description" = "60일 연속으로 실천하기";
-"achievement.streak_66.description" = "66일 연속으로 실천하기 — 프로그램 완료!";
+"achievement.streak_66.description" = "66일 연속 기록 달성";
 
 // MARK: - Achievement Unlock Popup
 "achievement.unlocked" = "업적을 달성했어요!";
@@ -1210,7 +1210,7 @@
 // MARK: - Onboarding V2 - Rating View
 "onboarding.rating.current_title" = "현재 평가";
 "onboarding.rating.potential_title" = "예상 평가";
-"onboarding.rating.potential_subtitle" = "66일 후";
+"onboarding.rating.potential_subtitle" = "플랜과 함께";
 "onboarding.rating.see_potential" = "가능성 보기";
 
 // MARK: - Onboarding V2 - Eight Habits Intro
@@ -1334,7 +1334,7 @@
 
 "onboarding.testimonials.testimonial_3_name" = "Sophie M.";
 "onboarding.testimonials.testimonial_3_age" = "45세";
-"onboarding.testimonials.testimonial_3_text" = "감사 일기 덕분에 세상을 긍정적으로 보게 됐어요. 66일이 지나자 자연스러운 습관이 되었어요.";
+"onboarding.testimonials.testimonial_3_text" = "감사 일기 덕분에 상황을 긍정적으로 보게 됐어요. 몇 주 만에 자연스러운 습관이 됐어요.";
 
 "onboarding.testimonials.testimonial_4_name" = "Lucas B.";
 "onboarding.testimonials.testimonial_4_age" = "35세";
@@ -2578,16 +2578,16 @@
 "learning.card.meditation_science.section3.content" = "하루 10~15분씩 8주만 꾸준히 연습해도 뇌에 눈에 띄는 변화가 나타나요.\n\nCortiFree와 함께라면 이미 올바른 길을 가고 있어요!";
 
 // MARK: - Learning Card 3: 66 days
-"learning.card.66days.title" = "습관이 자리 잡는 66일";
-"learning.card.66days.description" = "프로그램이 66일인 이유";
+"learning.card.66days.title" = "습관이 되기까지 얼마나 걸릴까요?";
+"learning.card.66days.description" = "과학이 말하는 것, 그리고 플랜이 28일 주기로 진행되는 이유";
 "learning.card.66days.section1.title" = "기준이 된 연구";
-"learning.card.66days.section1.content" = "• 유니버시티 칼리지 런던(2009)\n• 66일 = 습관이 자동화되는 평균 기간\n• 난이도에 따라 18일에서 254일까지 다양해요";
+"learning.card.66days.section1.content" = "• 유니버시티 칼리지 런던 (2009)\n• 매일 하는 행동이 자동화되기까지 18~254일이 걸렸어요\n• 사람과 습관의 복잡도에 따라 달라요";
 "learning.card.66days.section2.title" = "3단계";
 "learning.card.66days.section2.content" = "1. 1~3주차: 의식적으로 노력하는 시기\n2. 4~7주차: 자동화가 시작되는 시기\n3. 8~10주차: 습관이 자리 잡는 시기";
 "learning.card.66days.section3.title" = "효과가 있는 이유";
 "learning.card.66days.section3.content" = "• 새로운 신경 연결이 만들어져요\n• 점진적으로 강화돼요\n• 자동 반사처럼 바뀌어요";
 "learning.card.66days.section4.title" = "목표";
-"learning.card.66days.section4.content" = "66일이 지나면 새로운 스트레스 관리 습관이 삶의 일부가 되어 있을 거예요!";
+"learning.card.66days.section4.content" = "주기를 거듭할수록 새로운 스트레스 해소 습관이 삶의 일부가 돼요!";
 
 // MARK: - Learning Card 4: Neuroplasticity
 "learning.card.neuroplasticity.title" = "신경가소성: 뇌는 변할 수 있어요";
@@ -3476,10 +3476,10 @@
 "onboarding_v2.scientific.harvard_quote" = "습관은 안정적인 맥락에서 반복되는 행동을 통해 형성되며, 자동화되기까지 몇 주, 심지어 몇 달이 걸려요.";
 "onboarding_v2.scientific.harvard_highlight" = "안정적인 맥락에서 반복되는 행동";
 "onboarding_v2.scientific.harvard_source" = "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology,";
-"onboarding_v2.scientific.ucl_quote" = "96명의 참가자가 매일 하는 행동을 하나씩 실천했고, 자동화가 정점에 이르기까지의 기간은 평균 66일, 범위는 18일에서 254일로 나타났어요.";
-"onboarding_v2.scientific.ucl_highlight" = "평균 66일, 범위는 18일에서 254일";
+"onboarding_v2.scientific.ucl_quote" = "참가자 96명이 매일 하는 행동을 시작했고, 사람에 따라 18~254일 만에 자동화됐어요.";
+"onboarding_v2.scientific.ucl_highlight" = "18~254일";
 "onboarding_v2.scientific.ucl_source" = "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology.";
-"onboarding_v2.scientific.atomic_quote" = "평균적으로 새로운 행동이 자동화되기까지는 2개월 이상, 정확히는 66일이 걸려요.";
+"onboarding_v2.scientific.atomic_quote" = "평균적으로 새로운 행동이 자동화되기까지는 2개월 이상이 걸려요.";
 "onboarding_v2.scientific.atomic_highlight" = "2개월 이상";
 "onboarding_v2.scientific.atomic_source" = "Clear, J. (2018). Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones. Avery.";
 
@@ -3631,7 +3631,7 @@
 "editprofile.section.personal_info" = "개인 정보";
 "editprofile.first_name" = "이름";
 "editprofile.email" = "이메일";
-"editprofile.section.goals" = "66일 후 목표";
+"editprofile.section.goals" = "내 목표";
 "editprofile.section.account" = "계정 관리";
 "editprofile.restart_program" = "프로그램 다시 시작";
 "editprofile.logout" = "로그아웃";
@@ -4177,10 +4177,10 @@
 "inline.notificationservice.28" = "2주 연속! ⭐";
 "inline.notificationservice.29" = "습관이 자리 잡기 시작했어요. 계속해 봐요!";
 "inline.notificationservice.30" = "30일 연속! 🚀";
-"inline.notificationservice.31" = "66일의 절반을 왔어요. 최고예요!";
-"inline.notificationservice.32" = "66일! 해냈어요! 🏆";
+"inline.notificationservice.31" = "한 달 내내 포기하지 않았어요. 챔피언!";
+"inline.notificationservice.32" = "66일 연속! 🏆";
 "inline.notificationservice.33" = "습관이 몸에 배었어요! 진정한 웰빙 챔피언이에요";
-"inline.notificationservice.34" = "66일을 향해 계속 나아가요!";
+"inline.notificationservice.34" = "이 기세를 이어가요!";
 "inline.onboardingliveactivitymanager.00" = "선물이 기다리고 있어요";
 "inline.onboardingliveactivitymanager.01" = "맞춤 혜택이 곧 만료돼요.";
 "inline.onboardingliveactivitymanager.02" = "선물 열기";
@@ -5212,3 +5212,18 @@
 "milo.weekly.question.2" = "이번 주를 돌아보면, 플랜의 어떤 순간이 가장 도움이 됐나요?";
 "milo.weekly.question.3" = "이번 주에 무엇이 스트레스였고, 몸은 어떻게 반응했나요?";
 "milo.weekly.question.4" = "다음 주를 조금 더 가볍게 만들 수 있다면, 무엇부터 바꾸고 싶나요?";
+
+/* Celebrations + end-of-session rating */
+"celebration.streak.subtitle_first" = "오늘의 첫 운동 완료! 내일도 돌아와 연속 기록을 늘려 보세요.";
+"celebration.streak.subtitle_next" = "연속 기록이 이어지고 있어요. 내일이면 %d일이 돼요.";
+"session.rating.title" = "어떠셨나요?";
+"session.rating.hint" = "밀어서 평가하기";
+"session.rating.low" = "별로예요";
+"session.rating.high" = "아주 좋아요";
+"session.rating.level.0" = "전혀 별로예요";
+"session.rating.level.1" = "그저 그래요";
+"session.rating.level.2" = "보통이에요";
+"session.rating.level.3" = "나쁘지 않아요";
+"session.rating.level.4" = "좋아요";
+"session.rating.level.5" = "아주 좋아요";
+"session.end.meditation.title" = "세션 완료";

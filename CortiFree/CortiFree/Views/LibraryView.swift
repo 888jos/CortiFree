@@ -200,9 +200,14 @@ struct LibraryView: View {
         path.append(Route.quickStart(category))
     }
 
-    /// Shortest sessions first, so a quick pick stays at the top of the list.
+    /// Sessions the user rated badly go last; otherwise the shortest first, so a quick pick
+    /// stays at the top of the list.
     private func quickStartSessions(in category: AudioSessionCategory) -> [GuidedSession] {
-        GuidedSessionCatalog.sessions(in: category).sorted { $0.durationMinutes < $1.durationMinutes }
+        GuidedSessionCatalog.sessions(in: category).sorted { lhs, rhs in
+            let l = SessionRatingStore.isDisliked(.meditation, id: lhs.id)
+            let r = SessionRatingStore.isDisliked(.meditation, id: rhs.id)
+            return l == r ? lhs.durationMinutes < rhs.durationMinutes : !l
+        }
     }
 
     // MARK: - For you now
@@ -212,7 +217,10 @@ struct LibraryView: View {
         let sessions = moment.categories
             .flatMap { GuidedSessionCatalog.sessions(in: $0) }
             .sorted { lhs, rhs in
-                // Not-yet-completed sessions first, then shorter ones.
+                // Ratings decide first (liked sessions come back, disliked ones sink; unrated
+                // count as neutral), then not-yet-completed sessions, then shorter ones.
+                let lScore = forYouScore(lhs), rScore = forYouScore(rhs)
+                if lScore != rScore { return lScore > rScore }
                 let l = GuidedSessionProgressStore.isCompleted(lhs.id), r = GuidedSessionProgressStore.isCompleted(rhs.id)
                 return l == r ? lhs.durationMinutes < rhs.durationMinutes : !l
             }
@@ -225,6 +233,11 @@ struct LibraryView: View {
             }
             ForEach(sessions.prefix(3)) { session in row(session) }
         }
+    }
+
+    /// Rating weight rounded to half points so small differences don't reshuffle the list.
+    private func forYouScore(_ session: GuidedSession) -> Double {
+        (SessionRatingStore.preferenceScore(for: .meditation, id: session.id) * 2).rounded() / 2
     }
 
     // MARK: - Themes
@@ -372,7 +385,14 @@ struct LibraryView: View {
     // MARK: - Breathing
 
     private var breathing: some View {
-        let exercises = BreathingPattern.allPatterns
+        // Liked techniques first, disliked ones last; the catalogue order otherwise (stable).
+        let exercises = BreathingPattern.allPatterns.enumerated()
+            .sorted { lhs, rhs in
+                let l = (SessionRatingStore.preferenceScore(for: .breathing, id: lhs.element.key) * 2).rounded()
+                let r = (SessionRatingStore.preferenceScore(for: .breathing, id: rhs.element.key) * 2).rounded()
+                return l == r ? lhs.offset < rhs.offset : l > r
+            }
+            .map(\.element)
         return VStack(alignment: .leading, spacing: 10) {
             LibrarySectionTitle(title: t("library.v2.breathing"), count: exercises.count)
             ForEach(exercises.prefix(shownBreathing)) { pattern in

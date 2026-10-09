@@ -348,99 +348,16 @@ struct BreathingSessionEndView: View {
     let onRestart: () -> Void
 
     @ObservedObject private var languageManager = LanguageManager.shared
-    @State private var feeling: String?
-    @State private var appear = false
-
-    private let feelings: [(id: String, icon: String)] = [("better", "face.smiling"), ("same", "minus.circle"), ("worse", "cloud.rain")]
 
     var body: some View {
-        VStack(spacing: 28) {
-            Spacer()
-
-            ZStack {
-                Circle()
-                    .fill(AudioPalette.accent.opacity(0.25))
-                    .frame(width: 140, height: 140)
-                    .blur(radius: 24)
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 76, weight: .regular))
-                    .foregroundStyle(.white, AudioPalette.accent)
-                    .symbolEffect(.bounce, value: appear)
-            }
-
-            VStack(spacing: 8) {
-                Text(languageManager.localized("breathing.completion.title"))
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                Text("\(pattern.localizedTitle) · \(minutesText) min · \(cycles) \(languageManager.localized("breathing.session.cycles"))")
-                    .font(.system(size: 15))
-                    .foregroundStyle(AudioPalette.secondaryText)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.horizontal, 32)
-
-            VStack(spacing: 14) {
-                Text(languageManager.localized("breathing.v2.feeling.title"))
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                HStack(spacing: 10) {
-                    ForEach(feelings, id: \.id) { item in
-                        let selected = feeling == item.id
-                        Button {
-                            HapticManager.light()
-                            feeling = item.id
-                        } label: {
-                            VStack(spacing: 8) {
-                                Image(systemName: item.icon).font(.system(size: 22, weight: .medium))
-                                Text(languageManager.localized("breathing.v2.feeling.\(item.id)"))
-                                    .font(.system(size: 13, weight: .medium))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                            }
-                            .foregroundStyle(selected ? AudioPalette.accent : .white)
-                            .frame(maxWidth: .infinity, minHeight: 84)
-                            .background(selected ? AudioPalette.accent.opacity(0.16) : Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(selected ? AudioPalette.accent.opacity(0.6) : Color.white.opacity(0.1), lineWidth: 1))
-                        }
-                        .buttonStyle(PressableCardStyle())
-                    }
-                }
-            }
-            .padding(.horizontal, 24)
-
-            Spacer()
-
-            VStack(spacing: 14) {
-                Button {
-                    HapticManager.light()
-                    if let feeling {
-                        AnalyticsManager.shared.track(event: "breathing_feedback", properties: ["exercise": pattern.name, "feeling": feeling])
-                    }
-                    onDone()
-                } label: {
-                    Text(languageManager.localized("breathing.v2.finish"))
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(AudioPalette.backgroundDeep)
-                        .frame(maxWidth: .infinity, minHeight: 56)
-                        .background(AudioPalette.accent, in: Capsule())
-                }
-                .buttonStyle(PressableCardStyle())
-
-                Button {
-                    HapticManager.light()
-                    onRestart()
-                } label: {
-                    Label(languageManager.localized("breathing.v2.again"), systemImage: "arrow.counterclockwise")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 32)
-        }
-        .onAppear { appear = true }
+        SessionEndView(
+            content: RatedContent(type: .breathing, id: pattern.key, title: pattern.localizedTitle),
+            title: languageManager.localized("breathing.completion.title"),
+            summary: "\(pattern.localizedTitle) · \(minutesText) min · \(cycles) \(languageManager.localized("breathing.session.cycles"))",
+            durationSeconds: Int(breathedSeconds),
+            secondaryAction: (languageManager.localized("breathing.v2.again"), "arrow.counterclockwise", onRestart),
+            onDone: onDone
+        )
     }
 
     private var minutesText: String {

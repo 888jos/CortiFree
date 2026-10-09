@@ -119,7 +119,7 @@ struct OnboardingV2FlowView: View {
             case .reassurance, .habitsQuiz, .stressPatternValidation, .symptomChecker:
                 return .reassurance
             case .cortisolScienceHook, .sixtyDayExplanation, .scientificPlan:
-                return .sixtyDayExplanation
+                return .cortisolScienceHook
             case .authentication, .loading:
                 return .authentication
             case .notificationPermissions, .eightHabitsIntro, .weekProgress:
@@ -393,18 +393,17 @@ struct OnboardingV2FlowView: View {
         case .cortisolScienceHook:
             CortisolScienceHookView(
                 onBack: { currentStep = .symptomChecker },
-                onContinue: { currentStep = .sixtyDayExplanation }
-            )
-
-        case .sixtyDayExplanation:
-            SixtyDaysExplanationView(
-                onBack: { currentStep = .cortisolScienceHook },
                 onContinue: { currentStep = .scientificPlan }
             )
 
+        case .sixtyDayExplanation:
+            // The "66 days" screen is gone (plans run in 28-day cycles); a progress saved
+            // on this step resumes on the next one.
+            Color.clear.onAppear { currentStep = .scientificPlan }
+
         case .scientificPlan:
             ScientificPlanView(
-                onBack: { currentStep = .sixtyDayExplanation },
+                onBack: { currentStep = .cortisolScienceHook },
                 onContinue: { currentStep = .authentication }
             )
 
