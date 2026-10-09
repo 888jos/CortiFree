@@ -14,11 +14,17 @@ final class NotificationRouter: ObservableObject {
     static let shared = NotificationRouter()
 
     @Published var pendingURL: URL?
+    /// In-app destinations (plan tab, review, Milo) opened by the main app (ContentView), not the root.
+    @Published var pendingAppLink: URL?
 
     private init() {}
 
     func handle(userInfo: [AnyHashable: Any]) {
         guard let link = userInfo["deeplink"] as? String, let url = URL(string: link) else { return }
-        pendingURL = url
+        if userInfo["campaign"] as? String == PlanReminderScheduler.campaign {
+            pendingAppLink = url
+        } else {
+            pendingURL = url
+        }
     }
 }

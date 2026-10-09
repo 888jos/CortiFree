@@ -16,15 +16,18 @@ class NotificationService {
             return
         }
 
-        // Morning notification (9h by default, time chosen during onboarding)
+        // Morning notification (9h by default, time chosen during onboarding). Subscribers following
+        // their plan get PlanReminderScheduler's reminder instead, which names today's session.
         let morning = morningReminderComponents
-        scheduleDailyNotification(
-            id: "daily_morning_meditation",
-            title: LanguageManager.shared.localizedString(for: "inline.notificationservice.00"),
-            body: LanguageManager.shared.localizedString(for: "inline.notificationservice.01"),
-            hour: morning.hour,
-            minute: morning.minute
-        )
+        if !UserDefaults.standard.bool(forKey: "planReminders.active") {
+            scheduleDailyNotification(
+                id: "daily_morning_meditation",
+                title: LanguageManager.shared.localizedString(for: "inline.notificationservice.00"),
+                body: LanguageManager.shared.localizedString(for: "inline.notificationservice.01"),
+                hour: morning.hour,
+                minute: morning.minute
+            )
+        }
 
         // Evening notification (19h)
         scheduleDailyNotification(
@@ -93,6 +96,7 @@ class NotificationService {
         let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
         UserDefaults.standard.set((parts.hour ?? 9) * 60 + (parts.minute ?? 0), forKey: Self.morningReminderKey)
         scheduleDailyNotifications()
+        Task { @MainActor in PlanReminderScheduler.shared.scheduleSoon() }
     }
 
     // MARK: - TRIAL NOTIFICATIONS (Day 2 & Day 3)

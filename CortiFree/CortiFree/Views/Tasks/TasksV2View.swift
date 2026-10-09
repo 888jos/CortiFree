@@ -73,6 +73,8 @@ struct TasksV2View: View {
     @AppStorage("plan.shortModeDay") private var shortModeDay: String = ""
     /// "yyyy-MM-dd" of the last day the streak banner was shown.
     @AppStorage("celebration.streak.lastDay") private var streakCelebratedDay: String = ""
+    /// "<cycle>-<start>" of the cycle whose « cycle N started » banner was closed.
+    @AppStorage("plan.cycleBanner.dismissed") private var cycleBannerDismissed: String = ""
 
     // MARK: - Day math
 
@@ -165,12 +167,25 @@ struct TasksV2View: View {
                             .transition(.opacity.combined(with: .move(edge: .top)))
                         }
 
+                        // Fallback only: the next cycle normally starts on its own (PersonalPlanStore.autoContinueIfNeeded).
                         if plan.isFinished && isShowingCurrentDay {
                             PlanFinishedCard(
                                 plan: plan,
                                 onContinue: { startNextCycle(goal: nil) },
                                 onChangeGoal: { goalPickerMode = .nextCycle }
                             )
+                        } else if showsCycleBanner(plan) {
+                            PlanCycleBanner(
+                                plan: plan,
+                                onChangeGoal: {
+                                    goalPickerMode = .change
+                                    AnalyticsManager.shared.track(event: "plan_cycle_banner_tapped", properties: ["cycle": plan.cycle, "action": "change_goal"])
+                                },
+                                onDismiss: {
+                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { cycleBannerDismissed = cycleBannerKey(plan) }
+                                }
+                            )
+                            .transition(.opacity.combined(with: .move(edge: .top)))
                         }
 
                         daySection(plan)
@@ -274,6 +289,7 @@ struct TasksV2View: View {
             Task {
                 await store.ensurePlan()
                 await reloadData()
+                PlanBilanCenter.shared.checkIfDue(source: "plan_tab")
                 // A GAD-7 taken in the Health app also tunes a day-1 plan.
                 if await AnxietyCheckStore.shared.importFromHealth() { store.applyAnxietyCheck() }
             }
@@ -290,7 +306,11 @@ struct TasksV2View: View {
         // New day while the app stays open (midnight) or on return to the app: show the right day.
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged).receive(on: RunLoop.main)) { _ in
             viewedPlanDay = nil
-            Task { await reloadData() }
+            Task {
+                // Day 29 at midnight: the next cycle starts without leaving the app.
+                await store.ensurePlan()
+                await reloadData()
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             Task {
@@ -308,6 +328,15 @@ struct TasksV2View: View {
             viewedPlanDay = nil
             markDone(item)
         }
+    }
+
+    private func cycleBannerKey(_ plan: PersonalPlan) -> String {
+        "\(plan.cycle)-\(Int(plan.startDate.timeIntervalSince1970))"
+    }
+
+    /// « Cycle 2 commencé » during the first days of a follow-up cycle, until closed.
+    private func showsCycleBanner(_ plan: PersonalPlan) -> Bool {
+        plan.cycle > 1 && plan.dayIndex() <= 3 && isShowingCurrentDay && cycleBannerDismissed != cycleBannerKey(plan)
     }
 
     private struct GoalPickerToken: Identifiable {
@@ -363,7 +392,7 @@ struct TasksV2View: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(String(format: "plan.header.week".localized, (displayedDay - 1) / 7 + 1) + " · " + theme.localizedTitle)
+                Text(String(format: "plan.header.cycle_day".localized, plan.cycle, displayedDay) + " · " + theme.localizedTitle)
                     .font(Font.Poppins.custom(.semiBold, size: 12))
                     .foregroundStyle(PlanPalette.accent)
                     .textCase(.uppercase)
@@ -715,9 +744,8 @@ struct TasksV2View: View {
     }
 
     private func startNextCycle(goal: PlanGoal?) {
-        store.startNextCycle(goal: goal)
+        store.startNextCycle(goal: goal, auto: false)
         viewedPlanDay = nil
-        AnalyticsManager.shared.track(event: "plan_next_cycle", properties: ["goal": (goal ?? plan?.goal)?.rawValue ?? ""])
     }
 
     // MARK: - Data

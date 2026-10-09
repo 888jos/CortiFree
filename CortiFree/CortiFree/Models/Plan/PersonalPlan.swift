@@ -86,6 +86,8 @@ struct PlanItem: Codable, Identifiable, Hashable {
     let shortMinutes: Int?
     /// Habit variant index (sport/nature/social rotation).
     let variant: Int?
+    /// « Au choix » (autonomy cycle): the user picks the content among the alternatives.
+    var choice: Bool? = nil
 
     /// Key used in task_statuses (no dots: Firestore field name).
     var statusKey: String { "plan_\(id)" }
@@ -167,6 +169,16 @@ struct PlanEdit: Codable, Identifiable, Hashable {
 struct PlanPreferences: Codable, Equatable {
     /// Content ids (breathing keys, session ids, habit ids) the user doesn't want proposed again.
     var excludedRefIDs: Set<String> = []
+    /// Habits kept ≥ 80 % over a whole cycle: they leave the following plans (PlanCycleReview).
+    var acquiredHabits: Set<String>?
+    /// Content of the previous cycle, proposed again only when nothing else fits (this cycle only).
+    var previousCycleRefIDs: Set<String>?
+    /// Gentler ramp chosen at the cycle review (this cycle only).
+    var gentler: Bool?
+
+    var cycleOptions: PlanCycleOptions {
+        PlanCycleOptions(avoidRefIDs: previousCycleRefIDs ?? [], retiredHabits: acquiredHabits ?? [], gentle: gentler ?? false)
+    }
 }
 
 // MARK: - Plan
@@ -204,6 +216,8 @@ struct PersonalPlan: Codable, Equatable {
     }
 
     var excludedRefIDs: Set<String> { preferences?.excludedRefIDs ?? [] }
+    var cycleOptions: PlanCycleOptions { preferences?.cycleOptions ?? PlanCycleOptions() }
+    var cycleTheme: PlanCycleTheme { .forCycle(cycle) }
 
     /// Day index (1-based, not clamped) for a given date.
     func dayIndex(on date: Date = Date()) -> Int {

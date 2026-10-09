@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var scrollTimer: Timer?
     @State private var isAssistantPresented = false
     @State private var assistantPulse = false
+    @ObservedObject private var bilanCenter = PlanBilanCenter.shared
 
     private var isMiniPlayerVisible: Bool {
         soundPlayer.currentExercise != nil || sessionPlayer.currentSession != nil
@@ -94,6 +95,20 @@ struct ContentView: View {
         .overlay(alignment: .top) { CelebrationHost() }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: sessionPlayer.currentSession?.id)
         .ignoresSafeArea(.keyboard)
+        // « Ton bilan des 28 jours », once per cycle (day 28, or the first days of the next cycle).
+        .fullScreenCover(item: $bilanCenter.request) { request in
+            PlanBilanView(request: request)
+        }
+        // Plan reminders (PlanReminderScheduler): open the plan, the review or Milo.
+        .onReceive(NotificationRouter.shared.$pendingAppLink.compactMap { $0 }) { url in
+            NotificationRouter.shared.pendingAppLink = nil
+            if url.host == "milo" {
+                isAssistantPresented = true
+            } else {
+                selectedTab = .tasks
+                PlanBilanCenter.shared.checkAfterLaunch(source: "notification")
+            }
+        }
         .fullScreenCover(isPresented: $sessionPlayer.isFullPlayerPresented) {
             NowPlayingView()
                 .presentationBackground(.clear)
@@ -101,6 +116,7 @@ struct ContentView: View {
         // Streak shown on Home / Profile must be right without opening the Plan tab first.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             StreakService.shared.refresh()
+            PlanBilanCenter.shared.checkAfterLaunch(source: "app_open")
         }
         .sheet(isPresented: $isAssistantPresented) {
             AssistantChatView()
@@ -109,6 +125,8 @@ struct ContentView: View {
         }
         .onAppear {
             StreakService.shared.refresh()
+            PlanReminderScheduler.shared.start()
+            PlanBilanCenter.shared.checkAfterLaunch(source: "app_open")
             withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
                 assistantPulse = true
             }

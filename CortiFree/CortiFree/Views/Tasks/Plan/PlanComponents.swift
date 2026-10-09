@@ -169,7 +169,7 @@ struct PlanProgressCard: View {
                     .foregroundStyle(.white)
                 Spacer()
                 if plan.cycle > 1 {
-                    Text(String(format: "plan.cycle".localized, plan.cycle))
+                    Text(String(format: "plan.cycle".localized, plan.cycle) + " · " + plan.cycleTheme.localizedTitle)
                         .font(Font.Poppins.custom(.medium, size: 12))
                         .foregroundStyle(.white.opacity(0.7))
                         .padding(.horizontal, 10).padding(.vertical, 5)
@@ -619,5 +619,52 @@ struct PlanFinishedCard: View {
         }
         .padding(22)
         .planGlass(cornerRadius: 28, tint: PlanPalette.accent)
+    }
+}
+
+// MARK: - Follow-up cycle banner
+
+/// Light banner at the top of a follow-up cycle (started on its own on day 29): the user
+/// already has today's tasks and can still pick another goal.
+struct PlanCycleBanner: View {
+    let plan: PersonalPlan
+    let onChangeGoal: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: plan.cycleTheme.symbol)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 38, height: 38)
+                .background(Circle().fill(LinearGradient(colors: PlanPalette.itemGradient, startPoint: .topLeading, endPoint: .bottomTrailing)))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(format: "plan.cycle_banner.title".localized, plan.cycle, plan.cycleTheme.localizedTitle))
+                    .font(Font.Poppins.custom(.semiBold, size: 14))
+                    .foregroundStyle(.white)
+                Button {
+                    HapticManager.light()
+                    onChangeGoal()
+                } label: {
+                    Text("plan.cycle_banner.change_goal".localized)
+                        .font(Font.Poppins.custom(.medium, size: 13))
+                        .foregroundStyle(PlanPalette.accent)
+                        .underline()
+                }
+                .buttonStyle(.plain)
+            }
+            Spacer(minLength: 0)
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .frame(width: 30, height: 30)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("plan.close".localized)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .planGlass(cornerRadius: 20, tint: PlanPalette.accent)
     }
 }

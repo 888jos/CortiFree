@@ -114,7 +114,10 @@ final class PersonalPlanStore: ObservableObject {
             plan = loadLocalPlan()
         }
         if plan == nil { plan = loadLocalPlan() }
-        if plan != nil && !isProvisional { return }
+        if plan != nil && !isProvisional {
+            await autoContinueIfNeeded()
+            return
+        }
 
         if let ensureTask { await ensureTask.value; return }
         let task = Task { [weak self] in
@@ -143,6 +146,7 @@ final class PersonalPlanStore: ObservableObject {
         ensureTask = task
         await task.value
         ensureTask = nil
+        await autoContinueIfNeeded()
     }
 
     /// Called at the end of onboarding with the user's answers.
@@ -195,15 +199,80 @@ final class PersonalPlanStore: ObservableObject {
         apply(fresh)
     }
 
-    /// After day 28: start a follow-up cycle with the same or a new goal.
-    func startNextCycle(goal: PlanGoal?) {
+    /// After day 28: start a follow-up cycle with the same or a new goal. `auto` = started by the
+    /// app because the user didn't choose (day 29 must never be empty).
+    func startNextCycle(goal: PlanGoal?, auto: Bool = false) {
+        let previous = plan
+        let newPlan = nextCyclePlan(goal: goal, startDate: Date())
+        if let previous { savePreviousPlan(previous) }
+        clearNextCycleChoice()
+        undoSnapshot = nil
+        apply(newPlan)
+        AnalyticsManager.shared.track(event: "plan_cycle_started", properties: [
+            "cycle": newPlan.cycle, "goal": newPlan.goal.rawValue, "auto": auto,
+            "goal_changed": previous.map { $0.goal != newPlan.goal } ?? false
+        ])
+    }
+
+    /// The plan the next cycle will be (deterministic: the day-29 notification can name its first session).
+    func nextCyclePlan(goal: PlanGoal? = nil, startDate: Date) -> PersonalPlan {
         let profile = plan?.profile ?? storedOnboardingProfile() ?? PlanProfile()
         let keepGoal = goal ?? plan?.goal
         let override: PlanGoal? = (plan?.goalChosenByUser ?? false) || goal != nil ? keepGoal : nil
-        var newPlan = PersonalPlanGenerator.generate(profile: profile, overrideGoal: override, anxiety: anxiety, startDate: Date(),
+        var newPlan = PersonalPlanGenerator.generate(profile: profile, overrideGoal: override, anxiety: anxiety, startDate: startDate,
                                                      cycle: (plan?.cycle ?? 1) + 1, excluded: plan?.excludedRefIDs ?? [])
         newPlan.preferences = plan?.preferences
-        apply(newPlan)
+        return newPlan
+    }
+
+    // MARK: - Cycle continuity
+
+    private var isAutoContinuing = false
+
+    /// Day 29 and later without a new cycle: start it with the same goal (or the one picked at
+    /// the cycle review), so there is always something to do today.
+    func autoContinueIfNeeded() async {
+        guard let current = plan, current.isFinished, !isProvisional, !isAutoContinuing else { return }
+        isAutoContinuing = true
+        defer { isAutoContinuing = false }
+        let choice = nextCycleChoice(for: current)
+        startNextCycle(goal: choice?.goal, auto: choice == nil)
+    }
+
+    /// Goal picked at the day-28 review, applied when the cycle ends.
+    struct NextCycleChoice: Codable, Equatable {
+        let goal: PlanGoal
+        let gentle: Bool
+        /// Start date of the plan the choice was made for (a choice never leaks to another cycle).
+        let planStart: Date
+    }
+
+    private var nextChoiceKey: String { "personalPlan.nextCycleChoice.v1.\(userKey)" }
+    private var previousPlanKey: String { "personalPlan.previous.v1.\(userKey)" }
+
+    func setNextCycleChoice(goal: PlanGoal, gentle: Bool) {
+        guard let plan else { return }
+        let choice = NextCycleChoice(goal: goal, gentle: gentle, planStart: plan.startDate)
+        if let data = try? JSONEncoder().encode(choice) { defaults.set(data, forKey: nextChoiceKey) }
+    }
+
+    func nextCycleChoice(for plan: PersonalPlan) -> NextCycleChoice? {
+        guard let data = defaults.data(forKey: nextChoiceKey),
+              let choice = try? JSONDecoder().decode(NextCycleChoice.self, from: data),
+              choice.planStart == plan.startDate else { return nil }
+        return choice
+    }
+
+    private func clearNextCycleChoice() { defaults.removeObject(forKey: nextChoiceKey) }
+
+    /// The cycle that ended before the current one (for its review, on this device only).
+    var previousPlan: PersonalPlan? {
+        guard let data = defaults.data(forKey: previousPlanKey) else { return nil }
+        return try? JSONDecoder().decode(PersonalPlan.self, from: data)
+    }
+
+    private func savePreviousPlan(_ plan: PersonalPlan) {
+        if let data = try? JSONEncoder().encode(plan) { defaults.set(data, forKey: previousPlanKey) }
     }
 
     /// After the day-1 anxiety check: rebuild today's plan with it (same goal choice and cycle).
