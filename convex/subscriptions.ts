@@ -13,7 +13,8 @@ import { ActionCtx, httpAction, internalMutation, MutationCtx } from "./_generat
  *
  * Env: REVENUECAT_WEBHOOK_AUTH (required, exact Authorization header value set in
  * the RevenueCat dashboard), REVENUECAT_SECRET_API_KEY (optional, enables the REST
- * fallback), REVENUECAT_ENTITLEMENT_ID (optional, default "pro").
+ * fallback; v1 key, or v2 key with REVENUECAT_PROJECT_ID), REVENUECAT_ENTITLEMENT_ID
+ * (optional, default "pro").
  */
 
 const restCheckInterval = 60_000;
@@ -212,36 +213,83 @@ export const saveRestEntitlement = internalMutation({
   },
 });
 
-/**
- * Asks RevenueCat directly (GET /v1/subscribers/{id}) when the webhook has not
- * granted access. At most once per minute per user. Returns true if the user now
- * holds an active entitlement.
- */
-export async function refreshEntitlementFromRevenueCat(ctx: ActionCtx, userId: Id<"users">): Promise<boolean> {
-  const apiKey = process.env.REVENUECAT_SECRET_API_KEY;
-  if (!apiKey) return false;
-  if (!(await ctx.runMutation(internal.subscriptions.startRestCheck, { userId }))) return false;
+type RestEntitlement = { expiresAt: number | null; productId?: string };
 
+/** API v1 secret key: GET /v1/subscribers/{id}. */
+async function fetchEntitlementV1(apiKey: string, userId: string): Promise<RestEntitlement | null> {
   const response = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(userId)}`, {
     headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
   }).catch(() => null);
-  if (!response?.ok) return false;
+  if (!response?.ok) return null;
   const body: unknown = await response.json().catch(() => null);
   const entitlement = (body as { subscriber?: { entitlements?: Record<string, unknown> } } | null)?.subscriber
     ?.entitlements?.[entitlementId()] as
     | { expires_date?: string | null; grace_period_expires_date?: string | null; product_identifier?: string }
     | undefined;
-  if (!entitlement) return false;
+  if (!entitlement) return null;
 
   const dates = [entitlement.expires_date, entitlement.grace_period_expires_date];
   const expiresAt =
     entitlement.expires_date === null || entitlement.expires_date === undefined
       ? null
       : Math.max(...dates.filter((d): d is string => typeof d === "string").map((d) => Date.parse(d) || 0));
+  return { expiresAt, productId: entitlement.product_identifier };
+}
+
+/** RevenueCat's internal id of the entitlement (v2 lists entitlements by id, not lookup key). */
+let v2EntitlementIdCache: { projectId: string; lookupKey: string; id: string } | null = null;
+
+/**
+ * API v2 secret key (REVENUECAT_PROJECT_ID set): active entitlements of the customer
+ * (GET /v2/projects/{project}/customers/{id}/active_entitlements). Needs the key's
+ * read access to customer information and project configuration.
+ */
+async function fetchEntitlementV2(apiKey: string, projectId: string, userId: string): Promise<RestEntitlement | null> {
+  const base = `https://api.revenuecat.com/v2/projects/${encodeURIComponent(projectId)}`;
+  const headers = { Authorization: `Bearer ${apiKey}`, Accept: "application/json" };
+  const lookupKey = entitlementId();
+
+  if (v2EntitlementIdCache?.projectId !== projectId || v2EntitlementIdCache.lookupKey !== lookupKey) {
+    const response = await fetch(`${base}/entitlements?limit=100`, { headers }).catch(() => null);
+    if (!response?.ok) return null;
+    const body = (await response.json().catch(() => null)) as { items?: { id?: string; lookup_key?: string }[] } | null;
+    const id = body?.items?.find((e) => e.lookup_key === lookupKey)?.id;
+    if (!id) return null;
+    v2EntitlementIdCache = { projectId, lookupKey, id };
+  }
+
+  const response = await fetch(`${base}/customers/${encodeURIComponent(userId)}/active_entitlements`, { headers }).catch(
+    () => null
+  );
+  if (!response?.ok) return null;
+  const body = (await response.json().catch(() => null)) as {
+    items?: { entitlement_id?: string; expires_at?: number | null }[];
+  } | null;
+  const active = body?.items?.find((e) => e.entitlement_id === v2EntitlementIdCache?.id);
+  if (!active) return null;
+  return { expiresAt: typeof active.expires_at === "number" ? active.expires_at : null };
+}
+
+/**
+ * Asks RevenueCat directly when the webhook has not granted access, with a v1 secret
+ * key, or a v2 one when REVENUECAT_PROJECT_ID is set. At most once per minute per user.
+ * Returns true if the user now holds an active entitlement.
+ */
+export async function refreshEntitlementFromRevenueCat(ctx: ActionCtx, userId: Id<"users">): Promise<boolean> {
+  const apiKey = process.env.REVENUECAT_SECRET_API_KEY;
+  if (!apiKey) return false;
+  if (!(await ctx.runMutation(internal.subscriptions.startRestCheck, { userId }))) return false;
+
+  const projectId = process.env.REVENUECAT_PROJECT_ID;
+  const entitlement = projectId
+    ? await fetchEntitlementV2(apiKey, projectId, userId)
+    : await fetchEntitlementV1(apiKey, userId);
+  if (!entitlement) return false;
+
   await ctx.runMutation(internal.subscriptions.saveRestEntitlement, {
     userId,
-    expiresAt,
-    productId: entitlement.product_identifier,
+    expiresAt: entitlement.expiresAt,
+    ...(entitlement.productId ? { productId: entitlement.productId } : {}),
   });
-  return expiresAt === null || expiresAt > Date.now();
+  return entitlement.expiresAt === null || entitlement.expiresAt > Date.now();
 }

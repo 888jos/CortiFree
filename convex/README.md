@@ -180,7 +180,8 @@ les nombres Convex `v.number()` sont des `Double` ; les ids sont des `String`.
 | `DEEPSEEK_API_KEY` | ✅ | à fournir | Milo (`assistant:chat`) |
 | `OPENAI_API_KEY` | à fournir | **à fournir** | bilan visage hebdomadaire (`faceScan:analyze`) ; `OPENAI_FACE_MODEL` optionnel (défaut `gpt-5-mini`) |
 | `REVENUECAT_WEBHOOK_AUTH` | à fournir | **à fournir** | secret du webhook RevenueCat : valeur exacte de l'en-tête `Authorization` configurée dans RevenueCat (`Bearer <secret>` ou `<secret>`) |
-| `REVENUECAT_SECRET_API_KEY` | recommandé | **recommandé** | clé secrète API v1 RevenueCat (`sk_…`) : vérifie l'abonnement quand le webhook n'est pas encore arrivé (achat à l'instant, abonnés antérieurs au webhook) |
+| `REVENUECAT_SECRET_API_KEY` | ✅ | ✅ | clé secrète API RevenueCat (`sk_…`, v1, ou v2 avec `REVENUECAT_PROJECT_ID`) : vérifie l'abonnement quand le webhook n'est pas encore arrivé (achat à l'instant, abonnés antérieurs au webhook) |
+| `REVENUECAT_PROJECT_ID` | ✅ `proj3f3f17f6` | ✅ `proj3f3f17f6` | requis avec une clé v2 (lecture clients + configuration projet) ; absent = API v1 |
 | `REVENUECAT_ENTITLEMENT_ID` | optionnel | optionnel | défaut `pro` |
 | `CONVEX_SITE_URL` | automatique | automatique | fourni par Convex |
 

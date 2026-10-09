@@ -198,6 +198,33 @@ describe("AI quotas", () => {
     expect((await ask()).remaining).toBe(10);
     expect(restCalls).toHaveLength(1);
   });
+
+  test("REST fallback with an API v2 key (REVENUECAT_PROJECT_ID set)", async () => {
+    const t = convexTest(schema, modules);
+    const { userId, as } = await setupUser(t);
+    process.env.REVENUECAT_SECRET_API_KEY = "sk_rc_v2_test";
+    process.env.REVENUECAT_PROJECT_ID = "proj_test";
+    const restCalls: string[] = [];
+    vi.stubGlobal("fetch", async (url: string) => {
+      if (url.startsWith("https://api.revenuecat.com/")) {
+        restCalls.push(url);
+        if (url.includes("/entitlements?")) {
+          return Response.json({ items: [{ id: "entl_other", lookup_key: "basic" }, { id: "entl_pro", lookup_key: "pro" }] });
+        }
+        expect(url).toBe(`https://api.revenuecat.com/v2/projects/proj_test/customers/${userId}/active_entitlements`);
+        return Response.json({ items: [{ entitlement_id: "entl_pro", expires_at: Date.now() + 86_400_000 }] });
+      }
+      return Response.json({ choices: [{ message: { content: "ok" } }] });
+    });
+    try {
+      const ask = () => as.action(api.assistant.chat, { kind: "chat", messages: [{ role: "user", content: "hi" }] });
+      expect((await ask()).remaining).toBe(11);
+      expect((await ask()).remaining).toBe(10);
+      expect(restCalls.filter((u) => u.includes("/active_entitlements"))).toHaveLength(1);
+    } finally {
+      delete process.env.REVENUECAT_PROJECT_ID;
+    }
+  });
 });
 
 describe("assistant input", () => {
