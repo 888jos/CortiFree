@@ -172,6 +172,8 @@ private struct AuthenticatedAppRootView: View {
                     }
             } else if isLocked {
                 SubscriptionLockedView(
+                    authViewModel: authViewModel,
+                    hasSubscribedBefore: revenueCat.customerInfo?.entitlements.all.isEmpty == false,
                     isRestoring: isRestoring,
                     onUnlock: presentPaywall,
                     onRestore: restorePurchases
@@ -269,10 +271,19 @@ private struct AuthenticatedAppRootView: View {
 }
 
 /// Shown to signed-in users without an active subscription after they close the paywall.
+/// Keeps the legal links and account controls reachable (guidelines 3.1.2 and 5.1.1(v)).
 private struct SubscriptionLockedView: View {
+    @ObservedObject var authViewModel: AuthViewModel
+    /// False for users who never had an entitlement: no "your subscription has ended".
+    let hasSubscribedBefore: Bool
     let isRestoring: Bool
     let onUnlock: () -> Void
     let onRestore: () -> Void
+
+    @State private var showSignOutAlert = false
+    @State private var showAccountDeletion = false
+
+    private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
     var body: some View {
         ZStack {
@@ -286,12 +297,12 @@ private struct SubscriptionLockedView: View {
                     .font(.system(size: 44, weight: .semibold))
                     .foregroundStyle(.white)
 
-                Text(LanguageManager.shared.localizedString(for: "access_locked.title"))
+                Text(t(hasSubscribedBefore ? "access_locked.title" : "access_locked.title_new"))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
-                Text(LanguageManager.shared.localizedString(for: "access_locked.subtitle"))
+                Text(t(hasSubscribedBefore ? "access_locked.subtitle" : "access_locked.subtitle_new"))
                     .font(.system(size: 16))
                     .foregroundStyle(.white.opacity(0.75))
                     .multilineTextAlignment(.center)
@@ -300,7 +311,7 @@ private struct SubscriptionLockedView: View {
                 Spacer()
 
                 Button(action: onUnlock) {
-                    Text(LanguageManager.shared.localizedString(for: "access_locked.unlock"))
+                    Text(t(hasSubscribedBefore ? "access_locked.unlock" : "access_locked.unlock_new"))
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -319,9 +330,44 @@ private struct SubscriptionLockedView: View {
                     }
                 }
                 .disabled(isRestoring)
-                .padding(.bottom, 32)
+
+                VStack(spacing: 10) {
+                    HStack(spacing: 20) {
+                        footerLink(t("paywall_custom.footer_terms")) { LegalDocumentsHelper.openTerms() }
+                        footerLink(t("paywall_custom.footer_privacy")) { LegalDocumentsHelper.openPrivacyPolicy() }
+                    }
+                    HStack(spacing: 20) {
+                        footerLink(t("settings.signout")) { showSignOutAlert = true }
+                        footerLink(t("settings.delete_account")) { showAccountDeletion = true }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 24)
             }
         }
+        .alert(t("settings.alert.signout.title"), isPresented: $showSignOutAlert) {
+            Button(t("common.cancel"), role: .cancel) {}
+            Button(t("settings.alert.signout.title"), role: .destructive) { authViewModel.signOut() }
+        } message: {
+            Text(t("settings.alert.signout.message"))
+        }
+        // Settings runs the full deletion flow (confirmation, re-authentication, errors).
+        .sheet(isPresented: $showAccountDeletion) {
+            SettingsView(promptsAccountDeletion: true)
+                .environmentObject(authViewModel)
+        }
+    }
+
+    private func footerLink(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(.white.opacity(0.6))
+                .underline()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .buttonStyle(.plain)
     }
 }
 

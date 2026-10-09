@@ -85,7 +85,7 @@ struct WidgetInsights {
 
     var todayMood: WidgetMood? { moods[WidgetInsightsStore.dayKey(date)] }
 
-    // MARK: Cortisol (estimation ludique, pas une mesure médicale)
+    // MARK: Météo intérieure (score ludique tiré des check-ins, jamais affiché comme une mesure)
 
     var cortisolLevel: Int {
         var level = 52.0

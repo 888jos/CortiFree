@@ -38,7 +38,8 @@ final class DeepSeekChatService {
 }
 
 enum MiloConsent {
-    static let storageKey = "milo.consent.uids"
+    /// v2: the disclosure now covers Apple Health / heart-rate context, so earlier consents are asked again.
+    static let storageKey = "milo.consent.v2.uids"
     static func isGranted(in stored: String, uid: String?) -> Bool {
         guard let uid else { return false }; return stored.split(separator: ",").contains { $0 == uid }
     }

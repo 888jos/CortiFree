@@ -237,7 +237,12 @@ struct HomeView: View {
             CustomPaywallView(
                 onComplete: { showCustomPaywall = false },
                 onPurchase: { _ in },
-                onRestore: { showCustomPaywall = false }
+                onRestore: {
+                    Task { @MainActor in
+                        _ = try? await RevenueCatManager.shared.restorePurchases()
+                        if RevenueCatManager.shared.hasPremiumEntitlement { showCustomPaywall = false }
+                    }
+                }
             )
         }
         #if DEBUG

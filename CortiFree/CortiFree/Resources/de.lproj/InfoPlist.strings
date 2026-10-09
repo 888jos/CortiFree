@@ -1,14 +1,15 @@
 /* Generated from the English CortiFree localization. */
-"NSPhotoLibraryUsageDescription" = "CortiFree benötigt Zugriff auf Ihre Fotobibliothek, damit Sie Ihren Fortschritt speichern und teilen können.";
+"NSPhotoLibraryUsageDescription" = "CortiFree lässt dich ein Foto für deinen wöchentlichen Gesichts-Check und deine Fortschrittsfotos auswählen.";
 "NSCameraUsageDescription" = "CortiFree nutzt die Kamera, um deinen Puls zu messen (Finger auf der Linse, mit Blitz) und dein wöchentliches Gesichts-Check-Selfie aufzunehmen.";
 "CFBundleDisplayName" = "CortiFree";
-"NSHumanReadableCopyright" = "© 2025 CortiFree. Alle Rechte vorbehalten.";
-"NSLocationWhenInUseUsageDescription" = "CortiFree verwendet Ihren Standort, um personalisierte Vorschläge für Naturaktivitäten basierend auf Ihrer Region zu unterbreiten.";
-"NSMotionUsageDescription" = "CortiFree verwendet Motion Tracking, um Ihre körperliche Aktivität zu überwachen und bessere Übungsempfehlungen zu geben.";
-"NSPhotoLibraryAddUsageDescription" = "CortiFree benötigt die Berechtigung zum Speichern von Bildern in Ihrer Fotobibliothek.";
-"NSMicrophoneUsageDescription" = "CortiFree benötigt Mikrofonzugang für geführte Meditations- und Atemübungen.";
-"NSHealthShareUsageDescription" = "CortiFree liest deine Angst-Fragebögen (GAD-7), deine Stimmungen sowie Herzfrequenz, Herzfrequenzvariabilität und Schlaf (z. B. von der Apple Watch), um deinen Plan zu personalisieren und mit Milo deinen Puls zu messen. Diese Daten bleiben auf deinem iPhone.";
+"NSHumanReadableCopyright" = "© 2026 CortiFree. Alle Rechte vorbehalten.";
+"NSPhotoLibraryAddUsageDescription" = "CortiFree speichert die Fortschrittsbilder, die du teilen möchtest, in deiner Fotomediathek.";
+"NSHealthShareUsageDescription" = "CortiFree liest deine Angst-Fragebögen (GAD-7), deine Stimmungen sowie Herzfrequenz, Herzfrequenzvariabilität und Schlaf (z. B. von der Apple Watch), um deinen Plan zu personalisieren und mit Milo deinen Puls zu messen. Gesundheitsdaten werden nie für Werbung genutzt. Nur wenn du Milo, den KI-Coach, erlaubst, wird eine kurze Zusammenfassung (Herzfrequenz, HRV, Schlaf) mit deinen Nachrichten gesendet, um seine Antworten anzupassen.";
 "NSHealthUpdateUsageDescription" = "CortiFree speichert deine Angst-Checks, Stimmungen und Achtsamkeitsminuten in Apple Health.";
 
 // MARK: - Tracking
 "NSUserTrackingUsageDescription" = "CortiFree verwendet diese Kennung, um dein Erlebnis zu personalisieren und die Wirksamkeit von Werbung zu messen.";
+
+/* Milo voice dictation */
+"NSMicrophoneUsageDescription" = "CortiFree nutzt das Mikrofon, damit du Milo deine Nachrichten diktieren kannst.";
+"NSSpeechRecognitionUsageDescription" = "CortiFree wandelt deine Stimme in Text um, damit du Milo deine Nachrichten diktieren kannst. Wenn möglich, erfolgt die Transkription auf deinem iPhone.";

@@ -313,7 +313,8 @@ struct BreatheWidgetView: View {
     }
 }
 
-// MARK: - 4. Jauge de cortisol
+// MARK: - 4. Météo intérieure (ex « jauge de cortisol »)
+// Weather from the user's own check-ins, never a number presented as a physiological measure.
 
 struct CortisolWidgetView: View {
     let insights: WidgetInsights
@@ -322,25 +323,26 @@ struct CortisolWidgetView: View {
     private var level: Int { insights.cortisolLevel }
     private var tier: Int { insights.cortisolTier }
     private var tint: Color { CFW.tierColor(tier) }
+    private var weatherSymbol: String {
+        ["sun.max.fill", "cloud.sun.fill", "cloud.fill", "cloud.bolt.rain.fill"][min(max(tier, 0), 3)]
+    }
 
     var body: some View {
         switch family {
         case .accessoryCircular:
-            Gauge(value: Double(level), in: 0...100) {
-                Text("CORT")
-            } currentValueLabel: {
-                Text("\(level)")
+            ZStack {
+                AccessoryWidgetBackground()
+                Image(systemName: weatherSymbol)
+                    .font(.system(size: 24, weight: .semibold))
             }
-            .gaugeStyle(.accessoryCircular)
             .widgetAccentable()
         case .systemSmall:
             VStack(alignment: .leading, spacing: 6) {
                 header
                 Spacer(minLength: 0)
-                HStack(alignment: .lastTextBaseline, spacing: 1) {
-                    Text("\(level)").font(CFW.font(44, .heavy)).foregroundStyle(.white)
-                    Text("%").font(CFW.font(20, .bold)).foregroundStyle(CFW.muted)
-                }
+                Image(systemName: weatherSymbol)
+                    .symbolRenderingMode(.multicolor)
+                    .font(.system(size: 38, weight: .semibold))
                 Text(WidgetL10n.string("widget.cortisol.tier.\(tier)"))
                     .font(CFW.font(13, .bold))
                     .foregroundStyle(tint)
@@ -350,10 +352,9 @@ struct CortisolWidgetView: View {
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
                     header
-                    HStack(alignment: .lastTextBaseline, spacing: 1) {
-                        Text("\(level)").font(CFW.font(48, .heavy)).foregroundStyle(.white)
-                        Text("%").font(CFW.font(22, .bold)).foregroundStyle(CFW.muted)
-                    }
+                    Image(systemName: weatherSymbol)
+                        .symbolRenderingMode(.multicolor)
+                        .font(.system(size: 42, weight: .semibold))
                     battery
                 }
                 .frame(width: 130)
@@ -378,7 +379,7 @@ struct CortisolWidgetView: View {
 
     private var header: some View {
         HStack(spacing: 4) {
-            Image(systemName: "waveform.path.ecg").font(.system(size: 11, weight: .bold))
+            Image(systemName: "cloud.sun.fill").font(.system(size: 11, weight: .bold))
             Text(WidgetL10n.string("widget.cortisol.title").uppercased())
                 .font(CFW.font(11, .bold))
                 .kerning(1.2)

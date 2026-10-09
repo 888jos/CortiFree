@@ -160,7 +160,7 @@
 "social.thousands_changed" = "CortiFree로 달라진 수많은 삶";
 "social.discover_how" = "나와 같은 사람들이 어떻게 평온을 찾았는지 알아보세요";
 "social.measurable_results" = "측정 가능한 결과";
-"social.stress_reduction" = "단 60일 만에 체감 스트레스가 평균 68% 감소";
+"social.stress_reduction" = "내 속도에 맞춰, 매일 작은 습관으로 더 차분해져요";
 "social.without_cortifree" = "CortiFree 없이";
 "social.with_cortifree" = "CortiFree와 함께";
 "social.stress_level" = "스트레스 수준";
@@ -1232,7 +1232,7 @@
 // Meditation
 "onboarding.eight_habits_flow.meditation_title" = "마음챙김 명상";
 "onboarding.eight_habits_flow.meditation_subtitle" = "마음을 진정시키고 스트레스를 줄여요";
-"onboarding.eight_habits_flow.meditation_benefit_1" = "불안 30% 감소";
+"onboarding.eight_habits_flow.meditation_benefit_1" = "불안을 누그러뜨리는 데 도움이 될 수 있어요";
 "onboarding.eight_habits_flow.meditation_benefit_2" = "집중력 향상";
 "onboarding.eight_habits_flow.meditation_benefit_3" = "코르티솔 감소";
 "onboarding.eight_habits_flow.meditation_impact_serenity" = "평온";
@@ -2109,13 +2109,13 @@
 "breathing_detail.how_it_works.default" = "안내되는 호흡 리듬을 따라 자연스러운 이완 반응을 활성화하고 평온을 찾아요.";
 
 // Scientific evidence texts (3 bullet points, 10-12 words max, 1 source)
-"breathing_detail.evidence.cardiac_coherence_1" = "3주 만에 코르티솔 수치 23% 감소";
+"breathing_detail.evidence.cardiac_coherence_1" = "느린 호흡이 체감 스트레스를 낮춘다는 연구가 있어요";
 "breathing_detail.evidence.cardiac_coherence_2" = "첫 세션부터 심박 변이도 향상";
 "breathing_detail.evidence.cardiac_coherence_3" = "신경계의 균형을 맞춰 정신적 명료함 향상";
 
 "breathing_detail.evidence.box_breathing_1" = "심박수를 동기화해 신경계를 진정시켜요";
 "breathing_detail.evidence.box_breathing_2" = "심박수를 늦춰 깊은 안정감을 줘요";
-"breathing_detail.evidence.box_breathing_3" = "5분 후 집중력 25% 향상";
+"breathing_detail.evidence.box_breathing_3" = "몇 분만 해도 다시 집중하는 데 도움이 될 수 있어요";
 
 "breathing_detail.evidence.alternate_breathing_1" = "양쪽 뇌 반구의 균형을 맞춰 불안을 줄여요";
 "breathing_detail.evidence.alternate_breathing_2" = "부교감 신경계를 통해 심박수를 안정시켜요";
@@ -2158,7 +2158,7 @@
 "breathing_pattern.four_seven_eight.benefit_3" = "긴장 완화";
 "breathing_pattern.four_seven_eight.benefit_4" = "생각을 진정시켜요";
 
-"breathing_pattern.coherence.benefit_1" = "코르티솔 -23%";
+"breathing_pattern.coherence.benefit_1" = "더 차분해지도록 도와줘요";
 "breathing_pattern.coherence.benefit_2" = "심박 변이도 +";
 "breathing_pattern.coherence.benefit_3" = "면역 체계 +";
 "breathing_pattern.coherence.benefit_4" = "감정 조절";
@@ -2189,36 +2189,36 @@
 "breathing_pattern.bhastrika.benefit_4" = "정신적 지구력";
 
 // MARK: - Breathing Pattern Scientific Evidence
-"breathing_pattern.deep_abdominal.evidence_1" = "미주신경을 활성화하고 코르티솔을 18% 줄여요";
-"breathing_pattern.deep_abdominal.evidence_2" = "단 3분 만에 혈중 산소 포화도 22% 향상";
+"breathing_pattern.deep_abdominal.evidence_1" = "느리고 깊은 호흡으로 이완 반응을 이끌어요";
+"breathing_pattern.deep_abdominal.evidence_2" = "더 깊고 효율적인 호흡을 도와줘요";
 "breathing_pattern.deep_abdominal.evidence_3" = "심박수를 평균 분당 8회 낮춰요";
 
-"breathing_pattern.four_seven_eight.evidence_1" = "Harvard 연구에 따르면 66일 만에 불안 44% 감소";
-"breathing_pattern.four_seven_eight.evidence_2" = "꾸준히 실천하는 사람의 수면의 질 65% 향상";
+"breathing_pattern.four_seven_eight.evidence_1" = "불안한 순간을 진정시키는 데 널리 쓰이는 기법이에요";
+"breathing_pattern.four_seven_eight.evidence_2" = "잠들기 전 긴장을 풀 때 자주 쓰여요";
 "breathing_pattern.four_seven_eight.evidence_3" = "혈압을 평균 7mmHg 낮춰요";
 
-"breathing_pattern.coherence.evidence_1" = "단 3주 실천으로 코르티솔 23% 감소";
-"breathing_pattern.coherence.evidence_2" = "HeartMath Institute에 따르면 항노화 호르몬 DHEA 100% 증가";
-"breathing_pattern.coherence.evidence_3" = "1,500명 대상 연구에 따르면 불안 증상 46% 감소";
+"breathing_pattern.coherence.evidence_1" = "꾸준한 느린 호흡이 체감 스트레스를 낮춘다는 연구가 있어요";
+"breathing_pattern.coherence.evidence_2" = "연구에서 더 건강한 심박 변이도와 연관되었어요";
+"breathing_pattern.coherence.evidence_3" = "꾸준히 하면 불안감을 줄이는 데 도움이 될 수 있어요";
 
-"breathing_pattern.slow66.evidence_1" = "더 나은 수면을 위해 멜라토닌 생성 38% 증가";
-"breathing_pattern.slow66.evidence_2" = "수면 연구에 따르면 잠드는 시간 54% 단축";
-"breathing_pattern.slow66.evidence_3" = "과학적으로 측정 가능한 깊은 수면의 질 42% 향상";
+"breathing_pattern.slow66.evidence_1" = "몸이 긴장을 풀도록 돕는 부드러운 리듬이에요";
+"breathing_pattern.slow66.evidence_2" = "더 쉽게 잠드는 데 도움이 될 수 있어요";
+"breathing_pattern.slow66.evidence_3" = "잠자리에 들기 전 더 차분한 상태를 만들어줘요";
 
-"breathing_pattern.triangle.evidence_1" = "단 5분 실천으로 불안 31% 감소";
-"breathing_pattern.triangle.evidence_2" = "규칙적인 호흡 리듬 덕분에 근육 긴장 45% 감소";
-"breathing_pattern.triangle.evidence_3" = "세션 직후 정신적 명료함 27% 향상";
+"breathing_pattern.triangle.evidence_1" = "불안한 순간을 가라앉히는 간단한 리듬이에요";
+"breathing_pattern.triangle.evidence_2" = "일정한 리듬이 근육 긴장을 푸는 데 도움이 될 수 있어요";
+"breathing_pattern.triangle.evidence_3" = "한 세션 후 머리가 맑아졌다고 느끼는 분이 많아요";
 
-"breathing_pattern.box.evidence_1" = "Navy SEALs에 따르면 단 5분 후 집중력 25% 향상";
-"breathing_pattern.box.evidence_2" = "한 번의 세션으로 코르티솔 24% 감소";
-"breathing_pattern.box.evidence_3" = "심박 변이도 34% 증가로 신경계 균형 향상";
+"breathing_pattern.box.evidence_1" = "운동선수와 응급 대응 요원이 압박 속에서 집중력을 유지하려고 사용해요";
+"breathing_pattern.box.evidence_2" = "한 번만 해도 더 차분해지는 데 도움이 될 수 있어요";
+"breathing_pattern.box.evidence_3" = "고른 리듬이 신경계의 균형을 도와줘요";
 
-"breathing_pattern.kapalabhati.evidence_1" = "거의 즉시 뇌 산소 공급 48% 증가";
-"breathing_pattern.kapalabhati.evidence_2" = "꾸준한 요가 수련으로 호흡 능력 36% 향상";
-"breathing_pattern.kapalabhati.evidence_3" = "단 10분 운동으로 신진대사 21% 촉진";
+"breathing_pattern.kapalabhati.evidence_1" = "더 또렷하게 깨어 있도록 돕는 활력의 요가 호흡이에요";
+"breathing_pattern.kapalabhati.evidence_2" = "전통적으로 호흡을 강화하기 위해 수련해 왔어요";
+"breathing_pattern.kapalabhati.evidence_3" = "빠르게 에너지를 끌어올릴 수 있어요";
 
-"breathing_pattern.bhastrika.evidence_1" = "세션 후 과학적으로 측정된 신체 에너지 56% 증가";
-"breathing_pattern.bhastrika.evidence_2" = "강한 산소 공급으로 인지 능력 39% 향상";
+"breathing_pattern.bhastrika.evidence_1" = "한 세션 후 더 활기차졌다고 느끼는 분이 많아요";
+"breathing_pattern.bhastrika.evidence_2" = "더 또렷하고 맑은 정신을 느끼는 데 도움이 될 수 있어요";
 "breathing_pattern.bhastrika.evidence_3" = "체온을 평균 1.2°C 높여요";
 
 "breathing_pattern.default.evidence" = "호흡에 관한 수많은 국제 과학 연구로 검증된 기법";
@@ -2287,34 +2287,34 @@
 
 // MARK: - Meditation Scientific Evidence
 "meditation.conscious_breathing.evidence_1" = "단 3분 실천으로 부교감 신경계를 활성화해요";
-"meditation.conscious_breathing.evidence_2" = "한 번의 세션 후 스트레스 호르몬인 코르티솔 25% 감소";
+"meditation.conscious_breathing.evidence_2" = "꾸준히 하면 스트레스 수준을 낮추는 데 도움이 될 수 있어요";
 "meditation.conscious_breathing.evidence_3" = "심박 변이도를 크게 개선하고 스트레스 회복을 앞당겨요";
 
-"meditation.body_scan.evidence_1" = "단 5분 만에 불안 수준 30% 감소";
+"meditation.body_scan.evidence_1" = "단 몇 분 만에 불안한 마음을 누그러뜨리는 데 도움이 될 수 있어요";
 "meditation.body_scan.evidence_2" = "신체 인식을 높이고 만성 근육 긴장을 효과적으로 줄여요";
 "meditation.body_scan.evidence_3" = "MBSR 치료 분야의 15건 이상의 임상 연구로 검증";
 
-"meditation.mindfulness.evidence_1" = "8주 만에 해마의 회백질 8% 증가";
-"meditation.mindfulness.evidence_2" = "불안 39% 감소 및 주의 지속 시간 크게 향상";
+"meditation.mindfulness.evidence_1" = "꾸준한 마음챙김이 주의력과 관련된 뇌 영역의 변화와 연관된다는 연구가 있어요";
+"meditation.mindfulness.evidence_2" = "불안을 줄이고 주의력을 높이는 데 도움이 될 수 있어요";
 "meditation.mindfulness.evidence_3" = "뇌의 공포·불안 중추인 편도체의 활동을 줄여요";
 
 "meditation.grounding.evidence_1" = "3~5분 안에 불안 발작을 효과적으로 멈춰요";
 "meditation.grounding.evidence_2" = "전전두엽 피질을 활성화해 뇌의 공황 반응을 끊어요";
-"meditation.grounding.evidence_3" = "위기 및 공황 상황에서 입증된 효과율 87%";
+"meditation.grounding.evidence_3" = "공황 같은 순간을 넘기는 데 널리 쓰이는 기법이에요";
 
-"meditation.visualization.evidence_1" = "안전한 마음의 피난처를 만들어 코르티솔 27% 감소";
+"meditation.visualization.evidence_1" = "마음속에 안전한 피난처를 만들어 스트레스를 낮추는 데 도움이 될 수 있어요";
 "meditation.visualization.evidence_2" = "실제 경험과 같은 뇌 영역을 활성화해요";
 "meditation.visualization.evidence_3" = "기분을 개선하고 외상 후 스트레스 장애 증상을 줄여요";
 
-"meditation.compassion.evidence_1" = "꾸준한 실천으로 자존감과 자기 가치감 35% 향상";
+"meditation.compassion.evidence_1" = "꾸준히 하면 자존감을 키우는 데 도움이 될 수 있어요";
 "meditation.compassion.evidence_2" = "우울, 불안, 가혹한 자기비판을 크게 줄여요";
 "meditation.compassion.evidence_3" = "Kristin Neff 박사의 200건 이상의 연구로 검증";
 
-"meditation.focus_clarity.evidence_1" = "지속적인 주의력과 집중력을 꾸준히 40% 향상";
+"meditation.focus_clarity.evidence_1" = "시간이 지날수록 주의력과 집중력을 유지하는 데 도움이 될 수 있어요";
 "meditation.focus_clarity.evidence_2" = "정신적 산만함을 줄이고 의사 결정의 명확성을 높여요";
 "meditation.focus_clarity.evidence_3" = "단 2주 실천 후 눈에 띄는 효과";
 
-"meditation.yoga_nidra.evidence_1" = "꾸준히 실천하는 사람의 수면의 질 68% 향상";
+"meditation.yoga_nidra.evidence_1" = "더 깊고 편안한 수면을 돕는 데 자주 쓰여요";
 "meditation.yoga_nidra.evidence_2" = "30분 실천은 깊은 수면 2시간과 같아요";
 "meditation.yoga_nidra.evidence_3" = "불면증을 효과적으로 줄이고 깊은 신체 회복을 도와요";
 
@@ -2340,7 +2340,7 @@
 "antistress.slow_walk.benefit_3" = "현재에 더 머물기";
 "antistress.slow_walk.benefit_4" = "신체 이완";
 
-"antistress.slow_walk.evidence_1" = "코르티솔 수치 20% 감소";
+"antistress.slow_walk.evidence_1" = "스트레스 수준을 낮추는 데 도움이 될 수 있어요";
 "antistress.slow_walk.evidence_2" = "신체 인식을 높이고 긴장을 줄여요";
 "antistress.slow_walk.evidence_3" = "자연스러운 엔도르핀 분비를 촉진해요";
 "antistress.slow_walk.source" = "Journal of Environmental Psychology (2019)";
@@ -2354,7 +2354,7 @@
 "antistress.conscious_stretching.benefit_3" = "혈액 순환";
 "antistress.conscious_stretching.benefit_4" = "깊은 이완";
 
-"antistress.conscious_stretching.evidence_1" = "쌓인 근육 긴장 30% 감소";
+"antistress.conscious_stretching.evidence_1" = "쌓인 근육 긴장을 푸는 데 도움이 돼요";
 "antistress.conscious_stretching.evidence_2" = "혈액 순환과 산소 공급 개선";
 "antistress.conscious_stretching.evidence_3" = "스트레스 관련 만성 통증 완화";
 "antistress.conscious_stretching.source" = "Physical Therapy Journal (2017)";
@@ -2370,7 +2370,7 @@
 
 "antistress.audio_relaxation.evidence_1" = "빠르게 깊은 이완 상태로 이끌어요";
 "antistress.audio_relaxation.evidence_2" = "스트레스 관련 뇌 활동 감소";
-"antistress.audio_relaxation.evidence_3" = "수면의 질 40% 향상";
+"antistress.audio_relaxation.evidence_3" = "수면의 질을 높이는 데 도움이 될 수 있어요";
 "antistress.audio_relaxation.source" = "Sleep Medicine Reviews (2018)";
 "antistress.audio_relaxation.subtitle" = "가이드 오디오로 깊이 이완하기";
 
@@ -2383,7 +2383,7 @@
 "antistress.white_noise.benefit_4" = "마음 진정";
 
 "antistress.white_noise.evidence_1" = "방해되는 주변 소리를 가려 줘요";
-"antistress.white_noise.evidence_2" = "잠드는 데 38% 도움";
+"antistress.white_noise.evidence_2" = "더 쉽게 잠드는 데 도움이 될 수 있어요";
 "antistress.white_noise.evidence_3" = "과도한 정신 활동 감소";
 "antistress.white_noise.source" = "Journal of Sleep Research (2017)";
 "antistress.white_noise.subtitle" = "마음을 달래 주는 차분한 소리";
@@ -2396,7 +2396,7 @@
 "antistress.positive_mantra.benefit_3" = "정신력";
 "antistress.positive_mantra.benefit_4" = "동기 부여";
 
-"antistress.positive_mantra.evidence_1" = "부정적인 생각 40% 감소";
+"antistress.positive_mantra.evidence_1" = "부정적인 생각의 고리를 끊는 데 도움이 될 수 있어요";
 "antistress.positive_mantra.evidence_2" = "자신감과 자존감을 높여요";
 "antistress.positive_mantra.evidence_3" = "예기 불안 감소";
 "antistress.positive_mantra.source" = "Journal of Clinical Psychology (2018)";
@@ -2471,9 +2471,9 @@
 "antistress.body_scan.benefit_2" = "긴장 해소";
 "antistress.body_scan.benefit_3" = "더 나은 수면";
 "antistress.body_scan.benefit_4" = "신체 인식";
-"antistress.body_scan.evidence_1" = "만성 스트레스와 불안 35% 감소";
+"antistress.body_scan.evidence_1" = "꾸준히 하면 스트레스와 불안을 줄이는 데 도움이 될 수 있어요";
 "antistress.body_scan.evidence_2" = "몸에 쌓인 근육 긴장을 풀어 줘요";
-"antistress.body_scan.evidence_3" = "수면의 질 40% 향상";
+"antistress.body_scan.evidence_3" = "수면의 질을 높이는 데 도움이 될 수 있어요";
 "antistress.body_scan.source" = "Journal of Behavioral Medicine (2017)";
 
 // Benefits
@@ -2573,7 +2573,7 @@
 "learning.card.meditation_science.section1.title" = "과학적 증거";
 "learning.card.meditation_science.section1.content" = "수천 건의 과학 연구가 명상의 효과를 입증했어요.\n\n• 전전두엽 피질이 두꺼워짐\n• 편도체(공포 중추) 축소\n• 회백질 증가";
 "learning.card.meditation_science.section2.title" = "측정 가능한 결과";
-"learning.card.meditation_science.section2.content" = "• 8주 후 코르티솔 -30%\n• 집중력 40% 향상\n• 불안 증상 50% 감소";
+"learning.card.meditation_science.section2.content" = "• 연구에서 꾸준한 명상은 더 낮은 스트레스 수준과 연관되었어요\n• 시간이 지나면서 집중력을 높일 수 있어요\n• 불안 증상이 줄었다고 말하는 분이 많아요";
 "learning.card.meditation_science.section3.title" = "필요한 시간";
 "learning.card.meditation_science.section3.content" = "하루 10~15분씩 8주만 꾸준히 연습해도 뇌에 눈에 띄는 변화가 나타나요.\n\nCortiFree와 함께라면 이미 올바른 길을 가고 있어요!";
 
@@ -2609,7 +2609,7 @@
 "learning.card.sleep_cycles.section2.title" = "수면 주기 최적화하기";
 "learning.card.sleep_cycles.section2.content" = "• 7.5시간 또는 9시간을 목표로 하세요(5~6번의 완전한 주기)\n• 6시간이나 8시간은 피하세요(주기 중간에 깨면 피곤해요)\n• 매일 같은 시간에 자고 일어나세요(주말에도)";
 "learning.card.sleep_cycles.section3.title" = "코르티솔에 미치는 영향";
-"learning.card.sleep_cycles.section3.content" = "• 깊은 수면 = 코르티솔 70% 감소\n• 수면 부족 = 다음 날 코르티솔 +37%\n• 나쁜 밤 3번 = 인슐린 저항성(당뇨 전 단계)";
+"learning.card.sleep_cycles.section3.content" = "• 깊은 잠은 몸이 스트레스에서 회복하도록 도와줘요\n• 잠이 부족하면 다음 날 더 스트레스를 받을 수 있어요\n• 짧은 밤이 반복되면 전반적인 건강에 영향을 줘요: 수면 문제가 계속되면 의사와 상담하세요";
 "learning.card.sleep_cycles.section4.title" = "질 > 양";
 "learning.card.sleep_cycles.section4.content" = "얕고 자주 깨는 8시간보다 깊은 수면이 충분한 6시간이 더 나아요!";
 
@@ -2629,9 +2629,9 @@
 "learning.card.food.title" = "스트레스를 줄이는 식단";
 "learning.card.food.description" = "코르티솔을 조절하는 음식";
 "learning.card.food.section1.title" = "코르티솔을 낮추는 음식";
-"learning.card.food.section1.content" = "건강한 지방:\n• 아보카도, 견과류, 아몬드\n• 올리브유, 등푸른 생선(연어, 고등어)\n• 항염 작용을 하는 오메가-3가 풍부해요\n\n마그네슘이 풍부한 음식:\n• 다크 초콜릿(카카오 70% 이상)\n• 시금치, 바나나\n• 호박씨, 아몬드\n• 마그네슘은 불안과 코르티솔을 줄여요\n\n비타민 C:\n• 감귤류, 키위, 파프리카\n• 코르티솔을 15~20% 줄여요\n• 면역력을 강화해요\n\n녹차와 홍차:\n• 마음을 진정시키는 L-테아닌\n• 6주 후 코르티솔 20% 감소";
+"learning.card.food.section1.content" = "건강한 지방:\n• 아보카도, 견과류, 아몬드\n• 올리브유, 등푸른 생선(연어, 고등어)\n• 항염 작용을 하는 오메가-3가 풍부해요\n\n마그네슘이 풍부한 음식:\n• 다크 초콜릿(카카오 70% 이상)\n• 시금치, 바나나\n• 호박씨, 아몬드\n• 마그네슘은 신경계의 균형에 관여해요\n\n비타민 C:\n• 감귤류, 키위, 파프리카\n• 몸이 스트레스에 대처하는 데 도움이 될 수 있어요\n• 면역력을 강화해요\n\n녹차와 홍차:\n• 마음을 진정시키는 L-테아닌\n• 커피보다 부드러운 대안이에요";
 "learning.card.food.section2.title" = "코르티솔을 높이는 음식";
-"learning.card.food.section2.content" = "과도한 카페인:\n• 하루 400mg 이상(커피 4잔)\n• 코르티솔이 30% 증가해요\n• 수면을 방해해요\n\n정제당:\n• 혈당 급상승 = 코르티솔 급상승\n• 전신 염증\n• 중독과 갈망\n\n알코올:\n• 깊은 수면을 방해해요\n• 밤사이 코르티솔을 높여요\n• 탈수";
+"learning.card.food.section2.content" = "과도한 카페인:\n• 하루 400mg 이상(커피 4잔)\n• 스트레스 반응을 키울 수 있어요\n• 수면을 방해해요\n\n정제 설탕:\n• 혈당이 급등했다가 급락해요\n• 기분과 에너지에 영향을 줄 수 있어요\n• 당 충동이 생겨요\n\n알코올:\n• 깊은 잠을 방해해요\n• 다음 날 더 긴장될 수 있어요\n• 탈수가 와요";
 "learning.card.food.section3.title" = "타이밍이 중요해요";
 "learning.card.food.section3.content" = "• 단백질이 풍부한 아침 식사(코르티솔 안정화)\n• 저녁에는 당과 카페인을 피하세요\n• 잠들기 2~3시간 전에 가볍게 저녁 식사하기";
 
@@ -2649,7 +2649,7 @@
 "learning.card.nature.title" = "자연의 힘";
 "learning.card.nature.description" = "자연이 마음을 진정시키는 이유";
 "learning.card.nature.section1.title" = "과학 연구";
-"learning.card.nature.section1.content" = "자연과의 접촉은 스트레스에 입증된 효과가 있어요.\n\n• 자연에서 20분 후 코르티솔 -15%\n• 혈압 감소\n• 기분 개선";
+"learning.card.nature.section1.content" = "자연과의 접촉은 더 낮은 스트레스와 연관돼요:\n\n• 자연 속에서 20분을 보내면 더 차분해진다고 느끼는 분이 많아요\n• 혈압을 낮추는 데 도움이 될 수 있어요\n• 기분이 좋아져요";
 "learning.card.nature.section2.title" = "산림욕(신린요쿠)";
 "learning.card.nature.section2.content" = "• 일본의 오래된 전통\n• 숲속을 천천히 걷기\n• 오감으로 교감하기";
 "learning.card.nature.section3.title" = "효과";
@@ -2665,7 +2665,7 @@
 "learning.card.cardiac_coherence.section2.title" = "즉각적인 효과";
 "learning.card.cardiac_coherence.section2.content" = "• 3~5분 만에 코르티솔 감소\n• 심박수 감소\n• 혈압 저하\n• 차분함과 맑은 정신";
 "learning.card.cardiac_coherence.section3.title" = "장기적인 효과(2주 후)";
-"learning.card.cardiac_coherence.section3.content" = "• 평균 코르티솔 -24%\n• 감정 조절 능력 향상\n• 수면의 질 개선\n• 면역력 강화\n• DHEA(노화 방지 호르몬) +17%";
+"learning.card.cardiac_coherence.section3.content" = "• 스트레스 수준을 낮추는 데 도움이 될 수 있어요\n• 감정 조절이 더 좋아져요\n• 수면의 질을 높일 수 있어요\n• 연구에서 더 건강한 심박 변이도가 나타났어요";
 "learning.card.cardiac_coherence.section4.title" = "이런 사람들이 활용해요";
 "learning.card.cardiac_coherence.section4.content" = "• 전투기 조종사\n• 엘리트 운동선수\n• 의사와 의료진\n• 기업 임원";
 "learning.card.cardiac_coherence.section5.title" = "CortiFree에서";
@@ -2677,9 +2677,9 @@
 "learning.card.yoga.section1.title" = "스트레스 완화 요가의 종류";
 "learning.card.yoga.section1.content" = "요가는 단순한 신체 운동 그 이상이에요. 몸과 마음 모두에 작용하는 강력한 스트레스 조절 도구예요.\n\n• 하타 요가: 부드러워서 초보자에게 딱 좋아요\n• 인 요가: 자세를 오래 유지하며 매우 편안해요\n• 요가 니드라: 누워서 하는 가이드 명상\n• 빈야사: 역동적이지만 명상적이에요";
 "learning.card.yoga.section2.title" = "코르티솔에 미치는 영향";
-"learning.card.yoga.section2.content" = "• 60분 세션 후 -27%\n• 꾸준히 하면 효과가 누적돼요\n• 12주 후(주 3회) 코르티솔 -41%";
+"learning.card.yoga.section2.content" = "• 한 번만 해도 더 차분해진다고 느끼는 분이 많아요\n• 꾸준히 수련할수록 효과가 쌓여요\n• 연구에서 꾸준한 요가는 더 낮은 스트레스와 연관되었어요";
 "learning.card.yoga.section3.title" = "과학적으로 입증된 효과";
-"learning.card.yoga.section3.content" = "신체적 효과:\n• 유연성과 근력\n• 자세 개선\n• 만성 통증 감소\n• 균형감 향상\n\n정신적 효과:\n• 불안 증상 -65%\n• 감정 조절 능력 향상\n• 회백질 증가\n• 집중력 향상\n\n생리적 효과:\n• 부교감 신경계 활성화(이완)\n• 심박 변이도 개선\n• 염증 감소\n• 소화 개선";
+"learning.card.yoga.section3.content" = "신체적:\n• 유연성과 근력\n• 더 나은 자세\n• 만성 통증을 덜어줄 수 있어요\n• 균형 감각 향상\n\n정신적:\n• 불안 증상을 줄일 수 있어요\n• 감정 조절 향상\n• 집중력 향상\n\n생리적:\n• 부교감신경계 활성화(이완)\n• 더 나은 심박 변이도\n• 소화를 도울 수 있어요";
 "learning.card.yoga.section4.title" = "뇌에서 일어나는 일";
 "learning.card.yoga.section4.content" = "• GABA(진정 작용 신경전달물질) 증가\n• 편도체 활동 감소(두려움/스트레스)\n• 전전두엽 피질 활성화(감정 조절)";
 "learning.card.yoga.section5.title" = "유연하지 않아도 괜찮아요";
@@ -2695,13 +2695,13 @@
 "learning.card.sleep_cortisol.section3.title" = "CortiFree의 해결책";
 "learning.card.sleep_cortisol.section3.content" = "• 오전 7시 전에 일어나기(아침 루틴)\n• 밤 11시 전에 잠자리에 들기(회복)\n• 저녁 명상(수면 준비)";
 "learning.card.sleep_cortisol.section4.title" = "알고 계셨나요?";
-"learning.card.sleep_cortisol.section4.content" = "잠을 설친 단 하룻밤만으로도 다음 날 코르티솔이 37% 늘어날 수 있어요!";
+"learning.card.sleep_cortisol.section4.content" = "하룻밤만 잠을 설쳐도 다음 날 더 예민하고 스트레스를 받을 수 있어요!";
 
 // MARK: - Learning Card 13: Hydration
 "learning.card.hydration.title" = "수분 섭취와 스트레스";
 "learning.card.hydration.description" = "물을 마시면 스트레스가 줄어드는 이유";
 "learning.card.hydration.section1.title" = "탈수의 영향";
-"learning.card.hydration.section1.content" = "물은 스트레스 조절에 중요한 역할을 해요.\n\n• 코르티솔 증가(+25%)\n• 피로와 짜증\n• 집중력 저하";
+"learning.card.hydration.section1.content" = "수분은 스트레스를 다루는 데 영향을 줘요. 가벼운 탈수만으로도 다음과 같은 일이 생길 수 있어요:\n\n• 더 긴장된 느낌\n• 피로와 짜증\n• 집중하기 어려움";
 "learning.card.hydration.section2.title" = "충분한 수분 섭취의 효과";
 "learning.card.hydration.section2.content" = "• 체온 조절\n• 노폐물 배출\n• 뇌 기능 향상";
 "learning.card.hydration.section3.title" = "권장 사항";
@@ -2725,7 +2725,7 @@
 "learning.card.social.title" = "긍정적인 인간관계";
 "learning.card.social.description" = "사회적 지지의 중요성";
 "learning.card.social.section1.title" = "코르티솔에 미치는 영향";
-"learning.card.social.section1.content" = "질 좋은 인간관계는 스트레스 관리에 꼭 필요해요.\n\n• 긍정적인 교류 → 코르티솔 -20%\n• 옥시토신(‘사랑 호르몬’) 분비\n• 안정감과 소속감";
+"learning.card.social.section1.content" = "양질의 사회적 관계는 스트레스 관리에 꼭 필요해요:\n\n• 긍정적인 교류는 더 차분해지도록 도와줘요\n• 옥시토신(\"사랑 호르몬\") 분비\n• 안정감과 소속감";
 "learning.card.social.section2.title" = "도움이 되는 관계의 유형";
 "learning.card.social.section2.content" = "• 친구와의 깊은 대화\n• 가족과 보내는 소중한 시간\n• 그룹 활동(운동, 취미)";
 "learning.card.social.section3.title" = "피해야 할 것";
@@ -2741,7 +2741,7 @@
 "learning.card.light.section2.title" = "생체 시계에 미치는 영향";
 "learning.card.light.section2.content" = "• 코르티솔/멜라토닌 주기를 조절해요\n• 밤 수면의 질을 높여요\n• 낮 동안의 에너지와 각성도를 높여요\n• 모든 생체 리듬을 동기화해요";
 "learning.card.light.section3.title" = "과학 연구";
-"learning.card.light.section3.content" = "• 아침 햇빛으로 낮 에너지 +25%\n• 저녁에 1시간 더 빨리 잠들어요\n• 우울 증상 -35%\n• 식욕 조절 개선";
+"learning.card.light.section3.content" = "• 아침 햇빛으로 낮 동안 더 많은 에너지\n• 저녁에 더 쉽게 잠들기\n• 기분을 끌어올리는 데 도움이 될 수 있어요\n• 식욕 조절 향상";
 "learning.card.light.section4.title" = "저녁에는 피하세요";
 "learning.card.light.section4.content" = "• 잠들기 1~2시간 전 화면\n• 밝은 조명(따뜻하거나 은은한 조명이 좋아요)\n• 멜라토닌을 차단하는 블루라이트";
 "learning.card.light.section5.title" = "CortiFree 팁";
@@ -2755,7 +2755,7 @@
 "learning.card.negative_thoughts.section2.title" = "3칸 기법";
 "learning.card.negative_thoughts.section2.content" = "1칸: 상황\n2칸: 자동적 생각\n3칸: 현실적인 대안 생각";
 "learning.card.negative_thoughts.section3.title" = "측정 가능한 효과";
-"learning.card.negative_thoughts.section3.content" = "• 인지 치료로 불안 -40%\n• 이런 생각을 알아차리고 바꾸면 코르티솔 -28%\n• 8~12주 후 지속적인 개선";
+"learning.card.negative_thoughts.section3.content" = "• 인지 기법은 불안을 줄이는 효과가 잘 연구되어 있어요\n• 이런 생각을 알아차리고 다시 바라보면 스트레스가 줄어들 수 있어요\n• 지속적인 개선은 보통 8~12주 수련 후에 나타나요";
 "learning.card.negative_thoughts.section4.title" = "일기 쓰기 팁";
 "learning.card.negative_thoughts.section4.content" = "CortiFree 일기에 생각을 적으면 그 생각을 알아차리고, 의문을 품고, 바꿔 나갈 수 있어요!";
 
@@ -2763,9 +2763,9 @@
 "learning.card.gratitude.title" = "감사와 뇌";
 "learning.card.gratitude.description" = "감사가 주는 과학적 효과";
 "learning.card.gratitude.section1.title" = "뇌에서 일어나는 일";
-"learning.card.gratitude.section1.content" = "감사 연습은 단순한 ‘긍정적 사고’가 아니에요. 뇌와 스트레스 수준을 바꾸는, 과학적으로 검증된 기법이에요.\n\n• 내측 전전두엽 피질 활성화(웰빙)\n• 도파민과 세로토닌 분비(행복)\n• 편도체 활동 감소(스트레스/두려움)\n• 평균 코르티솔 -23%";
+"learning.card.gratitude.section1.content" = "감사 연습은 단순한 \"긍정적 사고\"가 아니에요. 관심과 스트레스 수준을 바꿀 수 있는, 잘 연구된 습관이에요.\n\n• 웰빙과 관련된 뇌 영역의 활동과 연관돼요\n• 긍정적인 감정을 키울 수 있어요\n• 스트레스를 덜 느끼는 데 도움이 될 수 있어요";
 "learning.card.gratitude.section2.title" = "주요 과학 연구";
-"learning.card.gratitude.section2.content" = "UC 버클리(2015):\n• 주 3회 감사 일기 쓰기\n• 12주 후 우울감 -27%\n• 수면과 인간관계 개선\n\n하버드 의과대학(2021):\n• 하루 5분 감사하기\n• 체감 행복 +25%\n• 불안 -18%";
+"learning.card.gratitude.section2.content" = "연구에서 시사하는 점:\n• 주 몇 회 감사 일기 쓰기\n• 시간이 지나면서 기분 개선과 연관돼요\n• 수면과 인간관계 개선\n\n일상에서는:\n• 하루 5분 감사하기\n• 더 행복해졌다고 말하는 분이 많아요\n• 그리고 불안도 덜해요";
 "learning.card.gratitude.section3.title" = "효과적으로 연습하는 방법";
 "learning.card.gratitude.section3.content" = "감사 3가지 방법(하루 5분):\n1. 감사한 일 3가지를 적어요\n2. 구체적으로 적어요(그냥 ‘가족’이 아니라)\n3. 적으면서 그 감정을 느껴 보세요\n4. 매일 다른 감사거리를 찾아요\n\n예시:\n너무 막연함: “건강해서 감사해요”\n구체적임: “통증 없이 아침 산책을 하며 얼굴에 닿는 상쾌한 공기를 느낄 수 있어서 감사해요”";
 "learning.card.gratitude.section4.title" = "장기 효과";
@@ -2901,7 +2901,7 @@
 "tips.card.environment.section1.title" = "정리하기(곤마리 법칙 응용)";
 "tips.card.environment.section1.content" = "일주일에 한 구역씩:\n\n물건 하나하나를 들고 스스로에게 물어보세요.\n• 지난 6개월 동안 사용했나?\n• 설레는가?\n• 정말 쓸모 있나?\n\n세 번 모두 아니라면 → 기부, 재활용, 또는 버리기.\n\n눈에 보이는 어수선함 = 정신적 과부하.\n깨끗한 공간 = 맑은 마음.";
 "tips.card.environment.section2.title" = "실내 식물";
-"tips.card.environment.section2.content" = "관리가 쉬운 스트레스 완화 식물 TOP 5:\n\n1. 스킨답서스(공기 + 스트레스)\n2. 산세베리아(밤에 산소 배출)\n3. 알로에 베라(공기 정화)\n4. 접란(쉽고 효과적)\n5. 라벤더(진정 효과가 있는 향)\n\n입증된 효과:\n• 코르티솔 -15%\n• 공기 질 개선\n• 마음을 편안하게 하는 시각 효과";
+"tips.card.environment.section2.content" = "관리가 쉬운 스트레스 완화 식물 TOP 5:\n\n1. 스킨답서스(공기 + 스트레스)\n2. 산세베리아(밤에 산소 배출)\n3. 알로에 베라(공기 정화)\n4. 접란(쉽고 효과적)\n5. 라벤더(진정 효과가 있는 향)\n\n장점:\n• 더 차분하게 느껴지는 공간\n• 공기 질 개선\n• 마음을 편안하게 하는 시각 효과";
 "tips.card.environment.section3.title" = "자연광 최대한 들이기";
 "tips.card.environment.section3.content" = "• 일어나면 커튼 열기\n• 가능하면 창가에 책상 두기\n• 아침에는 주광색 전구(5000-6500K)\n• 저녁에는 전구색 전구(2700-3000K)\n• 침실에는 조광기\n\n빛 = 일주기 리듬의 최대 조절자.";
 "tips.card.environment.section4.title" = "소리와 음악";
@@ -3054,7 +3054,7 @@
 "antistress.grounding_5_senses.benefit_4" = "현재에 더 머무르기";
 "antistress.grounding_5_senses.evidence_1" = "불안한 생각의 고리를 효과적으로 끊어 줘요";
 "antistress.grounding_5_senses.evidence_2" = "2분 만에 공황 증상을 줄여 줘요";
-"antistress.grounding_5_senses.evidence_3" = "감정 조절 능력이 30% 향상돼요";
+"antistress.grounding_5_senses.evidence_3" = "강한 감정을 다스리는 데 도움이 될 수 있어요";
 "antistress.grounding_5_senses.source" = "Journal of Anxiety Disorders (2019)";
 
 // Anchoring 5-4-3-2-1
@@ -3412,7 +3412,7 @@
 // MARK: - Onboarding V2 - Social Proof
 "onboarding_v2.social_proof.users_count" = "50,000명 이상의 사용자";
 "onboarding_v2.social_proof.rating" = "4.8/5";
-"onboarding_v2.social_proof.stress_reduction" = "평균 스트레스 -47%";
+"onboarding_v2.social_proof.stress_reduction" = "하루하루, 조금씩 더 차분하게";
 
 // MARK: - Onboarding V2 - Testimonials
 "onboarding_v2.testimonial.1_name" = "Sophie";
@@ -3971,6 +3971,7 @@
 
 // Radar chart section
 "paywall_custom.radar_title" = "%@님의 28일 변화";
+"paywall_custom.radar_disclaimer" = "답변을 바탕으로 한 참고용 예측이며, 보장되거나 의학적인 결과가 아니에요.";
 
 // Radar labels
 "paywall_custom.radar_label_global" = "전체";
@@ -4008,33 +4009,34 @@
 "paywall_custom.habit_social_stat" = "일주일에 4번 사람들과 교류하게 돼요.";
 
 // Symptom fix strings - Mental
-"paywall_custom.fix_anxiety" = "불안의 소용돌이 없이 차분한 마음을 되찾아요";
-"paywall_custom.fix_focus" = "집중력이 돌아와 억지로 하지 않아도 몰입하게 돼요";
-"paywall_custom.fix_negative_thoughts" = "기운 빠지게 하는 부정적인 생각의 고리를 끊어요";
-"paywall_custom.fix_irritability" = "덜 예민하게 반응하고, 신경계가 진짜로 차분해져요";
-"paywall_custom.fix_brain_fog" = "머릿속 안개가 걷히고 다시 맑게 생각할 수 있어요";
-"paywall_custom.fix_motivation" = "의욕이 다시 살아나 앞으로 나아가고 싶어져요";
+"paywall_custom.fix_anxiety" = "불안한 생각의 소용돌이를 잠재우는 데 도움이 되는 도구";
+"paywall_custom.fix_focus" = "더 쉽게 집중하도록 도와주는 운동";
+"paywall_custom.fix_negative_thoughts" = "지치게 하는 부정적인 생각에서 벗어나는 기법";
+"paywall_custom.fix_irritability" = "덜 예민하게 반응하도록 도와주는 호흡";
+"paywall_custom.fix_brain_fog" = "생각이 더 맑아지도록 도와주는 짧은 휴식";
+"paywall_custom.fix_motivation" = "의욕을 다시 불러일으키는 데 도움이 되는 작은 일일 성취";
 
 // Symptom fix strings - Physical
-"paywall_custom.fix_sleep" = "깊이 자고 정말 개운하게 일어나요";
-"paywall_custom.fix_fatigue" = "만성 피로가 사라지고 하루 종일 에너지가 유지돼요";
-"paywall_custom.fix_headaches" = "머리와 목에 쌓인 긴장을 풀어요";
-"paywall_custom.fix_tension" = "몸의 긴장이 풀리고, 더 이상 비상 경계 상태에 머물지 않아요";
-"paywall_custom.fix_weight" = "더 규칙적인 습관으로 몸을 돌봐요";
-"paywall_custom.fix_heart" = "심박이 안정되고, 호흡이 가장 강력한 도구가 돼요";
+"paywall_custom.fix_sleep" = "더 잘 자도록 도와주는 저녁 루틴";
+"paywall_custom.fix_fatigue" = "낮 동안 덜 지치도록 도와주는 습관";
+"paywall_custom.fix_headaches" = "머리와 목의 긴장을 푸는 데 도움이 되는 운동";
+"paywall_custom.fix_tension" = "몸의 긴장을 내려놓도록 도와주는 이완";
+"paywall_custom.fix_weight" = "몸을 돌보는 더 꾸준한 일상 습관";
+"paywall_custom.fix_heart" = "심장이 빨리 뛸 때 더 차분해지도록 도와주는 느린 호흡";
 
 // Symptom fix strings - Social
-"paywall_custom.fix_isolation" = "억지로 하지 않아도 사람들과 연결되고 싶은 마음이 다시 생겨요";
-"paywall_custom.fix_conflicts" = "날이 선 상태에서 벗어나면 관계도 편안해져요";
-"paywall_custom.fix_interest" = "에너지가 돌아오면서 좋아하던 일도 다시 즐기게 돼요";
-"paywall_custom.fix_communication" = "신경계가 안정되면 소통도 더 잘돼요";
-"paywall_custom.fix_impatience" = "가장 소중한 사람들에게 다시 다정해질 수 있어요";
+"paywall_custom.fix_isolation" = "다른 사람들과 다시 이어지도록 도와주는 부드러운 걸음";
+"paywall_custom.fix_conflicts" = "다른 사람과의 긴장된 순간을 누그러뜨리는 데 도움이 되는 진정 도구";
+"paywall_custom.fix_interest" = "좋아하는 일에 쏟을 에너지를 찾도록 도와주는 루틴";
+"paywall_custom.fix_communication" = "스트레스 상황에서도 차분하게 말하도록 도와주는 기법";
+"paywall_custom.fix_impatience" = "소중한 사람들에게 인내심을 유지하도록 도와주는 잠깐의 멈춤";
 
 // Fallback fix strings
-"paywall_custom.fallback_stress" = "스트레스를 버티는 대신, 스트레스를 지나 보낼 수 있어요";
-"paywall_custom.fallback_sleep" = "푹 자고 정말 개운하게 일어나요";
-"paywall_custom.fallback_energy" = "기운이 뚝 떨어지지 않고 하루 종일 에너지가 유지돼요";
-"paywall_custom.fallback_focus" = "집중력이 돌아와 자연스럽게 몰입하게 돼요";
+"paywall_custom.fallback_stress" = "스트레스를 견디기보다 헤쳐 나가도록 돕는 도구";
+"paywall_custom.fallback_sleep" = "더 개운하게 자고 일어나도록 도와주는 루틴";
+"paywall_custom.fallback_energy" = "하루 종일 에너지가 이어지도록 도와주는 습관";
+"paywall_custom.fallback_focus" = "더 쉽게 집중하도록 도와주는 운동";
+"paywall_custom.fix_disclaimer" = "결과는 사람마다 달라요. CortiFree는 웰니스 앱이며 의료를 대체하지 않아요. 두근거림, 지속적인 피로, 체중 변화 같은 증상이 걱정된다면 의사와 상담하세요.";
 "first_launch.cta_sub" = "무료 퀴즈 · 4분";
 "editprofile.first_name_required" = "프로필을 저장하기 전에 이름을 입력해 주세요.";
 "first_launch.mascot_intro" = "안녕하세요, 저는 Milo예요. 평온함과 에너지, 집중력을 되찾도록 도와줄 나만의 동반자예요. 맞춤 플랜을 만들기 위해 몇 가지 질문을 드릴게요.";
@@ -4342,6 +4344,9 @@
 "access_locked.title" = "구독이 종료되었어요";
 "access_locked.subtitle" = "CortiFree를 다시 활성화하고 플랜, 세션, 운동을 되찾으세요.";
 "access_locked.unlock" = "CortiFree 다시 활성화";
+"access_locked.title_new" = "CortiFree 잠금 해제";
+"access_locked.subtitle_new" = "구독을 시작하고 맞춤 플랜, 세션, 운동을 이용해 보세요.";
+"access_locked.unlock_new" = "요금제 보기";
 "access_locked.restore" = "구매 복원";
 
 /* Breathing */
@@ -4736,13 +4741,14 @@
 "assistant.consent.title" = "Milo와 대화하기 전에";
 "assistant.consent.point.provider" = "메시지는 CortiFree 서버를 거쳐 AI 제공업체(DeepSeek)로 전송되어 Milo의 답변을 생성해요.";
 "assistant.consent.point.plan" = "답변을 맞춤화하기 위해 CortiFree 플랜의 짧은 요약(목표, 운동, 진행 상황)이 메시지와 함께 전송돼요.";
+"assistant.consent.point.health" = "Apple 건강을 연결했거나 앱에서 맥박을 측정했다면, Milo가 조언을 맞출 수 있도록 최근 심박수·심박 변이도·수면 데이터도 함께 전송돼요. 광고에는 절대 사용되지 않아요.";
 "assistant.consent.point.diagnosis" = "Milo는 일반적인 웰빙 정보를 제공하며 진단이나 의료 조언이 아니에요. 응급 상황에서는 지역 응급 서비스에 연락하세요.";
 "assistant.consent.point.revoke" = "이 동의는 설정 › 개인정보 보호에서 언제든지 철회할 수 있어요.";
 "assistant.consent.privacy" = "개인정보 처리방침 읽기";
 "assistant.consent.accept" = "동의하고 계속하기";
 "assistant.consent.decline" = "나중에";
 "settings.privacy.milo" = "AI 어시스턴트 Milo";
-"settings.privacy.milo_subtitle" = "메시지와 플랜 요약을 DeepSeek이 처리하도록 허용";
+"settings.privacy.milo_subtitle" = "메시지, 플랜 요약, 심박수 및 수면 데이터를 DeepSeek이 처리하도록 허용";
 
 // MARK: - Auth & onboarding demo
 "auth.signup_subtitle" = "CortiFree와 함께 웰빙 여정을 시작해 보세요";
@@ -4949,8 +4955,8 @@
 "widget.v.milo.desc" = "Milo가 당신의 하루에 반응해요: 평온, 뿌듯, 지침, 잠듦.";
 "widget.v.breathe.name" = "호흡";
 "widget.v.breathe.desc" = "앱을 열지 않고 한 번 탭으로 1분 박스 호흡.";
-"widget.v.cortisol.name" = "코르티솔 게이지";
-"widget.v.cortisol.desc" = "추정 스트레스 수준. 자신을 돌볼수록 내려가요.";
+"widget.v.cortisol.name" = "마음 날씨";
+"widget.v.cortisol.desc" = "체크인으로 보는 나의 마음 날씨예요. 나를 돌보면 맑아져요.";
 "widget.v.mood.name" = "오늘의 기분";
 "widget.v.mood.desc" = "한 번 탭으로 기분을 기록하고 한 달을 색으로 채워 보세요.";
 "widget.v.planet.name" = "나의 행성";
@@ -4983,16 +4989,16 @@
 "widget.planet.name.saturn" = "토성";
 "widget.planet.name.uranus" = "천왕성";
 "widget.planet.name.neptune" = "해왕성";
-"widget.cortisol.title" = "코르티솔";
-"widget.cortisol.tier.0" = "평온";
-"widget.cortisol.tier.1" = "안정";
-"widget.cortisol.tier.2" = "상승 중";
-"widget.cortisol.tier.3" = "경고";
+"widget.cortisol.title" = "마음 날씨";
+"widget.cortisol.tier.0" = "맑음";
+"widget.cortisol.tier.1" = "구름 조금";
+"widget.cortisol.tier.2" = "흐려지는 중";
+"widget.cortisol.tier.3" = "폭풍";
 "widget.cortisol.hint.0" = "잘하고 있어요. 몸이 고마워해요.";
 "widget.cortisol.hint.1" = "잠깐 호흡하면 완벽해요.";
 "widget.cortisol.hint.2" = "2분만 화면을 내려놓고 천천히 숨 쉬세요.";
 "widget.cortisol.hint.3" = "멈추세요. 지금 1분 호흡해요.";
-"widget.cortisol.disclaimer" = "재미로 보는 추정치이며 의학적 측정이 아니에요";
+"widget.cortisol.disclaimer" = "체크인을 바탕으로 한 것이며 의학적 측정이 아니에요";
 "widget.mood.title" = "지금 기분은 어때요?";
 "widget.mood.recent" = "최근 14일";
 "widget.message.title" = "Milo의 한마디";
@@ -5329,6 +5335,12 @@
 "calm.face.tip.neutral" = "편안한 표정으로 카메라를 보며";
 "calm.face.tip.nomakeup" = "가능하면 민낯으로, 매주 같은 시간에";
 "calm.face.privacy" = "사진은 iPhone의 진행 사진에 저장돼요. 분석을 위해 한 번 OpenAI로 전송되며 CortiFree 서버에는 저장되지 않아요.";
+"calm.face.consent.title" = "얼굴 체크 전에";
+"calm.face.consent.point.provider" = "셀카는 CortiFree 서버를 거쳐 AI 제공업체(OpenAI)로 전송되어 눈에 보이는 피로 신호를 설명해요. 한 번만 분석되며 CortiFree에 저장되지 않고 신원 확인에 사용되지 않아요.";
+"calm.face.consent.point.storage" = "사진 자체는 iPhone의 진행 사진에 남아요. 언제든 삭제할 수 있어요.";
+"calm.face.consent.point.wellness" = "이것은 웰빙 관찰이며 의료 측정이나 진단이 아니에요.";
+"calm.face.consent.point.optional" = "얼굴 체크는 선택 사항이에요. 건너뛰어도 CortiFree의 다른 기능은 모두 사용할 수 있어요.";
+"calm.face.consent.continue" = "동의하고 계속하기";
 "calm.face.take" = "셀카 찍기";
 "calm.face.library" = "사진 선택하기";
 "calm.face.choose" = "사진 선택";
@@ -5512,7 +5524,7 @@
 "milo.pulse.watch.measured" = "Apple Watch로 측정됨 (%@)";
 "milo.pulse.watch.stale" = "최근 측정이 아니에요. 시계에서 심박수 앱을 연 뒤 새로고침하세요.";
 "milo.pulse.camera.title" = "손가락을 카메라에";
-"milo.pulse.camera.done" = "플래시로 측정했어요.";
+"milo.pulse.camera.done" = "플래시로 측정했어요. 추정치이며 의료기기가 아니에요.";
 "milo.pulse.camera.doubtful" = "신호가 불규칙했어요. 수치가 정확하지 않을 수 있어요. 너무 세게 누르지 말고 다시 해 보세요.";
 "milo.pulse.send" = "Milo에게 보내기";
 "milo.pulse.again" = "다시 측정";

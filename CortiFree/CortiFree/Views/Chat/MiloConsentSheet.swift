@@ -1,7 +1,17 @@
 import SwiftUI
 
 /// One-time disclosure shown before the first message is sent to the AI provider.
+/// Also used, with its own points, before the first weekly face check (selfie → OpenAI).
 struct MiloConsentSheet: View {
+    var titleKey = "assistant.consent.title"
+    var points: [(icon: String, key: String)] = [
+        ("server.rack", "assistant.consent.point.provider"),
+        ("list.bullet.rectangle", "assistant.consent.point.plan"),
+        ("heart.text.square", "assistant.consent.point.health"),
+        ("stethoscope", "assistant.consent.point.diagnosis"),
+        ("hand.raised.fill", "assistant.consent.point.revoke")
+    ]
+    var acceptKey = "assistant.consent.accept"
     let onAccept: () -> Void
     let onDecline: () -> Void
 
@@ -19,16 +29,13 @@ struct MiloConsentSheet: View {
                             .frame(maxWidth: .infinity)
                             .padding(.top, 28)
 
-                        Text(LanguageManager.shared.localizedString(for: "assistant.consent.title"))
+                        Text(LanguageManager.shared.localizedString(for: titleKey))
                             .font(.custom("Poppins-SemiBold", size: 22))
                             .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
 
-                        point(icon: "server.rack", key: "assistant.consent.point.provider")
-                        point(icon: "list.bullet.rectangle", key: "assistant.consent.point.plan")
-                        point(icon: "stethoscope", key: "assistant.consent.point.diagnosis")
-                        point(icon: "hand.raised.fill", key: "assistant.consent.point.revoke")
+                        ForEach(points, id: \.key) { point(icon: $0.icon, key: $0.key) }
 
                         Button {
                             LegalDocumentsHelper.openPrivacyPolicy()
@@ -47,7 +54,7 @@ struct MiloConsentSheet: View {
 
                 VStack(spacing: 10) {
                     Button(action: onAccept) {
-                        Text(LanguageManager.shared.localizedString(for: "assistant.consent.accept"))
+                        Text(LanguageManager.shared.localizedString(for: acceptKey))
                             .font(.custom("Poppins-SemiBold", size: 16))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)

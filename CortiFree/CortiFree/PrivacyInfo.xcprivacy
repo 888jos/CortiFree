@@ -5,9 +5,13 @@
 	<!-- The app requests ATT and sends events to TikTok for ad attribution. -->
 	<key>NSPrivacyTracking</key>
 	<true/>
-	<!-- Third-party SDK domains are declared in each SDK's own privacy manifest. -->
+	<!-- TikTok Business SDK endpoints (its own manifest declares none). -->
 	<key>NSPrivacyTrackingDomains</key>
-	<array/>
+	<array>
+		<string>analytics.us.tiktok.com</string>
+		<string>business-api.tiktok.com</string>
+		<string>ads.tiktok.com</string>
+	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>
@@ -19,6 +23,15 @@
 				<string>CA92.1</string>
 				<!-- Shared with the widget through the app group (WidgetDataStore) -->
 				<string>1C8F.1</string>
+			</array>
+		</dict>
+		<dict>
+			<!-- NarrationRenderer reads cached audio modification dates to evict old renders (files inside the app container only) -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
 			</array>
 		</dict>
 	</array>
@@ -49,7 +62,7 @@
 			</array>
 		</dict>
 		<dict>
-			<!-- Stress, mood, sleep and energy check-ins -->
+			<!-- Stress, mood, sleep and energy check-ins; Apple Health heart-rate context sent to the AI coach after consent -->
 			<key>NSPrivacyCollectedDataType</key>
 			<string>NSPrivacyCollectedDataTypeHealth</string>
 			<key>NSPrivacyCollectedDataTypeLinked</key>
@@ -60,6 +73,32 @@
 			<array>
 				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
 				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+		</dict>
+		<dict>
+			<!-- Weekly face scan: selfie sent to OpenAI for analysis, not stored -->
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypePhotosorVideos</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+		<dict>
+			<!-- Heart rate / HRV / sleep context shared with the Milo AI coach (DeepSeek) after consent -->
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeFitness</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
 			</array>
 		</dict>
 		<dict>

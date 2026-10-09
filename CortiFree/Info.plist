@@ -62,8 +62,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.solstys.cortifree
-</string>
+			<string>com.solstys.cortifree</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>cortifree</string>
@@ -85,19 +84,21 @@
 	<key>NSCameraUsageDescription</key>
 	<string>CortiFree uses the camera to measure your heart rate (fingertip on the lens, with the flash) and to take your weekly face check selfie.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>CortiFree reads your anxiety questionnaires (GAD-7), your moods, and your heart rate, heart rate variability and sleep (for example from Apple Watch) to personalize your plan and measure your pulse with Milo. This data stays on your iPhone.</string>
+	<string>CortiFree reads your anxiety questionnaires (GAD-7), your moods, and your heart rate, heart rate variability and sleep (for example from Apple Watch) to personalize your plan and measure your pulse with Milo. Health data is never used for advertising. Only if you allow Milo, the AI coach, a short summary (heart rate, HRV, sleep) is sent with your messages to adapt its answers.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>CortiFree saves your daily moods and mindful minutes to Apple Health.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>CortiFree utilise le micro pour les exercices de respiration guidée.</string>
+	<string>CortiFree uses the microphone so you can dictate your messages to Milo.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>CortiFree turns your voice into text so you can dictate your messages to Milo. When possible, transcription happens on your iPhone.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>CortiFree saves the progress images you choose to share to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>CortiFree uses your photo library for an optional wellness photo preview.</string>
+	<string>CortiFree lets you pick a photo for your weekly face check and your progress photos.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
-	<key>NSUserNotificationsUsageDescription</key>
-	<string>CortiFree envoie des rappels pour vos routines quotidiennes.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>CortiFree utilise cet identifiant pour personnaliser votre expérience et mesurer l'efficacité des publicités.</string>
+	<string>CortiFree uses this identifier to personalize your experience and measure the effectiveness of ads.</string>
 	<key>REVENUECAT_API_KEY</key>
 	<string>appl_SfyPvLkFFQKWDdIDvePwFwccztX</string>
 	<key>SKAdNetworkItems</key>

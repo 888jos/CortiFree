@@ -43,6 +43,13 @@ struct SettingsView: View {
     @State private var infoAlertMessage: String?
     @State private var showWidgetGallery: Bool = false
 
+    /// Opens straight on the delete-account confirmation (from the subscription locked screen).
+    private let promptsAccountDeletion: Bool
+
+    init(promptsAccountDeletion: Bool = false) {
+        self.promptsAccountDeletion = promptsAccountDeletion
+    }
+
     private static let appStoreID = "6758314805"
     private static let supportEmail = "cortifree@driftstudio.app"
 
@@ -182,6 +189,7 @@ struct SettingsView: View {
             viewModel.calculateLocalDataSize()
             viewModel.refreshNotificationAuthorization()
             NotificationService.shared.syncDailyNotificationsWithPreference()
+            if promptsAccountDeletion && authViewModel.isAuthenticated { showDeleteAccountAlert = true }
         }
         .onChange(of: scenePhase) { _, phase in
             // Returning from the iOS Settings app after changing the permission

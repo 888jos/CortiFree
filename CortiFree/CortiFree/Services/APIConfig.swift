@@ -48,9 +48,13 @@ final class APIConfig {
         if let key = value(for: .revenueCatAPIKey), !key.isEmpty, !key.hasPrefix("$(") {
             return key
         }
-        // Fallback to avoid crash - uses test key
         Logger.warning("RevenueCat API key not found in Info.plist, using fallback", category: .subscription)
+        #if DEBUG
         return "test_lHXDZOSssHKRdtZSSgpdZyhvGwY"
+        #else
+        // Release never falls back to the Test Store key (public production SDK key).
+        return "appl_SfyPvLkFFQKWDdIDvePwFwccztX"
+        #endif
     }
 
     /// Superwall API Key

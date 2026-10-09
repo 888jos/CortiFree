@@ -46,6 +46,11 @@ enum FaceScanError: LocalizedError {
     }
 }
 
+/// Explicit consent to send the selfie to OpenAI (per account, same storage format as `MiloConsent`).
+enum FaceScanConsent {
+    static let storageKey = "calm.face.consent.uids"
+}
+
 enum FaceScanAnalyzer {
     private struct Response: Decodable { let content: String }
     private struct Payload: Decodable {

@@ -361,6 +361,11 @@ struct CustomPaywallView: View {
                         .foregroundColor(.white)
                 }
             }
+
+            Text("paywall_custom.fix_disclaimer".localized)
+                .font(.custom("Poppins-Regular", size: 12))
+                .foregroundColor(.white.opacity(0.55))
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -652,6 +657,12 @@ struct CustomPaywallView: View {
             .responsiveFrame(width: 280, height: 280)
             .padding(.vertical, 8)
             .drawingGroup() // PERFORMANCE: Render radar chart as bitmap
+
+            Text("paywall_custom.radar_disclaimer".localized)
+                .font(.custom("Poppins-Regular", size: 12))
+                .foregroundColor(.white.opacity(0.55))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }

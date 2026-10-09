@@ -1,13 +1,14 @@
 "CFBundleDisplayName" = "CortiFree";
 "NSCameraUsageDescription" = "CortiFreeはカメラで心拍数を測定し（指をレンズに当ててライトを使用）、毎週のフェイスチェック用セルフィーを撮影します。";
-"NSPhotoLibraryUsageDescription" = "進捗の写真を保存・共有するため、写真ライブラリへのアクセスが必要です。";
-"NSPhotoLibraryAddUsageDescription" = "画像を写真ライブラリに保存する許可が必要です。";
-"NSMicrophoneUsageDescription" = "ガイド付き瞑想と呼吸エクササイズのためにマイクを使用します。";
-"NSLocationWhenInUseUsageDescription" = "お住まいの地域に合った自然アクティビティを提案するために位置情報を使用します。";
-"NSMotionUsageDescription" = "運動を記録し、より良いエクササイズを提案するためにモーションデータを使用します。";
-"NSHealthShareUsageDescription" = "CortiFreeは、プランのパーソナライズとMiloでの脈拍測定のために、不安の質問票（GAD-7）、気分、心拍数・心拍変動・睡眠（Apple Watchなど）を読み取ります。データはiPhone内に保存されます。";
+"NSPhotoLibraryUsageDescription" = "毎週のフェイスチェックと進捗写真に使う写真を選ぶために使用します。";
+"NSPhotoLibraryAddUsageDescription" = "共有を選んだ進捗画像を写真ライブラリに保存します。";
+"NSHealthShareUsageDescription" = "CortiFreeは、プランのパーソナライズとMiloでの脈拍測定のために、不安の質問票（GAD-7）、気分、心拍数・心拍変動・睡眠（Apple Watchなど）を読み取ります。ヘルスケアデータが広告に使われることはありません。AIコーチのMiloを許可した場合のみ、返答を調整するため簡単な要約（心拍数・HRV・睡眠）がメッセージと一緒に送信されます。";
 "NSHealthUpdateUsageDescription" = "CortiFreeは不安チェック、毎日の気分、マインドフル時間をAppleヘルスケアに保存します。";
 
 // MARK: - Tracking
 "NSUserTrackingUsageDescription" = "CortiFreeは、体験をパーソナライズし、広告の効果を測定するためにこの識別子を使用します。";
-"NSHumanReadableCopyright" = "© 2025 CortiFree. 無断転載を禁じます。";
+"NSHumanReadableCopyright" = "© 2026 CortiFree. 無断転載を禁じます。";
+
+/* Milo voice dictation */
+"NSMicrophoneUsageDescription" = "CortiFreeは、Miloへのメッセージを音声で入力するためにマイクを使用します。";
+"NSSpeechRecognitionUsageDescription" = "CortiFreeは、Miloへのメッセージを音声で入力するために声をテキストに変換します。可能な場合、文字起こしはiPhone上で行われます。";

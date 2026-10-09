@@ -160,7 +160,7 @@
 "social.thousands_changed" = "Tausende Leben verändert mit CortiFree";
 "social.discover_how" = "Entdecke, wie Menschen wie du ihre Gelassenheit gefunden haben";
 "social.measurable_results" = "Messbare Ergebnisse";
-"social.stress_reduction" = "Durchschnittlich 68% weniger wahrgenommener Stress in nur 60 Tagen";
+"social.stress_reduction" = "Kleine tägliche Gewohnheiten, die dir helfen, ruhiger zu werden – in deinem eigenen Tempo";
 "social.without_cortifree" = "Ohne CortiFree";
 "social.with_cortifree" = "Mit CortiFree";
 "social.stress_level" = "Stresslevel";
@@ -1232,7 +1232,7 @@
 // Meditation
 "onboarding.eight_habits_flow.meditation_title" = "Achtsame Meditation";
 "onboarding.eight_habits_flow.meditation_subtitle" = "Beruhigt den Geist, reduziert Stress";
-"onboarding.eight_habits_flow.meditation_benefit_1" = "Reduziert die Angst um 30%";
+"onboarding.eight_habits_flow.meditation_benefit_1" = "Kann helfen, Ängste zu lindern";
 "onboarding.eight_habits_flow.meditation_benefit_2" = "Verbessert Konzentration";
 "onboarding.eight_habits_flow.meditation_benefit_3" = "Verringert Cortisol";
 "onboarding.eight_habits_flow.meditation_impact_serenity" = "Gelassenheit";
@@ -2109,13 +2109,13 @@
 "breathing_detail.how_it_works.default" = "Folge dem geführten Atemrhythmus, um deine natürliche Entspannungsreaktion zu aktivieren und Ruhe zu finden.";
 
 // Scientific evidence texts (3 bullet points, 10-12 words max, 1 source)
-"breathing_detail.evidence.cardiac_coherence_1" = "Reduziert Cortisolspiegel um 23% in 3 Wochen";
+"breathing_detail.evidence.cardiac_coherence_1" = "Studien bringen langsames Atmen mit weniger wahrgenommenem Stress in Verbindung";
 "breathing_detail.evidence.cardiac_coherence_2" = "Verbessert die Herzfrequenzvariabilität ab der ersten Sitzung";
 "breathing_detail.evidence.cardiac_coherence_3" = "Erhöht die geistige Klarheit, indem das Nervensystem ausgeglichen wird";
 
 "breathing_detail.evidence.box_breathing_1" = "Beruhigt das Nervensystem durch Synchronisation der Herzfrequenz";
 "breathing_detail.evidence.box_breathing_2" = "Verlangsamt die Herzfrequenz für tiefe Ruhe";
-"breathing_detail.evidence.box_breathing_3" = "Verbessert die Konzentration um 25% nach 5 Minuten";
+"breathing_detail.evidence.box_breathing_3" = "Kann dir helfen, dich nach wenigen Minuten wieder zu fokussieren";
 
 "breathing_detail.evidence.alternate_breathing_1" = "Reduziert Angst durch Ausgleich beider Gehirnhälften";
 "breathing_detail.evidence.alternate_breathing_2" = "Beruhigt die Herzfrequenz über das parasympathische System";
@@ -2158,7 +2158,7 @@
 "breathing_pattern.four_seven_eight.benefit_3" = "Verringert die Spannung";
 "breathing_pattern.four_seven_eight.benefit_4" = "Beruhigt Gedanken";
 
-"breathing_pattern.coherence.benefit_1" = "Cortisol-Senkung -23%";
+"breathing_pattern.coherence.benefit_1" = "Hilft dir, ruhiger zu werden";
 "breathing_pattern.coherence.benefit_2" = "Herzvariabilität +";
 "breathing_pattern.coherence.benefit_3" = "Immunsystem +";
 "breathing_pattern.coherence.benefit_4" = "Reguliert Emotionen";
@@ -2189,36 +2189,36 @@
 "breathing_pattern.bhastrika.benefit_4" = "Mentale Ausdauer";
 
 // MARK: - Breathing Pattern Scientific Evidence
-"breathing_pattern.deep_abdominal.evidence_1" = "Aktiviert Vagusnerv und reduziert Cortisol um 18%";
-"breathing_pattern.deep_abdominal.evidence_2" = "Verbessert die Sauerstoffzufuhr im Blut um 22% in nur 3 Minuten";
+"breathing_pattern.deep_abdominal.evidence_1" = "Aktiviert die Entspannungsreaktion durch langsame, tiefe Atemzüge";
+"breathing_pattern.deep_abdominal.evidence_2" = "Fördert eine vollere, effizientere Atmung";
 "breathing_pattern.deep_abdominal.evidence_3" = "Reduziert die Herzfrequenz um durchschnittlich 8 Schläge pro Minute";
 
-"breathing_pattern.four_seven_eight.evidence_1" = "Reduziert Angst um 44% in 66 Tagen nach Harvard-Studien";
-"breathing_pattern.four_seven_eight.evidence_2" = "Verbessert die Schlafqualität um 65% bei regulären Praktikern";
+"breathing_pattern.four_seven_eight.evidence_1" = "Eine beliebte Technik, um ängstliche Momente zu beruhigen";
+"breathing_pattern.four_seven_eight.evidence_2" = "Wird oft zum Runterkommen vor dem Schlafen genutzt";
 "breathing_pattern.four_seven_eight.evidence_3" = "Senkung des Blutdrucks um durchschnittlich 7 mmHg";
 
-"breathing_pattern.coherence.evidence_1" = "Cortisol-Senkung um 23% nach nur 3 Wochen Praxis";
-"breathing_pattern.coherence.evidence_2" = "Anstieg des Anti-Aging-Hormons DHEA um 100% laut HeartMath Institute";
-"breathing_pattern.coherence.evidence_3" = "Reduziert Angstsymptome um 46% laut Studien mit 1.500 Personen";
+"breathing_pattern.coherence.evidence_1" = "Forschung bringt regelmäßiges langsames Atmen mit weniger wahrgenommenem Stress in Verbindung";
+"breathing_pattern.coherence.evidence_2" = "In Studien mit einer gesünderen Herzratenvariabilität verbunden";
+"breathing_pattern.coherence.evidence_3" = "Kann bei regelmäßigem Üben helfen, Angstgefühle zu verringern";
 
-"breathing_pattern.slow66.evidence_1" = "Steigerung der Melatoninproduktion um 38% für besseren Schlaf";
-"breathing_pattern.slow66.evidence_2" = "Reduziert die Einschlafzeit laut Schlafstudien um 54%";
-"breathing_pattern.slow66.evidence_3" = "Verbessert die Tiefschlafqualität wissenschaftlich messbar um 42%";
+"breathing_pattern.slow66.evidence_1" = "Ein sanfter Rhythmus, der deinem Körper beim Runterkommen hilft";
+"breathing_pattern.slow66.evidence_2" = "Kann dir helfen, leichter einzuschlafen";
+"breathing_pattern.slow66.evidence_3" = "Unterstützt einen ruhigeren Zustand vor dem Schlafengehen";
 
-"breathing_pattern.triangle.evidence_1" = "Reduziert die Angst um 31% in nur 5 Minuten Übung";
-"breathing_pattern.triangle.evidence_2" = "Verringert die Muskelspannung um 45% dank regelmäßigem Atemrhythmus";
-"breathing_pattern.triangle.evidence_3" = "Verbessert die geistige Klarheit um 27% unmittelbar nach der Sitzung";
+"breathing_pattern.triangle.evidence_1" = "Ein einfacher Rhythmus, um ängstliche Momente zu beruhigen";
+"breathing_pattern.triangle.evidence_2" = "Sein gleichmäßiger Rhythmus kann helfen, Muskelverspannungen zu lösen";
+"breathing_pattern.triangle.evidence_3" = "Viele Menschen fühlen sich nach einer Sitzung klarer im Kopf";
 
-"breathing_pattern.box.evidence_1" = "Verbessert die Konzentration um 25% nach nur 5 Minuten laut Navy SEALs";
-"breathing_pattern.box.evidence_2" = "Reduziert Cortisol um 24% in einer einzigen Übungseinheit";
-"breathing_pattern.box.evidence_3" = "Erhöht die Herzvariabilität um 34% für ein besseres Nervengleichgewicht";
+"breathing_pattern.box.evidence_1" = "Wird von Sportlern und Einsatzkräften genutzt, um unter Druck fokussiert zu bleiben";
+"breathing_pattern.box.evidence_2" = "Kann dir helfen, dich schon in einer einzigen Sitzung ruhiger zu fühlen";
+"breathing_pattern.box.evidence_3" = "Sein gleichmäßiger Rhythmus unterstützt ein ausgeglicheneres Nervensystem";
 
-"breathing_pattern.kapalabhati.evidence_1" = "Erhöht die Sauerstoffversorgung des Gehirns um 48% fast sofort";
-"breathing_pattern.kapalabhati.evidence_2" = "Verbessert die Atmungskapazität um 36% mit regelmäßiger Yoga-Praxis";
-"breathing_pattern.kapalabhati.evidence_3" = "Stimuliert den Stoffwechsel um 21% in nur 10 Minuten Übung";
+"breathing_pattern.kapalabhati.evidence_1" = "Ein belebender Yoga-Atem, der dich wacher machen kann";
+"breathing_pattern.kapalabhati.evidence_2" = "Wird traditionell praktiziert, um die Atmung zu stärken";
+"breathing_pattern.kapalabhati.evidence_3" = "Kann dir schnell einen Energieschub geben";
 
-"breathing_pattern.bhastrika.evidence_1" = "Erhöht die physische Energie um 56% wissenschaftlich gemessen nach der Sitzung";
-"breathing_pattern.bhastrika.evidence_2" = "Verbessert die kognitive Leistung durch intensive Sauerstoffzufuhr um 39 %";
+"breathing_pattern.bhastrika.evidence_1" = "Viele Menschen fühlen sich nach einer Sitzung energiegeladener";
+"breathing_pattern.bhastrika.evidence_2" = "Kann dir helfen, dich klarer und wacher zu fühlen";
 "breathing_pattern.bhastrika.evidence_3" = "Steigert die Körpertemperatur um durchschnittlich 1,2 Grad Celsius";
 
 "breathing_pattern.default.evidence" = "Technik validiert durch zahlreiche internationale wissenschaftliche Studien zur Atmung";
@@ -2287,34 +2287,34 @@
 
 // MARK: - Meditation Scientific Evidence
 "meditation.conscious_breathing.evidence_1" = "Aktiviert dein parasympathisches Nervensystem in nur 3 Minuten Übung";
-"meditation.conscious_breathing.evidence_2" = "Reduziert Cortisol, das Stresshormon, um 25% nach einer Sitzung";
+"meditation.conscious_breathing.evidence_2" = "Kann bei regelmäßigem Üben helfen, das Stresslevel zu senken";
 "meditation.conscious_breathing.evidence_3" = "Verbessert die Herzfrequenzvariabilität und beschleunigt die Erholung von Stress";
 
-"meditation.body_scan.evidence_1" = "Reduziert die Angst in nur 5 Minuten um 30%";
+"meditation.body_scan.evidence_1" = "Kann schon in wenigen Minuten helfen, ängstliche Gefühle zu lindern";
 "meditation.body_scan.evidence_2" = "Verbessert das Körperbewusstsein und reduziert chronische Muskelverspannungen effektiv";
 "meditation.body_scan.evidence_3" = "Validiert durch über 15 klinische Studien in der MBSR-Therapie";
 
-"meditation.mindfulness.evidence_1" = "Erhöht die graue Substanz im Hippocampus um 8% in 8 Wochen";
-"meditation.mindfulness.evidence_2" = "Reduziert die Angst um 39% und verbessert die Aufmerksamkeitsspanne signifikant";
+"meditation.mindfulness.evidence_1" = "Studien bringen regelmäßige Achtsamkeit mit Veränderungen in Hirnbereichen in Verbindung, die für Aufmerksamkeit zuständig sind";
+"meditation.mindfulness.evidence_2" = "Kann helfen, Ängste zu verringern und die Aufmerksamkeit zu verbessern";
 "meditation.mindfulness.evidence_3" = "Verringert die Aktivität der Amygdala, des Furcht- und Angstzentrums des Gehirns";
 
 "meditation.grounding.evidence_1" = "Stoppt Angstattacken in 3 bis 5 Minuten effektiv";
 "meditation.grounding.evidence_2" = "Aktiviert den präfrontalen Kortex, um die Panikreaktion im Gehirn zu unterbrechen";
-"meditation.grounding.evidence_3" = "Nachgewiesene 87% Effektivitätsrate in Krisen- und Paniksituationen";
+"meditation.grounding.evidence_3" = "Eine weit verbreitete Technik, um Panikmomente zu überstehen";
 
-"meditation.visualization.evidence_1" = "Reduziert Cortisol um 27% durch die Schaffung einer sicheren mentalen Zuflucht";
+"meditation.visualization.evidence_1" = "Kann Stress senken, indem du dir einen sicheren mentalen Zufluchtsort schaffst";
 "meditation.visualization.evidence_2" = "Aktiviert die gleichen Gehirnbereiche wie tatsächliche reale Erfahrungen";
 "meditation.visualization.evidence_3" = "Verbessert die Stimmung und reduziert Symptome einer posttraumatischen Belastungsstörung";
 
-"meditation.compassion.evidence_1" = "Steigert Selbstwertgefühl und Selbstachtung mit der Übung um 35%";
+"meditation.compassion.evidence_1" = "Kann bei regelmäßigem Üben helfen, das Selbstwertgefühl zu stärken";
 "meditation.compassion.evidence_2" = "Reduziert Depressionen, Angstzustände und harte Selbstkritik deutlich";
 "meditation.compassion.evidence_3" = "Validierung durch über 200 Studien von Kristin Neff PhD";
 
-"meditation.focus_clarity.evidence_1" = "Verbessert anhaltende Aufmerksamkeit und Fokus beständig um 40%";
+"meditation.focus_clarity.evidence_1" = "Kann helfen, Aufmerksamkeit und Konzentration langfristig zu halten";
 "meditation.focus_clarity.evidence_2" = "Reduziert mentale Ablenkung und verbessert die Klarheit der Entscheidungsfindung";
 "meditation.focus_clarity.evidence_3" = "Zeigt sichtbare Effekte nach nur 2 Wochen Praxis";
 
-"meditation.yoga_nidra.evidence_1" = "Verbessert die Schlafqualität um 68% bei regelmäßig Praktizierenden";
+"meditation.yoga_nidra.evidence_1" = "Wird oft genutzt, um tieferen, erholsameren Schlaf zu unterstützen";
 "meditation.yoga_nidra.evidence_2" = "30 Minuten Übung entspricht 2 Stunden Tiefschlaf";
 "meditation.yoga_nidra.evidence_3" = "Reduziert effektiv Schlaflosigkeit und fördert tiefe körperliche Erholung";
 
@@ -2340,7 +2340,7 @@
 "antistress.slow_walk.benefit_3" = "Verstärkte Präsenz";
 "antistress.slow_walk.benefit_4" = "Körperliche Entspannung";
 
-"antistress.slow_walk.evidence_1" = "Reduziert den Cortisolspiegel um 20%";
+"antistress.slow_walk.evidence_1" = "Kann helfen, das Stresslevel zu senken";
 "antistress.slow_walk.evidence_2" = "Verbessert das Körperbewusstsein und reduziert Spannungen";
 "antistress.slow_walk.evidence_3" = "Fördert die natürliche Endorphinproduktion";
 "antistress.slow_walk.source" = "Journal of Environmental Psychology (2019)";
@@ -2354,7 +2354,7 @@
 "antistress.conscious_stretching.benefit_3" = "Blutzirkulation";
 "antistress.conscious_stretching.benefit_4" = "Tiefe Entspannung";
 
-"antistress.conscious_stretching.evidence_1" = "Reduziert die akkumulierte Muskelspannung um 30%";
+"antistress.conscious_stretching.evidence_1" = "Hilft, angesammelte Muskelverspannungen zu lösen";
 "antistress.conscious_stretching.evidence_2" = "Verbessert die Durchblutung und Sauerstoffversorgung";
 "antistress.conscious_stretching.evidence_3" = "Reduziert stressbedingte chronische Schmerzen";
 "antistress.conscious_stretching.source" = "Physical Therapy Journal (2017)";
@@ -2370,7 +2370,7 @@
 
 "antistress.audio_relaxation.evidence_1" = "Induziert tiefen Entspannungszustand schnell";
 "antistress.audio_relaxation.evidence_2" = "Reduziert stressbedingte Gehirnaktivität";
-"antistress.audio_relaxation.evidence_3" = "Verbessert die Schlafqualität um 40%";
+"antistress.audio_relaxation.evidence_3" = "Kann helfen, die Schlafqualität zu verbessern";
 "antistress.audio_relaxation.source" = "Sleep Medicine Reviews (2018)";
 "antistress.audio_relaxation.subtitle" = "Tiefe Entspannung durch geführtes Zuhören";
 
@@ -2383,7 +2383,7 @@
 "antistress.white_noise.benefit_4" = "Beruhigend";
 
 "antistress.white_noise.evidence_1" = "Überdeckt störende Umgebungsgeräusche";
-"antistress.white_noise.evidence_2" = "Verbessert das Einschlafen um 38%";
+"antistress.white_noise.evidence_2" = "Kann dir helfen, leichter einzuschlafen";
 "antistress.white_noise.evidence_3" = "Reduziert übermäßige geistige Aktivität";
 "antistress.white_noise.source" = "Journal of Sleep Research (2017)";
 "antistress.white_noise.subtitle" = "Beruhigende Geräusche, um den Geist zu beruhigen";
@@ -2396,7 +2396,7 @@
 "antistress.positive_mantra.benefit_3" = "Mentale Stärke";
 "antistress.positive_mantra.benefit_4" = "Motivation";
 
-"antistress.positive_mantra.evidence_1" = "Reduziert negative Gedanken um 40%";
+"antistress.positive_mantra.evidence_1" = "Kann helfen, negative Gedankenschleifen zu unterbrechen";
 "antistress.positive_mantra.evidence_2" = "Stärkung von Selbstvertrauen und Selbstwertgefühl";
 "antistress.positive_mantra.evidence_3" = "Reduziert vorausschauende Angst";
 "antistress.positive_mantra.source" = "Journal of Clinical Psychology (2018)";
@@ -2471,9 +2471,9 @@
 "antistress.body_scan.benefit_2" = "Löst Spannungen";
 "antistress.body_scan.benefit_3" = "Besserer Schlaf";
 "antistress.body_scan.benefit_4" = "Körperbewusstsein";
-"antistress.body_scan.evidence_1" = "Reduziert chronischen Stress und Angst um 35%";
+"antistress.body_scan.evidence_1" = "Kann bei regelmäßigem Üben helfen, Stress und Ängste zu verringern";
 "antistress.body_scan.evidence_2" = "Löst akkumulierte Muskelspannung im Körper";
-"antistress.body_scan.evidence_3" = "Verbessert die Schlafqualität um 40%";
+"antistress.body_scan.evidence_3" = "Kann helfen, die Schlafqualität zu verbessern";
 "antistress.body_scan.source" = "Journal of Behavioral Medicine (2017)";
 
 // Benefits
@@ -2573,7 +2573,7 @@
 "learning.card.meditation_science.section1.title" = "Wissenschaftliche Erkenntnisse";
 "learning.card.meditation_science.section1.content" = "Tausende wissenschaftliche Studien haben die Vorteile der Meditation gezeigt:\n\n• Verdickung des präfrontalen Cortex\n• Reduktion der Amygdala (Angstzentrum)\n• Zunahme der grauen Substanz";
 "learning.card.meditation_science.section2.title" = "Messbare Ergebnisse";
-"learning.card.meditation_science.section2.content" = "• -30% Cortisol nach 8 Wochen\n• 40% Konzentrationsverbesserung\n• 50% Reduktion der Angstsymptome";
+"learning.card.meditation_science.section2.content" = "• Forschung bringt regelmäßige Meditation mit einem niedrigeren Stresslevel in Verbindung\n• Sie kann mit der Zeit die Konzentration verbessern\n• Viele Menschen berichten von weniger Angstsymptomen";
 "learning.card.meditation_science.section3.title" = "Zeitbedarf";
 "learning.card.meditation_science.section3.content" = "Sichtbare Gehirnveränderungen treten nach nur 8 Wochen täglicher Übung für 10-15 Minuten auf.\n\nSie sind mit CortiFree bereits auf dem richtigen Weg!";
 
@@ -2609,7 +2609,7 @@
 "learning.card.sleep_cycles.section2.title" = "Optimierung deiner Zyklen";
 "learning.card.sleep_cycles.section2.content" = "• Ziele auf 7,5 oder 9 Stunden Schlaf (5 oder 6 vollständige Zyklen)\n• Vermeide 6 oder 8 Stunden (Aufwachen mitten im Zyklus = Müdigkeit)\n• Geh zu festen Zeiten ins Bett und steh zu festen Zeiten auf (auch am Wochenende)";
 "learning.card.sleep_cycles.section3.title" = "Auswirkungen auf Cortisol";
-"learning.card.sleep_cycles.section3.content" = "• Tiefschlaf = 70 % weniger Cortisol\n• Schlafmangel = +37 % Cortisol am nächsten Tag\n• 3 schlechte Nächte = Insulinresistenz (Prädiabetes)";
+"learning.card.sleep_cycles.section3.content" = "• Tiefschlaf hilft deinem Körper, sich von Stress zu erholen\n• Schlafmangel kann dich am nächsten Tag gestresster machen\n• Wiederholte kurze Nächte beeinträchtigen deine allgemeine Gesundheit: Sprich mit einem Arzt, wenn schlechter Schlaf anhält";
 "learning.card.sleep_cycles.section4.title" = "Qualität > Quantität";
 "learning.card.sleep_cycles.section4.content" = "Lieber 6 Stunden mit viel Tiefschlaf als 8 Stunden leichter, unterbrochener Schlaf!";
 
@@ -2629,9 +2629,9 @@
 "learning.card.food.title" = "Antistressernährung";
 "learning.card.food.description" = "Lebensmittel, die Cortisol regulieren";
 "learning.card.food.section1.title" = "Lebensmittel, die Cortisol reduzieren";
-"learning.card.food.section1.content" = "Gesunde Fette:\n• Avocados, Nüsse, Mandeln\n• Olivenöl, fetter Fisch (Lachs, Makrele)\n• Reich an entzündungshemmenden Omega-3-Fettsäuren\n\nMagnesiumreiche Lebensmittel:\n• Dunkle Schokolade (>70 % Kakao)\n• Spinat, Bananen\n• Kürbiskerne, Mandeln\n• Magnesium reduziert Angst und Cortisol\n\nVitamin C:\n• Zitrusfrüchte, Kiwis, Paprika\n• Senkt Cortisol um 15-20 %\n• Stärkt das Immunsystem\n\nGrüner und schwarzer Tee:\n• L-Theanin, das den Geist beruhigt\n• 20 % weniger Cortisol nach 6 Wochen";
+"learning.card.food.section1.content" = "Gesunde Fette:\n• Avocados, Nüsse, Mandeln\n• Olivenöl, fetter Fisch (Lachs, Makrele)\n• Reich an entzündungshemmenden Omega-3-Fettsäuren\n\nMagnesiumreiche Lebensmittel:\n• Dunkle Schokolade (>70 % Kakao)\n• Spinat, Bananen\n• Kürbiskerne, Mandeln\n• Magnesium spielt eine Rolle für das Gleichgewicht des Nervensystems\n\nVitamin C:\n• Zitrusfrüchte, Kiwis, Paprika\n• Kann dem Körper helfen, mit Stress umzugehen\n• Stärkt das Immunsystem\n\nGrüner und schwarzer Tee:\n• L-Theanin, das den Geist beruhigt\n• Eine mildere Alternative zu Kaffee";
 "learning.card.food.section2.title" = "Lebensmittel, die Cortisol erhöhen";
-"learning.card.food.section2.content" = "Zu viel Koffein:\n• Mehr als 400 mg/Tag (4 Kaffees)\n• Erhöht Cortisol um 30 %\n• Stört den Schlaf\n\nRaffinierter Zucker:\n• Blutzuckerspitzen = Cortisolspitzen\n• Systemische Entzündungen\n• Sucht und Heißhunger\n\nAlkohol:\n• Stört den Tiefschlaf\n• Erhöht das nächtliche Cortisol\n• Dehydrierung";
+"learning.card.food.section2.content" = "Zu viel Koffein:\n• Mehr als 400 mg/Tag (4 Kaffees)\n• Kann die Stressreaktion verstärken\n• Stört den Schlaf\n\nRaffinierter Zucker:\n• Blutzuckerspitzen und -einbrüche\n• Kann Stimmung und Energie beeinflussen\n• Heißhunger\n\nAlkohol:\n• Stört den Tiefschlaf\n• Kann dich am nächsten Tag angespannter machen\n• Dehydrierung";
 "learning.card.food.section3.title" = "Der Zeitpunkt zählt";
 "learning.card.food.section3.content" = "• Proteinreiches Frühstück (stabilisiert Cortisol)\n• Vermeide Zucker und Koffein am Abend\n• Leichtes Abendessen 2-3 Stunden vor dem Schlafengehen";
 
@@ -2649,7 +2649,7 @@
 "learning.card.nature.title" = "Die Kraft der Natur";
 "learning.card.nature.description" = "Warum die Natur beruhigt";
 "learning.card.nature.section1.title" = "Wissenschaftliche Untersuchungen";
-"learning.card.nature.section1.content" = "Der Kontakt mit der Natur wirkt sich nachweislich auf Stress aus:\n\n• -15% Cortisol nach 20 Minuten in der Natur\n• Verminderter Blutdruck\n• Verbesserte Stimmung";
+"learning.card.nature.section1.content" = "Kontakt mit der Natur wird mit weniger Stress in Verbindung gebracht:\n\n• Viele Menschen fühlen sich nach 20 Min. in der Natur ruhiger\n• Kann helfen, den Blutdruck zu senken\n• Bessere Stimmung";
 "learning.card.nature.section2.title" = "Waldbaden (Shinrin-yoku)";
 "learning.card.nature.section2.content" = "• Alte japanische Praxis\n• Langsamer Spaziergang im Wald\n• Verbindung mit den 5 Sinnen";
 "learning.card.nature.section3.title" = "Vorteile";
@@ -2665,7 +2665,7 @@
 "learning.card.cardiac_coherence.section2.title" = "Sofortige Vorteile";
 "learning.card.cardiac_coherence.section2.content" = "• Cortisolreduktion in 3-5 Minuten\n• Verminderte Herzfrequenz\n• niedrigerer Blutdruck\n• Gefühl von Ruhe und geistiger Klarheit";
 "learning.card.cardiac_coherence.section3.title" = "Langzeitwirkungen (nach 2 Wochen)";
-"learning.card.cardiac_coherence.section3.content" = "• -24 % Cortisol im Durchschnitt\n• Bessere emotionale Regulierung\n• Verbesserte Schlafqualität\n• Stärkung des Immunsystems\n• +17 % DHEA (Anti-Aging-Hormon)";
+"learning.card.cardiac_coherence.section3.content" = "• Kann helfen, das Stresslevel zu senken\n• Bessere Emotionsregulation\n• Kann die Schlafqualität verbessern\n• In Studien gesündere Herzratenvariabilität";
 "learning.card.cardiac_coherence.section4.title" = "Verwendet von";
 "learning.card.cardiac_coherence.section4.content" = "• Kampfpiloten\n• Elitesportler\n• Ärzte und Gesundheitspersonal\n• Geschäftsführer";
 "learning.card.cardiac_coherence.section5.title" = "In CortiFree";
@@ -2677,9 +2677,9 @@
 "learning.card.yoga.section1.title" = "Arten von Anti-Stress Yoga";
 "learning.card.yoga.section1.content" = "Yoga ist viel mehr als eine körperliche Praxis. Es ist ein wirkungsvolles Werkzeug zur Stressregulierung, das auf deinen Körper UND deinen Geist wirkt.\n\n• Hatha Yoga: sanft, perfekt für Anfänger\n• Yin Yoga: lange Haltungen, sehr entspannend\n• Yoga Nidra: geführte Meditation im Liegen\n• Vinyasa: dynamisch, aber meditativ";
 "learning.card.yoga.section2.title" = "Auswirkungen auf Cortisol";
-"learning.card.yoga.section2.content" = "• -27% nach einer 60-minütigen Sitzung\n• Kumulative Effekte mit regelmäßiger Praxis\n• -41% Cortisol nach 12 Wochen (3x / Woche)";
+"learning.card.yoga.section2.content" = "• Viele Menschen fühlen sich schon nach einer einzigen Sitzung ruhiger\n• Die Wirkung baut sich bei regelmäßigem Üben auf\n• Studien bringen regelmäßiges Yoga mit weniger Stress in Verbindung";
 "learning.card.yoga.section3.title" = "Wissenschaftlich nachgewiesene Vorteile";
-"learning.card.yoga.section3.content" = "Körperlich:\n• Beweglichkeit und Muskelkraft\n• Bessere Haltung\n• Weniger chronische Schmerzen\n• Verbessertes Gleichgewicht\n\nMental:\n• -65 % Angstsymptome\n• Bessere emotionale Regulierung\n• Mehr graue Substanz\n• Verbesserte Konzentration\n\nPhysiologisch:\n• Aktivierung des parasympathischen Systems (Entspannung)\n• Bessere Herzfrequenzvariabilität\n• Weniger Entzündungen\n• Verbesserte Verdauung";
+"learning.card.yoga.section3.content" = "Körperlich:\n• Beweglichkeit und Muskelkraft\n• Bessere Haltung\n• Kann chronische Schmerzen lindern\n• Besseres Gleichgewicht\n\nMental:\n• Kann Angstsymptome verringern\n• Bessere Emotionsregulation\n• Bessere Konzentration\n\nPhysiologisch:\n• Aktivierung des Parasympathikus (Entspannung)\n• Bessere Herzratenvariabilität\n• Kann die Verdauung unterstützen";
 "learning.card.yoga.section4.title" = "Was passiert in deinem Gehirn";
 "learning.card.yoga.section4.content" = "• Erhöhte GABA (beruhigender Neurotransmitter)\n• Reduzierte Amygdala-Aktivität (Angst / Stress)\n• Aktivierter präfrontaler Cortex (emotionale Kontrolle)";
 "learning.card.yoga.section5.title" = "Keine Notwendigkeit, flexibel zu sein";
@@ -2695,13 +2695,13 @@
 "learning.card.sleep_cortisol.section3.title" = "CortiFree Lösungen";
 "learning.card.sleep_cortisol.section3.content" = "• Aufwachen vor 7 Uhr morgens (Morgenroutine)\n• Vor 23 Uhr ins Bett gehen (Erholung)\n• Abendmeditation (Schlafvorbereitung)";
 "learning.card.sleep_cortisol.section4.title" = "Wusstest du das?";
-"learning.card.sleep_cortisol.section4.content" = "Eine einzige Nacht mit schlechtem Schlaf kann dein Cortisol am nächsten Tag um 37% erhöhen!";
+"learning.card.sleep_cortisol.section4.content" = "Schon eine einzige Nacht mit schlechtem Schlaf kann dich am nächsten Tag gestresster und reizbarer machen!";
 
 // MARK: - Learning Card 13: Hydration
 "learning.card.hydration.title" = "Hydratation und Stress";
 "learning.card.hydration.description" = "Warum Wassertrinken Stress reduziert";
 "learning.card.hydration.section1.title" = "Auswirkungen der Dehydrierung";
-"learning.card.hydration.section1.content" = "Wasser spielt eine entscheidende Rolle bei der Stressregulierung:\n\n• Erhöhtes Cortisol (+25%)\n• Müdigkeit und Reizbarkeit\n• Schwierigkeiten bei der Konzentration";
+"learning.card.hydration.section1.content" = "Wasser spielt eine Rolle dafür, wie du mit Stress umgehst. Schon leichte Dehydrierung kann zu Folgendem führen:\n\n• Du fühlst dich angespannter\n• Müdigkeit und Gereiztheit\n• Konzentrationsschwierigkeiten";
 "learning.card.hydration.section2.title" = "Vorteile einer guten Hydratation";
 "learning.card.hydration.section2.content" = "• Regulierung der Körpertemperatur\n• Ausscheidung von Giftstoffen\n• Bessere Gehirnfunktion";
 "learning.card.hydration.section3.title" = "Empfehlung";
@@ -2725,7 +2725,7 @@
 "learning.card.social.title" = "Positive soziale Beziehungen";
 "learning.card.social.description" = "Die Bedeutung der sozialen Unterstützung";
 "learning.card.social.section1.title" = "Auswirkungen auf Cortisol";
-"learning.card.social.section1.content" = "Hochwertige soziale Kontakte sind für den Umgang mit Stress unerlässlich:\n\n• Positive Begegnungen → -20% Cortisol\n• Freisetzung von Oxytocin (\"Liebeshormon\")\n• Gefühl von Sicherheit und Zugehörigkeit";
+"learning.card.social.section1.content" = "Gute soziale Kontakte sind wichtig, um mit Stress umzugehen:\n\n• Positive Begegnungen helfen dir, ruhiger zu werden\n• Ausschüttung von Oxytocin („Kuschelhormon“)\n• Gefühl von Sicherheit und Zugehörigkeit";
 "learning.card.social.section2.title" = "Arten vorteilhafter Verbindungen";
 "learning.card.social.section2.content" = "• Tiefe Gespräche mit Freunden\n• Qualitätsmomente mit Familie\n• Gruppenaktivitäten (Sport, Hobbys)";
 "learning.card.social.section3.title" = "Zu vermeiden";
@@ -2741,7 +2741,7 @@
 "learning.card.light.section2.title" = "Auswirkungen auf deine biologische Uhr";
 "learning.card.light.section2.content" = "• Reguliert den Cortisol / Melatonin-Zyklus\n• Verbessert die nächtliche Schlafqualität\n• Erhöht die Tagesenergie und Wachsamkeit\n• Synchronisiert alle deine biologischen Rhythmen";
 "learning.card.light.section3.title" = "Wissenschaftliche Untersuchungen";
-"learning.card.light.section3.content" = "• +25% Tagesenergie mit morgendlicher Exposition\n• Einschlafen 1 Stunde schneller am Abend\n• -35% depressive Symptome\n• Bessere Appetitregulierung";
+"learning.card.light.section3.content" = "• Mehr Energie am Tag durch Morgenlicht\n• Abends leichter einschlafen\n• Kann helfen, die Stimmung aufzuhellen\n• Bessere Appetitregulation";
 "learning.card.light.section4.title" = "Abends vermeiden";
 "learning.card.light.section4.content" = "• Bildschirme 1-2 Stunden vor dem Zubettgehen\n• Helle Lichter (bevorzugen warme / gedimmte Lichter)\n• Blaues Licht, das Melatonin blockiert";
 "learning.card.light.section5.title" = "CortiFree-Tipp";
@@ -2755,7 +2755,7 @@
 "learning.card.negative_thoughts.section2.title" = "Die 3-Spalten-Technik";
 "learning.card.negative_thoughts.section2.content" = "Spalte 1: Situation\nSpalte 2: Automatisches Denken\nSpalte 3: Realistischer alternativer Gedanke";
 "learning.card.negative_thoughts.section3.title" = "Messbare Auswirkungen";
-"learning.card.negative_thoughts.section3.content" = "• -40% Angst mit kognitiver Therapie\n• -28% Cortisol durch Identifizierung und Modifikation dieser Gedanken\n• Dauerhafte Verbesserung nach 8-12 Wochen";
+"learning.card.negative_thoughts.section3.content" = "• Kognitive Techniken sind gut erforscht, um Ängste zu verringern\n• Diese Gedanken zu erkennen und umzudeuten kann Stress senken\n• Eine dauerhafte Besserung stellt sich oft nach 8-12 Wochen Übung ein";
 "learning.card.negative_thoughts.section4.title" = "Journaling-Tipp";
 "learning.card.negative_thoughts.section4.content" = "Deine Gedanken im CortiFree-Journal aufzuschreiben hilft dir, sie zu erkennen, zu hinterfragen und zu verwandeln!";
 
@@ -2763,9 +2763,9 @@
 "learning.card.gratitude.title" = "Dankbarkeit und das Gehirn";
 "learning.card.gratitude.description" = "Die wissenschaftliche Wirkung der Anerkennung";
 "learning.card.gratitude.section1.title" = "Was passiert in deinem Gehirn";
-"learning.card.gratitude.section1.content" = "Dankbarkeit zu üben ist nicht nur \"positives Denken\": Es ist eine wissenschaftlich validierte Technik, die dein Gehirn und dein Stressniveau verändert.\n\n• Aktivierung des medialen präfrontalen Cortex (Wohlbefinden)\n• Freisetzung von Dopamin und Serotonin (Glück)\n• Reduzierte Amygdala-Aktivität (Stress/Angst)\n• -23% Cortisol im Durchschnitt";
+"learning.card.gratitude.section1.content" = "Dankbarkeit zu üben ist nicht nur „positives Denken“: Es ist eine gut erforschte Praxis, die deinen Fokus und dein Stresslevel verändern kann.\n\n• Mit Aktivität in Hirnbereichen verbunden, die am Wohlbefinden beteiligt sind\n• Kann positive Emotionen fördern\n• Kann dir helfen, dich weniger gestresst zu fühlen";
 "learning.card.gratitude.section2.title" = "Wichtige wissenschaftliche Studien";
-"learning.card.gratitude.section2.content" = "UC Berkeley (2015):\n• Dankbarkeitstagebuch 3x/Woche\n• -27% Depression nach 12 Wochen\n• Besserer Schlaf und bessere soziale Beziehungen\n\nHarvard Medical School (2021):\n• 5 Minuten Dankbarkeit pro Tag\n• +25% empfundenes Glück\n• -18% Angst";
+"learning.card.gratitude.section2.content" = "Was Studien nahelegen:\n• Ein Dankbarkeitstagebuch, einige Male pro Woche geschrieben\n• Mit besserer Stimmung im Laufe der Zeit verbunden\n• Besserer Schlaf und bessere soziale Beziehungen\n\nIm Alltag:\n• 5 Minuten Dankbarkeit pro Tag\n• Viele Menschen berichten, glücklicher zu sein\n• Und weniger ängstlich";
 "learning.card.gratitude.section3.title" = "Wie man effektiv übt";
 "learning.card.gratitude.section3.content" = "3-Dankbarkeiten-Methode (5 min/Tag):\n1. Schreibe 3 Dinge auf, für die du dankbar bist\n2. Sei konkret (nicht nur \"meine Familie\")\n3. Spüre die Emotion beim Schreiben\n4. Variiere deine Dankbarkeiten jeden Tag\n\nBeispiele:\nZu vage: \"Ich bin dankbar für meine Gesundheit\"\nKonkret: \"Ich bin dankbar, dass ich meinen Morgenspaziergang ohne Schmerzen machen und die frische Luft auf meinem Gesicht spüren konnte\"";
 "learning.card.gratitude.section4.title" = "Langfristige Auswirkungen";
@@ -2901,7 +2901,7 @@
 "tips.card.environment.section1.title" = "Ausmisten (angepasste KonMari-Regel)";
 "tips.card.environment.section1.content" = "1 Zone/Woche:\n\nNimm jedes Objekt und frage dich:\n• Habe ich es in den letzten 6 Monaten verwendet?\n• Bringt es mir Freude?\n• Ist es wirklich nützlich?\n\nWenn 3x nein → Spenden, recyceln oder Müll.\n\nVisuelles Durcheinander = Mentale Überlastung.\nKlarer Raum = Klarer Geist.";
 "tips.card.environment.section2.title" = "Zimmerpflanzen";
-"tips.card.environment.section2.content" = "Top 5 pflegeleichte Anti-Stress-Pflanzen:\n\n1. Efeutute (Luft + Stress)\n2. Bogenhanf (gibt nachts Sauerstoff ab)\n3. Aloe Vera (reinigt die Luft)\n4. Grünlilie (pflegeleicht, wirksam)\n5. Lavendel (beruhigender Duft)\n\nNachgewiesene Vorteile:\n• -15% Cortisol\n• Bessere Luftqualität\n• Beruhigende visuelle Wirkung";
+"tips.card.environment.section2.content" = "Top 5 pflegeleichte Anti-Stress-Pflanzen:\n\n1. Efeutute (Luft + Stress)\n2. Bogenhanf (gibt nachts Sauerstoff ab)\n3. Aloe Vera (reinigt die Luft)\n4. Grünlilie (pflegeleicht, wirksam)\n5. Lavendel (beruhigender Duft)\n\nVorteile:\n• Ein Raum, in dem du dich ruhiger fühlst\n• Bessere Luftqualität\n• Beruhigende visuelle Wirkung";
 "tips.card.environment.section3.title" = "Maximales natürliches Licht";
 "tips.card.environment.section3.content" = "• Vorhänge gleich nach dem Aufwachen öffnen\n• Schreibtisch möglichst in Fensternähe\n• Tageslichtlampen (5000-6500K) am Morgen\n• Warmweiße Lampen (2700-3000K) am Abend\n• Dimmer in den Schlafzimmern\n\nLicht = Regulator Nr. 1 des zirkadianen Rhythmus.";
 "tips.card.environment.section4.title" = "Klänge und Musik";
@@ -3054,7 +3054,7 @@
 "antistress.grounding_5_senses.benefit_4" = "Verbesserte Präsenz";
 "antistress.grounding_5_senses.evidence_1" = "Unterbricht den Kreislauf der ängstlichen Gedanken effektiv";
 "antistress.grounding_5_senses.evidence_2" = "Reduziert Paniksymptome in 2 Minuten";
-"antistress.grounding_5_senses.evidence_3" = "Verbessert emotionale Regulation um 30%";
+"antistress.grounding_5_senses.evidence_3" = "Kann dir helfen, starke Emotionen zu regulieren";
 "antistress.grounding_5_senses.source" = "Journal of Anxiety Disorders (2019)";
 
 // Anchoring 5-4-3-2-1
@@ -3412,7 +3412,7 @@
 // MARK: - Onboarding V2 - Social Proof
 "onboarding_v2.social_proof.users_count" = "+50.000 Nutzer";
 "onboarding_v2.social_proof.rating" = "4,8/5";
-"onboarding_v2.social_proof.stress_reduction" = "-47% Stress im Durchschnitt";
+"onboarding_v2.social_proof.stress_reduction" = "Fühl dich ruhiger, Tag für Tag";
 
 // MARK: - Onboarding V2 - Testimonials
 "onboarding_v2.testimonial.1_name" = "Sophie";
@@ -3971,6 +3971,7 @@
 
 // Radar chart section
 "paywall_custom.radar_title" = "%@s Entwicklung über 28 Tage";
+"paywall_custom.radar_disclaimer" = "Orientierende Prognose auf Basis deiner Antworten, kein garantiertes oder medizinisches Ergebnis.";
 
 // Radar labels
 "paywall_custom.radar_label_global" = "Insgesamt";
@@ -4008,33 +4009,34 @@
 "paywall_custom.habit_social_stat" = "pflegst du 4-mal pro Woche soziale Kontakte.";
 
 // Symptom fix strings - Mental
-"paywall_custom.fix_anxiety" = "Dein Kopf kommt zur Ruhe, ohne dass sich die Angst im Kreis dreht";
-"paywall_custom.fix_focus" = "Dein Fokus kehrt zurück, du kommst mühelos in den Flow";
-"paywall_custom.fix_negative_thoughts" = "Du durchbrichst den Kreislauf negativer Gedanken, die dich erschöpfen";
-"paywall_custom.fix_irritability" = "Du reagierst weniger impulsiv, dein Nervensystem kommt wirklich zur Ruhe";
-"paywall_custom.fix_brain_fog" = "Der Gehirnnebel lichtet sich und du denkst wieder klar";
-"paywall_custom.fix_motivation" = "Deine Motivation flammt wieder auf, du willst wieder vorankommen";
+"paywall_custom.fix_anxiety" = "Werkzeuge, die helfen können, ängstliche Gedankenspiralen zu beruhigen";
+"paywall_custom.fix_focus" = "Übungen, die dir helfen können, dich leichter zu konzentrieren";
+"paywall_custom.fix_negative_thoughts" = "Techniken, um aus zehrenden negativen Gedanken auszusteigen";
+"paywall_custom.fix_irritability" = "Atemübungen, die dir helfen können, weniger gereizt zu reagieren";
+"paywall_custom.fix_brain_fog" = "Kurze Pausen, die dir helfen können, klarer zu denken";
+"paywall_custom.fix_motivation" = "Kleine tägliche Erfolge, die helfen können, deine Motivation neu zu entfachen";
 
 // Symptom fix strings - Physical
-"paywall_custom.fix_sleep" = "Du schläfst tief und wachst wirklich erholt auf";
-"paywall_custom.fix_fatigue" = "Die chronische Müdigkeit lässt nach, deine Energie hält den ganzen Tag";
-"paywall_custom.fix_headaches" = "Du löst die Verspannungen, die auf Kopf und Nacken lasten";
-"paywall_custom.fix_tension" = "Deine körperlichen Verspannungen lösen sich, dein Körper ist nicht mehr in Alarmbereitschaft";
-"paywall_custom.fix_weight" = "Du kümmerst dich mit regelmäßigeren Gewohnheiten um deinen Körper";
-"paywall_custom.fix_heart" = "Dein Herz beruhigt sich, die Atmung wird zu deinem stärksten Werkzeug";
+"paywall_custom.fix_sleep" = "Abendroutinen, die dir helfen können, besser zu schlafen";
+"paywall_custom.fix_fatigue" = "Gewohnheiten, die dir helfen können, dich tagsüber weniger ausgelaugt zu fühlen";
+"paywall_custom.fix_headaches" = "Übungen, die helfen können, Spannungen in Kopf und Nacken zu lösen";
+"paywall_custom.fix_tension" = "Entspannung, die deinem Körper helfen kann, Verspannungen loszulassen";
+"paywall_custom.fix_weight" = "Beständigere Alltagsgewohnheiten, um gut auf deinen Körper zu achten";
+"paywall_custom.fix_heart" = "Langsames Atmen, das dir helfen kann, ruhiger zu werden, wenn dein Herz rast";
 
 // Symptom fix strings - Social
-"paywall_custom.fix_isolation" = "Du hast wieder Lust auf Kontakt mit anderen, ganz ohne Zwang";
-"paywall_custom.fix_conflicts" = "Deine Beziehungen entspannen sich, wenn du nicht mehr ständig unter Strom stehst";
-"paywall_custom.fix_interest" = "Deine Interessen kehren zurück, wenn deine Energie steigt";
-"paywall_custom.fix_communication" = "Du kommunizierst besser, wenn dein Nervensystem reguliert ist";
-"paywall_custom.fix_impatience" = "Du gehst wieder liebevoller mit den Menschen um, die dir wichtig sind";
+"paywall_custom.fix_isolation" = "Sanfte Schritte, die dir helfen können, wieder mit anderen in Kontakt zu kommen";
+"paywall_custom.fix_conflicts" = "Beruhigungswerkzeuge, die angespannte Momente mit anderen entschärfen können";
+"paywall_custom.fix_interest" = "Routinen, die dir helfen können, Energie für das zu finden, was du gerne tust";
+"paywall_custom.fix_communication" = "Techniken, die dir helfen können, unter Stress ruhig zu sprechen";
+"paywall_custom.fix_impatience" = "Pausen, die dir helfen können, mit den Menschen, die dir wichtig sind, geduldig zu bleiben";
 
 // Fallback fix strings
-"paywall_custom.fallback_stress" = "Du bist deinem Stress nicht länger ausgeliefert – du kommst durch ihn hindurch";
-"paywall_custom.fallback_sleep" = "Du schläfst und wachst wirklich erholt auf";
-"paywall_custom.fallback_energy" = "Deine Energie hält den ganzen Tag, ohne Einbruch";
-"paywall_custom.fallback_focus" = "Dein Fokus kehrt zurück, mühelos im Flow";
+"paywall_custom.fallback_stress" = "Werkzeuge, die dir helfen, durch Stress hindurchzugehen, statt ihn zu ertragen";
+"paywall_custom.fallback_sleep" = "Routinen, die dir helfen können, besser zu schlafen und ausgeruhter aufzuwachen";
+"paywall_custom.fallback_energy" = "Gewohnheiten, die helfen können, dass deine Energie den ganzen Tag anhält";
+"paywall_custom.fallback_focus" = "Übungen, die dir helfen können, dich leichter zu konzentrieren";
+"paywall_custom.fix_disclaimer" = "Die Ergebnisse sind von Mensch zu Mensch verschieden. CortiFree ist eine Wellness-App und ersetzt keine ärztliche Behandlung: Wenn dich Symptome wie Herzklopfen, anhaltende Müdigkeit oder Gewichtsveränderungen beunruhigen, sprich mit einem Arzt.";
 "first_launch.cta_sub" = "Kostenloses Quiz · 4 Minuten";
 "editprofile.first_name_required" = "Gib einen Vornamen ein, bevor du dein Profil speicherst.";
 "first_launch.mascot_intro" = "Hey, ich bin Milo, dein persönlicher Begleiter. Ich helfe dir, wieder zu Gelassenheit, Energie und Konzentration zu finden. Ich habe ein paar Fragen an dich, damit ich deinen persönlichen Plan erstellen kann.";
@@ -4335,6 +4337,9 @@
 "access_locked.title" = "Dein Abo ist abgelaufen";
 "access_locked.subtitle" = "Aktiviere CortiFree erneut, um deinen Plan, deine Sessions und Übungen zurückzubekommen.";
 "access_locked.unlock" = "CortiFree reaktivieren";
+"access_locked.title_new" = "Schalte CortiFree frei";
+"access_locked.subtitle_new" = "Starte dein Abo, um auf deinen persönlichen Plan, deine Sessions und Übungen zuzugreifen.";
+"access_locked.unlock_new" = "Angebote ansehen";
 "access_locked.restore" = "Käufe wiederherstellen";
 
 /* Breathing */
@@ -4729,13 +4734,14 @@
 "assistant.consent.title" = "Bevor du mit Milo chattest";
 "assistant.consent.point.provider" = "Deine Nachrichten werden über den Server von CortiFree an einen KI-Anbieter (DeepSeek) gesendet, der Milos Antworten erzeugt.";
 "assistant.consent.point.plan" = "Um Antworten zu personalisieren, wird eine kurze Zusammenfassung deines CortiFree-Plans (Ziel, Übungen, Fortschritt) mitgesendet.";
+"assistant.consent.point.health" = "Wenn du Apple Health verbunden oder deinen Puls in der App gemessen hast, werden auch deine aktuellen Werte zu Herzfrequenz, Herzfrequenzvariabilität und Schlaf gesendet, damit Milo seine Tipps anpassen kann. Sie werden nie für Werbung genutzt.";
 "assistant.consent.point.diagnosis" = "Milo bietet allgemeine Informationen zum Wohlbefinden, keine Diagnose und keinen medizinischen Rat. Wende dich im Notfall an den Notruf.";
 "assistant.consent.point.revoke" = "Du kannst diese Einwilligung jederzeit unter Einstellungen › Datenschutz widerrufen.";
 "assistant.consent.privacy" = "Datenschutzerklärung lesen";
 "assistant.consent.accept" = "Einverstanden, weiter";
 "assistant.consent.decline" = "Nicht jetzt";
 "settings.privacy.milo" = "KI-Assistent Milo";
-"settings.privacy.milo_subtitle" = "DeepSeek darf deine Nachrichten und eine Plan-Zusammenfassung verarbeiten";
+"settings.privacy.milo_subtitle" = "DeepSeek darf deine Nachrichten, eine Plan-Zusammenfassung sowie deine Herzfrequenz- und Schlafdaten verarbeiten";
 
 // MARK: - Auth & onboarding demo
 "auth.sign_up" = "Registrieren";
@@ -4946,8 +4952,8 @@
 "widget.v.milo.desc" = "Milo reagiert auf deinen Tag: entspannt, stolz, erschöpft oder schlafend.";
 "widget.v.breathe.name" = "Atmen";
 "widget.v.breathe.desc" = "Eine Minute Box-Atmung mit einem Tipp, ohne die App zu öffnen.";
-"widget.v.cortisol.name" = "Cortisol-Anzeige";
-"widget.v.cortisol.desc" = "Dein geschätztes Stresslevel – es sinkt, wenn du auf dich achtest.";
+"widget.v.cortisol.name" = "Inneres Wetter";
+"widget.v.cortisol.desc" = "Dein Stimmungswetter aus deinen Check-ins – es klart auf, wenn du auf dich achtest.";
 "widget.v.mood.name" = "Stimmung des Tages";
 "widget.v.mood.desc" = "Halte deine Stimmung mit einem Tipp fest und sieh deinen Monat bunt werden.";
 "widget.v.planet.name" = "Dein Planet";
@@ -4980,16 +4986,16 @@
 "widget.planet.name.saturn" = "Saturn";
 "widget.planet.name.uranus" = "Uranus";
 "widget.planet.name.neptune" = "Neptun";
-"widget.cortisol.title" = "Cortisol";
-"widget.cortisol.tier.0" = "Zen";
-"widget.cortisol.tier.1" = "Im Griff";
-"widget.cortisol.tier.2" = "Steigend";
-"widget.cortisol.tier.3" = "Alarm";
+"widget.cortisol.title" = "Inneres Wetter";
+"widget.cortisol.tier.0" = "Sonnig";
+"widget.cortisol.tier.1" = "Heiter";
+"widget.cortisol.tier.2" = "Es zieht zu";
+"widget.cortisol.tier.3" = "Stürmisch";
 "widget.cortisol.hint.0" = "Weiter so, dein Körper dankt es dir.";
 "widget.cortisol.hint.1" = "Eine kurze Atempause und alles ist gut.";
 "widget.cortisol.hint.2" = "Leg das Handy 2 Minuten weg und atme langsam.";
 "widget.cortisol.hint.3" = "Stopp. Eine Minute atmen, jetzt.";
-"widget.cortisol.disclaimer" = "Spielerische Schätzung, keine medizinische Messung";
+"widget.cortisol.disclaimer" = "Basiert auf deinen Check-ins, keine medizinische Messung";
 "widget.mood.title" = "Wie fühlst du dich?";
 "widget.mood.recent" = "Deine letzten 14 Tage";
 "widget.message.title" = "Milos Notiz";
@@ -5326,6 +5332,12 @@
 "calm.face.tip.neutral" = "Neutraler Ausdruck, Blick in die Kamera";
 "calm.face.tip.nomakeup" = "Am besten ungeschminkt, jede Woche zur gleichen Zeit";
 "calm.face.privacy" = "Dein Foto bleibt auf deinem iPhone, bei deinen Fortschrittsfotos. Zur Analyse wird es einmal an OpenAI gesendet und nicht auf den Servern von CortiFree gespeichert.";
+"calm.face.consent.title" = "Vor deinem Gesichts-Check";
+"calm.face.consent.point.provider" = "Dein Selfie wird über den Server von CortiFree an einen KI-Anbieter (OpenAI) gesendet, der sichtbare Müdigkeitszeichen beschreibt. Es wird einmal analysiert, nicht von CortiFree gespeichert und nicht zu deiner Identifizierung genutzt.";
+"calm.face.consent.point.storage" = "Das Foto selbst bleibt auf deinem iPhone, bei deinen Fortschrittsfotos. Du kannst es jederzeit löschen.";
+"calm.face.consent.point.wellness" = "Das ist eine Wellness-Beobachtung, keine medizinische Messung und keine Diagnose.";
+"calm.face.consent.point.optional" = "Der Gesichts-Check ist freiwillig: Du kannst ihn überspringen und alles andere in CortiFree weiter nutzen.";
+"calm.face.consent.continue" = "Einverstanden, weiter";
 "calm.face.take" = "Selfie aufnehmen";
 "calm.face.library" = "Lieber ein Foto wählen";
 "calm.face.choose" = "Foto wählen";
@@ -5509,7 +5521,7 @@
 "milo.pulse.watch.measured" = "Von deiner Apple Watch gemessen: %@";
 "milo.pulse.watch.stale" = "Diese Messung ist nicht aktuell. Öffne für eine neue die App Herzfrequenz auf deiner Uhr und aktualisiere.";
 "milo.pulse.camera.title" = "Finger auf die Kamera";
-"milo.pulse.camera.done" = "Mit dem Blitz gemessen.";
+"milo.pulse.camera.done" = "Mit dem Blitz gemessen: eine Schätzung, kein Medizinprodukt.";
 "milo.pulse.camera.doubtful" = "Das Signal war unregelmäßig, der Wert kann falsch sein. Versuch es noch einmal, ohne zu fest zu drücken.";
 "milo.pulse.send" = "An Milo senden";
 "milo.pulse.again" = "Erneut messen";

@@ -23,9 +23,14 @@ struct FaceScanView: View {
     @State private var showCamera = false
     @State private var libraryItem: PhotosPickerItem?
     @State private var errorMessage: String?
+    @State private var showConsent = false
+    @AppStorage(FaceScanConsent.storageKey) private var consentStore = ""
 
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
     private var cameraAvailable: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
+    /// The selfie goes to OpenAI: nothing can be taken or picked before this explicit consent.
+    private var consentUID: String { UnifiedFirebaseService.shared.auth.currentUserId ?? "local" }
+    private var hasConsent: Bool { MiloConsent.isGranted(in: consentStore, uid: consentUID) }
 
     var body: some View {
         ZStack {
@@ -74,6 +79,25 @@ struct FaceScanView: View {
             }
         }
         .onAppear { store.reload() }
+        .sheet(isPresented: $showConsent) {
+            MiloConsentSheet(
+                titleKey: "calm.face.consent.title",
+                points: [
+                    ("server.rack", "calm.face.consent.point.provider"),
+                    ("iphone", "calm.face.consent.point.storage"),
+                    ("stethoscope", "calm.face.consent.point.wellness"),
+                    ("hand.raised.fill", "calm.face.consent.point.optional")
+                ],
+                acceptKey: "calm.face.consent.continue",
+                onAccept: {
+                    consentStore = MiloConsent.granting(consentUID, in: consentStore)
+                    AnalyticsManager.shared.track(event: "face_check_consent_given")
+                    showConsent = false
+                },
+                onDecline: { showConsent = false }
+            )
+            .presentationDetents([.large])
+        }
     }
 
     // MARK: Intro
@@ -119,17 +143,21 @@ struct FaceScanView: View {
             }
 
             VStack(spacing: 8) {
-                if cameraAvailable {
-                    primary(t("calm.face.take"), icon: "camera.fill") { showCamera = true }
+                if !hasConsent {
+                    primary(t(cameraAvailable ? "calm.face.take" : "calm.face.choose"), icon: cameraAvailable ? "camera.fill" : nil) { showConsent = true }
+                } else {
+                    if cameraAvailable {
+                        primary(t("calm.face.take"), icon: "camera.fill") { showCamera = true }
+                    }
+                    PhotosPicker(selection: $libraryItem, matching: .images) {
+                        Text(t(cameraAvailable ? "calm.face.library" : "calm.face.choose"))
+                            .font(.system(size: 15, weight: cameraAvailable ? .medium : .semibold))
+                            .foregroundStyle(cameraAvailable ? .white.opacity(0.75) : AudioPalette.backgroundDeep)
+                            .frame(maxWidth: .infinity, minHeight: cameraAvailable ? 40 : 52)
+                            .background(cameraAvailable ? Color.clear : AudioPalette.accent, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
                 }
-                PhotosPicker(selection: $libraryItem, matching: .images) {
-                    Text(t(cameraAvailable ? "calm.face.library" : "calm.face.choose"))
-                        .font(.system(size: 15, weight: cameraAvailable ? .medium : .semibold))
-                        .foregroundStyle(cameraAvailable ? .white.opacity(0.75) : AudioPalette.backgroundDeep)
-                        .frame(maxWidth: .infinity, minHeight: cameraAvailable ? 40 : 52)
-                        .background(cameraAvailable ? Color.clear : AudioPalette.accent, in: Capsule())
-                }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
@@ -195,6 +223,7 @@ struct FaceScanView: View {
     // MARK: Scan
 
     private func start(_ image: UIImage) {
+        guard hasConsent else { showConsent = true; return }
         errorMessage = nil
         phase = .scanning(image)
         Task {

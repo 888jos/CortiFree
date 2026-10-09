@@ -160,7 +160,7 @@
 "social.thousands_changed" = "CortiFreeで変わった何千もの人生";
 "social.discover_how" = "あなたと同じような人たちが、どうやって穏やかさを取り戻したのかご覧ください";
 "social.measurable_results" = "目に見える成果";
-"social.stress_reduction" = "わずか60日で、感じるストレスが平均68%減少";
+"social.stress_reduction" = "自分のペースで続けられる、心が穏やかになる小さな毎日の習慣";
 "social.without_cortifree" = "CortiFreeなし";
 "social.with_cortifree" = "CortiFreeあり";
 "social.stress_level" = "ストレスレベル";
@@ -1232,7 +1232,7 @@
 // Meditation
 "onboarding.eight_habits_flow.meditation_title" = "マインドフルな瞑想";
 "onboarding.eight_habits_flow.meditation_subtitle" = "心を落ち着かせ、ストレスを軽減";
-"onboarding.eight_habits_flow.meditation_benefit_1" = "不安を30%軽減";
+"onboarding.eight_habits_flow.meditation_benefit_1" = "不安をやわらげる助けになるかもしれません";
 "onboarding.eight_habits_flow.meditation_benefit_2" = "集中力を高める";
 "onboarding.eight_habits_flow.meditation_benefit_3" = "コルチゾールを減らす";
 "onboarding.eight_habits_flow.meditation_impact_serenity" = "穏やかさ";
@@ -2109,13 +2109,13 @@
 "breathing_detail.how_it_works.default" = "ガイドの呼吸リズムに合わせて、体に備わったリラックス反応を引き出し、落ち着きを取り戻しましょう。";
 
 // Scientific evidence texts (3 bullet points, 10-12 words max, 1 source)
-"breathing_detail.evidence.cardiac_coherence_1" = "3週間でコルチゾール値を23%低下";
+"breathing_detail.evidence.cardiac_coherence_1" = "ゆっくりした呼吸は、感じるストレスの軽減と関連があるとされています";
 "breathing_detail.evidence.cardiac_coherence_2" = "最初のセッションから心拍変動を改善";
 "breathing_detail.evidence.cardiac_coherence_3" = "神経系のバランスを整え、頭をクリアにする";
 
 "breathing_detail.evidence.box_breathing_1" = "心拍を同調させて神経系を落ち着かせる";
 "breathing_detail.evidence.box_breathing_2" = "心拍数を下げて深い落ち着きをもたらす";
-"breathing_detail.evidence.box_breathing_3" = "5分後に集中力が25%向上";
+"breathing_detail.evidence.box_breathing_3" = "数分で気持ちを切り替える助けになるかもしれません";
 
 "breathing_detail.evidence.alternate_breathing_1" = "左右の脳半球のバランスを整えて不安を軽減";
 "breathing_detail.evidence.alternate_breathing_2" = "副交感神経系を通じて心拍を落ち着かせる";
@@ -2158,7 +2158,7 @@
 "breathing_pattern.four_seven_eight.benefit_3" = "緊張をやわらげる";
 "breathing_pattern.four_seven_eight.benefit_4" = "思考を落ち着かせる";
 
-"breathing_pattern.coherence.benefit_1" = "コルチゾール -23%";
+"breathing_pattern.coherence.benefit_1" = "穏やかな気持ちになれます";
 "breathing_pattern.coherence.benefit_2" = "心拍変動 +";
 "breathing_pattern.coherence.benefit_3" = "免疫システム +";
 "breathing_pattern.coherence.benefit_4" = "感情を整える";
@@ -2189,36 +2189,36 @@
 "breathing_pattern.bhastrika.benefit_4" = "精神的な持久力";
 
 // MARK: - Breathing Pattern Scientific Evidence
-"breathing_pattern.deep_abdominal.evidence_1" = "迷走神経を活性化し、コルチゾールを18%低下";
-"breathing_pattern.deep_abdominal.evidence_2" = "わずか3分で血中酸素化を22%改善";
+"breathing_pattern.deep_abdominal.evidence_1" = "ゆっくりした深い呼吸でリラックス反応を促します";
+"breathing_pattern.deep_abdominal.evidence_2" = "より深く、効率のよい呼吸を促します";
 "breathing_pattern.deep_abdominal.evidence_3" = "心拍数を平均で毎分8拍低下";
 
-"breathing_pattern.four_seven_eight.evidence_1" = "ハーバードの研究によると、66日間で不安が44%減少";
-"breathing_pattern.four_seven_eight.evidence_2" = "定期的に実践する人の睡眠の質が65%向上";
+"breathing_pattern.four_seven_eight.evidence_1" = "不安な瞬間を落ち着かせる定番のテクニックです";
+"breathing_pattern.four_seven_eight.evidence_2" = "眠る前に気持ちを落ち着かせるためによく使われます";
 "breathing_pattern.four_seven_eight.evidence_3" = "血圧を平均7 mmHg低下";
 
-"breathing_pattern.coherence.evidence_1" = "わずか3週間の実践でコルチゾールが23%低下";
-"breathing_pattern.coherence.evidence_2" = "HeartMath Instituteによると、アンチエイジングホルモンDHEAが100%増加";
-"breathing_pattern.coherence.evidence_3" = "1,500人を対象とした研究によると、不安症状が46%減少";
+"breathing_pattern.coherence.evidence_1" = "ゆっくりした呼吸を続けると、感じるストレスが減ると研究で示されています";
+"breathing_pattern.coherence.evidence_2" = "研究では、心拍変動の健全さとの関連が指摘されています";
+"breathing_pattern.coherence.evidence_3" = "続けることで、不安な気持ちをやわらげる助けになるかもしれません";
 
-"breathing_pattern.slow66.evidence_1" = "メラトニンの分泌を38%増やし、睡眠を改善";
-"breathing_pattern.slow66.evidence_2" = "睡眠研究によると、寝つくまでの時間が54%短縮";
-"breathing_pattern.slow66.evidence_3" = "深い睡眠の質が42%向上（科学的に測定可能）";
+"breathing_pattern.slow66.evidence_1" = "体をゆっくり落ち着かせる、やさしいリズムです";
+"breathing_pattern.slow66.evidence_2" = "寝つきをよくする助けになるかもしれません";
+"breathing_pattern.slow66.evidence_3" = "就寝前の穏やかな状態をサポートします";
 
-"breathing_pattern.triangle.evidence_1" = "わずか5分の実践で不安が31%減少";
-"breathing_pattern.triangle.evidence_2" = "規則正しい呼吸リズムにより筋肉の緊張が45%減少";
-"breathing_pattern.triangle.evidence_3" = "セッション直後に頭のクリアさが27%向上";
+"breathing_pattern.triangle.evidence_1" = "不安な瞬間を落ち着かせるシンプルなリズムです";
+"breathing_pattern.triangle.evidence_2" = "一定のリズムが筋肉の緊張をほぐす助けになります";
+"breathing_pattern.triangle.evidence_3" = "実践後に頭がすっきりすると感じる人が多くいます";
 
-"breathing_pattern.box.evidence_1" = "Navy SEALsによると、わずか5分で集中力が25%向上";
-"breathing_pattern.box.evidence_2" = "1回のセッションでコルチゾールが24%低下";
-"breathing_pattern.box.evidence_3" = "心拍変動が34%増加し、神経のバランスが向上";
+"breathing_pattern.box.evidence_1" = "アスリートや緊急対応の現場で、プレッシャーの中でも集中を保つために使われています";
+"breathing_pattern.box.evidence_2" = "1回の実践でも気持ちが落ち着く助けになるかもしれません";
+"breathing_pattern.box.evidence_3" = "均等なリズムが自律神経のバランスをサポートします";
 
-"breathing_pattern.kapalabhati.evidence_1" = "脳の酸素化がほぼ瞬時に48%増加";
-"breathing_pattern.kapalabhati.evidence_2" = "ヨガを定期的に実践することで呼吸能力が36%向上";
-"breathing_pattern.kapalabhati.evidence_3" = "わずか10分のエクササイズで代謝が21%向上";
+"breathing_pattern.kapalabhati.evidence_1" = "意識がはっきりする、活力を高めるヨガの呼吸法です";
+"breathing_pattern.kapalabhati.evidence_2" = "古くから、呼吸を鍛えるために実践されてきました";
+"breathing_pattern.kapalabhati.evidence_3" = "手軽に元気を引き出すきっかけになります";
 
-"breathing_pattern.bhastrika.evidence_1" = "セッション後、身体のエネルギーが56%増加（科学的に測定）";
-"breathing_pattern.bhastrika.evidence_2" = "強い酸素化により認知パフォーマンスが39%向上";
+"breathing_pattern.bhastrika.evidence_1" = "実践後に活力を感じる人が多くいます";
+"breathing_pattern.bhastrika.evidence_2" = "頭が冴えて目が覚める感覚を得られるかもしれません";
 "breathing_pattern.bhastrika.evidence_3" = "体温が平均1.2℃上昇";
 
 "breathing_pattern.default.evidence" = "呼吸に関する数多くの国際的な科学研究で実証されたテクニック";
@@ -2287,34 +2287,34 @@
 
 // MARK: - Meditation Scientific Evidence
 "meditation.conscious_breathing.evidence_1" = "わずか3分の実践で副交感神経系を活性化";
-"meditation.conscious_breathing.evidence_2" = "1回のセッションでストレスホルモンのコルチゾールが25%低下";
+"meditation.conscious_breathing.evidence_2" = "続けることでストレスレベルを下げる助けになるかもしれません";
 "meditation.conscious_breathing.evidence_3" = "心拍変動を大きく改善し、ストレスからの回復を早める";
 
-"meditation.body_scan.evidence_1" = "わずか5分で不安レベルが30%低下";
+"meditation.body_scan.evidence_1" = "わずか数分で不安な気持ちをやわらげる助けになります";
 "meditation.body_scan.evidence_2" = "体への気づきを高め、慢性的な筋肉の緊張を効果的に軽減";
 "meditation.body_scan.evidence_3" = "MBSR療法における15以上の臨床研究で実証";
 
-"meditation.mindfulness.evidence_1" = "8週間で海馬の灰白質が8%増加";
-"meditation.mindfulness.evidence_2" = "不安が39%減少し、注意持続時間が大きく向上";
+"meditation.mindfulness.evidence_1" = "研究では、マインドフルネスの継続が注意に関わる脳の領域の変化と関連しているとされています";
+"meditation.mindfulness.evidence_2" = "不安をやわらげ、注意力を高める助けになるかもしれません";
 "meditation.mindfulness.evidence_3" = "脳の恐怖と不安の中枢である扁桃体の活動を低下";
 
 "meditation.grounding.evidence_1" = "3〜5分で不安発作を効果的に鎮める";
 "meditation.grounding.evidence_2" = "前頭前皮質を活性化し、脳のパニック反応を中断";
-"meditation.grounding.evidence_3" = "危機やパニックの場面で87%の有効性が実証";
+"meditation.grounding.evidence_3" = "パニックのような瞬間を乗り切るために広く使われているテクニックです";
 
-"meditation.visualization.evidence_1" = "安全な心の避難所を作ることでコルチゾールが27%低下";
+"meditation.visualization.evidence_1" = "心の中に安全な避難場所をつくることで、ストレスをやわらげるかもしれません";
 "meditation.visualization.evidence_2" = "実際の体験と同じ脳の領域を活性化";
 "meditation.visualization.evidence_3" = "気分を改善し、心的外傷後ストレス障害の症状を軽減";
 
-"meditation.compassion.evidence_1" = "実践により自己肯定感と自己価値感が35%向上";
+"meditation.compassion.evidence_1" = "続けることで自己肯定感を育む助けになるかもしれません";
 "meditation.compassion.evidence_2" = "うつ、不安、厳しい自己批判を大きく軽減";
 "meditation.compassion.evidence_3" = "Kristin Neff博士による200以上の研究で実証";
 
-"meditation.focus_clarity.evidence_1" = "持続的な注意力と集中力が安定して40%向上";
+"meditation.focus_clarity.evidence_1" = "長い目で見て、注意力や集中力を保つ助けになります";
 "meditation.focus_clarity.evidence_2" = "気が散るのを減らし、判断のクリアさを向上";
 "meditation.focus_clarity.evidence_3" = "わずか2週間の実践で目に見える効果";
 
-"meditation.yoga_nidra.evidence_1" = "継続的に実践する人の睡眠の質が68%向上";
+"meditation.yoga_nidra.evidence_1" = "より深く、安らかな眠りをサポートするためによく使われます";
 "meditation.yoga_nidra.evidence_2" = "30分の実践は2時間の深い睡眠に相当";
 "meditation.yoga_nidra.evidence_3" = "不眠を効果的に軽減し、体の深い回復を促す";
 
@@ -2340,7 +2340,7 @@
 "antistress.slow_walk.benefit_3" = "今ここにいる感覚が高まる";
 "antistress.slow_walk.benefit_4" = "身体のリラックス";
 
-"antistress.slow_walk.evidence_1" = "コルチゾール値を20%低下";
+"antistress.slow_walk.evidence_1" = "ストレスレベルを下げる助けになるかもしれません";
 "antistress.slow_walk.evidence_2" = "体への気づきを高め、緊張を軽減";
 "antistress.slow_walk.evidence_3" = "エンドルフィンの自然な分泌を促す";
 "antistress.slow_walk.source" = "Journal of Environmental Psychology（2019）";
@@ -2354,7 +2354,7 @@
 "antistress.conscious_stretching.benefit_3" = "血液循環";
 "antistress.conscious_stretching.benefit_4" = "深いリラックス";
 
-"antistress.conscious_stretching.evidence_1" = "たまった筋肉の緊張を30%軽減";
+"antistress.conscious_stretching.evidence_1" = "たまった筋肉の緊張をほぐす助けになります";
 "antistress.conscious_stretching.evidence_2" = "血液循環と酸素供給を改善";
 "antistress.conscious_stretching.evidence_3" = "ストレスに関連する慢性的な痛みを軽減";
 "antistress.conscious_stretching.source" = "Physical Therapy Journal（2017）";
@@ -2370,7 +2370,7 @@
 
 "antistress.audio_relaxation.evidence_1" = "すばやく深いリラックス状態に導く";
 "antistress.audio_relaxation.evidence_2" = "ストレスに関連する脳の活動を抑える";
-"antistress.audio_relaxation.evidence_3" = "睡眠の質を40%向上";
+"antistress.audio_relaxation.evidence_3" = "睡眠の質を高める助けになるかもしれません";
 "antistress.audio_relaxation.source" = "Sleep Medicine Reviews（2018）";
 "antistress.audio_relaxation.subtitle" = "ガイド音声で深くリラックス";
 
@@ -2383,7 +2383,7 @@
 "antistress.white_noise.benefit_4" = "心が安らぐ";
 
 "antistress.white_noise.evidence_1" = "邪魔な環境音をかき消す";
-"antistress.white_noise.evidence_2" = "寝つきが38%改善";
+"antistress.white_noise.evidence_2" = "寝つきをよくする助けになるかもしれません";
 "antistress.white_noise.evidence_3" = "頭の働きすぎを抑える";
 "antistress.white_noise.source" = "Journal of Sleep Research（2017）";
 "antistress.white_noise.subtitle" = "心を落ち着かせる癒やしのサウンド";
@@ -2396,7 +2396,7 @@
 "antistress.positive_mantra.benefit_3" = "心の強さ";
 "antistress.positive_mantra.benefit_4" = "やる気";
 
-"antistress.positive_mantra.evidence_1" = "ネガティブな思考を40%減少";
+"antistress.positive_mantra.evidence_1" = "ネガティブな思考のループを断ち切る助けになります";
 "antistress.positive_mantra.evidence_2" = "自信と自己肯定感を高める";
 "antistress.positive_mantra.evidence_3" = "予期不安を軽減";
 "antistress.positive_mantra.source" = "Journal of Clinical Psychology（2018）";
@@ -2471,9 +2471,9 @@
 "antistress.body_scan.benefit_2" = "緊張をほぐす";
 "antistress.body_scan.benefit_3" = "睡眠の改善";
 "antistress.body_scan.benefit_4" = "体への気づき";
-"antistress.body_scan.evidence_1" = "慢性的なストレスと不安を35%軽減";
+"antistress.body_scan.evidence_1" = "続けることで、ストレスや不安をやわらげる助けになるかもしれません";
 "antistress.body_scan.evidence_2" = "体にたまった筋肉の緊張を解放";
-"antistress.body_scan.evidence_3" = "睡眠の質を40%向上";
+"antistress.body_scan.evidence_3" = "睡眠の質を高める助けになるかもしれません";
 "antistress.body_scan.source" = "Journal of Behavioral Medicine（2017）";
 
 // Benefits
@@ -2573,7 +2573,7 @@
 "learning.card.meditation_science.section1.title" = "科学的証拠";
 "learning.card.meditation_science.section1.content" = "何千もの科学研究が瞑想の効果を示しています：\n\n• 前頭前皮質が厚くなる\n• 扁桃体（恐怖の中枢）が縮小する\n• 灰白質が増える";
 "learning.card.meditation_science.section2.title" = "測定できる効果";
-"learning.card.meditation_science.section2.content" = "• 8週間でコルチゾールが30%減少\n• 集中力が40%向上\n• 不安症状が50%減少";
+"learning.card.meditation_science.section2.content" = "• 研究では、定期的な瞑想とストレスレベルの低下との関連が指摘されています\n• 続けることで集中力が高まるかもしれません\n• 不安の症状が減ったと感じる人が多くいます";
 "learning.card.meditation_science.section3.title" = "必要な時間";
 "learning.card.meditation_science.section3.content" = "毎日10〜15分の練習を続けると、わずか8週間で脳に目に見える変化が現れます。\n\nCortiFreeで、もう正しい道を歩んでいますよ！";
 
@@ -2609,7 +2609,7 @@
 "learning.card.sleep_cycles.section2.title" = "サイクルの最適化";
 "learning.card.sleep_cycles.section2.content" = "• 7.5時間または9時間の睡眠を目指す（5〜6サイクル）\n• 6時間や8時間は避ける（サイクル途中で起きる＝疲れが残る）\n• 決まった時間に寝て起きる（週末も）";
 "learning.card.sleep_cycles.section3.title" = "コルチゾールへの影響";
-"learning.card.sleep_cycles.section3.content" = "• 深い睡眠 = コルチゾールが70%低下\n• 睡眠不足 = 翌日のコルチゾールが37%増加\n• 3晩の睡眠不足 = インスリン抵抗性（糖尿病予備群）";
+"learning.card.sleep_cycles.section3.content" = "• 深い眠りは、体がストレスから回復する助けになります\n• 睡眠不足だと、翌日ストレスを感じやすくなることがあります\n• 短い睡眠が続くと全体的な健康に影響します。睡眠不足が続くときは医師に相談してください";
 "learning.card.sleep_cycles.section4.title" = "量より質";
 "learning.card.sleep_cycles.section4.content" = "浅く途切れがちな8時間の睡眠より、深い睡眠をたっぷりとれる6時間のほうが良いのです！";
 
@@ -2629,9 +2629,9 @@
 "learning.card.food.title" = "ストレス対策の食事";
 "learning.card.food.description" = "コルチゾールを整える食べ物";
 "learning.card.food.section1.title" = "コルチゾールを下げる食べ物";
-"learning.card.food.section1.content" = "良質な脂質：\n• アボカド、ナッツ、アーモンド\n• オリーブオイル、青魚（サーモン、サバ）\n• 抗炎症作用のあるオメガ3が豊富\n\nマグネシウムが豊富な食品：\n• ダークチョコレート（カカオ70%以上）\n• ほうれん草、バナナ\n• かぼちゃの種、アーモンド\n• マグネシウムは不安とコルチゾールを減らす\n\nビタミンC：\n• 柑橘類、キウイ、パプリカ\n• コルチゾールを15〜20%減らす\n• 免疫力を高める\n\n緑茶と紅茶：\n• 心を落ち着かせるL-テアニン\n• 6週間でコルチゾールが20%減少";
+"learning.card.food.section1.content" = "良質な脂質：\n• アボカド、ナッツ、アーモンド\n• オリーブオイル、青魚（サーモン、サバ）\n• 抗炎症作用のあるオメガ3が豊富\n\nマグネシウムが豊富な食品：\n• ダークチョコレート（カカオ70%以上）\n• ほうれん草、バナナ\n• かぼちゃの種、アーモンド\n• マグネシウムは神経系のバランスに関わっています\n\nビタミンC：\n• 柑橘類、キウイ、パプリカ\n• 体がストレスに対処する助けになるかもしれません\n• 免疫力を支える\n\n緑茶と紅茶：\n• 心を落ち着かせるL-テアニン\n• コーヒーよりもやさしい代わりの選択肢";
 "learning.card.food.section2.title" = "コルチゾールを上げる食べ物";
-"learning.card.food.section2.content" = "カフェインのとりすぎ：\n• 1日400mg以上（コーヒー4杯）\n• コルチゾールが30%上昇\n• 睡眠を妨げる\n\n精製された糖分：\n• 血糖値の急上昇 = コルチゾールの急上昇\n• 全身の炎症\n• 依存と食欲\n\nアルコール：\n• 深い睡眠を妨げる\n• 夜間のコルチゾールを増やす\n• 脱水";
+"learning.card.food.section2.content" = "カフェインの摂りすぎ：\n• 1日400mg以上（コーヒー4杯分）\n• ストレス反応を強めることがあります\n• 睡眠の妨げになります\n\n精製された糖類：\n• 血糖値の急上昇と急降下\n• 気分やエネルギーに影響することがあります\n• 食べたい衝動\n\nアルコール：\n• 深い眠りを妨げます\n• 翌日、緊張が残りやすくなることがあります\n• 脱水";
 "learning.card.food.section3.title" = "タイミングが大切";
 "learning.card.food.section3.content" = "• タンパク質たっぷりの朝食（コルチゾールを安定させる）\n• 夜は糖分とカフェインを避ける\n• 夕食は軽めに、寝る2〜3時間前までに";
 
@@ -2649,7 +2649,7 @@
 "learning.card.nature.title" = "自然の力";
 "learning.card.nature.description" = "自然が心を癒す理由";
 "learning.card.nature.section1.title" = "科学研究";
-"learning.card.nature.section1.content" = "自然とふれあうことには、ストレスへの効果が実証されています：\n\n• 自然の中で20分過ごすとコルチゾールが15%減少\n• 血圧の低下\n• 気分の改善";
+"learning.card.nature.section1.content" = "自然とふれあうことは、ストレスの軽減と関連があるとされています：\n\n• 自然の中で20分過ごすと、穏やかな気持ちになる人が多くいます\n• 血圧を下げる助けになるかもしれません\n• 気分の改善";
 "learning.card.nature.section2.title" = "森林浴";
 "learning.card.nature.section2.content" = "• 日本古来の習慣\n• 森の中をゆっくり歩く\n• 五感でつながる";
 "learning.card.nature.section3.title" = "効果";
@@ -2665,7 +2665,7 @@
 "learning.card.cardiac_coherence.section2.title" = "すぐに得られる効果";
 "learning.card.cardiac_coherence.section2.content" = "• 3〜5分でコルチゾールが低下\n• 心拍数の低下\n• 血圧の低下\n• 落ち着きと頭のすっきり感";
 "learning.card.cardiac_coherence.section3.title" = "長期的な効果（2週間後）";
-"learning.card.cardiac_coherence.section3.content" = "• コルチゾールが平均24%減少\n• 感情をコントロールしやすくなる\n• 睡眠の質の向上\n• 免疫力の強化\n• DHEA（抗老化ホルモン）が17%増加";
+"learning.card.cardiac_coherence.section3.content" = "• ストレスレベルを下げる助けになるかもしれません\n• 感情のコントロールがしやすくなる\n• 睡眠の質を高める助けになるかもしれません\n• 研究では、心拍変動の健全さとの関連が指摘されています";
 "learning.card.cardiac_coherence.section4.title" = "実践している人たち";
 "learning.card.cardiac_coherence.section4.content" = "• 戦闘機パイロット\n• トップアスリート\n• 医師や医療従事者\n• 企業の経営者";
 "learning.card.cardiac_coherence.section5.title" = "CortiFreeでは";
@@ -2677,9 +2677,9 @@
 "learning.card.yoga.section1.title" = "ストレス対策のヨガの種類";
 "learning.card.yoga.section1.content" = "ヨガは単なる運動ではありません。体と心の両方に働きかける、強力なストレス調整ツールです。\n\n• ハタヨガ：穏やかで初心者に最適\n• 陰ヨガ：ポーズを長く保ち、とてもリラックスできる\n• ヨガニドラ：横になって行う誘導瞑想\n• ヴィンヤサ：動きがありながら瞑想的";
 "learning.card.yoga.section2.title" = "コルチゾールへの効果";
-"learning.card.yoga.section2.content" = "• 60分のセッション後に27%減少\n• 継続すると効果が積み重なる\n• 12週間（週3回）でコルチゾールが41%減少";
+"learning.card.yoga.section2.content" = "• 1回の実践でも穏やかな気持ちになる人が多くいます\n• 続けるほど効果が積み重なります\n• 研究では、定期的なヨガとストレスの軽減との関連が指摘されています";
 "learning.card.yoga.section3.title" = "科学的に実証された効果";
-"learning.card.yoga.section3.content" = "体への効果：\n• 柔軟性と筋力\n• 姿勢の改善\n• 慢性的な痛みの軽減\n• バランス感覚の向上\n\n心への効果：\n• 不安症状が65%減少\n• 感情をコントロールしやすくなる\n• 灰白質の増加\n• 集中力の向上\n\n生理的な効果：\n• 副交感神経系（リラックス）の活性化\n• 心拍変動の改善\n• 炎症の軽減\n• 消化の改善";
+"learning.card.yoga.section3.content" = "身体面：\n• 柔軟性と筋力\n• 姿勢の改善\n• 慢性的な痛みをやわらげるかもしれません\n• バランス感覚の向上\n\n精神面：\n• 不安の症状をやわらげるかもしれません\n• 感情のコントロールがしやすくなる\n• 集中力の向上\n\n生理面：\n• 副交感神経（リラックス）の活性化\n• 心拍変動の改善\n• 消化をサポートするかもしれません";
 "learning.card.yoga.section4.title" = "脳の中で起きていること";
 "learning.card.yoga.section4.content" = "• GABA（心を落ち着かせる神経伝達物質）の増加\n• 扁桃体（恐怖・ストレス）の活動の低下\n• 前頭前皮質（感情のコントロール）の活性化";
 "learning.card.yoga.section5.title" = "体が硬くても大丈夫";
@@ -2695,13 +2695,13 @@
 "learning.card.sleep_cortisol.section3.title" = "CortiFreeの解決策";
 "learning.card.sleep_cortisol.section3.content" = "• 朝7時前に起きる（朝のルーティン）\n• 夜11時前に寝る（回復）\n• 夜の瞑想（眠りの準備）";
 "learning.card.sleep_cortisol.section4.title" = "知っていましたか？";
-"learning.card.sleep_cortisol.section4.content" = "たった一晩眠れなかっただけで、翌日のコルチゾールが37%増えることがあります！";
+"learning.card.sleep_cortisol.section4.content" = "たった一晩の睡眠不足でも、翌日はストレスを感じやすく、イライラしやすくなることがあります！";
 
 // MARK: - Learning Card 13: Hydration
 "learning.card.hydration.title" = "水分補給とストレス";
 "learning.card.hydration.description" = "水を飲むとストレスが減る理由";
 "learning.card.hydration.section1.title" = "脱水による影響";
-"learning.card.hydration.section1.content" = "水はストレスの調整に重要な役割を果たしています：\n\n• コルチゾールの増加（+25%）\n• 疲れやイライラ\n• 集中しにくくなる";
+"learning.card.hydration.section1.content" = "水分は、ストレスへの対処にも関わっています。軽い脱水でも次のようなことが起こり得ます：\n\n• 緊張を感じやすくなる\n• 疲労感やイライラ\n• 集中しづらくなる";
 "learning.card.hydration.section2.title" = "しっかり水分をとるメリット";
 "learning.card.hydration.section2.content" = "• 体温の調節\n• 老廃物の排出\n• 脳の働きが良くなる";
 "learning.card.hydration.section3.title" = "おすすめ";
@@ -2725,7 +2725,7 @@
 "learning.card.social.title" = "ポジティブな人間関係";
 "learning.card.social.description" = "人とのつながりの大切さ";
 "learning.card.social.section1.title" = "コルチゾールへの影響";
-"learning.card.social.section1.content" = "質の良い人とのつながりは、ストレスケアに欠かせません：\n\n• ポジティブな交流 → コルチゾールが20%減少\n• オキシトシン（「愛情ホルモン」）の分泌\n• 安心感と帰属感";
+"learning.card.social.section1.content" = "質の高い人とのつながりは、ストレスと上手につき合うために欠かせません：\n\n• ポジティブな交流は穏やかな気持ちにつながります\n• オキシトシン（「愛情ホルモン」）の分泌\n• 安心感と所属感";
 "learning.card.social.section2.title" = "良いつながりの種類";
 "learning.card.social.section2.content" = "• 友人との深い会話\n• 家族と過ごす大切な時間\n• グループ活動（スポーツ、趣味）";
 "learning.card.social.section3.title" = "避けたいこと";
@@ -2741,7 +2741,7 @@
 "learning.card.light.section2.title" = "体内時計への影響";
 "learning.card.light.section2.content" = "• コルチゾールとメラトニンのサイクルを整える\n• 夜の睡眠の質を高める\n• 日中のエネルギーと覚醒度を高める\n• すべての生体リズムをシンクロさせる";
 "learning.card.light.section3.title" = "科学研究";
-"learning.card.light.section3.content" = "• 朝に光を浴びると日中のエネルギーが25%アップ\n• 夜に1時間早く眠れる\n• うつ症状が35%減少\n• 食欲のコントロールが改善";
+"learning.card.light.section3.content" = "• 朝の光で日中のエネルギーが増える\n• 夜、寝つきやすくなる\n• 気分を上向かせる助けになるかもしれません\n• 食欲の調整がしやすくなる";
 "learning.card.light.section4.title" = "夜に避けたいこと";
 "learning.card.light.section4.content" = "• 寝る1〜2時間前の画面\n• 明るい照明（暖色系や暗めの照明がおすすめ）\n• メラトニンを妨げるブルーライト";
 "learning.card.light.section5.title" = "CortiFreeのヒント";
@@ -2755,7 +2755,7 @@
 "learning.card.negative_thoughts.section2.title" = "3コラム法";
 "learning.card.negative_thoughts.section2.content" = "コラム1：状況\nコラム2：自動思考\nコラム3：現実的な別の考え方";
 "learning.card.negative_thoughts.section3.title" = "測定できる効果";
-"learning.card.negative_thoughts.section3.content" = "• 認知療法で不安が40%減少\n• こうした思考に気づき修正することでコルチゾールが28%減少\n• 8〜12週間で持続的な改善";
+"learning.card.negative_thoughts.section3.content" = "• 認知的な手法は、不安を減らす方法として十分に研究されています\n• こうした考えに気づいて捉え直すことで、ストレスを減らせることがあります\n• 持続的な改善は、8〜12週間の実践の後に見られることが多いです";
 "learning.card.negative_thoughts.section4.title" = "ジャーナルのヒント";
 "learning.card.negative_thoughts.section4.content" = "CortiFreeのジャーナルに思考を書き出すと、それに気づき、問い直し、変えていく助けになります！";
 
@@ -2763,9 +2763,9 @@
 "learning.card.gratitude.title" = "感謝と脳";
 "learning.card.gratitude.description" = "感謝の科学的な効果";
 "learning.card.gratitude.section1.title" = "脳の中で起きていること";
-"learning.card.gratitude.section1.content" = "感謝の実践は、ただの「ポジティブ思考」ではありません。脳とストレスレベルを変える、科学的に検証されたテクニックです。\n\n• 内側前頭前皮質（幸福感）の活性化\n• ドーパミンとセロトニン（幸せ）の分泌\n• 扁桃体（ストレス・恐怖）の活動の低下\n• コルチゾールが平均23%減少";
+"learning.card.gratitude.section1.content" = "感謝を実践することは単なる「ポジティブ思考」ではありません。意識の向け方やストレスレベルを変えられる、十分に研究された習慣です。\n\n• 幸福感に関わる脳の領域の活動と関連があるとされています\n• ポジティブな感情を高めるかもしれません\n• ストレスを感じにくくなる助けになるかもしれません";
 "learning.card.gratitude.section2.title" = "主な科学的研究";
-"learning.card.gratitude.section2.content" = "カリフォルニア大学バークレー校（2015年）：\n• 週3回の感謝ジャーナル\n• 12週間でうつ症状が27%減少\n• 睡眠と人間関係の改善\n\nハーバード大学医学大学院（2021年）：\n• 1日5分の感謝\n• 幸福感が25%アップ\n• 不安が18%減少";
+"learning.card.gratitude.section2.content" = "研究が示唆していること：\n• 週に数回、感謝日記を書く\n• 長期的な気分の向上と関連があるとされています\n• 睡眠や人間関係の改善\n\n日常生活では：\n• 1日5分の感謝の時間\n• 幸せを感じるようになったという人が多くいます\n• 不安も感じにくくなります";
 "learning.card.gratitude.section3.title" = "効果的な実践方法";
 "learning.card.gratitude.section3.content" = "3つの感謝メソッド（1日5分）：\n1. 感謝していることを3つ書く\n2. 具体的に書く（「家族」だけでなく）\n3. 書きながらその気持ちを味わう\n4. 毎日違うことに感謝する\n\n例：\n漠然としすぎ：「健康に感謝している」\n具体的：「痛みなく朝の散歩ができて、顔に新鮮な空気を感じられたことに感謝している」";
 "learning.card.gratitude.section4.title" = "長期効果";
@@ -2901,7 +2901,7 @@
 "tips.card.environment.section1.title" = "片づけ（こんまり流をアレンジ）";
 "tips.card.environment.section1.content" = "週に1エリアずつ：\n\nひとつひとつ手に取って、自分に問いかけます：\n• この6か月で使った？\n• ときめく？\n• 本当に役に立つ？\n\n3つともNO → 寄付、リサイクル、または処分。\n\n目に見える散らかり = 心の負担。\nすっきりした空間 = すっきりした心。";
 "tips.card.environment.section2.title" = "観葉植物";
-"tips.card.environment.section2.content" = "育てやすいストレス対策植物トップ5：\n\n1. ポトス（空気 + ストレス）\n2. サンスベリア（夜に酸素を出す）\n3. アロエベラ（空気を浄化）\n4. オリヅルラン（簡単で効果的）\n5. ラベンダー（心を落ち着かせる香り）\n\n実証された効果：\n• コルチゾールが15%減少\n• 空気の質が良くなる\n• 見た目に癒される";
+"tips.card.environment.section2.content" = "手入れが簡単なストレス対策の植物トップ5：\n\n1. ポトス（空気＋ストレス）\n2. サンスベリア（夜に酸素を出す）\n3. アロエベラ（空気をきれいにする）\n4. オリヅルラン（育てやすく効果的）\n5. ラベンダー（心を落ち着かせる香り）\n\nメリット：\n• 穏やかに感じられる空間\n• 空気の質の向上\n• 見た目にも癒やされる";
 "tips.card.environment.section3.title" = "自然光をたっぷりと";
 "tips.card.environment.section3.content" = "• 起きたらカーテンを開ける\n• できればデスクは窓の近くに\n• 朝は昼光色の電球（5000〜6500K）\n• 夜は電球色の電球（2700〜3000K）\n• 寝室には調光器を\n\n光 = 概日リズムを整える一番の要素。";
 "tips.card.environment.section4.title" = "音と音楽";
@@ -3054,7 +3054,7 @@
 "antistress.grounding_5_senses.benefit_4" = "今に集中できる";
 "antistress.grounding_5_senses.evidence_1" = "不安な思考のループを効果的に断ち切る";
 "antistress.grounding_5_senses.evidence_2" = "2分でパニック症状を軽減";
-"antistress.grounding_5_senses.evidence_3" = "感情のコントロールが30%向上";
+"antistress.grounding_5_senses.evidence_3" = "強い感情を整える助けになります";
 "antistress.grounding_5_senses.source" = "Journal of Anxiety Disorders（2019年）";
 
 // Anchoring 5-4-3-2-1
@@ -3412,7 +3412,7 @@
 // MARK: - Onboarding V2 - Social Proof
 "onboarding_v2.social_proof.users_count" = "50,000人以上のユーザー";
 "onboarding_v2.social_proof.rating" = "4.8/5";
-"onboarding_v2.social_proof.stress_reduction" = "ストレスが平均47%減少";
+"onboarding_v2.social_proof.stress_reduction" = "一日ずつ、穏やかな気持ちに";
 
 // MARK: - Onboarding V2 - Testimonials
 "onboarding_v2.testimonial.1_name" = "Sophie";
@@ -3971,6 +3971,7 @@
 
 // Radar chart section
 "paywall_custom.radar_title" = "%@さんの28日間の変化";
+"paywall_custom.radar_disclaimer" = "回答にもとづく目安の予測であり、保証された結果や医学的な結果ではありません。";
 
 // Radar labels
 "paywall_custom.radar_label_global" = "総合";
@@ -4008,33 +4009,34 @@
 "paywall_custom.habit_social_stat" = "週4回、人とつながります。";
 
 // Symptom fix strings - Mental
-"paywall_custom.fix_anxiety" = "不安の渦に巻き込まれず、穏やかな心を取り戻せます";
-"paywall_custom.fix_focus" = "集中力が戻り、無理なくフロー状態に入れます";
-"paywall_custom.fix_negative_thoughts" = "消耗するネガティブ思考のループを断ち切れます";
-"paywall_custom.fix_irritability" = "反応しすぎなくなり、神経系が本当に落ち着きます";
-"paywall_custom.fix_brain_fog" = "頭のもやが晴れ、またクリアに考えられます";
-"paywall_custom.fix_motivation" = "やる気が再び灯り、また前に進みたくなります";
+"paywall_custom.fix_anxiety" = "不安の渦を静める助けになるツール";
+"paywall_custom.fix_focus" = "集中しやすくなる助けになるエクササイズ";
+"paywall_custom.fix_negative_thoughts" = "心を消耗させるネガティブな考えから抜け出すテクニック";
+"paywall_custom.fix_irritability" = "イライラしにくくなる助けになる呼吸法";
+"paywall_custom.fix_brain_fog" = "頭がすっきりしやすくなる助けになる短い休憩";
+"paywall_custom.fix_motivation" = "やる気を取り戻す助けになる、毎日の小さな達成";
 
 // Symptom fix strings - Physical
-"paywall_custom.fix_sleep" = "ぐっすり眠り、しっかり休めた状態で目覚められます";
-"paywall_custom.fix_fatigue" = "慢性的な疲れが薄れ、一日中エネルギーが続きます";
-"paywall_custom.fix_headaches" = "頭や首にたまった緊張をゆるめられます";
-"paywall_custom.fix_tension" = "体の緊張がほどけ、体が警戒モードから解放されます";
-"paywall_custom.fix_weight" = "規則正しい習慣で体をいたわれます";
-"paywall_custom.fix_heart" = "心拍が落ち着き、呼吸がいちばん頼れるツールになります";
+"paywall_custom.fix_sleep" = "ぐっすり眠る助けになる夜のルーティン";
+"paywall_custom.fix_fatigue" = "日中の消耗感をやわらげる助けになる習慣";
+"paywall_custom.fix_headaches" = "頭や首の緊張をほぐす助けになるエクササイズ";
+"paywall_custom.fix_tension" = "体の力みを手放す助けになるリラクゼーション";
+"paywall_custom.fix_weight" = "体をいたわる、より安定した毎日の習慣";
+"paywall_custom.fix_heart" = "動悸がするときに落ち着く助けになるゆっくりした呼吸";
 
 // Symptom fix strings - Social
-"paywall_custom.fix_isolation" = "無理をせず、人とつながりたい気持ちを取り戻せます";
-"paywall_custom.fix_conflicts" = "ピリピリした状態から抜け出すと、人間関係も穏やかになります";
-"paywall_custom.fix_interest" = "エネルギーが戻るにつれて、好きなことへの興味も戻ってきます";
-"paywall_custom.fix_communication" = "神経系が整うと、コミュニケーションがうまくいきます";
-"paywall_custom.fix_impatience" = "いちばん大切な人たちに、またやさしくなれます";
+"paywall_custom.fix_isolation" = "人とまたつながる助けになるやさしいステップ";
+"paywall_custom.fix_conflicts" = "人との緊張した場面をやわらげる助けになる、気持ちを落ち着かせるツール";
+"paywall_custom.fix_interest" = "好きなことへのエネルギーを見つける助けになるルーティン";
+"paywall_custom.fix_communication" = "ストレス下でも落ち着いて話す助けになるテクニック";
+"paywall_custom.fix_impatience" = "大切な人に対して辛抱強くいられるようにする小さな間";
 
 // Fallback fix strings
-"paywall_custom.fallback_stress" = "ストレスをやり過ごすのではなく、乗り越えていけます";
-"paywall_custom.fallback_sleep" = "眠って、しっかり休めた状態で目覚められます";
-"paywall_custom.fallback_energy" = "エネルギーが途切れず、一日中続きます";
-"paywall_custom.fallback_focus" = "集中力が戻り、無理なくフロー状態に";
+"paywall_custom.fallback_stress" = "ストレスを我慢するのではなく、乗り越えていくためのツール";
+"paywall_custom.fallback_sleep" = "ぐっすり眠り、すっきり目覚める助けになるルーティン";
+"paywall_custom.fallback_energy" = "一日中エネルギーが続く助けになる習慣";
+"paywall_custom.fallback_focus" = "集中しやすくなる助けになるエクササイズ";
+"paywall_custom.fix_disclaimer" = "結果には個人差があります。CortiFreeはウェルネスアプリであり、医療の代わりにはなりません。動悸、続く疲労感、体重の変化などの症状が気になる場合は、医師にご相談ください。";
 "first_launch.cta_sub" = "無料クイズ・約4分";
 "editprofile.first_name_required" = "プロフィールを保存する前にファーストネームを入力してください。";
 "first_launch.mascot_intro" = "こんにちは、Miloです。あなたが穏やかさ、元気、集中力を取り戻せるようにサポートするパートナーです。あなた専用のプランをつくるために、いくつか質問させてくださいね。";
@@ -4342,6 +4344,9 @@
 "access_locked.title" = "サブスクリプションの期限が切れました";
 "access_locked.subtitle" = "CortiFreeを再開して、プラン・セッション・エクササイズを取り戻しましょう。";
 "access_locked.unlock" = "CortiFreeを再開する";
+"access_locked.title_new" = "CortiFreeのロックを解除";
+"access_locked.subtitle_new" = "サブスクリプションを開始して、あなた専用のプラン・セッション・エクササイズを利用しましょう。";
+"access_locked.unlock_new" = "プランを見る";
 "access_locked.restore" = "購入を復元";
 
 /* Breathing */
@@ -4736,13 +4741,14 @@
 "assistant.consent.title" = "Miloとチャットする前に";
 "assistant.consent.point.provider" = "メッセージはCortiFreeのサーバーを経由してAIプロバイダー（DeepSeek）に送信され、Miloの返答が生成されます。";
 "assistant.consent.point.plan" = "返答をパーソナライズするため、CortiFreeプランの簡単な概要（目標・エクササイズ・進捗）がメッセージと一緒に送信されます。";
+"assistant.consent.point.health" = "Appleヘルスケアを連携しているか、アプリで脈拍を測定した場合は、Miloがアドバイスを調整できるよう、最近の心拍数・心拍変動・睡眠のデータも送信されます。広告に使われることはありません。";
 "assistant.consent.point.diagnosis" = "Miloはウェルビーイングに関する一般的な情報を提供するもので、診断や医療アドバイスではありません。緊急時は救急サービスに連絡してください。";
 "assistant.consent.point.revoke" = "この同意は「設定 › プライバシー」でいつでも取り消せます。";
 "assistant.consent.privacy" = "プライバシーポリシーを読む";
 "assistant.consent.accept" = "同意して続ける";
 "assistant.consent.decline" = "今はしない";
 "settings.privacy.milo" = "AIアシスタント Milo";
-"settings.privacy.milo_subtitle" = "メッセージとプランの概要をDeepSeekが処理することを許可します";
+"settings.privacy.milo_subtitle" = "メッセージ、プランの概要、心拍数と睡眠のデータをDeepSeekが処理することを許可します";
 
 // MARK: - Auth & onboarding demo
 "auth.signup_subtitle" = "CortiFreeに参加して、ウェルビーイングの旅を始めましょう";
@@ -4949,8 +4955,8 @@
 "widget.v.milo.desc" = "Miloがあなたの一日に反応します：のんびり、誇らしげ、お疲れ、おやすみ。";
 "widget.v.breathe.name" = "深呼吸";
 "widget.v.breathe.desc" = "アプリを開かずに、ワンタップで1分間のボックス呼吸。";
-"widget.v.cortisol.name" = "コルチゾールメーター";
-"widget.v.cortisol.desc" = "推定ストレスレベル。セルフケアをすると下がります。";
+"widget.v.cortisol.name" = "こころの天気";
+"widget.v.cortisol.desc" = "チェックインから見えるあなたの気分の天気。セルフケアをすると晴れてきます。";
 "widget.v.mood.name" = "今日の気分";
 "widget.v.mood.desc" = "ワンタップで気分を記録して、1か月をカラフルに。";
 "widget.v.planet.name" = "あなたの惑星";
@@ -4983,16 +4989,16 @@
 "widget.planet.name.saturn" = "土星";
 "widget.planet.name.uranus" = "天王星";
 "widget.planet.name.neptune" = "海王星";
-"widget.cortisol.title" = "コルチゾール";
-"widget.cortisol.tier.0" = "穏やか";
-"widget.cortisol.tier.1" = "安定";
-"widget.cortisol.tier.2" = "上昇中";
-"widget.cortisol.tier.3" = "注意";
+"widget.cortisol.title" = "こころの天気";
+"widget.cortisol.tier.0" = "快晴";
+"widget.cortisol.tier.1" = "晴れ";
+"widget.cortisol.tier.2" = "くもり空";
+"widget.cortisol.tier.3" = "嵐";
 "widget.cortisol.hint.0" = "その調子。体が喜んでいます。";
 "widget.cortisol.hint.1" = "少し深呼吸すれば完璧です。";
 "widget.cortisol.hint.2" = "2分間画面から離れて、ゆっくり呼吸を。";
 "widget.cortisol.hint.3" = "ストップ。今すぐ1分間呼吸しましょう。";
-"widget.cortisol.disclaimer" = "遊び心のある推定値で、医学的な測定ではありません";
+"widget.cortisol.disclaimer" = "チェックインにもとづくもので、医学的な測定ではありません";
 "widget.mood.title" = "今の気分は？";
 "widget.mood.recent" = "直近14日間";
 "widget.message.title" = "Miloのひとこと";
@@ -5329,6 +5335,12 @@
 "calm.face.tip.neutral" = "自然な表情でカメラを見て";
 "calm.face.tip.nomakeup" = "できればすっぴんで、毎週同じ時間に";
 "calm.face.privacy" = "写真はiPhoneの進捗写真に保存されます。分析のため一度だけOpenAIに送信され、CortiFreeのサーバーには保存されません。";
+"calm.face.consent.title" = "フェイスチェックの前に";
+"calm.face.consent.point.provider" = "セルフィーはCortiFreeのサーバーを経由してAIプロバイダー（OpenAI）に送信され、見た目の疲れのサインが説明されます。分析は一度だけで、CortiFreeには保存されず、本人の識別にも使われません。";
+"calm.face.consent.point.storage" = "写真そのものはiPhoneの進捗写真に保存されます。いつでも削除できます。";
+"calm.face.consent.point.wellness" = "これはウェルビーイングのための観察であり、医療的な測定や診断ではありません。";
+"calm.face.consent.point.optional" = "フェイスチェックは任意です。スキップしてもCortiFreeの他の機能はすべて使えます。";
+"calm.face.consent.continue" = "同意して続ける";
 "calm.face.take" = "セルフィーを撮る";
 "calm.face.library" = "写真を選ぶ";
 "calm.face.choose" = "写真を選ぶ";
@@ -5512,7 +5524,7 @@
 "milo.pulse.watch.measured" = "Apple Watchで測定（%@）";
 "milo.pulse.watch.stale" = "この測定は最新ではありません。ウォッチで「心拍数」アプリを開いてから更新してください。";
 "milo.pulse.camera.title" = "指をカメラに当てて";
-"milo.pulse.camera.done" = "フラッシュで測定しました。";
+"milo.pulse.camera.done" = "フラッシュで測定しました。推定値であり、医療機器ではありません。";
 "milo.pulse.camera.doubtful" = "信号が不安定でした。数値がずれている可能性があります。強く押さえすぎずにもう一度試してください。";
 "milo.pulse.send" = "Miloに送る";
 "milo.pulse.again" = "もう一度測る";

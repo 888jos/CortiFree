@@ -7,17 +7,18 @@
 "CFBundleDisplayName" = "CortiFree";
 
 /* App Description */
-"NSHumanReadableCopyright" = "© 2025 CortiFree. All rights reserved.";
+"NSHumanReadableCopyright" = "© 2026 CortiFree. All rights reserved.";
 
 /* Privacy Descriptions */
 "NSCameraUsageDescription" = "CortiFree uses the camera to measure your heart rate (fingertip on the lens, with the flash) and to take your weekly face check selfie.";
-"NSPhotoLibraryUsageDescription" = "CortiFree needs access to your photo library to let you save and share your progress.";
-"NSPhotoLibraryAddUsageDescription" = "CortiFree needs permission to save images to your photo library.";
-"NSMicrophoneUsageDescription" = "CortiFree needs microphone access for guided meditation and breathing exercises.";
-"NSLocationWhenInUseUsageDescription" = "CortiFree uses your location to provide personalized nature activity suggestions based on your area.";
-"NSMotionUsageDescription" = "CortiFree uses motion tracking to monitor your physical activity and provide better exercise recommendations.";
-"NSHealthShareUsageDescription" = "CortiFree reads your anxiety questionnaires (GAD-7), your moods, and your heart rate, heart rate variability and sleep (for example from Apple Watch) to personalize your plan and measure your pulse with Milo. This data stays on your iPhone.";
+"NSPhotoLibraryUsageDescription" = "CortiFree lets you pick a photo for your weekly face check and your progress photos.";
+"NSPhotoLibraryAddUsageDescription" = "CortiFree saves the progress images you choose to share to your photo library.";
+"NSHealthShareUsageDescription" = "CortiFree reads your anxiety questionnaires (GAD-7), your moods, and your heart rate, heart rate variability and sleep (for example from Apple Watch) to personalize your plan and measure your pulse with Milo. Health data is never used for advertising. Only if you allow Milo, the AI coach, a short summary (heart rate, HRV, sleep) is sent with your messages to adapt its answers.";
 "NSHealthUpdateUsageDescription" = "CortiFree saves your daily moods and mindful minutes to Apple Health.";
 
 // MARK: - Tracking
 "NSUserTrackingUsageDescription" = "CortiFree uses this identifier to personalize your experience and measure the effectiveness of ads.";
+
+/* Milo voice dictation */
+"NSMicrophoneUsageDescription" = "CortiFree uses the microphone so you can dictate your messages to Milo.";
+"NSSpeechRecognitionUsageDescription" = "CortiFree turns your voice into text so you can dictate your messages to Milo. When possible, transcription happens on your iPhone.";
