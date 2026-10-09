@@ -63,13 +63,29 @@ struct LottieViewRepresentable: UIViewRepresentable {
             view.addSubview(animationView)
             view.clipsToBounds = true // Important pour rogner les débordements
 
+            // Pinned on all four edges: the animation fills exactly the frame it is
+            // given. Its own (per-animation) size must never push the layout around it.
+            for axis in [NSLayoutConstraint.Axis.horizontal, .vertical] {
+                animationView.setContentHuggingPriority(.fittingSizeLevel, for: axis)
+                animationView.setContentCompressionResistancePriority(.fittingSizeLevel, for: axis)
+            }
             NSLayoutConstraint.activate([
-                animationView.heightAnchor.constraint(equalTo: view.heightAnchor),
-                animationView.widthAnchor.constraint(equalTo: view.widthAnchor)
+                animationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                animationView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                animationView.topAnchor.constraint(equalTo: view.topAnchor),
+                animationView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ])
         }
 
         return view
+    }
+
+    /// Take exactly the size SwiftUI proposes, so the animation never feeds a
+    /// size of its own back into the surrounding layout.
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIView, context: Context) -> CGSize? {
+        guard let width = proposal.width, let height = proposal.height,
+              width.isFinite, height.isFinite else { return nil }
+        return CGSize(width: width, height: height)
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {

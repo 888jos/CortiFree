@@ -60,12 +60,14 @@ struct RatingSocialProofView: View {
                                 )
                             )
                             .multilineTextAlignment(.center)
+                            .balancedLines()
                             .lineSpacing(4)
 
                         Text("onboarding_v2.rating_proof.subtitle".localized)
                             .font(.poppinsRegular(15))
                             .foregroundColor(.white.opacity(0.72))
                             .multilineTextAlignment(.center)
+                            .balancedLines()
                             .lineSpacing(4)
                             .padding(.horizontal, 8)
                     }

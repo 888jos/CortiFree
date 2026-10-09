@@ -114,12 +114,14 @@ struct LoadingAnalysisView: View {
                         .font(.faroBold(32))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
+                        .balancedLines()
 
                     // Subtitle (changes with progress)
                     Text(currentSubtitle)
                         .font(.custom("Poppins-Medium", size: 16))
                         .foregroundColor(Color(hex: "808080"))
                         .multilineTextAlignment(.center)
+                        .balancedLines()
                         .animation(.easeInOut(duration: 0.3), value: currentSubtitle)
                 }
 

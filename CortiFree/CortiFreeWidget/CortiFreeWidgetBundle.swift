@@ -15,5 +15,6 @@ struct CortiFreeWidgetBundle: WidgetBundle {
         LockScreenWidget()
         CortiFreeWidgetControl()
         CortiFreeWidgetLiveActivity()
+        CortiFreeInsightsWidgets().body
     }
 }

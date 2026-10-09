@@ -34,10 +34,6 @@ enum Planet: String, CaseIterable, Identifiable {
         }
     }
 
-    var imageName: String {
-        return rawValue
-    }
-
     var haloColor: Color {
         switch self {
         case .mercury: return Color(hex: "A46A2B") // brun doré métallique

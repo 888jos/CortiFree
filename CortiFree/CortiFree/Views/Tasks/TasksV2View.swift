@@ -26,11 +26,6 @@ struct TasksV2View: View {
         let minutes: Int
     }
 
-    private struct AnxietyCheckLaunch: Identifiable {
-        var id: Int { checkpoint }
-        let checkpoint: Int
-    }
-
     private struct HabitSelection: Identifiable {
         var id: String { item.id }
         let item: PlanItem
@@ -46,7 +41,6 @@ struct TasksV2View: View {
     @ObservedObject private var player = GuidedSessionPlayer.shared
     @ObservedObject private var achievementService = AchievementService.shared
     @ObservedObject private var habitBadgeService = HabitBadgeService.shared
-    @ObservedObject private var anxietyChecks = AnxietyCheckStore.shared
     @ObservedObject private var miloCheckIn = MiloWeeklyCheckIn.shared
 
     @State private var userSettings: UserSettings?
@@ -66,7 +60,6 @@ struct TasksV2View: View {
 
     @State private var breathingLaunch: BreathingLaunch?
     @State private var habitSelection: HabitSelection?
-    @State private var anxietyCheckLaunch: AnxietyCheckLaunch?
     @State private var showWhy = false
     @State private var goalPickerMode: PlanGoalPickerSheet.Mode?
 
@@ -157,17 +150,6 @@ struct TasksV2View: View {
                             }
                         )
 
-                        if isShowingCurrentDay, let checkpoint = anxietyChecks.dueCheckpoint(for: plan) {
-                            PlanAnxietyCheckCard(
-                                checkpoint: checkpoint,
-                                onStart: { anxietyCheckLaunch = AnxietyCheckLaunch(checkpoint: checkpoint) },
-                                onLater: {
-                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { anxietyChecks.snoozeForToday() }
-                                }
-                            )
-                            .transition(.opacity.combined(with: .move(edge: .top)))
-                        }
-
                         if isShowingCurrentDay, !plan.isFinished, miloCheckIn.isDue(planDay: todayIndex) {
                             PlanMiloCheckInCard(
                                 onStart: { miloCheckIn.start(planDay: todayIndex, cycle: plan.cycle, source: "plan_card") },
@@ -244,15 +226,6 @@ struct TasksV2View: View {
                 isCurrentDay: isViewingToday
             )
         }
-        .sheet(item: $anxietyCheckLaunch) { launch in
-            AnxietyCheckSheet(checkpoint: launch.checkpoint) { result in
-                AnalyticsManager.shared.track(event: "anxiety_check_completed", properties: [
-                    "checkpoint": launch.checkpoint,
-                    "source": result.source.rawValue
-                ])
-                if launch.checkpoint == 1 { store.applyAnxietyCheck() }
-            }
-        }
         .sheet(item: $swapTarget) { item in
             PlanSwapSheet(
                 item: item,
@@ -302,7 +275,7 @@ struct TasksV2View: View {
                 await store.ensurePlan()
                 await reloadData()
                 PlanBilanCenter.shared.checkIfDue(source: "plan_tab")
-                // A GAD-7 taken in the Health app also tunes a day-1 plan.
+                // A GAD-7 taken in the Health app silently tunes a day-1 plan (never asked here).
                 if await AnxietyCheckStore.shared.importFromHealth() { store.applyAnxietyCheck() }
             }
         }

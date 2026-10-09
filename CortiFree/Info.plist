@@ -83,11 +83,11 @@
 	<key>NSAdvertisingAttributionReportEndpoint</key>
 	<string>https://api-adservices.apple.com/api/v1/</string>
 	<key>NSCameraUsageDescription</key>
-	<string>CortiFree uses the camera for an optional wellness photo preview.</string>
+	<string>CortiFree uses the camera to measure your heart rate (fingertip on the lens, with the flash) and to take your weekly face check selfie.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>CortiFree reads your anxiety questionnaires (GAD-7) and your moods to personalize your plan. This data stays on your iPhone.</string>
+	<string>CortiFree reads your anxiety questionnaires (GAD-7), your moods, and your heart rate, heart rate variability and sleep (for example from Apple Watch) to personalize your plan and measure your pulse with Milo. This data stays on your iPhone.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>CortiFree saves your anxiety check-ins, daily moods and mindful minutes to Apple Health.</string>
+	<string>CortiFree saves your daily moods and mindful minutes to Apple Health.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>CortiFree utilise le micro pour les exercices de respiration guidée.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

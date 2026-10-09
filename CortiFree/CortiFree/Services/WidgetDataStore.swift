@@ -51,6 +51,7 @@ struct WidgetDataStore {
         if let startDate = startDate ?? UserDefaults.standard.object(forKey: "programStartDate") as? Date {
             defaults.set(startDate, forKey: programStartDateKey)
         }
+        WidgetInsightsStore.recordTodayProgress(from: tasks)
         WidgetCenter.shared.reloadAllTimelines()
     }
 

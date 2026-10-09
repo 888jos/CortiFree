@@ -518,6 +518,8 @@ struct OnboardingV2FlowView: View {
         let isPremium = RevenueCatManager.shared.hasPremiumEntitlement
         if isPremium {
             hasSeenPaywall = false
+            // Trial just started: first session + plan + reminder before Home (TrialKickoffView).
+            if RevenueCatManager.shared.startedSubscriptionRecently { TrialKickoff.markPending() }
         }
 
         // Clear re-engagement tracking
@@ -628,6 +630,13 @@ struct OnboardingBreathingIntroView: View {
     @State private var elapsedSeconds = 0
     @State private var breathStartDate: Date?
     @State private var hasExited = false
+    @StateObject private var pulseMeter = PulseCameraMeter()
+    @State private var pulseStage: PulseStage?
+    @State private var pulseBefore: PulseCameraMeter.Reading?
+    @State private var pulseAfter: PulseCameraMeter.Reading?
+
+    /// Heart rate with the flash before and after the breathing (each step can be skipped).
+    private enum PulseStage { case before, after, comparison }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// 4 s inhale / 6 s exhale.
@@ -640,7 +649,8 @@ struct OnboardingBreathingIntroView: View {
         description: ""
     ))
 
-    private let duration = 30
+    /// One minute when the heart rate is measured around it, so the effect has time to show.
+    private var duration: Int { pulseBefore == nil ? 30 : 60 }
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -648,6 +658,10 @@ struct OnboardingBreathingIntroView: View {
             GalaxyBackgroundView(intensity: 0.9)
                 .ignoresSafeArea()
 
+            if let pulseStage {
+                pulseContent(pulseStage)
+                    .transition(.opacity)
+            } else {
             VStack(spacing: 0) {
                 header
 
@@ -683,7 +697,9 @@ struct OnboardingBreathingIntroView: View {
                 }
                 .padding(.bottom, 34)
             }
+            }
         }
+        .animation(.easeInOut(duration: 0.3), value: pulseStage)
         .onReceive(timer) { _ in
             guard isStarted, !isComplete else { return }
             elapsedSeconds += 1
@@ -698,6 +714,55 @@ struct OnboardingBreathingIntroView: View {
         }
     }
 
+    @ViewBuilder
+    private func pulseContent(_ stage: PulseStage) -> some View {
+        switch stage {
+        case .before:
+            OnboardingPulseMeasureView(
+                meter: pulseMeter,
+                isAfter: false,
+                onFinish: { reading in
+                    pulseBefore = reading
+                    // Not skipped: it is the day-1 weekly pulse, not asked again in the check-in.
+                    if let reading { WeeklyPulseStore.recordOnboardingPulse(reading.bpm) }
+                    pulseStage = nil
+                    withAnimation(.easeInOut(duration: 0.3)) { hasSeenIntro = true }
+                },
+                onBack: { pulseStage = nil }
+            )
+        case .after:
+            measureAfterView
+        case .comparison:
+            if let pulseBefore, let pulseAfter {
+                OnboardingPulseComparisonView(
+                    before: pulseBefore,
+                    after: pulseAfter,
+                    onRemeasure: { pulseStage = .after },
+                    onContinue: exitToNextStep
+                )
+            }
+        }
+    }
+
+    private var measureAfterView: some View {
+        #if targetEnvironment(simulator)
+        OnboardingPulseMeasureView(
+            meter: pulseMeter,
+            isAfter: true,
+            onFinish: finishAfterMeasure,
+            simulatedBPM: Double(max(58, (pulseBefore?.bpm ?? 80) - 9))
+        )
+        #else
+        OnboardingPulseMeasureView(meter: pulseMeter, isAfter: true, onFinish: finishAfterMeasure)
+        #endif
+    }
+
+    private func finishAfterMeasure(_ reading: PulseCameraMeter.Reading?) {
+        guard let reading else { return exitToNextStep() }
+        pulseAfter = reading
+        pulseStage = .comparison
+    }
+
     private var introductionContent: some View {
         VStack(spacing: 0) {
             Spacer(minLength: 30)
@@ -710,12 +775,14 @@ struct OnboardingBreathingIntroView: View {
                 .font(.faroBold(29))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .balancedLines()
                 .padding(.top, 18)
 
             Text("onboarding_v2.breathing_intro.subtitle".localized)
                 .font(.poppinsRegular(16))
                 .foregroundStyle(.white.opacity(0.72))
                 .multilineTextAlignment(.center)
+                .balancedLines()
                 .lineSpacing(4)
                 .padding(.horizontal, 30)
                 .padding(.top, 10)
@@ -733,11 +800,15 @@ struct OnboardingBreathingIntroView: View {
                     .font(.faroBold(30))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
+                    .balancedLines()
 
-                Text(isComplete ? "onboarding_v2.breath_demo.done_subtitle".localized : "onboarding_v2.breath_demo.instructions".localized)
+                Text(isComplete
+                     ? (pulseBefore != nil ? "onboarding_v2.pulse.done_subtitle" : "onboarding_v2.breath_demo.done_subtitle").localized
+                     : "onboarding_v2.breath_demo.instructions".localized)
                     .font(.poppinsRegular(16))
                     .foregroundStyle(.white.opacity(0.72))
                     .multilineTextAlignment(.center)
+                    .balancedLines()
                     .padding(.horizontal, 28)
             }
 
@@ -811,8 +882,10 @@ struct OnboardingBreathingIntroView: View {
     }
 
     private var primaryTitle: String {
-        if isComplete { return "onboarding_v2.breath_demo.continue".localized }
-        return "onboarding_v2.breath_demo.begin".localized
+        if isComplete {
+            return (pulseBefore != nil ? "onboarding_v2.pulse.cta_after" : "onboarding_v2.breath_demo.continue").localized
+        }
+        return (pulseBefore != nil ? "onboarding_v2.pulse.begin_long" : "onboarding_v2.breath_demo.begin").localized
     }
 
     private func exitToNextStep() {
@@ -832,17 +905,16 @@ struct OnboardingBreathingIntroView: View {
     }
 
     private var timeText: String {
-        String(format: "00:%02d", max(duration - elapsedSeconds, 0))
+        let remaining = max(duration - elapsedSeconds, 0)
+        return String(format: "%02d:%02d", remaining / 60, remaining % 60)
     }
 
     private func primaryAction() {
         HapticManager.light()
         if isComplete {
-            onContinue()
+            if pulseBefore != nil { pulseStage = .after } else { exitToNextStep() }
         } else if !hasSeenIntro {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                hasSeenIntro = true
-            }
+            pulseStage = .before
         } else if !isStarted {
             isStarted = true
         }

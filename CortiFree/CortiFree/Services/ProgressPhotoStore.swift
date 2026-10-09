@@ -24,7 +24,8 @@ final class ProgressPhotoStore: ObservableObject {
         UIImage(contentsOfFile: photosDirectory.appendingPathComponent(photo.filename).path)
     }
 
-    func add(data: Data, date: Date = Date()) throws {
+    @discardableResult
+    func add(data: Data, date: Date = Date()) throws -> ProgressPhoto {
         guard let image = UIImage(data: data),
               let jpeg = image.jpegData(compressionQuality: 0.82) else {
             throw CocoaError(.fileReadCorruptFile)
@@ -38,6 +39,7 @@ final class ProgressPhotoStore: ObservableObject {
         )
         photos.insert(photo, at: 0)
         try persist()
+        return photo
     }
 
     func delete(_ photo: ProgressPhoto) {

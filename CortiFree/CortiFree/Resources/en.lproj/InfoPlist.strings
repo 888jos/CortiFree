@@ -10,14 +10,14 @@
 "NSHumanReadableCopyright" = "© 2025 CortiFree. All rights reserved.";
 
 /* Privacy Descriptions */
-"NSCameraUsageDescription" = "CortiFree needs camera access to let you scan documents and track your progress visually.";
+"NSCameraUsageDescription" = "CortiFree uses the camera to measure your heart rate (fingertip on the lens, with the flash) and to take your weekly face check selfie.";
 "NSPhotoLibraryUsageDescription" = "CortiFree needs access to your photo library to let you save and share your progress.";
 "NSPhotoLibraryAddUsageDescription" = "CortiFree needs permission to save images to your photo library.";
 "NSMicrophoneUsageDescription" = "CortiFree needs microphone access for guided meditation and breathing exercises.";
 "NSLocationWhenInUseUsageDescription" = "CortiFree uses your location to provide personalized nature activity suggestions based on your area.";
 "NSMotionUsageDescription" = "CortiFree uses motion tracking to monitor your physical activity and provide better exercise recommendations.";
-"NSHealthShareUsageDescription" = "CortiFree reads your anxiety questionnaires (GAD-7) and your moods to personalize your plan. This data stays on your iPhone.";
-"NSHealthUpdateUsageDescription" = "CortiFree saves your anxiety check-ins, daily moods and mindful minutes to Apple Health.";
+"NSHealthShareUsageDescription" = "CortiFree reads your anxiety questionnaires (GAD-7), your moods, and your heart rate, heart rate variability and sleep (for example from Apple Watch) to personalize your plan and measure your pulse with Milo. This data stays on your iPhone.";
+"NSHealthUpdateUsageDescription" = "CortiFree saves your daily moods and mindful minutes to Apple Health.";
 
 // MARK: - Tracking
 "NSUserTrackingUsageDescription" = "CortiFree uses this identifier to personalize your experience and measure the effectiveness of ads.";

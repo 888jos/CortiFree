@@ -34,7 +34,7 @@ enum PlanAssistantContext {
             let display = item.display(week: week, short: false)
             let duration = display.minutes > 0 ? ", \(display.minutes) min" : ""
             let status = doneToday.contains(item.statusKey) ? "done" : "to do"
-            return "- [\(PlanDaySlot.slot(for: item).rawValue)] \(display.kindLabel): \(display.title)\(duration) (\(status))"
+            return "- [\(PlanDaySlot.slot(for: item).rawValue)] id=\(item.id) \(display.kindLabel): \(display.title)\(duration) (\(status))"
         }.joined(separator: "\n")
 
         var lines = [
@@ -45,10 +45,20 @@ enum PlanAssistantContext {
             "Today's items:",
             itemLines.isEmpty ? "- none" : itemLines
         ]
+        // The days ahead, so Milo can point at one when proposing a change.
+        let upcoming = stride(from: dayNumber + 1, through: min(dayNumber + 6, PersonalPlan.length), by: 1).compactMap { number -> String? in
+            guard let day = plan.day(number) else { return nil }
+            let entries = day.items.map { "id=\($0.id) \($0.display(week: day.week, short: false).title)" }
+            return "- Day \(number): " + entries.joined(separator: "; ")
+        }
+        if !upcoming.isEmpty {
+            lines.append("Next days:")
+            lines.append(contentsOf: upcoming)
+        }
         if plan.isFinished {
             lines.append("The 28 days are over: the user can continue with a new cycle or change goal from the Plan tab.")
         }
-        lines.append("Use this when the user asks about their plan. The user can change goal or regenerate the plan from the Plan tab settings; you cannot modify the plan yourself yet. Do not invent progress beyond the statuses above.")
+        lines.append("Use this when the user asks about their plan. Do not invent progress beyond the statuses above.")
         return lines.joined(separator: "\n")
     }
 }

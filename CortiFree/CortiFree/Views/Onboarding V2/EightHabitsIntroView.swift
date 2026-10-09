@@ -50,6 +50,7 @@ struct EightHabitsIntroView: View {
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
+                        .balancedLines()
                         .lineLimit(nil)
                         .fixedSize(horizontal: false, vertical: true)
                         .responsivePadding(.horizontal, 20)

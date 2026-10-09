@@ -124,6 +124,7 @@ struct WeekProgressView: View {
                     .font(.custom("Poppins-Regular", size: 16))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
+                    .balancedLines()
                     .lineLimit(nil)
                     .frame(minHeight: 60, maxHeight: 80, alignment: .center)
                     .padding(.horizontal, 32)
@@ -229,6 +230,7 @@ struct WeekProgressView: View {
                         .font(.custom("Poppins-Regular", size: 12))
                         .foregroundColor(.white.opacity(0.6))
                         .multilineTextAlignment(.center)
+                        .balancedLines()
                         .padding(.horizontal, 32)
 
                     // Button

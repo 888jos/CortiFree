@@ -131,12 +131,14 @@ struct AuthenticationView: View {
                         .font(.faroBold(30))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.leading)
+                        .balancedLines(alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
 
                     Text("onboarding_v2.auth.subtitle".localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.76))
                         .multilineTextAlignment(.leading)
+                        .balancedLines(alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -745,11 +747,13 @@ struct AppleAuthView: View {
                         .font(.faroBold(28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
+                        .balancedLines()
 
                     Text("onboarding_v2.auth.apple_description".localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.85))
                         .multilineTextAlignment(.center)
+                        .balancedLines()
                         .padding(.horizontal, 40)
                 }
 

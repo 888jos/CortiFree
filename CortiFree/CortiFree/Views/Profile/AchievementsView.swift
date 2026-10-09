@@ -15,7 +15,7 @@ struct AchievementsView: View {
     @State private var selectedAchievement: Achievement? = nil
     @State private var selectedHabitBadge: HabitBadge? = nil
     #if DEBUG
-    @State private var debugAllBadgesUnlocked = true
+    @State private var debugAllBadgesUnlocked = false
     #endif
 
     var body: some View {
@@ -117,23 +117,18 @@ struct AchievementsView: View {
                 }
             }
         }
-        .fullScreenCover(item: $selectedAchievement) { achievement in
+        .sheet(item: $selectedAchievement) { achievement in
             AchievementDetailView(achievement: achievement)
+                .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedHabitBadge) { badge in
-            BadgeDetailSheet(
-                badge: badge,
-                currentProgress: habitBadgeService.badges(for: badge.habitId).map(\.progress).max() ?? badge.progress
-            )
+            HabitBadgeDetailView(habitId: badge.habitId, focusedLevel: badge.level)
+                .presentationDragIndicator(.visible)
         }
         .task {
+            // Real progress, also in debug builds: the debug button below can still force a state.
             await achievementService.loadAchievements()
             await habitBadgeService.loadHabitBadges()
-            #if DEBUG
-            achievementService.setAllUnlockedForDebug(true)
-            habitBadgeService.setAllUnlockedForDebug(true)
-            debugAllBadgesUnlocked = true
-            #endif
         }
     }
 
@@ -141,17 +136,17 @@ struct AchievementsView: View {
         HStack(spacing: 0) {
             summaryValue(
                 "\(totalUnlockedCount)",
-                label: "Unlocked"
+                label: "achievements.summary.unlocked".localized
             )
             Divider().overlay(.white.opacity(0.12)).frame(height: 46)
             summaryValue(
                 "\(totalBadgeCount)",
-                label: "Total"
+                label: "achievements.summary.total".localized
             )
             Divider().overlay(.white.opacity(0.12)).frame(height: 46)
             summaryValue(
                 "\(Int((globalCompletionPercentage * 100).rounded()))%",
-                label: "Complete"
+                label: "achievements.summary.complete".localized
             )
         }
         .padding(.vertical, 18)
@@ -176,7 +171,7 @@ struct AchievementsView: View {
     private func habitBadgeSection(for habitId: String) -> some View {
         let badges = habitBadgeService.badges(for: habitId)
         let progress = badges.map(\.progress).max() ?? 0
-        let total = badges.map(\.requirement).max() ?? 0
+        let next = HabitBadge.nextLevel(for: habitId, progress: progress)
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -186,9 +181,20 @@ struct AchievementsView: View {
 
                 Spacer()
 
-                Text("\(progress)/\(total)")
-                    .font(.faroRegular(11))
+                Text(verbatim: next.map { "\(progress)/\($0.requirement)" } ?? "\(progress)")
+                    .font(.faroSemiBold(12))
+                    .foregroundColor(next.map { Color(hex: $0.level.color) } ?? .white.opacity(0.55))
+                    .monospacedDigit()
+            }
+
+            if let next {
+                Text(String(format: "achievements.habit.next".localized, next.level.displayName, max(0, next.requirement - progress)))
+                    .font(.faroRegular(12))
                     .foregroundColor(.white.opacity(0.55))
+            } else {
+                Text("achievements.habit.done".localized)
+                    .font(.faroRegular(12))
+                    .foregroundColor(Color(hex: HabitBadge.BadgeLevel.diamond.color))
             }
 
             LazyVGrid(
@@ -269,133 +275,6 @@ struct CategoryFilterButton: View {
                 .glassCapsule(tint: isSelected ? color : nil, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
-    }
-}
-
-// MARK: - Achievement Detail View
-
-struct AchievementDetailView: View {
-    @Environment(\.dismiss) var dismiss
-    let achievement: Achievement
-
-    var body: some View {
-        ZStack {
-            GalaxyBackgroundView(intensity: 0.55)
-
-            VStack(spacing: 0) {
-                HStack {
-                    Spacer()
-                    Button {
-                        HapticManager.light()
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(width: 44, height: 44)
-                            .contentShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .glassCircle(interactive: true)
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 10)
-
-                Spacer(minLength: 30)
-
-                badgeVisual
-                    .frame(width: 190, height: 190)
-
-                Text(achievement.isUnlocked ? "achievement.unlocked".localized : "achievements.not_started".localized)
-                    .font(.faroSemiBold(12))
-                    .foregroundColor(.white.opacity(0.58))
-                    .textCase(.uppercase)
-                    .padding(.top, 28)
-
-                Text(achievement.title)
-                    .font(.faroBold(30))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 10)
-
-                Text(achievement.description)
-                    .font(.faroRegular(15))
-                    .foregroundColor(.white.opacity(0.72))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .padding(.top, 12)
-
-                if achievement.isUnlocked, let unlockedAt = achievement.unlockedAt {
-                    Label(
-                        String(format: "achievements.unlocked_date".localized, formatDate(unlockedAt)),
-                        systemImage: "checkmark.circle.fill"
-                    )
-                    .font(.faroRegular(13))
-                    .foregroundColor(.white.opacity(0.68))
-                    .padding(.top, 18)
-                } else {
-                    VStack(spacing: 9) {
-                        Text(String(format: "achievements.progress".localized, achievement.progress, achievement.requirement))
-                            .font(.faroSemiBold(13))
-                            .foregroundColor(.white)
-
-                        GeometryReader { geo in
-                            ZStack(alignment: .leading) {
-                                Capsule()
-                                    .fill(Color.white.opacity(0.1))
-
-                                Capsule()
-                                    .fill(Color(hex: "B794F6"))
-                                    .frame(width: geo.size.width * achievement.progressPercentage)
-                            }
-                        }
-                        .frame(height: 7)
-                    }
-                    .padding(.horizontal, 40)
-                    .padding(.top, 18)
-                }
-
-                Spacer()
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var badgeVisual: some View {
-        ZStack {
-            BadgeOctagonShape()
-                .fill(achievement.isUnlocked ? Color(hex: "B794F6").opacity(0.24) : Color.white.opacity(0.08))
-                .overlay {
-                    BadgeOctagonShape()
-                        .stroke(achievement.isUnlocked ? Color(hex: "B794F6").opacity(0.72) : Color.white.opacity(0.22), lineWidth: 3)
-                }
-
-            if let assetName = achievement.badgeAssetName {
-                Image(assetName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 132, height: 132)
-                    .saturation(achievement.isUnlocked ? 1 : 0)
-                    .opacity(achievement.isUnlocked ? 1 : 0.28)
-            } else {
-                Image(systemName: achievement.icon)
-                    .font(.system(size: 82, weight: .semibold))
-                    .foregroundColor(.white.opacity(achievement.isUnlocked ? 1 : 0.28))
-            }
-
-            if !achievement.isUnlocked {
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.72))
-            }
-        }
-    }
-
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
     }
 }
 

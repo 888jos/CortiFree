@@ -8,15 +8,25 @@ struct AssistantChatView: View {
     @ObservedObject private var soundPlayer = SoundPlayer.shared
     @ObservedObject private var store = MiloStore.shared
     @ObservedObject private var importCenter = MiloImportCenter.shared
+    @ObservedObject private var planStore = PersonalPlanStore.shared
     @State private var conversationID = UUID()
     @State private var menuPath: [MiloRoute] = []
+    @State private var appeared = false
     @State private var messages: [DeepSeekChatMessage] = []
     @State private var draft = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var cardsByMessage: [Int: AssistantRecommendation] = [:]
+    /// Plan changes Milo proposed, by message, and what the user did with them.
+    @State private var planProposals: [Int: PlanAssistantProposal] = [:]
+    @State private var planProposalStates: [Int: PlanProposalState] = [:]
     @State private var openedBreathing: BreathingPattern?
     @State private var runningBreathing: BreathingPattern?
+    /// Pulse check: the sheet, the last reading and the messages that offer to measure again.
+    @State private var showPulse = false
+    @State private var lastPulse: MiloPulseReading?
+    @State private var pulseMessages: Set<Int> = []
+    @State private var awaitingPulseFollowUp = false
     /// Intent of the suggestion the user tapped, so the card matches it in every language.
     @State private var pendingIntent: MiloIntent?
     @AppStorage("assistant.daily.date") private var assistantDailyDate = ""
@@ -28,6 +38,9 @@ struct AssistantChatView: View {
     /// « Bring your story to Milo » sheet, with the document shared from another app if any.
     @State private var importRequest: MiloImportRequest?
     @State private var pendingImportAfterConsent: MiloImportRequest?
+    /// « Decode this message » sheet (screenshot or pasted text).
+    @State private var decodeRequest: MiloDecodeRequest?
+    @State private var pendingDecodeAfterConsent: MiloDecodeRequest?
     @FocusState private var composerFocused: Bool
 
     private let dailyLimit = 12
@@ -37,7 +50,9 @@ struct AssistantChatView: View {
         let length = store.replyLength == .detailed
             ? "Keep replies to four or five sentences of plain prose"
             : "Keep replies to two or three short sentences of plain prose"
-        return Self.basePrompt.replacingOccurrences(of: "{LENGTH}", with: length)
+        let prompt = Self.basePrompt.replacingOccurrences(of: "{LENGTH}", with: length)
+        // Plan changes go through a card the user confirms (see PlanAssistantProposal).
+        return planStore.plan == nil ? prompt : prompt + "\n\n" + PlanAssistantProposal.instructions
     }
 
     private static let basePrompt = """
@@ -75,11 +90,25 @@ struct AssistantChatView: View {
         }
         .tint(AudioPalette.accent)
         .preferredColorScheme(.dark)
+        // The keyboard of the composer must not follow the user into the menu / history pages.
+        .onChange(of: menuPath) { _, path in
+            if !path.isEmpty { composerFocused = false }
+        }
+        .opacity(appeared ? 1 : 0)
+        .onAppear { withAnimation(.easeOut(duration: 0.25)) { appeared = true } }
+    }
+
+    /// Closes Milo without the slide-down animation (it is presented without one too).
+    private func close() {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) { dismiss() }
     }
 
     private var chat: some View {
         ZStack {
-            GalaxyBackgroundView(intensity: 0.85)
+            // Still sky: animated stars refracted through the glass made the composer flicker.
+            GalaxyBackgroundView(intensity: 0.85, isAnimated: false)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -99,6 +128,22 @@ struct AssistantChatView: View {
             consumeSharedDocument()
         }
         .onChange(of: importCenter.pendingDocument) { _, _ in consumeSharedDocument() }
+        .onChange(of: importCenter.pendingLink) { _, _ in consumeSharedDocument() }
+        .onChange(of: importCenter.pendingDecode) { _, _ in consumeSharedDocument() }
+        .sheet(item: $decodeRequest) { request in
+            MiloDecodeView(
+                initialDocument: request.document,
+                isQuotaReached: assistantDailyUsage >= dailyLimit,
+                onAnalyzed: {
+                    refreshDailyQuotaIfNeeded()
+                    assistantDailyUsage += 1
+                },
+                onBreathe: startQuickReset,
+                onTalk: decodeDiscussed
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
         .onChange(of: importCenter.pendingError) { _, error in
             guard let error else { return }
             errorMessage = error
@@ -107,6 +152,7 @@ struct AssistantChatView: View {
         .sheet(item: $importRequest) { request in
             MiloImportView(
                 initialDocument: request.document,
+                initialLink: request.link,
                 isQuotaReached: assistantDailyUsage >= dailyLimit,
                 onAnalyzed: {
                     refreshDailyQuotaIfNeeded()
@@ -119,18 +165,27 @@ struct AssistantChatView: View {
         }
 
         .sheet(item: $openedBreathing) { BreathingExerciseDetailView(pattern: $0) }
-        .fullScreenCover(item: $runningBreathing) { pattern in
+        .fullScreenCover(item: $runningBreathing, onDismiss: pulseFollowUp) { pattern in
             BreathingDetailFlowView(pattern: pattern, duration: TimeInterval(pattern.defaultMinutes * 60)) {
                 runningBreathing = nil
             }
         }
+        .sheet(isPresented: $showPulse) {
+            MiloPulseSheet(onResult: handlePulse)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
         .sheet(isPresented: $showConsent, onDismiss: {
             pendingConsentText = nil
             // Open the import only once the consent sheet is gone (one sheet at a time).
-            if let request = pendingImportAfterConsent, MiloConsent.isGranted(in: consentStore, uid: UnifiedFirebaseService.shared.auth.currentUserId) {
+            let granted = MiloConsent.isGranted(in: consentStore, uid: UnifiedFirebaseService.shared.auth.currentUserId)
+            if let request = pendingImportAfterConsent, granted {
                 importRequest = request
+            } else if let request = pendingDecodeAfterConsent, granted {
+                decodeRequest = request
             }
             pendingImportAfterConsent = nil
+            pendingDecodeAfterConsent = nil
         }) {
             MiloConsentSheet(
                 onAccept: acceptConsent,
@@ -144,12 +199,14 @@ struct AssistantChatView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Button { dismiss() } label: {
+            Button { close() } label: {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
-                    .cfGlassCircle()
+                    // Interactive glass inside a Button eats the first tap: plain glass here.
+                    .cfGlassCircle(interactive: false)
+                    .contentShape(Circle())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(t("assistant.close"))
@@ -163,20 +220,21 @@ struct AssistantChatView: View {
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                 }
-                .transition(.opacity)
             }
 
             Spacer()
 
             Button {
                 HapticManager.light()
+                composerFocused = false
                 menuPath = [.menu]
             } label: {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
-                    .cfGlassCircle()
+                    .cfGlassCircle(interactive: false)
+                    .contentShape(Circle())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(t("milo.menu.open"))
@@ -195,7 +253,6 @@ struct AssistantChatView: View {
         .padding(.horizontal, 16)
         .padding(.top, 12)
         .padding(.bottom, 6)
-        .animation(.easeOut(duration: 0.2), value: messages.isEmpty)
     }
 
     private func avatar(size: CGFloat) -> some View {
@@ -225,6 +282,14 @@ struct AssistantChatView: View {
                                 recommendationCard(card)
                                     .padding(.leading, 38)
                             }
+                            if let proposal = planProposals[index] {
+                                planProposalCard(proposal, index: index)
+                                    .padding(.leading, 38)
+                            }
+                            if index == pulseMessages.max() {
+                                measureAgainButton
+                                    .padding(.leading, 38)
+                            }
                         }
                         .id(index)
                     }
@@ -240,6 +305,8 @@ struct AssistantChatView: View {
                 .padding(.vertical, 12)
             }
             .scrollDismissesKeyboard(.interactively)
+            // Stays still while everything fits on screen.
+            .scrollBounceBehavior(.basedOnSize)
             .onChange(of: messages.count) { _, count in
                 withAnimation { proxy.scrollTo(count - 1, anchor: .top) }
             }
@@ -269,9 +336,134 @@ struct AssistantChatView: View {
                 }
             }
 
+            pulseBanner
+            decodeBanner
             importBanner
         }
         .padding(.bottom, 8)
+    }
+
+    /// Entry point to the pulse check (Apple Watch or flash).
+    private var pulseBanner: some View {
+        Button {
+            HapticManager.light()
+            showPulse = true
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color(hex: "FF6B8A"))
+                    .frame(width: 40, height: 40)
+                    .background(Color(hex: "FF6B8A").opacity(0.16), in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(t("milo.pulse.banner.title"))
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.leading)
+                    Text(t("milo.pulse.banner.subtitle"))
+                        .font(.system(size: 13))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(AudioPalette.secondaryText)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cfGlass(cornerRadius: 20)
+        }
+        .buttonStyle(PressableCardStyle())
+        .disabled(isLoading)
+    }
+
+    private var measureAgainButton: some View {
+        Button {
+            HapticManager.light()
+            showPulse = true
+        } label: {
+            Label(t("milo.pulse.measure_again"), systemImage: "heart.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color(hex: "FF6B8A"))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .background(Color(hex: "FF6B8A").opacity(0.14), in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Pulse
+
+    /// A reading comes back from the sheet: Milo answers locally (no network needed) with a
+    /// breathing exercise chosen for that heart rate, and compares with the previous reading.
+    private func handlePulse(_ bpm: Int, _ source: MiloPulseSource) {
+        let previous = lastPulse
+        lastPulse = MiloPulseReading(bpm: bpm, source: source, date: Date())
+        messages.append(DeepSeekChatMessage(role: "user", content: String(format: t("milo.pulse.user.\(source.rawValue)"), bpm)))
+
+        let band = MiloPulseReading.band(for: bpm)
+        var reply = String(format: t("milo.pulse.reply.\(band)"), bpm)
+        if let previous, Date().timeIntervalSince(previous.date) < 2 * 3600 {
+            let change = bpm - previous.bpm
+            let comparison = change < 0
+                ? String(format: t("milo.pulse.compare.lower"), previous.bpm, bpm, -change)
+                : String(format: t("milo.pulse.compare.same"), previous.bpm, bpm)
+            reply = comparison + " " + reply
+        }
+        let index = messages.count
+        messages.append(DeepSeekChatMessage(role: "assistant", content: reply))
+        cardsByMessage[index] = AssistantRecommendation(kind: .breathing(MiloPulseReading.exercise(for: bpm)))
+        pulseMessages.insert(index)
+        awaitingPulseFollowUp = true
+        store.save(id: conversationID, messages: messages)
+    }
+
+    /// After a breathing exercise started from a pulse card: invite to measure again.
+    private func pulseFollowUp() {
+        guard awaitingPulseFollowUp else { return }
+        awaitingPulseFollowUp = false
+        let index = messages.count
+        messages.append(DeepSeekChatMessage(role: "assistant", content: t("milo.pulse.followup")))
+        pulseMessages.insert(index)
+        store.save(id: conversationID, messages: messages)
+    }
+
+    /// Entry point to « Decode this message ».
+    private var decodeBanner: some View {
+        Button {
+            HapticManager.light()
+            openDecode()
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "text.bubble.fill")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(AudioPalette.accent)
+                    .frame(width: 40, height: 40)
+                    .background(AudioPalette.accent.opacity(0.16), in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(t("milo.decode.banner.title"))
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.leading)
+                    Text(t("milo.decode.banner.subtitle"))
+                        .font(.system(size: 13))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(AudioPalette.secondaryText)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cfGlass(cornerRadius: 20)
+        }
+        .buttonStyle(PressableCardStyle())
+        .disabled(isLoading)
     }
 
     /// Entry point to « Bring your story to Milo » (chat with another AI, Health PDF…).
@@ -341,7 +533,7 @@ struct AssistantChatView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .cfGlass(cornerRadius: 18, interactive: true)
+            .cfGlass(cornerRadius: 18)
         }
         .buttonStyle(PressableCardStyle())
         .disabled(isLoading)
@@ -403,6 +595,21 @@ struct AssistantChatView: View {
                 .padding(5)
                 .accessibilityLabel(t("milo.import.title"))
 
+                Button {
+                    HapticManager.light()
+                    showPulse = true
+                } label: {
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color(hex: "FF6B8A"))
+                        .frame(width: 34, height: 34)
+                        .background(Color.white.opacity(0.10), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isLoading)
+                .padding(.vertical, 5)
+                .accessibilityLabel(t("milo.pulse.banner.title"))
+
                 TextField(t("assistant.composer.placeholder"), text: $draft, axis: .vertical)
                     .font(.system(size: 16))
                     .foregroundStyle(.white)
@@ -416,18 +623,20 @@ struct AssistantChatView: View {
                         .foregroundStyle(canSend ? AudioPalette.backgroundDeep : .white.opacity(0.5))
                         .frame(width: 34, height: 34)
                         .background(canSend ? AudioPalette.accent : Color.white.opacity(0.12), in: Circle())
+                        .animation(.easeOut(duration: 0.15), value: canSend)
                 }
                 .buttonStyle(.plain)
                 .disabled(!canSend)
                 .padding(5)
                 .accessibilityLabel(t("assistant.send"))
             }
-            .cfGlass(cornerRadius: 22)
+            // Steady surface: Liquid Glass re-morphed at every keystroke / line change.
+            .background(Color(hex: "1A1530").opacity(0.92), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 1))
         }
         .padding(.horizontal, 16)
         .padding(.top, 6)
         .padding(.bottom, 12)
-        .animation(.easeOut(duration: 0.15), value: canSend)
     }
 
     private var canSend: Bool {
@@ -497,8 +706,10 @@ struct AssistantChatView: View {
                     // The user may have started or opened another conversation meanwhile.
                     guard currentID == conversationID else { isLoading = false; return }
                     let responseIndex = messages.count
-                    messages.append(DeepSeekChatMessage(role: "assistant", content: cleanAssistantResponse(response)))
+                    let (reply, proposal) = PlanAssistantProposal.extract(from: response)
+                    messages.append(DeepSeekChatMessage(role: "assistant", content: cleanAssistantResponse(reply)))
                     if let card { cardsByMessage[responseIndex] = card }
+                    if let proposal { planProposals[responseIndex] = proposal }
                     store.save(id: conversationID, messages: messages)
                     isLoading = false
                 }
@@ -545,6 +756,18 @@ struct AssistantChatView: View {
         if let insight = store.insight {
             context += "\n" + insight.contextLine
         }
+        if let lastPulse, lastPulse.date > Date().addingTimeInterval(-2 * 3600) {
+            context += "\nHeart rate measured in Milo \(lastPulse.date.formatted(date: .omitted, time: .shortened)): \(lastPulse.bpm) bpm (\(lastPulse.source == .watch ? "Apple Watch" : "phone camera"), wellness estimate, not medical)."
+        }
+        if let signals = HealthKitService.shared.latestBodySignals {
+            context += "\n" + signals.contextLine
+        }
+        if let face = FaceScanStore.shared.contextLine {
+            context += "\n" + face
+        }
+        if let pulse = PulseCheckRecord.last, pulse.date > Date().addingTimeInterval(-3 * 86_400) {
+            context += "\n" + pulse.contextLine
+        }
         if !store.memory.isEmpty {
             context += "\nWhat the user asked Milo to remember about them (use it naturally, never quote it back): \(store.memory)"
         }
@@ -554,8 +777,8 @@ struct AssistantChatView: View {
     // MARK: - Import
 
     /// Sign-in and consent come first: the document is sent to the AI provider.
-    private func openImport(with document: MiloImportDocument? = nil) {
-        let request = MiloImportRequest(document: document)
+    private func openImport(with document: MiloImportDocument? = nil, link: URL? = nil) {
+        let request = MiloImportRequest(document: document, link: link)
         guard let uid = UnifiedFirebaseService.shared.auth.currentUserId else {
             messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.signin.required")))
             return
@@ -569,9 +792,44 @@ struct AssistantChatView: View {
     }
 
     private func consumeSharedDocument() {
-        guard let document = importCenter.pendingDocument else { return }
-        importCenter.pendingDocument = nil
-        openImport(with: document)
+        if let document = importCenter.pendingDecode {
+            importCenter.pendingDecode = nil
+            openDecode(with: document)
+        } else if let link = importCenter.pendingLink {
+            importCenter.pendingLink = nil
+            openImport(link: link)
+        } else if let document = importCenter.pendingDocument {
+            importCenter.pendingDocument = nil
+            openImport(with: document)
+        }
+    }
+
+    /// Same gates as the import: the message is sent to the AI provider.
+    private func openDecode(with document: MiloImportDocument? = nil) {
+        let request = MiloDecodeRequest(document: document)
+        guard let uid = UnifiedFirebaseService.shared.auth.currentUserId else {
+            messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.signin.required")))
+            return
+        }
+        guard MiloConsent.isGranted(in: consentStore, uid: uid) else {
+            pendingDecodeAfterConsent = request
+            showConsent = true
+            return
+        }
+        decodeRequest = request
+    }
+
+    /// A short round of physiological sighs once the decode sheet is gone.
+    private func startQuickReset() {
+        let pattern = BreathingPattern.allPatterns.first { $0.name == "PhysiologicalSigh" } ?? BreathingPattern.allPatterns.first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { runningBreathing = pattern }
+    }
+
+    /// Milo continues in the chat with its read of the message, so the user can answer back.
+    private func decodeDiscussed(_ result: MiloDecodeResult) {
+        if !messages.isEmpty { newConversation() }
+        let text = [result.meaning, result.reassurance].filter { !$0.isEmpty }.joined(separator: " ")
+        messages.append(DeepSeekChatMessage(role: "assistant", content: text))
     }
 
     /// Milo opens a new conversation from what it learned, so the user can answer right away.
@@ -603,6 +861,11 @@ struct AssistantChatView: View {
         conversationID = UUID()
         messages = []
         cardsByMessage = [:]
+        planProposals = [:]
+        planProposalStates = [:]
+        pulseMessages = []
+        lastPulse = nil
+        awaitingPulseFollowUp = false
         draft = ""
         errorMessage = nil
         isLoading = false
@@ -613,6 +876,11 @@ struct AssistantChatView: View {
         conversationID = conversation.id
         messages = conversation.messages
         cardsByMessage = [:]
+        planProposals = [:]
+        planProposalStates = [:]
+        pulseMessages = []
+        lastPulse = nil
+        awaitingPulseFollowUp = false
         errorMessage = nil
         isLoading = false
         store.isTemporary = false
@@ -768,6 +1036,88 @@ struct AssistantChatView: View {
         terms.contains { text.contains($0) }
     }
 
+    // MARK: - Plan change card
+
+    enum PlanProposalState { case applied, declined, failed }
+
+    private func planProposalCard(_ proposal: PlanAssistantProposal, index: Int) -> some View {
+        let state = planProposalStates[index]
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: state == .applied ? "checkmark.circle.fill" : "calendar.badge.clock")
+                    .font(.system(size: 22))
+                    .foregroundStyle(AudioPalette.accent)
+                    .frame(width: 30)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(t("milo.plan.card.title").uppercased())
+                        .font(.system(size: 11, weight: .semibold))
+                        .tracking(0.8)
+                        .foregroundStyle(AudioPalette.accent)
+                    Text(proposal.summary)
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+
+            switch state {
+            case .none:
+                HStack(spacing: 10) {
+                    Button {
+                        HapticManager.light()
+                        planProposalStates[index] = .declined
+                        AnalyticsManager.shared.track(event: "milo_plan_change_declined", properties: ["kind": proposal.kindName])
+                    } label: {
+                        Text(t("milo.plan.card.decline"))
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .background(Color.white.opacity(0.14), in: Capsule())
+                    }
+                    Button {
+                        HapticManager.light()
+                        planProposalStates[index] = proposal.apply() ? .applied : .failed
+                    } label: {
+                        Text(t("milo.plan.card.apply"))
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(AudioPalette.backgroundDeep)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .background(AudioPalette.accent, in: Capsule())
+                    }
+                }
+                .buttonStyle(PressableCardStyle())
+            case .applied:
+                HStack {
+                    Text(t("plan.edit.updated"))
+                        .font(.system(size: 13))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                    Spacer()
+                    // Only the latest edit can be undone: hide the button once the plan moved on.
+                    if planStore.undoSnapshot != nil, index == planProposalStates.filter({ $0.value == .applied }).keys.max() {
+                        Button(t("plan.edit.undo")) {
+                            HapticManager.light()
+                            planStore.undoLastEdit()
+                            planProposalStates[index] = .declined
+                        }
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(AudioPalette.accent)
+                    }
+                }
+            case .declined:
+                Text(t("milo.plan.card.declined"))
+                    .font(.system(size: 13))
+                    .foregroundStyle(AudioPalette.secondaryText)
+            case .failed:
+                Text(t("milo.plan.card.failed"))
+                    .font(.system(size: 13))
+                    .foregroundStyle(AudioPalette.secondaryText)
+            }
+        }
+        .padding(14)
+        .cfGlass(cornerRadius: 22)
+    }
+
     // MARK: - Exercise card
 
     private func recommendationCard(_ card: AssistantRecommendation) -> some View {
@@ -840,7 +1190,7 @@ struct AssistantChatView: View {
             runningBreathing = pattern
         case .session(let session):
             // The full player is presented from the root view: close the chat first.
-            dismiss()
+            close()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 GuidedSessionPlayer.shared.play(session, presentFullPlayer: true)
             }
@@ -858,9 +1208,42 @@ struct AssistantChatView: View {
 
 // MARK: - Models
 
+private struct MiloDecodeRequest: Identifiable {
+    let id = UUID()
+    let document: MiloImportDocument?
+}
+
 private struct MiloImportRequest: Identifiable {
     let id = UUID()
     let document: MiloImportDocument?
+    var link: URL? = nil
+}
+
+/// A heart rate measured from Milo, and the exercise it calls for.
+struct MiloPulseReading {
+    let bpm: Int
+    let source: MiloPulseSource
+    let date: Date
+
+    /// calm < 70 ≤ normal < 85 ≤ elevated < 100 ≤ high (resting heart rate, wellness ranges).
+    static func band(for bpm: Int) -> String {
+        switch bpm {
+        case ..<70: return "calm"
+        case ..<85: return "normal"
+        case ..<100: return "elevated"
+        default: return "high"
+        }
+    }
+
+    /// The faster the heart, the more direct the technique: sighs first, then slow paced breathing.
+    static func exercise(for bpm: Int) -> BreathingPattern {
+        switch bpm {
+        case ..<70: return .humming
+        case ..<85: return .extendedExhale
+        case ..<100: return .coherence
+        default: return .physiologicalSigh
+        }
+    }
 }
 
 private struct AssistantRecommendation: Identifiable {

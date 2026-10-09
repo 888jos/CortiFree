@@ -91,6 +91,7 @@ struct StressPatternValidationView: View {
                     .font(.custom("Poppins-Medium", size: 15))
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
+                    .balancedLines()
                     .padding(.horizontal, 32)
 
                 Spacer()
@@ -100,6 +101,7 @@ struct StressPatternValidationView: View {
                     .font(.custom("Poppins-Regular", size: 11))
                     .foregroundColor(.white.opacity(0.25))
                     .multilineTextAlignment(.center)
+                    .balancedLines()
                     .padding(.horizontal, 40)
                     .padding(.bottom, 10)
 

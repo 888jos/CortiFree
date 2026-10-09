@@ -462,6 +462,19 @@ class RevenueCatManager: ObservableObject {
         return entitlement.expirationDate
     }
 
+    /// True when the "pro" access was first bought less than a day ago (trial just started),
+    /// false for a restored older subscription. Unknown info counts as recent.
+    var startedSubscriptionRecently: Bool {
+        guard let entitlement = customerInfo?.entitlements[entitlementID], entitlement.isActive else { return false }
+        guard let start = entitlement.originalPurchaseDate else { return true }
+        return Date().timeIntervalSince(start) < 24 * 3600
+    }
+
+    /// Whether the active "pro" entitlement is in its free trial.
+    var isInTrialPeriod: Bool {
+        customerInfo?.entitlements[entitlementID]?.periodType == .trial
+    }
+
     /// Get subscription type (monthly or yearly)
     func getSubscriptionType() -> String? {
         guard let entitlement = customerInfo?.entitlements[entitlementID],

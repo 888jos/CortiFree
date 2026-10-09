@@ -32,6 +32,7 @@ struct ScientificPlanView: View {
                             )
                         )
                         .multilineTextAlignment(.center)
+                        .balancedLines()
                         .padding(.horizontal, 32)
                         .padding(.top, 80)
                         .padding(.bottom, 40)
@@ -187,6 +188,7 @@ struct BadgeView: View {
                 .font(.custom("Poppins-SemiBold", size: 10))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
+                .balancedLines()
 
             // Laurier droit
             Image(systemName: "laurel.trailing")

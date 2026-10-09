@@ -64,7 +64,6 @@ class HomeViewModel: ObservableObject {
 
     private func handleLevelUp(level: Int) {
         triggerHaptic(.heavy)
-        // TODO: Show confetti animation
         #if DEBUG
         print("🎉 Level Up! Now at level \(level)")
         #endif

@@ -30,11 +30,13 @@ struct CortiFreeComparisonView: View {
                                 .font(.faroBold(30))
                                 .foregroundStyle(.white)
                                 .multilineTextAlignment(.center)
+                                .balancedLines()
 
                             Text("onboarding_v2.comparison.subtitle".localized)
                                 .font(.custom("Poppins-Regular", size: 15))
                                 .foregroundStyle(.white.opacity(0.62))
                                 .multilineTextAlignment(.center)
+                                .balancedLines()
                                 .lineSpacing(4)
                         }
                         .padding(.horizontal, 28)
@@ -46,6 +48,7 @@ struct CortiFreeComparisonView: View {
                             .font(.custom("Poppins-Regular", size: 12))
                             .foregroundStyle(.white.opacity(0.42))
                             .multilineTextAlignment(.center)
+                            .balancedLines()
                             .padding(.horizontal, 34)
                     }
                     .padding(.top, 26)

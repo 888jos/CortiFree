@@ -104,9 +104,9 @@ struct PlanCycleGeneratorTests {
 
     // MARK: Next goal
 
-    private func stats(goal: PlanGoal, start: Int?, end: Int?, activeDays: Int = 20) -> PlanCycleStats {
+    private func stats(goal: PlanGoal, start: Double?, end: Double?, activeDays: Int = 20) -> PlanCycleStats {
         PlanCycleStats(cycle: 1, goal: goal, activeDays: activeDays, sessionsCompleted: 20, minutesPracticed: 120, bestStreak: 7,
-                       habits: [], topPractice: nil, anxiety: PlanAnxietyTrend(start: start, middle: nil, end: end))
+                       habits: [], topPractice: nil, stress: PlanStressTrend(weeks: [start, nil, nil, end]))
     }
 
     @Test func bigStressDropSuggestsSleepOrFocus() {

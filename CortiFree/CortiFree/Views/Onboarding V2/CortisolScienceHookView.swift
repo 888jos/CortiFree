@@ -53,6 +53,7 @@ struct CortisolScienceHookView: View {
                         .font(.faroBold(22))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
+                        .balancedLines()
                         .lineSpacing(4)
 
                     Text("cortisol_hook.subtitle".localized)

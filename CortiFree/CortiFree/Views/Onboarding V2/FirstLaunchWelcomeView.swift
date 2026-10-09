@@ -39,12 +39,14 @@ struct FirstLaunchWelcomeView: View {
                             .font(.poppinsRegular(16))
                             .foregroundStyle(.white.opacity(0.86))
                             .multilineTextAlignment(.center)
+                            .balancedLines()
                             .lineSpacing(3)
 
                         Text("first_launch.mascot_plan".localized)
                             .font(.poppinsRegular(15))
                             .foregroundStyle(.white.opacity(0.68))
                             .multilineTextAlignment(.center)
+                            .balancedLines()
                             .lineSpacing(3)
                     }
 

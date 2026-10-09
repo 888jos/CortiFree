@@ -23,6 +23,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Register custom fonts
         FontManager.registerFonts()
 
+        // iPad: centre the (iPhone) layout in a readable column. No-op on iPhone.
+        IPadColumnLayout.install()
+
         // Initialize analytics (Amplitude)
         AnalyticsManager.shared.initialize()
 
@@ -157,12 +160,16 @@ private struct AuthenticatedAppRootView: View {
     @State private var isLocked = false
     @State private var isPresentingPaywall = false
     @State private var isRestoring = false
+    @State private var showsTrialKickoff = TrialKickoff.isPending
 
     var body: some View {
         ZStack {
             if accessResolved {
                 ContentView()
                     .environmentObject(authViewModel)
+                    .fullScreenCover(isPresented: $showsTrialKickoff) {
+                        TrialKickoffView { showsTrialKickoff = false }
+                    }
             } else if isLocked {
                 SubscriptionLockedView(
                     isRestoring: isRestoring,
@@ -318,12 +325,17 @@ private struct SubscriptionLockedView: View {
     }
 }
 
+private enum CheckInDrawer: String, Identifiable {
+    case daily, weekly
+    var id: String { rawValue }
+}
+
 @main
 struct CortiFreeApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var authViewModel = AuthViewModel()
     @Environment(\.scenePhase) private var scenePhase
-    @State private var showDailyCheckIn = false
+    @State private var checkIn: CheckInDrawer?
 
     // IMPORTANT: Use @AppStorage to make onboarding completion reactive
     @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
@@ -382,11 +394,16 @@ struct CortiFreeApp: App {
             .onChange(of: authViewModel.isAuthenticated) { _, isAuthenticated in
                 if isAuthenticated { presentDailyCheckInIfNeeded() }
             }
-            .sheet(isPresented: $showDailyCheckIn) {
-                DailyCheckInView(targetDate: DailyCheckInService.shared.previousDay())
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
-                    .presentationCornerRadius(28)
+            .sheet(item: $checkIn, onDismiss: presentWeeklyCheckInIfNeeded) { drawer in
+                Group {
+                    switch drawer {
+                    case .daily: DailyCheckInView(targetDate: Date())
+                    case .weekly: WeeklyCheckInView()
+                    }
+                }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
             }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
@@ -420,17 +437,34 @@ struct CortiFreeApp: App {
         }
     }
 
+    /// First app open of the day: the daily check-in drawer, then the weekly one when due.
     private func presentDailyCheckInIfNeeded() {
+        guard checkIn == nil, !TrialKickoff.isPending else { return }
         #if DEBUG
         if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_DAILY_CHECKIN"] == "1" {
-            showDailyCheckIn = true
+            checkIn = .daily
+            return
+        }
+        if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_WEEKLY_CHECKIN"] == "1" {
+            checkIn = .weekly
             return
         }
         #endif
-        guard !showDailyCheckIn,
-              DailyCheckInService.shared.shouldPresent() else { return }
-        DailyCheckInService.shared.markPrompted()
-        showDailyCheckIn = true
+        if DailyCheckInService.shared.shouldPresent() {
+            DailyCheckInService.shared.markPrompted()
+            checkIn = .daily
+        } else {
+            presentWeeklyCheckInIfNeeded()
+        }
+    }
+
+    private func presentWeeklyCheckInIfNeeded() {
+        guard WeeklyCheckInService.shared.shouldPresent() else { return }
+        WeeklyCheckInService.shared.markPrompted()
+        // Let the previous drawer finish closing before opening the next one.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            if checkIn == nil { checkIn = .weekly }
+        }
     }
 
     private func startOnboardingDropOffLiveActivityIfNeeded() {

@@ -25,14 +25,6 @@ struct PlanCycleTests {
         PersonalPlanGenerator.generate(profile: PlanProfile(reasonCodes: ["anxiety"]), startDate: start, cycle: cycle)
     }
 
-    private func check(_ score: Int, on date: Date) -> AnxietyCheckResult {
-        // 7 answers summing to `score` (max 3 each).
-        var answers = Array(repeating: 0, count: 7)
-        var left = score
-        for i in 0..<7 where left > 0 { answers[i] = min(3, left); left -= answers[i] }
-        return AnxietyCheckResult(date: date, answers: answers, source: .app)
-    }
-
     // MARK: Review stats
 
     @Test func statsCountSessionsMinutesAndBestStreak() {
@@ -42,7 +34,7 @@ struct PlanCycleTests {
         for day in [1, 2, 3, 4, 5, 10, 11, 12] { done[day] = ["plan_breathing"] }
         done[2]?.insert("plan_meditation")
 
-        let stats = PlanCycleReview.stats(plan: p, done: done, anxietyResults: [])
+        let stats = PlanCycleReview.stats(plan: p, done: done, stress: [:])
         let breathingMinutes = [1, 2, 3, 4, 5, 10, 11, 12].compactMap { p.day($0)?.items.first { $0.kind == .breathing }?.minutes }.reduce(0, +)
         let audioMinutes = p.day(2)?.items.first { $0.id == "meditation" }?.minutes ?? 0
 
@@ -62,7 +54,7 @@ struct PlanCycleTests {
                 done[day.dayNumber, default: []].insert(item.statusKey)
             }
         }
-        let stats = PlanCycleReview.stats(plan: p, done: done, anxietyResults: [])
+        let stats = PlanCycleReview.stats(plan: p, done: done, stress: [:])
         #expect(stats.habits.first?.habitID == anchor)
         #expect(stats.habits.first?.rate == 1)
         #expect(PlanCycleReview.acquiredHabits(stats) == [anchor])
@@ -72,31 +64,28 @@ struct PlanCycleTests {
         let stats = PlanCycleStats(cycle: 1, goal: .stress, activeDays: 20, sessionsCompleted: 0, minutesPracticed: 0, bestStreak: 0,
                                    habits: [PlanHabitRate(habitID: "sport", scheduled: 4, done: 4),
                                             PlanHabitRate(habitID: "water", scheduled: 28, done: 23)],
-                                   topPractice: nil, anxiety: PlanAnxietyTrend())
+                                   topPractice: nil, stress: PlanStressTrend())
         #expect(PlanCycleReview.acquiredHabits(stats) == ["water"])
     }
 
-    // MARK: Anxiety trend
+    // MARK: Stress trend (daily check-ins)
 
-    @Test func anxietyTrendPicksTheThreeCheckpoints() {
-        let start = date(1, 0)
-        let results = [
-            check(14, on: date(1, 9)),   // day 1
-            check(10, on: date(14, 9)),  // day 14
-            check(9, on: date(15, 9)),   // later in the day-14 window: wins
-            check(8, on: date(29, 9))    // day 29 (late day-28 check)
-        ]
-        let trend = PlanCycleReview.anxietyTrend(results: results, planStart: start, calendar: calendar)
-        #expect(trend.start == 14)
-        #expect(trend.middle == 9)
-        #expect(trend.end == 8)
-        #expect(trend.changePercent == -43)
+    @Test func stressTrendAveragesEachWeek() {
+        // Week 1: 4, 5, 4 → 4.33; week 2: one check-in only → nil; week 3: 3, 3; week 4: 3, 2, 3, 2 → 2.5.
+        let stress: [Int: Int] = [1: 4, 3: 5, 6: 4, 10: 2, 15: 3, 21: 3, 22: 3, 24: 2, 26: 3, 28: 2]
+        let trend = PlanCycleReview.stressTrend(stress)
+        #expect(trend.weeks.count == 4)
+        #expect(abs((trend.start ?? 0) - 13.0 / 3.0) < 0.001)
+        #expect(trend.weeks[1] == nil)
+        #expect(trend.weeks[2] == 3)
+        #expect(trend.end == 2.5)
+        #expect(trend.changePercent == -42)
     }
 
-    @Test func anxietyChangeNeedsBothEnds() {
-        #expect(PlanAnxietyTrend(start: 12, middle: nil, end: nil).changePercent == nil)
-        #expect(PlanAnxietyTrend(start: 0, middle: nil, end: 3).changePercent == nil)
-        #expect(PlanAnxietyTrend(start: 10, middle: nil, end: 12).changePercent == 20)
+    @Test func stressChangeNeedsBothEnds() {
+        #expect(PlanStressTrend(weeks: [4, nil, nil, nil]).changePercent == nil)
+        #expect(PlanStressTrend(weeks: [nil, 3, 3, 2]).changePercent == nil)
+        #expect(PlanStressTrend(weeks: [2.5, nil, nil, 3]).changePercent == 20)
     }
 
     // MARK: Completion mapping

@@ -476,6 +476,8 @@ struct ProfileBadgesShowcase: View {
 struct ProfileShortcutsSection: View {
     let openMilo: () -> Void
     @Environment(\.openURL) private var openURL
+    /// Asked once at the first pulse measure; off = the pulse is always measured with the flash.
+    @AppStorage(AppleWatchPreference.storageKey) private var appleWatch = ""
 
     private static let appStoreURL = URL(string: "https://apps.apple.com/app/id6758314805")!
     private static let reviewURL = URL(string: "https://apps.apple.com/app/id6758314805?action=write-review")!
@@ -509,9 +511,40 @@ struct ProfileShortcutsSection: View {
                     row(icon: "star.fill", title: "profile.v2.more.rate", subtitle: "profile.v2.more.rate_sub")
                 }
                 .buttonStyle(.plain)
+
+                separator
+
+                watchRow
             }
             .glassCard(cornerRadius: 22)
         }
+    }
+
+    private var watchRow: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "applewatch")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(PlanPalette.accent)
+                .frame(width: 36, height: 36)
+                .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(PlanPalette.accent.opacity(0.15)))
+            VStack(alignment: .leading, spacing: 2) {
+                Text("profile.v2.more.watch".localized)
+                    .font(.faroSemiBold(15))
+                    .foregroundColor(.white)
+                Text("profile.v2.more.watch_sub".localized)
+                    .font(.faroRegular(12))
+                    .foregroundColor(.white.opacity(0.55))
+            }
+            Spacer(minLength: 0)
+            Toggle("", isOn: Binding(
+                get: { appleWatch == AppleWatchPreference.yes },
+                set: { appleWatch = $0 ? AppleWatchPreference.yes : AppleWatchPreference.no }
+            ))
+            .labelsHidden()
+            .tint(PlanPalette.accent)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
     }
 
     private var separator: some View {

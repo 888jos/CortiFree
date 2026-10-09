@@ -3,8 +3,8 @@
 //  CortiFree
 //
 //  « Ton bilan des 28 jours »: full screen, once per cycle (PlanBilanCenter).
-//  1. the day-28 anxiety check if it is missing (30 s), 2. the results (anxiety J1 → J14 → J28,
-//  sessions, minutes, best streak, habits) with a shareable card, 3. what the next cycle brings.
+//  1. the results (felt stress week 1 → 4 from the daily check-ins, sessions, minutes, best
+//  streak, habits) with a shareable card, 2. what the next cycle brings.
 //
 
 import SwiftUI
@@ -12,15 +12,13 @@ import SwiftUI
 struct PlanBilanView: View {
     let request: PlanBilanCenter.Request
 
-    private enum Step { case loading, check, results, next }
+    private enum Step { case loading, results, next }
 
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var store = PersonalPlanStore.shared
     @State private var step: Step = .loading
     @State private var stats: PlanCycleStats?
-    @State private var done: [Int: Set<String>] = [:]
     @State private var shareImage: Image?
-    @State private var showCheck = false
     @State private var showGoalPicker = false
     @State private var selectedGoal: PlanGoal?
     @State private var trackedView = false
@@ -45,8 +43,6 @@ struct PlanBilanView: View {
             switch step {
             case .loading:
                 ProgressView().tint(.white)
-            case .check:
-                checkStep.transition(.opacity)
             case .results:
                 if let stats { resultsStep(stats).transition(.opacity) }
             case .next:
@@ -69,14 +65,6 @@ struct PlanBilanView: View {
             .accessibilityLabel("plan.close".localized)
         }
         .animation(.easeInOut(duration: 0.3), value: step)
-        .sheet(isPresented: $showCheck) {
-            AnxietyCheckSheet(checkpoint: AnxietyCheckStore.checkpoints.last ?? PersonalPlan.length) { result in
-                AnalyticsManager.shared.track(event: "anxiety_check_completed", properties: [
-                    "checkpoint": PersonalPlan.length, "source": result.source.rawValue, "context": "plan_bilan"
-                ])
-                recomputeStats()
-            }
-        }
         .sheet(isPresented: $showGoalPicker) {
             PlanGoalPickerSheet(currentGoal: nextGoal, mode: .nextCycle) { goal in
                 selectedGoal = goal
@@ -88,46 +76,6 @@ struct PlanBilanView: View {
     }
 
     // MARK: - Steps
-
-    private var checkStep: some View {
-        VStack(spacing: 18) {
-            Spacer()
-            Image(systemName: "waveform.path.ecg")
-                .font(.system(size: 44, weight: .semibold))
-                .foregroundStyle(PlanPalette.accent)
-            Text("plan.bilan.check.title".localized)
-                .font(.faroBold(28))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-            Text("plan.bilan.check.subtitle".localized)
-                .font(Font.Poppins.custom(.regular, size: 15))
-                .foregroundStyle(PlanPalette.secondaryText)
-                .multilineTextAlignment(.center)
-            Spacer()
-            Button {
-                HapticManager.medium()
-                showCheck = true
-            } label: {
-                Text("plan.bilan.check.start".localized)
-                    .font(Font.Poppins.custom(.semiBold, size: 16))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-            }
-            .planGlassButtonStyle(prominent: true)
-            Button {
-                HapticManager.light()
-                step = .results
-            } label: {
-                Text("plan.bilan.check.skip".localized)
-                    .font(Font.Poppins.custom(.medium, size: 15))
-                    .foregroundStyle(.white.opacity(0.75))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(24)
-    }
 
     private func resultsStep(_ stats: PlanCycleStats) -> some View {
         ScrollView {
@@ -148,7 +96,7 @@ struct PlanBilanView: View {
                         .foregroundStyle(PlanPalette.secondaryText)
                 }
 
-                PlanBilanAnxietyCard(trend: stats.anxiety)
+                PlanBilanStressCard(trend: stats.stress)
 
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                     statTile("checkmark.circle.fill", value: "\(stats.sessionsCompleted)", label: "plan.bilan.stat.sessions".localized)
@@ -339,18 +287,12 @@ struct PlanBilanView: View {
     // MARK: - Data
 
     private func load() async {
-        done = await PlanCompletionLoader.doneKeys(for: plan)
-        recomputeStats()
-        let missingCheck = stats?.anxiety.end == nil && (!request.isCurrentCycle || plan.dayIndex() >= PersonalPlan.length)
-        step = missingCheck ? .check : .results
-        if missingCheck { AnalyticsManager.shared.track(event: "plan_bilan_check_offered", properties: ["cycle": plan.cycle]) }
-    }
-
-    private func recomputeStats() {
-        let computed = PlanCycleReview.stats(plan: plan, done: done, anxietyResults: AnxietyCheckStore.shared.results)
+        async let doneKeys = PlanCompletionLoader.doneKeys(for: plan)
+        async let stress = PlanStressLoader.stress(for: plan)
+        let computed = PlanCycleReview.stats(plan: plan, done: await doneKeys, stress: await stress)
         stats = computed
         shareImage = renderShareImage(computed)
-        if step == .check { step = .results }
+        step = .results
     }
 
     private func renderShareImage(_ stats: PlanCycleStats) -> Image? {
@@ -365,8 +307,8 @@ struct PlanBilanView: View {
             "timing": request.isCurrentCycle ? "day_28" : "next_cycle",
             "sessions": stats.sessionsCompleted, "minutes": stats.minutesPracticed,
             "active_days": stats.activeDays, "best_streak": stats.bestStreak,
-            "anxiety_change": stats.anxiety.changePercent ?? NSNull(),
-            "has_end_check": stats.anxiety.end != nil
+            "stress_change": stats.stress.changePercent ?? NSNull(),
+            "has_stress_trend": stats.stress.changePercent != nil
         ]
     }
 
@@ -395,10 +337,10 @@ struct PlanBilanView: View {
     }
 }
 
-// MARK: - Anxiety J1 → J14 → J28
+// MARK: - Felt stress, week 1 → week 4
 
-struct PlanBilanAnxietyCard: View {
-    let trend: PlanAnxietyTrend
+struct PlanBilanStressCard: View {
+    let trend: PlanStressTrend
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -408,18 +350,17 @@ struct PlanBilanAnxietyCard: View {
                     .foregroundStyle(change <= 0 ? PlanPalette.done : .white)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text("plan.bilan.anxiety.title".localized)
+                Text("plan.bilan.stress.title".localized)
                     .font(.faroSemiBold(18))
                     .foregroundStyle(.white)
             }
             HStack(spacing: 8) {
-                point(1, trend.start)
-                arrow
-                point(14, trend.middle)
-                arrow
-                point(28, trend.end)
+                ForEach(Array(trend.weeks.enumerated()), id: \.offset) { index, value in
+                    if index > 0 { arrow }
+                    point(week: index + 1, value)
+                }
             }
-            Text("plan.bilan.anxiety.footnote".localized)
+            Text((trend.changePercent == nil ? "plan.bilan.stress.empty" : "plan.bilan.stress.footnote").localized)
                 .font(Font.Poppins.custom(.regular, size: 11))
                 .foregroundStyle(PlanPalette.tertiaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -436,14 +377,16 @@ struct PlanBilanAnxietyCard: View {
             .foregroundStyle(.white.opacity(0.4))
     }
 
-    private func point(_ day: Int, _ score: Int?) -> some View {
+    private func point(week: Int, _ value: Double?) -> some View {
         VStack(spacing: 4) {
-            Text(String(format: "plan.bilan.anxiety.day".localized, day))
+            Text(String(format: "plan.bilan.stress.week".localized, week))
                 .font(Font.Poppins.custom(.medium, size: 11))
                 .foregroundStyle(PlanPalette.secondaryText)
-            Text(score.map { "\($0)/21" } ?? "–")
+            Text(value.map { $0.formatted(.number.precision(.fractionLength(1))) + "/5" } ?? "–")
                 .font(Font.Poppins.custom(.semiBold, size: 16))
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity)
     }
@@ -466,7 +409,7 @@ struct PlanBilanShareCard: View {
                     .font(.faroBold(30))
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
-                if let change = stats.anxiety.changePercent, change < 0 {
+                if let change = stats.stress.changePercent, change < 0 {
                     Text(PlanBilanText.change(change))
                         .font(.faroBold(36))
                         .foregroundStyle(PlanPalette.done)
@@ -500,7 +443,7 @@ struct PlanBilanShareCard: View {
 enum PlanBilanText {
     /// « -32 % de stress ressenti » / « +5 % … ».
     static func change(_ percent: Int) -> String {
-        String(format: "plan.bilan.anxiety.change".localized, percent > 0 ? "+\(percent)" : "\(percent)")
+        String(format: "plan.bilan.stress.change".localized, percent > 0 ? "+\(percent)" : "\(percent)")
     }
 
     static func practiceName(_ key: String?) -> String? {

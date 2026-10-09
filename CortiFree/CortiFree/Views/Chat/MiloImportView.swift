@@ -14,6 +14,8 @@ import PhotosUI
 struct MiloImportView: View {
     /// A document shared from another app, analysed right away.
     var initialDocument: MiloImportDocument?
+    /// A conversation link shared through « Share › CortiFree », fetched then analysed.
+    var initialLink: URL?
     let isQuotaReached: Bool
     /// One assistant call was spent (counts toward the daily quota).
     let onAnalyzed: () -> Void
@@ -67,7 +69,8 @@ struct MiloImportView: View {
             }
         }
         .onAppear {
-            if let initialDocument, phase == .choose { start(initialDocument) }
+            guard phase == .choose else { return }
+            if let initialDocument { start(initialDocument) } else if let initialLink { start(link: initialLink) }
         }
         .onChange(of: screenshot) { _, item in
             guard let item else { return }
@@ -146,7 +149,7 @@ struct MiloImportView: View {
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 38, height: 38)
-                .cfGlassCircle()
+                .cfGlassCircle(interactive: false)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(t("common.close"))
@@ -288,6 +291,24 @@ struct MiloImportView: View {
 
     // MARK: - Analysis
 
+    /// Milo starts « reading » while the shared page loads, so the hand-off feels instant.
+    private func start(link: URL) {
+        guard !isQuotaReached else { errorMessage = t("assistant.quota.reached"); return }
+        errorMessage = nil
+        phase = .reading(MiloImportDocument(text: "", source: .aiChat, fileName: MiloShareLinkReader.provider(for: link)))
+        analysisTask = Task {
+            do {
+                let document = try await MiloShareLinkReader.read(link)
+                guard !Task.isCancelled else { return }
+                start(document)
+            } catch {
+                guard !Task.isCancelled else { return }
+                errorMessage = MiloImportError.linkUnreadable.errorDescription
+                phase = .choose
+            }
+        }
+    }
+
     private func start(_ document: MiloImportDocument) {
         guard !isQuotaReached else { errorMessage = t("assistant.quota.reached"); return }
         errorMessage = nil
@@ -408,8 +429,11 @@ struct MiloImportView: View {
 
 /// Milo « reads » the document: glowing orbit around the avatar, the page scanned line by
 /// line, and the topics found in the document popping in one after another.
-private struct MiloReadingView: View {
+struct MiloReadingView: View {
     let document: MiloImportDocument
+    /// Other flows (« Decode this message ») reuse the animation with their own wording.
+    var titleKey = "milo.import.reading.title"
+    var stepKeys: [String]? = nil
 
     @State private var topics: [MiloImportTopics.Topic] = []
     @State private var visibleTopics = 0
@@ -419,6 +443,11 @@ private struct MiloReadingView: View {
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
     private var steps: [String] {
+        if let stepKeys { return stepKeys.map(t) }
+        if document.text.isEmpty {
+            let provider = document.fileName ?? t("milo.import.reading.provider_fallback")
+            return [String(format: t("milo.import.reading.step.open"), provider)]
+        }
         let first = document.source == .healthPDF ? "milo.import.reading.step.health" : "milo.import.reading.step.read"
         return [first, "milo.import.reading.step.notice", "milo.import.reading.step.connect"].map(t)
     }
@@ -439,10 +468,10 @@ private struct MiloReadingView: View {
                 .frame(width: 190, height: 190)
 
             VStack(spacing: 8) {
-                Text(t("milo.import.reading.title"))
+                Text(t(titleKey))
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                Text(steps[stepIndex])
+                Text(steps[min(stepIndex, steps.count - 1)])
                     .font(.system(size: 15))
                     .foregroundStyle(AudioPalette.secondaryText)
                     .contentTransition(.opacity)
@@ -462,6 +491,8 @@ private struct MiloReadingView: View {
             Spacer(minLength: 20)
         }
         .onAppear(perform: run)
+        // A shared link starts empty, then the fetched conversation arrives.
+        .onChange(of: document) { _, _ in run() }
         .accessibilityElement(children: .combine)
     }
 
@@ -540,6 +571,8 @@ private struct MiloReadingView: View {
 
     private func run() {
         topics = MiloImportTopics.detect(in: document.text)
+        visibleTopics = 0
+        stepIndex = 0
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) { appeared = true }
         for index in 1...2 {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 1.8) {

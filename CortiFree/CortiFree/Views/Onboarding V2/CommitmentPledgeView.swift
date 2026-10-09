@@ -77,6 +77,7 @@ struct CommitmentPledgeView: View {
                     .font(.faroBold(24))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
+                    .balancedLines()
                     .lineSpacing(4)
                     .padding(.horizontal, 32)
 

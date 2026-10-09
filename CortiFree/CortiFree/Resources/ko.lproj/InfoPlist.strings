@@ -1,11 +1,11 @@
 "CFBundleDisplayName" = "CortiFree";
-"NSCameraUsageDescription" = "CortiFree는 Glow Scan과 시각적인 웰빙 분석을 위해 카메라를 사용합니다.";
+"NSCameraUsageDescription" = "CortiFree는 카메라로 심박수를 측정하고(손가락을 렌즈에 대고 플래시 사용) 주간 얼굴 체크 셀카를 찍어요.";
 "NSPhotoLibraryUsageDescription" = "진행 상황을 저장하고 공유하려면 사진 보관함 접근 권한이 필요합니다.";
 "NSPhotoLibraryAddUsageDescription" = "이미지를 사진 보관함에 저장하려면 권한이 필요합니다.";
 "NSMicrophoneUsageDescription" = "가이드 명상과 호흡 운동을 위해 마이크를 사용합니다.";
 "NSLocationWhenInUseUsageDescription" = "지역에 맞는 자연 활동을 추천하기 위해 위치 정보를 사용합니다.";
 "NSMotionUsageDescription" = "신체 활동을 기록하고 더 나은 운동을 추천하기 위해 움직임 데이터를 사용합니다.";
-"NSHealthShareUsageDescription" = "CortiFree는 플랜을 맞춤화하기 위해 불안 질문지(GAD-7)와 기분을 읽어요. 이 데이터는 iPhone에만 남아요.";
+"NSHealthShareUsageDescription" = "CortiFree는 플랜을 맞춤화하고 Milo로 맥박을 측정하기 위해 불안 질문지(GAD-7), 기분, 심박수·심박 변이도·수면(예: Apple Watch)을 읽어요. 이 데이터는 iPhone에만 남아요.";
 "NSHealthUpdateUsageDescription" = "CortiFree는 불안 체크, 하루 기분, 마음챙김 시간을 Apple 건강에 저장해요.";
 
 // MARK: - Tracking

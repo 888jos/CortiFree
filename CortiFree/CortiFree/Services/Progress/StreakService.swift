@@ -61,6 +61,7 @@ final class StreakService {
         if streak > defaults.integer(forKey: "bestStreak") {
             defaults.set(streak, forKey: "bestStreak")
         }
+        WidgetInsightsStore.setStreak(streak, best: defaults.integer(forKey: "bestStreak"))
         NotificationCenter.default.post(name: NSNotification.Name("StreakUpdated"), object: nil)
     }
 }

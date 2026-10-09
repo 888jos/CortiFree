@@ -28,6 +28,7 @@ struct SixtyDaysExplanationView: View {
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(Color(hex: "B794F6").opacity(0.8))
                             .multilineTextAlignment(.center)
+                            .balancedLines()
                     }
                     .padding(.horizontal, 32)
                     .padding(.top, 100)
@@ -48,6 +49,7 @@ struct SixtyDaysExplanationView: View {
                             )
                         )
                         .multilineTextAlignment(.center)
+                        .balancedLines()
                         .shadow(color: Color(hex: "B794F6").opacity(0.8), radius: 30, x: 0, y: 0)
                         .padding(.bottom, 12)
 
@@ -57,11 +59,13 @@ struct SixtyDaysExplanationView: View {
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(Color(hex: "B794F6").opacity(0.8))
                             .multilineTextAlignment(.center)
+                            .balancedLines()
 
                         Text("onboarding_v2.sixty_days.habit_transform".localized)
                             .font(.custom("Poppins-Regular", size: 16))
                             .foregroundColor(Color(hex: "B794F6").opacity(0.8))
                             .multilineTextAlignment(.center)
+                            .balancedLines()
                     }
                     .padding(.horizontal, 32)
                     .padding(.bottom, 32)

@@ -47,6 +47,7 @@ struct Achievement: Identifiable, Codable, Equatable {
         case "streak_50": return "Invincible"
         case "streak_60": return "Legend"
         case "streak_66": return "Master"
+        case "first_breath": return "First breath"
         default: return title
         }
     }
@@ -152,6 +153,15 @@ struct Achievement: Identifiable, Codable, Equatable {
             icon: "flame.fill",
             category: .streak,
             requirement: 66
+        ),
+        // First session right after the trial starts (TrialKickoffView).
+        Achievement(
+            id: "first_breath",
+            titleKey: "achievement.first_breath.title",
+            descriptionKey: "achievement.first_breath.description",
+            icon: "wind",
+            category: .special,
+            requirement: 1
         )
     ]
 

@@ -26,6 +26,7 @@ struct HomeView: View {
     @State private var showCustomPaywall = false
     @State private var showRatingSocialProofDebug = false
     @State private var showCelebrationsGalleryDebug = false
+    @State private var showTrialKickoffDebug = false
     @State private var currentTime = Date() // For countdown updates
     @State private var didInitProgram = false
 
@@ -136,6 +137,10 @@ struct HomeView: View {
                                 antiStressButton
                                     .padding(.top, 16)
 
+                                // Body stress (Apple Watch), calm check, 60-second reset, breathe before TikTok
+                                HomeCalmToolsSection()
+                                    .padding(.top, 18)
+
                                 #if DEBUG
                                 VStack(spacing: 12) {
                                     Button(action: { showOnboarding = true }) {
@@ -157,6 +162,11 @@ struct HomeView: View {
                                     }
                                     Button(action: { showCustomPaywall = true }) {
                                         Text("💳 Custom Paywall")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    Button(action: { showTrialKickoffDebug = true }) {
+                                        Text("🌱 Post-trial kickoff (preview)")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
@@ -215,7 +225,7 @@ struct HomeView: View {
             JournalHomeView()
         }
         .sheet(isPresented: $showDailyCheckIn) {
-            DailyCheckInView(targetDate: DailyCheckInService.shared.previousDay())
+            DailyCheckInView(targetDate: Date())
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
                 .presentationCornerRadius(28)
@@ -237,6 +247,9 @@ struct HomeView: View {
         }
         .fullScreenCover(isPresented: $showCelebrationsGalleryDebug) {
             CelebrationsGalleryView()
+        }
+        .fullScreenCover(isPresented: $showTrialKickoffDebug) {
+            TrialKickoffView(isPreview: true) { showTrialKickoffDebug = false }
         }
         .fullScreenCover(isPresented: $showRatingSocialProofDebug) {
             RatingSocialProofView {

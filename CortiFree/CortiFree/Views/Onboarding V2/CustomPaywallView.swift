@@ -219,6 +219,7 @@ struct CustomPaywallView: View {
                 .font(.faroBold(28))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
+                .balancedLines()
                 .lineSpacing(4)
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
@@ -232,6 +233,7 @@ struct CustomPaywallView: View {
                 .font(.custom("Poppins-Regular", size: 15))
                 .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
+                .balancedLines()
 
             // Date badge
             Text(formattedEndDate)
@@ -493,6 +495,7 @@ struct CustomPaywallView: View {
                 .font(.custom("Poppins-Regular", size: 14))
                 .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
+                .balancedLines()
 
             // Date transformation
             HStack(spacing: 16) {
@@ -615,6 +618,7 @@ struct CustomPaywallView: View {
                 .font(.faroBold(22))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
+                .balancedLines()
 
             // Hexagon radar chart - switches between two states
             ZStack {

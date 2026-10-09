@@ -86,17 +86,18 @@ struct PlanHabitRate: Equatable {
     var rate: Double { scheduled > 0 ? Double(done) / Double(scheduled) : 0 }
 }
 
-/// GAD-7 scores around the plan checkpoints (day 1, 14, 28).
-struct PlanAnxietyTrend: Equatable {
-    var start: Int?
-    var middle: Int?
-    var end: Int?
+/// Felt stress from the daily check-in (1 = calm … 5 = very stressed), averaged per plan week.
+struct PlanStressTrend: Equatable {
+    /// Weeks 1…4; nil when the week has too few check-ins to mean something.
+    var weeks: [Double?] = Array(repeating: nil, count: 4)
 
-    /// Relative change start → end, in percent (negative = less anxiety). Nil without both ends
-    /// or when the start score is 0.
+    var start: Double? { weeks.first ?? nil }
+    var end: Double? { weeks.last ?? nil }
+
+    /// Relative change week 1 → week 4, in percent (negative = less stress). Nil without both ends.
     var changePercent: Int? {
         guard let start, let end, start > 0 else { return nil }
-        return Int((Double(end - start) / Double(start) * 100).rounded())
+        return Int(((end - start) / start * 100).rounded())
     }
 }
 
@@ -114,7 +115,7 @@ struct PlanCycleStats: Equatable {
     let habits: [PlanHabitRate]
     /// Most completed kind of practice: "breathing" or an AudioSessionCategory raw value.
     let topPractice: String?
-    let anxiety: PlanAnxietyTrend
+    let stress: PlanStressTrend
 }
 
 /// What to do next, from the cycle's results.
@@ -136,9 +137,10 @@ enum PlanCycleReview {
     static let littleProgressDrop = -10
     static let lowActivityDays = 10
 
-    /// - Parameter done: validated status keys ("plan_breathing", "plan_habit_water"…) per plan day.
-    static func stats(plan: PersonalPlan, done: [Int: Set<String>], anxietyResults: [AnxietyCheckResult],
-                      calendar: Calendar = .current) -> PlanCycleStats {
+    /// - Parameters:
+    ///   - done: validated status keys ("plan_breathing", "plan_habit_water"…) per plan day.
+    ///   - stress: daily check-in stress (1…5) per plan day.
+    static func stats(plan: PersonalPlan, done: [Int: Set<String>], stress: [Int: Int]) -> PlanCycleStats {
         var sessions = 0
         var minutes = 0
         var practice: [String: Int] = [:]
@@ -189,7 +191,7 @@ enum PlanCycleReview {
             cycle: plan.cycle, goal: plan.goal, activeDays: activeDays.count,
             sessionsCompleted: sessions, minutesPracticed: minutes, bestStreak: best,
             habits: habits, topPractice: top,
-            anxiety: anxietyTrend(results: anxietyResults, planStart: plan.startDate, calendar: calendar)
+            stress: stressTrend(stress)
         )
     }
 
@@ -200,17 +202,17 @@ enum PlanCycleReview {
         return a.habitID < b.habitID
     }
 
-    /// Day 1: the first check from 2 weeks before the start to day 7 (same rule as the baseline).
-    /// Day 14: the last one between day 10 and day 21. Day 28: the last one between day 24 and
-    /// day 35 (the day-28 check is often taken a day or two late).
-    static func anxietyTrend(results: [AnxietyCheckResult], planStart: Date, calendar: Calendar = .current) -> PlanAnxietyTrend {
-        let start = calendar.startOfDay(for: planStart)
-        func day(_ offset: Int) -> Date { calendar.date(byAdding: .day, value: offset, to: start) ?? start }
-        let sorted = results.sorted { $0.date < $1.date }
-        let first = sorted.first { $0.date >= day(-14) && $0.date < day(7) }
-        let middle = sorted.last { $0.date >= day(9) && $0.date < day(21) }
-        let end = sorted.last { $0.date >= day(23) && $0.date < day(35) }
-        return PlanAnxietyTrend(start: first?.score, middle: middle?.score, end: end?.score)
+    /// A week needs this many daily check-ins for its average to count.
+    static let minimumCheckInsPerWeek = 2
+
+    /// Average felt stress of each plan week (days 1–7, 8–14, 15–21, 22–28).
+    static func stressTrend(_ stress: [Int: Int]) -> PlanStressTrend {
+        let weeks: [Double?] = (0..<4).map { week in
+            let values = (week * 7 + 1...week * 7 + 7).compactMap { stress[$0] }
+            guard values.count >= minimumCheckInsPerWeek else { return nil }
+            return Double(values.reduce(0, +)) / Double(values.count)
+        }
+        return PlanStressTrend(weeks: weeks)
     }
 
     /// Habits kept ≥ 80 % over the cycle (and proposed at least `acquiredMinimumScheduled` times).
@@ -222,7 +224,7 @@ enum PlanCycleReview {
 
     /// Big stress drop → another goal (sleep or focus); little progress → same goal, gentler.
     static func suggestion(for stats: PlanCycleStats, secondaryGoal: PlanGoal) -> PlanNextCycleSuggestion {
-        if let change = stats.anxiety.changePercent {
+        if let change = stats.stress.changePercent {
             if change <= bigProgressDrop {
                 return PlanNextCycleSuggestion(goal: nextGoal(after: stats.goal, secondary: secondaryGoal), gentle: false, reason: .bigProgress)
             }

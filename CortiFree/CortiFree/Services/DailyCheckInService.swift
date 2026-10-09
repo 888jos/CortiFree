@@ -7,12 +7,12 @@ final class DailyCheckInService {
     private let completedDayKey = "daily_check_in_last_completed_day"
     private init() {}
 
+    /// Opens on the first app open of the day, until today's check-in is done.
     func shouldPresent(on date: Date = Date()) -> Bool {
         guard UserPersistence.hasCompletedOnboarding,
-              UnifiedFirebaseService.shared.auth.currentUser != nil else { return false }
-        if let settings = UserSettings.loadFromUserDefaults(),
-           Calendar.current.startOfDay(for: settings.programStartDate) >= Calendar.current.startOfDay(for: date) { return false }
-        guard !hasCompleted(on: previousDay(relativeTo: date)) else { return false }
+              UnifiedFirebaseService.shared.auth.currentUser != nil,
+              !hasCompleted(on: date),
+              !isProgramFirstDay(date) else { return false }
         return UserDefaults.standard.string(forKey: promptedDayKey) != dayKey(for: date)
     }
 
@@ -22,7 +22,7 @@ final class DailyCheckInService {
 
     func shouldShowHomeShortcut(on date: Date = Date()) -> Bool {
         UserPersistence.hasCompletedOnboarding && UnifiedFirebaseService.shared.auth.currentUser != nil
-            && !hasCompleted(on: previousDay(relativeTo: date))
+            && !hasCompleted(on: date)
     }
 
     func markPrompted(on date: Date = Date()) { UserDefaults.standard.set(dayKey(for: date), forKey: promptedDayKey) }
@@ -45,12 +45,15 @@ final class DailyCheckInService {
         let healthDate = Calendar.current.isDateInToday(start) ? Date() : start.addingTimeInterval(12 * 3600)
         await HealthKitService.shared.saveDailyMood(mood, date: healthDate)
         UserDefaults.standard.set(dayKey(for: start), forKey: completedDayKey)
+        WidgetInsightsStore.recordCheckIn(moodRaw: mood.rawValue, stress: stress, for: start)
         ProgressAnalyticsService.shared.invalidateDashboardCache()
         NotificationCenter.default.post(name: NSNotification.Name("DailyCheckInSaved"), object: nil)
     }
 
-    func previousDay(relativeTo date: Date = Date()) -> Date {
-        Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: date)) ?? date
+    /// Not on the day the program starts: the user has just finished onboarding.
+    func isProgramFirstDay(_ date: Date = Date()) -> Bool {
+        guard let settings = UserSettings.loadFromUserDefaults() else { return false }
+        return Calendar.current.startOfDay(for: settings.programStartDate) >= Calendar.current.startOfDay(for: date)
     }
 
     private func dayKey(for date: Date) -> String { Self.dayFormatter.string(from: date) }

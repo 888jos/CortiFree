@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var isEditingPlan = false
     @State private var scrollTimer: Timer?
     @State private var isAssistantPresented = false
+    @ObservedObject private var breathePause = BreathePauseCenter.shared
     @State private var assistantPulse = false
     @ObservedObject private var bilanCenter = PlanBilanCenter.shared
 
@@ -58,7 +59,7 @@ struct ContentView: View {
                 .overlay(alignment: .topTrailing) {
                     Button {
                         HapticManager.light()
-                        isAssistantPresented = true
+                        openMilo()
                     } label: {
                         Image("cortifree_assistant_avatar")
                             .resizable()
@@ -103,7 +104,7 @@ struct ContentView: View {
         .onReceive(NotificationRouter.shared.$pendingAppLink.compactMap { $0 }) { url in
             NotificationRouter.shared.pendingAppLink = nil
             if url.host == "milo" {
-                isAssistantPresented = true
+                openMilo()
             } else {
                 selectedTab = .tasks
                 PlanBilanCenter.shared.checkAfterLaunch(source: "notification")
@@ -117,16 +118,22 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             StreakService.shared.refresh()
             PlanBilanCenter.shared.checkAfterLaunch(source: "app_open")
+            // The share extension could not bring the app forward: the user opened it themselves.
+            if MiloImportCenter.shared.checkShareInbox() { openMilo() }
         }
-        .sheet(isPresented: $isAssistantPresented) {
+        // « Breathe before TikTok »: opened by the Shortcuts automation.
+        .fullScreenCover(item: $breathePause.pending) { app in
+            BreathePauseView(app: app)
+        }
+        // Milo is a fixed full screen: no slide-up, no drag-to-dismiss (it fades in itself).
+        .fullScreenCover(isPresented: $isAssistantPresented) {
             AssistantChatView()
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
         }
         .onAppear {
             StreakService.shared.refresh()
             PlanReminderScheduler.shared.start()
             PlanBilanCenter.shared.checkAfterLaunch(source: "app_open")
+            if MiloImportCenter.shared.checkShareInbox() { openMilo() }
             withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
                 assistantPulse = true
             }
@@ -140,13 +147,27 @@ struct ContentView: View {
             // A PDF or text file shared to CortiFree (« Open in CortiFree »): Milo reads it.
             if url.isFileURL {
                 MiloImportCenter.shared.receive(url)
-                isAssistantPresented = true
+                openMilo()
+            } else if url.scheme == "cortifree" && url.host == "milo-import" {
+                // Sent from « Share › CortiFree » (ChatGPT, Claude, Grok, Gemini, Files…).
+                if MiloImportCenter.shared.checkShareInbox() { openMilo() }
             } else if url.scheme == "cortifree" && url.host == "tasks" {
                 selectedTab = .tasks
             } else if url.scheme == "cortifree" && url.host == "progress" {
                 selectedTab = .progress
+            } else if url.scheme == "cortifree" && url.host == "home" {
+                selectedTab = .home
+            } else if url.scheme == "cortifree" && url.host == "milo" {
+                openMilo()
             }
         }
+    }
+
+    /// Opens Milo without the full-screen cover's slide-up animation.
+    private func openMilo() {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) { isAssistantPresented = true }
     }
 }
 

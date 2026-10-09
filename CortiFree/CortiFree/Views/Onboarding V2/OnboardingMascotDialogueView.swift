@@ -8,7 +8,9 @@ import SwiftUI
 struct OnboardingMascotDialogueView: View {
     let message: String
     var prominent: Bool = false
-    @State private var displayedMessage = ""
+    /// Typewriter: how many characters are shown. The full message is always laid
+    /// out, so the lines never reflow while it types.
+    @State private var revealedCount = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var mascotSize: CGFloat { prominent ? 223 : 122 }
@@ -19,9 +21,8 @@ struct OnboardingMascotDialogueView: View {
             LottieView(filename: "sloth_meditate.json", loopMode: .loop)
                 .frame(width: mascotSize, height: mascotSize)
 
-            Text(displayedMessage)
+            Text(revealedMessage)
                 .font(.poppinsSemiBold(prominent ? 19 : 17))
-                .foregroundStyle(Color(hex: "1A1A4E"))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(0)
                 // Grows with larger text sizes instead of shrinking the words to an unreadable size.
@@ -29,7 +30,8 @@ struct OnboardingMascotDialogueView: View {
                 .minimumScaleFactor(0.85)
                 .fixedSize(horizontal: false, vertical: true)
                 .allowsTightening(true)
-                .padding(.horizontal, prominent ? 24 : 22)
+                .balancedLines(alignment: .leading)
+                .padding(.horizontal, prominent ? 20 : 16)
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, minHeight: bubbleHeight, alignment: .center)
                 .background {
@@ -48,16 +50,27 @@ struct OnboardingMascotDialogueView: View {
         .accessibilityLabel(message)
         .task(id: message) {
             if reduceMotion {
-                displayedMessage = message
+                revealedCount = message.count
                 return
             }
-            displayedMessage = ""
-            for character in message {
+            revealedCount = 0
+            for count in 1...max(message.count, 1) {
                 guard !Task.isCancelled else { return }
-                displayedMessage.append(character)
+                revealedCount = count
                 try? await Task.sleep(nanoseconds: 20_000_000)
             }
         }
+    }
+
+    /// The whole message, with the characters not typed yet left transparent.
+    private var revealedMessage: AttributedString {
+        let ink = Color(hex: "1A1A4E")
+        let typed = message.prefix(revealedCount)
+        var shown = AttributedString(String(typed))
+        shown.foregroundColor = ink
+        var hidden = AttributedString(String(message.dropFirst(typed.count)))
+        hidden.foregroundColor = ink.opacity(0)
+        return shown + hidden
     }
 }
 

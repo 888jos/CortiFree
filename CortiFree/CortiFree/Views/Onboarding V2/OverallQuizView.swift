@@ -237,7 +237,7 @@ struct OverallQuizView: View {
     }
 
     private var genderCardWidth: CGFloat {
-        let availableWidth = UIScreen.main.bounds.width - 48
+        let availableWidth = IPadColumnLayout.contentWidth - 48
         // Keep both identity cards narrower than the answer buttons so the
         // larger gap never changes the progress/header layout.
         return max(0, ((availableWidth - 20 - 16) / 2) * 0.8)
@@ -593,6 +593,7 @@ struct OverallAnswerButton: View {
                 Text(text)
                     .font(.custom("Poppins-Medium", size: 18))
                     .foregroundColor(.white)
+                    .balancedLines(alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 16)

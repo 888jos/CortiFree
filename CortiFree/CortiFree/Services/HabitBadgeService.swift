@@ -48,7 +48,9 @@ class HabitBadgeService: ObservableObject {
                     id: "\(row.habitId)_\(row.level.rawValue)",
                     habitId: row.habitId,
                     level: row.level,
-                    requirement: row.requirement,
+                    // Thresholds stored by older versions were shares of the 66-day program:
+                    // always use the current catalog.
+                    requirement: HabitBadge.getRequirements(for: row.habitId)[row.level] ?? row.requirement,
                     progress: row.progress,
                     unlockedAt: row.unlockedAt.map { Date(timeIntervalSince1970: $0 / 1000) }
                 )
@@ -159,10 +161,11 @@ class HabitBadgeService: ObservableObject {
     }
 
     private func applyLocalProgress(userID: String?) {
-        guard let userID else { return }
         var counts: [String: Int] = [:]
-        for completion in LocalProgressStore.load(for: userID) {
-            counts[completion.habitID, default: 0] += 1
+        if let userID {
+            for completion in LocalProgressStore.load(for: userID) {
+                counts[completion.habitID, default: 0] += 1
+            }
         }
 
         for index in habitBadges.indices {
@@ -194,7 +197,7 @@ class HabitBadgeService: ObservableObject {
 
     /// Retourne le nombre total de badges
     var totalBadgesCount: Int {
-        return 32 // 8 habitudes × 4 niveaux
+        HabitBadge.allHabitIds.count * HabitBadge.BadgeLevel.allCases.count
     }
 
     /// Retourne le pourcentage de badges débloqués

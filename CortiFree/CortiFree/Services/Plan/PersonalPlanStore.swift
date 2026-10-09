@@ -271,8 +271,9 @@ final class PersonalPlanStore: ObservableObject {
         defer { isAutoContinuing = false }
         // The finished cycle decides what changes: acquired habits leave, little progress → gentler.
         let done = await PlanCompletionLoader.doneKeys(for: current)
+        let stress = await PlanStressLoader.stress(for: current)
         guard plan == current, !isProvisional else { return }
-        let stats = PlanCycleReview.stats(plan: current, done: done, anxietyResults: AnxietyCheckStore.shared.results)
+        let stats = PlanCycleReview.stats(plan: current, done: done, stress: stress)
         let suggestion = PlanCycleReview.suggestion(for: stats, secondaryGoal: current.secondaryGoal)
         let choice = nextCycleChoice(for: current)
         // Without a choice the goal stays the same; the gentler ramp follows the results then.
@@ -330,8 +331,8 @@ final class PersonalPlanStore: ObservableObject {
         if let data = try? JSONEncoder().encode(plan) { defaults.set(data, forKey: previousPlanKey) }
     }
 
-    /// After the day-1 anxiety check: rebuild today's plan with it (same goal choice and cycle).
-    /// Later checks only measure progress; they shape the next cycle.
+    /// After a GAD-7 imported from Apple Health on day 1: rebuild today's plan with it (same goal
+    /// choice and cycle). Later ones only shape the next cycles.
     func applyAnxietyCheck() {
         guard let plan, plan.dayIndex() == 1 else { return }
         let newPlan = PersonalPlanGenerator.generate(
@@ -348,7 +349,7 @@ final class PersonalPlanStore: ObservableObject {
         apply(adjusted)
     }
 
-    /// Latest GAD-7 band, from the on-device history only.
+    /// Latest GAD-7 band imported from Apple Health (never asked in the app).
     private var anxiety: AnxietySeverity? { AnxietyCheckStore.shared.currentSeverity }
 
     // MARK: - Editing

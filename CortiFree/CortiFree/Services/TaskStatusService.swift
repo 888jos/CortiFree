@@ -3,8 +3,10 @@ import Foundation
 @MainActor
 final class TaskStatusService {
     static let shared = TaskStatusService()
-    static let habitTotals = ["meditation": 47, "breathing": 47, "journal": 66, "sport": 28,
-                              "water": 66, "nature": 28, "social": 28, "sleep": 132]
+    /// Diamond threshold of each habit badge (the long-term goal shown next to the progress).
+    static let habitTotals: [String: Int] = Dictionary(uniqueKeysWithValues: HabitBadge.allHabitIds.map {
+        ($0, HabitBadge.getRequirements(for: $0)[.diamond] ?? 0)
+    })
     private init() {}
 
     func saveTaskStatus(day: Int, taskTitle: String, status: String) async throws {

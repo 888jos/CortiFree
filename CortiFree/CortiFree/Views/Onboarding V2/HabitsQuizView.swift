@@ -534,6 +534,7 @@ struct HabitsAnswerButton: View {
                 Text(text)
                     .font(.custom("Poppins-Medium", size: 18))
                     .foregroundColor(.white)
+                    .balancedLines(alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 16)

@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ProgressPhotosSection: View {
     @ObservedObject private var store = ProgressPhotoStore.shared
+    @ObservedObject private var faceStore = FaceScanStore.shared
     @State private var selectedItem: PhotosPickerItem?
     @State private var showGallery = false
     @State private var importError = false
@@ -66,6 +67,7 @@ struct ProgressPhotosSection: View {
                                         .glassCapsule()
                                         .padding(7)
                                 }
+                                .overlay(alignment: .topLeading) { FaceScanPhotoBadge(photo: photo).padding(7) }
                                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                             }
                             .buttonStyle(.plain)
@@ -89,6 +91,7 @@ struct ProgressPhotosSection: View {
                 selectedItem = nil
             }
         }
+        .onAppear { faceStore.reload() }
         .fullScreenCover(isPresented: $showGallery) {
             ProgressPhotoGalleryView()
         }
@@ -139,6 +142,7 @@ private struct ProgressPhotoGalleryView: View {
                                         .aspectRatio(0.82, contentMode: .fit)
                                         .clipped()
                                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                        .overlay(alignment: .bottomLeading) { FaceScanPhotoBadge(photo: photo).padding(8) }
 
                                     Button(role: .destructive) {
                                         store.delete(photo)
@@ -159,6 +163,27 @@ private struct ProgressPhotoGalleryView: View {
                     .padding(20)
                 }
             }
+        }
+    }
+}
+
+/// Week and « rested » score on photos taken by the weekly face check.
+private struct FaceScanPhotoBadge: View {
+    let photo: ProgressPhoto
+    @ObservedObject private var faceStore = FaceScanStore.shared
+
+    var body: some View {
+        if let record = faceStore.records.first(where: { $0.photoID == photo.id }) {
+            HStack(spacing: 4) {
+                Image(systemName: "face.smiling")
+                    .font(.system(size: 9, weight: .semibold))
+                Text(verbatim: "\(String(format: "calm.face.result.week".localized, record.slot + 1)) · \(record.result.restedScore)")
+                    .font(.faroSemiBold(9))
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 5)
+            .glassCapsule(tint: Color.appTheme)
         }
     }
 }

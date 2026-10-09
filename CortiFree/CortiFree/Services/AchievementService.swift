@@ -188,6 +188,20 @@ class AchievementService: ObservableObject {
         }
     }
 
+    /// Unlocked by the trial kickoff, which shows its own celebration (not queued here).
+    func unlockFirstBreathAchievement() async {
+        guard let index = achievements.firstIndex(where: { $0.id == "first_breath" && !$0.isUnlocked }) else { return }
+        achievements[index].progress = 1
+        achievements[index].unlockedAt = Date()
+        await saveAchievement(achievements[index])
+        AnalyticsManager.shared.trackAchievementUnlocked(
+            achievementId: "first_breath",
+            achievementTitle: achievements[index].englishTitle,
+            achievementCategory: Achievement.AchievementCategory.special.rawValue,
+            achievementMilestone: 1
+        )
+    }
+
     func checkPerfectWeek(daysCompleted: [Bool]) async {
         // Check if last 7 days are all completed
         let lastSevenDays = daysCompleted.suffix(7)

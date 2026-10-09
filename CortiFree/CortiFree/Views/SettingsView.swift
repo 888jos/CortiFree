@@ -41,6 +41,7 @@ struct SettingsView: View {
     @State private var isDeletingAccount: Bool = false
     @State private var isRestoringPurchases: Bool = false
     @State private var infoAlertMessage: String?
+    @State private var showWidgetGallery: Bool = false
 
     private static let appStoreID = "6758314805"
     private static let supportEmail = "cortifree@driftstudio.app"
@@ -256,6 +257,7 @@ struct SettingsView: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 profileObjectiveSection
+                widgetsSection
                 subscriptionSection
                 privacySecuritySection
                 aboutSupportSection
@@ -317,6 +319,24 @@ struct SettingsView: View {
                     )
                 )
             }
+        }
+    }
+
+    // MARK: - Widgets Section
+    private var widgetsSection: some View {
+        settingsSection(title: LanguageManager.shared.localizedString(for: "settings.section.widgets"), icon: "square.grid.2x2.fill") {
+            settingsRow(
+                icon: "apps.iphone.badge.plus",
+                title: LanguageManager.shared.localizedString(for: "settings.widgets.row"),
+                subtitle: LanguageManager.shared.localizedString(for: "settings.widgets.row_subtitle"),
+                showChevron: true
+            ) {
+                HapticManager.light()
+                showWidgetGallery = true
+            }
+        }
+        .sheet(isPresented: $showWidgetGallery) {
+            WidgetGalleryView()
         }
     }
 

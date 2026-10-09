@@ -81,7 +81,7 @@ struct HabitBadgeRow: View {
         .glassCard(cornerRadius: 16)
         .sheet(isPresented: $showDetail) {
             if let badge = selectedBadge {
-                BadgeDetailSheet(badge: badge, currentProgress: currentProgress)
+                HabitBadgeDetailView(habitId: badge.habitId, focusedLevel: badge.level)
             }
         }
     }
@@ -114,117 +114,6 @@ struct BadgeMiniView: View {
                 .font(.custom("Poppins-Medium", size: 10))
                 .foregroundColor(badge.isUnlocked ? .white : .white.opacity(0.4))
         }
-    }
-}
-
-// MARK: - Badge Detail Sheet
-
-struct BadgeDetailSheet: View {
-
-    let badge: HabitBadge
-    let currentProgress: Int
-    @Environment(\.dismiss) var dismiss
-
-    var body: some View {
-        ZStack {
-            // Background gradient
-            LinearGradient(
-                colors: [
-                    Color(hex: "1A1B3A"),
-                    Color(hex: "0D0E1F")
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
-            VStack(spacing: 24) {
-                Spacer()
-
-                // Large badge display
-                ZStack {
-                    BadgeOctagonMark(
-                        icon: HabitBadge.habitIcon(badge.habitId),
-                        number: nil,
-                        isUnlocked: badge.isUnlocked,
-                        accent: Color(hex: badge.level.color),
-                        size: 120,
-                        assetName: badge.badgeAssetName
-                    )
-                }
-
-                // Title
-                Text("\(habitName) - \(levelName)")
-                    .font(.custom("Poppins-Bold", size: 24))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-
-                // Status
-                if badge.isUnlocked {
-                    if let unlockedDate = badge.unlockedAt {
-                        Text(String(format: "badge.unlocked_date".localized, formattedDate(unlockedDate)))
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                } else {
-                    VStack(spacing: 8) {
-                        Text(String(format: "badge.progress".localized, currentProgress, badge.requirement))
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.white)
-
-                        // Progress bar
-                        GeometryReader { geometry in
-                            ZStack(alignment: .leading) {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.white.opacity(0.1))
-
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B794F6"))
-                                    .frame(width: geometry.size.width * badge.progressPercentage)
-                            }
-                        }
-                        .frame(height: 12)
-                        .frame(maxWidth: 200)
-
-                        Text(String(format: "badge.remaining".localized, max(0, badge.requirement - currentProgress)))
-                            .font(.custom("Poppins-Regular", size: 12))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-                }
-
-                Spacer()
-
-                // Close button
-                Button(action: {
-                    dismiss()
-                }) {
-                    Text("achievements.close".localized)
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .buttonStyle(.glassPrimary(tint: GlassTokens.accent, cornerRadius: 16))
-                .padding(.horizontal, 40)
-                .padding(.bottom, 20)
-            }
-        }
-    }
-
-    private var habitName: String {
-        HabitBadge.habitDisplayName(badge.habitId)
-    }
-
-    private var levelName: String {
-        badge.level.displayName
-    }
-
-    private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.locale = LanguageManager.shared.currentLanguage.locale
-        return formatter.string(from: date)
     }
 }
 

@@ -10,14 +10,14 @@
 "NSHumanReadableCopyright" = "© 2025 CortiFree. Tous droits réservés.";
 
 /* Privacy Descriptions */
-"NSCameraUsageDescription" = "CortiFree a besoin d'accéder à l'appareil photo pour vous permettre de scanner des documents et suivre visuellement vos progrès.";
+"NSCameraUsageDescription" = "CortiFree utilise l'appareil photo pour mesurer ton rythme cardiaque (doigt sur l'objectif, avec le flash) et prendre ton selfie du check visage hebdomadaire.";
 "NSPhotoLibraryUsageDescription" = "CortiFree a besoin d'accéder à votre photothèque pour vous permettre de sauvegarder et partager vos progrès.";
 "NSPhotoLibraryAddUsageDescription" = "CortiFree a besoin de votre permission pour enregistrer des images dans votre photothèque.";
 "NSMicrophoneUsageDescription" = "CortiFree a besoin d'accéder au microphone pour les exercices guidés de méditation et de respiration.";
 "NSLocationWhenInUseUsageDescription" = "CortiFree utilise votre localisation pour fournir des suggestions d'activités nature personnalisées selon votre région.";
 "NSMotionUsageDescription" = "CortiFree utilise le suivi de mouvement pour surveiller votre activité physique et fournir de meilleures recommandations d'exercices.";
-"NSHealthShareUsageDescription" = "CortiFree lit tes questionnaires d'anxiété (GAD-7) et tes humeurs pour personnaliser ton plan. Ces données restent sur ton iPhone.";
-"NSHealthUpdateUsageDescription" = "CortiFree enregistre tes points anxiété, tes humeurs et tes minutes de pleine conscience dans Apple Santé.";
+"NSHealthShareUsageDescription" = "CortiFree lit tes questionnaires d'anxiété (GAD-7), tes humeurs, ainsi que ton rythme cardiaque, ta variabilité cardiaque et ton sommeil (par exemple depuis l'Apple Watch) pour personnaliser ton plan et mesurer ton pouls avec Milo. Ces données restent sur ton iPhone.";
+"NSHealthUpdateUsageDescription" = "CortiFree enregistre tes humeurs et tes minutes de pleine conscience dans Apple Santé.";
 
 // MARK: - Tracking
 "NSUserTrackingUsageDescription" = "CortiFree utilise cet identifiant pour personnaliser votre expérience et mesurer l'efficacité des publicités.";

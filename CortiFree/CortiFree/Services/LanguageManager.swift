@@ -25,6 +25,7 @@ class LanguageManager: ObservableObject {
             UserDefaults.standard.set(currentLanguage.rawValue, forKey: "selectedLanguage")
             UserDefaults.standard.set([currentLanguage.rawValue], forKey: "AppleLanguages")
             UserDefaults.standard.synchronize()
+            WidgetInsightsStore.mirrorLanguage(currentLanguage.rawValue)
 
             // Sync Superwall paywall language immediately
             if Superwall.isInitialized {
@@ -117,6 +118,7 @@ class LanguageManager: ObservableObject {
             currentLanguage = Language(rawValue: String(systemLang.prefix(2))) ?? .english
         }
         updateBundle()
+        WidgetInsightsStore.mirrorLanguage(currentLanguage.rawValue)
     }
 
     private func updateBundle() {

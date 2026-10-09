@@ -67,7 +67,11 @@ struct ProfileView: View {
                         ProfileBadgesShowcase(achievements: streakAchievements, seeAll: { showAchievements = true })
                             .cascadeAppear(index: 5, totalCount: 7, baseDelay: 0.05)
 
-                        ProfileShortcutsSection(openMilo: { showAssistant = true })
+                        ProfileShortcutsSection(openMilo: {
+                            var transaction = Transaction()
+                            transaction.disablesAnimations = true
+                            withTransaction(transaction) { showAssistant = true }
+                        })
                             .cascadeAppear(index: 6, totalCount: 7, baseDelay: 0.05)
 
                         Spacer(minLength: 120)
@@ -80,6 +84,7 @@ struct ProfileView: View {
                 ZStack(alignment: .center) {
                     // Banner image
                     profileBanner
+                        .iPadFullBleed()
                         .offset(y: -65)
 
                     // Profile header elements
@@ -114,10 +119,9 @@ struct ProfileView: View {
         .fullScreenCover(isPresented: $showJournalHistory) {
             JournalHistoryView()
         }
-        .sheet(isPresented: $showAssistant) {
+        // Milo is a fixed full screen, opened without the slide-up (see ContentView.openMilo).
+        .fullScreenCover(isPresented: $showAssistant) {
             AssistantChatView()
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
         }
         .onAppear {
             firstName = getUserFirstName()

@@ -2,8 +2,8 @@
 //  HabitBadge.swift
 //  CortiFree
 //
-//  Système de badges à 4 niveaux par habitude
-//  Bronze (25%), Argent (50%), Or (75%), Diamant (100%)
+//  Système de badges à 4 niveaux par habitude (Bronze, Argent, Or, Diamant),
+//  débloqués à des paliers fixes de validations (voir getRequirements).
 //
 
 import Foundation
@@ -127,76 +127,29 @@ extension HabitBadge {
         }
     }
 
-    /// Retourne les paliers de déblocage pour chaque habitude
+    /// Unlock thresholds: how many times the habit was validated, all cycles together.
+    /// Absolute milestones, not a share of a fixed-length program: plan cycles of 28 days
+    /// follow each other forever. Bronze comes in the first week, silver within the first
+    /// cycle, gold after a few cycles, diamond is a long-term goal. Habits the plan schedules
+    /// less often (sport, nature, social, journal) have lower thresholds.
     static func getRequirements(for habitId: String) -> [BadgeLevel: Int] {
+        let tiers: [Int]
         switch habitId {
-        case "meditation":
-            return [
-                .bronze: 12,    // 25% de 47
-                .silver: 24,    // 50% de 47
-                .gold: 36,      // 75% de 47
-                .diamond: 47    // 100%
-            ]
-
-        case "breathing":
-            return [
-                .bronze: 12,
-                .silver: 24,
-                .gold: 36,
-                .diamond: 47
-            ]
-
-        case "journal":
-            return [
-                .bronze: 17,    // 25% de 66 (16.5 → 17)
-                .silver: 33,    // 50% de 66
-                .gold: 50,      // 75% de 66 (49.5 → 50)
-                .diamond: 66    // 100%
-            ]
-
-        case "sport":
-            return [
-                .bronze: 7,     // 25% de 28
-                .silver: 14,    // 50% de 28
-                .gold: 21,      // 75% de 28
-                .diamond: 28    // 100%
-            ]
-
-        case "water":
-            return [
-                .bronze: 17,
-                .silver: 33,
-                .gold: 50,
-                .diamond: 66
-            ]
-
-        case "nature":
-            return [
-                .bronze: 7,
-                .silver: 14,
-                .gold: 21,
-                .diamond: 28
-            ]
-
-        case "social":
-            return [
-                .bronze: 7,
-                .silver: 14,
-                .gold: 21,
-                .diamond: 28
-            ]
-
-        case "sleep":
-            return [
-                .bronze: 33,    // 25% de 132
-                .silver: 66,    // 50% de 132
-                .gold: 99,      // 75% de 132
-                .diamond: 132   // 100%
-            ]
-
-        default:
-            return [:]
+        case "meditation", "breathing", "sleep": tiers = [3, 15, 40, 100]
+        case "water": tiers = [5, 20, 50, 120]
+        case "journal": tiers = [3, 10, 30, 75]
+        case "sport", "nature", "social": tiers = [2, 8, 20, 50]
+        default: return [:]
         }
+        return Dictionary(uniqueKeysWithValues: zip(BadgeLevel.allCases, tiers))
+    }
+
+    /// Next level still to unlock for a progress count, nil once diamond is reached.
+    static func nextLevel(for habitId: String, progress: Int) -> (level: BadgeLevel, requirement: Int)? {
+        let requirements = getRequirements(for: habitId)
+        return BadgeLevel.allCases
+            .compactMap { level in requirements[level].map { (level: level, requirement: $0) } }
+            .first { progress < $0.requirement }
     }
 
     /// Nom affiché de l'habitude
