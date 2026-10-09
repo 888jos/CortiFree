@@ -31,6 +31,12 @@ struct CelebrationHost: View {
                 MilestoneCelebrationView(content: .badge(badge)) { center.dismissCurrent() }
                     .id(badge.id)
                     .transition(.opacity)
+            case .habitAcquired(let habitID):
+                ZStack(alignment: .top) {
+                    Color.clear.confetti(isActive: true)
+                    CelebrationBanner(kind: .habitAcquired(habitID: habitID)) { center.dismissCurrent() }
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
             case nil:
                 EmptyView()
             }
@@ -46,6 +52,7 @@ struct CelebrationBanner: View {
     enum Kind {
         case streak(days: Int)
         case dayComplete(items: Int, minutes: Int)
+        case habitAcquired(habitID: String)
     }
 
     let kind: Kind
@@ -88,6 +95,8 @@ struct CelebrationBanner: View {
             badge("flame.fill", foreground: .white, fill: AppConstants.Colors.streakOrange)
         case .dayComplete:
             badge("checkmark.seal.fill", foreground: PlanPalette.deep, fill: PlanPalette.done)
+        case .habitAcquired(let habitID):
+            badge(PlanItem.habitSymbol(habitID), foreground: PlanPalette.deep, fill: PlanPalette.done)
         }
     }
 
@@ -111,6 +120,8 @@ struct CelebrationBanner: View {
                              : String(format: "celebration.streak.title".localized, days)
         case .dayComplete:
             return "celebration.day.title".localized
+        case .habitAcquired:
+            return "celebration.habit_acquired.title".localized
         }
     }
 
@@ -120,6 +131,8 @@ struct CelebrationBanner: View {
             return "celebration.streak.subtitle".localized
         case .dayComplete(let items, let minutes):
             return String(format: "celebration.day.subtitle".localized, items, minutes)
+        case .habitAcquired(let habitID):
+            return String(format: "celebration.habit_acquired.subtitle".localized, "plan.habit.\(habitID).name".localized)
         }
     }
 }

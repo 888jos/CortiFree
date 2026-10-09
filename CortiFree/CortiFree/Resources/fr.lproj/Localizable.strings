@@ -5167,3 +5167,22 @@
 "plan_reminder.j29.body" = "Ton cycle %@ commence aujourd'hui : %@";
 "plan_reminder.j29_generic.title" = "Un nouveau cycle commence";
 "plan_reminder.j29_generic.body" = "Ton cycle %@ commence aujourd'hui. Ta première séance t'attend.";
+
+/* Retention: cycle themes, next goal, acquired habits */
+"plan.maintenance.sleep.title" = "Semaine sommeil";
+"plan.maintenance.sleep.subtitle" = "Des séances légères pour t'endormir plus facilement.";
+"plan.maintenance.focus.title" = "Semaine concentration";
+"plan.maintenance.focus.subtitle" = "De courtes pauses pour vider ta tête et te recentrer.";
+"plan.maintenance.relations.title" = "Semaine relations";
+"plan.maintenance.relations.subtitle" = "De la douceur pour toi et pour les autres.";
+"plan.maintenance.energy.title" = "Semaine énergie";
+"plan.maintenance.energy.subtitle" = "Des coups de pouce en douceur pour bien démarrer ta journée.";
+"plan.item.choice" = "Au choix";
+"plan.bilan.suggest.big_progress" = "Ton stress a bien baissé : on passe à %@ ?";
+"plan.bilan.suggest.progress" = "Tu progresses : on continue sur %@.";
+"plan.bilan.suggest.little_progress" = "On garde %@ avec un rythme plus doux.";
+"plan.bilan.suggest.no_data" = "On continue sur %@.";
+"plan.bilan.acquired.badge" = "Acquise";
+"plan.bilan.acquired.next" = "%@ est acquise : elle laisse la place à une nouvelle habitude.";
+"celebration.habit_acquired.title" = "Habitude acquise !";
+"celebration.habit_acquired.subtitle" = "%@ : tenue plus de 80 %% du cycle";

@@ -17,6 +17,8 @@ enum Celebration: Identifiable, Equatable {
     case dayComplete(items: Int, minutes: Int)
     case achievement(Achievement)
     case badge(HabitBadge)
+    /// A habit kept ≥ 80 % over a whole cycle (PlanCycleReview): it leaves the plan.
+    case habitAcquired(habitID: String)
 
     var id: String {
         switch self {
@@ -24,13 +26,14 @@ enum Celebration: Identifiable, Equatable {
         case .dayComplete: return "day-complete"
         case .achievement(let achievement): return "achievement-\(achievement.id)"
         case .badge(let badge): return "badge-\(badge.id ?? "\(badge.habitId)_\(badge.level.rawValue)")"
+        case .habitAcquired(let habitID): return "habit-acquired-\(habitID)"
         }
     }
 
     var isMilestone: Bool {
         switch self {
         case .achievement, .badge: return true
-        case .streak, .dayComplete: return false
+        case .streak, .dayComplete, .habitAcquired: return false
         }
     }
 

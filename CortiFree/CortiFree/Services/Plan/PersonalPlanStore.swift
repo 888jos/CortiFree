@@ -175,7 +175,7 @@ final class PersonalPlanStore: ObservableObject {
         let variation = goal == nil ? (old.edits ?? []).filter { $0.kind == .regenerate }.count + 1 : 0
         var rebuilt = PersonalPlanGenerator.generate(profile: old.profile, overrideGoal: override, anxiety: anxiety,
                                                      startDate: old.startDate, cycle: old.cycle, excluded: old.excludedRefIDs,
-                                                     variation: variation)
+                                                     variation: variation, options: old.cycleOptions)
         rebuilt.days = old.days.filter { $0.dayNumber < today } + rebuilt.days.filter { $0.dayNumber >= today }
         rebuilt.preferences = old.preferences
         rebuilt.edits = (old.edits ?? []) + [PlanEdit(
@@ -193,7 +193,8 @@ final class PersonalPlanStore: ObservableObject {
         let profile = plan?.profile ?? storedOnboardingProfile() ?? PlanProfile()
         let override: PlanGoal? = (plan?.goalChosenByUser ?? false) ? plan?.goal : nil
         var fresh = PersonalPlanGenerator.generate(profile: profile, overrideGoal: override, anxiety: anxiety,
-                                                   startDate: Date(), cycle: 1, excluded: plan?.excludedRefIDs ?? [])
+                                                   startDate: Date(), cycle: 1, excluded: plan?.excludedRefIDs ?? [],
+                                                   options: PlanCycleOptions(retiredHabits: plan?.preferences?.acquiredHabits ?? []))
         fresh.preferences = plan?.preferences
         undoSnapshot = nil
         apply(fresh)
@@ -201,27 +202,40 @@ final class PersonalPlanStore: ObservableObject {
 
     /// After day 28: start a follow-up cycle with the same or a new goal. `auto` = started by the
     /// app because the user didn't choose (day 29 must never be empty).
-    func startNextCycle(goal: PlanGoal?, auto: Bool = false) {
+    func startNextCycle(goal: PlanGoal?, auto: Bool = false, gentle: Bool = false, acquiredHabits: Set<String> = []) {
         let previous = plan
-        let newPlan = nextCyclePlan(goal: goal, startDate: Date())
+        let newPlan = nextCyclePlan(goal: goal, startDate: Date(), gentle: gentle, acquiredHabits: acquiredHabits)
         if let previous { savePreviousPlan(previous) }
         clearNextCycleChoice()
         undoSnapshot = nil
         apply(newPlan)
         AnalyticsManager.shared.track(event: "plan_cycle_started", properties: [
             "cycle": newPlan.cycle, "goal": newPlan.goal.rawValue, "auto": auto,
-            "goal_changed": previous.map { $0.goal != newPlan.goal } ?? false
+            "goal_changed": previous.map { $0.goal != newPlan.goal } ?? false,
+            "theme": newPlan.cycleTheme.rawValue, "gentle": gentle,
+            "acquired_habits": acquiredHabits.sorted().joined(separator: ",")
         ])
+        let alreadyAcquired = previous?.preferences?.acquiredHabits ?? []
+        for habit in acquiredHabits.subtracting(alreadyAcquired).sorted() {
+            CelebrationCenter.shared.enqueue(.habitAcquired(habitID: habit))
+            AnalyticsManager.shared.track(event: "plan_habit_acquired", properties: ["habit": habit, "cycle": previous?.cycle ?? 1])
+        }
     }
 
     /// The plan the next cycle will be (deterministic: the day-29 notification can name its first session).
-    func nextCyclePlan(goal: PlanGoal? = nil, startDate: Date) -> PersonalPlan {
+    func nextCyclePlan(goal: PlanGoal? = nil, startDate: Date, gentle: Bool = false, acquiredHabits: Set<String> = []) -> PersonalPlan {
         let profile = plan?.profile ?? storedOnboardingProfile() ?? PlanProfile()
         let keepGoal = goal ?? plan?.goal
         let override: PlanGoal? = (plan?.goalChosenByUser ?? false) || goal != nil ? keepGoal : nil
+        // Acquired habits accumulate; « avoid » and « gentler » only concern the cycle that follows.
+        var preferences = plan?.preferences ?? PlanPreferences()
+        preferences.acquiredHabits = (preferences.acquiredHabits ?? []).union(acquiredHabits)
+        preferences.previousCycleRefIDs = plan.map(PlanCycleReview.usedRefIDs)
+        preferences.gentler = gentle ? true : nil
         var newPlan = PersonalPlanGenerator.generate(profile: profile, overrideGoal: override, anxiety: anxiety, startDate: startDate,
-                                                     cycle: (plan?.cycle ?? 1) + 1, excluded: plan?.excludedRefIDs ?? [])
-        newPlan.preferences = plan?.preferences
+                                                     cycle: (plan?.cycle ?? 1) + 1, excluded: plan?.excludedRefIDs ?? [],
+                                                     options: preferences.cycleOptions)
+        newPlan.preferences = preferences
         return newPlan
     }
 
@@ -235,8 +249,29 @@ final class PersonalPlanStore: ObservableObject {
         guard let current = plan, current.isFinished, !isProvisional, !isAutoContinuing else { return }
         isAutoContinuing = true
         defer { isAutoContinuing = false }
+        // The finished cycle decides what changes: acquired habits leave, little progress → gentler.
+        let done = await PlanCompletionLoader.doneKeys(for: current)
+        guard plan == current, !isProvisional else { return }
+        let stats = PlanCycleReview.stats(plan: current, done: done, anxietyResults: AnxietyCheckStore.shared.results)
+        let suggestion = PlanCycleReview.suggestion(for: stats, secondaryGoal: current.secondaryGoal)
         let choice = nextCycleChoice(for: current)
-        startNextCycle(goal: choice?.goal, auto: choice == nil)
+        // Without a choice the goal stays the same; the gentler ramp follows the results then.
+        startNextCycle(goal: choice?.goal, auto: choice == nil,
+                       gentle: choice?.gentle ?? (suggestion.gentle && suggestion.goal == current.goal),
+                       acquiredHabits: Set(PlanCycleReview.acquiredHabits(stats)))
+    }
+
+    /// Picked at the review once the next cycle already started: rebuilds it from today.
+    func adjustCurrentCycle(goal: PlanGoal, gentle: Bool) {
+        guard let current = plan else { return }
+        if (current.preferences?.gentler ?? false) != gentle {
+            var updated = current
+            var preferences = current.preferences ?? PlanPreferences()
+            preferences.gentler = gentle ? true : nil
+            updated.preferences = preferences
+            plan = updated
+        }
+        regenerate(goal: goal, reason: "plan_bilan")
     }
 
     /// Goal picked at the day-28 review, applied when the cycle ends.
@@ -285,7 +320,8 @@ final class PersonalPlanStore: ObservableObject {
             anxiety: anxiety,
             startDate: plan.startDate,
             cycle: plan.cycle,
-            excluded: plan.excludedRefIDs
+            excluded: plan.excludedRefIDs,
+            options: plan.cycleOptions
         )
         var adjusted = newPlan
         adjusted.preferences = plan.preferences

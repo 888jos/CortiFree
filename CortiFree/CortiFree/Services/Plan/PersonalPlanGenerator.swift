@@ -39,9 +39,19 @@ struct PlanAnalysis {
     var anxiety: AnxietySeverity?
     /// Content the user asked not to see again (PlanPreferences.excludedRefIDs).
     var excluded: Set<String> = []
+    /// Content of the previous cycle: still allowed, but only when nothing fresher fits.
+    var avoid: Set<String> = []
+    /// Habits the user acquired: replaced by new ones.
+    var retiredHabits: Set<String> = []
+    /// Cycle theme (Apaiser, Ancrer, Autonomie, Entretien).
+    var cycleTheme: PlanCycleTheme = .soothe
 }
 
 enum PersonalPlanGenerator {
+
+    /// New content to favour in the plans (e.g. the month's new guided sessions, see §1.4 of
+    /// RETENTION_POST_28_DAYS_PLAN.md). Fill it when new sessions ship; empty = no boost.
+    nonisolated(unsafe) static var priorityRefIDs: Set<String> = []
 
     // MARK: Public API
 
@@ -52,10 +62,15 @@ enum PersonalPlanGenerator {
         startDate: Date = Date(),
         cycle: Int = 1,
         excluded: Set<String> = [],
-        variation: Int = 0
+        variation: Int = 0,
+        options: PlanCycleOptions = PlanCycleOptions()
     ) -> PersonalPlan {
         var analysis = analyze(profile, overrideGoal: overrideGoal, anxiety: anxiety)
         analysis.excluded = excluded
+        analysis.avoid = options.avoidRefIDs
+        analysis.retiredHabits = options.retiredHabits
+        analysis.cycleTheme = PlanCycleTheme.forCycle(cycle)
+        if options.gentle { analysis.gentle = true }
         let seedString = "\(fingerprint(profile))|\(analysis.primary.rawValue)|\(analysis.secondary.rawValue)|\(cycle)|\(anxiety?.rawValue ?? "-")" + (variation > 0 ? "|v\(variation)" : "")
         var rng = SeededGenerator(seed: seedString)
 
@@ -71,8 +86,14 @@ enum PersonalPlanGenerator {
         for dayNumber in 1...PersonalPlan.length {
             let week = (dayNumber - 1) / 7 + 1
             let theme = PlanWeekTheme.forWeek(week)
-            // Day slot: secondary goal every 3rd day, primary otherwise.
-            let slotGoal: PlanGoal = (dayNumber % 3 == 0 && analysis.secondary != analysis.primary) ? analysis.secondary : analysis.primary
+            // Day slot: secondary goal every 3rd day, primary otherwise. Maintenance cycles follow
+            // the week's theme (sleep, focus, relations, energy) and come back to the goal every 3rd day.
+            let slotGoal: PlanGoal
+            if analysis.cycleTheme == .maintenance {
+                slotGoal = dayNumber % 3 == 0 ? analysis.primary : PlanMaintenanceTheme.forWeek(week, cycle: cycle).goal
+            } else {
+                slotGoal = (dayNumber % 3 == 0 && analysis.secondary != analysis.primary) ? analysis.secondary : analysis.primary
+            }
             var items: [PlanItem] = []
 
             // (a) Breathing
@@ -94,6 +115,12 @@ enum PersonalPlanGenerator {
                 let audio = pickAudio(day: dayNumber, week: week, goal: slotGoal, theme: theme, analysis: analysis, cycle: cycle, excluding: nil, eveningPresent: false, history: &audioHistory, rng: &rng)
                 items.append(audio)
                 items.append(contentsOf: pickHabits(day: dayNumber, week: week, analysis: analysis, anchor: anchorHabit, history: &habitHistory, rng: &rng))
+            }
+
+            // Autonomy cycle: every other day the guided session is « au choix » (the user picks it).
+            if analysis.cycleTheme == .autonomy && dayNumber % 2 == 0,
+               let index = items.firstIndex(where: { $0.kind == .audio }) {
+                items[index].choice = true
             }
 
             days.append(PlanDay(dayNumber: dayNumber, week: week, items: items))
@@ -255,6 +282,8 @@ enum PersonalPlanGenerator {
 
     /// Main audio cap per week (minutes).
     private static func audioCap(week: Int, analysis: PlanAnalysis, cycle: Int) -> Int {
+        // Maintenance: a light plan (≈ 10 min a day with the breathing).
+        if analysis.cycleTheme == .maintenance { return analysis.gentle || analysis.compact ? 5 : 7 }
         let w = min(4, week + (cycle > 1 ? 1 : 0)) - 1
         var caps = analysis.gentle ? [4, 6, 8, 10] : [5, 7, 10, 12]
         if analysis.compact { caps = zip(caps, [4, 5, 6, 8]).map { min($0, $1) } }
@@ -262,9 +291,15 @@ enum PersonalPlanGenerator {
     }
 
     private static func breathingTarget(week: Int, analysis: PlanAnalysis, cycle: Int) -> Int {
+        if analysis.cycleTheme == .maintenance { return 3 }
         let w = min(4, week + (cycle > 1 ? 1 : 0)) - 1
         let targets = analysis.gentle || analysis.compact ? [2, 2, 3, 4] : [2, 3, 4, 5]
         return targets[max(0, min(3, w))]
+    }
+
+    /// Previous-cycle content is pushed back; content flagged as new is pushed forward.
+    private static func freshness(_ id: String, analysis: PlanAnalysis, avoidPenalty: Double) -> Double {
+        (analysis.avoid.contains(id) ? -avoidPenalty : 0) + (priorityRefIDs.contains(id) ? 1.5 : 0)
     }
 
     // MARK: - Breathing
@@ -298,6 +333,8 @@ enum PersonalPlanGenerator {
             let base = weights[pattern.category] ?? 0
             guard base > 0 else { continue }
             var score = base + history.penalty(pattern.key, day: day, recentWindow: 3, recentPenalty: 3, countPenalty: 0.35)
+            // Anchor cycle: new breathing techniques first.
+            score += freshness(pattern.key, analysis: analysis, avoidPenalty: analysis.cycleTheme == .anchor ? 2 : 1)
             score += rng.nextUnit() * 0.8
             if score > bestScore { bestScore = score; bestPattern = pattern }
         }
@@ -364,6 +401,7 @@ enum PersonalPlanGenerator {
             // Ramp: prefer sessions close to this week's cap.
             score += 1.5 * Double(session.durationMinutes) / Double(max(cap, 1))
             score += history.penalty(session.id, day: day, recentWindow: 6, recentPenalty: 6, countPenalty: 2)
+            score += freshness(session.id, analysis: analysis, avoidPenalty: 3)
             score += rng.nextUnit() * 0.6
             if score > bestScore { bestScore = score; best = session }
         }
@@ -404,6 +442,7 @@ enum PersonalPlanGenerator {
 
     private static func hasEvening(day: Int, analysis: PlanAnalysis) -> Bool {
         if analysis.primary == .sleep { return true }
+        if analysis.cycleTheme == .maintenance { return false }
         if analysis.secondary == .sleep { return day % 2 == 1 }
         return false
     }
@@ -411,7 +450,7 @@ enum PersonalPlanGenerator {
     private static func pickEvening(day: Int, week: Int, analysis: PlanAnalysis, cycle: Int, history: inout UsageHistory, rng: inout SeededGenerator) -> PlanItem {
         let w = min(4, week + (cycle > 1 ? 1 : 0)) - 1
         let caps = analysis.gentle || analysis.compact ? [8, 10, 10, 12] : [10, 10, 12, 15]
-        let cap = caps[max(0, min(3, w))]
+        let cap = analysis.cycleTheme == .maintenance ? 10 : caps[max(0, min(3, w))]
 
         var candidates = GuidedSessionCatalog.sessions(in: .sleep)
         candidates += ["body-pmr-8", "body-scan-10", "body-yoga-nidra-15"].compactMap(GuidedSessionCatalog.session(id:))
@@ -428,6 +467,7 @@ enum PersonalPlanGenerator {
             if session.id == "body-pmr-8" && analysis.tension { score += 1 }
             score += 1.0 * Double(session.durationMinutes) / Double(cap)
             score += history.penalty(session.id, day: day, recentWindow: 2, recentPenalty: 4, countPenalty: 0.6)
+            score += freshness(session.id, analysis: analysis, avoidPenalty: 1.5)
             score += rng.nextUnit() * 0.6
             if score > bestScore { bestScore = score; best = session }
         }
@@ -460,13 +500,22 @@ enum PersonalPlanGenerator {
         if analysis.isolation { w["social", default: 0] += 1 }
         if analysis.tension { w["nature", default: 0] += 0.5 }
         for id in analysis.excluded where w[id] != nil { w[id] = 0 }
+        for id in activeRetiredHabits(analysis) where w[id] != nil { w[id] = 0 }
         return w
+    }
+
+    /// Acquired habits leave the plan, as long as at least 3 habits remain to choose from.
+    private static func activeRetiredHabits(_ analysis: PlanAnalysis) -> Set<String> {
+        let available = habitIDs.filter { !analysis.excluded.contains($0) }
+        let retired = analysis.retiredHabits.intersection(available)
+        return available.count - retired.count >= 3 ? retired : []
     }
 
     /// Habits ordered by relevance (stable).
     static func rankedHabits(_ analysis: PlanAnalysis) -> [String] {
         let w = combinedHabitWeights(analysis)
-        return habitIDs.filter { !analysis.excluded.contains($0) }.sorted { a, b in
+        let retired = activeRetiredHabits(analysis)
+        return habitIDs.filter { !analysis.excluded.contains($0) && !retired.contains($0) }.sorted { a, b in
             let wa = w[a] ?? 0, wb = w[b] ?? 0
             return wa != wb ? wa > wb : (habitIDs.firstIndex(of: a)! < habitIDs.firstIndex(of: b)!)
         }
@@ -475,6 +524,8 @@ enum PersonalPlanGenerator {
     private static func pickHabits(day: Int, week: Int, analysis: PlanAnalysis, anchor: String, history: inout UsageHistory, rng: inout SeededGenerator) -> [PlanItem] {
         let weights = combinedHabitWeights(analysis)
         let count: Int = {
+            // Autonomy and maintenance: fewer imposed habits.
+            if analysis.cycleTheme == .autonomy || analysis.cycleTheme == .maintenance { return 2 }
             if analysis.compact { return 2 }
             if week == 1 { return 2 }
             if analysis.gentle && week == 2 { return 2 }

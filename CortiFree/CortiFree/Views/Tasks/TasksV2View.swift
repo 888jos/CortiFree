@@ -246,7 +246,8 @@ struct TasksV2View: View {
             PlanSwapSheet(
                 item: item,
                 week: (displayedDay - 1) / 7 + 1,
-                alternatives: store.alternatives(dayNumber: displayedDay, itemID: item.id)
+                // « Au choix »: the suggested session stays one of the options.
+                alternatives: (item.choice == true ? [item] : []) + store.alternatives(dayNumber: displayedDay, itemID: item.id)
             ) { replacement, excludeOld in
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
                     if store.swapItem(dayNumber: displayedDay, itemID: item.id, with: replacement, excludeOld: excludeOld) { didEdit() }
@@ -347,7 +348,12 @@ struct TasksV2View: View {
     // MARK: - Sections
 
     private func header(_ plan: PersonalPlan) -> some View {
-        let theme = PlanWeekTheme.forWeek((displayedDay - 1) / 7 + 1)
+        let week = (displayedDay - 1) / 7 + 1
+        let theme = PlanWeekTheme.forWeek(week)
+        // Maintenance cycles (4+) have their own rotating weekly themes.
+        let maintenance = plan.cycleTheme == .maintenance ? PlanMaintenanceTheme.forWeek(week, cycle: plan.cycle) : nil
+        let themeTitle = maintenance?.localizedTitle ?? theme.localizedTitle
+        let themeSubtitle = maintenance?.localizedSubtitle ?? theme.localizedSubtitle
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 HStack(spacing: 5) {
@@ -392,7 +398,7 @@ struct TasksV2View: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(String(format: "plan.header.cycle_day".localized, plan.cycle, displayedDay) + " · " + theme.localizedTitle)
+                Text(String(format: "plan.header.cycle_day".localized, plan.cycle, displayedDay) + " · " + themeTitle)
                     .font(Font.Poppins.custom(.semiBold, size: 12))
                     .foregroundStyle(PlanPalette.accent)
                     .textCase(.uppercase)
@@ -402,7 +408,7 @@ struct TasksV2View: View {
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
-                Text(theme.localizedSubtitle)
+                Text(themeSubtitle)
                     .font(Font.Poppins.custom(.regular, size: 14))
                     .foregroundStyle(PlanPalette.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
@@ -596,6 +602,12 @@ struct TasksV2View: View {
     // MARK: - Actions
 
     private func open(_ item: PlanItem, short: Bool) {
+        // « Au choix » (autonomy cycle): the user picks today's session first.
+        if item.choice == true, store.isEditable(dayNumber: displayedDay) {
+            swapTarget = item
+            AnalyticsManager.shared.track(event: "plan_choice_opened", properties: ["kind": item.kind.rawValue, "plan_day": displayedDay])
+            return
+        }
         switch item.kind {
         case .breathing:
             breathingLaunch = BreathingLaunch(item: item, pattern: item.breathingPattern(short: short), minutes: item.resolvedMinutes(short: short))

@@ -433,6 +433,13 @@ struct PlanItemCard: View {
                                     .font(Font.Poppins.custom(.medium, size: 12))
                                     .foregroundStyle(PlanPalette.tertiaryText)
                             }
+                            if item.choice == true && !isDone {
+                                Text("plan.item.choice".localized)
+                                    .font(Font.Poppins.custom(.medium, size: 10))
+                                    .foregroundStyle(PlanPalette.accent)
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(Capsule().fill(PlanPalette.accent.opacity(0.15)))
+                            }
                             if isShort && (item.shortRefID != nil || item.shortMinutes != nil) {
                                 Text("plan.short.badge".localized)
                                     .font(Font.Poppins.custom(.medium, size: 10))

@@ -28,7 +28,16 @@ struct PlanBilanView: View {
     private var plan: PersonalPlan { request.plan }
     private var nextCycle: Int { plan.cycle + 1 }
     private var nextTheme: PlanCycleTheme { .forCycle(nextCycle) }
-    private var nextGoal: PlanGoal { selectedGoal ?? plan.goal }
+    private var suggestion: PlanNextCycleSuggestion? {
+        stats.map { PlanCycleReview.suggestion(for: $0, secondaryGoal: plan.secondaryGoal) }
+    }
+    private var nextGoal: PlanGoal { selectedGoal ?? suggestion?.goal ?? plan.goal }
+    /// Gentler ramp when suggested for the goal that is kept.
+    private var nextGentle: Bool {
+        guard let suggestion else { return false }
+        return suggestion.gentle && nextGoal == suggestion.goal
+    }
+    private var acquired: [String] { stats.map(PlanCycleReview.acquiredHabits) ?? [] }
 
     var body: some View {
         ZStack {
@@ -227,9 +236,17 @@ struct PlanBilanView: View {
             .padding(16)
             .planGlass(cornerRadius: 22)
 
-            Text(String(format: "plan.bilan.next.goal".localized, nextGoal.localizedName))
-                .font(Font.Poppins.custom(.medium, size: 14))
-                .foregroundStyle(.white.opacity(0.85))
+            if let suggestion, selectedGoal == nil {
+                infoRow(suggestion.goal == plan.goal ? "arrow.triangle.2.circlepath" : "arrow.turn.up.right",
+                        String(format: "plan.bilan.suggest.\(suggestion.reason.rawValue)".localized, suggestion.goal.localizedName))
+            } else {
+                Text(String(format: "plan.bilan.next.goal".localized, nextGoal.localizedName))
+                    .font(Font.Poppins.custom(.medium, size: 14))
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+            ForEach(acquired, id: \.self) { habit in
+                infoRow("checkmark.seal.fill", String(format: "plan.bilan.acquired.next".localized, "plan.habit.\(habit).name".localized))
+            }
 
             Spacer()
 
@@ -305,6 +322,13 @@ struct PlanBilanView: View {
                 .font(Font.Poppins.custom(.medium, size: 14))
                 .foregroundStyle(.white)
             Spacer()
+            if acquired.contains(habit.habitID) {
+                Label("plan.bilan.acquired.badge".localized, systemImage: "checkmark.seal.fill")
+                    .font(Font.Poppins.custom(.semiBold, size: 11))
+                    .foregroundStyle(PlanPalette.deep)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(Capsule().fill(PlanPalette.done))
+            }
             Text("\(Int((habit.rate * 100).rounded())) %")
                 .font(Font.Poppins.custom(.semiBold, size: 14))
                 .foregroundStyle(habit.rate >= PlanCycleReview.acquiredThreshold ? PlanPalette.done : .white.opacity(0.75))
@@ -349,16 +373,21 @@ struct PlanBilanView: View {
     /// Start / change goal / close. On day 28 the choice is kept for tomorrow; after that the
     /// next cycle already started on its own: a new goal rebuilds it from today.
     private func finish(goal: PlanGoal?, action: String) {
+        let gentle = nextGentle
         if let goal {
             if request.isCurrentCycle {
-                store.setNextCycleChoice(goal: goal, gentle: false)
-            } else if let current = store.plan, current.cycle == nextCycle, goal != current.goal {
-                store.regenerate(goal: goal, reason: "plan_bilan")
+                store.setNextCycleChoice(goal: goal, gentle: gentle)
+            } else if let current = store.plan, current.cycle == nextCycle,
+                      goal != current.goal || gentle != (current.preferences?.gentler ?? false) {
+                store.adjustCurrentCycle(goal: goal, gentle: gentle)
             }
         }
         AnalyticsManager.shared.track(event: "plan_bilan_next_cycle", properties: [
             "action": action, "cycle": nextCycle, "goal": (goal ?? plan.goal).rawValue,
             "goal_changed": goal.map { $0 != plan.goal } ?? false,
+            "suggested_goal": suggestion?.goal.rawValue ?? "", "suggestion": suggestion?.reason.rawValue ?? "",
+            "followed_suggestion": goal == nil || goal == suggestion?.goal, "gentle": gentle,
+            "acquired_habits": acquired.joined(separator: ","),
             "timing": request.isCurrentCycle ? "day_28" : "next_cycle"
         ])
         PlanBilanCenter.shared.request = nil

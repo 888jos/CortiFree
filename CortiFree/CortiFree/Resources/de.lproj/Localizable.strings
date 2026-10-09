@@ -5169,3 +5169,22 @@
 "plan_reminder.j29.body" = "Dein Zyklus %@ beginnt heute: %@";
 "plan_reminder.j29_generic.title" = "Ein neuer Zyklus beginnt";
 "plan_reminder.j29_generic.body" = "Dein Zyklus %@ beginnt heute. Deine erste Session wartet.";
+
+/* Retention: cycle themes, next goal, acquired habits */
+"plan.maintenance.sleep.title" = "Schlaf-Woche";
+"plan.maintenance.sleep.subtitle" = "Leichte Sessions, um leichter einzuschlafen.";
+"plan.maintenance.focus.title" = "Fokus-Woche";
+"plan.maintenance.focus.subtitle" = "Kurze Pausen, um den Kopf frei zu bekommen.";
+"plan.maintenance.relations.title" = "Beziehungs-Woche";
+"plan.maintenance.relations.subtitle" = "Freundlichkeit dir selbst und anderen gegenüber.";
+"plan.maintenance.energy.title" = "Energie-Woche";
+"plan.maintenance.energy.subtitle" = "Sanfte Impulse für einen guten Start in den Tag.";
+"plan.item.choice" = "Nach Wahl";
+"plan.bilan.suggest.big_progress" = "Dein Stress ist deutlich gesunken: Weiter mit %@?";
+"plan.bilan.suggest.progress" = "Du machst Fortschritte: Wir bleiben bei %@.";
+"plan.bilan.suggest.little_progress" = "Wir bleiben bei %@, in sanfterem Tempo.";
+"plan.bilan.suggest.no_data" = "Wir machen mit %@ weiter.";
+"plan.bilan.acquired.badge" = "Gefestigt";
+"plan.bilan.acquired.next" = "%@ sitzt jetzt: Platz für eine neue Gewohnheit.";
+"celebration.habit_acquired.title" = "Gewohnheit gefestigt!";
+"celebration.habit_acquired.subtitle" = "%@: über 80 %% des Zyklus gehalten";

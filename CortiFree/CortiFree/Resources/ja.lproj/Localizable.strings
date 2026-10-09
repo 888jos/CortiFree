@@ -5172,3 +5172,22 @@
 "plan_reminder.j29.body" = "サイクル%@が今日スタート：%@";
 "plan_reminder.j29_generic.title" = "新しいサイクルが始まります";
 "plan_reminder.j29_generic.body" = "サイクル%@が今日スタート。最初のセッションが待っています。";
+
+/* Retention: cycle themes, next goal, acquired habits */
+"plan.maintenance.sleep.title" = "睡眠の週";
+"plan.maintenance.sleep.subtitle" = "寝つきをよくする軽めのセッション。";
+"plan.maintenance.focus.title" = "集中の週";
+"plan.maintenance.focus.subtitle" = "頭をすっきりさせ、集中を取り戻す短い休憩。";
+"plan.maintenance.relations.title" = "人間関係の週";
+"plan.maintenance.relations.subtitle" = "自分にも周りにもやさしく。";
+"plan.maintenance.energy.title" = "エネルギーの週";
+"plan.maintenance.energy.subtitle" = "1日を気持ちよく始めるためのやさしい後押し。";
+"plan.item.choice" = "自由に選ぶ";
+"plan.bilan.suggest.big_progress" = "ストレスがしっかり下がりました。次は%@に進みましょうか？";
+"plan.bilan.suggest.progress" = "順調です。%@を続けましょう。";
+"plan.bilan.suggest.little_progress" = "%@はそのままに、よりゆるやかなペースで。";
+"plan.bilan.suggest.no_data" = "%@を続けましょう。";
+"plan.bilan.acquired.badge" = "習得";
+"plan.bilan.acquired.next" = "%@は身につきました。新しい習慣に入れ替わります。";
+"celebration.habit_acquired.title" = "習慣が身につきました！";
+"celebration.habit_acquired.subtitle" = "%@：サイクルの80%%以上を達成";
