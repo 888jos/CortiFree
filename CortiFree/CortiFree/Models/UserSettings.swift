@@ -32,8 +32,12 @@ struct UserSettings: Codable {
     var currentProgramDay: Int {
         // Calendar days between local midnights, like PersonalPlan.dayIndex, so the program day and
         // the plan day always switch together (also for start dates that aren't at midnight).
+        // The start is stored as local midnight where the program began: round to the nearest
+        // midnight, so after a flight (Paris midnight = 18:00 the day before in New York) day N
+        // stays day N, like the plan (PersonalPlan.startDay).
         let calendar = Calendar.current
-        let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: programStartDate),
+        let start = calendar.startOfDay(for: programStartDate.addingTimeInterval(12 * 3600))
+        let days = calendar.dateComponents([.day], from: start,
                                            to: calendar.startOfDay(for: Date())).day ?? 0
         return max(1, days + 1) // Jour 1 = jour de début
     }

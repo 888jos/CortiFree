@@ -209,6 +209,9 @@ struct PersonalPlan: Codable, Equatable {
     var preferences: PlanPreferences?
     /// Last edit date (nil = never edited).
     var updatedAt: Date?
+    /// Calendar day the plan started, where it started ("yyyy-MM-dd"). Day numbers count from it,
+    /// so travelling across time zones doesn't shift them (nil in older plans: startDate is used).
+    var startDay: String?
 
     static func == (lhs: PersonalPlan, rhs: PersonalPlan) -> Bool {
         lhs.startDate == rhs.startDate && lhs.goal == rhs.goal && lhs.cycle == rhs.cycle
@@ -222,11 +225,29 @@ struct PersonalPlan: Codable, Equatable {
     /// Day index (1-based, not clamped) for a given date.
     func dayIndex(on date: Date = Date()) -> Int {
         let cal = Calendar.current
-        let elapsed = cal.dateComponents([.day], from: cal.startOfDay(for: startDate), to: cal.startOfDay(for: date)).day ?? 0
+        let start = startDay.flatMap(Self.date(fromDay:)) ?? cal.startOfDay(for: startDate)
+        let elapsed = cal.dateComponents([.day], from: start, to: cal.startOfDay(for: date)).day ?? 0
         return max(1, elapsed + 1)
     }
 
     var isFinished: Bool { dayIndex() > PersonalPlan.length }
+
+    static func dayString(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        return f.string(from: date)
+    }
+
+    /// Local midnight of a "yyyy-MM-dd" day in the current time zone.
+    static func date(fromDay day: String) -> Date? {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        return f.date(from: day).map { Calendar.current.startOfDay(for: $0) }
+    }
 
     func day(_ number: Int) -> PlanDay? {
         days.first { $0.dayNumber == min(max(1, number), PersonalPlan.length) }

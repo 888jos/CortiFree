@@ -24,6 +24,10 @@ final class PersonalPlanStore: ObservableObject {
     private let onboardingProfileKey = "personalPlan.onboardingProfile.v1"
     private var ensureTask: Task<Void, Never>?
     private var loadedForUser: String = ""
+    /// Remote saves go one at a time, newest plan last (two quick edits can't land reversed).
+    private var pendingRemote: PersonalPlan?
+    private var remoteSaveTask: Task<Void, Never>?
+    private var lastRemoteCheck: Date = .distantPast
 
     private init() {
         loadedForUser = userKey
@@ -147,6 +151,7 @@ final class PersonalPlanStore: ObservableObject {
         }
         if plan == nil { plan = loadLocalPlan() }
         if plan != nil && !isProvisional {
+            await syncWithRemote()
             await autoContinueIfNeeded()
             return
         }
@@ -156,8 +161,12 @@ final class PersonalPlanStore: ObservableObject {
             guard let self else { return }
             self.isLoading = true
             defer { self.isLoading = false }
+            // Signed out / switched account while fetching: the result belongs to someone else.
+            let key = self.userKey
+            let result = await self.fetchRemotePlan()
+            guard key == self.userKey else { return }
 
-            switch await self.fetchRemotePlan() {
+            switch result {
             case .found(let remote):
                 self.isProvisional = false
                 self.plan = remote
@@ -542,10 +551,17 @@ final class PersonalPlanStore: ObservableObject {
     // MARK: - Persistence
 
     private func apply(_ newPlan: PersonalPlan) {
+        var newPlan = newPlan
+        newPlan.updatedAt = Date()
+        if newPlan.startDay == nil {
+            // A rebuild of the same plan keeps its day; a new plan starts today, here.
+            newPlan.startDay = plan?.startDate == newPlan.startDate ? plan?.startDay : nil
+            newPlan.startDay = newPlan.startDay ?? PersonalPlan.dayString(newPlan.startDate)
+        }
         isProvisional = false
         plan = newPlan
         saveLocal(newPlan)
-        Task { await saveRemote(newPlan) }
+        queueRemoteSave(newPlan)
         NotificationCenter.default.post(name: .personalPlanDidChange, object: nil)
     }
 
@@ -553,7 +569,15 @@ final class PersonalPlanStore: ObservableObject {
         guard let data = defaults.data(forKey: planKey),
               let decoded = try? JSONDecoder().decode(PersonalPlan.self, from: data),
               decoded.days.count == PersonalPlan.length else { return nil }
-        return decoded
+        return Self.withStartDay(decoded)
+    }
+
+    /// Older plans have no startDay: pin it to the day they show now, before any trip abroad.
+    private static func withStartDay(_ plan: PersonalPlan) -> PersonalPlan {
+        guard plan.startDay == nil else { return plan }
+        var plan = plan
+        plan.startDay = PersonalPlan.dayString(plan.startDate)
+        return plan
     }
 
     private func saveLocal(_ plan: PersonalPlan) {
@@ -562,10 +586,50 @@ final class PersonalPlanStore: ObservableObject {
         }
     }
 
-    private func saveRemote(_ plan: PersonalPlan) async {
+    private var dirtyKey: String { "personalPlan.remoteDirty.v1.\(userKey)" }
+
+    /// Latest plan wins; a failed save stays « dirty » and is retried at the next ensurePlan().
+    private func queueRemoteSave(_ plan: PersonalPlan) {
+        guard Auth.auth().currentUser != nil else { return }
+        defaults.set(true, forKey: dirtyKey)
+        pendingRemote = plan
+        guard remoteSaveTask == nil else { return }
+        remoteSaveTask = Task { [weak self] in
+            guard let self else { return }
+            defer { self.remoteSaveTask = nil }
+            let key = self.userKey
+            while let next = self.pendingRemote {
+                self.pendingRemote = nil
+                guard await self.saveRemote(next), key == self.userKey else { return }
+            }
+            if key == self.userKey { self.defaults.removeObject(forKey: self.dirtyKey) }
+        }
+    }
+
+    /// Another device (or a reinstall) may have changed the plan: adopt the cloud copy when it is
+    /// newer, push ours when it never reached the cloud. At most once a minute.
+    private func syncWithRemote() async {
+        guard Auth.auth().currentUser != nil, Date().timeIntervalSince(lastRemoteCheck) > 60, let local = plan else { return }
+        lastRemoteCheck = Date()
+        if defaults.bool(forKey: dirtyKey) {
+            queueRemoteSave(local)
+            return
+        }
+        let key = userKey
+        guard case .found(let remote) = await fetchRemotePlan(), key == userKey,
+              let current = plan, Self.stamp(remote) > Self.stamp(current) else { return }
+        plan = remote
+        saveLocal(remote)
+        NotificationCenter.default.post(name: .personalPlanDidChange, object: nil)
+    }
+
+    private static func stamp(_ plan: PersonalPlan) -> Date { plan.updatedAt ?? plan.generatedAt }
+
+    @discardableResult
+    private func saveRemote(_ plan: PersonalPlan) async -> Bool {
         guard Auth.auth().currentUser != nil,
               let data = try? JSONEncoder().encode(plan),
-              let json = String(data: data, encoding: .utf8) else { return }
+              let json = String(data: data, encoding: .utf8) else { return false }
         let doc: [String: Any] = [
             "version": plan.version,
             "goal": plan.goal.rawValue,
@@ -583,10 +647,12 @@ final class PersonalPlanStore: ObservableObject {
             let _: String = try await ConvexBackend.shared.call(
                 .mutation, path: "plan:saveCurrent", args: doc
             )
+            return true
         } catch {
             #if DEBUG
             print("⚠️ PersonalPlanStore: remote save failed: \(error.localizedDescription)")
             #endif
+            return false
         }
     }
 
@@ -609,7 +675,7 @@ final class PersonalPlanStore: ObservableObject {
             guard let data = remote.planJSON.data(using: .utf8),
                   let decoded = try? JSONDecoder().decode(PersonalPlan.self, from: data),
                   decoded.days.count == PersonalPlan.length else { return .unavailable }
-            return .found(decoded)
+            return .found(Self.withStartDay(decoded))
         } catch {
             return .unavailable
         }
