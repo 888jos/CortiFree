@@ -84,6 +84,12 @@ struct TasksV2View: View {
         userSettings?.currentProgramDay ?? UserSettings.loadFromUserDefaults()?.currentProgramDay ?? 1
     }
 
+    /// False while the program start couldn't be read (offline right after sign-in, later cycle):
+    /// validating then would write the history on day_1.
+    private var programDayKnown: Bool {
+        userSettings != nil || UserSettings.loadFromUserDefaults() != nil
+    }
+
     private func absoluteDay(forPlanDay day: Int) -> Int {
         max(1, actualAbsoluteDay - (todayIndex - day))
     }
@@ -649,7 +655,7 @@ struct TasksV2View: View {
     }
 
     private func markDone(_ item: PlanItem) {
-        guard isViewingToday, status(item) != .done else { return }
+        guard isViewingToday, programDayKnown, status(item) != .done else { return }
         let day = absoluteDay(forPlanDay: displayedDay)
         let key = dayKey(day)
         let isFirstToday = !(taskStatuses[key]?.values.contains(.done) ?? false)
@@ -707,7 +713,7 @@ struct TasksV2View: View {
     }
 
     private func undo(_ item: PlanItem) {
-        guard isViewingToday else { return }
+        guard isViewingToday, programDayKnown else { return }
         let day = absoluteDay(forPlanDay: displayedDay)
         let key = dayKey(day)
         HapticManager.light()
@@ -733,7 +739,7 @@ struct TasksV2View: View {
     }
 
     private func skip(_ item: PlanItem) {
-        guard isViewingToday else { return }
+        guard isViewingToday, programDayKnown else { return }
         if status(item) == .done { undo(item) }
         let day = absoluteDay(forPlanDay: displayedDay)
         HapticManager.medium()
@@ -801,7 +807,17 @@ struct TasksV2View: View {
             #if DEBUG
             print("⚠️ Plan: error loading data: \(error)")
             #endif
-            if userSettings == nil { userSettings = UserSettings.loadFromUserDefaults() ?? UserSettings() }
+            // Never default the program start to today here (UserSettings()): on plan day 10 that
+            // would write today's history on day_1. The first plan cycle starts with the program.
+            if userSettings == nil {
+                // (A provisional offline plan starts today: not a reference.)
+                userSettings = UserSettings.loadFromUserDefaults() ?? plan.flatMap { plan in
+                    guard plan.cycle == 1, !store.isProvisional else { return nil }
+                    let start = plan.startDay.flatMap(PersonalPlan.date(fromDay:))
+                        ?? Calendar.current.startOfDay(for: plan.startDate)
+                    return UserSettings(programStartDate: start)
+                }
+            }
         }
         // Offline / not synced yet: completions saved on this device still count.
         mergeLocalCompletions()

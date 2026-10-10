@@ -17,7 +17,7 @@ final class PersonalPlanStore: ObservableObject {
     @Published private(set) var plan: PersonalPlan?
     @Published private(set) var isLoading = false
     /// True while showing a memory-only plan because the cloud plan couldn't be read.
-    private var isProvisional = false
+    private(set) var isProvisional = false
 
     private let defaults = UserDefaults.standard
     /// Last onboarding answers (not per-user: onboarding can happen before sign-in).
