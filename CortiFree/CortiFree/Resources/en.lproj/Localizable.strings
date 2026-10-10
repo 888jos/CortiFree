@@ -5666,3 +5666,11 @@
 "calm.pulse.hint.cover_flash" = "Cover the flash too: put your fingertip over the camera AND the flash right next to it.";
 "calm.pulse.hint.hold_still" = "Keep your finger in place, don't move…";
 "calm.pulse.hint.almost_done" = "Just a few more seconds…";
+
+/* Journal: photo source picker */
+"journal.photo_source.title" = "Choose a source";
+"journal.photo_source.camera" = "Camera";
+"journal.photo_source.library" = "Photo Library";
+
+/* Undo toast */
+"common.undo" = "Undo";

@@ -232,7 +232,7 @@ struct FaceScanView: View {
                 let result = try await FaceScanAnalyzer.analyze(image)
                 await minimumShow
                 let record = try store.save(image: image, result: result)
-                AnalyticsManager.shared.track(event: "face_check_completed", properties: ["slot": record.slot, "score": result.restedScore])
+                AnalyticsManager.shared.track(event: "face_check_completed", properties: ["slot": record.slot])
                 HapticManager.success()
                 phase = .result(record)
             } catch {

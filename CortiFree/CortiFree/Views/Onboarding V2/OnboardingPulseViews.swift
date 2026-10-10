@@ -81,13 +81,13 @@ struct OnboardingPulseMeasureView: View {
         }
         .onChange(of: meter.state) { _, state in
             if phase == .measuring, case .failed = state, let onUnclear {
-                AnalyticsManager.shared.track(event: "onboarding_pulse_unclear", properties: ["bpm": -1, "after": isAfter])
+                AnalyticsManager.shared.track(event: "onboarding_pulse_unclear", properties: ["has_reading": false, "after": isAfter])
                 onUnclear()
                 return
             }
             guard phase == .measuring, case .done = state, let reading = meter.lastReading else { return }
             if PulsePlausibility.doubt(for: reading) != nil, let onUnclear {
-                AnalyticsManager.shared.track(event: "onboarding_pulse_unclear", properties: ["bpm": reading.bpm, "after": isAfter])
+                AnalyticsManager.shared.track(event: "onboarding_pulse_unclear", properties: ["has_reading": true, "after": isAfter])
                 onUnclear()
             } else if PulsePlausibility.doubt(for: reading) != nil {
                 HapticManager.warning()
@@ -154,7 +154,7 @@ struct OnboardingPulseMeasureView: View {
                 primaryButton("onboarding_v2.pulse.remeasure".localized, action: measure)
                 Button("onboarding_v2.pulse.keep".localized) {
                     HapticManager.light()
-                    AnalyticsManager.shared.track(event: "onboarding_pulse_doubt_kept", properties: ["bpm": reading.bpm, "after": isAfter])
+                    AnalyticsManager.shared.track(event: "onboarding_pulse_doubt_kept", properties: ["after": isAfter])
                     if isAfter { onFinish(reading) } else { phase = .result(reading) }
                 }
                 .font(.poppinsMedium(14))

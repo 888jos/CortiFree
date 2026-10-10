@@ -124,16 +124,16 @@ struct JournalHomeView: View {
                 }
             }
         )
-        .confirmationDialog("Choisir la source", isPresented: $showPhotoSourcePicker) {
-            Button("Appareil photo") {
+        .confirmationDialog(LanguageManager.shared.localizedString(for: "journal.photo_source.title"), isPresented: $showPhotoSourcePicker) {
+            Button(LanguageManager.shared.localizedString(for: "journal.photo_source.camera")) {
                 imagePickerSourceType = .camera
                 showImagePicker = true
             }
-            Button("Photothèque") {
+            Button(LanguageManager.shared.localizedString(for: "journal.photo_source.library")) {
                 imagePickerSourceType = .photoLibrary
                 showImagePicker = true
             }
-            Button("Annuler", role: .cancel) {}
+            Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) {}
         }
         .alert(LanguageManager.shared.localizedString(for: "alert.error.title"), isPresented: Binding(
             get: { saveError != nil },

@@ -5669,3 +5669,11 @@
 "calm.pulse.hint.cover_flash" = "フラッシュも覆ってください：指先でカメラとそのすぐ横のフラッシュの両方を覆います。";
 "calm.pulse.hint.hold_still" = "指をそのまま動かさないで…";
 "calm.pulse.hint.almost_done" = "あと数秒です…";
+
+/* Journal: photo source picker */
+"journal.photo_source.title" = "写真を選ぶ方法";
+"journal.photo_source.camera" = "カメラ";
+"journal.photo_source.library" = "写真ライブラリ";
+
+/* Undo toast */
+"common.undo" = "取り消す";

@@ -5666,3 +5666,11 @@
 "calm.pulse.hint.cover_flash" = "Cubre también el flash: pon la yema del dedo sobre la cámara Y el flash, justo al lado.";
 "calm.pulse.hint.hold_still" = "Mantén el dedo quieto, sin moverte…";
 "calm.pulse.hint.almost_done" = "Solo unos segundos más…";
+
+/* Journal: photo source picker */
+"journal.photo_source.title" = "Elegir origen";
+"journal.photo_source.camera" = "Cámara";
+"journal.photo_source.library" = "Fototeca";
+
+/* Undo toast */
+"common.undo" = "Deshacer";

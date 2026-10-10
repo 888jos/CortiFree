@@ -44,7 +44,7 @@ struct UndoToast: View {
                     HapticManager.light()
                     undoAction()
                 }) {
-                    Text("Annuler")
+                    Text(LanguageManager.shared.localizedString(for: "common.undo"))
                         .font(.custom("Poppins-SemiBold", size: 14))
                         .foregroundColor(Color.appTheme)
                         .padding(.horizontal, 16)

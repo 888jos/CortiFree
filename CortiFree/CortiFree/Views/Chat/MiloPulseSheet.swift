@@ -179,7 +179,7 @@ struct MiloPulseSheet: View {
     private func finish(_ bpm: Int, _ source: MiloPulseSource) {
         HapticManager.light()
         meter.stop()
-        AnalyticsManager.shared.track(event: "milo_pulse_measured", properties: ["source": source.rawValue, "bpm": bpm])
+        AnalyticsManager.shared.track(event: "milo_pulse_measured", properties: ["source": source.rawValue])
         onResult(bpm, source)
         dismiss()
     }

@@ -5666,3 +5666,11 @@
 "calm.pulse.hint.cover_flash" = "Deck auch den Blitz ab: Fingerspitze auf Kamera UND Blitz direkt daneben.";
 "calm.pulse.hint.hold_still" = "Lass den Finger liegen, nicht bewegen…";
 "calm.pulse.hint.almost_done" = "Nur noch ein paar Sekunden…";
+
+/* Journal: photo source picker */
+"journal.photo_source.title" = "Quelle wählen";
+"journal.photo_source.camera" = "Kamera";
+"journal.photo_source.library" = "Fotomediathek";
+
+/* Undo toast */
+"common.undo" = "Rückgängig";

@@ -1,0 +1,94 @@
+/*
+  Localizable.strings - Japanese
+  CortiFreeWidget
+*/
+
+// MARK: - Widget header
+"widget.program" = "CORTIFREE プログラム";
+"widget.tasks" = "タスク";
+"widget.day" = "Day";
+"widget.day_of" = "/28";
+
+// MARK: - Widget footer messages
+"widget.footer.zero"    = "0%% 完了、さあ始めよう！";
+"widget.footer.low"     = "%d%% 完了、いいスタート！";
+"widget.footer.mid"     = "%d%% 完了、順調です";
+"widget.footer.high"    = "%d%% 完了、もう半分！";
+"widget.footer.almost"  = "%d%% 完了、ゴールはすぐそこ";
+"widget.footer.perfect" = "100%% 完了、パーフェクトな一日 ✦";
+
+// MARK: - Widget empty state
+"widget.empty" = "今日のタスクはありません";
+
+// MARK: - Widget metadata
+"widget.display_name"   = "CortiFree";
+"widget.description"    = "今日のタスク";
+
+// MARK: - Lock screen widget
+"widget.lockscreen.display_name" = "CortiFree";
+"widget.lockscreen.description"  = "ロック画面から CortiFree を開く";
+
+// MARK: - Widgets (Milo, Respire, Cortisol, Humeur, Message, Streak)
+"widget.v.milo.name" = "Milo";
+"widget.v.milo.desc" = "Milo があなたの一日に反応します：穏やか、誇らしげ、お疲れ、おやすみ。";
+"widget.v.breathe.name" = "呼吸";
+"widget.v.breathe.desc" = "アプリを開かずに、ワンタップで1分間のボックス呼吸。";
+"widget.v.cortisol.name" = "心のお天気";
+"widget.v.cortisol.desc" = "チェックインから見る気分のお天気。自分をいたわると晴れていきます。";
+"widget.v.mood.name" = "今日の気分";
+"widget.v.mood.desc" = "ワンタップで気分を記録して、1か月が色で満たされていくのを見よう。";
+"widget.v.message.name" = "Milo のひとこと";
+"widget.v.message.desc" = "今の時間帯にぴったりな Milo からのひとこと。";
+"widget.v.streak.name" = "連続記録";
+"widget.v.streak.desc" = "自分をいたわった連続日数。炎を絶やさないで。";
+"widget.milo.status.sleeping" = "Milo は眠っています。あなたは？";
+"widget.milo.status.stressed" = "Milo はプレッシャーを感じています";
+"widget.milo.status.tired" = "Milo は朝からずっと待っています…";
+"widget.milo.status.proud" = "Milo はあなたを誇りに思っています";
+"widget.milo.status.morning" = "Milo もあなたと一緒に目覚めます";
+"widget.milo.status.chill" = "Milo はリラックス中";
+"widget.breathe.title" = "呼吸";
+"widget.breathe.cta" = "1分でリラックス";
+"widget.breathe.follow" = "波に合わせて";
+"widget.breathe.inhale" = "吸う";
+"widget.breathe.hold" = "止める";
+"widget.breathe.exhale" = "吐く";
+"widget.breathe.today" = "今日 %d 回";
+"widget.breathe.stop" = "停止";
+"widget.cortisol.title" = "心のお天気";
+"widget.cortisol.tier.0" = "晴れ";
+"widget.cortisol.tier.1" = "おおむね晴れ";
+"widget.cortisol.tier.2" = "くもり始め";
+"widget.cortisol.tier.3" = "嵐";
+"widget.cortisol.hint.0" = "その調子。体が喜んでいます。";
+"widget.cortisol.hint.1" = "ちょっと呼吸の休憩をすれば完璧。";
+"widget.cortisol.hint.2" = "2分間画面から離れて、ゆっくり呼吸しよう。";
+"widget.cortisol.hint.3" = "ストップ。今すぐ1分間の呼吸を。";
+"widget.cortisol.disclaimer" = "チェックインに基づく目安で、医学的な測定ではありません";
+"widget.mood.title" = "今の気分は？";
+"widget.mood.recent" = "直近14日間";
+"widget.message.title" = "Milo のひとこと";
+"widget.quote.sleeping.0" = "スマホを置いて。そう、あなたです。";
+"widget.quote.sleeping.1" = "最高のストレス解消は枕です。";
+"widget.quote.sleeping.2" = "明日はもっといい日に。おやすみ。";
+"widget.quote.stressed.0" = "深呼吸。そのメールは60秒待てます。";
+"widget.quote.stressed.1" = "コルチゾールにも休憩が必要。私もです。";
+"widget.quote.stressed.2" = "肩を下ろして、あごをゆるめて。そう、その感じ。";
+"widget.quote.tired.0" = "朝から一度も深呼吸していないでしょう？";
+"widget.quote.tired.1" = "小さなタスクをひとつ。ひとつだけ。";
+"widget.quote.tired.2" = "待ってます。プレッシャーはなし。まあ、少しだけ。";
+"widget.quote.proud.0" = "すごい、絶好調ですね。";
+"widget.quote.proud.1" = "未来のあなたがありがとうと言っています。";
+"widget.quote.proud.2" = "今日も完了。誇りに思います。";
+"widget.quote.morning.0" = "コーヒーの前にお水を一杯？";
+"widget.quote.morning.1" = "これまでの月曜日も乗り越えてきました。今日も大丈夫。";
+"widget.quote.morning.2" = "今日は、ゆっくり着実に。";
+"widget.quote.chill.0" = "ゆっくりも立派なスピード。";
+"widget.quote.chill.1" = "3回呼吸しよう。一緒に数えます。";
+"widget.quote.chill.2" = "思っているほど急ぎのことはありません。";
+"widget.streak.days" = "日連続";
+"widget.streak.zero" = "今日から連続記録を始めよう";
+"widget.streak.next" = "次の目標：%d";
+"widget.streak.inline" = "%d 日連続";
+"widget.streak.days.one" = "日連続";
+"widget.streak.inline.one" = "%d 日連続";

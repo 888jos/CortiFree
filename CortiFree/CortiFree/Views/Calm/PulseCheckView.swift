@@ -87,7 +87,7 @@ struct PulseCheckView: View {
             case .measureAfter(let before, let mode):
                 afterDoubtful = doubtful
                 PulseCheckRecord(before: before, after: bpm, mode: mode, date: Date()).save()
-                AnalyticsManager.shared.track(event: "calm_check_completed", properties: ["before": before, "after": bpm, "mode": mode.rawValue])
+                AnalyticsManager.shared.track(event: "calm_check_completed", properties: ["mode": mode.rawValue])
                 phase = .final(before: before, after: bpm, mode: mode)
             default: break
             }

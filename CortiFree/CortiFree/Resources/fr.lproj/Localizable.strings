@@ -5664,3 +5664,11 @@
 "calm.pulse.hint.cover_flash" = "Couvre aussi le flash : pose le bout du doigt sur la caméra ET le flash, juste à côté.";
 "calm.pulse.hint.hold_still" = "Garde le doigt posé, sans bouger…";
 "calm.pulse.hint.almost_done" = "Encore quelques secondes…";
+
+/* Journal: photo source picker */
+"journal.photo_source.title" = "Choisir la source";
+"journal.photo_source.camera" = "Appareil photo";
+"journal.photo_source.library" = "Photothèque";
+
+/* Undo toast */
+"common.undo" = "Annuler";

@@ -5669,3 +5669,11 @@
 "calm.pulse.hint.cover_flash" = "플래시도 가려 주세요: 손가락 끝으로 카메라와 바로 옆 플래시를 함께 덮어요.";
 "calm.pulse.hint.hold_still" = "손가락을 그대로 두고 움직이지 마세요…";
 "calm.pulse.hint.almost_done" = "몇 초만 더요…";
+
+/* Journal: photo source picker */
+"journal.photo_source.title" = "사진 가져오기";
+"journal.photo_source.camera" = "카메라";
+"journal.photo_source.library" = "사진 보관함";
+
+/* Undo toast */
+"common.undo" = "실행 취소";
