@@ -335,8 +335,6 @@ class AnalyticsManager {
         // TikTok: Identify user then CompleteRegistration
         TikTokManager.shared.identify(userId: userId)
         TikTokManager.shared.trackCompleteRegistration(method: authMethod)
-        // PostHog
-        PostHogManager.shared.trackRegistration(method: authMethod)
     }
 
     func trackOnboardingAuthenticationFailed(error: String, authMethod: String) {
@@ -482,8 +480,6 @@ class AnalyticsManager {
         ])
         // TikTok: ViewContent (paywall seen)
         TikTokManager.shared.trackViewContent()
-        // PostHog
-        PostHogManager.shared.trackPaywallViewed(source: "onboarding")
     }
 
     func trackOnboardingViewPlanClicked() {
@@ -902,11 +898,9 @@ class AnalyticsManager {
         if isTrial {
             // Trial gratuit commencé → StartTrial (valeur 0, pas de paiement réel)
             TikTokManager.shared.trackStartTrial(productId: productId)
-            PostHogManager.shared.trackTrialStarted(productId: productId)
         } else {
             // Vrai paiement → Subscribe
             TikTokManager.shared.trackSubscribe(productId: productId, price: priceDouble, currency: currency)
-            PostHogManager.shared.trackPurchase(productId: productId, price: priceDouble, currency: currency)
         }
     }
 

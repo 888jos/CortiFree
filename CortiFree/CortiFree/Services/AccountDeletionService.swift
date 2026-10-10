@@ -89,7 +89,6 @@ final class AccountDeletionService {
     /// Clears analytics / paywall identities so the next account isn't linked to this one.
     static func resetThirdPartyIdentities() {
         AnalyticsManager.shared.reset()
-        PostHogManager.shared.reset()
         TikTokManager.shared.logout()
         Superwall.shared.reset()
     }

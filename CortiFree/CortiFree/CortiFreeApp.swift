@@ -32,9 +32,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Onboarding writes that didn't reach the server yet (quiz baseline, completion).
         OnboardingSync.start()
 
-        // Initialize PostHog Analytics
-        PostHogManager.shared.initialize()
-
         // Initialize TikTok App Events SDK
         TikTokManager.shared.initialize()
 
