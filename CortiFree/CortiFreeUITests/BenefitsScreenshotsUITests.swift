@@ -9,8 +9,8 @@
 //      -destination 'platform=iOS Simulator,name=iPhone 15' \
 //      -only-testing:CortiFreeUITests/BenefitsScreenshotsUITests
 //
-//  Files: <SHOTS_DIR>/<page>_<lang>.png (page = home, plan, library, breathing, meditation).
-//  TEST_RUNNER_PAGES=meditation,plan limits the capture to some pages.
+//  Files: <SHOTS_DIR>/<page>_<lang>.png (page = home, plan, library, breathing, meditation = player).
+//  TEST_RUNNER_PAGES=meditation,plan and TEST_RUNNER_LANGS=fr,ja limit the capture.
 //  Taps use screen coordinates: the tab bar labels change with the language.
 //
 
@@ -27,7 +27,7 @@ final class BenefitsScreenshotsUITests: XCTestCase {
         static let tabLibrary = CGVector(dx: 0.672, dy: 0.920)
         static let breathingTile = CGVector(dx: 0.150, dy: 0.755)
         static let meditationTile = CGVector(dx: 0.384, dy: 0.755)
-        static let back = CGVector(dx: 0.107, dy: 0.105)
+        static let firstMeditation = CGVector(dx: 0.267, dy: 0.405)
         static let firstExercisePlay = CGVector(dx: 0.860, dy: 0.455)
     }
 
@@ -42,7 +42,8 @@ final class BenefitsScreenshotsUITests: XCTestCase {
         let pages = Set((env["PAGES"] ?? "home,plan,library,meditation,breathing").split(separator: ",").map(String.init))
         try FileManager.default.createDirectory(atPath: outDir, withIntermediateDirectories: true)
 
-        for lang in languages {
+        let langs = env["LANGS"].map { $0.split(separator: ",").map(String.init) } ?? languages
+        for lang in langs {
             let app = XCUIApplication()
             // Argument domain: overrides the in-app language for this launch only.
             app.launchArguments = ["-selectedLanguage", lang, "-AppleLanguages", "(\(lang))"]
@@ -61,17 +62,21 @@ final class BenefitsScreenshotsUITests: XCTestCase {
             if pages.contains("home") { tap(Spot.tabHome); try shot("home") }
             if pages.contains("plan") { tap(Spot.tabPlan); try shot("plan") }
             if pages.contains("library") { tap(Spot.tabLibrary); try shot("library") }
-            if pages.contains("meditation") {
-                tap(Spot.tabHome)
-                tap(Spot.meditationTile, wait: 3)
-                try shot("meditation")
-                tap(Spot.back)
-            }
             if pages.contains("breathing") {
                 tap(Spot.tabHome)
                 tap(Spot.breathingTile)
                 tap(Spot.firstExercisePlay, wait: 6)
                 try shot("breathing")
+                app.terminate()
+                app.launch()
+                pause(4)
+            }
+            // Last: the full-screen player keeps playing (mini player) once opened.
+            if pages.contains("meditation") {
+                tap(Spot.tabHome)
+                tap(Spot.meditationTile, wait: 3)
+                tap(Spot.firstMeditation, wait: 15) // the session may still be preparing
+                try shot("meditation")
             }
 
             app.terminate()
