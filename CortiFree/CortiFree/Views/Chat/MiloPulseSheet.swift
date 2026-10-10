@@ -17,7 +17,7 @@ struct MiloPulseSheet: View {
     let onResult: (Int, MiloPulseSource) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var meter = PulseCameraMeter()
+    @StateObject private var meter = PulseCameraMeter(source: "milo")
     @State private var step: Step = .choose
     /// Asked once: without a watch the flash measure starts straight away (Profile changes it).
     @AppStorage(AppleWatchPreference.storageKey) private var appleWatch = ""

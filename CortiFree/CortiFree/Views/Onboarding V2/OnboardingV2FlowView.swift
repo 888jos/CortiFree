@@ -666,7 +666,7 @@ struct OnboardingBreathingIntroView: View {
     @State private var elapsedSeconds = 0
     @State private var breathStartDate: Date?
     @State private var hasExited = false
-    @StateObject private var pulseMeter = PulseCameraMeter()
+    @StateObject private var pulseMeter = PulseCameraMeter(source: "onboarding")
     @State private var pulseStage: PulseStage? = .before
     @State private var pulseBefore: PulseCameraMeter.Reading?
     @State private var pulseAfter: PulseCameraMeter.Reading?

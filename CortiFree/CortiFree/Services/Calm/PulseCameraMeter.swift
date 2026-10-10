@@ -6,6 +6,9 @@
 //  fingertip over the lens, the red level of the image rises and falls with each beat.
 //  About 12 seconds of clean signal give a reliable pulse. Wellness only, not medical.
 //
+//  Each measure ends with a « pulse_measure_ended » Amplitude event (outcome, signal quality,
+//  frame rate, finger coverage…) so failures can be understood from the field.
+//
 //  The simulator has no camera: it plays a synthetic pulse so the flow can be tested.
 //
 
@@ -55,8 +58,22 @@ final class PulseCameraMeter: NSObject, ObservableObject {
     }
 
     static let measureDuration: TimeInterval = 12
-    /// Extra time a doubtful signal gets before its best guess is used (the ring fills during it).
-    static let graceDuration: TimeInterval = 3
+    /// Extra time a doubtful signal gets to become reliable before its best guess is used (the
+    /// ring fills during it). A finger that settles late usually gives a clean last window.
+    static let graceDuration: TimeInterval = 13
+    /// How often the final check runs once the measure time is reached.
+    private static let checkInterval: TimeInterval = 0.5
+    /// The waveform and ring are redrawn at most this often: redrawing at the camera's 30 fps
+    /// kept the main thread busy for nothing.
+    private static let uiInterval: TimeInterval = 1.0 / 15
+
+    /// Where the measure was opened from (Amplitude « source »).
+    let source: String
+
+    init(source: String) {
+        self.source = source
+        super.init()
+    }
 
     private let session = AVCaptureSession()
     private let queue = DispatchQueue(label: "cortifree.pulse.camera")
@@ -74,6 +91,9 @@ final class PulseCameraMeter: NSObject, ObservableObject {
     private var waitStart: TimeInterval?
     /// A hint is shown only once its cause lasted a moment, so it does not flicker frame to frame.
     private var pendingHint: (hint: Hint?, since: TimeInterval)?
+    private var lastCheck: TimeInterval = 0
+    private var lastUIUpdate: TimeInterval = 0
+    private var diagnostics = Diagnostics()
     #if targetEnvironment(simulator)
     private var simulationTimer: Timer?
     /// Synthetic heart rate played by the simulator.
@@ -95,6 +115,9 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         lastReading = nil
         hint = nil
         pendingHint = nil
+        lastCheck = 0
+        lastUIUpdate = 0
+        diagnostics = Diagnostics()
         state = .waitingForFinger
 
         #if targetEnvironment(simulator)
@@ -103,6 +126,7 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         Task {
             guard await Self.cameraAllowed() else {
                 state = .failed(LanguageManager.shared.localizedString(for: "calm.pulse.error.camera"))
+                report(outcome: "no_camera_permission")
                 return
             }
             configureAndRun()
@@ -111,6 +135,11 @@ final class PulseCameraMeter: NSObject, ObservableObject {
     }
 
     func stop() {
+        // Closed while still measuring (back, skip, sheet dismissed).
+        if state == .waitingForFinger || state == .measuring {
+            report(outcome: "cancelled")
+            state = .idle
+        }
         #if targetEnvironment(simulator)
         simulationTimer?.invalidate()
         simulationTimer = nil
@@ -140,9 +169,11 @@ final class PulseCameraMeter: NSObject, ObservableObject {
               let input = try? AVCaptureDeviceInput(device: camera)
         else {
             state = .failed(LanguageManager.shared.localizedString(for: "calm.pulse.error.camera"))
+            report(outcome: "no_camera")
             return
         }
         device = camera
+        diagnostics.torch = camera.hasTorch
         let output = AVCaptureVideoDataOutput()
         output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
         output.alwaysDiscardsLateVideoFrames = true
@@ -161,7 +192,12 @@ final class PulseCameraMeter: NSObject, ObservableObject {
             if (try? camera.lockForConfiguration()) != nil {
                 if camera.hasTorch { try? camera.setTorchModeOn(level: 0.8) }
                 if camera.isExposureModeSupported(.continuousAutoExposure) { camera.exposureMode = .continuousAutoExposure }
-                if camera.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) { camera.whiteBalanceMode = .continuousAutoWhiteBalance }
+                // Fixed, neutral white balance: auto white balance treats the red fingertip as a
+                // colour cast and pulls the red down, which hid the finger and flattened the pulse.
+                if camera.isWhiteBalanceModeSupported(.locked) {
+                    let neutral = AVCaptureDevice.WhiteBalanceGains(redGain: 1, greenGain: 1, blueGain: 1)
+                    camera.setWhiteBalanceModeLocked(with: neutral)
+                }
                 // A little darker than auto: a fingertip under the flash otherwise clips at white.
                 camera.setExposureTargetBias(max(camera.minExposureTargetBias, -1.5))
                 // Steady 30 fps: the pulse maths need regular samples.
@@ -188,6 +224,7 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         let evenAndWarm = spread < 14 && red > 60 && red >= green && red >= blue
         let fingerOn = redDominant || evenAndWarm
         if fingerOn { lastFingerTime = time }
+        diagnostics.frame(at: time, fingerOn: fingerOn, measuring: state == .measuring, red: red, green: green, blue: blue)
 
         // Coaching: an even but dark image means the lens is covered and the flash is not.
         if fingerOn {
@@ -202,10 +239,12 @@ final class PulseCameraMeter: NSObject, ObservableObject {
             // After 6 s with the flash on, measure anyway: the rhythm decides, not the colour test.
             let waitedLong = time - (waitStart ?? time) > 6
             guard fingerOn || waitedLong else { return }
+            if !fingerOn { diagnostics.startedWithoutFinger = true }
             state = .measuring
             HapticManager.light()
         } else if let last = lastFingerTime, time - last > 2.5, measureStart.map({ time - $0 < 6 }) ?? true {
             // Finger lifted early for a while: start over. Later on, keep going and let the maths judge.
+            diagnostics.restarts += 1
             state = .waitingForFinger
             waitStart = time
             samples = []
@@ -219,6 +258,7 @@ final class PulseCameraMeter: NSObject, ObservableObject {
 
         // One second for the exposure to settle on the finger, then freeze it and start clean.
         if !exposureLocked, time - (measureStart ?? time) > 1 {
+            diagnostics.lockedColour = (red, green, blue)
             lockExposure()
             samples = []
             measureStart = time
@@ -233,28 +273,38 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         // 90 % of the ring for the normal measure, the last 10 % for the grace time: the ring is
         // only full when the measure really ends.
         let total = Self.measureDuration + Self.graceDuration
-        progress = elapsed <= Self.measureDuration
-            ? 0.9 * elapsed / Self.measureDuration
-            : min(1, 0.9 + 0.1 * (elapsed - Self.measureDuration) / Self.graceDuration)
+        if time - lastUIUpdate >= Self.uiInterval {
+            lastUIUpdate = time
+            progress = elapsed <= Self.measureDuration
+                ? 0.9 * elapsed / Self.measureDuration
+                : min(1, 0.9 + 0.1 * (elapsed - Self.measureDuration) / Self.graceDuration)
+            updateWaveform()
+        }
         if elapsed > Self.measureDuration, fingerOn { hint = .almostDone }
-        updateWaveform()
 
         if time - lastLiveUpdate > 1, elapsed > 5 {
             lastLiveUpdate = time
             // Keep the last good value while the signal is unclear for a moment.
-            if let estimate = PulseSignal.estimate(samples) { liveBPM = estimate.bpm }
+            if let estimate = PulseSignal.estimate(samples) {
+                liveBPM = estimate.bpm
+                diagnostics.best = estimate
+            }
         }
 
-        if elapsed >= Self.measureDuration {
+        if elapsed >= Self.measureDuration, time - lastCheck >= Self.checkInterval {
+            lastCheck = time
             let estimate = PulseSignal.estimate(samples)
+            if let estimate { diagnostics.best = estimate }
             if let estimate, estimate.reliable || elapsed >= total {
-                // A doubtful signal gets a few more seconds to settle before giving its best guess.
-                finish(with: Reading(bpm: estimate.bpm, reliable: estimate.reliable))
+                // A doubtful signal gets more time to settle before giving its best guess.
+                finish(with: Reading(bpm: estimate.bpm, reliable: estimate.reliable), elapsed: elapsed)
             } else if elapsed >= total {
                 if let live = liveBPM {
-                    finish(with: Reading(bpm: live, reliable: false))
+                    finish(with: Reading(bpm: live, reliable: false), elapsed: elapsed)
                 } else {
                     // No rhythm at all (finger not on the lens): no number rather than a wrong one.
+                    diagnostics.elapsed = elapsed
+                    report(outcome: "no_signal")
                     state = .failed(LanguageManager.shared.localizedString(for: "calm.pulse.error.signal"))
                     stop()
                 }
@@ -271,7 +321,9 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         if candidate == nil || time - (pendingHint?.since ?? time) > 0.6 { hint = candidate }
     }
 
-    private func finish(with reading: Reading) {
+    private func finish(with reading: Reading, elapsed: TimeInterval) {
+        diagnostics.elapsed = elapsed
+        report(outcome: reading.reliable ? "reliable" : "unreliable", reading: reading)
         hint = nil
         lastReading = reading
         state = .done(reading.bpm)
@@ -311,6 +363,75 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         }
         #endif
     }
+
+    // MARK: Diagnostics
+
+    /// What the measure saw, sent to Amplitude when it ends.
+    private struct Diagnostics {
+        var firstFrame: TimeInterval?
+        var lastFrame: TimeInterval?
+        var frames = 0
+        var measuringFrames = 0
+        var fingerFrames = 0
+        var maxGap: TimeInterval = 0
+        var restarts = 0
+        var startedWithoutFinger = false
+        var torch = false
+        var lockedColour: (red: Double, green: Double, blue: Double)?
+        var best: PulseSignal.Estimate?
+        var elapsed: TimeInterval = 0
+
+        mutating func frame(at time: TimeInterval, fingerOn: Bool, measuring: Bool, red: Double, green: Double, blue: Double) {
+            if firstFrame == nil { firstFrame = time }
+            if let lastFrame { maxGap = max(maxGap, time - lastFrame) }
+            lastFrame = time
+            frames += 1
+            if measuring {
+                measuringFrames += 1
+                if fingerOn { fingerFrames += 1 }
+            }
+        }
+
+        var fps: Double {
+            guard let firstFrame, let lastFrame, lastFrame > firstFrame else { return 0 }
+            return Double(frames - 1) / (lastFrame - firstFrame)
+        }
+    }
+
+    private func report(outcome: String, reading: Reading? = nil) {
+        let d = diagnostics
+        var properties: [String: Any] = [
+            "source": source,
+            "outcome": outcome,
+            "duration_s": rounded(d.elapsed),
+            "total_s": rounded((d.lastFrame ?? 0) - (d.firstFrame ?? 0)),
+            "fps": rounded(d.fps),
+            "max_frame_gap_ms": Int(d.maxGap * 1000),
+            "finger_ratio": d.measuringFrames > 0 ? rounded(Double(d.fingerFrames) / Double(d.measuringFrames)) : 0,
+            "restarts": d.restarts,
+            "started_without_finger": d.startedWithoutFinger,
+            "torch": d.torch,
+            "thermal_state": ProcessInfo.processInfo.thermalState.rawValue
+        ]
+        if let reading {
+            properties["bpm"] = reading.bpm
+            properties["reliable"] = reading.reliable
+        }
+        if let best = d.best {
+            properties["periodicity"] = rounded(best.periodicity)
+            properties["estimate_bpm"] = best.bpm
+            properties["channel"] = best.channel
+            properties["window_s"] = rounded(best.window)
+        }
+        if let colour = d.lockedColour {
+            properties["locked_red"] = Int(colour.red)
+            properties["locked_green"] = Int(colour.green)
+            properties["locked_blue"] = Int(colour.blue)
+        }
+        AnalyticsManager.shared.track(event: "pulse_measure_ended", properties: properties)
+    }
+
+    private func rounded(_ value: Double) -> Double { (value * 100).rounded() / 100 }
 
     // MARK: Simulator
 

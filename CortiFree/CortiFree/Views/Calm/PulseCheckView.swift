@@ -39,7 +39,7 @@ struct PulseCheckView: View {
     var onContinue: (() -> Void)? = nil
 
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var meter = PulseCameraMeter()
+    @StateObject private var meter = PulseCameraMeter(source: "calm")
 
     private enum Phase: Equatable {
         case intro
