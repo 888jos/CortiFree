@@ -1,5 +1,6 @@
 import SwiftUI
 import Foundation
+import SuperwallKit
 
 /// Milo, the in-app companion: a calm welcome with time-of-day suggestions written as
 /// full sentences, plain-text replies, and one exercise card when a reply calls for it.
@@ -14,10 +15,13 @@ struct AssistantChatView: View {
     @State private var appeared = false
     @State private var messages: [DeepSeekChatMessage] = []
     @State private var draft = ""
+    @StateObject private var dictation = MiloDictation()
     @State private var isLoading = false
     /// The request whose reply the screen is waiting for; a reply to an older one only refreshes the quota.
     @State private var activeRequestID: UUID?
     @State private var errorMessage: String?
+    /// The server refused the request for lack of an active subscription.
+    @State private var needsPremium = false
     @State private var cardsByMessage: [Int: AssistantRecommendation] = [:]
     /// Plan changes Milo proposed, by message, and what the user did with them.
     @State private var planProposals: [Int: PlanAssistantProposal] = [:]
@@ -44,6 +48,8 @@ struct AssistantChatView: View {
     @State private var decodeRequest: MiloDecodeRequest?
     @State private var pendingDecodeAfterConsent: MiloDecodeRequest?
     @FocusState private var composerFocused: Bool
+    /// The draft came (at least partly) from the dictation: reported with the message.
+    @State private var draftWasDictated = false
 
     private let dailyLimit = 12
     private let moment = MiloMoment.current
@@ -87,6 +93,20 @@ struct AssistantChatView: View {
         }
         .opacity(appeared ? 1 : 0)
         .onAppear { withAnimation(.easeOut(duration: 0.25)) { appeared = true } }
+        .onDisappear { dictation.cancel() }
+        .alert(t("milo.dictation.denied.title"), isPresented: Binding(
+            get: { dictation.failure != nil },
+            set: { if !$0 { dictation.failure = nil } }
+        )) {
+            if dictation.failure == .denied {
+                Button(t("milo.dictation.open_settings")) {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                }
+            }
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(t(dictation.failure == .denied ? "milo.dictation.denied.message" : "milo.dictation.unavailable"))
+        }
     }
 
     /// Closes Milo without the slide-down animation (it is presented without one too).
@@ -527,6 +547,21 @@ struct AssistantChatView: View {
                     .multilineTextAlignment(.center)
             }
 
+            if needsPremium {
+                Button {
+                    HapticManager.medium()
+                    presentPremiumPaywall()
+                } label: {
+                    Label(t("assistant.premium.unlock"), systemImage: "sparkles")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 10)
+                        .background(Color(hex: "8B5CF6"), in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+
             HStack(alignment: .bottom, spacing: 4) {
                 Button {
                     HapticManager.light()
@@ -565,6 +600,14 @@ struct AssistantChatView: View {
                     .focused($composerFocused)
                     .padding(.vertical, 11)
 
+                MiloDictationButton(dictation: dictation) {
+                    // The accurate (server) transcript only with Milo's AI consent; otherwise Apple's alone.
+                    let useCloud = MiloConsent.isGranted(in: consentStore, uid: UnifiedFirebaseService.shared.auth.currentUserId)
+                    dictation.toggle(currentText: draft, useCloud: useCloud) { draft = $0; draftWasDictated = true }
+                }
+                .disabled(isLoading)
+                .padding(.vertical, 5)
+
                 Button(action: send) {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 15, weight: .bold))
@@ -594,6 +637,7 @@ struct AssistantChatView: View {
     // MARK: - Sending
 
     private func send() {
+        dictation.cancel()
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         let intent = pendingIntent
         pendingIntent = nil
@@ -601,6 +645,7 @@ struct AssistantChatView: View {
 
         refreshDailyQuotaIfNeeded()
         errorMessage = nil
+        needsPremium = false
 
         // Crisis replies stay local: they never need sign-in, consent or the network.
         if isEmergency(text) {
@@ -628,8 +673,15 @@ struct AssistantChatView: View {
         draft = ""
         composerFocused = false
         messages.append(DeepSeekChatMessage(role: "user", content: text))
+        AnalyticsManager.shared.track(event: "milo_message_sent", properties: [
+            "source": intent != nil ? "suggestion" : (draftWasDictated ? "dictated" : "typed"),
+            "length": text.count,
+            "turn": messages.filter { $0.role == "user" }.count
+        ])
+        draftWasDictated = false
 
         guard assistantDailyUsage < dailyLimit else {
+            AnalyticsManager.shared.track(event: "milo_error", properties: ["kind": "quota_local"])
             messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.quota.reached")))
             return
         }
@@ -641,6 +693,7 @@ struct AssistantChatView: View {
         activeRequestID = requestID
         isLoading = true
 
+        let sentAt = Date()
         Task {
             do {
                 let request = MiloRequestKind.chat(
@@ -651,6 +704,11 @@ struct AssistantChatView: View {
                 )
                 let response = try await DeepSeekChatService.shared.reply(request, messages: messages)
                 await MainActor.run {
+                    AnalyticsManager.shared.track(event: "milo_reply_received", properties: [
+                        "latency_ms": Int(Date().timeIntervalSince(sentAt) * 1000),
+                        "has_card": card != nil,
+                        "has_plan_proposal": PlanAssistantProposal.extract(from: response).1 != nil
+                    ])
                     syncDailyUsageFromServer()
                     // The user may have started or opened another conversation (and sent there) meanwhile.
                     guard requestID == activeRequestID else { return }
@@ -666,6 +724,7 @@ struct AssistantChatView: View {
                 }
             } catch DeepSeekChatError.quotaExceeded {
                 await MainActor.run {
+                    AnalyticsManager.shared.track(event: "milo_error", properties: ["kind": "quota_server"])
                     // Server quota (12/day per account, UTC day): Milo says so instead of an error banner.
                     refreshDailyQuotaIfNeeded()
                     assistantDailyUsage = dailyLimit
@@ -677,6 +736,10 @@ struct AssistantChatView: View {
                 }
             } catch {
                 await MainActor.run {
+                    AnalyticsManager.shared.track(event: "milo_error", properties: [
+                        "kind": (error as? DeepSeekChatError).map { String(describing: $0) } ?? "other",
+                        "latency_ms": Int(Date().timeIntervalSince(sentAt) * 1000)
+                    ])
                     guard requestID == activeRequestID else { return }
                     activeRequestID = nil
                     guard currentID == conversationID else { isLoading = false; return }
@@ -687,10 +750,30 @@ struct AssistantChatView: View {
                     }
                     errorMessage = (error as? DeepSeekChatError)?.errorDescription
                         ?? t("assistant.error.unavailable")
+                    if case DeepSeekChatError.subscriptionRequired = error { needsPremium = true }
                     isLoading = false
                 }
             }
         }
+    }
+
+    /// Opens the main paywall from Milo; once subscribed, the user can send again.
+    private func presentPremiumPaywall() {
+        AnalyticsManager.shared.track(event: "milo_premium_paywall_opened")
+        let handler = PaywallPresentationHandler()
+        handler.onDismiss { _, result in
+            switch result {
+            case .purchased, .restored:
+                Task { @MainActor in
+                    await RevenueCatManager.shared.refreshCustomerInfo(forceServerFetch: true)
+                    needsPremium = false
+                    errorMessage = nil
+                }
+            case .declined:
+                break
+            }
+        }
+        Superwall.shared.register(placement: SuperwallPlacement.onboarding, params: ["source": "milo"], handler: handler)
     }
 
     private func acceptConsent() {

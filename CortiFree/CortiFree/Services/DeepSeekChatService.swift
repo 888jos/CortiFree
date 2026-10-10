@@ -7,8 +7,9 @@ enum DeepSeekChatError: LocalizedError {
     var errorDescription: String? {
         let key: String
         switch self {
-        // The app is behind the paywall: a refused subscription only happens while RevenueCat syncs.
-        case .notConfigured, .unavailable, .subscriptionRequired: key = "assistant.error.unavailable"
+        case .notConfigured, .unavailable: key = "assistant.error.unavailable"
+        // No active subscription on the server (expired, or not synced yet): say so instead of « unavailable ».
+        case .subscriptionRequired: key = "assistant.error.premium"
         case .signedOut, .unauthorized: key = "assistant.error.signin"
         case .quotaExceeded: key = "assistant.quota.reached"
         case .offline: key = "assistant.error.offline"
@@ -79,8 +80,9 @@ final class DeepSeekChatService {
 }
 
 enum MiloConsent {
-    /// v2: the disclosure now covers Apple Health / heart-rate context, so earlier consents are asked again.
-    static let storageKey = "milo.consent.v2.uids"
+    /// v2: the disclosure covers Apple Health / heart-rate context. v3: voice dictation is sent
+    /// to OpenAI for transcription. Each new disclosure asks earlier consents again.
+    static let storageKey = "milo.consent.v3.uids"
     static func isGranted(in stored: String, uid: String?) -> Bool {
         guard let uid else { return false }; return stored.split(separator: ",").contains { $0 == uid }
     }

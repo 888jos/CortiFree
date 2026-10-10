@@ -7,6 +7,7 @@ struct MiloConsentSheet: View {
     var points: [(icon: String, key: String)] = [
         ("server.rack", "assistant.consent.point.provider"),
         ("list.bullet.rectangle", "assistant.consent.point.plan"),
+        ("mic.fill", "assistant.consent.point.voice"),
         ("heart.text.square", "assistant.consent.point.health"),
         ("stethoscope", "assistant.consent.point.diagnosis"),
         ("hand.raised.fill", "assistant.consent.point.revoke")
