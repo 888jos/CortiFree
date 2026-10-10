@@ -12,6 +12,10 @@ import PhotosUI
 struct FaceScanView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var store = FaceScanStore.shared
+    /// Where the check was opened from (Amplitude « source » when shared to Milo).
+    var source = "calm"
+    /// Called after « En parler avec Milo », so a sheet hosting this screen can close too.
+    var onSharedToMilo: (() -> Void)?
 
     private enum Phase: Equatable {
         case intro
@@ -398,9 +402,19 @@ struct FaceScanView: View {
                 }
                 .padding(.horizontal, 20)
             }
-            primary(t("calm.common.done")) { dismiss() }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 14)
+            VStack(spacing: 10) {
+                primary(t("milo.decode.result.talk"), icon: "bubble.left.and.text.bubble.right.fill") {
+                    MiloFaceShare.shared.share(record, source: source)
+                    dismiss()
+                    onSharedToMilo?()
+                }
+                Button(t("calm.common.done")) { dismiss() }
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .frame(maxWidth: .infinity, minHeight: 40)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
         }
     }
 

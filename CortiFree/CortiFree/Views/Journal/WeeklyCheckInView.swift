@@ -60,7 +60,9 @@ struct WeeklyCheckInView: View {
             WeeklyCheckInService.shared.markPrompted()
             AnalyticsManager.shared.track(event: "weekly_checkin_shown", properties: ["week": week])
         }
-        .fullScreenCover(isPresented: $showFaceScan) { FaceScanView() }
+        .fullScreenCover(isPresented: $showFaceScan) {
+            FaceScanView(source: "weekly_checkin", onSharedToMilo: { dismiss() })
+        }
         .fullScreenCover(isPresented: $showPulse) { PulseCheckView() }
     }
 

@@ -92,8 +92,21 @@ final class MiloStore: ObservableObject {
 
     // MARK: History
 
+    /// Conversation the user was in when they last left Milo (nil: a new, empty one). Milo
+    /// reopens it instead of starting over each time.
+    var lastConversationID: UUID? {
+        get { defaults.string(forKey: key("lastConversation")).flatMap(UUID.init(uuidString:)) }
+        set { defaults.set(newValue?.uuidString, forKey: key("lastConversation")) }
+    }
+
+    var lastConversation: MiloConversation? {
+        guard let id = lastConversationID else { return nil }
+        return conversations.first { $0.id == id }
+    }
+
     func save(id: UUID, messages: [DeepSeekChatMessage]) {
         guard !isTemporary, messages.contains(where: { $0.role == "user" }) else { return }
+        lastConversationID = id
         conversations.removeAll { $0.id == id }
         conversations.insert(MiloConversation(id: id, updatedAt: Date(), messages: messages), at: 0)
         if conversations.count > Self.historyLimit { conversations.removeLast(conversations.count - Self.historyLimit) }

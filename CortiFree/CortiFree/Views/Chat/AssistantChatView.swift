@@ -135,6 +135,12 @@ struct AssistantChatView: View {
             if let opener = MiloWeeklyCheckIn.shared.consumeOpener() {
                 if !messages.isEmpty { newConversation() }
                 messages.append(DeepSeekChatMessage(role: "assistant", content: opener))
+            } else if let face = MiloFaceShare.shared.consume() {
+                startFaceConversation(face)
+            } else if messages.isEmpty, let last = store.lastConversation {
+                // By default Milo reopens the conversation the user left; openers above (and
+                // shared documents, decoded messages) start a new one instead.
+                open(last)
             }
             consumeSharedDocument()
         }
@@ -386,6 +392,31 @@ struct AssistantChatView: View {
         pulseMessages.insert(index)
         awaitingPulseFollowUp = true
         store.save(id: conversationID, messages: messages)
+    }
+
+    // MARK: - Face check
+
+    /// « En parler avec Milo » from a face check: the result as the user's message, Milo's read
+    /// and tip as the reply, and an anti-stress exercise matching the signs under it.
+    private func startFaceConversation(_ record: FaceScanRecord) {
+        if !messages.isEmpty { newConversation() }
+        messages.append(DeepSeekChatMessage(role: "user", content: MiloFaceShare.userMessage(for: record)))
+        let index = messages.count
+        messages.append(DeepSeekChatMessage(role: "assistant", content: MiloFaceShare.reply(for: record)))
+        if store.showsExerciseCards, let card = recommendation(for: "", intent: faceIntent(record.result)) {
+            cardsByMessage[index] = card
+        }
+        store.save(id: conversationID, messages: messages)
+    }
+
+    /// A tight jaw → body relaxation; a tired face → sleep at night, stress SOS by day;
+    /// otherwise a breathing exercise (slow at night).
+    private func faceIntent(_ result: FaceScanResult) -> MiloIntent {
+        if result.jawTension != .low { return .session(.bodyRelax) }
+        if result.restedScore < 50 || result.darkCircles == .high {
+            return moment == .night ? .session(.sleep) : .session(.stressSOS)
+        }
+        return .breathing(slow: moment == .night)
     }
 
     /// After a breathing exercise started from a pulse card: invite to measure again.
@@ -901,6 +932,7 @@ struct AssistantChatView: View {
 
     private func newConversation() {
         conversationID = UUID()
+        store.lastConversationID = nil
         messages = []
         cardsByMessage = [:]
         planProposals = [:]
@@ -916,6 +948,7 @@ struct AssistantChatView: View {
 
     private func open(_ conversation: MiloConversation) {
         conversationID = conversation.id
+        store.lastConversationID = conversation.id
         messages = conversation.messages
         cardsByMessage = [:]
         planProposals = [:]
