@@ -72,6 +72,8 @@ class HabitBadgeService: ObservableObject {
             print("❌ HabitBadgeService: Failed to load badges - \(error.localizedDescription)")
             habitBadges = HabitBadge.allHabitIds.flatMap(HabitBadge.badgesForHabit)
             applyLocalProgress(userID: userId)
+            // Not this account's real state: load again next time, and don't celebrate from it.
+            loadedUserID = nil
         }
     }
 
@@ -108,6 +110,8 @@ class HabitBadgeService: ObservableObject {
         // starting from the default catalog re-celebrated badges already earned.
         await loadHabitBadges()
         let userId = Auth.auth().currentUser?.uid
+        // Server state unavailable (offline): checking now would re-celebrate earned badges.
+        guard userId == nil || loadedUserID == userId else { return }
 
         // Récupérer tous les badges pour cette habitude
         let habitBadgesForCheck = habitBadges.filter { $0.habitId == habitId }

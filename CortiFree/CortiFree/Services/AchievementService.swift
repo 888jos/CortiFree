@@ -17,6 +17,10 @@ class AchievementService: ObservableObject {
     @Published var showAchievementPopup: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
+    /// Account whose achievements were read from the server (nil: not loaded, e.g. offline).
+    private var loadedForUser: String?
+    /// Checks run one after the other: two quick validations can't unlock the same one twice.
+    private var checkChain: Task<Void, Never>?
 
     private struct AchievementRow: Decodable {
         let achievementId: String
@@ -83,6 +87,7 @@ class AchievementService: ObservableObject {
             }
 
             achievements = userAchievements
+            loadedForUser = Auth.auth().currentUser?.uid
             #if DEBUG
             print("✅ Loaded \(achievements.filter(\.isUnlocked).count)/\(achievements.count) achievements (streak: \(currentStreak))")
             #endif
@@ -117,11 +122,29 @@ class AchievementService: ObservableObject {
     // MARK: - Check and Unlock Achievements
 
     func checkAchievements(taskCompleted: String? = nil, currentDay: Int = 0, currentStreak: Int = 0, tasksCompletedToday: Int = 0) async {
+        let previous = checkChain
+        let task = Task { @MainActor in
+            await previous?.value
+            await self.runCheck(taskCompleted: taskCompleted, currentDay: currentDay, currentStreak: currentStreak,
+                                tasksCompletedToday: tasksCompletedToday)
+        }
+        checkChain = task
+        await task.value
+    }
+
+    private func runCheck(taskCompleted: String?, currentDay: Int, currentStreak: Int, tasksCompletedToday: Int) async {
+        // Without this account's unlocked state from the server, everything looks locked and
+        // earned achievements would be celebrated again: load it first, or skip this check.
+        let uid = Auth.auth().currentUser?.uid
+        if uid == nil || loadedForUser != uid { await loadAchievements() }
+        guard let uid, loadedForUser == uid else { return }
+
         var unlocked: [Achievement] = []
 
         // Check each achievement
         for (index, var achievement) in achievements.enumerated() {
             guard !achievement.isUnlocked else { continue }
+            let before = achievement
 
             switch achievement.id {
             case "first_task":
@@ -157,7 +180,9 @@ class AchievementService: ObservableObject {
             }
 
             achievements[index] = achievement
-            await saveAchievement(achievement)
+            if achievement.progress != before.progress || achievement.unlockedAt != nil {
+                await saveAchievement(achievement)
+            }
         }
 
         // Every unlock is celebrated, one after the other (CelebrationCenter queue).
