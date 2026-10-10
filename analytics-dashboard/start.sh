@@ -24,14 +24,14 @@ echo ""
 echo "✨ Le dashboard va s'ouvrir automatiquement dans ton navigateur..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "📊 Dashboard: http://localhost:8000/cortifree-analytics.html"
+echo "📊 Dashboard: http://localhost:8000/"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "Pour arrêter: Ctrl+C"
 echo ""
 
 # Attendre 2 secondes puis ouvrir le navigateur
-sleep 2 && open "http://localhost:8000/cortifree-analytics.html" &
+sleep 2 && open "http://localhost:8000/" &
 
 # Lancer le serveur Python
 cd "$DIR"

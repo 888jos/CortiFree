@@ -1,3 +1,52 @@
+# CortiFree Analytics — dashboard live (Amplitude + RevenueCat)
+
+## Lancer
+
+```bash
+cd analytics-dashboard
+./start.sh                                  # ou : python3 dashboard_server.py --port 8000
+```
+
+Ouvre **http://localhost:8000/** (page `index.html`). L'ancien dashboard reste disponible sur
+`/cortifree-analytics.html`.
+
+## Clés (`analytics-dashboard/.env.local`, jamais commité)
+
+| Clé | Obligatoire | Usage |
+|---|---|---|
+| `AMPLITUDE_API_KEY` | oui | API Dashboard REST (Basic auth) |
+| `AMPLITUDE_SECRET_KEY` | oui | idem |
+| `AMPLITUDE_API_BASE_URL` | oui pour l'UE | `https://analytics.eu.amplitude.com` (projet en zone EU) |
+| `REVENUECAT_SECRET_API_KEY` | non | clé secrète **v2** avec lecture *charts/metrics* : MRR, revenus, abonnés, essais, churn |
+| `REVENUECAT_PROJECT_ID` | non | `proj…` |
+
+Sans RevenueCat, la page Monétisation affiche un encart « Connecte RevenueCat » et utilise les
+événements de revenu Amplitude (`revenue_amount`, `[Amplitude] Revenue`, `rc_*`).
+
+## Pages
+
+Vue d'ensemble · Onboarding · Monétisation · Engagement & rétention · Notifications · Explorateur d'événements.
+Sélecteur de période (aujourd'hui / 7 j / 30 j / 90 j / perso) avec comparaison à la période précédente.
+
+## Principes
+
+- Aucun chiffre ni liste d'événements codé en dur : la liste des événements vient de `/api/2/events/list`,
+  les propriétés de l'API Taxonomy, l'entonnoir d'onboarding est reconstruit depuis
+  `onboarding_screen_viewed` (`screen_name` ordonné par `step_number`, un flow par `total_steps`).
+- Les pages cherchent des noms d'événements « sémantiques » (`paywall_open`, `transaction_complete`,
+  `notification_opened`…) ; tant qu'un événement n'a jamais été reçu, la carte affiche « en attente de … ».
+- Le serveur (`dashboard_server.py`, stdlib Python) met en cache chaque réponse 5 min, limite à 4 requêtes
+  Amplitude simultanées, réessaie sur 429 et ne renvoie jamais les clés. « Actualiser » contourne le cache.
+- `DASHBOARD_DEBUG=1` affiche la durée de chaque appel Amplitude.
+
+Endpoints locaux : `/api/status`, `/api/events`, `/api/series`, `/api/breakdown`, `/api/sums`, `/api/users`,
+`/api/onboarding`, `/api/funnel`, `/api/retention`, `/api/ltv`, `/api/event-props`, `/api/user-props`,
+`/api/revenuecat`, `/api/revenuecat/chart`.
+
+---
+
+# (Ancienne documentation)
+
 # 🎯 CortiFree Analytics Dashboard
 
 Dashboard analytics standalone (HTML/JS) pour visualiser les métriques clés de l'app CortiFree iOS.
