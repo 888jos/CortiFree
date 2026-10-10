@@ -3130,11 +3130,11 @@
 "onboarding_v2.reassurance.start_quiz" = "Start the quiz";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
-"onboarding_v2.habits.q1" = "When you get home in the evening, can you relax quickly?";
-"onboarding_v2.habits.q1_opt1" = "Never";
-"onboarding_v2.habits.q1_opt2" = "Rarely";
+"onboarding_v2.habits.q1" = "When you get home in the evening, do you struggle to unwind?";
+"onboarding_v2.habits.q1_opt1" = "Always";
+"onboarding_v2.habits.q1_opt2" = "Often";
 "onboarding_v2.habits.q1_opt3" = "Sometimes";
-"onboarding_v2.habits.q1_opt4" = "Often";
+"onboarding_v2.habits.q1_opt4" = "Rarely";
 "onboarding_v2.habits.q2" = "Have you ever canceled plans with loved ones because of fatigue or stress?";
 "onboarding_v2.habits.q2_opt1" = "Very often";
 "onboarding_v2.habits.q2_opt2" = "Often";
@@ -5674,3 +5674,17 @@
 
 /* Undo toast */
 "common.undo" = "Undo";
+
+/* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
+"paywall_custom.headline.plan.named" = "%1$@, %2$@ is ready.";
+"paywall_custom.headline.plan.anonymous" = "%@ is ready.";
+"onboarding_v2.pulse_recap.result" = "During your minute of breathing, your heart went from %1$d to %2$d BPM.";
+"onboarding_v2.pulse_recap.plan" = "In 1 minute of breathing, your heart slowed by %d BPM: your plan builds on that reflex every day.";
+"onboarding_v2.pulse_recap.paywall" = "In 1 minute, your heart slowed by %d BPM. Imagine 28 days.";
+"paywall_custom.reviews.title" = "What users say";
+"paywall_custom.reviews.rating" = "4.9 out of 5 · App Store";
+"paywall_custom.reviews.translated" = "Reviews translated from French";
+"paywall_custom.reviews.r1_title" = "Great for sleep";
+"paywall_custom.reviews.r1_text" = "Been using it for a week. The plan tracking is well done compared to other apps. The interface is cool, but what I like most are the routines; the one to get ready for sleep works really well for me.";
+"paywall_custom.reviews.r2_title" = "Useful every day";
+"paywall_custom.reviews.r2_text" = "Great app! Helps you find a better routine.";

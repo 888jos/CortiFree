@@ -3130,11 +3130,11 @@
 "onboarding_v2.reassurance.start_quiz" = "퀴즈 시작하기";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
-"onboarding_v2.habits.q1" = "저녁에 집에 오면 금방 긴장이 풀리나요?";
-"onboarding_v2.habits.q1_opt1" = "전혀 아니에요";
-"onboarding_v2.habits.q1_opt2" = "거의 아니에요";
+"onboarding_v2.habits.q1" = "저녁에 집에 와도 긴장을 풀기 어렵나요?";
+"onboarding_v2.habits.q1_opt1" = "항상 그래요";
+"onboarding_v2.habits.q1_opt2" = "자주 그래요";
 "onboarding_v2.habits.q1_opt3" = "가끔 그래요";
-"onboarding_v2.habits.q1_opt4" = "자주 그래요";
+"onboarding_v2.habits.q1_opt4" = "거의 아니에요";
 "onboarding_v2.habits.q2" = "피로나 스트레스 때문에 소중한 사람과의 약속을 취소한 적이 있나요?";
 "onboarding_v2.habits.q2_opt1" = "아주 자주";
 "onboarding_v2.habits.q2_opt2" = "자주";
@@ -5677,3 +5677,17 @@
 
 /* Undo toast */
 "common.undo" = "실행 취소";
+
+/* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
+"paywall_custom.headline.plan.named" = "%1$@님, %2$@이 준비됐어요.";
+"paywall_custom.headline.plan.anonymous" = "%@이 준비됐어요.";
+"onboarding_v2.pulse_recap.result" = "1분 동안 호흡하는 사이 심박수가 %1$d에서 %2$d BPM으로 바뀌었어요.";
+"onboarding_v2.pulse_recap.plan" = "1분 호흡으로 심박수가 %d BPM 내려갔어요. 플랜은 매일 이 반응을 활용해요.";
+"onboarding_v2.pulse_recap.paywall" = "단 1분 만에 심박수가 %d BPM 내려갔어요. 28일이면 어떨까요?";
+"paywall_custom.reviews.title" = "사용자 후기";
+"paywall_custom.reviews.rating" = "5점 만점에 4.9 · App Store";
+"paywall_custom.reviews.translated" = "프랑스어 후기를 번역했어요";
+"paywall_custom.reviews.r1_title" = "수면에 최고";
+"paywall_custom.reviews.r1_text" = "1주일째 사용 중이에요. 다른 앱에 비해 플랜 관리가 잘 되어 있어요. 화면도 좋지만 제일 마음에 드는 건 루틴이고, 특히 잠들기 준비 루틴이 저한테는 정말 효과적이에요.";
+"paywall_custom.reviews.r2_title" = "매일 유용해요";
+"paywall_custom.reviews.r2_text" = "멋진 앱! 더 나은 루틴을 찾는 데 도움이 돼요.";

@@ -3130,11 +3130,11 @@
 "onboarding_v2.reassurance.start_quiz" = "Quiz starten";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
-"onboarding_v2.habits.q1" = "Wenn du abends nach Hause kommst, kannst du dich schnell entspannen?";
-"onboarding_v2.habits.q1_opt1" = "Nie";
-"onboarding_v2.habits.q1_opt2" = "Selten";
+"onboarding_v2.habits.q1" = "Fällt es dir schwer, abends nach Hause zu kommen und abzuschalten?";
+"onboarding_v2.habits.q1_opt1" = "Immer";
+"onboarding_v2.habits.q1_opt2" = "Oft";
 "onboarding_v2.habits.q1_opt3" = "Manchmal";
-"onboarding_v2.habits.q1_opt4" = "Oft";
+"onboarding_v2.habits.q1_opt4" = "Selten";
 "onboarding_v2.habits.q2" = "Hast du schon einmal wegen Müdigkeit oder Stress Pläne mit Freunden oder Familie abgesagt?";
 "onboarding_v2.habits.q2_opt1" = "Sehr oft";
 "onboarding_v2.habits.q2_opt2" = "Oft";
@@ -5674,3 +5674,17 @@
 
 /* Undo toast */
 "common.undo" = "Rückgängig";
+
+/* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
+"paywall_custom.headline.plan.named" = "%1$@, %2$@ ist bereit.";
+"paywall_custom.headline.plan.anonymous" = "%@ ist bereit.";
+"onboarding_v2.pulse_recap.result" = "Während deiner Atemminute ist dein Puls von %1$d auf %2$d BPM gesunken.";
+"onboarding_v2.pulse_recap.plan" = "In 1 Minute Atmen ist dein Puls um %d BPM gesunken: Dein Plan baut jeden Tag auf diesem Reflex auf.";
+"onboarding_v2.pulse_recap.paywall" = "In 1 Minute ist dein Puls um %d BPM gesunken. Stell dir 28 Tage vor.";
+"paywall_custom.reviews.title" = "Das sagen Nutzer";
+"paywall_custom.reviews.rating" = "4,9 von 5 · App Store";
+"paywall_custom.reviews.translated" = "Bewertungen aus dem Französischen übersetzt";
+"paywall_custom.reviews.r1_title" = "Super für den Schlaf";
+"paywall_custom.reviews.r1_text" = "Seit einer Woche im Einsatz. Die Planverfolgung ist im Vergleich zu anderen Apps gut gemacht. Die Oberfläche ist cool, aber am meisten mag ich die Routinen – die zur Schlafvorbereitung wirkt bei mir jedenfalls sehr gut.";
+"paywall_custom.reviews.r2_title" = "Im Alltag nützlich";
+"paywall_custom.reviews.r2_text" = "Super App! Hilft, eine bessere Routine zu finden.";

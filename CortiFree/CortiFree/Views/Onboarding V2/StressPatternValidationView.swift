@@ -80,7 +80,8 @@ struct StressPatternValidationView: View {
 
                 // Histogram
                 stressHistogram
-                    .frame(height: 336) // 280 × 1.2
+                    // 280 × 1.2, shorter when the heart-rate card below needs the room
+                    .frame(height: OnboardingPulseResult.current == nil ? 336 : 270)
                     .padding(.horizontal, 40)
 
                 Spacer()
@@ -93,6 +94,16 @@ struct StressPatternValidationView: View {
                     .multilineTextAlignment(.center)
                     .balancedLines()
                     .padding(.horizontal, 32)
+
+                // The heart-rate drop measured during the breathing exercise of the quiz
+                if let pulse = OnboardingPulseResult.current {
+                    OnboardingPulseRecap(
+                        text: "onboarding_v2.pulse_recap.result".localized(pulse.before, pulse.after),
+                        drop: pulse.drop
+                    )
+                    .padding(.horizontal, 28)
+                    .padding(.top, 18)
+                }
 
                 Spacer()
 

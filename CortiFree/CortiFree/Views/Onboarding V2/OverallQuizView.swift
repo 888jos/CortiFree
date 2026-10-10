@@ -127,10 +127,10 @@ struct OverallQuizView: View {
 
     private func trackQuestionViewed(_ index: Int) {
         let questionTexts = [
-            "Raisons du stress",
-            "Durée du stress",
-            "Genre",
-            "Âge"
+            "Stress reasons",
+            "Stress duration",
+            "Gender",
+            "Age"
         ]
         AnalyticsManager.shared.trackOnboardingQuizQuestionViewed(
             questionNumber: index + 1,
@@ -139,12 +139,12 @@ struct OverallQuizView: View {
         )
     }
 
-    private func trackQuestionAnswered(_ index: Int, answerIndex: Int, answerText: String) {
+    private func trackQuestionAnswered(_ index: Int, answerIndex: Int, answerText: String, answerTexts: [String]? = nil) {
         let questionTexts = [
-            "Raisons du stress",
-            "Durée du stress",
-            "Genre",
-            "Âge"
+            "Stress reasons",
+            "Stress duration",
+            "Gender",
+            "Age"
         ]
         let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
         AnalyticsManager.shared.trackOnboardingQuizQuestionAnswered(
@@ -153,7 +153,8 @@ struct OverallQuizView: View {
             answerIndex: answerIndex,
             answerText: answerText,
             timeToAnswer: timeToAnswer,
-            quizType: "overall"
+            quizType: "overall",
+            answerTexts: answerTexts
         )
     }
 
@@ -392,8 +393,8 @@ struct OverallQuizView: View {
                                 "onboarding_v2.overall.reason_difficult".localized,
                                 "onboarding_v2.overall.reason_habits".localized
                             ]
-                            let selectedTexts = selectedReasons.sorted().compactMap { reasonTexts[safe: $0] }.joined(separator: ", ")
-                            trackQuestionAnswered(0, answerIndex: selectedReasons.count, answerText: selectedTexts)
+                            let selected = selectedReasons.sorted().compactMap { reasonTexts[safe: $0] }
+                            trackQuestionAnswered(0, answerIndex: selectedReasons.count, answerText: selected.joined(separator: ", "), answerTexts: selected)
                             advance()
                         }) {
                             Text(StringKeys.Common.continueButton)
@@ -419,13 +420,14 @@ struct OverallQuizView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Answer buttons
             VStack(spacing: 22) {
-                ForEach(0..<5, id: \.self) { index in
+                // "Plusieurs années" overlapped "Plus d'un an": one answer now. The "years" code
+                // stays readable for older drafts and accounts.
+                ForEach(0..<4, id: \.self) { index in
                     let durationTexts = [
                         "onboarding_v2.overall.duration_weeks".localized,
                         "onboarding_v2.overall.duration_2_6_months".localized,
                         "onboarding_v2.overall.duration_6_12_months".localized,
-                        "onboarding_v2.overall.duration_1_year_plus".localized,
-                        "onboarding_v2.overall.duration_years".localized
+                        "onboarding_v2.overall.duration_1_year_plus".localized
                     ]
                     OverallAnswerButton(
                         number: index + 1,
@@ -479,10 +481,9 @@ struct OverallQuizView: View {
             "onboarding_v2.overall.duration_weeks".localized,
             "onboarding_v2.overall.duration_2_6_months".localized,
             "onboarding_v2.overall.duration_6_12_months".localized,
-            "onboarding_v2.overall.duration_1_year_plus".localized,
-            "onboarding_v2.overall.duration_years".localized
+            "onboarding_v2.overall.duration_1_year_plus".localized
         ]
-        let durationCodes = ["weeks", "2_6_months", "6_12_months", "1_year_plus", "years"]
+        let durationCodes = ["weeks", "2_6_months", "6_12_months", "1_year_plus"]
 
         let genderIndex = selectedGender ?? 2
         let genderCode = ["male", "female", "other"][genderIndex]

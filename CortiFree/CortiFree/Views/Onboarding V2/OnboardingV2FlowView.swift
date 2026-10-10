@@ -294,12 +294,26 @@ struct OnboardingV2FlowView: View {
         persistLiveActivityProgress(currentStep)
     }
 
+    /// Bump whenever the onboarding screens change: the analytics dashboard shows the funnel
+    /// of the latest version (older versions stay selectable).
+    nonisolated static let analyticsVersion = "2026-10-10"
+
+    /// The screens a user really goes through, in order. Steps that only redirect
+    /// (sixtyDayExplanation, notificationPermissions) and the fallback sign-up after the
+    /// paywall (accountRequired) are not funnel steps.
+    static let funnelSteps: [OnboardingStep] = [
+        .welcome, .firstName, .overall, .reassurance, .habitsQuiz, .stressPatternValidation,
+        .symptomChecker, .cortisolScienceHook, .scientificPlan, .authentication, .loading,
+        .planReady, .planDay, .commitmentPledge, .complete
+    ]
+
     private func trackOnboardingScreen(_ step: OnboardingStep) {
-        let stepNumber = (OnboardingStep.allCases.firstIndex(of: step) ?? 0) + 1
+        guard let index = Self.funnelSteps.firstIndex(of: step) else { return }
         AnalyticsManager.shared.trackOnboardingScreenViewed(
             screenName: step.rawValue,
-            stepNumber: stepNumber,
-            totalSteps: OnboardingStep.allCases.count
+            stepNumber: index + 1,
+            totalSteps: Self.funnelSteps.count,
+            version: Self.analyticsVersion
         )
     }
 
@@ -359,6 +373,7 @@ struct OnboardingV2FlowView: View {
         case .overall:
             OverallQuizView(onComplete: { data in
                 overallQuizData = data
+                AnalyticsICP.overallCompleted(data)
                 currentStep = .reassurance
             })
 
@@ -373,6 +388,7 @@ struct OnboardingV2FlowView: View {
         case .habitsQuiz:
             HabitsQuizView(onComplete: { result in
                 habitsQuizResult = result
+                AnalyticsICP.habitsCompleted(result)
                 currentStep = .stressPatternValidation
 
                 // Save in background without blocking UI
@@ -405,6 +421,7 @@ struct OnboardingV2FlowView: View {
                 onBack: { currentStep = .stressPatternValidation },
                 onContinue: { symptoms in
                     selectedSymptoms = symptoms
+                    AnalyticsICP.symptomsSelected(symptoms)
                     currentStep = .cortisolScienceHook
                 }
             )
@@ -637,20 +654,20 @@ struct OnboardingV2FlowView: View {
 // MARK: - Breathing introduction
 
 /// A short, skippable first exercise that lets users experience the core loop
-/// before answering the onboarding questions.
+/// before answering the onboarding questions. It opens on the heart-rate instructions:
+/// measure, breathe (starts right away), measure again, compare.
 struct OnboardingBreathingIntroView: View {
     let onContinue: () -> Void
     let onBack: () -> Void
 
     @StateObject private var planetSettings = PlanetSettings.shared
     @State private var isStarted = false
-    @State private var hasSeenIntro = false
     @State private var isComplete = false
     @State private var elapsedSeconds = 0
     @State private var breathStartDate: Date?
     @State private var hasExited = false
     @StateObject private var pulseMeter = PulseCameraMeter()
-    @State private var pulseStage: PulseStage?
+    @State private var pulseStage: PulseStage? = .before
     @State private var pulseBefore: PulseCameraMeter.Reading?
     @State private var pulseAfter: PulseCameraMeter.Reading?
     /// The user measured but the reading was unclear: the after-measure and the result screen still follow.
@@ -687,11 +704,7 @@ struct OnboardingBreathingIntroView: View {
             VStack(spacing: 0) {
                 header
 
-                if hasSeenIntro {
-                    exerciseContent
-                } else {
-                    introductionContent
-                }
+                exerciseContent
 
                 VStack(spacing: 12) {
                     if !isStarted || isComplete {
@@ -722,6 +735,8 @@ struct OnboardingBreathingIntroView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: pulseStage)
+        // A result from an earlier onboarding must not be shown for this one.
+        .onAppear { OnboardingPulseResult.clear() }
         .onReceive(timer) { _ in
             guard isStarted, !isComplete else { return }
             elapsedSeconds += 1
@@ -748,14 +763,18 @@ struct OnboardingBreathingIntroView: View {
                     // Not skipped: it is the day-1 weekly pulse, not asked again in the check-in.
                     if let reading { WeeklyPulseStore.recordOnboardingPulse(reading.bpm) }
                     pulseStage = nil
-                    withAnimation(.easeInOut(duration: 0.3)) { hasSeenIntro = true }
+                    // "Start breathing" was the button of the result: the breathing starts now.
+                    // Skipped: the ready screen still says how long it lasts.
+                    if reading != nil { isStarted = true }
                 },
-                onBack: { pulseStage = nil },
+                onBack: {
+                    pulseMeter.stop()
+                    onBack()
+                },
                 onUnclear: {
                     pulseBefore = nil
                     pulseAttempted = true
                     pulseStage = nil
-                    withAnimation(.easeInOut(duration: 0.3)) { hasSeenIntro = true }
                 }
             )
         case .after:
@@ -793,34 +812,6 @@ struct OnboardingBreathingIntroView: View {
     private func unclearAfterMeasure() {
         pulseAfter = nil
         pulseStage = .comparison
-    }
-
-    private var introductionContent: some View {
-        VStack(spacing: 0) {
-            Spacer(minLength: 30)
-
-            LottieView(filename: "sloth_intro.json", loopMode: .loop)
-                .frame(width: 132, height: 132)
-                .accessibilityHidden(true)
-
-            Text("onboarding_v2.breathing_intro.title".localized)
-                .font(.faroBold(29))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .balancedLines()
-                .padding(.top, 18)
-
-            Text("onboarding_v2.breathing_intro.subtitle".localized)
-                .font(.poppinsRegular(16))
-                .foregroundStyle(.white.opacity(0.72))
-                .multilineTextAlignment(.center)
-                .balancedLines()
-                .lineSpacing(4)
-                .padding(.horizontal, 30)
-                .padding(.top, 10)
-
-            Spacer()
-        }
     }
 
     private var exerciseContent: some View {
@@ -945,8 +936,6 @@ struct OnboardingBreathingIntroView: View {
         HapticManager.light()
         if isComplete {
             if measuresPulse { pulseStage = .after } else { exitToNextStep() }
-        } else if !hasSeenIntro {
-            pulseStage = .before
         } else if !isStarted {
             isStarted = true
         }

@@ -138,6 +138,14 @@ struct OnboardingPlanReadyView: View {
                 }
             }
 
+            if let pulse = OnboardingPulseResult.current {
+                OnboardingPulseRecap(
+                    text: "onboarding_v2.pulse_recap.plan".localized(pulse.drop),
+                    drop: pulse.drop,
+                    accent: plan.goal.accentColor
+                )
+            }
+
             if !whyLines.isEmpty {
                 VStack(alignment: .leading, spacing: 14) {
                     Text("onboarding_v2.plan_ready.why".localized)

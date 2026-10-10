@@ -3130,11 +3130,11 @@
 "onboarding_v2.reassurance.start_quiz" = "Commencer le quiz";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
-"onboarding_v2.habits.q1" = "Quand tu rentres le soir, arrives-tu à te détendre rapidement ?";
-"onboarding_v2.habits.q1_opt1" = "Jamais";
-"onboarding_v2.habits.q1_opt2" = "Rarement";
+"onboarding_v2.habits.q1" = "Quand tu rentres le soir, as-tu du mal à te détendre ?";
+"onboarding_v2.habits.q1_opt1" = "Toujours";
+"onboarding_v2.habits.q1_opt2" = "Souvent";
 "onboarding_v2.habits.q1_opt3" = "Parfois";
-"onboarding_v2.habits.q1_opt4" = "Souvent";
+"onboarding_v2.habits.q1_opt4" = "Rarement";
 "onboarding_v2.habits.q2" = "As-tu déjà annulé des plans avec des proches à cause de la fatigue ou du stress ?";
 "onboarding_v2.habits.q2_opt1" = "Très souvent";
 "onboarding_v2.habits.q2_opt2" = "Souvent";
@@ -5672,3 +5672,17 @@
 
 /* Undo toast */
 "common.undo" = "Annuler";
+
+/* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
+"paywall_custom.headline.plan.named" = "%1$@, %2$@ est prêt.";
+"paywall_custom.headline.plan.anonymous" = "%@ est prêt.";
+"onboarding_v2.pulse_recap.result" = "Pendant ta minute de respiration, ton cœur est passé de %1$d à %2$d BPM.";
+"onboarding_v2.pulse_recap.plan" = "En 1 minute de respiration, ton cœur a ralenti de %d BPM : ton plan reprend ce réflexe chaque jour.";
+"onboarding_v2.pulse_recap.paywall" = "En 1 minute, ton cœur a ralenti de %d BPM. Imagine 28 jours.";
+"paywall_custom.reviews.title" = "Ce qu'en disent les utilisateurs";
+"paywall_custom.reviews.rating" = "4,9 sur 5 · App Store";
+"paywall_custom.reviews.translated" = "";
+"paywall_custom.reviews.r1_title" = "Top pour le sommeil";
+"paywall_custom.reviews.r1_text" = "Utilisé depuis 1 semaine. Le suivi du plan est pas mal fait par rapport à d'autres applis. L'interface est cool mais ce que j'aime bien c'est surtout les routines, celle de préparation au sommeil est très efficace pour moi en tout cas.";
+"paywall_custom.reviews.r2_title" = "Utile au quotidien";
+"paywall_custom.reviews.r2_text" = "Super appli ! Aide à trouver une meilleure routine.";

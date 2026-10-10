@@ -369,6 +369,12 @@ struct OnboardingPulseComparisonView: View {
             VStack(spacing: 12) {
                 Button {
                     HapticManager.light()
+                    // Best moment of the onboarding to ask for a rating, but only when the heart
+                    // clearly slowed down (never after a faster, steady or unclear measure).
+                    if outcome == .calmer {
+                        AnalyticsManager.shared.track(event: "onboarding_rating_requested", properties: ["bpm_drop": delta])
+                        AppRatingService.shared.requestRatingIfAppropriate()
+                    }
                     onContinue()
                 } label: {
                     Text("onboarding_v2.breath_demo.continue".localized)
@@ -400,6 +406,12 @@ struct OnboardingPulseComparisonView: View {
                 "before": before?.bpm ?? -1, "after": after?.bpm ?? -1, "outcome": "\(outcome)",
                 "reliable": (before?.reliable ?? false) && (after?.reliable ?? false)
             ])
+            // Reused on the quiz result, the plan and the pre-paywall, only when it clearly slowed down.
+            if outcome == .calmer, let before, let after {
+                OnboardingPulseResult.save(before: before.bpm, after: after.bpm)
+            } else {
+                OnboardingPulseResult.clear()
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 showConfetti = true
                 HapticManager.success()

@@ -3130,11 +3130,11 @@
 "onboarding_v2.reassurance.start_quiz" = "Empezar el cuestionario";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
-"onboarding_v2.habits.q1" = "Cuando llegas a casa por la noche, ¿puedes relajarte rápidamente?";
-"onboarding_v2.habits.q1_opt1" = "Nunca";
-"onboarding_v2.habits.q1_opt2" = "Raramente";
+"onboarding_v2.habits.q1" = "Cuando llegas a casa por la noche, ¿te cuesta relajarte?";
+"onboarding_v2.habits.q1_opt1" = "Siempre";
+"onboarding_v2.habits.q1_opt2" = "A menudo";
 "onboarding_v2.habits.q1_opt3" = "A veces";
-"onboarding_v2.habits.q1_opt4" = "A menudo";
+"onboarding_v2.habits.q1_opt4" = "Rara vez";
 "onboarding_v2.habits.q2" = "¿Alguna vez has cancelado planes con tus seres queridos por cansancio o estrés?";
 "onboarding_v2.habits.q2_opt1" = "Muy a menudo";
 "onboarding_v2.habits.q2_opt2" = "A menudo";
@@ -5674,3 +5674,17 @@
 
 /* Undo toast */
 "common.undo" = "Deshacer";
+
+/* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
+"paywall_custom.headline.plan.named" = "%1$@, %2$@ está listo.";
+"paywall_custom.headline.plan.anonymous" = "%@ está listo.";
+"onboarding_v2.pulse_recap.result" = "Durante tu minuto de respiración, tu corazón pasó de %1$d a %2$d BPM.";
+"onboarding_v2.pulse_recap.plan" = "En 1 minuto de respiración, tu corazón bajó %d BPM: tu plan retoma ese reflejo cada día.";
+"onboarding_v2.pulse_recap.paywall" = "En 1 minuto, tu corazón bajó %d BPM. Imagina 28 días.";
+"paywall_custom.reviews.title" = "Lo que dicen los usuarios";
+"paywall_custom.reviews.rating" = "4,9 de 5 · App Store";
+"paywall_custom.reviews.translated" = "Reseñas traducidas del francés";
+"paywall_custom.reviews.r1_title" = "Genial para el sueño";
+"paywall_custom.reviews.r1_text" = "La uso desde hace una semana. El seguimiento del plan está bien hecho comparado con otras apps. La interfaz mola, pero lo que más me gusta son las rutinas; la de preparación para dormir me funciona muy bien.";
+"paywall_custom.reviews.r2_title" = "Útil en el día a día";
+"paywall_custom.reviews.r2_text" = "¡Gran app! Ayuda a encontrar una rutina mejor.";

@@ -152,6 +152,25 @@ class LanguageManager: ObservableObject {
         return translated == key ? englishBundle.localizedString(forKey: key, value: key, table: nil) : translated
     }
 
+    /// English version of a text shown in the current language (analytics: answers from every
+    /// language grouped together). Unknown texts come back unchanged.
+    func englishText(forDisplayed text: String) -> String {
+        if reverseTableLanguage != currentLanguage.rawValue {
+            var table: [String: String] = [:]
+            if let url = bundle.url(forResource: "Localizable", withExtension: "strings"),
+               let strings = NSDictionary(contentsOf: url) as? [String: String] {
+                for (key, value) in strings where table[value] == nil { table[value] = key }
+            }
+            reverseTable = table
+            reverseTableLanguage = currentLanguage.rawValue
+        }
+        guard let key = reverseTable[text] else { return text }
+        return englishBundle.localizedString(forKey: key, value: text, table: nil)
+    }
+
+    private var reverseTable: [String: String] = [:]
+    private var reverseTableLanguage = ""
+
     private lazy var englishBundle: Bundle = {
         guard let path = Bundle.main.path(forResource: "en", ofType: "lproj"),
               let bundle = Bundle(path: path) else { return .main }

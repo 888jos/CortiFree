@@ -3130,11 +3130,11 @@
 "onboarding_v2.reassurance.start_quiz" = "クイズを始める";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
-"onboarding_v2.habits.q1" = "夜に帰宅したとき、すぐにリラックスできますか？";
-"onboarding_v2.habits.q1_opt1" = "まったくない";
-"onboarding_v2.habits.q1_opt2" = "めったにない";
+"onboarding_v2.habits.q1" = "夜に帰宅したあと、なかなかリラックスできませんか？";
+"onboarding_v2.habits.q1_opt1" = "いつも";
+"onboarding_v2.habits.q1_opt2" = "よくある";
 "onboarding_v2.habits.q1_opt3" = "ときどき";
-"onboarding_v2.habits.q1_opt4" = "よくある";
+"onboarding_v2.habits.q1_opt4" = "めったにない";
 "onboarding_v2.habits.q2" = "疲れやストレスで、大切な人との予定をキャンセルしたことはありますか？";
 "onboarding_v2.habits.q2_opt1" = "とてもよくある";
 "onboarding_v2.habits.q2_opt2" = "よくある";
@@ -5677,3 +5677,17 @@
 
 /* Undo toast */
 "common.undo" = "取り消す";
+
+/* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
+"paywall_custom.headline.plan.named" = "%1$@さん、%2$@の準備ができました。";
+"paywall_custom.headline.plan.anonymous" = "%@の準備ができました。";
+"onboarding_v2.pulse_recap.result" = "1分間の呼吸で、心拍数が%1$dから%2$d BPMになりました。";
+"onboarding_v2.pulse_recap.plan" = "1分間の呼吸で心拍数が%d BPM下がりました。プランでは毎日この反応を活かします。";
+"onboarding_v2.pulse_recap.paywall" = "たった1分で心拍数が%d BPM下がりました。28日間続けたら？";
+"paywall_custom.reviews.title" = "ユーザーの声";
+"paywall_custom.reviews.rating" = "5点中4.9 · App Store";
+"paywall_custom.reviews.translated" = "フランス語のレビューを翻訳しています";
+"paywall_custom.reviews.r1_title" = "睡眠にぴったり";
+"paywall_custom.reviews.r1_text" = "使い始めて1週間。プランの進み具合の確認は他のアプリよりよくできています。デザインもいいけど、一番気に入っているのはルーティンで、寝る前の準備のルーティンが私にはとても効果的です。";
+"paywall_custom.reviews.r2_title" = "毎日役に立つ";
+"paywall_custom.reviews.r2_text" = "すばらしいアプリ！より良い習慣づくりに役立ちます。";

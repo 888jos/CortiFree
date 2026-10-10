@@ -25,8 +25,6 @@ struct CustomPaywallView: View {
     @State private var animateComparison = false
     @State private var openFAQ: Int?
     @ObservedObject private var planStore = PersonalPlanStore.shared
-    @State private var showStartProgramScreen: Bool = false
-    @State private var showBenefitsFlow: Bool = false
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
     @State private var purchaseErrorMessage: String = ""
@@ -72,6 +70,9 @@ struct CustomPaywallView: View {
                     // Promise section with date
                     promiseSection
 
+                    // Heart-rate drop of the breathing exercise
+                    pulseRecapSection
+
                     // Personalized insight (replaces both benefits + quiz insight)
                     personalizedInsightSection
 
@@ -83,6 +84,10 @@ struct CustomPaywallView: View {
 
                     // Features list
                     featuresSection
+
+                    // Real App Store reviews
+                    OnboardingAppStoreReviews()
+                        .padding(.horizontal, AppConstants.Layout.paddingXLarge)
 
                     // Expandable FAQ
                     faqSection
@@ -102,23 +107,6 @@ struct CustomPaywallView: View {
         .onAppear {
             loadUserName()
         }
-        .onChange(of: showStartProgramScreen) { _, show in
-            if show {
-                showStartProgramScreen = false
-                showBenefitsFlow = true
-            }
-        }
-        .fullScreenCover(isPresented: $showBenefitsFlow) {
-            OnboardingBenefitsFlowView {
-                showBenefitsFlow = false
-                DispatchQueue.main.async {
-                    presentSuperwallPaywall()
-                }
-            }
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
-        }
     }
 
     private func presentSuperwallPaywall() {
@@ -126,6 +114,8 @@ struct CustomPaywallView: View {
                     "placement": SuperwallPlacement.onboarding,
                     "source": "continue_to_your_plan"
                 ])
+                // First name, plan and heart-rate drop for the paywall template.
+                OnboardingPersonalization.sendToSuperwall(plan: planStore.plan)
                 let handler = PaywallPresentationHandler()
                 handler.onPresent { _ in
                     UserDefaults.standard.set(true, forKey: "hasSeenPaywall")
@@ -157,19 +147,10 @@ struct CustomPaywallView: View {
 
     // MARK: - Load User Name
 
-    /// First name only; stays empty when unknown so the copy falls back to a version without a name.
+    /// First name typed in the onboarding (most users skip the account step), else the account's;
+    /// stays empty when unknown so the copy falls back to a version without a name.
     private func loadUserName() {
-        guard let user = Auth.auth().currentUser else {
-            userName = ""
-            return
-        }
-        if let displayName = user.displayName, !displayName.isEmpty {
-            userName = displayName.components(separatedBy: " ").first ?? displayName
-        } else if let cached = UserDefaults.standard.string(forKey: "userFirstName"), !cached.isEmpty {
-            userName = cached
-        } else {
-            userName = ""
-        }
+        userName = OnboardingPersonalization.firstName
     }
 
     // MARK: - Header Section
@@ -196,11 +177,23 @@ struct CustomPaywallView: View {
             : String(format: "\(base).named".localized, name)
     }
 
+    /// "Lise, ton plan Calme intérieur est prêt.": the name of the plan generated after the analysis.
+    private var planHeadline: String? {
+        guard let title = planStore.plan?.localizedTitle, !title.isEmpty else { return nil }
+        let name = userName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if name.isEmpty {
+            return String(format: "paywall_custom.headline.plan.anonymous".localized, title)
+        }
+        // Mid-sentence: "ton plan…" / "your … plan" / "dein Plan…" (no-op for ja/ko).
+        let midSentence = title.prefix(1).lowercased() + title.dropFirst()
+        return String(format: "paywall_custom.headline.plan.named".localized, name, midSentence)
+    }
+
     private var headerSection: some View {
         // "Prénom, ton plan … est prêt." as the title, the 28-day promise below it.
         let lines = personalizedTitle.components(separatedBy: "\n")
         return VStack(spacing: 10) {
-            Text(lines.first ?? "")
+            Text(planHeadline ?? lines.first ?? "")
                 .font(.faroBold(28))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
@@ -253,6 +246,19 @@ struct CustomPaywallView: View {
                 .balancedLines()
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
+    }
+
+    // MARK: - Pulse Recap Section
+
+    @ViewBuilder
+    private var pulseRecapSection: some View {
+        if let pulse = OnboardingPulseResult.current {
+            OnboardingPulseRecap(
+                text: "onboarding_v2.pulse_recap.paywall".localized(pulse.drop),
+                drop: pulse.drop
+            )
+            .padding(.horizontal, AppConstants.Layout.paddingXLarge)
+        }
     }
 
     // MARK: - Personalized Insight Section (fused benefits + quiz patterns)
@@ -630,7 +636,7 @@ struct CustomPaywallView: View {
             // Main CTA button - Presents the Superwall paywall
             Button(action: {
                 HapticManager.medium()
-                showStartProgramScreen = true
+                presentSuperwallPaywall()
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.right")
