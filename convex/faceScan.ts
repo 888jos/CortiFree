@@ -50,7 +50,10 @@ async function requestAnalysis(apiKey: string, model: string, image: string, lan
     body: JSON.stringify({
       model,
       response_format: { type: "json_object" },
-      max_completion_tokens: 600,
+      // gpt-5 models think before answering, and the thinking counts in this budget: with 600
+      // tokens it used them all about one time in three and the reply came back empty.
+      ...(model.startsWith("gpt-5") ? { reasoning_effort: "minimal" } : {}),
+      max_completion_tokens: 2000,
       messages: [
         { role: "system", content: prompt(language.replace(/[^\p{L}\p{M} ()-]/gu, "").trim().slice(0, 40) || "English") },
         {
@@ -74,7 +77,9 @@ async function requestAnalysis(apiKey: string, model: string, image: string, lan
   ) {
     throw new Error("Invalid face check response");
   }
-  const content = result.choices[0]?.message?.content;
+  const choice = result.choices[0];
+  const content = choice?.message?.content;
+  if (choice?.finish_reason === "length") console.warn("faceScan: reply cut by the token budget");
   if (typeof content !== "string" || !content.trim()) {
     throw new Error("Invalid face check response");
   }
