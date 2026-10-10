@@ -69,7 +69,7 @@ enum FaceScanAnalyzer {
 
     @MainActor
     static func analyze(_ image: UIImage) async throws -> FaceScanResult {
-        guard let jpeg = resized(image, maxSide: 768)?.jpegData(compressionQuality: 0.7) else { throw FaceScanError.unreadable }
+        guard let jpeg = jpegForUpload(image) else { throw FaceScanError.unreadable }
         let code = LanguageManager.shared.currentLanguage.rawValue
         let language = Locale(identifier: "en").localizedString(forLanguageCode: code) ?? code
 
@@ -101,10 +101,26 @@ enum FaceScanAnalyzer {
         )
     }
 
+    /// The server refuses images over ~650 KB (900 000 base64 characters): stay well under it.
+    private static let maxJPEGBytes = 450_000
+
+    private static func jpegForUpload(_ image: UIImage) -> Data? {
+        for (side, quality) in [(768.0, 0.7), (640.0, 0.6), (512.0, 0.5)] {
+            if let data = resized(image, maxSide: side)?.jpegData(compressionQuality: quality), data.count <= maxJPEGBytes {
+                return data
+            }
+        }
+        return nil
+    }
+
     private static func resized(_ image: UIImage, maxSide: CGFloat) -> UIImage? {
         let scale = min(1, maxSide / max(image.size.width, image.size.height))
         let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
-        return UIGraphicsImageRenderer(size: size).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+        // Scale 1: the renderer otherwise draws at the screen scale (×3), a 2300 px photo
+        // that went over the server's size limit (« Invalid image »).
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: size, format: format).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
     }
 }
 

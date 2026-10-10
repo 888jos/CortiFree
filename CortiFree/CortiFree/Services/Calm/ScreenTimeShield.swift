@@ -55,6 +55,8 @@ enum ScreenTimeShield {
         }
         set {
             defaults?.set(try? JSONEncoder().encode(newValue), forKey: selectionKey)
+            let picked = !newValue.applicationTokens.isEmpty || !newValue.categoryTokens.isEmpty || !newValue.webDomainTokens.isEmpty
+            UserDefaults.standard.set(picked, forKey: BreathePauseCenter.configuredKey)
         }
     }
 

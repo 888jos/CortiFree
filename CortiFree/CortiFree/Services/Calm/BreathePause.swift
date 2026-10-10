@@ -109,6 +109,10 @@ final class BreathePauseCenter: ObservableObject {
     /// The pause to show (ContentView presents it full screen).
     @Published var pending: PauseTarget?
 
+    /// Set once the pause is really in place: the Shortcuts automation ran at least once, or
+    /// apps were picked for the Screen Time shield. Home then stops offering the setup.
+    nonisolated static let configuredKey = "calm.pause.configured"
+
     /// After a pause, openings within this window go straight to the app (no loop).
     private let passWindow: TimeInterval = 10 * 60
     private func key(_ app: PauseApp) -> String { "calm.pause.passUntil.\(app.rawValue)" }
@@ -120,6 +124,7 @@ final class BreathePauseCenter: ObservableObject {
             return
         }
         pending = .app(app)
+        UserDefaults.standard.set(true, forKey: Self.configuredKey)
         AnalyticsManager.shared.track(event: "breathe_pause_shown", properties: ["app": app.rawValue])
     }
 

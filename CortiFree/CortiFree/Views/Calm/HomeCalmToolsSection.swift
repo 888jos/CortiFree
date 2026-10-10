@@ -19,6 +19,8 @@ struct HomeCalmToolsSection: View {
     @State private var showFaceScan = false
     /// « No Apple Watch » (asked at the first pulse measure, changed in Profile): no watch prompts.
     @AppStorage(AppleWatchPreference.storageKey) private var appleWatch = ""
+    /// Once « breathe before TikTok » is set up it leaves Home (changed from Profile).
+    @AppStorage(BreathePauseCenter.configuredKey) private var pauseConfigured = false
 
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
@@ -30,7 +32,9 @@ struct HomeCalmToolsSection: View {
             HStack(spacing: 10) {
                 tile(icon: "heart.fill", title: t("calm.home.pulse"), subtitle: lastPulseSubtitle) { showPulse = true }
                 tile(icon: "bolt.heart.fill", title: t("calm.home.reset"), subtitle: t("calm.home.reset.subtitle")) { showReset = true }
-                tile(icon: "hand.raised.fill", title: t("calm.home.pause"), subtitle: t("calm.home.pause.subtitle")) { showPauseSetup = true }
+                if !pauseConfigured {
+                    tile(icon: "hand.raised.fill", title: t("calm.home.pause"), subtitle: t("calm.home.pause.subtitle")) { showPauseSetup = true }
+                }
             }
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)

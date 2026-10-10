@@ -237,6 +237,7 @@ struct FaceScanView: View {
                 phase = .result(record)
             } catch {
                 await minimumShow
+                AnalyticsManager.shared.track(event: "face_check_failed", properties: ["error": String(describing: error)])
                 errorMessage = (error as? LocalizedError)?.errorDescription ?? t("calm.face.error.unavailable")
                 phase = .intro
             }
