@@ -42,7 +42,9 @@ final class OnboardingLiveActivityManager {
             return
         }
 
-        if hasSeenPaywall {
+        // The gift starts as soon as the pre-paywall shows: it must not fall back to the
+        // onboarding progress when the user leaves before the Superwall paywall.
+        if hasSeenPaywall || hasActiveGiftOffer {
             showLiveGiftOffer()
         } else {
             startOrUpdateProgress(currentStep: currentStep, totalSteps: totalSteps)
@@ -54,6 +56,8 @@ final class OnboardingLiveActivityManager {
             logUnavailable()
             return
         }
+        // Never replace a running gift offer by the onboarding progress.
+        guard !hasActiveGiftOffer else { return }
 
         let safeTotal = max(totalSteps, 1)
         let safeStep = min(max(currentStep, 1), safeTotal)
@@ -65,8 +69,8 @@ final class OnboardingLiveActivityManager {
             totalSteps: safeTotal,
             title: title(currentStep: safeStep, totalSteps: safeTotal),
             subtitle: remaining == 1
-                ? "\(percentage)% complete - 1 step left"
-                : "\(percentage)% complete - \(remaining) steps left",
+                ? String(format: LanguageManager.shared.localizedString(for: "live_activity.subtitle.one"), percentage)
+                : String(format: LanguageManager.shared.localizedString(for: "live_activity.subtitle.other"), percentage, remaining),
             offerEndsAt: nil,
             imageName: "AppLogo",
             deepLinkPath: "onboarding",
@@ -74,6 +78,10 @@ final class OnboardingLiveActivityManager {
         )
 
         upsert(state, staleDate: nil)
+    }
+
+    private var hasActiveGiftOffer: Bool {
+        (UserDefaults.standard.object(forKey: offerDeadlineKey) as? Date).map { $0 > Date() } ?? false
     }
 
     func prepareLiveGiftOffer() {
@@ -107,7 +115,7 @@ final class OnboardingLiveActivityManager {
             title: LanguageManager.shared.localizedString(for: "inline.onboardingliveactivitymanager.00"),
             subtitle: LanguageManager.shared.localizedString(for: "inline.onboardingliveactivitymanager.01"),
             offerEndsAt: endDate,
-            imageName: "AppLogo",
+            imageName: "LiveGift",
             deepLinkPath: SuperwallPlacement.liveGift,
             ctaTitle: LanguageManager.shared.localizedString(for: "inline.onboardingliveactivitymanager.02")
         )

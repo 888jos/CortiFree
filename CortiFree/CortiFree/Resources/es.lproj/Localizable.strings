@@ -4137,7 +4137,7 @@
 "inline.notificationservice.32" = "¡66 DÍAS SEGUIDOS! 🏆";
 "inline.notificationservice.33" = "¡El hábito está arraigado! Eres todo un ejemplo de bienestar";
 "inline.notificationservice.34" = "¡Sigue con este ritmo!";
-"inline.onboardingliveactivitymanager.00" = "Un regalo te espera";
+"inline.onboardingliveactivitymanager.00" = "Psst, ¡Milo quiere hacerte un regalo!";
 "inline.onboardingliveactivitymanager.01" = "Tu oferta personalizada caduca pronto.";
 "inline.onboardingliveactivitymanager.02" = "Abrir mi regalo";
 "inline.legaldocumentshelper.00" = "Política de privacidad";
@@ -5116,6 +5116,8 @@
 "live_activity.title.starting" = "Tu plan empieza";
 "live_activity.title.building" = "Creando tu plan";
 "live_activity.title.almost_ready" = "Casi listo";
+"live_activity.subtitle.one" = "%d %% completado · queda 1 paso";
+"live_activity.subtitle.other" = "%d %% completado · quedan %d pasos";
 
 /* Convex auth (errors, password reset with code) */
 "auth.error.invalid_credentials" = "Correo o contraseña incorrectos.";

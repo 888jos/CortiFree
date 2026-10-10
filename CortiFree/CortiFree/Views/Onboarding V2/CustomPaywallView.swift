@@ -107,6 +107,9 @@ struct CustomPaywallView: View {
         }
         .onAppear {
             loadUserName()
+            guard !RevenueCatManager.shared.hasPremiumEntitlement else { return }
+            OnboardingLiveActivityManager.shared.prepareLiveGiftOffer()
+            OnboardingLiveActivityManager.shared.showLiveGiftOffer()
         }
         // Feature tour (localized app screenshots) between the pre-paywall and Superwall.
         .fullScreenCover(isPresented: $showBenefitsFlow) {

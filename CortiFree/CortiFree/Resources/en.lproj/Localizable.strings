@@ -4137,7 +4137,7 @@
 "inline.notificationservice.32" = "66 DAYS IN A ROW! 🏆";
 "inline.notificationservice.33" = "The habit is ingrained! You're a wellness champion";
 "inline.notificationservice.34" = "Keep the momentum going!";
-"inline.onboardingliveactivitymanager.00" = "A gift is waiting for you";
+"inline.onboardingliveactivitymanager.00" = "Psst, Milo wants to give you a gift!";
 "inline.onboardingliveactivitymanager.01" = "Your personalized offer expires soon.";
 "inline.onboardingliveactivitymanager.02" = "Open my gift";
 "inline.legaldocumentshelper.00" = "Privacy Policy";
@@ -5116,6 +5116,8 @@
 "live_activity.title.starting" = "Starting your plan";
 "live_activity.title.building" = "Building your plan";
 "live_activity.title.almost_ready" = "Almost ready";
+"live_activity.subtitle.one" = "%d%% complete · 1 step left";
+"live_activity.subtitle.other" = "%d%% complete · %d steps left";
 
 /* Convex auth (errors, password reset with code) */
 "auth.error.invalid_credentials" = "Incorrect email or password.";

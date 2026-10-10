@@ -431,6 +431,12 @@ struct CortiFreeApp: App {
             }
             .onAppear {
                 presentDailyCheckInIfNeeded()
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-previewLiveGiftActivity") {
+                    OnboardingLiveActivityManager.shared.prepareLiveGiftOffer()
+                    OnboardingLiveActivityManager.shared.showLiveGiftOffer()
+                }
+                #endif
             }
             .onChange(of: authViewModel.isAuthenticated) { _, isAuthenticated in
                 if isAuthenticated { presentDailyCheckInIfNeeded() }

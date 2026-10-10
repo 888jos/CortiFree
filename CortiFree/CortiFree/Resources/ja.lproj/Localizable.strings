@@ -4137,7 +4137,7 @@
 "inline.notificationservice.32" = "66日連続！🏆";
 "inline.notificationservice.33" = "習慣が身につきました！本当によくがんばりましたね";
 "inline.notificationservice.34" = "この調子で続けよう！";
-"inline.onboardingliveactivitymanager.00" = "プレゼントが届いています";
+"inline.onboardingliveactivitymanager.00" = "ねえ、Miloがあなたにプレゼントを贈りたいみたい！";
 "inline.onboardingliveactivitymanager.01" = "あなた専用のオファーはまもなく終了します。";
 "inline.onboardingliveactivitymanager.02" = "プレゼントを開く";
 "inline.legaldocumentshelper.00" = "プライバシーポリシー";
@@ -5119,6 +5119,8 @@
 "live_activity.title.starting" = "プラン作成スタート";
 "live_activity.title.building" = "プランを作成中";
 "live_activity.title.almost_ready" = "もうすぐ完成";
+"live_activity.subtitle.one" = "%d%%完了・残り1ステップ";
+"live_activity.subtitle.other" = "%d%%完了・残り%dステップ";
 
 /* Convex auth (errors, password reset with code) */
 "auth.error.invalid_credentials" = "メールアドレスまたはパスワードが正しくありません。";
