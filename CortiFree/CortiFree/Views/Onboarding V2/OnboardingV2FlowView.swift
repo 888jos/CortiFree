@@ -226,6 +226,10 @@ struct OnboardingV2FlowView: View {
             print("📍 Resuming from checkpoint: \(step.rawValue)")
             #endif
             currentStep = step.checkpoint
+            // Already signed in (killed during the analysis): don't ask to sign up again.
+            if currentStep == .authentication, Auth.auth().currentUser != nil {
+                currentStep = .loading
+            }
         }
     }
 
