@@ -195,6 +195,10 @@ private struct AuthenticatedAppRootView: View {
             if isPremium {
                 isLocked = false
                 accessResolved = true
+            } else if accessResolved, revenueCat.isPremiumStatusReady {
+                // Subscription expired or refunded while the app was open: same paywall as at launch.
+                accessResolved = false
+                presentPaywall()
             }
         }
     }

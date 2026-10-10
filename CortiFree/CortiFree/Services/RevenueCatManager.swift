@@ -158,6 +158,13 @@ class RevenueCatManager: ObservableObject {
             #if DEBUG
             print("⚠️ Failed to refresh customer info: \(error.localizedDescription)")
             #endif
+            // Offline: the SDK's last known status beats « unknown » (which lets everyone in).
+            if forceServerFetch, let cached = try? await Purchases.shared.customerInfo(fetchPolicy: .fromCacheOnly) {
+                await MainActor.run {
+                    self.customerInfo = cached
+                    self.updateSubscriptionStatus()
+                }
+            }
         }
     }
 
