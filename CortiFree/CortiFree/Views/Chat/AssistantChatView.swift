@@ -15,6 +15,8 @@ struct AssistantChatView: View {
     @State private var messages: [DeepSeekChatMessage] = []
     @State private var draft = ""
     @State private var isLoading = false
+    /// The request whose reply the screen is waiting for; a reply to an older one only refreshes the quota.
+    @State private var activeRequestID: UUID?
     @State private var errorMessage: String?
     @State private var cardsByMessage: [Int: AssistantRecommendation] = [:]
     /// Plan changes Milo proposed, by message, and what the user did with them.
@@ -635,6 +637,8 @@ struct AssistantChatView: View {
         // Pick the card first so Milo's reply can introduce it instead of naming something else.
         let card = store.showsExerciseCards ? recommendation(for: text, intent: intent) : nil
         let currentID = conversationID
+        let requestID = UUID()
+        activeRequestID = requestID
         isLoading = true
 
         Task {
@@ -648,7 +652,9 @@ struct AssistantChatView: View {
                 let response = try await DeepSeekChatService.shared.reply(request, messages: messages)
                 await MainActor.run {
                     syncDailyUsageFromServer()
-                    // The user may have started or opened another conversation meanwhile.
+                    // The user may have started or opened another conversation (and sent there) meanwhile.
+                    guard requestID == activeRequestID else { return }
+                    activeRequestID = nil
                     guard currentID == conversationID else { isLoading = false; return }
                     let responseIndex = messages.count
                     let (reply, proposal) = PlanAssistantProposal.extract(from: response)
@@ -663,12 +669,17 @@ struct AssistantChatView: View {
                     // Server quota (12/day per account, UTC day): Milo says so instead of an error banner.
                     refreshDailyQuotaIfNeeded()
                     assistantDailyUsage = dailyLimit
+                    guard requestID == activeRequestID else { return }
+                    activeRequestID = nil
                     guard currentID == conversationID else { isLoading = false; return }
                     messages.append(DeepSeekChatMessage(role: "assistant", content: t("assistant.quota.reached")))
                     isLoading = false
                 }
             } catch {
                 await MainActor.run {
+                    guard requestID == activeRequestID else { return }
+                    activeRequestID = nil
+                    guard currentID == conversationID else { isLoading = false; return }
                     // Give the text back so the user can retry without retyping.
                     if messages.last?.role == "user", messages.last?.content == text {
                         messages.removeLast()
