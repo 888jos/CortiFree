@@ -2,7 +2,7 @@
 //  CortiFreeViralWidgets.swift
 //  CortiFreeWidget
 //
-//  Les 7 widgets « écran d'accueil » : Milo, Respire, Cortisol, Humeur, Planète,
+//  Les 6 widgets « écran d'accueil » : Milo, Respire, Cortisol, Humeur,
 //  Message de Milo, Streak. Les vues vivent dans CortiFree/Views/Widgets (partagées
 //  avec la galerie des Réglages).
 //
@@ -32,16 +32,17 @@ struct InsightsProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<InsightsEntry>) -> Void) {
         let now = Date()
 
-        // Session « Respire » en cours : une entrée par phase (4 s) jusqu'à la fin.
+        // Session « Respire » en cours : une entrée par seconde jusqu'à la fin, pour que
+        // la piste des montagnes russes défile (WidgetKit anime d'une entrée à l'autre).
         if kind == .breathe, let start = WidgetInsightsStore.breathStart,
            now.timeIntervalSince(start) < WidgetInsightsStore.breathSessionSeconds {
-            let phase = WidgetInsightsStore.breathPhaseSeconds
+            let tick: TimeInterval = 1
             let end = start.addingTimeInterval(WidgetInsightsStore.breathSessionSeconds)
             var dates: [Date] = [now]
-            var next = start.addingTimeInterval((floor(now.timeIntervalSince(start) / phase) + 1) * phase)
+            var next = start.addingTimeInterval((floor(now.timeIntervalSince(start) / tick) + 1) * tick)
             while next < end {
                 dates.append(next)
-                next = next.addingTimeInterval(phase)
+                next = next.addingTimeInterval(tick)
             }
             dates.append(end)
             completion(Timeline(entries: dates.map { entry(at: $0) }, policy: .atEnd))

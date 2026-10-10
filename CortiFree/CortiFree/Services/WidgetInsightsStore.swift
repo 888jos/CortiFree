@@ -299,7 +299,8 @@ enum WidgetL10n {
     static func string(_ key: String) -> String {
         let code = WidgetDataStore.sharedDefaults?.string(forKey: WidgetInsightsStore.languageKey)
             ?? UserDefaults.standard.string(forKey: "selectedLanguage")
-        for candidate in [code, "en"].compactMap({ $0 }) {
+        // Sans langue choisie dans l'app (app jamais ouverte), on suit celle de l'iPhone.
+        for candidate in [code, Bundle.main.preferredLocalizations.first, "en"].compactMap({ $0 }) {
             if let path = Bundle.main.path(forResource: candidate, ofType: "lproj"),
                let bundle = Bundle(path: path) {
                 let value = bundle.localizedString(forKey: key, value: nil, table: nil)

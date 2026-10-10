@@ -223,12 +223,24 @@ struct BreatheWidgetView: View {
         return (0..<WidgetInsightsStore.breathSessionSeconds).contains(value) ? value : nil
     }
 
-    private var phase: Phase? {
+    var body: some View {
+        if interactive {
+            content(elapsed: elapsed)
+        } else {
+            // Galerie des Réglages : la séance de démo défile en boucle.
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                let t = context.date.timeIntervalSinceReferenceDate
+                content(elapsed: t.truncatingRemainder(dividingBy: WidgetInsightsStore.breathSessionSeconds).rounded(.down))
+            }
+        }
+    }
+
+    private func phase(at elapsed: TimeInterval?) -> Phase? {
         guard let elapsed else { return nil }
         return Phase(rawValue: Int(elapsed / WidgetInsightsStore.breathPhaseSeconds) % 4)
     }
 
-    private var phaseLabel: String {
+    private func phaseLabel(_ phase: Phase?) -> String {
         switch phase {
         case .inhale: return WidgetL10n.string("widget.breathe.inhale")
         case .holdFull, .holdEmpty: return WidgetL10n.string("widget.breathe.hold")
@@ -237,79 +249,185 @@ struct BreatheWidgetView: View {
         }
     }
 
-    /// Taille cible de la phase en cours (WidgetKit anime le passage d'une entrée à l'autre).
-    private var circleScale: CGFloat {
-        switch phase {
-        case .inhale, .holdFull: return 1
-        case .exhale, .holdEmpty, nil: return 0.62
+    @ViewBuilder
+    private func content(elapsed: TimeInterval?) -> some View {
+        let phase = phase(at: elapsed)
+        let compact = family == .systemSmall
+        IntentButton(intent: StartBreathingIntent(), interactive: interactive && phase == nil) {
+            VStack(alignment: .leading, spacing: compact ? 6 : 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        if !compact || phase == nil {
+                            Text(WidgetL10n.string("widget.breathe.title").uppercased())
+                                .font(CFW.font(10, .bold))
+                                .foregroundStyle(CFW.purple)
+                                .kerning(1.2)
+                        }
+                        Text(phase == nil ? WidgetL10n.string("widget.breathe.cta") : phaseLabel(phase))
+                            .font(CFW.font(phase == nil ? (compact ? 14 : 16) : (compact ? 18 : 20), .bold))
+                            .foregroundStyle(.white)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                            .contentTransition(.opacity)
+                    }
+                    Spacer(minLength: 0)
+                    if phase == nil {
+                        Image(systemName: "hand.tap.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.8))
+                    } else if let breathStart = interactive ? breathStart : nil {
+                        Text(timerInterval: breathStart...breathStart.addingTimeInterval(WidgetInsightsStore.breathSessionSeconds),
+                             countsDown: true)
+                            .font(CFW.font(12, .medium).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.75))
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 40, alignment: .trailing)
+                    }
+                }
+
+                BreathCoasterTrack(elapsed: elapsed ?? 0, markerPosition: compact ? 0.3 : 0.25)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                if !compact {
+                    HStack {
+                        Text(WidgetL10n.format("widget.breathe.today", insights.breathsToday))
+                            .font(CFW.font(12))
+                            .foregroundStyle(CFW.muted)
+                        Spacer(minLength: 0)
+                        if phase != nil {
+                            IntentButton(intent: StopBreathingIntent(), interactive: interactive) {
+                                Text(WidgetL10n.string("widget.breathe.stop"))
+                                    .font(CFW.font(12, .semibold))
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 4)
+                                    .background(Capsule().fill(CFW.faint))
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+    }
+}
+
+/// « Montagnes russes » de la respiration carrée 4-4-4-4 : la piste monte à l'inspiration,
+/// reste en haut, redescend à l'expiration, reste en bas. Elle défile de droite à gauche
+/// sous une bille fixe. Le widget reçoit une entrée par seconde et WidgetKit anime
+/// le décalage linéairement entre deux entrées : la piste glisse en continu.
+private struct BreathCoasterTrack: View {
+    let elapsed: TimeInterval
+    var markerPosition: CGFloat = 0.3
+
+    private static let phase = WidgetInsightsStore.breathPhaseSeconds
+    private static let session = WidgetInsightsStore.breathSessionSeconds
+    /// Vitesse de défilement : même pente de piste en petit et en moyen.
+    private static let pxPerSecond: CGFloat = 13
+
+    /// Niveau des poumons 0…1, segments linéaires pour que la bille, animée linéairement
+    /// d'une seconde à l'autre, reste pile sur la piste.
+    static func level(at t: TimeInterval) -> CGFloat {
+        guard t > 0, t < session else { return 0 }
+        let local = t.truncatingRemainder(dividingBy: phase * 4)
+        switch Int(local / phase) {
+        case 0: return local / phase
+        case 1: return 1
+        case 2: return 1 - (local - phase * 2) / phase
+        default: return 0
         }
     }
 
     var body: some View {
-        let compact = family == .systemSmall
-        let circle = compact ? 92.0 : 104.0
-        HStack(spacing: 16) {
-            IntentButton(intent: StartBreathingIntent(), interactive: interactive && phase == nil) {
-                ZStack {
-                    Circle().fill(CFW.purple.opacity(0.12))
-                    Circle()
-                        .fill(RadialGradient(colors: [CFW.purple, CFW.purple2.opacity(0.7)],
-                                             center: .center, startRadius: 0, endRadius: circle / 2))
-                        .scaleEffect(circleScale)
-                        .shadow(color: CFW.purple.opacity(0.6), radius: 12)
-                        .animation(.easeInOut(duration: 2), value: circleScale)
-                    VStack(spacing: 2) {
-                        Text(phaseLabel)
-                            .font(CFW.font(compact ? 14 : 15, .bold))
-                            .foregroundStyle(.white)
-                            .contentTransition(.opacity)
-                        if phase == nil {
-                            Image(systemName: "hand.tap.fill")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.8))
-                        } else if let breathStart {
-                            Text(timerInterval: breathStart...breathStart.addingTimeInterval(WidgetInsightsStore.breathSessionSeconds),
-                                 countsDown: true)
-                                .font(CFW.font(11, .medium).monospacedDigit())
-                                .foregroundStyle(.white.opacity(0.75))
-                                .multilineTextAlignment(.center)
-                                .frame(width: 44)
-                        }
-                    }
-                }
-                .frame(width: circle, height: circle)
-            }
-            .frame(maxWidth: compact ? .infinity : nil)
+        GeometryReader { geo in
+            let size = geo.size
+            let pxPerSecond = Self.pxPerSecond
+            let window = TimeInterval(size.width / pxPerSecond)
+            let markerX = size.width * markerPosition
+            let inset: CGFloat = 9
+            let y: (CGFloat) -> CGFloat = { level in size.height - inset - level * (size.height - inset * 2) }
+            // Piste complète de la séance (plus une marge avant/après), décalée selon le temps écoulé.
+            let start = -window
+            let end = Self.session + window
+            let trackWidth = CGFloat(end - start) * pxPerSecond
+            let offsetX = markerX - CGFloat(elapsed - start) * pxPerSecond
 
-            if !compact {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(WidgetL10n.string("widget.breathe.title"))
-                        .font(CFW.font(11, .bold))
-                        .foregroundStyle(CFW.purple)
-                        .kerning(1.2)
-                    Text(WidgetL10n.string(phase == nil ? "widget.breathe.cta" : "widget.breathe.follow"))
-                        .font(CFW.font(16, .bold))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
-                    Text(WidgetL10n.format("widget.breathe.today", insights.breathsToday))
-                        .font(CFW.font(12))
-                        .foregroundStyle(CFW.muted)
-                    if phase != nil {
-                        IntentButton(intent: StopBreathingIntent(), interactive: interactive) {
-                            Text(WidgetL10n.string("widget.breathe.stop"))
-                                .font(CFW.font(12, .semibold))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 5)
-                                .background(Capsule().fill(CFW.faint))
-                        }
+            ZStack(alignment: .topLeading) {
+                ForEach([0.0, 1.0], id: \.self) { level in
+                    Path { path in
+                        path.move(to: CGPoint(x: 0, y: y(level)))
+                        path.addLine(to: CGPoint(x: size.width, y: y(level)))
                     }
+                    .stroke(.white.opacity(0.08), style: StrokeStyle(lineWidth: 1, dash: [3, 5]))
                 }
-                Spacer(minLength: 0)
+
+                ZStack(alignment: .topLeading) {
+                    CoasterShape(start: start, end: end, closed: true, inset: inset)
+                        .fill(LinearGradient(colors: [CFW.purple.opacity(0.32), CFW.purple.opacity(0)],
+                                             startPoint: .top, endPoint: .bottom))
+                    CoasterShape(start: start, end: end, closed: false, inset: inset)
+                        .stroke(CFW.purple.opacity(0.55), style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round))
+                        .blur(radius: 5)
+                    CoasterShape(start: start, end: end, closed: false, inset: inset)
+                        .stroke(LinearGradient(colors: [.white, CFW.purple], startPoint: .top, endPoint: .bottom),
+                                style: StrokeStyle(lineWidth: 3.5, lineCap: .round, lineJoin: .round))
+                }
+                .frame(width: trackWidth, height: size.height)
+                .offset(x: offsetX)
+                .animation(.linear(duration: 1), value: elapsed)
+                .frame(width: size.width, height: size.height, alignment: .topLeading)
+                // Le passé (à gauche de la bille) s'efface.
+                .mask(
+                    LinearGradient(stops: [.init(color: .black.opacity(0.25), location: 0),
+                                           .init(color: .black.opacity(0.35), location: markerPosition),
+                                           .init(color: .black, location: markerPosition + 0.02),
+                                           .init(color: .black, location: 1)],
+                                   startPoint: .leading, endPoint: .trailing)
+                )
+
+                Circle()
+                    .fill(CFW.purple)
+                    .frame(width: 18, height: 18)
+                    .overlay(Circle().fill(.white).frame(width: 9, height: 9))
+                    .shadow(color: CFW.purple.opacity(0.9), radius: 8)
+                    .position(x: markerX, y: y(Self.level(at: elapsed)))
+                    .animation(.linear(duration: 1), value: elapsed)
             }
+            .frame(width: size.width, height: size.height)
+            .clipped()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct CoasterShape: Shape {
+    let start: TimeInterval
+    let end: TimeInterval
+    let closed: Bool
+    let inset: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let y = { (level: CGFloat) in rect.height - inset - level * (rect.height - inset * 2) }
+        let pxPerSecond = rect.width / CGFloat(end - start)
+        let phase = WidgetInsightsStore.breathPhaseSeconds
+        // Les sommets de la piste tombent aux changements de phase : un point par phase suffit.
+        var times: [TimeInterval] = [start]
+        var t = 0.0
+        while t <= WidgetInsightsStore.breathSessionSeconds {
+            times.append(t)
+            t += phase
+        }
+        times.append(end)
+        var path = Path()
+        for (index, time) in times.enumerated() {
+            let point = CGPoint(x: CGFloat(time - start) * pxPerSecond, y: y(BreathCoasterTrack.level(at: time)))
+            if index == 0 { path.move(to: point) } else { path.addLine(to: point) }
+        }
+        if closed {
+            path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+            path.addLine(to: CGPoint(x: 0, y: rect.height))
+            path.closeSubpath()
+        }
+        return path
     }
 }
 
