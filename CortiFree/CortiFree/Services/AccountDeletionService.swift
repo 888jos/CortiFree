@@ -104,7 +104,8 @@ final class AccountDeletionService {
             "streakDays", "bestStreak", "UserSettings", "programStartDate", "currentWeek", "currentDay",
             "progressDashboardCacheV2.lifetime",
             "daily_check_in_last_prompted_day", "daily_check_in_last_completed_day",
-            "personalPlan.onboardingProfile.v1", "plan.shortModeDay"
+            "personalPlan.onboardingProfile.v1", "plan.shortModeDay",
+            "userFirstName", "celebration.streak.lastDay"
         ].forEach { defaults.removeObject(forKey: $0) }
         SessionRatingStore.clear()
         if HealthKitService.shared.isEnabled { HealthKitService.shared.disable() }
