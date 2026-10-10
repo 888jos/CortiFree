@@ -20,49 +20,46 @@ struct ReassuranceView: View {
     @State private var showButton: Bool = false
     @State private var screenViewTime: Date?
 
+    /// One hand-written sentence per answer, never the answers pasted back into a template:
+    /// the main reason, then the age (« in your thirties », not « 25–34 »), then how long.
     private var fullText: String {
-        let message1: String
-        switch overallData?.genderCode {
-        case "male":
-            message1 = "onboarding_v2.reassurance.message_part1_male".localized
-        case "female":
-            message1 = "onboarding_v2.reassurance.message_part1_female".localized
-        default:
-            message1 = "onboarding_v2.reassurance.message_part1_neutral".localized
+        var paragraphs: [String] = []
+        if let data = overallData {
+            if let reason = Self.mainReason(data.reasonCodes) {
+                paragraphs.append(text("reason_\(reason)"))
+            }
+            let context = [text("age_\(data.ageCode)"), text("duration_\(data.durationCode)")]
+                .filter { !$0.isEmpty }
+                .joined(separator: " ")
+            if !context.isEmpty { paragraphs.append(context) }
         }
-        let message2 = personalizedMessage
-        let message3 = "onboarding_v2.reassurance.message_part3".localized
-        let message4 = "onboarding_v2.reassurance.message_part4".localized
-        var text = "\(message1)\n\n\(message2)\n\n\(message3)\n\n\(message4)"
+        if paragraphs.isEmpty {
+            paragraphs.append("onboarding_v2.reassurance.message_part2".localized)
+        }
+        paragraphs.append(text("next"))
         if needsSupportMessage {
-            text += "\n\n" + "onboarding_v2.reassurance.support".localized
+            paragraphs.append("onboarding_v2.reassurance.support".localized)
         }
-        return text
+        return paragraphs.joined(separator: "\n\n")
+    }
+
+    /// Several reasons can be ticked: speak to the heaviest one only.
+    private static func mainReason(_ codes: [String]) -> String? {
+        let priority = ["difficult", "anxiety", "sleep", "energy", "focus", "mental", "habits"]
+        return priority.first(where: codes.contains) ?? codes.first
+    }
+
+    /// Localised sentence, or "" when an answer has none (unknown code).
+    private func text(_ key: String) -> String {
+        let fullKey = "onboarding_v2.reassurance.text.\(key)"
+        let value = fullKey.localized
+        return value == fullKey ? "" : value
     }
 
     /// Minors and people going through a hard time get a pointer to real help.
     private var needsSupportMessage: Bool {
         guard let data = overallData else { return false }
         return data.ageCode == "under_18" || data.reasonCodes.contains("difficult")
-    }
-
-    private var personalizedMessage: String {
-        guard let data = overallData else {
-            return "onboarding_v2.reassurance.message_part2".localized
-        }
-
-        let reason = data.reasonCodes
-            .map { "onboarding_v2.reassurance.reason_\($0)".localized }
-            .joined(separator: ", ")
-        let age = "onboarding_v2.reassurance.age_\(data.ageCode)".localized
-        let duration = "onboarding_v2.reassurance.duration_\(data.durationCode)".localized
-
-        return String(
-            format: "onboarding_v2.reassurance.personalized".localized,
-            reason,
-            age,
-            duration
-        )
     }
 
     init(overallData: OverallQuizData? = nil, onStartQuiz: @escaping () -> Void) {

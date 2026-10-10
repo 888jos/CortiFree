@@ -241,8 +241,8 @@ enum PersonalPlanGenerator {
         // Chronicity & availability
         let duration = profile.durationCode ?? ""
         let gentle = duration == "1_year_plus" || duration == "years" || (scores.global.map { $0 < 30 } ?? false) || anxiety == .severe
-        let availableMinutes: Int? = answers.count > 11 ? [10, 22, 37, 52, 75][safe: answers[11]] : profile.availableMinutes
-        let compact = (availableMinutes ?? 22) < 15
+        let availableMinutes: Int? = answers.count > 11 ? [5, 10, 15, 20][safe: answers[11]] : profile.availableMinutes
+        let compact = (availableMinutes ?? 10) <= 10
 
         return PlanAnalysis(
             weights: weights,

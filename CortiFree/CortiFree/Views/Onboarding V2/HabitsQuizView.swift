@@ -493,10 +493,9 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
                 "onboarding_v2.habits.q13_opt1".localized,
                 "onboarding_v2.habits.q13_opt2".localized,
                 "onboarding_v2.habits.q13_opt3".localized,
-                "onboarding_v2.habits.q13_opt4".localized,
-                "onboarding_v2.habits.q13_opt5".localized
+                "onboarding_v2.habits.q13_opt4".localized
             ],
-            scoring: [10, 30, 50, 75, 100]
+            scoring: [10, 40, 70, 100]
         )
     ]
 }
@@ -629,8 +628,8 @@ struct HabitsQuizResult {
 
     /// Temps disponible par jour en minutes (Q12, ex-Q13)
     var availableTime: Int {
-        let times = [10, 22, 37, 52, 75]
-        return times[safe: answers[11]] ?? 22
+        let times = [5, 10, 15, 20]
+        return times[safe: answers[11]] ?? 10
     }
 
     // MARK: - Compatibilité baselineData (simplifié)

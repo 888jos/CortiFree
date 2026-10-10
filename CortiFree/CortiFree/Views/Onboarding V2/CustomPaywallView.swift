@@ -21,35 +21,15 @@ struct CustomPaywallView: View {
 
     // REMOVED: RevenueCat is no longer used, Superwall handles everything
 
-    @State private var selectedPlan: PaywallPlan = .yearly
     @State private var userName: String = ""
-    @State private var radarAnimationProgress: Double = 0.0 // 0.0 = today, 1.0 = day 28
-    @State private var currentHabitIndex: Int = 0
-    @State private var currentWeek: Int = 1
+    @State private var animateComparison = false
+    @State private var openFAQ: Int?
+    @ObservedObject private var planStore = PersonalPlanStore.shared
     @State private var showStartProgramScreen: Bool = false
     @State private var showBenefitsFlow: Bool = false
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
     @State private var purchaseErrorMessage: String = ""
-
-    // Same week-4 targets as the habits progress screen, scaled to the quiz's daily time.
-    private var habitProgresses: [PaywallHabitProgress] {
-        let titleIDs = ["breathing": "breathe", "meditation": "meditate"]
-        return OnboardingHabitTargets.targets(availableMinutes: habitsQuizResult?.availableTime).map { target in
-            PaywallHabitProgress(
-                icon: target.icon,
-                title: "paywall_custom.habit_\(titleIDs[target.id] ?? target.id)_title".localized,
-                yAxisValues: target.yAxisValues,
-                currentValue: target.currentValue,
-                statMessage: target.statMessage,
-                curveStyle: target.curveStyle
-            )
-        }
-    }
-
-    private var currentHabitProgress: PaywallHabitProgress {
-        habitProgresses[currentHabitIndex]
-    }
 
     // End date of the plan
     /// Last day of the 28-day personal plan started today.
@@ -95,11 +75,8 @@ struct CustomPaywallView: View {
                     // Personalized insight (replaces both benefits + quiz insight)
                     personalizedInsightSection
 
-                    // Progress chart preview
-                    progressChartSection
-
-                    // Plan toggle
-                    planToggle
+                    // The user's real plan (generated after the analysis)
+                    planPreviewSection
 
                     // Date transformation
                     dateTransformationSection
@@ -107,8 +84,8 @@ struct CustomPaywallView: View {
                     // Features list
                     featuresSection
 
-                    // Radar chart with potential
-                    radarChartSection
+                    // Expandable FAQ
+                    faqSection
 
                     // Footer links only (button is floating)
                     footerLinksSection
@@ -124,7 +101,6 @@ struct CustomPaywallView: View {
         }
         .onAppear {
             loadUserName()
-            startRadarAnimation()
         }
         .onChange(of: showStartProgramScreen) { _, show in
             if show {
@@ -198,29 +174,45 @@ struct CustomPaywallView: View {
 
     // MARK: - Header Section
 
-    private var personalizedTitle: String {
-        guard let goal = habitsQuizResult?.primaryGoal else {
-            return "paywall_custom.title_default".localized
-        }
-        switch goal {
-        case "sleep":   return "paywall_custom.title_sleep".localized
-        case "stress":  return "paywall_custom.title_stress".localized
-        case "energy":  return "paywall_custom.title_energy".localized
-        case "focus":   return "paywall_custom.title_focus".localized
-        case "balance": return "paywall_custom.title_balance".localized
-        default:        return "paywall_custom.title_default".localized
+    /// Goal of the plan generated after the analysis; falls back to the quiz's main goal.
+    private var headlineGoal: String {
+        if let goal = planStore.plan?.goal { return goal.rawValue }
+        switch habitsQuizResult?.primaryGoal {
+        case "sleep": return "sleep"
+        case "stress": return "stress"
+        case "energy": return "energy"
+        case "focus": return "focus"
+        case "balance": return "emotional"
+        default: return "default"
         }
     }
 
+    /// "Prénom, ton plan sommeil est prêt…": one phrase per plan goal, with or without the first name.
+    private var personalizedTitle: String {
+        let name = userName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let base = "paywall_custom.headline.\(headlineGoal)"
+        return name.isEmpty
+            ? "\(base).anonymous".localized
+            : String(format: "\(base).named".localized, name)
+    }
+
     private var headerSection: some View {
-        VStack(spacing: 16) {
-            // Title
-            Text(personalizedTitle)
+        // "Prénom, ton plan … est prêt." as the title, the 28-day promise below it.
+        let lines = personalizedTitle.components(separatedBy: "\n")
+        return VStack(spacing: 10) {
+            Text(lines.first ?? "")
                 .font(.faroBold(28))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .balancedLines()
                 .lineSpacing(4)
+            if lines.count > 1 {
+                Text(lines.dropFirst().joined(separator: " "))
+                    .font(.custom("Poppins-SemiBold", size: 17))
+                    .foregroundColor(Color(hex: "B794F6"))
+                    .multilineTextAlignment(.center)
+                    .balancedLines()
+            }
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
@@ -245,6 +237,20 @@ struct CustomPaywallView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.white)
                 )
+
+            // Same "with / without CortiFree" curves as in the onboarding, drawn on appear.
+            CortiFreeComparisonChart(animate: animateComparison, height: 200)
+                .padding(.top, 8)
+                .onAppear {
+                    guard !animateComparison else { return }
+                    withAnimation(.easeOut(duration: 1.4).delay(0.3)) { animateComparison = true }
+                }
+
+            Text("onboarding_v2.comparison.disclaimer".localized)
+                .font(.custom("Poppins-Regular", size: 12))
+                .foregroundColor(.white.opacity(0.42))
+                .multilineTextAlignment(.center)
+                .balancedLines()
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
@@ -371,121 +377,77 @@ struct CustomPaywallView: View {
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
-    // MARK: - Progress Chart Section (same as HabitsProgressFlowView)
+    // MARK: - Plan Preview Section (the plan generated after the analysis)
 
-    private var progressChartSection: some View {
-        VStack(spacing: 12) {
-            // Habit icons row (clickable)
-            HStack(spacing: 6) {
-                ForEach(0..<habitProgresses.count, id: \.self) { index in
-                    Button(action: {
-                        HapticManager.light()
-                        currentHabitIndex = index
-                        currentWeek = 1
-                    }) {
-                        Image(systemName: habitProgresses[index].icon)
-                            .font(.system(size: 14))
-                            .foregroundColor(currentHabitIndex == index ? Color(hex: "B794F6") : .white.opacity(0.5))
-                            .frame(width: 30, height: 30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(currentHabitIndex == index ? Color(hex: "B794F6").opacity(0.2) : Color.white.opacity(0.05))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(currentHabitIndex == index ? Color(hex: "B794F6") : Color.white.opacity(0.2), lineWidth: 1.5)
-                            )
+    @ViewBuilder
+    private var planPreviewSection: some View {
+        if let plan = planStore.plan, let day = plan.day(1) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 12) {
+                    Image(systemName: plan.goal.symbol)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 36, height: 36)
+                        .background(Circle().fill(LinearGradient(colors: plan.goal.colors, startPoint: .topLeading, endPoint: .bottomTrailing)))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(plan.localizedTitle)
+                            .font(.faroSemiBold(16))
+                            .foregroundColor(.white)
+                        Text("paywall_custom.plan_day1".localized)
+                            .font(.custom("Poppins-Regular", size: 12))
+                            .foregroundColor(.white.opacity(0.6))
                     }
                 }
-            }
 
-            // Chart card
-            VStack(spacing: 10) {
-                // Title with gradient
-                Text(currentHabitProgress.title)
-                    .font(.faroSemiBold(16))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.white, Color(hex: "B794F6")],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                ForEach(day.items) { item in
+                    let display = item.display(week: 1, short: false)
+                    HStack(spacing: 10) {
+                        Image(systemName: display.symbol)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Color(hex: "B794F6"))
+                            .frame(width: 24)
+                        Text(display.title)
+                            .font(.custom("Poppins-Regular", size: 14))
+                            .foregroundColor(.white)
+                            .lineLimit(1)
+                        Spacer(minLength: 8)
+                        if let duration = display.durationLabel {
+                            Text(duration)
+                                .font(.custom("Poppins-SemiBold", size: 12))
+                                .foregroundColor(.white.opacity(0.6))
+                        }
+                    }
+                }
 
-                // Chart (using the real chart from HabitsProgressFlowView)
-                HabitProgressChart(
-                    yAxisValues: currentHabitProgress.yAxisValues,
-                    currentValue: currentHabitProgress.currentValue,
-                    weekNumber: OnboardingHabitTargets.planWeeks,
-                    maxValue: 4.0,
-                    currentProgress: 3.7,
-                    curveStyle: currentHabitProgress.curveStyle,
-                    currentWeek: $currentWeek
-                )
-                .frame(height: 160)
-                .drawingGroup()
+                Divider().background(Color.white.opacity(0.1))
+
+                // The four weekly themes of the cycle
+                HStack(spacing: 6) {
+                    ForEach(Array(PlanWeekTheme.allCases.enumerated()), id: \.offset) { index, theme in
+                        VStack(spacing: 4) {
+                            Text("S\(index + 1)")
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundColor(Color(hex: "B794F6"))
+                            Text(theme.localizedTitle)
+                                .font(.custom("Poppins-SemiBold", size: 11))
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.8)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.06)))
+                    }
+                }
             }
             .padding(AppConstants.Layout.paddingMedium)
             .background(
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.white.opacity(0.05))
             )
+            .padding(.horizontal, AppConstants.Layout.paddingXLarge)
         }
-        .padding(.horizontal, AppConstants.Layout.paddingXLarge)
-    }
-
-    // MARK: - Plan Toggle
-
-    private var planToggle: some View {
-        HStack(spacing: 0) {
-            // CortiFree option
-            Button(action: {
-                HapticManager.light()
-                withAnimation { selectedPlan = .yearly }
-            }) {
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(selectedPlan == .yearly ? Color.white : Color.clear)
-                        .frame(width: 8, height: 8)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white, lineWidth: 1)
-                        )
-                    Text("CortiFree")
-                        .font(.custom("Poppins-Medium", size: 14))
-                        .foregroundColor(selectedPlan == .yearly ? .white : .white.opacity(0.5))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-            }
-
-            // Sans CortiFree option
-            Button(action: {
-                HapticManager.light()
-                withAnimation { selectedPlan = .monthly }
-            }) {
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(selectedPlan == .monthly ? Color.white : Color.clear)
-                        .frame(width: 8, height: 8)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1)
-                        )
-                    Text("paywall_custom.plan_without".localized)
-                        .font(.custom("Poppins-Medium", size: 14))
-                        .foregroundColor(selectedPlan == .monthly ? .white : .white.opacity(0.5))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-            }
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.08))
-        )
-        .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
     // MARK: - Date Transformation Section
@@ -595,76 +557,70 @@ struct CustomPaywallView: View {
         .padding(.horizontal, AppConstants.Layout.paddingXLarge)
     }
 
-    // MARK: - Radar Chart Section
+    // MARK: - FAQ Section
 
-    // Two fixed states: small red (false) or large green (true)
-    private var hexagonIsLarge: Bool {
-        radarAnimationProgress >= 0.5
-    }
-
-    // Today: the user's own quiz scores. Day 28: an indicative projection.
-    // Vertex order: global, serenity, sleep, energy, focus, balance.
-    private var smallProgress: [Double] {
-        guard let result = habitsQuizResult else { return [0.15, 0.22, 0.18, 0.12, 0.20, 0.16] }
-        return [result.globalScore, result.serenityScore, result.sleepScore,
-                result.energyScore, result.focusScore, result.balanceScore]
-            .map { min(0.85, max(0.15, Double($0) / 100)) }
-    }
-
-    private var largeProgress: [Double] {
-        smallProgress.map { $0 + (0.95 - $0) * 0.7 }
-    }
-
-    private var radarChartSection: some View {
-        VStack(spacing: 16) {
-            Text(userName.isEmpty
-                 ? "paywall_custom.radar_title_generic".localized
-                 : String(format: "paywall_custom.radar_title".localized, userName))
+    private var faqSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("paywall_custom.faq.title".localized)
                 .font(.faroBold(22))
                 .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-                .balancedLines()
+                .padding(.horizontal, 4)
 
-            // Hexagon radar chart - switches between two states
-            ZStack {
-                // Background hexagon grid (responsive size)
-                HexagonRadarGrid()
-                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    .responsiveFrame(width: 165, height: 165)
-
-                // Filled irregular hexagon - either small red OR large green
-                HexagonRadarFill(progress: hexagonIsLarge ? largeProgress : smallProgress)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                (hexagonIsLarge ? Color(hex: "27AE60") : Color(hex: "D32F2F")).opacity(0.7),
-                                (hexagonIsLarge ? Color(hex: "27AE60") : Color(hex: "D32F2F")).opacity(0.4)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .responsiveFrame(width: 165, height: 165)
-
-                // Stroke around the filled hexagon
-                HexagonRadarFill(progress: hexagonIsLarge ? largeProgress : smallProgress)
-                    .stroke((hexagonIsLarge ? Color(hex: "27AE60") : Color(hex: "D32F2F")).opacity(0.8), lineWidth: 3)
-                    .responsiveFrame(width: 165, height: 165)
-
-                // Labels (using larger frame for positioning)
-                PaywallRadarLabels(size: ResponsiveLayout.cardWidth(base: 165))
+            VStack(spacing: 0) {
+                ForEach(1...4, id: \.self) { index in
+                    if index > 1 {
+                        Divider().background(Color.white.opacity(0.1))
+                    }
+                    faqRow(index)
+                }
             }
-            .responsiveFrame(width: 280, height: 280)
-            .padding(.vertical, 8)
-            .drawingGroup() // PERFORMANCE: Render radar chart as bitmap
-
-            Text("paywall_custom.radar_disclaimer".localized)
-                .font(.custom("Poppins-Regular", size: 12))
-                .foregroundColor(.white.opacity(0.55))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, AppConstants.Layout.paddingMedium)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(0.05))
+            )
         }
-        .padding(.horizontal, AppConstants.Layout.paddingLarge)
+        .padding(.horizontal, AppConstants.Layout.paddingXLarge)
+    }
+
+    private func faqRow(_ index: Int) -> some View {
+        let isOpen = openFAQ == index
+        return VStack(alignment: .leading, spacing: 10) {
+            Button {
+                HapticManager.light()
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    openFAQ = isOpen ? nil : index
+                }
+            } label: {
+                HStack(alignment: .top, spacing: 12) {
+                    Text("paywall_custom.faq.q\(index)".localized)
+                        .font(.custom("Poppins-SemiBold", size: 15))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(Color(hex: "B794F6"))
+                        .rotationEffect(.degrees(isOpen ? 180 : 0))
+                        .padding(.top, 3)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(isOpen ? .isSelected : [])
+
+            if isOpen {
+                Text("paywall_custom.faq.a\(index)".localized)
+                    .font(.custom("Poppins-Regular", size: 14))
+                    .foregroundColor(.white.opacity(0.72))
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(.vertical, 14)
+        .clipped()
     }
 
     // MARK: - Floating CTA Section (Fixed at bottom)
@@ -741,18 +697,6 @@ struct CustomPaywallView: View {
         }
     }
 
-    // MARK: - Helper Methods
-
-    private func startRadarAnimation() {
-        // PERFORMANCE: Use DispatchQueue instead of Timer for better performance
-        Task { @MainActor in
-            while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
-                radarAnimationProgress = radarAnimationProgress < 0.5 ? 1.0 : 0.0
-            }
-        }
-    }
-
 }
 
 // MARK: - Supporting Types
@@ -760,15 +704,6 @@ struct CustomPaywallView: View {
 enum PaywallPlan: String {
     case monthly = "monthly"
     case yearly = "yearly"
-}
-
-struct PaywallHabitProgress {
-    let icon: String
-    let title: String
-    let yAxisValues: [String]
-    let currentValue: String
-    let statMessage: String
-    let curveStyle: Int
 }
 
 // MARK: - Subcomponents

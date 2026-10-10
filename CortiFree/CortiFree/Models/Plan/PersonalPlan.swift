@@ -39,9 +39,31 @@ enum PlanGoal: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    /// Every goal shares the brand gradient: the goal is told apart by its symbol and
-    /// name, so the Plan tab keeps a single, consistent colour identity.
-    var colors: [Color] { [PlanPalette.accentDeep, PlanPalette.accent] }
+    var artworkName: String { "plan_goal_\(rawValue)" }
+
+    var accentColor: Color {
+        switch self {
+        case .stress: return Color(hex: "6FAF9D")
+        case .sleep: return Color(hex: "766EDB")
+        case .energy: return Color(hex: "F2A65A")
+        case .focus: return Color(hex: "4FA3B8")
+        case .emotional: return Color(hex: "C9828D")
+        }
+    }
+
+    var accentDeep: Color {
+        switch self {
+        case .stress: return Color(hex: "2F6F66")
+        case .sleep: return Color(hex: "3D478F")
+        case .energy: return Color(hex: "D96C4A")
+        case .focus: return Color(hex: "247B8A")
+        case .emotional: return Color(hex: "8F4F68")
+        }
+    }
+
+    /// Each personalized programme keeps CortiFree's dark surfaces while receiving
+    /// its own accent identity throughout plan UI and onboarding.
+    var colors: [Color] { [accentDeep, accentColor] }
 }
 
 // MARK: - Weekly themes

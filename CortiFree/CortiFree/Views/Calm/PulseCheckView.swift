@@ -52,6 +52,8 @@ struct PulseCheckView: View {
 
     @State private var phase: Phase = .intro
     @State private var mode = NervousResetMode.sigh
+    @AppStorage("pulse.firstUseGuideSeen.v1") private var hasSeenFirstUseGuide = false
+    @State private var firstUseGuidePage = 0
     /// A doubtful reading in this check (too high/low at rest, irregular signal).
     @State private var beforeDoubtful = false
     @State private var afterDoubtful = false
@@ -124,20 +126,39 @@ struct PulseCheckView: View {
 
     @ViewBuilder
     private var bottomBar: some View {
-        switch phase {
-        case .intro:
-            primary(t("calm.pulse.intro.cta")) { startMeasure(.measureBefore) }
-        case .beforeResult(let bpm):
+        if showsFirstUseGuide {
             VStack(spacing: 12) {
-                NervousResetModePicker(selection: $mode)
-                primary(t("calm.pulse.reset.cta")) { phase = .reset(before: bpm, mode: mode) }
+                HStack(spacing: 7) {
+                    ForEach(0..<firstUseGuidePages.count, id: \.self) { page in
+                        Capsule()
+                            .fill(page == firstUseGuidePage ? AudioPalette.accent : Color.white.opacity(0.22))
+                            .frame(width: page == firstUseGuidePage ? 20 : 7, height: 7)
+                    }
+                }
+                primary(t("calm.common.continue")) {
+                    if firstUseGuidePage < firstUseGuidePages.count - 1 {
+                        withAnimation(.easeInOut(duration: 0.22)) { firstUseGuidePage += 1 }
+                    } else {
+                        hasSeenFirstUseGuide = true
+                    }
+                }
             }
-        case .final:
-            primary(t(context == .onboarding ? "calm.common.continue" : "calm.common.done")) {
-                if context == .onboarding { onContinue?() } else { dismiss() }
+        } else {
+            switch phase {
+            case .intro:
+                primary(t("calm.pulse.intro.cta")) { startMeasure(.measureBefore) }
+            case .beforeResult(let bpm):
+                VStack(spacing: 12) {
+                    NervousResetModePicker(selection: $mode)
+                    primary(t("calm.pulse.reset.cta")) { phase = .reset(before: bpm, mode: mode) }
+                }
+            case .final:
+                primary(t(context == .onboarding ? "calm.common.continue" : "calm.common.done")) {
+                    if context == .onboarding { onContinue?() } else { dismiss() }
+                }
+            default:
+                Color.clear.frame(height: 72)
             }
-        default:
-            Color.clear.frame(height: 72)
         }
     }
 
@@ -169,32 +190,35 @@ struct PulseCheckView: View {
 
     @ViewBuilder
     private var content: some View {
-        switch phase {
-        case .intro:
-            VStack(spacing: 16) {
-                PulseHeart(beating: true, bpm: 70).frame(width: 150, height: 150)
-                Text(t(context == .onboarding ? "calm.pulse.intro.title_onboarding" : "calm.pulse.intro.title"))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                Text(t("calm.pulse.intro.subtitle"))
-                    .font(.system(size: 15))
-                    .foregroundStyle(AudioPalette.secondaryText)
-                    .multilineTextAlignment(.center)
-                Label(t("calm.pulse.intro.how"), systemImage: "camera.fill")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.85))
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 9)
-                    .background(Color.white.opacity(0.1), in: Capsule())
-            }
-            .padding(.horizontal, 28)
+        if showsFirstUseGuide {
+            firstUseGuide
+        } else {
+            switch phase {
+            case .intro:
+                VStack(spacing: 16) {
+                    PulseHeart(beating: true, bpm: 70).frame(width: 150, height: 150)
+                    Text(t(context == .onboarding ? "calm.pulse.intro.title_onboarding" : "calm.pulse.intro.title"))
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                    Text(t("calm.pulse.intro.subtitle"))
+                        .font(.system(size: 15))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                        .multilineTextAlignment(.center)
+                    Label(t("calm.pulse.intro.how"), systemImage: "camera.fill")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(Color.white.opacity(0.1), in: Capsule())
+                }
+                .padding(.horizontal, 28)
 
-        case .measureBefore, .measureAfter:
-            measuring(after: { if case .measureAfter = phase { return true } else { return false } }())
+            case .measureBefore, .measureAfter:
+                measuring(after: { if case .measureAfter = phase { return true } else { return false } }())
 
-        case .beforeResult(let bpm):
-            VStack(spacing: 14) {
+            case .beforeResult(let bpm):
+                VStack(spacing: 14) {
                 Text(t("calm.pulse.before.label").uppercased())
                     .font(.system(size: 12, weight: .semibold))
                     .tracking(1)
@@ -220,16 +244,52 @@ struct PulseCheckView: View {
                     .foregroundStyle(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 28)
-            }
+                }
 
-        case .reset(let before, let mode):
-            NervousResetSession(mode: mode) {
-                startMeasure(.measureAfter(before: before, mode: mode))
-            }
+            case .reset(let before, let mode):
+                NervousResetSession(mode: mode) {
+                    startMeasure(.measureAfter(before: before, mode: mode))
+                }
 
-        case .final(let before, let after, _):
-            finalView(before: before, after: after)
+            case .final(let before, let after, _):
+                finalView(before: before, after: after)
+            }
         }
+    }
+
+    private var showsFirstUseGuide: Bool {
+        context == .standalone && !hasSeenFirstUseGuide
+    }
+
+    private var firstUseGuidePages: [(icon: String, title: String, body: String)] {
+        [
+            ("camera.fill", t("calm.pulse.intro.how"), t("onboarding_v2.pulse.step_finger")),
+            ("hand.point.up.left.fill", t("onboarding_v2.pulse.title"), t("onboarding_v2.pulse.step_pressure")),
+            ("timer", t("calm.pulse.measure.title"), t("onboarding_v2.pulse.step_still"))
+        ]
+    }
+
+    private var firstUseGuide: some View {
+        let page = firstUseGuidePages[firstUseGuidePage]
+        return VStack(spacing: 20) {
+            Image(systemName: page.icon)
+                .font(.system(size: 54, weight: .semibold))
+                .foregroundStyle(AudioPalette.accent)
+                .frame(width: 118, height: 118)
+                .background(Color.white.opacity(0.08), in: Circle())
+            Text(page.title)
+                .font(.system(size: 27, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+            Text(page.body)
+                .font(.system(size: 16))
+                .foregroundStyle(AudioPalette.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .id(firstUseGuidePage)
+        .transition(.opacity.combined(with: .scale(scale: 0.98)))
+        .padding(.horizontal, 32)
     }
 
     private func measuring(after: Bool) -> some View {
@@ -300,6 +360,17 @@ struct PulseMeasuringView: View {
 
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
+    /// Live coaching under the ring: what to fix, else the default instruction.
+    private var hintKey: String {
+        switch meter.hint {
+        case .coverFlash: return "calm.pulse.hint.cover_flash"
+        case .placeFinger: return "calm.pulse.measure.place_finger"
+        case .holdStill: return "calm.pulse.hint.hold_still"
+        case .almostDone: return "calm.pulse.hint.almost_done"
+        case nil: return meter.state == .waitingForFinger ? "calm.pulse.measure.place_finger" : "calm.pulse.measure.hold_still"
+        }
+    }
+
     var body: some View {
         VStack(spacing: 22) {
             Text(title)
@@ -331,8 +402,6 @@ struct PulseMeasuringView: View {
 
             Group {
                 switch meter.state {
-                case .waitingForFinger:
-                    Text(t("calm.pulse.measure.place_finger"))
                 case .failed(let message):
                     VStack(spacing: 10) {
                         Text(message)
@@ -341,13 +410,16 @@ struct PulseMeasuringView: View {
                             .foregroundStyle(AudioPalette.accent)
                     }
                 default:
-                    Text(t("calm.pulse.measure.hold_still"))
+                    Text(t(hintKey))
+                        .contentTransition(.opacity)
                 }
             }
             .font(.system(size: 15))
-            .foregroundStyle(.white.opacity(0.8))
+            .foregroundStyle(meter.hint == .coverFlash || meter.hint == .holdStill ? Color(hex: "FFC56B") : .white.opacity(0.8))
             .multilineTextAlignment(.center)
             .padding(.horizontal, 32)
+            .frame(minHeight: 44, alignment: .top)
+            .animation(.easeInOut(duration: 0.25), value: meter.hint)
         }
     }
 }

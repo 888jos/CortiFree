@@ -34,6 +34,9 @@ struct OnboardingPulseMeasureView: View {
     /// nil when the user skipped the measure.
     let onFinish: (PulseCameraMeter.Reading?) -> Void
     var onBack: (() -> Void)?
+    /// When set, an implausible reading never shows the "measure again" screen: the flow
+    /// simply carries on without a number (the onboarding must never feel like an error).
+    var onUnclear: (() -> Void)?
     #if targetEnvironment(simulator)
     var simulatedBPM: Double = 84
     #endif
@@ -77,8 +80,16 @@ struct OnboardingPulseMeasureView: View {
             if isAfter { measure() }
         }
         .onChange(of: meter.state) { _, state in
+            if phase == .measuring, case .failed = state, let onUnclear {
+                AnalyticsManager.shared.track(event: "onboarding_pulse_unclear", properties: ["bpm": -1, "after": isAfter])
+                onUnclear()
+                return
+            }
             guard phase == .measuring, case .done = state, let reading = meter.lastReading else { return }
-            if PulsePlausibility.doubt(for: reading) != nil {
+            if PulsePlausibility.doubt(for: reading) != nil, let onUnclear {
+                AnalyticsManager.shared.track(event: "onboarding_pulse_unclear", properties: ["bpm": reading.bpm, "after": isAfter])
+                onUnclear()
+            } else if PulsePlausibility.doubt(for: reading) != nil {
                 HapticManager.warning()
                 phase = .doubtful(reading)
             } else if isAfter {
@@ -175,8 +186,10 @@ struct OnboardingPulseMeasureView: View {
 
     private var instructions: some View {
         VStack(spacing: 16) {
-            PulseHeart(beating: true, bpm: 70)
-                .frame(width: 110, height: 110)
+            Image("pulse_camera_instruction")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 180, height: 190)
                 .accessibilityHidden(true)
             Text("onboarding_v2.pulse.title".localized)
                 .font(.faroBold(29))
@@ -284,20 +297,23 @@ struct OnboardingPulseMeasureView: View {
 // MARK: - Comparison
 
 struct OnboardingPulseComparisonView: View {
-    let before: PulseCameraMeter.Reading
-    let after: PulseCameraMeter.Reading
+    /// nil when that measure was not clear enough: the screen then celebrates the breathing
+    /// without showing heart-rate numbers.
+    let before: PulseCameraMeter.Reading?
+    let after: PulseCameraMeter.Reading?
     let onRemeasure: () -> Void
     let onContinue: () -> Void
 
     @State private var showConfetti = false
 
-    private enum Outcome { case calmer, steady, faster, unreliable }
+    private enum Outcome { case calmer, steady, faster, breathed }
 
-    private var delta: Int { before.bpm - after.bpm }
+    private var delta: Int { (before?.bpm ?? 0) - (after?.bpm ?? 0) }
 
     private var outcome: Outcome {
+        guard let before, let after else { return .breathed }
         if PulsePlausibility.doubt(for: before) != nil || PulsePlausibility.doubt(for: after) != nil
-            || abs(delta) > PulsePlausibility.maxCredibleChange { return .unreliable }
+            || abs(delta) > PulsePlausibility.maxCredibleChange { return .breathed }
         if delta >= 3 { return .calmer }
         if delta <= -3 { return .faster }
         return .steady
@@ -307,13 +323,21 @@ struct OnboardingPulseComparisonView: View {
         VStack(spacing: 0) {
             Spacer(minLength: 0)
             VStack(spacing: 20) {
-                HStack(alignment: .bottom, spacing: 18) {
-                    column("onboarding_v2.pulse.before".localized, before.bpm, emphasised: false)
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 22, weight: .bold))
+                if outcome != .breathed, let before, let after {
+                    HStack(alignment: .bottom, spacing: 18) {
+                        column("onboarding_v2.pulse.before".localized, before.bpm, emphasised: false)
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(AudioPalette.accent)
+                            .padding(.bottom, 26)
+                        column("onboarding_v2.pulse.after".localized, after.bpm, emphasised: true)
+                    }
+                } else {
+                    Image(systemName: "wind")
+                        .font(.system(size: 52, weight: .semibold))
                         .foregroundStyle(AudioPalette.accent)
-                        .padding(.bottom, 26)
-                    column("onboarding_v2.pulse.after".localized, after.bpm, emphasised: true)
+                        .frame(width: 112, height: 112)
+                        .background(Circle().fill(Color.white.opacity(0.08)))
                 }
                 if outcome == .calmer {
                     Text(String(format: "onboarding_v2.pulse.calmer_badge".localized, delta))
@@ -333,30 +357,31 @@ struct OnboardingPulseComparisonView: View {
                     .foregroundStyle(.white.opacity(0.75))
                     .multilineTextAlignment(.center)
                     .balancedLines()
-                Text("calm.pulse.disclaimer".localized)
-                    .font(.poppinsRegular(11))
-                    .foregroundStyle(.white.opacity(0.45))
-                    .multilineTextAlignment(.center)
+                if outcome != .breathed {
+                    Text("calm.pulse.disclaimer".localized)
+                        .font(.poppinsRegular(11))
+                        .foregroundStyle(.white.opacity(0.45))
+                        .multilineTextAlignment(.center)
+                }
             }
             .padding(.horizontal, 28)
             Spacer(minLength: 0)
             VStack(spacing: 12) {
-                let remeasureFirst = outcome == .faster || outcome == .unreliable
                 Button {
                     HapticManager.light()
-                    remeasureFirst ? onRemeasure() : onContinue()
+                    onContinue()
                 } label: {
-                    Text((remeasureFirst ? "onboarding_v2.pulse.remeasure" : "onboarding_v2.breath_demo.continue").localized)
+                    Text("onboarding_v2.breath_demo.continue".localized)
                         .font(.poppinsSemiBold(17))
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .contentShape(Capsule())
                 }
                 .buttonStyle(.glassPrimary)
-                if remeasureFirst {
-                    Button("onboarding_v2.breath_demo.continue".localized) {
+                if outcome == .faster {
+                    Button("onboarding_v2.pulse.remeasure".localized) {
                         HapticManager.light()
-                        onContinue()
+                        onRemeasure()
                     }
                     .font(.poppinsMedium(14))
                     .foregroundStyle(.white.opacity(0.62))
@@ -366,14 +391,19 @@ struct OnboardingPulseComparisonView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 34)
         }
-        .confetti(isActive: showConfetti)
+        // The first exercise is always celebrated, whatever the measure said.
+        .overlay {
+            if showConfetti { FullScreenConfetti() }
+        }
         .onAppear {
             AnalyticsManager.shared.track(event: "onboarding_pulse_compared", properties: [
-                "before": before.bpm, "after": after.bpm, "outcome": "\(outcome)",
-                "reliable": before.reliable && after.reliable
+                "before": before?.bpm ?? -1, "after": after?.bpm ?? -1, "outcome": "\(outcome)",
+                "reliable": (before?.reliable ?? false) && (after?.reliable ?? false)
             ])
-            guard outcome == .calmer else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { showConfetti = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                showConfetti = true
+                HapticManager.success()
+            }
         }
     }
 
@@ -382,7 +412,7 @@ struct OnboardingPulseComparisonView: View {
         case .calmer: return "onboarding_v2.pulse.calmer_title".localized
         case .steady: return "onboarding_v2.pulse.steady_title".localized
         case .faster: return "onboarding_v2.pulse.faster_title".localized
-        case .unreliable: return "onboarding_v2.pulse.unreliable_title".localized
+        case .breathed: return "onboarding_v2.pulse.breathed_title".localized
         }
     }
 
@@ -391,7 +421,7 @@ struct OnboardingPulseComparisonView: View {
         case .calmer: return "onboarding_v2.pulse.calmer_message".localized
         case .steady: return "onboarding_v2.pulse.steady_message".localized
         case .faster: return "onboarding_v2.pulse.faster_message".localized
-        case .unreliable: return "onboarding_v2.pulse.unreliable_message".localized
+        case .breathed: return "onboarding_v2.pulse.breathed_message".localized
         }
     }
 

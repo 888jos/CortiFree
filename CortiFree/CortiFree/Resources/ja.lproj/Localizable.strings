@@ -3126,33 +3126,7 @@
 "onboarding_v2.overall.duration_years" = "何年も";
 
 // MARK: - Onboarding V2 - Reassurance View
-"onboarding_v2.reassurance.greeting" = "ありがとうございます";
-"onboarding_v2.reassurance.message_part1" = "こうした状況にいるのは、あなただけではありません。";
-"onboarding_v2.reassurance.message_part1_male" = "こうした状況にいるのは、あなただけではありません。";
-"onboarding_v2.reassurance.message_part1_female" = "こうした状況にいるのは、あなただけではありません。";
-"onboarding_v2.reassurance.message_part1_neutral" = "こうした状況にいるのは、あなただけではありません。";
 "onboarding_v2.reassurance.message_part2" = "CortiFreeは、行動心理学と神経系の調整に関する科学にもとづいてつくられています。";
-"onboarding_v2.reassurance.personalized" = "%1$@についてサポートを求めているんですね。%2$@という時期に、%3$@この状態が続いてきたなら、日常生活に影響が出るのも無理はありません。";
-"onboarding_v2.reassurance.reason_sleep" = "睡眠と休息";
-"onboarding_v2.reassurance.reason_anxiety" = "ストレスと不安";
-"onboarding_v2.reassurance.reason_energy" = "エネルギー";
-"onboarding_v2.reassurance.reason_focus" = "集中力";
-"onboarding_v2.reassurance.reason_mental" = "心の健康";
-"onboarding_v2.reassurance.reason_difficult" = "つらい時期";
-"onboarding_v2.reassurance.reason_habits" = "新しい習慣づくり";
-"onboarding_v2.reassurance.age_under_18" = "10代";
-"onboarding_v2.reassurance.age_18_24" = "18〜24歳";
-"onboarding_v2.reassurance.age_25_34" = "25〜34歳";
-"onboarding_v2.reassurance.age_35_44" = "35〜44歳";
-"onboarding_v2.reassurance.age_45_54" = "45〜54歳";
-"onboarding_v2.reassurance.age_55_plus" = "55歳以上";
-"onboarding_v2.reassurance.duration_weeks" = "数週間";
-"onboarding_v2.reassurance.duration_2_6_months" = "2〜6か月";
-"onboarding_v2.reassurance.duration_6_12_months" = "半年から1年";
-"onboarding_v2.reassurance.duration_1_year_plus" = "1年以上";
-"onboarding_v2.reassurance.duration_years" = "何年も";
-"onboarding_v2.reassurance.message_part3" = "では、状況をよりよく理解し、あなたに合ったプログラムにするために、簡単なクイズに答えてください。";
-"onboarding_v2.reassurance.message_part4" = "回答は完全に非公開です。誰もアクセスできず、販売や共有されることも一切ありません。";
 "onboarding_v2.reassurance.start_quiz" = "クイズを始める";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
@@ -3254,11 +3228,10 @@
 "onboarding_v2.habits.q12_opt4" = "もっと集中したい";
 "onboarding_v2.habits.q12_opt5" = "全体のバランスを整えたい";
 "onboarding_v2.habits.q13" = "毎日、自分の心と体のためにどのくらい時間をとれますか？";
-"onboarding_v2.habits.q13_opt1" = "15分未満";
-"onboarding_v2.habits.q13_opt2" = "15〜30分";
-"onboarding_v2.habits.q13_opt3" = "30〜45分";
-"onboarding_v2.habits.q13_opt4" = "45〜60分";
-"onboarding_v2.habits.q13_opt5" = "1時間以上";
+"onboarding_v2.habits.q13_opt1" = "0〜5分";
+"onboarding_v2.habits.q13_opt2" = "5〜10分";
+"onboarding_v2.habits.q13_opt3" = "10〜15分";
+"onboarding_v2.habits.q13_opt4" = "15分以上";
 
 // MARK: - Onboarding V2 - Sixty Days Explanation
 "onboarding_v2.sixty_days.title" = "なぜ60日？";
@@ -3401,13 +3374,6 @@
 "onboarding_v2.week_progress.week10_desc" = "持続する変化";
 
 // MARK: - Onboarding V2 - Notifications
-"onboarding_v2.notifications.title" = "毎日やる気をキープ";
-"onboarding_v2.notifications.subtitle" = "進歩を続けるためのやさしいリマインダー";
-"onboarding_v2.notifications.benefit_1" = "大切なタイミングにあなた専用のリマインダー";
-"onboarding_v2.notifications.benefit_2" = "毎日の励ましメッセージ";
-"onboarding_v2.notifications.benefit_3" = "達成をお祝い";
-"onboarding_v2.notifications.enable_button" = "通知をオンにする";
-"onboarding_v2.notifications.skip_button" = "あとで";
 
 // MARK: - Onboarding V2 - Social Proof
 "onboarding_v2.social_proof.users_count" = "50,000人以上のユーザー";
@@ -3530,20 +3496,6 @@
 "onboarding_v2.week_progress.transformation" = "持続する変化";
 
 // MARK: - Onboarding V2 - Notification Permissions
-"onboarding_v2.notifications.mascot_message" = "習慣になるように、練習の時間をお知らせしますね！";
-"onboarding_v2.notifications.gentle_reminders" = "進歩を続けるためのやさしいリマインダー";
-"onboarding_v2.notifications.personalized" = "大切なタイミングにあなた専用のリマインダー";
-"onboarding_v2.notifications.daily_messages" = "毎日の励ましメッセージ";
-"onboarding_v2.notifications.celebrate" = "達成をお祝い";
-"onboarding_v2.notifications.enable" = "通知をオンにする";
-"onboarding_v2.notifications.later" = "あとで";
-"onboarding_v2.notifications.daily_routine" = "朝のリマインダー（9時）";
-"onboarding_v2.notifications.daily_routine_desc" = "瞑想セッションで一日を始めて、ストレスを減らしましょう";
-"onboarding_v2.notifications.streak_danger" = "連続記録がピンチ（20時）";
-"onboarding_v2.notifications.streak_danger_desc" = "今日まだ何も完了していなければ、連続記録が途切れないようにお知らせします";
-"onboarding_v2.notifications.reflection_moment" = "夜のジャーナル（19時）";
-"onboarding_v2.notifications.reflection_moment_desc" = "ジャーナルを書いて一日を振り返るためのリマインダー";
-"onboarding_v2.notifications.next" = "次へ";
 
 // MARK: - Common Onboarding
 "onboarding_v2.common.next" = "次へ";
@@ -3814,7 +3766,9 @@
 "onboarding_v2.commitment.1_week" = "1週間";
 "onboarding_v2.commitment.2_weeks" = "2週間";
 "onboarding_v2.commitment.2_weeks_sub" = "勢いをつける";
-"onboarding_v2.commitment.4_weeks" = "28日間";
+"onboarding_v2.commitment.3_weeks" = "3週間";
+"onboarding_v2.commitment.3_weeks_sub" = "習慣を定着させる";
+"onboarding_v2.commitment.4_weeks" = "4週間";
 "onboarding_v2.commitment.4_weeks_sub" = "プランの期間";
 "onboarding_v2.commitment.66_days" = "66日間";
 "onboarding_v2.commitment.subtitle" = "取り組む期間を選んでください";
@@ -3960,7 +3914,7 @@
 "paywall_custom.transform_subtitle" = "プランを続ければ、最初の習慣が\n身につく日：";
 
 // Features section
-"paywall_custom.feature_program_title" = "あなた専用のプログラム";
+"paywall_custom.feature_program_title" = "あなた専用のプラン";
 "paywall_custom.feature_program_desc" = "回答にもとづく28日間のプラン。いつでも変更できます。";
 "paywall_custom.feature_tasks_title" = "タスクの計画";
 "paywall_custom.feature_tasks_desc" = "毎日を支える、科学にもとづいた習慣。";
@@ -3981,7 +3935,7 @@
 "paywall_custom.radar_label_balance" = "バランス";
 
 // Floating CTA
-"paywall_custom.cta_start" = "プログラムを始める";
+"paywall_custom.cta_start" = "プランを始める";
 
 // Footer links
 "paywall_custom.footer_privacy" = "プライバシー";
@@ -4313,12 +4267,6 @@
 "daily_todos.title" = "ToDoリスト";
 "onboarding_v2.breathing_intro.subtitle" = "私と一緒にゆっくり呼吸しましょう。まずは簡単な一歩から始めます。";
 "onboarding_v2.breathing_intro.title" = "少し落ち着く時間をとりましょう";
-"onboarding_v2.notifications.allow" = "通知を許可";
-"onboarding_v2.notifications.allow_short" = "許可";
-"onboarding_v2.notifications.dont_allow" = "許可しない";
-"onboarding_v2.notifications.not_now" = "今はしない";
-"onboarding_v2.notifications.preview_body" = "通知にはアラート、サウンド、アイコンバッジが含まれる場合があります。これらは設定で変更できます。";
-"onboarding_v2.notifications.preview_title" = "“CortiFree”は通知を送信します。よろしいですか？";
 "common.previous_page" = "前のページ";
 "onboarding_v2.benefits.plan_title" = "あなたのための\n毎日のプラン";
 "onboarding_v2.benefits.plan_subtitle" = "シンプルな習慣が、毎日戻ってこられるリズムを作ります。";
@@ -4734,6 +4682,8 @@
 
 /* Milo: release safety (auth, consent, errors) */
 "assistant.error.unavailable" = "現在Miloを利用できません。しばらくしてからもう一度お試しください。";
+"assistant.error.premium" = "MiloはCortiFree Premiumの機能です。続けて話すにはサブスクリプションを開始してください。";
+"assistant.premium.unlock" = "Miloのロックを解除";
 "assistant.error.signin" = "Miloとのチャットを続けるには、もう一度サインインしてください。";
 "assistant.error.offline" = "オフラインのようです。接続を確認して、もう一度お試しください。";
 "assistant.error.invalid" = "Miloから予期しない返答がありました。もう一度お試しください。";
@@ -4741,6 +4691,7 @@
 "assistant.consent.title" = "Miloとチャットする前に";
 "assistant.consent.point.provider" = "メッセージはCortiFreeのサーバーを経由してAIプロバイダー（DeepSeek）に送信され、Miloの返答が生成されます。";
 "assistant.consent.point.plan" = "返答をパーソナライズするため、CortiFreeプランの簡単な概要（目標・エクササイズ・進捗）がメッセージと一緒に送信されます。";
+"assistant.consent.point.voice" = "メッセージを音声入力すると、あなたの声はCortiFreeのサーバーを経由して文字起こしサービス（OpenAI）に送られ、テキストに変換されます。CortiFreeは録音を保存しません。";
 "assistant.consent.point.health" = "Appleヘルスケアを連携しているか、アプリで脈拍を測定した場合は、Miloがアドバイスを調整できるよう、最近の心拍数・心拍変動・睡眠のデータも送信されます。広告に使われることはありません。";
 "assistant.consent.point.diagnosis" = "Miloはウェルビーイングに関する一般的な情報を提供するもので、診断や医療アドバイスではありません。緊急時は救急サービスに連絡してください。";
 "assistant.consent.point.revoke" = "この同意は「設定 › プライバシー」でいつでも取り消せます。";
@@ -4887,6 +4838,22 @@
 "onboarding_v2.sources.open_hint" = "ブラウザで論文を開きます";
 "onboarding_v2.comparison.day28" = "28日目";
 "onboarding_v2.week_progress.start_note" = "クイズの回答から算出したスタート地点です。";
+"onboarding_v2.plan_ready.title" = "プランができました";
+"onboarding_v2.plan_ready.length" = "%d日間";
+"onboarding_v2.plan_ready.per_day" = "1日 約%d分";
+"onboarding_v2.plan_ready.why" = "このプランの理由";
+"onboarding_v2.plan_ready.start_title" = "あなたのスタート地点";
+"onboarding_v2.plan_day.total" = "ガイド付き練習 約%d分";
+"onboarding_v2.plan_calendar.title" = "あなたの4週間";
+"onboarding_v2.plan_calendar.subtitle" = "1週目の日をタップすると内容が見られます。すべて調整できます。";
+"onboarding_v2.plan_calendar.locked" = "%@に解放：前の週の評価と感じ方に合わせて調整します。";
+"onboarding_v2.plan_calendar.edit_hint" = "⋯をタップすると、エクササイズを入れ替えたり外したりできます。";
+"onboarding_v2.plan_weeks.adapts_title" = "プランはあなたに合わせて変わります";
+"onboarding_v2.plan_weeks.adapt_ratings" = "セッション後の評価が次のセッションに反映されます。";
+"onboarding_v2.plan_weeks.adapt_milo" = "Miloに話せば、その日の内容を調整してくれます。";
+"onboarding_v2.plan_weeks.adapt_review" = "1日目・14日目・28日目に不安チェックで変化を確認します。";
+"onboarding_v2.plan_weeks.next_cycle" = "28日後は新しいサイクルへ：%@、次に%@、そして%@。";
+"paywall_custom.plan_day1" = "あなたの1日目";
 "onboarding_v2.week_progress.projection_note" = "継続した場合の目安です。変化には個人差があります。";
 "onboarding_v2.habits_progress.breathing_stat_fmt" = "週に%@、意識的な呼吸を練習します。";
 "onboarding_v2.habits_progress.meditation_stat_fmt" = "週に%@瞑想します。";
@@ -4902,7 +4869,6 @@
 "onboarding_v2.auth.generic_error" = "問題が発生しました。しばらくしてからもう一度お試しください。";
 "first_launch.have_account" = "アカウントをお持ちの方";
 "onboarding_v2.reassurance.support" = "いまが本当につらいときは、ひとりで抱えこまないでください。信頼できる人や医師に話す、または相談窓口に連絡しましょう。緊急のときは119に電話してください。";
-"onboarding_v2.notifications.time_label" = "リマインダーの時刻";
 
 /* Milo: bring your story (import a chat or a Health PDF) */
 "milo.import.title" = "Miloにあなたのことを伝えよう";
@@ -5152,9 +5118,6 @@
 "recovery.b.11.body" = "いつでも戻ってきてください。無料トライアルはまだ利用できます。";
 "recovery.trial_ending.title" = "無料トライアルがまもなく終了します";
 "recovery.trial_ending.body" = "サブスクリプションは%@に開始します。解約は「設定」>あなたの名前>「サブスクリプション」から。";
-"onboarding_v2.notifications.mascot_message_trial" = "無料トライアル終了の2日前にお知らせし、毎日のセッションもリマインドします。";
-"onboarding_v2.notifications.trial_reminder" = "トライアル終了の2日前にリマインド";
-"onboarding_v2.notifications.offers_consent" = "CortiFreeのヒントや特典も通知とメールで受け取る（いつでも変更できます）";
 "live_activity.title.starting" = "プラン作成スタート";
 "live_activity.title.building" = "プランを作成中";
 "live_activity.title.almost_ready" = "もうすぐ完成";
@@ -5593,6 +5556,14 @@
 "profile.v2.more.watch" = "Apple Watch";
 "profile.v2.more.watch_sub" = "フラッシュの代わりにウォッチで心拍を取得";
 
+/* Milo voice dictation */
+"milo.dictation.start" = "メッセージを音声入力";
+"milo.dictation.stop" = "音声入力を停止";
+"milo.dictation.denied.title" = "音声入力がオフです";
+"milo.dictation.denied.message" = "設定でマイクと音声認識を許可すると、Miloへのメッセージを音声で入力できます。";
+"milo.dictation.open_settings" = "設定を開く";
+"milo.dictation.unavailable" = "現在、音声入力は利用できません。";
+
 /* Breathe before TikTok — Screen Time shield */
 "calm.pause.shield.about_to_open" = "ブレーキをかけると決めたアプリを開こうとしていました";
 "calm.pause.shield.unlock" = "10分間ロック解除";
@@ -5614,3 +5585,87 @@
 
 /* Home avatar card — streak pill */
 "avatar.streak.accessibility" = "%d日連続";
+
+/* Support mail (contact / bug / feature request) */
+"settings.feature_request.title" = "機能をリクエスト";
+"settings.feature_request.subtitle" = "欲しい機能を教えてください";
+"support.mail.subject.contact" = "お問い合わせ";
+"support.mail.subject.bug" = "バグ報告";
+"support.mail.subject.feature" = "機能リクエスト";
+"support.mail.prompt.contact" = "こんにちは！";
+"support.mail.prompt.bug" = "問題の内容（操作内容・起きたこと・期待していたこと）を教えてください。スクリーンショットがあると助かります：";
+"support.mail.prompt.feature" = "CortiFreeにどんな機能が欲しいですか？それはどのように役立ちますか？";
+"support.mail.info_header" = "以下の情報は削除しないでください。サポートに役立ちます：";
+// Onboarding reassurance: one hand-written sentence per answer (reason, age, duration).
+"onboarding_v2.reassurance.text.reason_sleep" = "よく眠れないと、気分も余裕もエネルギーも、ぜんぶに響きます。睡眠は整え直せます。思っているより早く変わることも多いです。";
+"onboarding_v2.reassurance.text.reason_anxiety" = "ずっと下がらないストレスは、それだけで消耗します。性格のせいではありません。体が長く警戒モードのままだっただけで、また落ち着き方を思い出せます。";
+"onboarding_v2.reassurance.text.reason_energy" = "はっきりした理由もなくぐったりするのはつらいですよね。たいていは気合いの問題ではなく、体が長くストレスモードで動き続けているサインです。";
+"onboarding_v2.reassurance.text.reason_focus" = "頭があちこちに飛んでしまうのは、やる気や根性の問題ではないことがほとんど。一度に抱えていることが多すぎるだけです。";
+"onboarding_v2.reassurance.text.reason_mental" = "あふれてしまう前に心をケアする。それはまさに正しい判断です。";
+"onboarding_v2.reassurance.text.reason_difficult" = "いろいろなことが一度にのしかかると、小さなことまで重く感じます。ゆっくり、一歩ずつ進めていきましょう。";
+"onboarding_v2.reassurance.text.reason_habits" = "いい習慣は、やる気ではなく、毎日くり返しやすい小さな行動で続きます。そのやり方で、あなたの習慣をつくっていきます。";
+"onboarding_v2.reassurance.text.age_under_18" = "いまの年齢だと、勉強や将来、まわりの目など、プレッシャーはとても大きいものです。";
+"onboarding_v2.reassurance.text.age_18_24" = "20代前半は、学業や初めての仕事、まわりからの期待で、プレッシャーを感じて当然の時期です。";
+"onboarding_v2.reassurance.text.age_25_34" = "20代後半から30代は、仕事やプライベート、背負うものが増えて、負担がたまりやすい時期です。";
+"onboarding_v2.reassurance.text.age_35_44" = "40歳前後は、仕事、家族、こまごまとした気づかいと、多くのことを同時に抱えがちです。";
+"onboarding_v2.reassurance.text.age_45_54" = "50代前後は、生活のリズムも体も変わり、ストレスの感じ方も変わってきます。";
+"onboarding_v2.reassurance.text.age_55_plus" = "年齢を重ねると、何も言わずに我慢するのが当たり前になりがちです。自分のためにこの時間をとるのは、とてもいい決断です。";
+"onboarding_v2.reassurance.text.duration_weeks" = "そして早めに向き合えています。根づいてしまう前のいまが、いちばんいいタイミングです。";
+"onboarding_v2.reassurance.text.duration_2_6_months" = "数か月続いているなら、負担になるには十分でも、固まってしまうほどではありません。";
+"onboarding_v2.reassurance.text.duration_6_12_months" = "もうすぐ1年。うんざりするのも無理はありません。自分のペースで変えていけます。";
+"onboarding_v2.reassurance.text.duration_1_year_plus" = "1年以上は長いですね。でも、しっかり根づいたことでも、正しいやり方で取り組めば動き出します。";
+"onboarding_v2.reassurance.text.duration_years" = "何年も続くと「自分はこういう人間だ」と思ってしまうかもしれません。そうではありません。時間をかけてできたものは、時間をかけてほどけます。";
+"onboarding_v2.reassurance.text.next" = "ここからいくつか質問をして、あなたの状況を理解し、プランをつくります。回答はあなたとアプリの間だけのもの。販売も共有もしません。";
+// « Why this plan »: one written sentence per goal instead of « %@ » templates.
+"plan.why.primary.stress" = "まずはストレスを下げること。それがプランの中心です。毎日、力を抜くための時間を用意しています。";
+"plan.why.primary.sleep" = "まずは睡眠から。夜が整えば、ほかのこともついてきます。";
+"plan.why.primary.energy" = "まずはエネルギーから。無理せず、少しずつ元気を取り戻していきます。";
+"plan.why.primary.focus" = "まずは頭をすっきりさせること。気が散る時間を減らし、目の前のことに集中できる時間を増やします。";
+"plan.why.primary.emotional" = "この時期を乗り越えられるよう、自分にやさしくなれるプランにしています。";
+"plan.why.secondary.stress" = "日々のストレスもあわせてやわらげ、それに振り回されないようにします。";
+"plan.why.secondary.sleep" = "夜のケアもあわせて。よく眠れると、ほかのこともうまく回ります。";
+"plan.why.secondary.energy" = "エネルギーにも気を配り、無理なく続けられるようにします。";
+"plan.why.secondary.focus" = "ひとつのことに集中しやすくなるセッションも入っています。";
+"plan.why.secondary.emotional" = "自分をいたわる小さな時間を、毎日の中にちりばめています。";
+"milo.dictation.language" = "音声入力の言語";
+"milo.dictation.language.app" = "アプリの言語（%@）";
+"milo.dictation.language.hint" = "長押しで別の言語で音声入力できます。";
+"profile.v2.more.pause_sub" = "オン：アプリの変更やオフはこちら";
+
+/* Onboarding: account required after the trial started (auth skipped) */
+"onboarding_v2.auth.required_title" = "最後のステップ：アカウントを作成";
+"onboarding_v2.auth.required_subtitle" = "無料トライアルが有効になりました。サブスクリプション、プラン、進捗をすべてのデバイスで保つためにアカウントを作成してください。";
+
+/* Pre-paywall: personalized headline (plan goal, with or without the first name) */
+"paywall_custom.headline.stress.named" = "%@さん、ストレスケアプランの準備ができました。\n28日間で、自分のペースを取り戻そう。";
+"paywall_custom.headline.stress.anonymous" = "ストレスケアプランの準備ができました。\n28日間で、自分のペースを取り戻そう。";
+"paywall_custom.headline.sleep.named" = "%@さん、睡眠プランの準備ができました。\n28日間で、穏やかな夜へ。";
+"paywall_custom.headline.sleep.anonymous" = "睡眠プランの準備ができました。\n28日間で、穏やかな夜へ。";
+"paywall_custom.headline.energy.named" = "%@さん、エネルギープランの準備ができました。\n28日間で、毎日に活力を。";
+"paywall_custom.headline.energy.anonymous" = "エネルギープランの準備ができました。\n28日間で、毎日に活力を。";
+"paywall_custom.headline.focus.named" = "%@さん、集中力プランの準備ができました。\n28日間で、集中力を取り戻そう。";
+"paywall_custom.headline.focus.anonymous" = "集中力プランの準備ができました。\n28日間で、集中力を取り戻そう。";
+"paywall_custom.headline.emotional.named" = "%@さん、心のバランスプランの準備ができました。\n28日間、自分を大切にしよう。";
+"paywall_custom.headline.emotional.anonymous" = "心のバランスプランの準備ができました。\n28日間、自分を大切にしよう。";
+"paywall_custom.headline.default.named" = "%@さん、あなただけのプランの準備ができました。\n28日間で、新しい習慣を身につけよう。";
+"paywall_custom.headline.default.anonymous" = "あなただけのプランの準備ができました。\n28日間で、新しい習慣を身につけよう。";
+
+/* Pre-paywall FAQ */
+"paywall_custom.faq.title" = "よくある質問";
+"paywall_custom.faq.q1" = "1日にどれくらい時間がかかりますか？";
+"paywall_custom.faq.a1" = "あなたが選んだ時間です：5〜20分。忙しい日のために、どのセッションにも短いバージョンがあります。";
+"paywall_custom.faq.q2" = "28日間のあとはどうなりますか？";
+"paywall_custom.faq.a2" = "28日目にふり返りをして、そのあとは進み具合に合わせた新しいサイクルが続きます：習慣を定着させ、次に自分で続けられる力をつけます。目標はいつでも変更できます。";
+"paywall_custom.faq.q3" = "いつでも解約できますか？";
+"paywall_custom.faq.a3" = "はい、数秒でできます：設定 > ユーザ名 > サブスクリプション > CortiFree。無料トライアル中に解約すれば料金はかかりません。それ以外の場合は、支払い済みの期間が終わるまで利用できます。";
+"paywall_custom.faq.q4" = "CortiFreeは医療の代わりになりますか？";
+"paywall_custom.faq.a4" = "いいえ。CortiFreeはストレスをやわらげる習慣（呼吸、瞑想、睡眠）づくりをサポートしますが、医療機器ではありません。不安が強いときや危険を感じるときは、医師に相談するか、地域の相談窓口や緊急サービスに連絡してください。";
+
+/* Onboarding pulse: result without numbers (unclear measure) */
+"onboarding_v2.pulse.breathed_title" = "おつかれさま、1分間のゆっくり呼吸 🎉";
+"onboarding_v2.pulse.breathed_message" = "呼吸をゆっくりにできました。それが体をリラックスさせる合図です。これを毎日続けたらどうなるか想像してみて。";
+
+/* Pulse measure: live coaching */
+"calm.pulse.hint.cover_flash" = "フラッシュも覆ってください：指先でカメラとそのすぐ横のフラッシュの両方を覆います。";
+"calm.pulse.hint.hold_still" = "指をそのまま動かさないで…";
+"calm.pulse.hint.almost_done" = "あと数秒です…";

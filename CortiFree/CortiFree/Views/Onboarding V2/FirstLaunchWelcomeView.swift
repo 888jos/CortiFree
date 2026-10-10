@@ -15,6 +15,17 @@ struct FirstLaunchWelcomeView: View {
     @State private var screenViewTime: Date?
 
     @State private var hasContinued = false
+    /// Milo "speaks": the three lines are typed one after the other. The full text is always
+    /// laid out (untyped characters stay transparent), so nothing reflows while it types.
+    @State private var typedCount = 0
+    @State private var isTalking = false
+    @State private var showsActions = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var lines: [String] {
+        ["first_launch.mascot_greeting", "first_launch.mascot_role", "first_launch.mascot_plan"].map(\.localized)
+    }
+
     var body: some View {
         ZStack {
             GalaxyBackgroundView(intensity: 0.8)
@@ -28,27 +39,35 @@ struct FirstLaunchWelcomeView: View {
 
                 LottieView(filename: "sloth_intro.json", loopMode: .loop)
                     .frame(width: 190, height: 190)
+                    // A small bob while Milo is talking.
+                    .scaleEffect(isTalking ? 1.04 : 1, anchor: .bottom)
+                    .animation(
+                        isTalking ? .easeInOut(duration: 0.22).repeatForever(autoreverses: true) : .easeOut(duration: 0.2),
+                        value: isTalking
+                    )
 
                 ZStack {
                     VStack(spacing: 12) {
-                        Text("first_launch.mascot_greeting".localized)
+                        Text(typed(line: 0, color: .white))
                             .font(.faroBold(25))
-                            .foregroundStyle(.white)
 
-                        Text("first_launch.mascot_role".localized)
+                        Text(typed(line: 1, color: .white.opacity(0.86)))
                             .font(.poppinsRegular(16))
-                            .foregroundStyle(.white.opacity(0.86))
                             .multilineTextAlignment(.center)
                             .balancedLines()
                             .lineSpacing(3)
 
-                        Text("first_launch.mascot_plan".localized)
+                        Text(typed(line: 2, color: .white.opacity(0.68)))
                             .font(.poppinsRegular(15))
-                            .foregroundStyle(.white.opacity(0.68))
                             .multilineTextAlignment(.center)
                             .balancedLines()
                             .lineSpacing(3)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(lines.joined(separator: " "))
+                    // Tap to show everything at once.
+                    .contentShape(Rectangle())
+                    .onTapGesture(perform: revealAll)
 
                     IntroSparkle(color: Color(hex: "FFB7E8"), size: 18, delay: 0.0)
                         .offset(x: -150, y: -42)
@@ -94,11 +113,61 @@ struct FirstLaunchWelcomeView: View {
                     }
                 }
                 .padding(.bottom, 32)
+                .opacity(showsActions ? 1 : 0)
+                .offset(y: showsActions ? 0 : 12)
+                .allowsHitTesting(showsActions)
             }
         }
         .onAppear {
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingWelcomeViewed()
+        }
+        .task { await typeLines() }
+    }
+
+    // MARK: - Milo typing
+
+    /// Line `index` with only the characters typed so far visible.
+    private func typed(line index: Int, color: Color) -> AttributedString {
+        let text = lines[index]
+        let before = lines.prefix(index).reduce(0) { $0 + $1.count }
+        let visible = min(max(typedCount - before, 0), text.count)
+        var shown = AttributedString(String(text.prefix(visible)))
+        shown.foregroundColor = color
+        var hidden = AttributedString(String(text.dropFirst(visible)))
+        hidden.foregroundColor = color.opacity(0)
+        return shown + hidden
+    }
+
+    private var totalCount: Int { lines.reduce(0) { $0 + $1.count } }
+
+    private func typeLines() async {
+        guard !reduceMotion else { return revealAll() }
+        try? await Task.sleep(nanoseconds: 400_000_000)
+        isTalking = true
+        for (index, line) in lines.enumerated() {
+            for _ in line {
+                guard !Task.isCancelled, typedCount < totalCount else { return }
+                typedCount += 1
+                if typedCount % 12 == 0 { HapticManager.light() }
+                try? await Task.sleep(nanoseconds: 28_000_000)
+            }
+            // A breath between sentences, like someone talking.
+            if index < lines.count - 1 {
+                isTalking = false
+                try? await Task.sleep(nanoseconds: 380_000_000)
+                isTalking = true
+            }
+        }
+        revealAll()
+    }
+
+    private func revealAll() {
+        typedCount = totalCount
+        isTalking = false
+        guard !showsActions else { return }
+        withAnimation(.easeOut(duration: 0.35).delay(reduceMotion ? 0 : 0.2)) {
+            showsActions = true
         }
     }
 

@@ -81,6 +81,8 @@ struct OnboardingV2FlowView: View {
     @State private var onboardingStartTime: Date?
     @State private var suppressDropOffLiveActivity = false
     @State private var showReturningUserSignIn = false
+    @State private var hasGeneratedPlanThisSession = false
+    @ObservedObject private var planStore = PersonalPlanStore.shared
 
     private let firebaseManager = FirebaseManager.shared
 
@@ -103,13 +105,13 @@ struct OnboardingV2FlowView: View {
         case scientificPlan
         case authentication
         case loading
-        case eightHabitsIntro
-        case weekProgress
-        case eightHabits
-        case habitsProgress
+        case planReady
+        case planDay      // 4-week calendar: week 1 day by day, editable
         case notificationPermissions
         case commitmentPledge
         case complete
+        /// Auth was skipped before the analysis: an account is mandatory once the trial/payment started.
+        case accountRequired
 
         // Define logical checkpoints where user can resume
         // These are steps that make sense to restart from
@@ -123,12 +125,12 @@ struct OnboardingV2FlowView: View {
                 return .cortisolScienceHook
             case .authentication, .loading:
                 return .authentication
-            case .notificationPermissions, .eightHabitsIntro, .weekProgress:
-                return .eightHabitsIntro
-            case .eightHabits, .habitsProgress, .commitmentPledge:
-                return .eightHabits
+            case .notificationPermissions, .planReady, .planDay, .commitmentPledge:
+                return .planReady
             case .complete:
                 return .complete
+            case .accountRequired:
+                return .accountRequired
             }
         }
     }
@@ -203,6 +205,12 @@ struct OnboardingV2FlowView: View {
 
         restoreAnswersFromDraft()
 
+        // Paid / trial started without an account: still owes the sign-up.
+        if savedCheckpoint == OnboardingStep.accountRequired.rawValue && !isOnboardingComplete {
+            currentStep = .accountRequired
+            return
+        }
+
         // If user has seen paywall but not completed onboarding, go directly to paywall
         if hasSeenPaywall && !isOnboardingComplete {
             #if DEBUG
@@ -217,6 +225,9 @@ struct OnboardingV2FlowView: View {
             savedCheckpoint = OnboardingStep.authentication.rawValue
         } else if savedCheckpoint == "socialProof" {
             savedCheckpoint = OnboardingStep.complete.rawValue
+        } else if ["eightHabitsIntro", "weekProgress", "eightHabits", "habitsProgress", "planWeeks"].contains(savedCheckpoint) {
+            // The 8-habits screens were replaced by the plan screens.
+            savedCheckpoint = OnboardingStep.planReady.rawValue
         }
 
         // If we have a saved checkpoint, resume from there
@@ -418,6 +429,10 @@ struct OnboardingV2FlowView: View {
         case .authentication:
             AuthenticationView(
                 onBack: { currentStep = .scientificPlan },
+                onSkip: {
+                    // The account is asked again (mandatory) right after the trial starts.
+                    currentStep = .loading
+                },
                 onComplete: {
                     // Mark user as authenticated for re-engagement tracking
                     UserDefaults.standard.set(true, forKey: "user_is_authenticated")
@@ -430,56 +445,32 @@ struct OnboardingV2FlowView: View {
                 habitsQuizResult: habitsQuizResult,
                 selectedSymptoms: selectedSymptoms,
                 onComplete: {
-                    // The plan is ready: best moment to ask for notifications.
-                    continueAfterNotificationPermissionCheck()
+                    // The analysis ends on the real plan: generate it now so the next
+                    // screens show the user's own plan.
+                    generatePlanIfNeeded()
+                    currentStep = .planReady
                 }
             )
-
-        case .eightHabitsIntro:
-            EightHabitsIntroView(onContinue: {
-                currentStep = .weekProgress
-            })
-
-        case .weekProgress:
-            WeekProgressView(
-                habitsQuizResult: habitsQuizResult,
-                onBack: { currentStep = .eightHabitsIntro },
-                onContinue: { currentStep = .eightHabits }
-            )
-
-        case .eightHabits:
-            EightHabitsFlowView(onBack: { currentStep = .weekProgress }, onComplete: {
-                currentStep = .habitsProgress
-            })
 
         case .notificationPermissions:
-            NotificationPermissionsView(onContinue: {
-                currentStep = .eightHabitsIntro
-            })
+            // Screen removed (notifications are asked after the trial starts, in TrialKickoffView):
+            // a checkpoint saved on it resumes at the commitment.
+            Color.clear.onAppear { currentStep = .commitmentPledge }
 
-        case .habitsProgress:
-            HabitsProgressFlowView(
-                availableMinutes: habitsQuizResult?.availableTime,
-                onBack: { currentStep = .eightHabits },
-                onComplete: {
-                    #if DEBUG
-                    print("✅ OnboardingV2FlowView: Transition .habitsProgress → .commitmentPledge")
-                    #endif
-                    // Generate personalized plan based on quiz results
-                    if let habitsResult = habitsQuizResult {
-                        saveDataAndGeneratePlan(result: habitsResult)
-                    } else if let draft = PersonalPlanStore.shared.storedOnboardingProfile(), !draft.isEmpty {
-                        // Answers not in memory (should not happen after restoreAnswersFromDraft):
-                        // still build the plan from what each quiz step saved.
-                        PersonalPlanStore.shared.createPlanFromOnboarding(draft)
-                    }
-                    currentStep = .commitmentPledge
+        case .planReady, .planDay:
+            if let plan = planStore.plan {
+                planScreen(currentStep, plan: plan)
+            } else {
+                // No plan could be built (no answers at all): straight to the commitment.
+                Color.clear.onAppear {
+                    generatePlanIfNeeded()
+                    if PersonalPlanStore.shared.plan == nil { currentStep = .commitmentPledge }
                 }
-            )
+            }
 
         case .commitmentPledge:
             CommitmentPledgeView(
-                onBack: { currentStep = .habitsProgress },
+                onBack: { currentStep = .planDay },
                 onContinue: { currentStep = .complete }
             )
 
@@ -492,32 +483,39 @@ struct OnboardingV2FlowView: View {
                 onViewPlan: {
                     // After paywall acceptance (trial started), complete onboarding.
                     // Trial reminders are handled by Apple's own trial notification.
-                    completeOnboarding()
+                    if Auth.auth().currentUser == nil {
+                        currentStep = .accountRequired
+                    } else {
+                        completeOnboarding()
+                    }
                 }
             )
+
+        case .accountRequired:
+            if Auth.auth().currentUser != nil {
+                Color.clear.onAppear(perform: completeOnboardingAfterSignUp)
+            } else {
+                AuthenticationView(
+                    showsBack: false,
+                    titleKey: "onboarding_v2.auth.required_title",
+                    subtitleKey: "onboarding_v2.auth.required_subtitle",
+                    onComplete: {
+                        UserDefaults.standard.set(true, forKey: "user_is_authenticated")
+                        completeOnboardingAfterSignUp()
+                    }
+                )
+            }
         }
     }
 
-    /// After the analysis: shows the notification screen unless iOS already has a definitive answer.
-    /// Quiet (provisional) authorization still gets the screen, to ask for real alerts.
-    private func continueAfterNotificationPermissionCheck() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let next: OnboardingStep
-            switch settings.authorizationStatus {
-            case .notDetermined, .provisional:
-                next = .notificationPermissions
-            case .denied:
-                // A previous denial is handled later in the main app, not by
-                // repeatedly interrupting the onboarding flow.
-                UserDefaults.standard.set(false, forKey: "notificationsEnabled")
-                next = .eightHabitsIntro
-            default:
-                next = .eightHabitsIntro
-            }
-            DispatchQueue.main.async {
-                currentStep = next
-            }
+    /// Signed up after the trial started: what was saved as a guest goes to the account first.
+    private func completeOnboardingAfterSignUp() {
+        PersonalPlanStore.shared.claimGuestPlan()
+        OnboardingSync.flush()
+        if let overallData = overallQuizData {
+            Task { await saveOverallDataToFirebase(overallData) }
         }
+        completeOnboarding()
     }
 
     private func completeOnboarding() {
@@ -562,7 +560,32 @@ struct OnboardingV2FlowView: View {
         #endif
     }
 
+    @ViewBuilder
+    private func planScreen(_ step: OnboardingStep, plan: PersonalPlan) -> some View {
+        switch step {
+        case .planReady:
+            OnboardingPlanReadyView(plan: plan, habitsQuizResult: habitsQuizResult,
+                                    onContinue: { currentStep = .planDay })
+        default:
+            OnboardingPlanCalendarView(plan: plan, onBack: { currentStep = .planReady },
+                                       onContinue: { currentStep = .commitmentPledge })
+        }
+    }
+
     // MARK: - Firebase Integration
+
+    /// Builds the personal plan from the answers, once (resuming the flow keeps the plan).
+    private func generatePlanIfNeeded() {
+        guard PersonalPlanStore.shared.plan == nil || !hasGeneratedPlanThisSession else { return }
+        hasGeneratedPlanThisSession = true
+        if let habitsResult = habitsQuizResult {
+            saveDataAndGeneratePlan(result: habitsResult)
+        } else if let draft = PersonalPlanStore.shared.storedOnboardingProfile(), !draft.isEmpty {
+            // Answers not in memory (should not happen after restoreAnswersFromDraft):
+            // still build the plan from what each quiz step saved.
+            PersonalPlanStore.shared.createPlanFromOnboarding(draft)
+        }
+    }
 
     private func saveDataAndGeneratePlan(result: HabitsQuizResult) {
         // Plan personnalisé (28 jours) généré à partir des réponses : raison + durée du stress,
@@ -630,6 +653,9 @@ struct OnboardingBreathingIntroView: View {
     @State private var pulseStage: PulseStage?
     @State private var pulseBefore: PulseCameraMeter.Reading?
     @State private var pulseAfter: PulseCameraMeter.Reading?
+    /// The user measured but the reading was unclear: the after-measure and the result screen still follow.
+    @State private var pulseAttempted = false
+    private var measuresPulse: Bool { pulseBefore != nil || pulseAttempted }
 
     /// Heart rate with the flash before and after the breathing (each step can be skipped).
     private enum PulseStage { case before, after, comparison }
@@ -646,7 +672,7 @@ struct OnboardingBreathingIntroView: View {
     ))
 
     /// One minute when the heart rate is measured around it, so the effect has time to show.
-    private var duration: Int { pulseBefore == nil ? 30 : 60 }
+    private var duration: Int { measuresPulse ? 60 : 30 }
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -724,19 +750,23 @@ struct OnboardingBreathingIntroView: View {
                     pulseStage = nil
                     withAnimation(.easeInOut(duration: 0.3)) { hasSeenIntro = true }
                 },
-                onBack: { pulseStage = nil }
+                onBack: { pulseStage = nil },
+                onUnclear: {
+                    pulseBefore = nil
+                    pulseAttempted = true
+                    pulseStage = nil
+                    withAnimation(.easeInOut(duration: 0.3)) { hasSeenIntro = true }
+                }
             )
         case .after:
             measureAfterView
         case .comparison:
-            if let pulseBefore, let pulseAfter {
-                OnboardingPulseComparisonView(
-                    before: pulseBefore,
-                    after: pulseAfter,
-                    onRemeasure: { pulseStage = .after },
-                    onContinue: exitToNextStep
-                )
-            }
+            OnboardingPulseComparisonView(
+                before: pulseBefore,
+                after: pulseAfter,
+                onRemeasure: { pulseStage = .after },
+                onContinue: exitToNextStep
+            )
         }
     }
 
@@ -746,16 +776,22 @@ struct OnboardingBreathingIntroView: View {
             meter: pulseMeter,
             isAfter: true,
             onFinish: finishAfterMeasure,
+            onUnclear: unclearAfterMeasure,
             simulatedBPM: Double(max(58, (pulseBefore?.bpm ?? 80) - 9))
         )
         #else
-        OnboardingPulseMeasureView(meter: pulseMeter, isAfter: true, onFinish: finishAfterMeasure)
+        OnboardingPulseMeasureView(meter: pulseMeter, isAfter: true, onFinish: finishAfterMeasure, onUnclear: unclearAfterMeasure)
         #endif
     }
 
     private func finishAfterMeasure(_ reading: PulseCameraMeter.Reading?) {
         guard let reading else { return exitToNextStep() }
         pulseAfter = reading
+        pulseStage = .comparison
+    }
+
+    private func unclearAfterMeasure() {
+        pulseAfter = nil
         pulseStage = .comparison
     }
 
@@ -799,7 +835,7 @@ struct OnboardingBreathingIntroView: View {
                     .balancedLines()
 
                 Text(isComplete
-                     ? (pulseBefore != nil ? "onboarding_v2.pulse.done_subtitle" : "onboarding_v2.breath_demo.done_subtitle").localized
+                     ? (measuresPulse ? "onboarding_v2.pulse.done_subtitle" : "onboarding_v2.breath_demo.done_subtitle").localized
                      : "onboarding_v2.breath_demo.instructions".localized)
                     .font(.poppinsRegular(16))
                     .foregroundStyle(.white.opacity(0.72))
@@ -879,9 +915,9 @@ struct OnboardingBreathingIntroView: View {
 
     private var primaryTitle: String {
         if isComplete {
-            return (pulseBefore != nil ? "onboarding_v2.pulse.cta_after" : "onboarding_v2.breath_demo.continue").localized
+            return (measuresPulse ? "onboarding_v2.pulse.cta_after" : "onboarding_v2.breath_demo.continue").localized
         }
-        return (pulseBefore != nil ? "onboarding_v2.pulse.begin_long" : "onboarding_v2.breath_demo.begin").localized
+        return (measuresPulse ? "onboarding_v2.pulse.begin_long" : "onboarding_v2.breath_demo.begin").localized
     }
 
     private func exitToNextStep() {
@@ -908,7 +944,7 @@ struct OnboardingBreathingIntroView: View {
     private func primaryAction() {
         HapticManager.light()
         if isComplete {
-            if pulseBefore != nil { pulseStage = .after } else { exitToNextStep() }
+            if measuresPulse { pulseStage = .after } else { exitToNextStep() }
         } else if !hasSeenIntro {
             pulseStage = .before
         } else if !isStarted {

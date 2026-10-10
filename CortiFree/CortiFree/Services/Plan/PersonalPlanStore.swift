@@ -202,6 +202,24 @@ final class PersonalPlanStore: ObservableObject {
         apply(newPlan)
     }
 
+    /// Onboarding finished without an account (auth skipped), then signed in after the trial:
+    /// the plan built and edited as a guest becomes the account's plan and goes to the cloud.
+    func claimGuestPlan() {
+        guard Auth.auth().currentUser != nil else { return }
+        let guestKey = "personalPlan.current.v1.\(UserPersistence.localUserID)"
+        guard let data = defaults.data(forKey: guestKey),
+              let guest = try? JSONDecoder().decode(PersonalPlan.self, from: data),
+              guest.days.count == PersonalPlan.length else { return }
+        defaults.removeObject(forKey: guestKey)
+        loadedForUser = userKey
+        isProvisional = false
+        let claimed = Self.withStartDay(guest)
+        plan = claimed
+        saveLocal(claimed)
+        queueRemoteSave(claimed)
+        NotificationCenter.default.post(name: .personalPlanDidChange, object: nil)
+    }
+
     /// Change goal (nil = keep the current goal choice and just rebuild). Past days and the
     /// day count are kept: only today and the days ahead are rebuilt.
     /// Returns false when nothing changed (no plan day left to rebuild).

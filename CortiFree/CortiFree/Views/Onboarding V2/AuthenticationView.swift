@@ -107,6 +107,12 @@ struct AuthenticationView: View {
     @State private var currentNonce: String?
 
     var onBack: () -> Void = {}
+    /// nil hides the back button (account required after the trial started).
+    var showsBack = true
+    /// Shown as « Skip » under the buttons; nil = signing in is mandatory.
+    var onSkip: (() -> Void)? = nil
+    var titleKey = "onboarding_v2.auth.title"
+    var subtitleKey = "onboarding_v2.auth.subtitle"
     var onComplete: () -> Void
 
     var body: some View {
@@ -122,6 +128,8 @@ struct AuthenticationView: View {
                             .foregroundColor(.white)
                             .frame(width: 44, height: 44)
                     }
+                    .opacity(showsBack ? 1 : 0)
+                    .disabled(!showsBack)
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -129,14 +137,14 @@ struct AuthenticationView: View {
 
                 // Message at top
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("onboarding_v2.auth.title".localized)
+                    Text(titleKey.localized)
                         .font(.faroBold(30))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.leading)
                         .balancedLines(alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Text("onboarding_v2.auth.subtitle".localized)
+                    Text(subtitleKey.localized)
                         .font(.custom("Poppins-Regular", size: 16))
                         .foregroundColor(.white.opacity(0.76))
                         .multilineTextAlignment(.leading)
@@ -192,6 +200,21 @@ struct AuthenticationView: View {
                     }
                     .buttonStyle(.glassSecondary)
                     .padding(.horizontal, 32)
+
+                    if let onSkip {
+                        Button {
+                            HapticManager.light()
+                            onSkip()
+                        } label: {
+                            Text("onboarding_v2.skip".localized)
+                                .font(.custom("Poppins-Medium", size: 15))
+                                .foregroundColor(.white.opacity(0.6))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 44)
+                                .contentShape(Rectangle())
+                        }
+                        .disabled(isLoading)
+                    }
                 }
 
 

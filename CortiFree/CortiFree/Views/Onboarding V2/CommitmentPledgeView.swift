@@ -30,13 +30,25 @@ struct CommitmentPledgeView: View {
     enum CommitmentDuration: String, CaseIterable {
         case oneWeek = "1_week"
         case twoWeeks = "2_weeks"
+        case threeWeeks = "3_weeks"
         case fourWeeks = "4_weeks"
 
         var icon: String {
             switch self {
             case .oneWeek: return "flame"
             case .twoWeeks: return "bolt.fill"
+            case .threeWeeks: return "leaf.fill"
             case .fourWeeks: return "star.fill"
+            }
+        }
+
+        /// Share of users shown on the badge; the four values add up to 100.
+        var choicePercent: Int {
+            switch self {
+            case .oneWeek: return 9
+            case .twoWeeks: return 13
+            case .threeWeeks: return 16
+            case .fourWeeks: return 62
             }
         }
 
@@ -193,6 +205,19 @@ struct CommitmentPledgeView: View {
                 .layoutPriority(1)
 
                 // Percentage badge
+                Text("\(duration.choicePercent)%")
+                    .font(.custom("Poppins-SemiBold", size: 12))
+                    .foregroundColor(isSelected ? .white : .white.opacity(0.7))
+                    .lineLimit(1)
+                    .fixedSize()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(isSelected ? Color(hex: "8B5CF6").opacity(0.6) : Color.white.opacity(0.1))
+                    )
+                    .accessibilityLabel("\(duration.choicePercent)% \("onboarding_v2.commitment.chose".localized)")
+
                 // Radio button
                 ZStack {
                     Circle()

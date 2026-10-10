@@ -3126,33 +3126,7 @@
 "onboarding_v2.overall.duration_years" = "Mehrere Jahre";
 
 // MARK: - Onboarding V2 - Reassurance View
-"onboarding_v2.reassurance.greeting" = "Danke";
-"onboarding_v2.reassurance.message_part1" = "Du bist nicht allein in dieser Situation.";
-"onboarding_v2.reassurance.message_part1_male" = "Du bist nicht allein in dieser Situation.";
-"onboarding_v2.reassurance.message_part1_female" = "Du bist nicht allein in dieser Situation.";
-"onboarding_v2.reassurance.message_part1_neutral" = "Du bist nicht allein in dieser Situation.";
 "onboarding_v2.reassurance.message_part2" = "CortiFree basiert auf Verhaltenspsychologie und der Wissenschaft der Nervensystem-Regulation.";
-"onboarding_v2.reassurance.personalized" = "Du suchst Unterstützung für %@. Mit %@ und nachdem du schon seit %@ damit zu tun hast, ist es verständlich, dass es deinen Alltag beeinflusst.";
-"onboarding_v2.reassurance.reason_sleep" = "Schlaf und Ruhe";
-"onboarding_v2.reassurance.reason_anxiety" = "Stress und Angst";
-"onboarding_v2.reassurance.reason_energy" = "deine Energie";
-"onboarding_v2.reassurance.reason_focus" = "deinen Fokus";
-"onboarding_v2.reassurance.reason_mental" = "dein mentales Wohlbefinden";
-"onboarding_v2.reassurance.reason_difficult" = "eine schwierige Zeit";
-"onboarding_v2.reassurance.reason_habits" = "den Aufbau gesünderer Gewohnheiten";
-"onboarding_v2.reassurance.age_under_18" = "unter 18 Jahren";
-"onboarding_v2.reassurance.age_18_24" = "18–24 Jahren";
-"onboarding_v2.reassurance.age_25_34" = "25–34 Jahren";
-"onboarding_v2.reassurance.age_35_44" = "35–44 Jahren";
-"onboarding_v2.reassurance.age_45_54" = "45–54 Jahren";
-"onboarding_v2.reassurance.age_55_plus" = "55 Jahren oder mehr";
-"onboarding_v2.reassurance.duration_weeks" = "ein paar Wochen";
-"onboarding_v2.reassurance.duration_2_6_months" = "2 bis 6 Monaten";
-"onboarding_v2.reassurance.duration_6_12_months" = "6 Monaten bis zu einem Jahr";
-"onboarding_v2.reassurance.duration_1_year_plus" = "mehr als einem Jahr";
-"onboarding_v2.reassurance.duration_years" = "mehreren Jahren";
-"onboarding_v2.reassurance.message_part3" = "Jetzt machen wir ein kurzes Quiz, um deine Situation besser zu verstehen und deine Reise zu personalisieren.";
-"onboarding_v2.reassurance.message_part4" = "Deine Antworten sind absolut vertraulich. Niemand hat Zugriff darauf, und sie werden niemals verkauft oder weitergegeben.";
 "onboarding_v2.reassurance.start_quiz" = "Quiz starten";
 
 // MARK: - Onboarding V2 - Habits Quiz (12 questions)
@@ -3254,11 +3228,10 @@
 "onboarding_v2.habits.q12_opt4" = "Mich besser konzentrieren";
 "onboarding_v2.habits.q12_opt5" = "Insgesamt mehr Gleichgewicht";
 "onboarding_v2.habits.q13" = "Wie viel Zeit kannst du täglich deinem Wohlbefinden widmen?";
-"onboarding_v2.habits.q13_opt1" = "Weniger als 15 Minuten";
-"onboarding_v2.habits.q13_opt2" = "15-30 Minuten";
-"onboarding_v2.habits.q13_opt3" = "30-45 Minuten";
-"onboarding_v2.habits.q13_opt4" = "45-60 Minuten";
-"onboarding_v2.habits.q13_opt5" = "Mehr als eine Stunde";
+"onboarding_v2.habits.q13_opt1" = "0-5 Minuten";
+"onboarding_v2.habits.q13_opt2" = "5-10 Minuten";
+"onboarding_v2.habits.q13_opt3" = "10-15 Minuten";
+"onboarding_v2.habits.q13_opt4" = "Mehr als 15 Minuten";
 
 // MARK: - Onboarding V2 - Sixty Days Explanation
 "onboarding_v2.sixty_days.title" = "Warum 60 Tage?";
@@ -3401,13 +3374,6 @@
 "onboarding_v2.week_progress.week10_desc" = "Dauerhafte Transformation";
 
 // MARK: - Onboarding V2 - Notifications
-"onboarding_v2.notifications.title" = "Bleib jeden Tag motiviert";
-"onboarding_v2.notifications.subtitle" = "Sanfte Erinnerungen, damit du dranbleibst";
-"onboarding_v2.notifications.benefit_1" = "Personalisierte Erinnerungen zu deinen Schlüsselmomenten";
-"onboarding_v2.notifications.benefit_2" = "Tägliche Motivationsbotschaften";
-"onboarding_v2.notifications.benefit_3" = "Wir feiern deine Erfolge";
-"onboarding_v2.notifications.enable_button" = "Mitteilungen aktivieren";
-"onboarding_v2.notifications.skip_button" = "Später";
 
 // MARK: - Onboarding V2 - Social Proof
 "onboarding_v2.social_proof.users_count" = "+50.000 Nutzer";
@@ -3530,20 +3496,6 @@
 "onboarding_v2.week_progress.transformation" = "Dauerhafte Transformation";
 
 // MARK: - Onboarding V2 - Notification Permissions
-"onboarding_v2.notifications.mascot_message" = "Ich werde dich daran erinnern zu üben, damit es zur Gewohnheit wird!";
-"onboarding_v2.notifications.gentle_reminders" = "Sanfte Erinnerungen, damit du dranbleibst";
-"onboarding_v2.notifications.personalized" = "Personalisierte Erinnerungen zu deinen Schlüsselmomenten";
-"onboarding_v2.notifications.daily_messages" = "Tägliche Motivationsbotschaften";
-"onboarding_v2.notifications.celebrate" = "Wir feiern deine Erfolge";
-"onboarding_v2.notifications.enable" = "Mitteilungen aktivieren";
-"onboarding_v2.notifications.later" = "Später";
-"onboarding_v2.notifications.daily_routine" = "Morgendliche Erinnerung (9 Uhr)";
-"onboarding_v2.notifications.daily_routine_desc" = "Beginne deinen Tag mit einer Meditation, um deinen Stress zu reduzieren";
-"onboarding_v2.notifications.streak_danger" = "Serie in Gefahr (20 Uhr)";
-"onboarding_v2.notifications.streak_danger_desc" = "Wir erinnern dich, wenn du heute noch nichts abgeschlossen hast, damit deine Serie erhalten bleibt";
-"onboarding_v2.notifications.reflection_moment" = "Abendjournal (19 Uhr)";
-"onboarding_v2.notifications.reflection_moment_desc" = "Erinnerung, in dein Tagebuch zu schreiben und über deinen Tag nachzudenken";
-"onboarding_v2.notifications.next" = "Weiter";
 
 // MARK: - Common Onboarding
 "onboarding_v2.common.next" = "Weiter";
@@ -3814,7 +3766,9 @@
 "onboarding_v2.commitment.1_week" = "1 Woche";
 "onboarding_v2.commitment.2_weeks" = "2 Wochen";
 "onboarding_v2.commitment.2_weeks_sub" = "In Schwung kommen";
-"onboarding_v2.commitment.4_weeks" = "28 Tage";
+"onboarding_v2.commitment.3_weeks" = "3 Wochen";
+"onboarding_v2.commitment.3_weeks_sub" = "Eine Routine aufbauen";
+"onboarding_v2.commitment.4_weeks" = "4 Wochen";
 "onboarding_v2.commitment.4_weeks_sub" = "Die Dauer deines Plans";
 "onboarding_v2.commitment.66_days" = "66 Tage";
 "onboarding_v2.commitment.subtitle" = "Wähle, wie lange du dranbleibst";
@@ -3960,7 +3914,7 @@
 "paywall_custom.transform_subtitle" = "Wenn du deinem Plan folgst, sind deine ersten\nGewohnheiten verankert am:";
 
 // Features section
-"paywall_custom.feature_program_title" = "Personalisiertes Programm";
+"paywall_custom.feature_program_title" = "Personalisierter Plan";
 "paywall_custom.feature_program_desc" = "Ein 28-Tage-Plan nach deinen Antworten, den du jederzeit anpassen kannst.";
 "paywall_custom.feature_tasks_title" = "Aufgabenplanung";
 "paywall_custom.feature_tasks_desc" = "Wissenschaftlich fundierte Gewohnheiten, die dir täglich helfen.";
@@ -3981,7 +3935,7 @@
 "paywall_custom.radar_label_balance" = "Gleichgewicht";
 
 // Floating CTA
-"paywall_custom.cta_start" = "Mein Programm starten";
+"paywall_custom.cta_start" = "Meinen Plan starten";
 
 // Footer links
 "paywall_custom.footer_privacy" = "Datenschutz";
@@ -4304,12 +4258,6 @@
 "daily_todos.title" = "Meine Aufgabenliste";
 "onboarding_v2.breathing_intro.subtitle" = "Atme langsam mit mir. Wir beginnen mit einem einfachen Schritt.";
 "onboarding_v2.breathing_intro.title" = "Gönnen wir uns einen ruhigen Moment";
-"onboarding_v2.notifications.allow" = "Mitteilungen erlauben";
-"onboarding_v2.notifications.allow_short" = "Erlauben";
-"onboarding_v2.notifications.dont_allow" = "Nicht erlauben";
-"onboarding_v2.notifications.not_now" = "Nicht jetzt";
-"onboarding_v2.notifications.preview_body" = "Mitteilungen können Hinweise, Töne und Symbolbadges enthalten. Du kannst sie in den Einstellungen konfigurieren.";
-"onboarding_v2.notifications.preview_title" = "CortiFree möchte dir Mitteilungen senden";
 "common.back" = "Zurück";
 "common.previous_page" = "Vorherige Seite";
 "common.ok" = "OK";
@@ -4727,6 +4675,8 @@
 
 /* Milo: release safety (auth, consent, errors) */
 "assistant.error.unavailable" = "Milo ist gerade nicht verfügbar. Bitte versuch es gleich noch einmal.";
+"assistant.error.premium" = "Milo ist Teil von CortiFree Premium. Aktiviere dein Abo, um weiter mit Milo zu sprechen.";
+"assistant.premium.unlock" = "Milo freischalten";
 "assistant.error.signin" = "Bitte melde dich erneut an, um weiter mit Milo zu chatten.";
 "assistant.error.offline" = "Du scheinst offline zu sein. Prüf deine Verbindung und versuch es erneut.";
 "assistant.error.invalid" = "Milo hat eine unerwartete Antwort gesendet. Bitte versuch es erneut.";
@@ -4734,6 +4684,7 @@
 "assistant.consent.title" = "Bevor du mit Milo chattest";
 "assistant.consent.point.provider" = "Deine Nachrichten werden über den Server von CortiFree an einen KI-Anbieter (DeepSeek) gesendet, der Milos Antworten erzeugt.";
 "assistant.consent.point.plan" = "Um Antworten zu personalisieren, wird eine kurze Zusammenfassung deines CortiFree-Plans (Ziel, Übungen, Fortschritt) mitgesendet.";
+"assistant.consent.point.voice" = "Wenn du eine Nachricht diktierst, wird deine Stimme über den Server von CortiFree an einen Transkriptionsdienst (OpenAI) gesendet und in Text umgewandelt. CortiFree speichert die Aufnahme nicht.";
 "assistant.consent.point.health" = "Wenn du Apple Health verbunden oder deinen Puls in der App gemessen hast, werden auch deine aktuellen Werte zu Herzfrequenz, Herzfrequenzvariabilität und Schlaf gesendet, damit Milo seine Tipps anpassen kann. Sie werden nie für Werbung genutzt.";
 "assistant.consent.point.diagnosis" = "Milo bietet allgemeine Informationen zum Wohlbefinden, keine Diagnose und keinen medizinischen Rat. Wende dich im Notfall an den Notruf.";
 "assistant.consent.point.revoke" = "Du kannst diese Einwilligung jederzeit unter Einstellungen › Datenschutz widerrufen.";
@@ -4884,6 +4835,22 @@
 "onboarding_v2.sources.open_hint" = "Öffnet die Studie im Browser";
 "onboarding_v2.comparison.day28" = "Tag 28";
 "onboarding_v2.week_progress.start_note" = "Dein Ausgangspunkt, berechnet aus deinen Quiz-Antworten.";
+"onboarding_v2.plan_ready.title" = "Dein Plan ist fertig";
+"onboarding_v2.plan_ready.length" = "%d Tage";
+"onboarding_v2.plan_ready.per_day" = "≈ %d Min. pro Tag";
+"onboarding_v2.plan_ready.why" = "Warum dieser Plan";
+"onboarding_v2.plan_ready.start_title" = "Dein Ausgangspunkt";
+"onboarding_v2.plan_day.total" = "≈ %d Min. angeleitete Übung";
+"onboarding_v2.plan_calendar.title" = "Deine 4 Wochen";
+"onboarding_v2.plan_calendar.subtitle" = "Tippe auf einen Tag deiner ersten Woche, um zu sehen, was dich erwartet. Du kannst alles anpassen.";
+"onboarding_v2.plan_calendar.locked" = "Wird am %@ freigeschaltet: Wir passen sie an deine Bewertungen und dein Gefühl der Vorwoche an.";
+"onboarding_v2.plan_calendar.edit_hint" = "Tippe auf ⋯, um eine Übung zu tauschen oder zu entfernen.";
+"onboarding_v2.plan_weeks.adapts_title" = "Dein Plan passt sich dir an";
+"onboarding_v2.plan_weeks.adapt_ratings" = "Deine Bewertungen nach jeder Übung lenken die nächsten.";
+"onboarding_v2.plan_weeks.adapt_milo" = "Milo kann deinen Tag anpassen, wenn du mit ihm darüber sprichst.";
+"onboarding_v2.plan_weeks.adapt_review" = "Ein Angst-Check an den Tagen 1, 14 und 28, um deine Entwicklung zu sehen.";
+"onboarding_v2.plan_weeks.next_cycle" = "Nach 28 Tagen ein neuer Zyklus: %@, dann %@, dann %@.";
+"paywall_custom.plan_day1" = "Dein Tag 1";
 "onboarding_v2.week_progress.projection_note" = "Eine unverbindliche Prognose bei regelmäßiger Praxis. Jeder Weg ist anders.";
 "onboarding_v2.habits_progress.breathing_stat_fmt" = "übst du %@ pro Woche bewusstes Atmen.";
 "onboarding_v2.habits_progress.meditation_stat_fmt" = "meditierst du %@ pro Woche.";
@@ -4899,7 +4866,6 @@
 "onboarding_v2.auth.generic_error" = "Etwas ist schiefgelaufen. Bitte versuche es gleich noch einmal.";
 "first_launch.have_account" = "Ich habe schon ein Konto";
 "onboarding_v2.reassurance.support" = "Wenn es gerade wirklich schwer ist, musst du das nicht allein schaffen: Sprich mit einer Vertrauensperson oder einer Ärztin bzw. einem Arzt oder wende dich an eine Beratungsstelle. Im Notfall wähle die 112.";
-"onboarding_v2.notifications.time_label" = "Uhrzeit der Erinnerung";
 
 /* Milo: bring your story (import a chat or a Health PDF) */
 "milo.import.title" = "Erzähl Milo deine Geschichte";
@@ -5149,9 +5115,6 @@
 "recovery.b.11.body" = "Komm zurück, wann du willst: Deine kostenlose Testphase ist noch verfügbar.";
 "recovery.trial_ending.title" = "Deine Testphase endet bald";
 "recovery.trial_ending.body" = "Dein Abo beginnt am %@. Kündigen: Einstellungen > dein Name > Abonnements.";
-"onboarding_v2.notifications.mascot_message_trial" = "Ich erinnere dich 2 Tage vor dem Ende deiner Testphase und jeden Tag an deine Session.";
-"onboarding_v2.notifications.trial_reminder" = "Erinnerung 2 Tage vor Ende der Testphase";
-"onboarding_v2.notifications.offers_consent" = "Auch Tipps und Angebote von CortiFree per Mitteilung und E-Mail erhalten. Du kannst das jederzeit ändern.";
 "live_activity.title.starting" = "Dein Plan startet";
 "live_activity.title.building" = "Dein Plan entsteht";
 "live_activity.title.almost_ready" = "Fast fertig";
@@ -5590,6 +5553,14 @@
 "profile.v2.more.watch" = "Apple Watch";
 "profile.v2.more.watch_sub" = "Puls von deiner Uhr statt mit dem Blitz";
 
+/* Milo voice dictation */
+"milo.dictation.start" = "Nachricht diktieren";
+"milo.dictation.stop" = "Diktat beenden";
+"milo.dictation.denied.title" = "Diktat deaktiviert";
+"milo.dictation.denied.message" = "Erlaube Mikrofon und Spracherkennung in den Einstellungen, um Milo deine Nachrichten zu diktieren.";
+"milo.dictation.open_settings" = "Einstellungen öffnen";
+"milo.dictation.unavailable" = "Das Diktat ist gerade nicht verfügbar.";
+
 /* Breathe before TikTok — Screen Time shield */
 "calm.pause.shield.about_to_open" = "Du wolltest eine App öffnen, die du bremsen wolltest";
 "calm.pause.shield.unlock" = "10 Min. entsperren";
@@ -5611,3 +5582,87 @@
 
 /* Home avatar card — streak pill */
 "avatar.streak.accessibility" = "%d-Tage-Serie";
+
+/* Support mail (contact / bug / feature request) */
+"settings.feature_request.title" = "Funktion vorschlagen";
+"settings.feature_request.subtitle" = "Sag uns, was du dir wünschst";
+"support.mail.subject.contact" = "Nachricht";
+"support.mail.subject.bug" = "Fehlerbericht";
+"support.mail.subject.feature" = "Funktionswunsch";
+"support.mail.prompt.contact" = "Hallo! ";
+"support.mail.prompt.bug" = "Beschreibe das Problem (was du getan hast, was passiert ist, was du erwartet hast). Screenshots helfen sehr:";
+"support.mail.prompt.feature" = "Was würdest du gerne in CortiFree sehen und wie würde es dir helfen?";
+"support.mail.info_header" = "Bitte behalte die Infos unten, sie helfen uns, dir zu helfen:";
+// Onboarding reassurance: one hand-written sentence per answer (reason, age, duration).
+"onboarding_v2.reassurance.text.reason_sleep" = "Schlecht schlafen färbt auf alles ab: Laune, Geduld, Energie. Schlaf lässt sich neu lernen, oft schneller, als man denkt.";
+"onboarding_v2.reassurance.text.reason_anxiety" = "Stress, der nie runterfährt, zermürbt. Das ist keine Charakterschwäche: Dein Körper war zu lange in Alarmbereitschaft und kann wieder lernen, zur Ruhe zu kommen.";
+"onboarding_v2.reassurance.text.reason_energy" = "Ohne echten Grund ausgelaugt zu sein, ist frustrierend. Meist fehlt nicht der Wille, sondern der Körper läuft schon zu lange im Stressmodus.";
+"onboarding_v2.reassurance.text.reason_focus" = "Wenn die Gedanken ständig abschweifen, fehlt selten die Disziplin. Meist hat der Kopf einfach zu viel gleichzeitig zu stemmen.";
+"onboarding_v2.reassurance.text.reason_mental" = "Auf deinen Kopf zu achten, bevor es überläuft, ist genau der richtige Reflex.";
+"onboarding_v2.reassurance.text.reason_difficult" = "Wenn alles gleichzeitig drückt, werden selbst kleine Dinge schwer. Wir gehen es langsam an, Schritt für Schritt.";
+"onboarding_v2.reassurance.text.reason_habits" = "Gute Gewohnheiten halten nicht durch Motivation, sondern durch kleine Schritte, die sich jeden Tag leicht wiederholen lassen. Genau so bauen wir deine auf.";
+"onboarding_v2.reassurance.text.age_under_18" = "In deinem Alter, zwischen Schule, Zukunft und dem Blick der anderen, kann der Druck riesig sein.";
+"onboarding_v2.reassurance.text.age_18_24" = "Anfang zwanzig, zwischen Studium, erstem Job und allem, was von dir erwartet wird, gibt es reichlich Druck.";
+"onboarding_v2.reassurance.text.age_25_34" = "Zwischen Ende zwanzig und deinen Dreißigern, mit Job, Privatleben und allem, was du trägst, sammelt sich schnell viel an.";
+"onboarding_v2.reassurance.text.age_35_44" = "Um die vierzig trägt man oft vieles gleichzeitig: Arbeit, Familie, Mental Load.";
+"onboarding_v2.reassurance.text.age_45_54" = "Um die fünfzig verändern sich Rhythmus und Körper, und Stress fühlt sich anders an als früher.";
+"onboarding_v2.reassurance.text.age_55_plus" = "Mit den Jahren gewöhnt man sich oft daran, alles wortlos wegzustecken. Dir diese Zeit zu nehmen, ist eine sehr gute Entscheidung.";
+"onboarding_v2.reassurance.text.duration_weeks" = "Und du kümmerst dich früh darum: der beste Moment, bevor es sich festsetzt.";
+"onboarding_v2.reassurance.text.duration_2_6_months" = "Es geht schon ein paar Monate so: lang genug, um zu belasten, aber nicht lang genug, um festgefahren zu sein.";
+"onboarding_v2.reassurance.text.duration_6_12_months" = "Fast ein Jahr schon, kein Wunder, dass du genug hast. Es kann sich ändern, in deinem Tempo.";
+"onboarding_v2.reassurance.text.duration_1_year_plus" = "Mehr als ein Jahr ist lang. Aber auch was sich festgesetzt hat, kann sich lösen, wenn man es richtig angeht.";
+"onboarding_v2.reassurance.text.duration_years" = "Nach Jahren glaubt man vielleicht, „so bin ich halt“. Stimmt nicht: Was mit der Zeit entstanden ist, kann sich mit der Zeit auch wieder lösen.";
+"onboarding_v2.reassurance.text.next" = "Jetzt ein paar Fragen, um zu verstehen, was du erlebst, und deinen Weg aufzubauen. Deine Antworten bleiben zwischen dir und der App: nie verkauft, nie weitergegeben.";
+// « Why this plan »: one written sentence per goal instead of « %@ » templates.
+"plan.why.primary.stress" = "Dein Stress muss runterfahren: Das ist das Herz deines Plans, mit jeden Tag einem Moment, um Druck abzulassen.";
+"plan.why.primary.sleep" = "Schlaf kommt zuerst: Wenn die Nächte besser werden, folgt der Rest.";
+"plan.why.primary.energy" = "Wir starten mit deiner Energie: wieder Schwung finden, ohne Druck, Tag für Tag.";
+"plan.why.primary.focus" = "Dein Plan zielt zuerst auf einen klareren Kopf: weniger zerstreut, mehr Momente, in denen du wirklich da bist.";
+"plan.why.primary.emotional" = "Dein Plan soll dir helfen, durch diese Zeit zu kommen, mit mehr Nachsicht mit dir selbst.";
+"plan.why.secondary.stress" = "Nebenbei beruhigen wir auch den Alltagsstress, damit er nicht alles einnimmt.";
+"plan.why.secondary.sleep" = "Auch deine Nächte bekommen Aufmerksamkeit: Besserer Schlaf hilft bei allem anderen.";
+"plan.why.secondary.energy" = "Wir behalten auch deine Energie im Blick, damit du durchhältst.";
+"plan.why.secondary.focus" = "Ein paar Einheiten helfen dir auch, bei einer Sache zu bleiben.";
+"plan.why.secondary.emotional" = "Kleine Momente der Nachsicht mit dir selbst sind in deine Tage eingebaut.";
+"milo.dictation.language" = "Diktiersprache";
+"milo.dictation.language.app" = "App-Sprache (%@)";
+"milo.dictation.language.hint" = "Lange drücken, um in einer anderen Sprache zu diktieren.";
+"profile.v2.more.pause_sub" = "Aktiv: Apps ändern oder ausschalten";
+
+/* Onboarding: account required after the trial started (auth skipped) */
+"onboarding_v2.auth.required_title" = "Letzter Schritt: Erstelle dein Konto";
+"onboarding_v2.auth.required_subtitle" = "Deine Testphase ist aktiv. Erstelle dein Konto, um dein Abo, deinen Plan und deinen Fortschritt auf all deinen Geräten zu behalten.";
+
+/* Pre-paywall: personalized headline (plan goal, with or without the first name) */
+"paywall_custom.headline.stress.named" = "%@, dein Anti‑Stress‑Plan ist bereit.\n28 Tage, um wieder die Kontrolle zu übernehmen.";
+"paywall_custom.headline.stress.anonymous" = "Dein Anti‑Stress‑Plan ist bereit.\n28 Tage, um wieder die Kontrolle zu übernehmen.";
+"paywall_custom.headline.sleep.named" = "%@, dein Schlafplan ist bereit.\n28 Tage für ruhigere Nächte.";
+"paywall_custom.headline.sleep.anonymous" = "Dein Schlafplan ist bereit.\n28 Tage für ruhigere Nächte.";
+"paywall_custom.headline.energy.named" = "%@, dein Energieplan ist bereit.\n28 Tage für neuen Schwung.";
+"paywall_custom.headline.energy.anonymous" = "Dein Energieplan ist bereit.\n28 Tage für neuen Schwung.";
+"paywall_custom.headline.focus.named" = "%@, dein Fokusplan ist bereit.\n28 Tage, um deine Konzentration zurückzugewinnen.";
+"paywall_custom.headline.focus.anonymous" = "Dein Fokusplan ist bereit.\n28 Tage, um deine Konzentration zurückzugewinnen.";
+"paywall_custom.headline.emotional.named" = "%@, dein Balance-Plan ist bereit.\n28 Tage, um gut für dich zu sorgen.";
+"paywall_custom.headline.emotional.anonymous" = "Dein Balance-Plan ist bereit.\n28 Tage, um gut für dich zu sorgen.";
+"paywall_custom.headline.default.named" = "%@, dein persönlicher Plan ist bereit.\n28 Tage für neue Gewohnheiten.";
+"paywall_custom.headline.default.anonymous" = "Dein persönlicher Plan ist bereit.\n28 Tage für neue Gewohnheiten.";
+
+/* Pre-paywall FAQ */
+"paywall_custom.faq.title" = "Häufige Fragen";
+"paywall_custom.faq.q1" = "Wie viel Zeit brauche ich pro Tag?";
+"paywall_custom.faq.a1" = "So viel, wie du gewählt hast: zwischen 5 und 20 Minuten. Für volle Tage gibt es jede Einheit auch in einer Kurzversion.";
+"paywall_custom.faq.q2" = "Was passiert nach den 28 Tagen?";
+"paywall_custom.faq.a2" = "An Tag 28 ziehst du Bilanz, danach geht dein Plan mit einem neuen Zyklus weiter, der auf deinen Fortschritten aufbaut: Gewohnheiten verankern, dann selbstständiger werden. Du kannst dein Ziel jederzeit ändern.";
+"paywall_custom.faq.q3" = "Kann ich jederzeit kündigen?";
+"paywall_custom.faq.a3" = "Ja, in wenigen Sekunden: Einstellungen > dein Name > Abonnements > CortiFree. Kündigst du während der kostenlosen Testphase, zahlst du nichts. Sonst bleibt dein Zugang bis zum Ende des bezahlten Zeitraums aktiv.";
+"paywall_custom.faq.q4" = "Ersetzt CortiFree eine ärztliche Behandlung?";
+"paywall_custom.faq.a4" = "Nein. CortiFree hilft dir, Anti-Stress-Gewohnheiten aufzubauen (Atmung, Meditation, Schlaf), ist aber kein Medizinprodukt. Wenn deine Angst stark ist oder du dich in Gefahr fühlst, sprich mit einer Ärztin oder einem Arzt oder ruf die Telefonseelsorge an (0800 111 0 111).";
+
+/* Onboarding pulse: result without numbers (unclear measure) */
+"onboarding_v2.pulse.breathed_title" = "Super, 1 Minute langsames Atmen 🎉";
+"onboarding_v2.pulse.breathed_message" = "Du hast gerade deinen Atem verlangsamt: genau das Signal, das deinem Körper hilft, sich zu entspannen. Stell dir das jeden Tag vor.";
+
+/* Pulse measure: live coaching */
+"calm.pulse.hint.cover_flash" = "Deck auch den Blitz ab: Fingerspitze auf Kamera UND Blitz direkt daneben.";
+"calm.pulse.hint.hold_still" = "Lass den Finger liegen, nicht bewegen…";
+"calm.pulse.hint.almost_done" = "Nur noch ein paar Sekunden…";

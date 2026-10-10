@@ -41,27 +41,30 @@ struct ScientificPlanView: View {
                     VStack(spacing: 24) {
                         // Harvard Quote
                         ScientificQuoteCard(
-                            symbol: "doc.text",
+                            logo: "study_annual_reviews",
                             quote: "onboarding_v2.scientific.harvard_quote".localized,
                             highlightedText: "onboarding_v2.scientific.harvard_highlight".localized,
                             // Citations stay in their original language and are never translated.
-                            source: "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology, 67, 289–314."
+                            source: "Wood, W., & Rünger, D. (2016). Psychology of Habit. Annual Review of Psychology, 67, 289–314.",
+                            url: URL(string: "https://doi.org/10.1146/annurev-psych-122414-033417")
                         )
 
                         // UCL Quote
                         ScientificQuoteCard(
-                            symbol: "doc.text",
+                            logo: "study_ucl",
                             quote: "onboarding_v2.scientific.ucl_quote".localized,
                             highlightedText: "onboarding_v2.scientific.ucl_highlight".localized,
-                            source: "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology, 40(6), 998–1009."
+                            source: "Lally, P., et al. (2010). How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology, 40(6), 998–1009.",
+                            url: URL(string: "https://doi.org/10.1002/ejsp.674")
                         )
 
                         // Atomic Habits Quote
                         ScientificQuoteCard(
-                            symbol: "book.closed",
+                            logo: "study_atomic_habits",
                             quote: "onboarding_v2.scientific.atomic_quote".localized,
                             highlightedText: "onboarding_v2.scientific.atomic_highlight".localized,
-                            source: "Clear, J. (2018). Atomic Habits. New York: Avery."
+                            source: "Clear, J. (2018). Atomic Habits. New York: Avery.",
+                            url: URL(string: "https://jamesclear.com/atomic-habits")
                         )
                     }
                     .padding(.horizontal, 24)
@@ -120,21 +123,27 @@ struct ScientificPlanView: View {
 // MARK: - Scientific Quote Card
 
 struct ScientificQuoteCard: View {
-    let symbol: String
+    /// Logo carré de l'éditeur / de l'institution (Assets).
+    let logo: String
     let quote: String
     let highlightedText: String
     let source: String
+    /// Lien vers l'étude, ouvert dans le navigateur de l'utilisateur.
+    var url: URL? = nil
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Top section: Logo left, Quote right with first gradient
             HStack(alignment: .top, spacing: 12) {
                 // Logo
-                Image(systemName: symbol)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundColor(Color(hex: "D4B4FF"))
+                Image(logo)
+                    .resizable()
+                    .scaledToFill()
                     .frame(width: 50, height: 50)
-                    .glassCard(cornerRadius: 8)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(.white.opacity(0.15)))
+                    .accessibilityHidden(true)
 
                 // Quote with guillemets
                 Text("\"\(attributedQuote)\"")
@@ -150,13 +159,32 @@ struct ScientificQuoteCard: View {
                 .fill(Color.white.opacity(0.15))
                 .frame(height: 1)
 
-            // Source section with second gradient
-            Text(source)
-                .font(.custom("Poppins-Regular", size: 11))
-                .foregroundColor(.white.opacity(0.6))
-                .lineSpacing(3)
+            // Source : soulignée et cliquable, ouvre l'étude dans le navigateur
+            Button {
+                guard let url else { return }
+                HapticManager.light()
+                openURL(url)
+            } label: {
+                HStack(alignment: .top, spacing: 6) {
+                    Text(source)
+                        .font(.custom("Poppins-Regular", size: 11))
+                        .underline(url != nil, color: .white.opacity(0.45))
+                        .foregroundColor(.white.opacity(0.7))
+                        .lineSpacing(3)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if url != nil {
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(Color(hex: "B794F6"))
+                    }
+                }
                 .padding(16)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(url == nil)
+            .accessibilityAddTraits(.isLink)
         }
         .glassCard(cornerRadius: 16, tint: Color(hex: "B794F6"))
     }

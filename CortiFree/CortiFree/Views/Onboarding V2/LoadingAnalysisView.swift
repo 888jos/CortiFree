@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct LoadingAnalysisView: View {
     private let speedMultiplier = 1.5
@@ -163,6 +164,27 @@ struct LoadingAnalysisView: View {
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingLoadingAnalysisViewed()
             startProgressAnimation()
+            askNotificationsDuringLoading()
+        }
+    }
+
+    /// The system notification prompt shows over the analysis (no dedicated screen any more).
+    /// Asked once: a user who already answered is not asked again. The reminder time is
+    /// chosen later, after the trial starts (TrialKickoffView).
+    private func askNotificationsDuringLoading() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                guard settings.authorizationStatus == .notDetermined || settings.authorizationStatus == .provisional else { return }
+                AnalyticsManager.shared.trackOnboardingNotificationPermissionRequested(
+                    streakEnabled: true,
+                    dailyRitualEnabled: true,
+                    weeklyReportEnabled: true
+                )
+                NotificationService.shared.requestNotificationPermission { granted in
+                    UserDefaults.standard.set(granted, forKey: "notificationsEnabled")
+                    AnalyticsManager.shared.trackOnboardingNotificationPermissionsGranted(granted: granted)
+                }
+            }
         }
     }
 
