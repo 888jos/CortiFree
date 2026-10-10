@@ -70,7 +70,7 @@ struct ContentView: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel("Open CortiFree Assistant")
                     // Keep the floating assistant above the tab bar, and above the mini player when one is showing.
-                    .offset(x: -10, y: isMiniPlayerVisible ? -176 : -104)
+                    .offset(x: -10, y: isMiniPlayerVisible ? -192 : -104)
                     .animation(.spring(response: 0.4, dampingFraction: 0.85), value: isMiniPlayerVisible)
                     // Out of the way while the content scrolls (it would cover the cards' checkmarks).
                     .opacity(isScrolling || isEditingPlan ? 0 : 1)
@@ -86,7 +86,7 @@ struct ContentView: View {
                     Spacer()
                     MiniPlayer()
                         .padding(.horizontal, 24)
-                        .padding(.bottom, isScrolling ? 8 : 96)
+                        .padding(.bottom, isScrolling ? 8 : 76)
                 }
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
             }

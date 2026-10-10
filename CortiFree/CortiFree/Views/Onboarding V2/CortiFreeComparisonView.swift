@@ -12,9 +12,6 @@ struct CortiFreeComparisonView: View {
 
     @State private var animateCurves = false
 
-    private let cortiFreeColor = Color(hex: "72D572")
-    private let baselineColor = Color.white.opacity(0.42)
-
     var body: some View {
         ZStack {
             GalaxyBackgroundView(intensity: 0.8)
@@ -41,7 +38,7 @@ struct CortiFreeComparisonView: View {
                         }
                         .padding(.horizontal, 28)
 
-                        chart
+                        CortiFreeComparisonChart(animate: animateCurves)
                             .padding(.horizontal, 22)
 
                         Text("onboarding_v2.comparison.disclaimer".localized)
@@ -129,6 +126,20 @@ struct CortiFreeComparisonView: View {
         .padding(.horizontal, 18)
         .padding(.top, 42)
     }
+}
+
+/// "With / without CortiFree" curves (illustrative), shared by the onboarding comparison
+/// screen and the pre-paywall summary. The curves draw themselves when `animate` turns true.
+struct CortiFreeComparisonChart: View {
+    var animate: Bool
+    var height: CGFloat = 260
+
+    private let cortiFreeColor = Color(hex: "72D572")
+    private let baselineColor = Color.white.opacity(0.42)
+
+    var body: some View {
+        chart
+    }
 
     private var chart: some View {
         VStack(spacing: 18) {
@@ -142,14 +153,14 @@ struct CortiFreeComparisonView: View {
                     chartGrid
 
                     ComparisonCurve(kind: .withoutCortiFree)
-                        .trim(from: 0, to: animateCurves ? 1 : 0)
+                        .trim(from: 0, to: animate ? 1 : 0)
                         .stroke(
                             baselineColor,
                             style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [7, 7])
                         )
 
                     ComparisonCurve(kind: .withCortiFree)
-                        .trim(from: 0, to: animateCurves ? 1 : 0)
+                        .trim(from: 0, to: animate ? 1 : 0)
                         .stroke(
                             cortiFreeColor,
                             style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
@@ -160,7 +171,7 @@ struct CortiFreeComparisonView: View {
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
-            .frame(height: 260)
+            .frame(height: height)
         }
         .padding(20)
         .glassCard(cornerRadius: 20)

@@ -23,6 +23,8 @@ enum AudioFocus {
         case breathingAmbience
         /// Spoken breathing cues: lowers the user's music while speaking.
         case voiceCues
+        /// Milo voice dictation: records the mic, lowers whatever is playing.
+        case dictation
     }
 
     private static var holders: Set<Owner> = []
@@ -67,10 +69,14 @@ enum AudioFocus {
 
     private static func apply(_ holders: Set<Owner>, activate: Bool) {
         let session = AVAudioSession.sharedInstance()
-        let category: AVAudioSession.Category = .playback
+        var category: AVAudioSession.Category = .playback
         let mode: AVAudioSession.Mode
         let options: AVAudioSession.CategoryOptions
-        if holders.contains(.guidedSession) {
+        if holders.contains(.dictation) {
+            category = .playAndRecord
+            mode = .default
+            options = [.duckOthers, .defaultToSpeaker]
+        } else if holders.contains(.guidedSession) {
             mode = .spokenAudio
             options = []
         } else if holders.contains(.ambientSound) {

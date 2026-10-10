@@ -199,7 +199,8 @@ struct OverallQuizView: View {
     private var genderQuestion: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(spacing: 16) {
-                HStack(spacing: 28) {
+                // Together the two cards span the width of the third answer button.
+                HStack(spacing: 14) {
                     OverallIdentityCard(
                         imageName: "onboarding_identity_male",
                         title: "onboarding_v2.overall.gender_male".localized,
@@ -207,7 +208,7 @@ struct OverallQuizView: View {
                     ) {
                         selectGender(0, answerText: "onboarding_v2.overall.gender_male".localized)
                     }
-                    .frame(width: genderCardWidth)
+                    .frame(maxWidth: .infinity)
 
                     OverallIdentityCard(
                         imageName: "onboarding_identity_female",
@@ -216,7 +217,7 @@ struct OverallQuizView: View {
                     ) {
                         selectGender(1, answerText: "onboarding_v2.overall.gender_female".localized)
                     }
-                    .frame(width: genderCardWidth)
+                    .frame(maxWidth: .infinity)
                 }
                 .frame(height: 190)
                 .frame(maxWidth: .infinity)
@@ -234,13 +235,6 @@ struct OverallQuizView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-    }
-
-    private var genderCardWidth: CGFloat {
-        let availableWidth = IPadColumnLayout.contentWidth - 48
-        // Keep both identity cards narrower than the answer buttons so the
-        // larger gap never changes the progress/header layout.
-        return max(0, ((availableWidth - 20 - 16) / 2) * 0.8)
     }
 
     // MARK: - Question 2: Age
