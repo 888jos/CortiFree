@@ -5608,3 +5608,6 @@
 "onboarding_v2.first_name.placeholder" = "Escribe tu nombre";
 "onboarding_v2.first_name.continue" = "Continuar";
 "onboarding_v2.first_name.skip" = "Continuar sin nombre";
+
+/* Home avatar card — streak pill */
+"avatar.streak.accessibility" = "Racha de %d días";

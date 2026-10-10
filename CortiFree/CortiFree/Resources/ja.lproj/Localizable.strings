@@ -5611,3 +5611,6 @@
 "onboarding_v2.first_name.placeholder" = "名前を入力";
 "onboarding_v2.first_name.continue" = "続ける";
 "onboarding_v2.first_name.skip" = "名前を入力せずに続ける";
+
+/* Home avatar card — streak pill */
+"avatar.streak.accessibility" = "%d日連続";

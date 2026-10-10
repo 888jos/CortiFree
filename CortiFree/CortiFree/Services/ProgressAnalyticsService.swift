@@ -149,15 +149,9 @@ final class ProgressAnalyticsService {
             now: now,
             calendar: calendar
         )
-        let streaks = ProgressAggregation.streaks(from: days)
         let storedBest = UserPersistence.bestStreak
-        let storedCurrent = UserPersistence.streakDays
-        let visibleContinuityLimit = days.last?.isActive == false
-            ? max(0, days.count - 1)
-            : days.count
-        let currentStreak = streaks.current == visibleContinuityLimit
-            ? max(storedCurrent, streaks.current)
-            : streaks.current
+        // Same streak as everywhere else (plan items, StreakService), not an all-activity count.
+        let currentStreak = StreakService.current
         let activityMetrics = buildActivityMetrics(
             taskCounts: mergedTaskCompletions.byCategory,
             exerciseRecords: exerciseRecords,
@@ -181,7 +175,7 @@ final class ProgressAnalyticsService {
             programStartDate: programStartDate,
             days: days,
             currentStreak: currentStreak,
-            bestStreak: max(storedBest, streaks.best),
+            bestStreak: max(storedBest, currentStreak),
             activities: activityMetrics,
             domainTrends: checkInTrends,
             topActivity: topActivity
@@ -216,7 +210,6 @@ final class ProgressAnalyticsService {
             now: now,
             calendar: calendar
         )
-        let streaks = ProgressAggregation.streaks(from: days)
         let activityMetrics = buildActivityMetrics(
             taskCounts: completedTaskData.byCategory,
             exerciseRecords: exerciseRecords,
@@ -226,8 +219,8 @@ final class ProgressAnalyticsService {
             generatedAt: now,
             programStartDate: programStartDate,
             days: days,
-            currentStreak: max(streaks.current, UserPersistence.streakDays),
-            bestStreak: max(streaks.best, UserPersistence.bestStreak),
+            currentStreak: StreakService.current,
+            bestStreak: max(StreakService.current, UserPersistence.bestStreak),
             activities: activityMetrics,
             domainTrends: [],
             topActivity: activityMetrics

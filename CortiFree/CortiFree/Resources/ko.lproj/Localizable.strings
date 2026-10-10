@@ -5611,3 +5611,6 @@
 "onboarding_v2.first_name.placeholder" = "이름을 입력하세요";
 "onboarding_v2.first_name.continue" = "계속";
 "onboarding_v2.first_name.skip" = "이름 없이 계속";
+
+/* Home avatar card — streak pill */
+"avatar.streak.accessibility" = "%d일 연속";

@@ -308,7 +308,9 @@ struct TasksV2View: View {
         }
         // Item done elsewhere: plan audio finished (mini player, other tab) or journal written.
         .onReceive(store.$completedItemID.compactMap { $0 }) { itemID in
+            let isToday = store.completedItemIsToday
             store.consumeCompletedItem()
+            guard isToday else { return }
             guard let item = plan?.day(min(todayIndex, PersonalPlan.length))?.items.first(where: { $0.id == itemID }) else { return }
             viewedPlanDay = nil
             markDone(item)
@@ -824,14 +826,11 @@ struct TasksV2View: View {
     /// Consecutive days (absolute program days) with at least one validated item.
     /// A day without validation yet (today) doesn't break the streak.
     private func updateGlobalStreak() {
-        var streak = 0
-        let today = actualAbsoluteDay
-        let todayDone = taskStatuses[dayKey(today)]?.values.contains(.done) ?? false
-        var day = todayDone ? today : today - 1
-        while day >= 1, taskStatuses[dayKey(day)]?.values.contains(.done) ?? false {
-            streak += 1
-            day -= 1
-        }
+        // Same rule as StreakService (statuses here already merged, server first).
+        let doneDays = Set(taskStatuses.compactMap { key, tasks -> Int? in
+            tasks.values.contains(.done) ? Int(key.replacingOccurrences(of: "day_", with: "")) : nil
+        })
+        let streak = StreakService.streak(doneDays: doneDays, today: actualAbsoluteDay)
         globalStreak = streak
         // Statuses failed to load: keep the stored streak instead of writing a wrong 0.
         guard statusesReliable else { return }

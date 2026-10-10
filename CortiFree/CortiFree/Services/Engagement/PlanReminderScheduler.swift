@@ -225,7 +225,9 @@ final class PlanReminderScheduler {
         guard observers.isEmpty else { return }
         let names: [Notification.Name] = [
             UIApplication.didBecomeActiveNotification, UIApplication.didEnterBackgroundNotification,
-            .personalPlanDidChange, Notification.Name("TaskValidated"), Notification.Name("TaskSkippedAfterValidation")
+            .personalPlanDidChange, Notification.Name("TaskValidated"), Notification.Name("TaskSkippedAfterValidation"),
+            // The streak is recomputed from the server after an app open: re-plan with the fresh value.
+            Notification.Name("StreakUpdated")
         ]
         observers = names.map { name in
             NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { _ in
@@ -306,7 +308,7 @@ final class PlanReminderScheduler {
             nextCycleFirstSession: nextFirst,
             reminderTime: PlanReminderPlanner.clamped(usual ?? NotificationService.shared.morningReminderComponents),
             doneToday: completions.contains { Calendar.current.isDate($0.completedAt, inSameDayAs: now) },
-            streak: UserDefaults.standard.integer(forKey: "streakDays"),
+            streak: StreakService.current,
             weekSessions: week.sessions, weekMinutes: week.minutes
         )
     }

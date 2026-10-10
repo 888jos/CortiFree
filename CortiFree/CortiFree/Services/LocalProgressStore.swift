@@ -56,11 +56,9 @@ enum LocalProgressStore {
         load(for: userID).filter { $0.habitID == habitID }.count
     }
 
-    #if DEBUG
     static func clear(for userID: String) {
         UserDefaults.standard.removeObject(forKey: key(for: userID))
     }
-    #endif
 
     private static func save(_ completions: [Completion], for userID: String) {
         guard let data = try? JSONEncoder().encode(completions) else { return }

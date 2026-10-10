@@ -57,8 +57,7 @@ struct AvatarProgressCard: View {
             loadProgress()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
-            // Reload streak when updated from TasksV2View
-            currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+            currentStreak = StreakService.current
             bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ProfileUpdated"))) { _ in
@@ -76,7 +75,8 @@ struct AvatarProgressCard: View {
         AvatarCardFront(
             firstName: firstName.isEmpty ? getUserFirstName() : firstName,
             startDate: startDate,
-            currentDay: currentProgramDay
+            currentDay: currentProgramDay,
+            streak: currentStreak
         )
     }
 
@@ -200,7 +200,7 @@ struct AvatarProgressCard: View {
         // Le plan est déjà chargé par l'onglet Plan ; on s'assure qu'il existe si l'accueil s'ouvre en premier.
         Task { await planStore.ensurePlan() }
 
-        currentStreak = UserDefaults.standard.integer(forKey: "streakDays")
+        currentStreak = StreakService.current
         bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
         firstName = getUserFirstName()
     }
@@ -252,24 +252,12 @@ struct AvatarProgressCard: View {
         }
     }
 
+    /// Next streak achievement (same milestones as AchievementService), counted on the streak.
     private var nextBadgeInfo: (title: String, daysLeft: Int)? {
-        let milestones = [3, 7, 14, 21, 28]
-        let badgeTitles = [
-            LanguageManager.shared.localizedString(for: "avatar.badge.beginner"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.motivated"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.determined"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.engaged"),
-            LanguageManager.shared.localizedString(for: "avatar.badge.master")
-        ]
-
-        for (index, milestone) in milestones.enumerated() {
-            if currentProgramDay < milestone {
-                let daysLeft = milestone - currentProgramDay
-                return (title: badgeTitles[index], daysLeft: daysLeft)
-            }
-        }
-
-        return nil // All badges unlocked
+        let milestones = [3, 7, 14, 21, 30, 40, 50, 60, 66]
+        guard let next = milestones.first(where: { currentStreak < $0 }) else { return nil }
+        return (title: LanguageManager.shared.localizedString(for: "achievement.streak_\(next).title"),
+                daysLeft: next - currentStreak)
     }
 }
 
@@ -507,6 +495,8 @@ struct AvatarCardFront: View {
     let startDate: Date
     /// Plan day (1...28); 0 = nothing started yet, every cell grey.
     let currentDay: Int
+    /// Current streak, shown top left (nil: no pill, e.g. in the onboarding).
+    var streak: Int? = nil
 
     private let totalDays = PersonalPlan.length
     private let columns = 7
@@ -522,6 +512,30 @@ struct AvatarCardFront: View {
                 .frame(width: 216)
                 .frame(height: 320)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+
+            if let streak {
+                VStack {
+                    HStack {
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(streak > 0 ? AppConstants.Colors.streakOrange : .white.opacity(0.6))
+                            Text("\(streak)")
+                                .font(.custom("Poppins-SemiBold", size: 12))
+                                .foregroundStyle(.white)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(.black.opacity(0.45)))
+                        .overlay(Capsule().stroke(.white.opacity(0.18), lineWidth: 1))
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(String(format: "avatar.streak.accessibility".localized, streak))
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                .padding(10)
+            }
 
             // Grid overlay INSIDE the image, in the last quarter
             VStack(spacing: 0) {

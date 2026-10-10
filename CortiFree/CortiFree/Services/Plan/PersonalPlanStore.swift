@@ -65,6 +65,10 @@ final class PersonalPlanStore: ObservableObject {
     /// Plan item done outside the Plan tab (audio finished, journal written); the Plan tab marks it
     /// done (even later, when it next appears), then calls consume.
     @Published private(set) var completedItemID: String?
+    /// Day the item was done: the Plan tab drops it when it only appears on a later day
+    /// (otherwise yesterday's meditation would tick today's item with the same id).
+    private(set) var completedItemDay: String?
+    var completedItemIsToday: Bool { completedItemDay == Self.dayString(Date()) }
     private let pendingAudioKey = "plan.pendingAudio.v1"
     private var audioFinishObserver: AnyCancellable?
 
@@ -74,7 +78,15 @@ final class PersonalPlanStore: ObservableObject {
         if let data = try? JSONEncoder().encode(pending) { defaults.set(data, forKey: pendingAudioKey) }
     }
 
-    func consumeCompletedItem() { completedItemID = nil }
+    func consumeCompletedItem() {
+        completedItemID = nil
+        completedItemDay = nil
+    }
+
+    private func markItemDone(_ itemID: String) {
+        completedItemDay = Self.dayString(Date())
+        completedItemID = itemID
+    }
 
     private var journalObserver: NSObjectProtocol?
 
@@ -84,7 +96,7 @@ final class PersonalPlanStore: ObservableObject {
             Task { @MainActor in
                 guard let self, let plan = self.plan, !plan.isFinished,
                       let item = plan.day(plan.dayIndex())?.items.first(where: { $0.kind == .habit && $0.refID == "journal" }) else { return }
-                self.completedItemID = item.id
+                self.markItemDone(item.id)
             }
         }
     }
@@ -107,7 +119,7 @@ final class PersonalPlanStore: ObservableObject {
         }
         guard let current = GuidedSessionPlayer.shared.currentSession?.id, pending.sessionIDs.contains(current) else { return }
         defaults.removeObject(forKey: pendingAudioKey)
-        completedItemID = pending.itemID
+        markItemDone(pending.itemID)
     }
 
     private static func dayString(_ date: Date) -> String {

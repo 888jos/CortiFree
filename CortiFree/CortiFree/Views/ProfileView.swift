@@ -27,6 +27,9 @@ struct ProfileView: View {
     @State private var firstName: String = ""
     @State private var todayDone = 0
 
+    /// Same streak as Home, Plan and the widget (refreshed when StreakService recomputes it).
+    @State private var streak = StreakService.current
+
     var body: some View {
         ZStack {
             // Galaxy animated background
@@ -38,7 +41,7 @@ struct ProfileView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
                         ProfileStatsStrip(
-                            streak: max(progress.data.currentStreak, UserPersistence.streakDays),
+                            streak: streak,
                             calmMinutes: calmMinutes,
                             unlockedBadges: totalUnlockedBadges,
                             totalBadges: totalBadges,
@@ -125,6 +128,7 @@ struct ProfileView: View {
         }
         .onAppear {
             firstName = getUserFirstName()
+            streak = StreakService.current
             refreshTodayDone()
             Task {
                 await viewModel.loadProfilePhoto()
@@ -134,6 +138,9 @@ struct ProfileView: View {
                 await achievementService.loadAchievements()
                 await habitBadgeService.loadHabitBadges()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("StreakUpdated"))) { _ in
+            streak = StreakService.current
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskValidated"))) { _ in
             refreshTodayDone()

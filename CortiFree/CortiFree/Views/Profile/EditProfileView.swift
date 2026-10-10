@@ -638,9 +638,8 @@ struct EditProfileView: View {
         UserDefaults.standard.set(1, forKey: "currentDay")
         UserDefaults.standard.set(Date(), forKey: "routineStartDate")
 
-        // Reset streaks
-        UserDefaults.standard.set(0, forKey: "streakDays")
-        UserDefaults.standard.set(0, forKey: "bestStreak")
+        // Reset streaks and this device's completions: old days 1…N must not count in the new run.
+        StreakService.reset(userID: Auth.auth().currentUser?.uid ?? UserPersistence.localUserID)
 
         // Day 1 starts today at midnight; keep every other user setting intact
         let newStartDate = UserSettings.calculateProgramStartDate()
