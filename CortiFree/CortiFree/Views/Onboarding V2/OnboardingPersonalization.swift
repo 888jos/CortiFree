@@ -12,29 +12,53 @@ import SuperwallKit
 
 // MARK: - Breathing pulse result
 
-/// Heart rate before / after the onboarding breathing, kept only when it clearly slowed down
-/// (same rule as the "Ton cœur a ralenti" result screen).
+/// Heart rate before / after the onboarding breathing: the user's own numbers when the heart
+/// clearly slowed down (same rule as the "Ton cœur a ralenti" result screen), the average effect
+/// of one minute of slow breathing when nothing could be measured, nothing otherwise.
 enum OnboardingPulseResult {
+    /// Average effect of one minute of slow breathing, shown (as an average) when the camera
+    /// measure failed.
+    static let averageBefore = 82
+    static let averageAfter = 74
+    static var averageDrop: Int { averageBefore - averageAfter }
+
     private static let beforeKey = "onboarding_pulse_recap_before"
     private static let afterKey = "onboarding_pulse_recap_after"
+    private static let averageKey = "onboarding_pulse_recap_is_average"
+
+    struct Recap {
+        let before: Int
+        let after: Int
+        let isAverage: Bool
+        var drop: Int { before - after }
+
+        /// The "average" wording when these are not the user's own numbers.
+        func key(_ base: String) -> String { isAverage ? "\(base)_average" : base }
+    }
 
     static func save(before: Int, after: Int) {
         UserDefaults.standard.set(before, forKey: beforeKey)
         UserDefaults.standard.set(after, forKey: afterKey)
+        UserDefaults.standard.set(false, forKey: averageKey)
+    }
+
+    static func saveAverage() {
+        save(before: averageBefore, after: averageAfter)
+        UserDefaults.standard.set(true, forKey: averageKey)
     }
 
     static func clear() {
         UserDefaults.standard.removeObject(forKey: beforeKey)
         UserDefaults.standard.removeObject(forKey: afterKey)
+        UserDefaults.standard.removeObject(forKey: averageKey)
     }
 
-    /// (before, after, drop) when the breathing slowed the heart down.
-    static var current: (before: Int, after: Int, drop: Int)? {
+    static var current: Recap? {
         let defaults = UserDefaults.standard
         guard let before = defaults.object(forKey: beforeKey) as? Int,
               let after = defaults.object(forKey: afterKey) as? Int,
               before > after else { return nil }
-        return (before, after, before - after)
+        return Recap(before: before, after: after, isAverage: defaults.bool(forKey: averageKey))
     }
 }
 
@@ -89,12 +113,14 @@ enum OnboardingPersonalization {
             "planGoal": plan?.goal.rawValue,
             "pulseBefore": nil,
             "pulseAfter": nil,
-            "pulseDrop": nil
+            "pulseDrop": nil,
+            "pulseIsAverage": nil
         ]
         if let pulse = OnboardingPulseResult.current {
             attributes["pulseBefore"] = pulse.before
             attributes["pulseAfter"] = pulse.after
             attributes["pulseDrop"] = pulse.drop
+            attributes["pulseIsAverage"] = pulse.isAverage
         }
         Superwall.shared.setUserAttributes(attributes)
     }

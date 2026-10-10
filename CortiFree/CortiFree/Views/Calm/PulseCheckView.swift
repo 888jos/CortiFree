@@ -357,6 +357,9 @@ struct PulseCheckView: View {
 struct PulseMeasuringView: View {
     @ObservedObject var meter: PulseCameraMeter
     let title: String
+    /// Finger placement reminder kept on screen during the whole measure (onboarding: the
+    /// instructions screen may have been skimmed).
+    var instruction: String? = nil
 
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
@@ -376,6 +379,23 @@ struct PulseMeasuringView: View {
             Text(title)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
+            if let instruction {
+                HStack(spacing: 14) {
+                    Image("pulse_camera_instruction")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 52, height: 56)
+                        .accessibilityHidden(true)
+                    Text(instruction)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(12)
+                .glassCard(cornerRadius: 18)
+                .padding(.horizontal, 24)
+            }
             ZStack {
                 Circle()
                     .trim(from: 0, to: meter.progress)

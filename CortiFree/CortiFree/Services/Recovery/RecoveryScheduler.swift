@@ -82,15 +82,11 @@ enum RecoveryPlanner {
             let main = SuperwallPlacement.onboarding
             return [
                 RecoveryMessage(id: "B-1", timing: .after(3600), key: "recovery.b.1", placement: main, isPromotional: false),
-                RecoveryMessage(id: "B-2", timing: .after(4 * 3600), key: "recovery.b.2", placement: main, isPromotional: false),
                 RecoveryMessage(id: "B-3", timing: .day(1, hour: 10, minute: 0), key: "recovery.b.3", placement: RecoveryPlacement.offer, isPromotional: true, requiredProduct: RecoveryPlacement.trialProduct),
                 RecoveryMessage(id: "B-4", timing: .day(1, hour: 19, minute: 0), key: goalKey ?? "recovery.b.4", placement: main, isPromotional: false),
-                RecoveryMessage(id: "B-5", timing: .day(2, hour: 19, minute: 0), key: "recovery.b.5", placement: RecoveryPlacement.offer, isPromotional: true, requiredProduct: RecoveryPlacement.trialProduct),
                 RecoveryMessage(id: "B-6", timing: .day(3, hour: 8, minute: 30), key: "recovery.b.6", placement: RecoveryPlacement.offer, isPromotional: true, requiredProduct: RecoveryPlacement.trialProduct),
                 RecoveryMessage(id: "B-7", timing: .day(4, hour: 19, minute: 0), key: "recovery.b.7", placement: main, isPromotional: false),
-                RecoveryMessage(id: "B-8", timing: .day(6, hour: 12, minute: 30), key: "recovery.b.8", placement: main, isPromotional: false),
                 RecoveryMessage(id: "B-9", timing: .day(7, hour: 10, minute: 0), key: "recovery.b.9", placement: RecoveryPlacement.lastChance, isPromotional: true, requiredProduct: RecoveryPlacement.discountProduct),
-                RecoveryMessage(id: "B-10", timing: .day(8, hour: 19, minute: 0), key: "recovery.b.10", placement: RecoveryPlacement.lastChance, isPromotional: true, requiredProduct: RecoveryPlacement.discountProduct),
                 RecoveryMessage(id: "B-11", timing: .day(14, hour: 10, minute: 0), key: "recovery.b.11", placement: main, isPromotional: false)
             ]
         }
@@ -129,8 +125,12 @@ enum RecoveryPlanner {
     static var allIdentifiers: [String] {
         let sequences = [RecoverySegment.earlyOnboarding, .planReady, .paywall].flatMap { sequence(for: $0, goal: nil) }
         let drops = [RecoverySegment.earlyOnboarding, .planReady, .paywall].map { dropOffMessage(for: $0, dropOffCount: 1) }
-        return (sequences + drops).map { identifier(for: $0) }
+        return (sequences + drops).map { identifier(for: $0) } + retiredIdentifiers
     }
+
+    /// Messages removed from the paywall sequence (too much about the trial); older builds may
+    /// still have them pending, so cancelAll clears them too.
+    static let retiredIdentifiers = ["recovery_B-2", "recovery_B-5", "recovery_B-8", "recovery_B-10"]
 
     static func identifier(for message: RecoveryMessage) -> String { "recovery_\(message.id)" }
 

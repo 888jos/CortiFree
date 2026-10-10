@@ -61,7 +61,8 @@ struct OnboardingPulseMeasureView: View {
                 case .measuring:
                     PulseMeasuringView(
                         meter: meter,
-                        title: (isAfter ? "onboarding_v2.pulse.measure_after" : "onboarding_v2.pulse.measure_before").localized
+                        title: (isAfter ? "onboarding_v2.pulse.measure_after" : "onboarding_v2.pulse.measure_before").localized,
+                        instruction: "onboarding_v2.pulse.measuring_instruction".localized
                     )
                 case .doubtful(let reading): doubtful(reading)
                 case .result(let reading): result(reading)
@@ -333,14 +334,21 @@ struct OnboardingPulseComparisonView: View {
                         column("onboarding_v2.pulse.after".localized, after.bpm, emphasised: true)
                     }
                 } else {
-                    Image(systemName: "wind")
-                        .font(.system(size: 52, weight: .semibold))
-                        .foregroundStyle(AudioPalette.accent)
-                        .frame(width: 112, height: 112)
-                        .background(Circle().fill(Color.white.opacity(0.08)))
+                    // No usable measure: the average effect of one minute of slow breathing,
+                    // labelled as an average (never presented as the user's own heart rate).
+                    HStack(alignment: .bottom, spacing: 18) {
+                        column("onboarding_v2.pulse.average_before".localized, OnboardingPulseResult.averageBefore, emphasised: false)
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(AudioPalette.accent)
+                            .padding(.bottom, 26)
+                        column("onboarding_v2.pulse.average_after".localized, OnboardingPulseResult.averageAfter, emphasised: true)
+                    }
                 }
-                if outcome == .calmer {
-                    Text(String(format: "onboarding_v2.pulse.calmer_badge".localized, delta))
+                if outcome == .calmer || outcome == .breathed {
+                    Text(outcome == .calmer
+                         ? String(format: "onboarding_v2.pulse.calmer_badge".localized, delta)
+                         : String(format: "onboarding_v2.pulse.average_badge".localized, OnboardingPulseResult.averageDrop))
                         .font(.poppinsSemiBold(15))
                         .foregroundStyle(Color(hex: "071B22"))
                         .padding(.horizontal, 16)
@@ -406,9 +414,13 @@ struct OnboardingPulseComparisonView: View {
                 "before": before?.bpm ?? -1, "after": after?.bpm ?? -1, "outcome": "\(outcome)",
                 "reliable": (before?.reliable ?? false) && (after?.reliable ?? false)
             ])
-            // Reused on the quiz result, the plan and the pre-paywall, only when it clearly slowed down.
+            // Reused on the quiz result, the plan and the pre-paywall: the user's own numbers when
+            // the heart clearly slowed down, the average when nothing could be measured, nothing
+            // when the measure was steady or faster.
             if outcome == .calmer, let before, let after {
                 OnboardingPulseResult.save(before: before.bpm, after: after.bpm)
+            } else if outcome == .breathed {
+                OnboardingPulseResult.saveAverage()
             } else {
                 OnboardingPulseResult.clear()
             }
@@ -424,7 +436,7 @@ struct OnboardingPulseComparisonView: View {
         case .calmer: return "onboarding_v2.pulse.calmer_title".localized
         case .steady: return "onboarding_v2.pulse.steady_title".localized
         case .faster: return "onboarding_v2.pulse.faster_title".localized
-        case .breathed: return "onboarding_v2.pulse.breathed_title".localized
+        case .breathed: return "onboarding_v2.pulse.average_title".localized
         }
     }
 
@@ -433,7 +445,7 @@ struct OnboardingPulseComparisonView: View {
         case .calmer: return "onboarding_v2.pulse.calmer_message".localized
         case .steady: return "onboarding_v2.pulse.steady_message".localized
         case .faster: return "onboarding_v2.pulse.faster_message".localized
-        case .breathed: return "onboarding_v2.pulse.breathed_message".localized
+        case .breathed: return "onboarding_v2.pulse.average_message".localized
         }
     }
 

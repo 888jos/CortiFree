@@ -27,6 +27,7 @@ struct CustomPaywallView: View {
     @ObservedObject private var planStore = PersonalPlanStore.shared
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
+    @State private var showBenefitsFlow: Bool = false
     @State private var purchaseErrorMessage: String = ""
 
     // End date of the plan
@@ -106,6 +107,18 @@ struct CustomPaywallView: View {
         }
         .onAppear {
             loadUserName()
+        }
+        // Feature tour (localized app screenshots) between the pre-paywall and Superwall.
+        .fullScreenCover(isPresented: $showBenefitsFlow) {
+            OnboardingBenefitsFlowView {
+                showBenefitsFlow = false
+                DispatchQueue.main.async {
+                    presentSuperwallPaywall()
+                }
+            }
+            #if DEBUG
+            .onboardingDebugHomeButton()
+            #endif
         }
     }
 
@@ -254,7 +267,7 @@ struct CustomPaywallView: View {
     private var pulseRecapSection: some View {
         if let pulse = OnboardingPulseResult.current {
             OnboardingPulseRecap(
-                text: "onboarding_v2.pulse_recap.paywall".localized(pulse.drop),
+                text: pulse.key("onboarding_v2.pulse_recap.paywall").localized(pulse.drop),
                 drop: pulse.drop
             )
             .padding(.horizontal, AppConstants.Layout.paddingXLarge)
@@ -633,10 +646,10 @@ struct CustomPaywallView: View {
 
     private var floatingCTASection: some View {
         VStack(spacing: 8) {
-            // Main CTA button - Presents the Superwall paywall
+            // Main CTA button - Feature tour, then the Superwall paywall
             Button(action: {
                 HapticManager.medium()
-                presentSuperwallPaywall()
+                showBenefitsFlow = true
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.right")

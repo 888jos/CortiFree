@@ -102,6 +102,8 @@ struct OnboardingPlanReadyView: View {
     var onBack: (() -> Void)? = nil
     let onContinue: () -> Void
 
+    @State private var showConfetti = false
+
     /// The user's own quiz scores. Axis order: global, serenity, sleep, energy, focus, balance.
     private var startingLevels: [Double]? {
         guard let result = habitsQuizResult else { return nil }
@@ -140,7 +142,7 @@ struct OnboardingPlanReadyView: View {
 
             if let pulse = OnboardingPulseResult.current {
                 OnboardingPulseRecap(
-                    text: "onboarding_v2.pulse_recap.plan".localized(pulse.drop),
+                    text: pulse.key("onboarding_v2.pulse_recap.plan").localized(pulse.drop),
                     drop: pulse.drop,
                     accent: plan.goal.accentColor
                 )
@@ -198,6 +200,17 @@ struct OnboardingPlanReadyView: View {
                 .padding(.vertical, 18)
                 .frame(maxWidth: .infinity)
                 .glassCard(cornerRadius: 20)
+            }
+        }
+        // The plan reveal right after the analysis is celebrated (once per appearance).
+        .overlay {
+            if showConfetti { FullScreenConfetti() }
+        }
+        .onAppear {
+            guard !showConfetti else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                showConfetti = true
+                HapticManager.success()
             }
         }
     }

@@ -98,7 +98,7 @@ struct StressPatternValidationView: View {
                 // The heart-rate drop measured during the breathing exercise of the quiz
                 if let pulse = OnboardingPulseResult.current {
                     OnboardingPulseRecap(
-                        text: "onboarding_v2.pulse_recap.result".localized(pulse.before, pulse.after),
+                        text: pulse.key("onboarding_v2.pulse_recap.result").localized(pulse.before, pulse.after),
                         drop: pulse.drop
                     )
                     .padding(.horizontal, 28)

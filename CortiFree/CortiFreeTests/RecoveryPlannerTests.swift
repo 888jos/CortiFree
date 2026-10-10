@@ -45,12 +45,11 @@ struct RecoveryPlannerTests {
         let messages = RecoveryPlanner.sequence(for: .paywall, goal: nil)
         let scheduled = RecoveryPlanner.schedule(messages, anchor: anchor, now: anchor, includePromotional: true,
                                                  availableProducts: allProducts, calendar: calendar)
-        #expect(scheduled.map(\.message.id) == ["B-1", "B-2", "B-3", "B-4", "B-5", "B-6", "B-7", "B-8", "B-9", "B-10", "B-11"])
+        #expect(scheduled.map(\.message.id) == ["B-1", "B-3", "B-4", "B-6", "B-7", "B-9", "B-11"])
         #expect(scheduled[0].date == date(8, 15))
-        #expect(scheduled[1].date == date(8, 18))
-        #expect(scheduled[2].date == date(9, 10))
-        #expect(scheduled[5].date == date(11, 8, 30))
-        #expect(scheduled[10].date == date(22, 10))
+        #expect(scheduled[1].date == date(9, 10))
+        #expect(scheduled[3].date == date(11, 8, 30))
+        #expect(scheduled[6].date == date(22, 10))
     }
 
     @Test func offersNeedConsent() {
@@ -58,7 +57,7 @@ struct RecoveryPlannerTests {
         let scheduled = RecoveryPlanner.schedule(RecoveryPlanner.sequence(for: .paywall, goal: nil), anchor: anchor, now: anchor,
                                                  includePromotional: false, availableProducts: allProducts, calendar: calendar)
         #expect(scheduled.allSatisfy { !$0.message.isPromotional })
-        #expect(scheduled.count == 6)
+        #expect(scheduled.count == 4)
     }
 
     @Test func offersNeedTheirProduct() {
@@ -69,7 +68,7 @@ struct RecoveryPlannerTests {
 
         let trialOnly = RecoveryPlanner.schedule(messages, anchor: anchor, now: anchor, includePromotional: true,
                                                  availableProducts: [RecoveryPlacement.trialProduct], calendar: calendar)
-        #expect(trialOnly.filter(\.message.isPromotional).map(\.message.id) == ["B-3", "B-5", "B-6"])
+        #expect(trialOnly.filter(\.message.isPromotional).map(\.message.id) == ["B-3", "B-6"])
     }
 
     @Test func pastMessagesAreSkipped() {
