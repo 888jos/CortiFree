@@ -16,6 +16,13 @@ enum PlanInsightText {
         let parts = code.split(separator: ":", maxSplits: 1).map(String.init)
         let key = parts[0]
         let arg = parts.count > 1 ? parts[1] : nil
+        // Goal-based reasons read as a written sentence per goal, not the goal's name in quotes.
+        if let goal = arg.flatMap(PlanGoal.init(rawValue:)), key != "primary_default" {
+            let family = key.hasPrefix("primary") ? "primary" : key
+            let writtenKey = "plan.why.\(family).\(goal.rawValue)"
+            let written = writtenKey.localized
+            if written != writtenKey { return (symbol(for: key, arg: arg), written) }
+        }
         let template = "plan.why.\(key)".localized
 
         var argText = ""
@@ -180,11 +187,21 @@ struct PlanGoalPickerSheet: View {
                         .foregroundStyle(.white.opacity(0.65))
                         .fixedSize(horizontal: false, vertical: true)
 
-                    PlanGlassGroup {
-                        VStack(spacing: 10) {
-                            ForEach(PlanGoal.allCases) { goal in
-                                goalRow(goal)
+                    // 2×2 grid of illustrated goals; the fifth one gets a full-width card below.
+                    VStack(spacing: 12) {
+                        // Grid (not LazyVGrid): both cards of a row share the same height.
+                        let firstFour = Array(PlanGoal.allCases.prefix(4))
+                        Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+                            ForEach(0..<2, id: \.self) { row in
+                                GridRow {
+                                    ForEach(firstFour[(row * 2)..<(row * 2 + 2)]) { goal in
+                                        goalTile(goal)
+                                    }
+                                }
                             }
+                        }
+                        ForEach(PlanGoal.allCases.dropFirst(4)) { goal in
+                            goalWideTile(goal)
                         }
                     }
 
@@ -219,32 +236,53 @@ struct PlanGoalPickerSheet: View {
         .onAppear { selected = currentGoal }
     }
 
-    private func goalRow(_ goal: PlanGoal) -> some View {
-        let isSelected = (selected ?? currentGoal) == goal
-        return Button {
-            HapticManager.light()
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) { selected = goal }
-        } label: {
-            HStack(spacing: 14) {
-                Image(systemName: goal.symbol)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 46, height: 46)
-                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(LinearGradient(colors: goal.colors, startPoint: .topLeading, endPoint: .bottomTrailing)))
+    private func isSelected(_ goal: PlanGoal) -> Bool { (selected ?? currentGoal) == goal }
+
+    private func select(_ goal: PlanGoal) {
+        HapticManager.light()
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) { selected = goal }
+    }
+
+    /// Square illustration on top, name and promise below.
+    private func goalTile(_ goal: PlanGoal) -> some View {
+        Button { select(goal) } label: {
+            VStack(alignment: .leading, spacing: 10) {
+                goalArtwork(goal)
+                    .aspectRatio(1, contentMode: .fit)
                 VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
-                        Text(goal.localizedName)
-                            .font(Font.Poppins.custom(.semiBold, size: 15))
-                            .foregroundStyle(.white)
-                        if goal == currentGoal {
-                            Text("plan.change.current".localized)
-                                .font(Font.Poppins.custom(.medium, size: 10))
-                                .foregroundStyle(.white.opacity(0.8))
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(Capsule().fill(.white.opacity(0.12)))
-                        }
-                    }
+                    Text(goal.localizedName)
+                        .font(Font.Poppins.custom(.semiBold, size: 15))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Text(goal.localizedPromise)
+                        .font(Font.Poppins.custom(.regular, size: 11))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 4)
+                Spacer(minLength: 0)
+            }
+            .padding(8)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .modifier(GoalCardStyle(goal: goal, isSelected: isSelected(goal)))
+    }
+
+    /// The odd goal out: same card, laid out wide.
+    private func goalWideTile(_ goal: PlanGoal) -> some View {
+        Button { select(goal) } label: {
+            HStack(spacing: 14) {
+                goalArtwork(goal)
+                    .frame(width: 92, height: 92)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(goal.localizedName)
+                        .font(Font.Poppins.custom(.semiBold, size: 15))
+                        .foregroundStyle(.white)
                     Text(goal.localizedPromise)
                         .font(Font.Poppins.custom(.regular, size: 12))
                         .foregroundStyle(.white.opacity(0.6))
@@ -252,15 +290,53 @@ struct PlanGoalPickerSheet: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 22))
-                    .foregroundStyle(isSelected ? PlanPalette.accent : .white.opacity(0.3))
             }
-            .padding(14)
+            .padding(8)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .planGlass(cornerRadius: 20, tint: isSelected ? goal.colors.last : nil, interactive: true)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .modifier(GoalCardStyle(goal: goal, isSelected: isSelected(goal)))
+    }
+
+    private func goalArtwork(_ goal: PlanGoal) -> some View {
+        Color.clear
+            .overlay(Image(goal.artworkName).resizable().scaledToFill())
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(alignment: .topLeading) {
+                if goal == currentGoal {
+                    Text("plan.change.current".localized)
+                        .font(Font.Poppins.custom(.medium, size: 10))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 7).padding(.vertical, 3)
+                        .background(Capsule().fill(.black.opacity(0.45)))
+                        .padding(6)
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                Image(systemName: isSelected(goal) ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(isSelected(goal) ? PlanPalette.accent : .white.opacity(0.85))
+                    .background(Circle().fill(.black.opacity(0.25)).padding(2))
+                    .padding(6)
+            }
+            .accessibilityHidden(true)
+    }
+}
+
+/// Glass card with an accent outline when picked.
+private struct GoalCardStyle: ViewModifier {
+    let goal: PlanGoal
+    let isSelected: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .planGlass(cornerRadius: 20, tint: isSelected ? goal.colors.last : nil)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(isSelected ? PlanPalette.accent : .clear, lineWidth: 2)
+            )
+            .scaleEffect(isSelected ? 1 : 0.98)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
