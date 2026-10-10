@@ -197,6 +197,14 @@ export const startRestCheck = internalMutation({
   },
 });
 
+/** Lets the next REST check run now (devTools.grantPremium). */
+export const clearRestCheck = internalMutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    if (await ctx.db.get(userId)) await ctx.db.patch(userId, { entitlementCheckedAt: undefined });
+  },
+});
+
 export const saveRestEntitlement = internalMutation({
   args: {
     userId: v.id("users"),

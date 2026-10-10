@@ -18,8 +18,10 @@ const ONESIGNAL_API = "https://api.onesignal.com";
 
 /** Steps from `authentication` on: the user has a plan. */
 const PLAN_READY_STEPS = new Set([
-  "authentication", "loading", "notificationPermissions", "eightHabitsIntro", "weekProgress",
-  "eightHabits", "habitsProgress", "commitmentPledge", "complete",
+  "authentication", "loading", "notificationPermissions", "planReady", "planDay", "planWeeks",
+  "commitmentPledge", "complete",
+  // Steps of older app builds (8-habits screens)
+  "eightHabitsIntro", "weekProgress", "eightHabits", "habitsProgress",
 ]);
 
 /** Copy used by the email templates ("struggling with {{main_symptom}}", "want to {{selected_goal}}"). */

@@ -231,7 +231,7 @@ export default defineSchema({
   /** Per-user daily counters of paid AI calls (aiAccess.ts). `day` is the UTC day key. */
   aiUsage: defineTable({
     userId: v.id("users"),
-    feature: v.union(v.literal("assistant"), v.literal("faceScan")),
+    feature: v.union(v.literal("assistant"), v.literal("faceScan"), v.literal("transcribe")),
     day: v.string(),
     count: v.number(),
     updatedAt: v.number(),

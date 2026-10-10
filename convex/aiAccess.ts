@@ -8,15 +8,30 @@ import { hasActiveEntitlement, refreshEntitlementFromRevenueCat } from "./subscr
 /**
  * Daily quotas for the paid AI calls (each one costs an upstream request). Counted
  * per UTC day, shared by every client of the account. `assistant` covers Milo chat,
- * « decode this message » and document import (the app shows one counter of 12).
+ * « decode this message » and document import (the app shows one counter of 12);
+ * `transcribe` is Milo voice dictation (one call per dictated message, ≤ 1 min).
  */
-export const AI_DAILY_LIMITS = { assistant: 12, faceScan: 3 } as const;
+export const AI_DAILY_LIMITS = { assistant: 12, faceScan: 3, transcribe: 40 } as const;
 export type AiFeature = keyof typeof AI_DAILY_LIMITS;
-const aiFeature = v.union(v.literal("assistant"), v.literal("faceScan"));
+const aiFeature = v.union(v.literal("assistant"), v.literal("faceScan"), v.literal("transcribe"));
 
 /** Errors the app matches on (ConvexError data). */
 export const QUOTA_EXCEEDED = "quota_exceeded";
 export const SUBSCRIPTION_REQUIRED = "subscription_required";
+
+/**
+ * Test accounts that may use the AI features without a subscription (quota still applies).
+ * Env AI_TEST_USERS: comma-separated user ids or emails. Set it on the dev deployment
+ * only, never on prod.
+ */
+export function isAiTestUser(user: { _id: string; email?: string }): boolean {
+  const list = (process.env.AI_TEST_USERS ?? "")
+    .split(",")
+    .map((entry) => entry.trim().toLowerCase())
+    .filter(Boolean);
+  if (list.length === 0) return false;
+  return list.includes(user._id.toLowerCase()) || (!!user.email && list.includes(user.email.toLowerCase()));
+}
 
 export function utcDayKey(now: number): string {
   return new Date(now).toISOString().slice(0, 10);
@@ -28,7 +43,7 @@ export const consume = internalMutation({
     const user = await ctx.db.get(userId);
     if (user === null) throw new ConvexError("Authentication required");
     const now = Date.now();
-    if (!hasActiveEntitlement(user, now)) return { ok: false as const, reason: SUBSCRIPTION_REQUIRED };
+    if (!hasActiveEntitlement(user, now) && !isAiTestUser(user)) return { ok: false as const, reason: SUBSCRIPTION_REQUIRED };
 
     const limit = AI_DAILY_LIMITS[feature];
     const day = utcDayKey(now);

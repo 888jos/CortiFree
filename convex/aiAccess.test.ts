@@ -134,6 +134,59 @@ describe("RevenueCat webhook", () => {
     ).rejects.toThrow(/subscription_required/);
     expect(deepSeekCalls).toHaveLength(0);
   });
+
+  test("AI_TEST_USERS lets listed test accounts in without a subscription", async () => {
+    const t = convexTest(schema, modules);
+    const { as } = await setupUser(t);
+    const other = await setupUser(t, { email: "b@example.test" });
+    process.env.AI_TEST_USERS = " A@example.test ,someone-else";
+    try {
+      const reply = await as.action(api.assistant.chat, { kind: "chat", messages: [{ role: "user", content: "hi" }] });
+      expect(reply.content).toBe("Breathe out slowly.");
+      await expect(
+        other.as.action(api.assistant.chat, { kind: "chat", messages: [{ role: "user", content: "hi" }] })
+      ).rejects.toThrow(/subscription_required/);
+    } finally {
+      delete process.env.AI_TEST_USERS;
+    }
+  });
+});
+
+describe("Voice transcription", () => {
+  const audio = btoa("fake m4a bytes");
+
+  test("subscribers get the text; the key and vocabulary stay on the server", async () => {
+    const t = convexTest(schema, modules);
+    const { userId, as } = await setupUser(t);
+    let sent: FormData | null = null;
+    let sentUrl = "";
+    vi.stubGlobal("fetch", async (url: string, init: RequestInit) => {
+      sentUrl = url;
+      sent = init.body as FormData;
+      return Response.json({ text: " Je me sens stressé ce matin. " });
+    });
+    await expect(as.action(api.transcribe.audio, { audio })).rejects.toThrow(/subscription_required/);
+
+    await webhook(t, purchase(userId));
+    const result = await as.action(api.transcribe.audio, { audio, language: "fr" });
+    expect(result).toEqual({ text: "Je me sens stressé ce matin.", remaining: 39 });
+    expect(sentUrl).toBe("https://api.openai.com/v1/audio/transcriptions");
+    expect(sent!.get("model")).toBe("gpt-4o-mini-transcribe");
+    expect(sent!.get("language")).toBe("fr");
+    expect(String(sent!.get("prompt"))).toContain("CortiFree");
+  });
+
+  test("rejects oversized audio and refunds failed calls", async () => {
+    const t = convexTest(schema, modules);
+    const { userId, as } = await setupUser(t);
+    await webhook(t, purchase(userId));
+    await expect(as.action(api.transcribe.audio, { audio: "A".repeat(2_100_000) })).rejects.toThrow(/Invalid audio/);
+
+    vi.stubGlobal("fetch", async () => new Response("down", { status: 503 }));
+    await expect(as.action(api.transcribe.audio, { audio })).rejects.toThrow(/Transcription unavailable/);
+    vi.stubGlobal("fetch", async () => Response.json({ text: "ok" }));
+    expect((await as.action(api.transcribe.audio, { audio })).remaining).toBe(39);
+  });
 });
 
 describe("AI quotas", () => {

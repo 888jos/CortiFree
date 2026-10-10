@@ -15,6 +15,7 @@ import type * as assistant from "../assistant.js";
 import type * as auth from "../auth.js";
 import type * as baseline from "../baseline.js";
 import type * as checkins from "../checkins.js";
+import type * as devTools from "../devTools.js";
 import type * as faceScan from "../faceScan.js";
 import type * as feedback from "../feedback.js";
 import type * as habits from "../habits.js";
@@ -36,6 +37,7 @@ import type * as settings from "../settings.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as tasks from "../tasks.js";
 import type * as todos from "../todos.js";
+import type * as transcribe from "../transcribe.js";
 
 import type {
   ApiFromModules,
@@ -51,6 +53,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   baseline: typeof baseline;
   checkins: typeof checkins;
+  devTools: typeof devTools;
   faceScan: typeof faceScan;
   feedback: typeof feedback;
   habits: typeof habits;
@@ -72,6 +75,7 @@ declare const fullApi: ApiFromModules<{
   subscriptions: typeof subscriptions;
   tasks: typeof tasks;
   todos: typeof todos;
+  transcribe: typeof transcribe;
 }>;
 
 /**
