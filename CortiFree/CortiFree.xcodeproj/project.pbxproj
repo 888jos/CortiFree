@@ -532,7 +532,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
@@ -565,7 +565,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeWidget/CortiFreeWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeWidget/Info.plist;
@@ -597,7 +597,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeShare/CortiFreeShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeShare/Info.plist;
@@ -629,7 +629,7 @@
 				CODE_SIGN_ENTITLEMENTS = CortiFreeShare/CortiFreeShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CortiFreeShare/Info.plist;
@@ -783,7 +783,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CONVEX_URL = "https://reliable-oyster-468.convex.cloud";
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -820,7 +820,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CONVEX_URL = "https://compassionate-jackal-621.convex.cloud";
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_TEAM = RSC662VDU8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
