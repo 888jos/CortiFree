@@ -27,11 +27,7 @@ struct SettingsView: View {
     @State private var pendingLanguage: String?
     @State private var showResetUserDefaultsAlert: Bool = false
     @State private var showClearAllDataAlert: Bool = false
-    @State private var showBugReport: Bool = false
-    @State private var bugReportText: String = ""
-    @State private var bugReportScreenshot: UIImage? = nil
-    @State private var showBugReportSuccess: Bool = false
-    @State private var isSubmittingBugReport: Bool = false
+    @State private var supportDraft: SupportMail.Draft?
     @State private var showCustomerCenter: Bool = false
     @State private var showLogin: Bool = false
     @State private var showReauthAlert: Bool = false
@@ -51,7 +47,7 @@ struct SettingsView: View {
     }
 
     private static let appStoreID = "6758314805"
-    private static let supportEmail = "cortifree@driftstudio.app"
+    private static let supportEmail = SupportMail.address
 
     private var appVersionString: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
@@ -197,22 +193,9 @@ struct SettingsView: View {
             viewModel.refreshNotificationAuthorization()
             NotificationService.shared.syncDailyNotificationsWithPreference()
         }
-        .sheet(isPresented: $showBugReport) {
-            BugReportSheet(
-                bugReportText: $bugReportText,
-                bugReportScreenshot: $bugReportScreenshot,
-                onSubmit: { submitBugReport() },
-                onCancel: {
-                    showBugReport = false
-                    bugReportText = ""
-                    bugReportScreenshot = nil
-                }
-            )
-        }
-        .alert(LanguageManager.shared.localizedString(for: "settings.bug_report.success"), isPresented: $showBugReportSuccess) {
-            Button(LanguageManager.shared.localizedString(for: "common.ok"), role: .cancel) { }
-        } message: {
-            Text(LanguageManager.shared.localizedString(for: "settings.bug_report.success_message"))
+        .sheet(item: $supportDraft) { draft in
+            SupportMailComposer(draft: draft)
+                .ignoresSafeArea()
         }
         .manageSubscriptionsSheet(isPresented: $showCustomerCenter)
         .fullScreenCover(isPresented: $showLogin) {
@@ -482,13 +465,19 @@ struct SettingsView: View {
 
                 settingsRow(icon: "envelope.fill", title: LanguageManager.shared.localizedString(for: "settings.about.contact"), subtitle: Self.supportEmail, showChevron: true) {
                     HapticManager.light()
-                    openURL("mailto:\(Self.supportEmail)")
+                    openSupportMail(.contact)
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
                 settingsRow(icon: "ladybug.fill", title: LanguageManager.shared.localizedString(for: "settings.bug_report.title"), subtitle: LanguageManager.shared.localizedString(for: "settings.bug_report.subtitle"), showChevron: true) {
                     HapticManager.light()
-                    showBugReport = true
+                    openSupportMail(.bug)
+                }
+                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+
+                settingsRow(icon: "lightbulb.fill", title: LanguageManager.shared.localizedString(for: "settings.feature_request.title"), subtitle: LanguageManager.shared.localizedString(for: "settings.feature_request.subtitle"), showChevron: true) {
+                    HapticManager.light()
+                    openSupportMail(.feature)
                 }
                 Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
 
@@ -870,82 +859,18 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Bug Report
+    // MARK: - Support Mail
 
-    private func submitBugReport() {
-        guard !isSubmittingBugReport else { return }
-
-        guard Auth.auth().currentUser != nil else {
-            sendBugReportByEmail()
+    /// Contact, bug and feature requests: Mail composer pre-filled with user id + device info,
+    /// then the default mail client, then copy the address as a last resort.
+    private func openSupportMail(_ kind: SupportMail.Kind) {
+        let draft = SupportMail.draft(kind)
+        if SupportMail.canUseComposer {
+            supportDraft = draft
             return
         }
-
-        isSubmittingBugReport = true
-        let screenshot = bugReportScreenshot
-        let description = bugReportText
-
-        Task {
-            do {
-                var reportData: [String: Any] = [
-                    "description": description,
-                    "appVersion": appVersionString,
-                    "iosVersion": UIDevice.current.systemVersion,
-                    "deviceModel": UIDevice.current.model,
-                    "language": LanguageManager.shared.currentLanguage.rawValue
-                ]
-                if let screenshot, let data = ProfilePhotoStorage.compressedJPEG(from: screenshot, maxDimension: 800) {
-                    let uploadURL: String = try await ConvexBackend.shared.call(
-                        .mutation, path: "feedback:generateScreenshotUploadUrl"
-                    )
-                    reportData["screenshotStorageId"] = try await ConvexBackend.shared.upload(data, to: uploadURL)
-                }
-                let _: JSONValue = try await ConvexBackend.shared.call(
-                    .mutation, path: "feedback:submitBugReport", args: reportData
-                )
-                HapticManager.success()
-                bugReportText = ""
-                bugReportScreenshot = nil
-                showBugReport = false
-                isSubmittingBugReport = false
-                // Let the sheet finish dismissing before presenting the confirmation
-                try? await Task.sleep(nanoseconds: 500_000_000)
-                showBugReportSuccess = true
-            } catch {
-                #if DEBUG
-                print("❌ Error submitting bug report: \(error)")
-                #endif
-                isSubmittingBugReport = false
-                // Network / rules failure: fall back to email so the report isn't lost
-                sendBugReportByEmail()
-            }
-        }
-    }
-
-    private func sendBugReportByEmail() {
-        let subject = "CortiFree bug report (\(appVersionString))"
-        let body = "\(bugReportText)\n\n—\niOS \(UIDevice.current.systemVersion) · \(UIDevice.current.model) · \(appVersionString)"
-        var components = URLComponents()
-        components.scheme = "mailto"
-        components.path = Self.supportEmail
-        components.queryItems = [
-            URLQueryItem(name: "subject", value: subject),
-            URLQueryItem(name: "body", value: body)
-        ]
-        showBugReport = false
-        bugReportText = ""
-        bugReportScreenshot = nil
-        guard let url = components.url else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            UIApplication.shared.open(url) { success in
-                if !success {
-                    UIPasteboard.general.string = Self.supportEmail
-                    infoAlertMessage = String(
-                        format: LanguageManager.shared.localizedString(for: "settings.contact.no_mail_app"),
-                        Self.supportEmail
-                    )
-                }
-            }
-        }
+        guard let url = SupportMail.mailtoURL(for: draft) else { return }
+        openURL(url.absoluteString)
     }
 
     // MARK: - Notifications
