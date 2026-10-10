@@ -156,12 +156,14 @@ class AnalyticsManager {
 
     /// Canonical screen-level event for Amplitude funnels. Specific screen
     /// events remain available for backwards-compatible Firebase dashboards.
-    func trackOnboardingScreenViewed(screenName: String, stepNumber: Int, totalSteps: Int) {
+    func trackOnboardingScreenViewed(screenName: String, stepNumber: Int, totalSteps: Int, version: String) {
         track(event: "onboarding_screen_viewed", properties: [
             "screen_name": screenName,
             "step_number": stepNumber,
-            "total_steps": totalSteps
+            "total_steps": totalSteps,
+            "onboarding_version": version
         ])
+        AmplitudeManager.shared.setUserProperties(["onboarding_version": version])
     }
 
     // 2. Overall Quiz (4 questions: raisons stress, durée stress, genre, âge)
@@ -194,26 +196,41 @@ class AnalyticsManager {
 
     // Legacy support - redirects to new format
     func trackOnboardingQuizQuestionViewed(questionNumber: Int, questionText: String, quizType: String = "habits") {
-        if quizType == "overall" {
-            trackOnboardingOverallQuizQuestionViewed(questionNumber: questionNumber)
-        } else {
-            trackOnboardingHabitsQuizQuestionViewed(questionNumber: questionNumber)
-        }
+        track(event: quizType == "overall" ? "onboarding_overall_quiz_question_viewed" : "onboarding_habits_quiz_question_viewed",
+              properties: [
+                "question_number": questionNumber,
+                "question_text_en": LanguageManager.shared.englishText(forDisplayed: questionText),
+                "quiz": quizType,
+                "onboarding_version": OnboardingV2FlowView.analyticsVersion
+              ])
     }
 
+    /// One answer of an onboarding quiz, with the question and the answer in English (every
+    /// language grouped together in the dashboard) and as shown on screen.
+    /// Multi-choice questions pass `answerTexts`: one list property, split per answer in Amplitude.
     func trackOnboardingQuizQuestionAnswered(
         questionNumber: Int,
         questionText: String,
         answerIndex: Int,
         answerText: String,
         timeToAnswer: Double,
-        quizType: String = "habits"
+        quizType: String = "habits",
+        answerTexts: [String]? = nil
     ) {
-        if quizType == "overall" {
-            trackOnboardingOverallQuizQuestionClicked(questionNumber: questionNumber)
-        } else {
-            trackOnboardingHabitsQuizQuestionClicked(questionNumber: questionNumber)
-        }
+        let language = LanguageManager.shared
+        let answers = answerTexts ?? [answerText]
+        track(event: quizType == "overall" ? "onboarding_overall_quiz_question_clicked" : "onboarding_habits_quiz_question_clicked",
+              properties: [
+                "question_number": questionNumber,
+                "question_text_en": language.englishText(forDisplayed: questionText),
+                "answer_index": answerIndex,
+                "answer_text_en": answers.map(language.englishText(forDisplayed:)),
+                "answer_text": answers,
+                "answer_count": answers.count,
+                "time_to_answer_s": (timeToAnswer * 10).rounded() / 10,
+                "quiz": quizType,
+                "onboarding_version": OnboardingV2FlowView.analyticsVersion
+              ])
     }
 
     // 3. Reassurance View
@@ -839,6 +856,11 @@ class AnalyticsManager {
     }
 
     // MARK: - Helper Methods
+
+    /// One user property (segments every chart in Amplitude: plan goal, premium, permission…).
+    func setUserProperty(_ name: String, value: Any) {
+        AmplitudeManager.shared.setUserProperties([name: value])
+    }
 
     func track(event: String, properties: [String: any Any]? = nil) {
         // Keep all existing event calls on the single Amplitude destination.

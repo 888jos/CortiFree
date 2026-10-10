@@ -168,6 +168,42 @@ class RevenueCatManager: ObservableObject {
         }
     }
 
+    /// Subscription state as Amplitude user properties, plus the transitions the app can see:
+    /// trial → paid, auto-renew turned off / back on, subscription lost. Revenue itself comes
+    /// from Superwall (first purchase) and the RevenueCat → Amplitude integration (renewals).
+    private func trackSubscriptionChanges(_ pro: EntitlementInfo?) {
+        let state: String
+        switch (pro?.isActive, pro?.periodType) {
+        case (true?, .trial?): state = "trial"
+        case (true?, .intro?): state = "intro"
+        case (true?, _): state = "paid"
+        default: state = pro == nil ? "never" : "expired"
+        }
+        AnalyticsManager.shared.setUserProperty("is_premium", value: pro?.isActive == true)
+        AnalyticsManager.shared.setUserProperty("subscription_period_type", value: state)
+        if let product = pro?.productIdentifier { AnalyticsManager.shared.setUserProperty("subscription_product", value: product) }
+        if let pro { AnalyticsManager.shared.setUserProperty("subscription_will_renew", value: pro.willRenew) }
+
+        let defaults = UserDefaults.standard
+        let previousState = defaults.string(forKey: "analytics.subscription.state")
+        let previousRenew = defaults.object(forKey: "analytics.subscription.willRenew") as? Bool
+        defer {
+            defaults.set(state, forKey: "analytics.subscription.state")
+            if let pro { defaults.set(pro.willRenew, forKey: "analytics.subscription.willRenew") }
+        }
+        guard let previousState, previousState != state || previousRenew != pro?.willRenew else { return }
+        let properties: [String: Any] = ["product_id": pro?.productIdentifier ?? "", "from": previousState, "to": state]
+        if previousState == "trial", state == "paid" {
+            AnalyticsManager.shared.track(event: "trial_converted", properties: properties)
+        } else if (previousState == "trial" || previousState == "paid" || previousState == "intro"), state == "expired" {
+            AnalyticsManager.shared.track(event: previousState == "trial" ? "trial_expired" : "subscription_expired", properties: properties)
+        }
+        if let previousRenew, let renew = pro?.willRenew, previousRenew != renew, pro?.isActive == true {
+            AnalyticsManager.shared.track(event: renew ? "subscription_auto_renew_on" : "subscription_auto_renew_off",
+                                          properties: properties.merging(["period_type": state]) { _, new in new })
+        }
+    }
+
     /// Start observing customer info changes in real-time
     private func startObservingCustomerInfo() {
         Task {
@@ -211,6 +247,8 @@ class RevenueCatManager: ObservableObject {
         } else {
             NotificationService.shared.cancelTrialEndingReminder()
         }
+
+        trackSubscriptionChanges(customerInfo.entitlements[entitlementID])
 
         // Mark that we've received a definitive answer from RevenueCat
         isPremiumStatusReady = true

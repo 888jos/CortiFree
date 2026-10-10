@@ -225,8 +225,10 @@ final class RecoveryScheduler {
 
     /// Steps from `authentication` on: the user has an account and a plan (segment A2).
     private static let planReadySteps: Set<String> = [
-        "authentication", "loading", "notificationPermissions", "eightHabitsIntro", "weekProgress",
-        "eightHabits", "habitsProgress", "commitmentPledge", "complete"
+        "authentication", "loading", "notificationPermissions", "planReady", "planDay", "planWeeks",
+        "commitmentPledge", "complete",
+        // Steps of older builds (8-habits screens)
+        "eightHabitsIntro", "weekProgress", "eightHabits", "habitsProgress"
     ]
 
     private init() {}

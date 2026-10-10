@@ -51,6 +51,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             purchaseController: purchaseController,
             options: superwallOptions
         )
+        // Notification funnel (scheduled → delivered → opened) and permission → Amplitude.
+        NotificationAnalytics.start()
+        Task { @MainActor in AnalyticsUserProperties.start() }
+
+        // Paywall, trial and purchase events → Amplitude (SuperwallAnalytics).
+        Superwall.shared.delegate = SuperwallAnalytics.shared
         if let gender = UserDefaults.standard.string(forKey: "onboarding_gender") {
             Superwall.shared.setUserAttributes(["gender": gender])
         }
@@ -101,16 +107,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         let notificationId = response.notification.request.identifier
         let userInfo = response.notification.request.content.userInfo
 
-        AnalyticsManager.shared.track(
-            event: "notification_clicked",
-            properties: [
-                "notification_id": notificationId,
-                "action": response.actionIdentifier,
-                "campaign": userInfo["campaign"] as? String ?? "",
-                "message_id": userInfo["message_id"] as? String ?? "",
-                "segment": userInfo["segment"] as? String ?? ""
-            ]
-        )
+        NotificationAnalytics.opened(response)
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
             Task { @MainActor in NotificationRouter.shared.handle(userInfo: userInfo) }
         }
@@ -128,13 +125,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let notificationId = notification.request.identifier
 
-        AnalyticsManager.shared.track(
-            event: "notification_received",
-            properties: [
-                "notification_id": notificationId,
-                "app_state": "foreground"
-            ]
-        )
+        NotificationAnalytics.shownInForeground(notification)
 
         #if DEBUG
         print("🔔 Notification received (foreground): \(notificationId)")

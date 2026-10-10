@@ -49,6 +49,18 @@ final class AmplitudeManager {
         amplitude.track(eventType: event, eventProperties: properties)
     }
 
+    /// Amplitude revenue event (« revenue_amount »), counted in Amplitude's revenue charts.
+    func logRevenue(productId: String, price: Double, currency: String?, properties: [String: Any]) {
+        let revenue = Revenue()
+        revenue.productId = productId
+        revenue.price = price
+        revenue.quantity = 1
+        revenue.revenueType = "purchase"
+        revenue.currency = currency
+        revenue.properties = properties
+        amplitude?.revenue(revenue: revenue)
+    }
+
     func flush() {
         amplitude?.flush()
     }
