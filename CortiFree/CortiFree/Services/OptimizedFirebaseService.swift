@@ -7,8 +7,9 @@ final class OptimizedFirebaseService {
     static let shared = OptimizedFirebaseService()
     private init() {}
 
+    /// The quiz is answered before the account exists: the baseline waits on the device
+    /// (OnboardingSync) and is sent as soon as the user is signed in.
     func saveQuizDataInBackground(_ result: HabitsQuizResult, overallData: OverallQuizData?) {
-        guard Auth.auth().currentUser != nil else { return }
         let baseline = result.baselineData
         var args: [String: Any] = [
             "baseline": [
@@ -34,21 +35,7 @@ final class OptimizedFirebaseService {
             ],
         ]
         if let overallData { args["profile"] = Self.profileAnswers(overallData) }
-
-        Task {
-            do {
-                let _: JSONValue = try await ConvexBackend.shared.call(
-                    .mutation, path: "baseline:saveInitial", args: args
-                )
-                #if DEBUG
-                print("✅ Onboarding baseline saved to Convex")
-                #endif
-            } catch {
-                #if DEBUG
-                print("⚠️ Convex onboarding save failed: \(error.localizedDescription)")
-                #endif
-            }
-        }
+        OnboardingSync.queueBaseline(args)
     }
 
     static func profileAnswers(_ data: OverallQuizData) -> [String: Any] {

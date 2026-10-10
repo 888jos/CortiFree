@@ -539,25 +539,8 @@ struct OnboardingV2FlowView: View {
         // Set routine start date for program progress tracking
         UserDefaults.standard.set(Date(), forKey: "routineStartDate")
 
-        // Persist completion in Convex.
-        if Auth.auth().currentUser != nil {
-            Task {
-                do {
-                    let _: JSONValue = try await ConvexBackend.shared.call(
-                        .mutation,
-                        path: "profile:saveOnboarding",
-                        args: ["completed": true]
-                    )
-                    #if DEBUG
-                    print("✅ Convex onboardingCompleted set to true")
-                    #endif
-                } catch {
-                    #if DEBUG
-                    print("⚠️ Failed to update onboardingCompleted: \(error.localizedDescription)")
-                    #endif
-                }
-            }
-        }
+        // Persist completion in Convex (retried until the server has it, see OnboardingSync).
+        OnboardingSync.queueCompleted()
 
         // Using @AppStorage, this will automatically trigger view update
         isOnboardingComplete = true
@@ -584,6 +567,9 @@ struct OnboardingV2FlowView: View {
             overallData: overallQuizData,
             symptoms: selectedSymptoms
         )
+
+        // The user is signed in now: send the baseline queued at the habits quiz (if it failed).
+        OnboardingSync.flush()
 
         Task {
             // Save quiz responses to Convex

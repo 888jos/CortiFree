@@ -29,6 +29,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Initialize analytics (Amplitude)
         AnalyticsManager.shared.initialize()
 
+        // Onboarding writes that didn't reach the server yet (quiz baseline, completion).
+        OnboardingSync.start()
+
         // Initialize PostHog Analytics
         PostHogManager.shared.initialize()
 

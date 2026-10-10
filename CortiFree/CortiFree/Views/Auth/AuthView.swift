@@ -992,7 +992,7 @@ struct AuthGoogleView: View {
                         firstName: user.profile?.givenName
                     )
                     UserDefaults.standard.set(user.profile?.givenName ?? "auth.default_user_name".localized, forKey: "userFirstName")
-                    UserDefaults.standard.set(signedIn.onboardingCompleted, forKey: "onboardingV2Completed")
+                    UserDefaults.standard.set(OnboardingSync.resolvedCompleted(server: signedIn.onboardingCompleted), forKey: "onboardingV2Completed")
                     await RevenueCatManager.shared.identifyUser(userId: signedIn.uid)
 
                     await MainActor.run {
@@ -1235,7 +1235,7 @@ struct AuthAppleView: View {
                     if let firstName, !firstName.isEmpty {
                         UserDefaults.standard.set(firstName, forKey: "userFirstName")
                     }
-                    UserDefaults.standard.set(user.onboardingCompleted, forKey: "onboardingV2Completed")
+                    UserDefaults.standard.set(OnboardingSync.resolvedCompleted(server: user.onboardingCompleted), forKey: "onboardingV2Completed")
                     await RevenueCatManager.shared.identifyUser(userId: user.uid)
 
                     await MainActor.run {

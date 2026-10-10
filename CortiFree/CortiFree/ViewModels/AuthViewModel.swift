@@ -92,8 +92,9 @@ final class AuthViewModel: ObservableObject {
 
     func syncOnboardingStatus(userId: String) {
         guard let user = auth.currentUser else { return }
-        hasCompletedOnboarding = user.onboardingCompleted
-        UserDefaults.standard.set(user.onboardingCompleted, forKey: "onboardingV2Completed")
+        let completed = OnboardingSync.resolvedCompleted(server: user.onboardingCompleted)
+        hasCompletedOnboarding = completed
+        UserDefaults.standard.set(completed, forKey: "onboardingV2Completed")
     }
 
     private func runAuthOperation(_ operation: @escaping @MainActor () async throws -> Void) async {

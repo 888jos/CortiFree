@@ -108,6 +108,7 @@ final class AccountDeletionService {
             "userFirstName", "celebration.streak.lastDay"
         ].forEach { defaults.removeObject(forKey: $0) }
         SessionRatingStore.clear()
+        OnboardingSync.clear()
         if HealthKitService.shared.isEnabled { HealthKitService.shared.disable() }
         WidgetDataStore.sharedDefaults?.removePersistentDomain(forName: WidgetDataStore.appGroupID)
     }
