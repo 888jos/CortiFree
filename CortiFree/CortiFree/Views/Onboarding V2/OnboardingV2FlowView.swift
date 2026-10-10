@@ -544,6 +544,8 @@ struct OnboardingV2FlowView: View {
 
         // Using @AppStorage, this will automatically trigger view update
         isOnboardingComplete = true
+        // The daily reminders wait for the end of the onboarding (time chosen on the permissions step).
+        NotificationService.shared.syncDailyNotificationsWithPreference()
         TikTokManager.shared.requestTrackingAuthorizationIfNeeded()
         if isPremium {
             OnboardingLiveActivityManager.shared.clearLiveGiftOffer()

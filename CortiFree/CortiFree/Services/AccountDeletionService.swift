@@ -105,8 +105,10 @@ final class AccountDeletionService {
             "progressDashboardCacheV2.lifetime",
             "daily_check_in_last_prompted_day", "daily_check_in_last_completed_day",
             "personalPlan.onboardingProfile.v1", "plan.shortModeDay",
-            "userFirstName", "celebration.streak.lastDay"
+            "userFirstName", "celebration.streak.lastDay",
+            "trialKickoffPending", "trialKickoffDone", "hasSeenPaywall", "onboardingCheckpoint"
         ].forEach { defaults.removeObject(forKey: $0) }
+        NotificationService.shared.cancelDailyNotifications()
         SessionRatingStore.clear()
         OnboardingSync.clear()
         if HealthKitService.shared.isEnabled { HealthKitService.shared.disable() }

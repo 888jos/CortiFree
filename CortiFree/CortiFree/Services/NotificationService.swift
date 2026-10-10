@@ -11,6 +11,12 @@ class NotificationService {
     /// Schedule daily notifications for user engagement
     func scheduleDailyNotifications() {
         guard !userDisabledNotifications else { return }
+        // Only for someone who finished the onboarding (the reminders talk about their program);
+        // not for a signed-out device or an abandoned onboarding.
+        guard UserDefaults.standard.bool(forKey: "onboardingV2Completed") else {
+            cancelDailyNotifications()
+            return
+        }
         guard hasNotificationPermission() else {
             print("⚠️ No notification permission - skipping daily notifications")
             return
