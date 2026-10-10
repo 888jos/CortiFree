@@ -5672,8 +5672,16 @@
 "common.undo" = "Annuler";
 
 /* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
-"paywall_custom.headline.plan.named" = "%1$@, %2$@ est prêt.";
-"paywall_custom.headline.plan.anonymous" = "%@ est prêt.";
+"paywall_custom.headline.goal.stress.named" = "%@, ton plan est fait pour apaiser ton stress.";
+"paywall_custom.headline.goal.stress.anonymous" = "Ton plan est fait pour apaiser ton stress.";
+"paywall_custom.headline.goal.sleep.named" = "%@, ton plan est fait pour apaiser ton sommeil.";
+"paywall_custom.headline.goal.sleep.anonymous" = "Ton plan est fait pour apaiser ton sommeil.";
+"paywall_custom.headline.goal.energy.named" = "%@, ton plan est fait pour te redonner de l'énergie.";
+"paywall_custom.headline.goal.energy.anonymous" = "Ton plan est fait pour te redonner de l'énergie.";
+"paywall_custom.headline.goal.focus.named" = "%@, ton plan est fait pour t'aider à retrouver ta concentration.";
+"paywall_custom.headline.goal.focus.anonymous" = "Ton plan est fait pour t'aider à retrouver ta concentration.";
+"paywall_custom.headline.goal.emotional.named" = "%@, ton plan est fait pour t'aider à retrouver ton équilibre.";
+"paywall_custom.headline.goal.emotional.anonymous" = "Ton plan est fait pour t'aider à retrouver ton équilibre.";
 "onboarding_v2.pulse_recap.result" = "Pendant ta minute de respiration, ton cœur est passé de %1$d à %2$d BPM.";
 "onboarding_v2.pulse_recap.plan" = "En 1 minute de respiration, ton cœur a ralenti de %d BPM : ton plan reprend ce réflexe chaque jour.";
 "onboarding_v2.pulse_recap.paywall" = "En 1 minute, ton cœur a ralenti de %d BPM. Imagine 28 jours.";

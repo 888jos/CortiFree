@@ -5677,8 +5677,16 @@
 "common.undo" = "取り消す";
 
 /* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
-"paywall_custom.headline.plan.named" = "%1$@さん、%2$@の準備ができました。";
-"paywall_custom.headline.plan.anonymous" = "%@の準備ができました。";
+"paywall_custom.headline.goal.stress.named" = "%@さん、ストレスをやわらげるためのプランができました。";
+"paywall_custom.headline.goal.stress.anonymous" = "ストレスをやわらげるためのプランができました。";
+"paywall_custom.headline.goal.sleep.named" = "%@さん、眠りを穏やかにするためのプランができました。";
+"paywall_custom.headline.goal.sleep.anonymous" = "眠りを穏やかにするためのプランができました。";
+"paywall_custom.headline.goal.energy.named" = "%@さん、元気を取り戻すためのプランができました。";
+"paywall_custom.headline.goal.energy.anonymous" = "元気を取り戻すためのプランができました。";
+"paywall_custom.headline.goal.focus.named" = "%@さん、集中力を取り戻すためのプランができました。";
+"paywall_custom.headline.goal.focus.anonymous" = "集中力を取り戻すためのプランができました。";
+"paywall_custom.headline.goal.emotional.named" = "%@さん、心のバランスを取り戻すためのプランができました。";
+"paywall_custom.headline.goal.emotional.anonymous" = "心のバランスを取り戻すためのプランができました。";
 "onboarding_v2.pulse_recap.result" = "1分間の呼吸で、心拍数が%1$dから%2$d BPMになりました。";
 "onboarding_v2.pulse_recap.plan" = "1分間の呼吸で心拍数が%d BPM下がりました。プランでは毎日この反応を活かします。";
 "onboarding_v2.pulse_recap.paywall" = "たった1分で心拍数が%d BPM下がりました。28日間続けたら？";

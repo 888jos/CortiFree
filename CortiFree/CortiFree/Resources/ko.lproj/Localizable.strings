@@ -5677,8 +5677,16 @@
 "common.undo" = "실행 취소";
 
 /* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
-"paywall_custom.headline.plan.named" = "%1$@님, %2$@이 준비됐어요.";
-"paywall_custom.headline.plan.anonymous" = "%@이 준비됐어요.";
+"paywall_custom.headline.goal.stress.named" = "%@님, 스트레스를 덜어 줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.stress.anonymous" = "스트레스를 덜어 줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.sleep.named" = "%@님, 편안한 잠을 도와줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.sleep.anonymous" = "편안한 잠을 도와줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.energy.named" = "%@님, 활력을 되찾아 줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.energy.anonymous" = "활력을 되찾아 줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.focus.named" = "%@님, 집중력을 되찾아 줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.focus.anonymous" = "집중력을 되찾아 줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.emotional.named" = "%@님, 마음의 균형을 되찾아 줄 플랜이 준비됐어요.";
+"paywall_custom.headline.goal.emotional.anonymous" = "마음의 균형을 되찾아 줄 플랜이 준비됐어요.";
 "onboarding_v2.pulse_recap.result" = "1분 동안 호흡하는 사이 심박수가 %1$d에서 %2$d BPM으로 바뀌었어요.";
 "onboarding_v2.pulse_recap.plan" = "1분 호흡으로 심박수가 %d BPM 내려갔어요. 플랜은 매일 이 반응을 활용해요.";
 "onboarding_v2.pulse_recap.paywall" = "단 1분 만에 심박수가 %d BPM 내려갔어요. 28일이면 어떨까요?";

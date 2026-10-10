@@ -190,20 +190,18 @@ struct CustomPaywallView: View {
             : String(format: "\(base).named".localized, name)
     }
 
-    /// "Lise, ton plan Calme intérieur est prêt.": the name of the plan generated after the analysis.
+    /// "Lise, ton plan est fait pour apaiser ton sommeil.": what the plan generated after the analysis is for.
     private var planHeadline: String? {
-        guard let title = planStore.plan?.localizedTitle, !title.isEmpty else { return nil }
+        guard let goal = planStore.plan?.goal else { return nil }
         let name = userName.trimmingCharacters(in: .whitespacesAndNewlines)
         if name.isEmpty {
-            return String(format: "paywall_custom.headline.plan.anonymous".localized, title)
+            return "paywall_custom.headline.goal.\(goal.rawValue).anonymous".localized
         }
-        // Mid-sentence: "ton plan…" / "your … plan" / "dein Plan…" (no-op for ja/ko).
-        let midSentence = title.prefix(1).lowercased() + title.dropFirst()
-        return String(format: "paywall_custom.headline.plan.named".localized, name, midSentence)
+        return String(format: "paywall_custom.headline.goal.\(goal.rawValue).named".localized, name)
     }
 
     private var headerSection: some View {
-        // "Prénom, ton plan … est prêt." as the title, the 28-day promise below it.
+        // "Prénom, ton plan est fait pour apaiser ton sommeil." as the title, the 28-day promise below it.
         let lines = personalizedTitle.components(separatedBy: "\n")
         return VStack(spacing: 10) {
             Text(planHeadline ?? lines.first ?? "")

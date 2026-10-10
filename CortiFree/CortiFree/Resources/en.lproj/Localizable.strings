@@ -5674,8 +5674,16 @@
 "common.undo" = "Undo";
 
 /* Onboarding personalization: plan headline, breathing pulse recap, App Store reviews */
-"paywall_custom.headline.plan.named" = "%1$@, %2$@ is ready.";
-"paywall_custom.headline.plan.anonymous" = "%@ is ready.";
+"paywall_custom.headline.goal.stress.named" = "%@, your plan is made to ease your stress.";
+"paywall_custom.headline.goal.stress.anonymous" = "Your plan is made to ease your stress.";
+"paywall_custom.headline.goal.sleep.named" = "%@, your plan is made to soothe your sleep.";
+"paywall_custom.headline.goal.sleep.anonymous" = "Your plan is made to soothe your sleep.";
+"paywall_custom.headline.goal.energy.named" = "%@, your plan is made to bring your energy back.";
+"paywall_custom.headline.goal.energy.anonymous" = "Your plan is made to bring your energy back.";
+"paywall_custom.headline.goal.focus.named" = "%@, your plan is made to help you focus again.";
+"paywall_custom.headline.goal.focus.anonymous" = "Your plan is made to help you focus again.";
+"paywall_custom.headline.goal.emotional.named" = "%@, your plan is made to help you find your balance again.";
+"paywall_custom.headline.goal.emotional.anonymous" = "Your plan is made to help you find your balance again.";
 "onboarding_v2.pulse_recap.result" = "During your minute of breathing, your heart went from %1$d to %2$d BPM.";
 "onboarding_v2.pulse_recap.plan" = "In 1 minute of breathing, your heart slowed by %d BPM: your plan builds on that reflex every day.";
 "onboarding_v2.pulse_recap.paywall" = "In 1 minute, your heart slowed by %d BPM. Imagine 28 days.";
