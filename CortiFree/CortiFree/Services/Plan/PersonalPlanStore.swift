@@ -356,9 +356,11 @@ final class PersonalPlanStore: ObservableObject {
     }
 
     /// After a GAD-7 imported from Apple Health on day 1: rebuild today's plan with it (same goal
-    /// choice and cycle). Later ones only shape the next cycles.
+    /// choice and cycle). Later ones only shape the next cycles. Days the user already edited
+    /// (swap, add, remove) keep their content, and the edit history is kept.
     func applyAnxietyCheck() {
-        guard let plan, plan.dayIndex() == 1 else { return }
+        // Never from a provisional (offline) plan: apply() would save it over the cloud one.
+        guard let plan, !isProvisional, plan.dayIndex() == 1 else { return }
         let newPlan = PersonalPlanGenerator.generate(
             profile: plan.profile,
             overrideGoal: plan.goalChosenByUser ? plan.goal : nil,
@@ -368,8 +370,14 @@ final class PersonalPlanStore: ObservableObject {
             excluded: plan.excludedRefIDs,
             options: plan.cycleOptions
         )
+        let editedDays = Set((plan.edits ?? []).filter { [.swap, .add, .remove].contains($0.kind) }.map(\.dayNumber))
         var adjusted = newPlan
+        adjusted.days = newPlan.days.map { day in
+            guard editedDays.contains(day.dayNumber), let kept = plan.day(day.dayNumber) else { return day }
+            return kept
+        }
         adjusted.preferences = plan.preferences
+        adjusted.edits = plan.edits
         apply(adjusted)
     }
 
