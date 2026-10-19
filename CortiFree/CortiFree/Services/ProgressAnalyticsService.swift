@@ -272,7 +272,9 @@ final class ProgressAnalyticsService {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        // The app writes these keys from the local calendar day (DailyCheckInService):
+        // read them in the same time zone, or west of UTC every day landed on the day before.
+        formatter.timeZone = .current
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()

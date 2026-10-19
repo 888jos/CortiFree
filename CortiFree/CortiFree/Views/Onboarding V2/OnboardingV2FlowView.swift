@@ -201,6 +201,11 @@ struct OnboardingV2FlowView: View {
             currentStep = .authentication
             return
         }
+        // Launch argument: open the onboarding straight on the quiz choice (AI or by hand).
+        if ProcessInfo.processInfo.arguments.contains("-onboardingStartAtQuiz") {
+            currentStep = .habitsQuiz
+            return
+        }
         #endif
 
         restoreAnswersFromDraft()
@@ -296,7 +301,7 @@ struct OnboardingV2FlowView: View {
 
     /// Bump whenever the onboarding screens change: the analytics dashboard shows the funnel
     /// of the latest version (older versions stay selectable).
-    nonisolated static let analyticsVersion = "2026-10-10"
+    nonisolated static let analyticsVersion = "2026-10-13"
 
     /// The screens a user really goes through, in order. Steps that only redirect
     /// (sixtyDayExplanation, notificationPermissions) and the fallback sign-up after the
@@ -380,13 +385,14 @@ struct OnboardingV2FlowView: View {
         case .reassurance:
             ReassuranceView(
                 overallData: overallQuizData,
+                onBack: { currentStep = .overall },
                 onStartQuiz: {
                     currentStep = .habitsQuiz
                 }
             )
 
         case .habitsQuiz:
-            HabitsQuizView(onComplete: { result in
+            HabitsQuizEntryView(onBack: { currentStep = .reassurance }, onComplete: { result in
                 habitsQuizResult = result
                 AnalyticsICP.habitsCompleted(result)
                 currentStep = .stressPatternValidation
@@ -448,6 +454,7 @@ struct OnboardingV2FlowView: View {
                 onBack: { currentStep = .scientificPlan },
                 onSkip: {
                     // The account is asked again (mandatory) right after the trial starts.
+                    AnalyticsManager.shared.track(event: "onboarding_authentication_skipped")
                     currentStep = .loading
                 },
                 onComplete: {
@@ -565,7 +572,8 @@ struct OnboardingV2FlowView: View {
         isOnboardingComplete = true
         // The daily reminders wait for the end of the onboarding (time chosen on the permissions step).
         NotificationService.shared.syncDailyNotificationsWithPreference()
-        TikTokManager.shared.requestTrackingAuthorizationIfNeeded()
+        // The tracking prompt waits for the program's second day (CortiFreeApp), not stacked
+        // on the trial kickoff right after the purchase.
         if isPremium {
             OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
         } else if hasSeenPaywall {
@@ -736,7 +744,11 @@ struct OnboardingBreathingIntroView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: pulseStage)
         // A result from an earlier onboarding must not be shown for this one.
-        .onAppear { OnboardingPulseResult.clear() }
+        .onAppear {
+            OnboardingPulseResult.clear()
+            trackStep("viewed")
+        }
+        .onChange(of: pulseBefore?.bpm) { _, bpm in if bpm != nil { trackStep("pulse_measured") } }
         .onReceive(timer) { _ in
             guard isStarted, !isComplete else { return }
             elapsedSeconds += 1
@@ -747,6 +759,7 @@ struct OnboardingBreathingIntroView: View {
         }
         .onChange(of: isStarted) { _, started in
             guard started else { return }
+            trackStep("started")
             startBreathingCycle()
         }
     }
@@ -769,6 +782,7 @@ struct OnboardingBreathingIntroView: View {
                 },
                 onBack: {
                     pulseMeter.stop()
+                    trackStep("back")
                     onBack()
                 },
                 onUnclear: {
@@ -878,6 +892,7 @@ struct OnboardingBreathingIntroView: View {
         HStack {
             Button {
                 HapticManager.light()
+                trackStep("back")
                 onBack()
             } label: {
                 Image(systemName: "arrow.left")
@@ -914,7 +929,18 @@ struct OnboardingBreathingIntroView: View {
     private func exitToNextStep() {
         guard !hasExited else { return }
         hasExited = true
+        trackStep(isComplete ? "completed" : (isStarted ? "left_during" : "skipped"))
         onContinue()
+    }
+
+    /// One event with an `action` (viewed, pulse_measured, started, skipped, left_during,
+    /// completed, back): where the quiz's breathing break loses people.
+    private func trackStep(_ action: String) {
+        AnalyticsManager.shared.track(event: "onboarding_breathing_intro", properties: [
+            "action": action,
+            "elapsed_seconds": elapsedSeconds,
+            "measures_pulse": measuresPulse,
+        ])
     }
 
     private func phaseTitle(at elapsed: Double) -> String {

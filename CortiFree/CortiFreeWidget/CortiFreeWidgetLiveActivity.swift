@@ -12,6 +12,8 @@ struct CortiFreeWidgetAttributes: ActivityAttributes {
         enum Phase: String, Codable, Hashable {
             case onboardingProgress
             case limitedOffer
+            /// « Copy the AI's reply and come back » while the user is in ChatGPT & co.
+            case aiQuizReturn
         }
 
         var phase: Phase
@@ -38,6 +40,8 @@ struct CortiFreeWidgetLiveActivity: Widget {
             Group {
                 if context.state.phase == .limitedOffer {
                     offerLockScreen(context.state)
+                } else if context.state.phase == .aiQuizReturn {
+                    aiQuizLockScreen(context.state)
                 } else {
                     progressLockScreen(context.state)
                 }
@@ -61,7 +65,7 @@ struct CortiFreeWidgetLiveActivity: Widget {
                         Text(context.state.subtitle)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
-                            .lineLimit(1)
+                            .lineLimit(context.state.phase == .aiQuizReturn ? 2 : 1)
                         if context.state.phase == .onboardingProgress {
                             ProgressView(value: context.state.progress)
                                 .tint(accent)
@@ -92,6 +96,10 @@ struct CortiFreeWidgetLiveActivity: Widget {
                     countdown(until: context.state.offerEndsAt)
                         .font(.caption2.bold())
                         .monospacedDigit()
+                } else if context.state.phase == .aiQuizReturn {
+                    Image(systemName: "doc.on.doc.fill")
+                        .font(.caption2.bold())
+                        .foregroundStyle(accent)
                 } else {
                     Text("\(Int((context.state.progress * 100).rounded()))%")
                         .font(.caption2.bold())
@@ -158,6 +166,44 @@ struct CortiFreeWidgetLiveActivity: Widget {
         .padding(.vertical, 14)
     }
 
+    /// AI quiz: the AI's logo, « Copy ChatGPT's reply », and the button back to CortiFree.
+    private func aiQuizLockScreen(_ state: CortiFreeWidgetAttributes.ContentState) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 14) {
+                leadingVisual(state, size: 34)
+                    .frame(width: 46, height: 46)
+                    .background(Color.white.opacity(0.08), in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(state.title)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                    Text(state.subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.78))
+                        .lineLimit(2)
+                }
+                Spacer(minLength: 0)
+            }
+            if let ctaTitle = state.ctaTitle, let url = liveActivityURL(state) {
+                Link(destination: url) {
+                    Label(ctaTitle, systemImage: "arrow.uturn.backward")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 38)
+                        .background(
+                            LinearGradient(colors: [accentDeep, accent], startPoint: .leading, endPoint: .trailing),
+                            in: Capsule()
+                        )
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+    }
+
     private func progressLockScreen(_ state: CortiFreeWidgetAttributes.ContentState) -> some View {
         HStack(spacing: 14) {
             leadingVisual(state, size: 46)
@@ -182,7 +228,20 @@ struct CortiFreeWidgetLiveActivity: Widget {
 
     @ViewBuilder
     private func leadingVisual(_ state: CortiFreeWidgetAttributes.ContentState, size: CGFloat) -> some View {
-        if state.phase == .limitedOffer {
+        if state.phase == .aiQuizReturn {
+            // The AI's logo in white (« sf:<symbol> » for another AI).
+            Group {
+                if state.imageName.hasPrefix("sf:") {
+                    Image(systemName: String(state.imageName.dropFirst(3))).resizable()
+                } else {
+                    Image(state.imageName).renderingMode(.template).resizable()
+                }
+            }
+            .scaledToFit()
+            .foregroundStyle(.white)
+            .frame(width: size * 0.8, height: size * 0.8)
+            .frame(width: size, height: size)
+        } else if state.phase == .limitedOffer {
             Image(state.imageName)
                 .resizable()
                 .scaledToFit()
@@ -206,6 +265,10 @@ struct CortiFreeWidgetLiveActivity: Widget {
             countdown(until: state.offerEndsAt)
                 .font(.title3.bold())
                 .monospacedDigit()
+                .foregroundStyle(accent)
+        } else if state.phase == .aiQuizReturn {
+            Image(systemName: "doc.on.doc.fill")
+                .font(.title3)
                 .foregroundStyle(accent)
         } else {
             Text("\(state.progressPercentage)%")

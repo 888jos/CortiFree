@@ -31,6 +31,7 @@
     monetization: { title: "Monétisation", render: renderMonetization },
     engagement: { title: "Engagement & rétention", render: renderEngagement },
     notifications: { title: "Notifications", render: renderNotifications },
+    checkin: { title: "Daily check-in", render: renderCheckIn },
     explorer: { title: "Explorateur d'événements", render: renderExplorer },
   };
 
@@ -1047,6 +1048,85 @@
   }
 
   // ------------------------------------------------------------------ notifications
+  // ------------------------------------------------------------------ Daily check-in
+  // The daily recap drawer (app: DailyCheckInView). Events: daily_checkin_shown / _skipped /
+  // _completed / _home_card_tapped, each with day = « today » (from 21:00) or « yesterday ».
+  // Answers: stress 1 = very calm … 5 = very stressed; sleep and energy 1 = bad … 5 = great.
+  function renderCheckIn(root, range) {
+    const SHOWN = ["daily_checkin_shown"];
+    const DONE = ["daily_checkin_completed"];
+    const SKIPPED = ["daily_checkin_skipped"];
+    const CARD = ["daily_checkin_home_card_tapped"];
+    const tile = (label, evs, i, m = "uniques") => kpi(label, async () => {
+      const [a, b] = await metricWithPrev(evs, m, range);
+      if (a.missing) return { missing: true, missingEvents: evs };
+      return { value: a.total, prev: b.total, spark: a.series, note: m === "uniques" ? "utilisateurs uniques" : "événements" };
+    }, SERIES[i]);
+    // Weighted average of a 1…5 answer, from its value breakdown.
+    const average = async (prop) => {
+      const r = await api("/api/breakdown", { event: DONE[0], prop, i: 30, limit: 10, ...rp(range) });
+      if (r.missing) return null;
+      let n = 0, total = 0;
+      r.rows.forEach((x) => { const v = Number(x.value); if (Number.isFinite(v)) { n += x.total; total += v * x.total; } });
+      return n ? total / n : null;
+    };
+    const MOOD_SCORE = { awful: 1, angry: 2, low: 3, okay: 4, good: 5, amazing: 6 };
+
+    root.append(
+      el("div", { class: "grid kpis" },
+        tile("Ont vu le check-in", SHOWN, 0),
+        tile("L'ont terminé", DONE, 2),
+        tile("Ont passé", SKIPPED, 4),
+        kpi("Taux de complétion", async () => {
+          const [[s, ps], [d, pd]] = await Promise.all([metricWithPrev(SHOWN, "totals", range), metricWithPrev(DONE, "totals", range)]);
+          if (s.missing || d.missing) return { missing: true, missingEvents: [...(s.missing ? SHOWN : []), ...(d.missing ? DONE : [])] };
+          return { value: s.total ? d.total / s.total : null, prev: ps.total ? pd.total / ps.total : undefined, fmt: (v) => fmtPct(v),
+            spark: s.series.map((v, i) => (v ? (d.series[i] || 0) / v : 0)), note: "terminés / vus" };
+        }, SERIES[6]),
+        tile("Ouverts depuis l'accueil", CARD, 1, "totals"),
+      ),
+      el("div", { class: "grid two" },
+        card({ title: "Tendance quotidienne", sub: "Utilisateurs uniques qui voient, terminent et passent le check-in", load: async (body) => {
+          const sets = await Promise.all([metricSeries(SHOWN, "uniques", range), metricSeries(DONE, "uniques", range), metricSeries(SKIPPED, "uniques", range)]);
+          const labels = ["Vu", "Terminé", "Passé"];
+          const ok = sets.map((s, i) => ({ ...s, label: labels[i], color: SERIES[[0, 2, 4][i]] })).filter((s) => !s.missing);
+          if (!ok.length) { body.replaceChildren(emptyBox(null, [...SHOWN, ...DONE, ...SKIPPED])); return; }
+          const c = el("div", { class: "chart" }); body.replaceChildren(c);
+          lineChart(c, ok[0].x, ok.map((s) => ({ label: s.label, data: s.series, color: s.color })));
+          const waiting = sets.map((s, i) => (s.missing ? [SHOWN, DONE, SKIPPED][i][0] : null)).filter(Boolean);
+          if (waiting.length) body.append(pendingList(waiting));
+        } }),
+        card({ title: "Moyennes des réponses", sub: "Sur les check-ins terminés de la période", load: async (body) => {
+          if (!has(DONE[0])) { body.replaceChildren(emptyBox(null, DONE)); return; }
+          const [stress, sleep, energy, moods] = await Promise.all([
+            average("stress"), average("sleep"), average("energy"),
+            api("/api/breakdown", { event: DONE[0], prop: "mood", i: 30, limit: 10, ...rp(range) }),
+          ]);
+          let n = 0, t = 0;
+          (moods.rows || []).forEach((x) => { const v = MOOD_SCORE[x.value]; if (v) { n += x.total; t += v * x.total; } });
+          const fmt = (v, max) => (v == null ? "—" : `${v.toFixed(1)} / ${max}`);
+          body.replaceChildren(table([{ label: "Question" }, { label: "Moyenne", num: true }, { label: "Lecture" }], [
+            ["Humeur", fmt(n ? t / n : null, 6), "1 = terrible … 6 = génial"],
+            ["Stress", fmt(stress, 5), "1 = très calme … 5 = très stressé"],
+            ["Sommeil", fmt(sleep, 5), "1 = très mal … 5 = très bien"],
+            ["Énergie", fmt(energy, 5), "1 = à plat … 5 = au top"],
+          ]));
+        }, skeletonKind: "lines" }),
+      ),
+      el("div", { class: "grid three" },
+        breakdownCard("Bilan d'aujourd'hui ou d'hier", "daily_checkin_completed", "day", range),
+        breakdownCard("Humeur", "daily_checkin_completed", "mood", range),
+        breakdownCard("Stress (1 calme → 5 stressé)", "daily_checkin_completed", "stress", range, { sortNumeric: true }),
+        breakdownCard("Sommeil (1 → 5)", "daily_checkin_completed", "sleep", range, { sortNumeric: true }),
+        breakdownCard("Énergie (1 → 5)", "daily_checkin_completed", "energy", range, { sortNumeric: true }),
+        breakdownCard("Avec une note", "daily_checkin_completed", "has_note", range),
+        breakdownCard("Passé à quelle question", "daily_checkin_skipped", "step", range),
+        breakdownCard("Vu : aujourd'hui ou hier", "daily_checkin_shown", "day", range),
+        breakdownCard("Série en cours au check-in", "daily_checkin_completed", "current_streak", range, { sortNumeric: true, limit: 20 }),
+      ),
+    );
+  }
+
   function renderNotifications(root, range) {
     const prev = prevRange(range);
     const SCHEDULED = ["notification_scheduled"];

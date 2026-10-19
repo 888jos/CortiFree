@@ -201,6 +201,8 @@ class RevenueCatManager: ObservableObject {
         if let previousRenew, let renew = pro?.willRenew, previousRenew != renew, pro?.isActive == true {
             AnalyticsManager.shared.track(event: renew ? "subscription_auto_renew_on" : "subscription_auto_renew_off",
                                           properties: properties.merging(["period_type": state]) { _, new in new })
+            // Turned off: the next app open says how long the access lasts and asks why.
+            if renew { CancelIntercept.clear() } else { CancelIntercept.markPending(until: pro?.expirationDate, periodType: state) }
         }
     }
 
@@ -513,6 +515,15 @@ class RevenueCatManager: ObservableObject {
         guard let entitlement = customerInfo?.entitlements[entitlementID], entitlement.isActive else { return false }
         guard let start = entitlement.originalPurchaseDate else { return true }
         return Date().timeIntervalSince(start) < 24 * 3600
+    }
+
+    /// Length of the current free trial in days, from the store (3, 7…), nil outside a trial.
+    /// The trial length is set in App Store Connect / Superwall, never assumed in the app.
+    var trialLengthDays: Int? {
+        guard let entitlement = customerInfo?.entitlements[entitlementID], entitlement.periodType == .trial,
+              let end = entitlement.expirationDate, let start = entitlement.latestPurchaseDate else { return nil }
+        let days = Int((end.timeIntervalSince(start) / 86_400).rounded())
+        return (1...31).contains(days) ? days : nil
     }
 
     /// Whether the active "pro" entitlement is in its free trial.

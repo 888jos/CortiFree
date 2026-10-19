@@ -41,7 +41,10 @@ export async function transcribeWithOpenAI(
     headers: { Authorization: `Bearer ${apiKey}` },
     body: form,
   });
-  if (!upstream.ok) throw new Error(`Transcription unavailable (${upstream.status})`);
+  if (!upstream.ok) {
+    console.error("transcribe: OpenAI error", upstream.status, (await upstream.text()).slice(0, 300));
+    throw new Error(`Transcription unavailable (${upstream.status})`);
+  }
   const result = (await upstream.json()) as { text?: unknown };
   return typeof result.text === "string" ? result.text.trim() : "";
 }

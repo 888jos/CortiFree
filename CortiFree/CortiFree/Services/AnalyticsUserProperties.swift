@@ -28,8 +28,7 @@ enum AnalyticsUserProperties {
         var properties: [String: Any] = [
             "app_language": LanguageManager.shared.currentLanguage.rawValue,
             "has_apple_watch": UserDefaults.standard.string(forKey: AppleWatchPreference.storageKey) ?? "unknown",
-            "health_connected": HealthKitService.shared.isEnabled,
-            "breathe_pause_configured": UserDefaults.standard.bool(forKey: BreathePauseCenter.configuredKey)
+            "health_connected": HealthKitService.shared.isEnabled
         ]
         if let plan = PersonalPlanStore.shared.plan {
             properties["plan_goal"] = plan.goal.rawValue

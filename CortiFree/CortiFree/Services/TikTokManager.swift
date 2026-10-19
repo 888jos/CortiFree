@@ -14,7 +14,7 @@ import TikTokBusinessSDK
 #endif
 
 final class TikTokManager {
-    private enum PendingEvent {
+    private enum PendingEvent: Codable {
         case identify(userId: String, email: String?)
         case registration(method: String)
         case login
@@ -26,8 +26,24 @@ final class TikTokManager {
     static let shared = TikTokManager()
     private var isInitialized = false
     private var didTrackLaunch = false
-    private var pendingEvents: [PendingEvent] = []
-    private init() {}
+    /// Events waiting for the tracking answer, kept on the phone: the prompt now comes on the
+    /// program's second day, so the trial start must survive the app being closed until then.
+    private static let pendingKey = "tiktok_pending_events"
+    private var pendingEvents: [PendingEvent] = [] {
+        didSet {
+            if pendingEvents.isEmpty {
+                UserDefaults.standard.removeObject(forKey: Self.pendingKey)
+            } else if let data = try? JSONEncoder().encode(pendingEvents) {
+                UserDefaults.standard.set(data, forKey: Self.pendingKey)
+            }
+        }
+    }
+    private init() {
+        if let data = UserDefaults.standard.data(forKey: Self.pendingKey),
+           let saved = try? JSONDecoder().decode([PendingEvent].self, from: data) {
+            pendingEvents = saved
+        }
+    }
 
     // MARK: - SDK Initialization
 

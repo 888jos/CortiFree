@@ -128,6 +128,9 @@ enum FaceScanAnalyzer {
 @MainActor
 final class FaceScanStore: ObservableObject {
     static let shared = FaceScanStore()
+    /// Off for now: the face check is hidden everywhere in the app (Home, weekly check-in,
+    /// Milo, progress photos). Set to true to bring it back.
+    nonisolated static let isEnabled = false
     static let slotDays = [1, 7, 14, 21, 28]
 
     @Published private(set) var records: [FaceScanRecord] = []

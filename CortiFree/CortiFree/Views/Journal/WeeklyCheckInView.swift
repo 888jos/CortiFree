@@ -33,7 +33,7 @@ struct WeeklyCheckInView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         header
                         moodStrip
-                        faceStep
+                        if FaceScanStore.isEnabled { faceStep }
                         pulseStep
                         miloStep
                     }
@@ -44,7 +44,7 @@ struct WeeklyCheckInView: View {
                     WeeklyCheckInService.shared.markPrompted()
                     dismiss()
                 } label: {
-                    Text(t(faceRecord == nil || pulseRecord == nil ? "daily_checkin.skip" : "calm.common.done"))
+                    Text(t((FaceScanStore.isEnabled && faceRecord == nil) || pulseRecord == nil ? "daily_checkin.skip" : "calm.common.done"))
                         .font(.custom("Poppins-Medium", size: 13))
                         .foregroundColor(.white.opacity(0.8))
                         .frame(maxWidth: .infinity)

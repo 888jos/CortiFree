@@ -135,7 +135,7 @@ struct AssistantChatView: View {
             if let opener = MiloWeeklyCheckIn.shared.consumeOpener() {
                 if !messages.isEmpty { newConversation() }
                 messages.append(DeepSeekChatMessage(role: "assistant", content: opener))
-            } else if let face = MiloFaceShare.shared.consume() {
+            } else if FaceScanStore.isEnabled, let face = MiloFaceShare.shared.consume() {
                 startFaceConversation(face)
             } else if messages.isEmpty, let last = store.lastConversation {
                 // By default Milo reopens the conversation the user left; openers above (and
@@ -835,7 +835,7 @@ struct AssistantChatView: View {
         if let signals = HealthKitService.shared.latestBodySignals {
             context += "\n" + signals.contextLine
         }
-        if let face = FaceScanStore.shared.contextLine {
+        if FaceScanStore.isEnabled, let face = FaceScanStore.shared.contextLine {
             context += "\n" + face
         }
         if let pulse = PulseCheckRecord.last, pulse.date > Date().addingTimeInterval(-3 * 86_400) {

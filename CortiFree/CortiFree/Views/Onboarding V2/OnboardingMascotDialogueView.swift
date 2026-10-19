@@ -57,7 +57,7 @@ struct OnboardingMascotDialogueView: View {
             for count in 1...max(message.count, 1) {
                 guard !Task.isCancelled else { return }
                 revealedCount = count
-                try? await Task.sleep(nanoseconds: 20_000_000)
+                try? await Task.sleep(nanoseconds: 10_000_000) // twice as fast: waiting reads as friction
             }
         }
     }

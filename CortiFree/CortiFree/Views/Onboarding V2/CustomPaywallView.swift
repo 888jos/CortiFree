@@ -28,6 +28,8 @@ struct CustomPaywallView: View {
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
     @State private var showBenefitsFlow: Bool = false
+    /// The feature tour is shown once: after a paywall decline, the button opens the paywall.
+    @AppStorage("onboarding_benefits_tour_seen") private var benefitsTourSeen = false
     @State private var purchaseErrorMessage: String = ""
 
     // End date of the plan
@@ -107,13 +109,11 @@ struct CustomPaywallView: View {
         }
         .onAppear {
             loadUserName()
-            guard !RevenueCatManager.shared.hasPremiumEntitlement else { return }
-            OnboardingLiveActivityManager.shared.prepareLiveGiftOffer()
-            OnboardingLiveActivityManager.shared.showLiveGiftOffer()
         }
         // Feature tour (localized app screenshots) between the pre-paywall and Superwall.
         .fullScreenCover(isPresented: $showBenefitsFlow) {
             OnboardingBenefitsFlowView {
+                benefitsTourSeen = true
                 showBenefitsFlow = false
                 DispatchQueue.main.async {
                     presentSuperwallPaywall()
@@ -137,7 +137,6 @@ struct CustomPaywallView: View {
                     UserDefaults.standard.set(true, forKey: "hasSeenPaywall")
                     UserDefaults.standard.set(true, forKey: "saw_paywall_without_accepting")
                     RecoveryScheduler.shared.markPaywallSeen()
-                    OnboardingLiveActivityManager.shared.prepareLiveGiftOffer()
                 }
                 handler.onDismiss { _, result in
                     switch result {
@@ -146,7 +145,8 @@ struct CustomPaywallView: View {
                             OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
                             return
                         }
-                        OnboardingLiveActivityManager.shared.showLiveGiftOffer()
+                        // The gift comes 10 min after a decline, not as the paywall closes.
+                        OnboardingLiveActivityManager.shared.scheduleLiveGiftOffer()
                     case .purchased, .restored:
                         OnboardingLiveActivityManager.shared.clearLiveGiftOffer()
                     }
@@ -650,7 +650,12 @@ struct CustomPaywallView: View {
             // Main CTA button - Feature tour, then the Superwall paywall
             Button(action: {
                 HapticManager.medium()
-                showBenefitsFlow = true
+                if benefitsTourSeen {
+                    AnalyticsManager.shared.track(event: "onboarding_prepaywall_reopened_paywall")
+                    presentSuperwallPaywall()
+                } else {
+                    showBenefitsFlow = true
+                }
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.right")

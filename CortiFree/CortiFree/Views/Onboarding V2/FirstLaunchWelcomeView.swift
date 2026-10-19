@@ -150,7 +150,7 @@ struct FirstLaunchWelcomeView: View {
                 guard !Task.isCancelled, typedCount < totalCount else { return }
                 typedCount += 1
                 if typedCount % 12 == 0 { HapticManager.light() }
-                try? await Task.sleep(nanoseconds: 28_000_000)
+                try? await Task.sleep(nanoseconds: 16_000_000)
             }
             // A breath between sentences, like someone talking.
             if index < lines.count - 1 {

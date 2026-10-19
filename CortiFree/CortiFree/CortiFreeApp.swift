@@ -366,9 +366,16 @@ private struct SubscriptionLockedView: View {
     }
 }
 
-private enum CheckInDrawer: String, Identifiable {
-    case daily, weekly
-    var id: String { rawValue }
+private enum CheckInDrawer: Identifiable, Equatable {
+    case daily(Date), meditation(day: Int), weekly, cancelIntercept
+    var id: String {
+        switch self {
+        case .cancelIntercept: return "cancel_intercept"
+        case .daily(let day): return "daily-\(day.timeIntervalSince1970)"
+        case .meditation(let day): return "meditation-\(day)"
+        case .weekly: return "weekly"
+        }
+    }
 }
 
 @main
@@ -377,6 +384,10 @@ struct CortiFreeApp: App {
     @StateObject private var authViewModel = AuthViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @State private var checkIn: CheckInDrawer?
+    /// The drawer that was open, to chain the next one when it closes.
+    @State private var lastCheckIn: CheckInDrawer?
+    /// The meditation of the day was started: no other drawer over the player.
+    @State private var meditationStarted = false
 
     // IMPORTANT: Use @AppStorage to make onboarding completion reactive
     @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
@@ -441,16 +452,17 @@ struct CortiFreeApp: App {
             .onChange(of: authViewModel.isAuthenticated) { _, isAuthenticated in
                 if isAuthenticated { presentDailyCheckInIfNeeded() }
             }
-            .sheet(item: $checkIn, onDismiss: presentWeeklyCheckInIfNeeded) { drawer in
+            .sheet(item: $checkIn, onDismiss: presentNextDrawer) { drawer in
                 Group {
                     switch drawer {
-                    case .daily: DailyCheckInView(targetDate: Date())
+                    case .daily(let day): DailyCheckInView(targetDate: day)
+                    case .meditation(let day): DailyMeditationDrawer(day: day) { meditationStarted = true }
                     case .weekly: WeeklyCheckInView()
+                    case .cancelIntercept: CancelInterceptView()
                     }
                 }
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-                .presentationCornerRadius(28)
+                .dailyDrawerPresentation(expandable: drawer == .weekly || drawer == .cancelIntercept)
+                .onAppear { lastCheckIn = drawer }
             }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
@@ -478,18 +490,24 @@ struct CortiFreeApp: App {
             print("📱 App became active")
             #endif
             presentDailyCheckInIfNeeded()
+            requestTrackingIfDue()
 
         @unknown default:
             break
         }
     }
 
-    /// First app open of the day: the daily check-in drawer, then the weekly one when due.
+    /// First app open of the day: the daily check-in drawer, then the meditation of the day
+    /// (first week only), then the weekly drawer when due. Each opens when the previous closes.
     private func presentDailyCheckInIfNeeded() {
         guard checkIn == nil, !TrialKickoff.isPending else { return }
         #if DEBUG
         if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_DAILY_CHECKIN"] == "1" {
-            checkIn = .daily
+            checkIn = .daily(DailyCheckInService.shared.pendingDay() ?? Date())
+            return
+        }
+        if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_DAILY_MEDITATION"] == "1" {
+            checkIn = .meditation(day: DailyMeditationService.shared.dayIndex ?? 0)
             return
         }
         if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_WEEKLY_CHECKIN"] == "1" {
@@ -497,20 +515,66 @@ struct CortiFreeApp: App {
             return
         }
         #endif
-        if DailyCheckInService.shared.shouldPresent() {
-            DailyCheckInService.shared.markPrompted()
-            checkIn = .daily
-        } else {
+        meditationStarted = false
+        // Renewal just turned off: that comes before the day's drawers (and replaces them).
+        if CancelIntercept.isDue {
+            checkIn = .cancelIntercept
+            return
+        }
+        if DailyCheckInService.shared.shouldPresent(), let day = DailyCheckInService.shared.pendingDay() {
+            DailyCheckInService.shared.markPrompted(for: day)
+            checkIn = .daily(day)
+        } else if !presentMeditationIfNeeded(delayed: false) {
             presentWeeklyCheckInIfNeeded()
+        }
+    }
+
+    private func presentNextDrawer() {
+        let closed = lastCheckIn
+        lastCheckIn = nil
+        switch closed {
+        case .daily:
+            if !presentMeditationIfNeeded(delayed: true) { presentWeeklyCheckInIfNeeded() }
+        case .meditation:
+            if !meditationStarted { presentWeeklyCheckInIfNeeded() }
+        case .weekly, .cancelIntercept, nil:
+            break
+        }
+    }
+
+    /// Returns true when the meditation of the day opens.
+    @discardableResult
+    private func presentMeditationIfNeeded(delayed: Bool) -> Bool {
+        guard DailyMeditationService.shared.shouldPresent(),
+              let day = DailyMeditationService.shared.dayIndex else { return false }
+        DailyMeditationService.shared.markShown()
+        open(.meditation(day: day), delayed: delayed)
+        return true
+    }
+
+    /// The App Tracking Transparency prompt from the program's second day (never during the
+    /// trial kickoff or the first day). It only shows once; TikTok events wait until then.
+    private func requestTrackingIfDue() {
+        guard UserPersistence.hasCompletedOnboarding, !TrialKickoff.isPending,
+              UnifiedFirebaseService.shared.auth.currentUser != nil,
+              !DailyCheckInService.shared.isProgramFirstDay() else { return }
+        // Asked once the app is fully active (an early request is ignored by iOS).
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            TikTokManager.shared.requestTrackingAuthorizationIfNeeded()
         }
     }
 
     private func presentWeeklyCheckInIfNeeded() {
         guard WeeklyCheckInService.shared.shouldPresent() else { return }
         WeeklyCheckInService.shared.markPrompted()
+        open(.weekly, delayed: true)
+    }
+
+    private func open(_ drawer: CheckInDrawer, delayed: Bool) {
+        guard delayed else { checkIn = drawer; return }
         // Let the previous drawer finish closing before opening the next one.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            if checkIn == nil { checkIn = .weekly }
+            if checkIn == nil { checkIn = drawer }
         }
     }
 
@@ -545,6 +609,10 @@ struct CortiFreeApp: App {
         case "paywall":
             let requested = query.first { $0.name == "placement" }?.value ?? SuperwallPlacement.onboarding
             presentRecoveryPaywall(requested: requested, messageID: messageID)
+            return
+        case "ai-quiz":
+            // « I copied it, come back » (AI quiz Live Activity): the Milo conversation pastes.
+            AIQuizReturnCenter.shared.requestPaste()
             return
         case "onboarding":
             // The onboarding resumes from its saved checkpoint on its own.

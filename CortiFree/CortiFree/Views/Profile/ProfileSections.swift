@@ -478,9 +478,6 @@ struct ProfileShortcutsSection: View {
     @Environment(\.openURL) private var openURL
     /// Asked once at the first pulse measure; off = the pulse is always measured with the flash.
     @AppStorage(AppleWatchPreference.storageKey) private var appleWatch = ""
-    /// « Breathe before TikTok » leaves Home once set up: changed from here.
-    @AppStorage(BreathePauseCenter.configuredKey) private var pauseConfigured = false
-    @State private var showPauseSetup = false
 
     private static let appStoreURL = URL(string: "https://apps.apple.com/app/id6758314805")!
     private static let reviewURL = URL(string: "https://apps.apple.com/app/id6758314805?action=write-review")!
@@ -518,26 +515,8 @@ struct ProfileShortcutsSection: View {
                 separator
 
                 watchRow
-
-                if pauseConfigured {
-                    separator
-
-                    Button {
-                        HapticManager.light()
-                        showPauseSetup = true
-                    } label: {
-                        row(icon: "hand.raised.fill", title: "calm.home.pause", subtitle: "profile.v2.more.pause_sub")
-                    }
-                    .buttonStyle(.plain)
-                }
             }
             .glassCard(cornerRadius: 22)
-        }
-        .sheet(isPresented: $showPauseSetup) {
-            Group {
-                if ScreenTimeShield.isEnabled { ScreenTimePauseSetupView() } else { BreathePauseSetupView() }
-            }
-            .presentationDetents([.large])
         }
     }
 

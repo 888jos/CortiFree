@@ -19,11 +19,22 @@ struct HomeView: View {
     @State private var showMeditationList = false
     @State private var showSoundsList = false
     @State private var showJournal = false
+    #if DEBUG
     @State private var showDailyCheckIn = false
-    @State private var showDailyCheckInShortcut = false
+    #endif
+    #if DEBUG
+    @State private var showDailyMeditationDebug = false
+    @State private var showCancelInterceptDebug = false
+    #endif
+    /// « Not now » (or swiped away): the check-in waits on Home until it is done.
+    @State private var showCheckInCard = false
+    @State private var homeCheckIn: HomeCheckInDay?
     @State private var showSettings = false
     @State private var showOnboarding = false
     @State private var showCustomPaywall = false
+    #if DEBUG
+    @State private var reviewPaywallPrice: ReviewPaywallPreview.Price?
+    #endif
     @State private var showRatingSocialProofDebug = false
     @State private var showCelebrationsGalleryDebug = false
     @State private var showTrialKickoffDebug = false
@@ -116,12 +127,6 @@ struct HomeView: View {
                                     .padding(.top, 20)
                                     .offset(y: scrollOffset * 0.3)
 
-                                if showDailyCheckInShortcut {
-                                    dailyCheckInShortcut
-                                        .padding(.top, 14)
-                                        .offset(y: scrollOffset * 0.35)
-                                }
-
                                 // Avatar Progress Card - 66 days grid
                                 AvatarProgressCard()
                                     .padding(.top, 20)
@@ -136,6 +141,12 @@ struct HomeView: View {
                                 // Anti-Stress Button
                                 antiStressButton
                                     .padding(.top, 16)
+
+                                if showCheckInCard {
+                                    dailyCheckInCard
+                                        .padding(.top, 14)
+                                        .transition(.opacity.combined(with: .move(edge: .top)))
+                                }
 
                                 // Body stress (Apple Watch), calm check, 60-second reset, breathe before TikTok
                                 HomeCalmToolsSection()
@@ -162,6 +173,30 @@ struct HomeView: View {
                                     }
                                     Button(action: { showCustomPaywall = true }) {
                                         Text("💳 Custom Paywall")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    // App Store review screenshots: annual plan, 7-day trial, one per price.
+                                    ForEach(ReviewPaywallPreview.Price.all) { price in
+                                        Button(action: { reviewPaywallPrice = price }) {
+                                            Text("🧾 Review paywall \(price.yearlyText)/yr")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                    }
+                                    // The drawers that open by themselves at the first app open of the day.
+                                    Button(action: { showDailyCheckIn = true }) {
+                                        Text("📝 Daily check-in")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    Button(action: { showDailyMeditationDebug = true }) {
+                                        Text("🧘 Méditation du jour (jour 1-7)")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
+                                    Button(action: { showCancelInterceptDebug = true }) {
+                                        Text("🚫 Renouvellement coupé (rattrapage)")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
@@ -224,12 +259,26 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showJournal) {
             JournalHomeView()
         }
+        .sheet(item: $homeCheckIn, onDismiss: refreshCheckInCard) { item in
+            DailyCheckInView(targetDate: item.date)
+                .dailyDrawerPresentation()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("DailyCheckInSaved"))) { _ in refreshCheckInCard() }
+        .onReceive(NotificationCenter.default.publisher(for: DailyCheckInService.stateChanged)) { _ in refreshCheckInCard() }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in refreshCheckInCard() }
+        #if DEBUG
         .sheet(isPresented: $showDailyCheckIn) {
             DailyCheckInView(targetDate: Date())
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-                .presentationCornerRadius(28)
+                .dailyDrawerPresentation()
         }
+        .sheet(isPresented: $showCancelInterceptDebug) {
+            CancelInterceptView().dailyDrawerPresentation()
+        }
+        .sheet(isPresented: $showDailyMeditationDebug) {
+            DailyMeditationDrawer(day: DailyMeditationService.shared.dayIndex ?? 0, onStart: {})
+                .dailyDrawerPresentation()
+        }
+        #endif
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
         }
@@ -247,6 +296,9 @@ struct HomeView: View {
         }
         #if DEBUG
         // Debug-only: Onboarding preview (excluded from production builds)
+        .fullScreenCover(item: $reviewPaywallPrice) { price in
+            ReviewPaywallPreview(price: price)
+        }
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingV2FlowView(enablesLiveActivityWhenAlreadyCompleted: true)
         }
@@ -272,68 +324,18 @@ struct HomeView: View {
                 initializeProgramStartDateIfNeeded()
             }
 
+            refreshCheckInCard()
+
             // Track app session for rating and check day 7
             AppRatingService.shared.trackAppSession()
             let currentDay = AppConstants.Routine.totalDays - daysRemaining + 1
             if currentDay == 7 {
                 AppRatingService.shared.trackProgramDay7()
             }
-
-            refreshDailyCheckInShortcut()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("DailyCheckInSaved"))) { _ in
-            showDailyCheckInShortcut = false
         }
     }
 
     // MARK: - Smart Scroll Handling
-
-    private var dailyCheckInShortcut: some View {
-        Button {
-            HapticManager.light()
-            showDailyCheckIn = true
-        } label: {
-            HStack(spacing: 14) {
-                Image(systemName: "checkmark.message.fill")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 42, height: 42)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.appTheme, Color.appThemeSecondary],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        in: Circle()
-                    )
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("home.daily_checkin.title".localized)
-                        .font(.custom("Poppins-SemiBold", size: 15))
-                        .foregroundColor(.white)
-                    Text("home.daily_checkin.subtitle".localized)
-                        .font(.custom("Poppins-Regular", size: 12))
-                        .foregroundColor(.white.opacity(0.62))
-                }
-
-                Spacer(minLength: 8)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color.appThemeSecondary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 13)
-            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .glassCard(cornerRadius: 18, tint: Color.appTheme, interactive: true)
-        }
-        .buttonStyle(ScaleButtonStyle())
-        .padding(.horizontal, AppConstants.Layout.paddingLarge)
-        .accessibilityLabel("home.daily_checkin.title".localized)
-    }
-
-    private func refreshDailyCheckInShortcut() {
-        showDailyCheckInShortcut = DailyCheckInService.shared.shouldShowHomeShortcut()
-    }
 
     private func handleScroll(offset: CGFloat) {
         // Calculate scroll velocity (direction and speed)
@@ -551,6 +553,50 @@ struct HomeView: View {
         case 9: return LanguageManager.shared.localizedString(for: StringKeys.Levels.enlightenedSage)
         case 10: return LanguageManager.shared.localizedString(for: StringKeys.Levels.immortalLegend)
         default: return level > 10 ? LanguageManager.shared.localizedString(for: StringKeys.Levels.supremeMaster) : LanguageManager.shared.localizedString(for: StringKeys.Levels.novice)
+        }
+    }
+
+    // MARK: - Daily check-in reminder
+
+    private var dailyCheckInCard: some View {
+        let isToday = DailyCheckInService.shared.pendingDay().map(Calendar.current.isDateInToday) ?? true
+        return Button {
+            HapticManager.light()
+            guard let day = DailyCheckInService.shared.pendingDay() else { return refreshCheckInCard() }
+            AnalyticsManager.shared.track(event: "daily_checkin_home_card_tapped", properties: ["day": isToday ? "today" : "yesterday"])
+            homeCheckIn = HomeCheckInDay(date: day)
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "checkmark.message.fill")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 42, height: 42)
+                    .background(Color.appTheme, in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("home.daily_checkin.title".localized)
+                        .font(.custom("Poppins-SemiBold", size: 15))
+                        .foregroundColor(.white)
+                    Text((isToday ? "home.daily_checkin.subtitle" : "home.daily_checkin.subtitle_yesterday").localized)
+                        .font(.custom("Poppins-Regular", size: 12))
+                        .foregroundColor(.white.opacity(0.62))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(Color.appThemeSecondary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 13)
+            .glassCard(cornerRadius: 18, tint: Color.appTheme, interactive: true)
+        }
+        .buttonStyle(ScaleButtonStyle())
+        .padding(.horizontal, AppConstants.Layout.paddingLarge)
+    }
+
+    private func refreshCheckInCard() {
+        withAnimation(.easeInOut(duration: 0.25)) {
+            showCheckInCard = DailyCheckInService.shared.shouldShowHomeCard()
         }
     }
 
@@ -970,4 +1016,10 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
 
     HomeView(isScrolling: $isScrolling, scrollTimer: $scrollTimer)
         .environment(\.locale, Locale(identifier: "en"))
+}
+
+/// The day a Home check-in card opens (sheet item).
+private struct HomeCheckInDay: Identifiable {
+    let date: Date
+    var id: TimeInterval { date.timeIntervalSince1970 }
 }

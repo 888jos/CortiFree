@@ -173,7 +173,7 @@ private struct FaceScanPhotoBadge: View {
     @ObservedObject private var faceStore = FaceScanStore.shared
 
     var body: some View {
-        if let record = faceStore.records.first(where: { $0.photoID == photo.id }) {
+        if FaceScanStore.isEnabled, let record = faceStore.records.first(where: { $0.photoID == photo.id }) {
             HStack(spacing: 4) {
                 Image(systemName: "face.smiling")
                     .font(.system(size: 9, weight: .semibold))

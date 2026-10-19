@@ -154,10 +154,12 @@ struct PlanProfile: Codable, Equatable {
     var improvementGoal: String?
     /// Daily time available (minutes) when raw answers are unavailable.
     var availableMinutes: Int?
+    /// The plan the user's own AI picked during onboarding (PlanGoal raw value): it wins over the answers.
+    var aiGoal: String?
     /// Where the data came from: onboarding / migrated / default.
     var source: String = "default"
 
-    var isEmpty: Bool { reasonCodes.isEmpty && quizAnswers == nil && symptomIDs.isEmpty && durationCode == nil && improvementGoal == nil }
+    var isEmpty: Bool { reasonCodes.isEmpty && quizAnswers == nil && symptomIDs.isEmpty && durationCode == nil && improvementGoal == nil && aiGoal == nil }
 }
 
 // MARK: - Edits

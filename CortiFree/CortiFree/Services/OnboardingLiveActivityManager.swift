@@ -4,6 +4,8 @@
 //
 
 import ActivityKit
+import UIKit
+import UserNotifications
 import Foundation
 
 struct CortiFreeWidgetAttributes: ActivityAttributes {
@@ -11,6 +13,8 @@ struct CortiFreeWidgetAttributes: ActivityAttributes {
         enum Phase: String, Codable, Hashable {
             case onboardingProgress
             case limitedOffer
+            /// « Copy the AI's reply and come back » while the user is in ChatGPT & co.
+            case aiQuizReturn
         }
 
         var phase: Phase
@@ -33,6 +37,12 @@ final class OnboardingLiveActivityManager {
 
     private let offerDuration: TimeInterval = 30 * 60
     private let offerDeadlineKey = "live_gift_offer_expires_at"
+    private let offerStartKey = "live_gift_offer_starts_at"
+    /// After a paywall decline, the gift waits a little: right away it reads as pressure.
+    static let giftDelay: TimeInterval = 10 * 60
+    private static let giftNotificationID = "live_gift_offer"
+    private let aiQuizReturnUntilKey = "live_ai_quiz_return_until"
+    private let aiQuizReturnDuration: TimeInterval = 30 * 60
 
     private init() {}
 
@@ -42,9 +52,11 @@ final class OnboardingLiveActivityManager {
             return
         }
 
-        // The gift starts as soon as the pre-paywall shows: it must not fall back to the
-        // onboarding progress when the user leaves before the Superwall paywall.
-        if hasSeenPaywall || hasActiveGiftOffer {
+        // The user is in their AI to copy its reply: that Live Activity stays.
+        guard !isAIQuizReturnActive else { return }
+
+        // The gift (armed by a paywall decline, 10 min later) wins over the onboarding progress.
+        if hasActiveGiftOffer {
             showLiveGiftOffer()
         } else {
             startOrUpdateProgress(currentStep: currentStep, totalSteps: totalSteps)
@@ -56,8 +68,8 @@ final class OnboardingLiveActivityManager {
             logUnavailable()
             return
         }
-        // Never replace a running gift offer by the onboarding progress.
-        guard !hasActiveGiftOffer else { return }
+        // Never replace a running gift offer, or the « come back » of the AI quiz, by the progress.
+        guard !hasActiveGiftOffer, !isAIQuizReturnActive else { return }
 
         let safeTotal = max(totalSteps, 1)
         let safeStep = min(max(currentStep, 1), safeTotal)
@@ -80,17 +92,105 @@ final class OnboardingLiveActivityManager {
         upsert(state, staleDate: nil)
     }
 
+    /// Started (its delay passed) and not expired.
     private var hasActiveGiftOffer: Bool {
-        (UserDefaults.standard.object(forKey: offerDeadlineKey) as? Date).map { $0 > Date() } ?? false
+        let defaults = UserDefaults.standard
+        guard let deadline = defaults.object(forKey: offerDeadlineKey) as? Date, deadline > Date() else { return false }
+        let start = defaults.object(forKey: offerStartKey) as? Date ?? .distantPast
+        return start <= Date()
     }
 
-    func prepareLiveGiftOffer() {
-        let defaults = UserDefaults.standard
-        if let currentDeadline = defaults.object(forKey: offerDeadlineKey) as? Date,
-           currentDeadline > Date() {
+    // MARK: « My AI answers for me »: copy the reply, come back
+
+    private var isAIQuizReturnActive: Bool {
+        (UserDefaults.standard.object(forKey: aiQuizReturnUntilKey) as? Date).map { $0 > Date() } ?? false
+    }
+
+    /// Started when the user leaves for their AI (the app must still be in the foreground).
+    /// Shows the AI's logo; « I copied it » opens cortifree://ai-quiz/paste.
+    func startAIQuizReturn(appName: String, logo: String) {
+        guard activitiesAreEnabled else {
+            logUnavailable()
             return
         }
-        defaults.set(Date().addingTimeInterval(offerDuration), forKey: offerDeadlineKey)
+        let until = Date().addingTimeInterval(aiQuizReturnDuration)
+        UserDefaults.standard.set(until, forKey: aiQuizReturnUntilKey)
+        let text = LanguageManager.shared
+        let state = CortiFreeWidgetAttributes.ContentState(
+            phase: .aiQuizReturn,
+            currentStep: 1,
+            totalSteps: 1,
+            title: String(format: text.localizedString(for: "live_activity.ai_quiz.title"), appName),
+            subtitle: text.localizedString(for: "live_activity.ai_quiz.subtitle"),
+            offerEndsAt: nil,
+            imageName: logo,
+            deepLinkPath: "ai-quiz/paste",
+            ctaTitle: text.localizedString(for: "live_activity.ai_quiz.cta")
+        )
+        upsert(state, staleDate: until)
+        alertOnceInBackground(state, until: until)
+    }
+
+    /// On iPhones without a Dynamic Island the activity is only on the Lock Screen: one banner,
+    /// once the user is in their AI, so they know where to come back.
+    private func alertOnceInBackground(_ state: CortiFreeWidgetAttributes.ContentState, until: Date) {
+        guard #available(iOS 16.2, *) else { return }
+        var task: UIBackgroundTaskIdentifier = .invalid
+        task = UIApplication.shared.beginBackgroundTask { UIApplication.shared.endBackgroundTask(task) }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            if let activity = Activity<CortiFreeWidgetAttributes>.activities.first,
+               activity.content.state.phase == .aiQuizReturn {
+                let alert = AlertConfiguration(
+                    title: LocalizedStringResource(stringLiteral: state.title),
+                    body: LocalizedStringResource(stringLiteral: state.subtitle),
+                    sound: .default
+                )
+                await activity.update(ActivityContent(state: state, staleDate: until), alertConfiguration: alert)
+            }
+            UIApplication.shared.endBackgroundTask(task)
+        }
+    }
+
+    /// The reply was read, or the user answers by hand / went back.
+    func endAIQuizReturn() {
+        guard UserDefaults.standard.object(forKey: aiQuizReturnUntilKey) != nil else { return }
+        UserDefaults.standard.removeObject(forKey: aiQuizReturnUntilKey)
+        guard #available(iOS 16.2, *) else { return }
+        Task {
+            for activity in Activity<CortiFreeWidgetAttributes>.activities where activity.content.state.phase == .aiQuizReturn {
+                await activity.end(nil, dismissalPolicy: .immediate)
+            }
+        }
+    }
+
+    /// Arms the gift right away (debug, launch argument).
+    func prepareLiveGiftOffer() {
+        scheduleLiveGiftOffer(after: 0)
+    }
+
+    /// After a Superwall decline: the gift starts `delay` later and lasts 30 min. A local
+    /// notification announces it (« Psss, Milo wants to give you a gift! » → the gift paywall);
+    /// once started, it is the Live Activity shown when the user leaves the app.
+    func scheduleLiveGiftOffer(after delay: TimeInterval = OnboardingLiveActivityManager.giftDelay) {
+        let defaults = UserDefaults.standard
+        if let deadline = defaults.object(forKey: offerDeadlineKey) as? Date, deadline > Date() { return }
+        let start = Date().addingTimeInterval(delay)
+        defaults.set(start, forKey: offerStartKey)
+        defaults.set(start.addingTimeInterval(offerDuration), forKey: offerDeadlineKey)
+        guard delay > 0 else { return }
+
+        let text = LanguageManager.shared
+        let content = UNMutableNotificationContent()
+        content.title = text.localizedString(for: "inline.onboardingliveactivitymanager.00")
+        content.body = text.localizedString(for: "inline.onboardingliveactivitymanager.01")
+        content.sound = .default
+        content.userInfo = ["deeplink": "cortifree://\(SuperwallPlacement.liveGift)", "campaign": "live_gift"]
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
+        UNUserNotificationCenter.current().add(
+            UNNotificationRequest(identifier: Self.giftNotificationID, content: content, trigger: trigger)
+        )
+        AnalyticsManager.shared.track(event: "live_gift_scheduled", properties: ["delay_minutes": Int(delay / 60)])
     }
 
     func showLiveGiftOffer() {
@@ -100,7 +200,8 @@ final class OnboardingLiveActivityManager {
         }
 
         let defaults = UserDefaults.standard
-        guard let endDate = defaults.object(forKey: offerDeadlineKey) as? Date else {
+        // Not before its delay has passed.
+        guard hasActiveGiftOffer, let endDate = defaults.object(forKey: offerDeadlineKey) as? Date else {
             return
         }
         guard endDate > Date() else {
@@ -125,6 +226,8 @@ final class OnboardingLiveActivityManager {
 
     func clearLiveGiftOffer() {
         UserDefaults.standard.removeObject(forKey: offerDeadlineKey)
+        UserDefaults.standard.removeObject(forKey: offerStartKey)
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [Self.giftNotificationID])
         end()
     }
 
@@ -204,4 +307,6 @@ final class OnboardingLiveActivityManager {
 enum SuperwallPlacement {
     static let onboarding = "campaign_trigger"
     static let liveGift = "live_gift"
+    /// Auto-renew just turned off, access still active (CancelInterceptView).
+    static let cancelIntercept = "cancel_intercept"
 }

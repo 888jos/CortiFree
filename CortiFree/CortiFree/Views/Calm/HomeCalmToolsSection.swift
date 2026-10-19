@@ -15,38 +15,26 @@ struct HomeCalmToolsSection: View {
     @State private var loaded = false
     @State private var showPulse = false
     @State private var showReset = false
-    @State private var showPauseSetup = false
     @State private var showFaceScan = false
     /// « No Apple Watch » (asked at the first pulse measure, changed in Profile): no watch prompts.
     @AppStorage(AppleWatchPreference.storageKey) private var appleWatch = ""
-    /// Once « breathe before TikTok » is set up it leaves Home (changed from Profile).
-    @AppStorage(BreathePauseCenter.configuredKey) private var pauseConfigured = false
 
     private func t(_ key: String) -> String { LanguageManager.shared.localizedString(for: key) }
 
     var body: some View {
         VStack(spacing: 12) {
             bodyStressCard
-            faceCheckCard
+            if FaceScanStore.isEnabled { faceCheckCard }
 
             HStack(spacing: 10) {
                 tile(icon: "heart.fill", title: t("calm.home.pulse"), subtitle: lastPulseSubtitle) { showPulse = true }
                 tile(icon: "bolt.heart.fill", title: t("calm.home.reset"), subtitle: t("calm.home.reset.subtitle")) { showReset = true }
-                if !pauseConfigured {
-                    tile(icon: "hand.raised.fill", title: t("calm.home.pause"), subtitle: t("calm.home.pause.subtitle")) { showPauseSetup = true }
-                }
             }
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
         .task { await refresh() }
         .fullScreenCover(isPresented: $showPulse) { PulseCheckView() }
         .fullScreenCover(isPresented: $showReset) { NervousResetView() }
-        .sheet(isPresented: $showPauseSetup) {
-            Group {
-                if ScreenTimeShield.isEnabled { ScreenTimePauseSetupView() } else { BreathePauseSetupView() }
-            }
-            .presentationDetents([.large])
-        }
         .fullScreenCover(isPresented: $showFaceScan) { FaceScanView() }
     }
 

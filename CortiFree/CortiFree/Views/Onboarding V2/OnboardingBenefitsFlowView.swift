@@ -44,6 +44,14 @@ struct OnboardingBenefitsFlowView: View {
             }
         }
         .interactiveDismissDisabled()
+        // Where the tour loses people before the paywall.
+        .onAppear { trackPage(0) }
+        .onChange(of: selectedPage) { _, page in trackPage(page) }
+    }
+
+    private func trackPage(_ page: Int) {
+        AnalyticsManager.shared.track(event: "onboarding_benefits_page_viewed",
+                                      properties: ["page": page + 1, "total": pages.count])
     }
 
     private var header: some View {

@@ -472,12 +472,13 @@ class AnalyticsManager {
         track(event: "onboarding_goals_selection_clicked")
     }
 
-    // 17. Onboarding Completion (Paywall)
+    // 17. Onboarding Completion: the PRE-paywall (CustomPaywallView), not the Superwall paywall
+    // (that one is `paywall_open`). `onboarding_paywall_viewed` is kept for the existing charts;
+    // new charts use `onboarding_prepaywall_viewed`.
     func trackOnboardingCompletionViewed(quizAnswersCount: Int = 0, hasQuizData: Bool = false) {
-        track(event: "onboarding_paywall_viewed", properties: [
-            "quiz_answers_count": quizAnswersCount,
-            "has_quiz_data": hasQuizData
-        ])
+        let properties: [String: Any] = ["quiz_answers_count": quizAnswersCount, "has_quiz_data": hasQuizData]
+        track(event: "onboarding_paywall_viewed", properties: properties)
+        track(event: "onboarding_prepaywall_viewed", properties: properties)
         // TikTok: ViewContent (paywall seen)
         TikTokManager.shared.trackViewContent()
     }
@@ -569,8 +570,10 @@ class AnalyticsManager {
         ])
     }
 
-    func trackDailyCheckInCompleted(mood: String, stress: Int, sleep: Int, energy: Int, hasNote: Bool) {
+    /// `day`: « today » (from 21:00) or « yesterday » (recap of the day before).
+    func trackDailyCheckInCompleted(mood: String, stress: Int, sleep: Int, energy: Int, hasNote: Bool, day: String = "today") {
         track(event: "daily_checkin_completed", properties: [
+            "day": day,
             "mood": mood,
             "stress": stress,
             "sleep": sleep,

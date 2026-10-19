@@ -317,7 +317,7 @@
 "daily_checkin.reflection_title" = "Anything worth remembering?";
 "daily_checkin.reflection_subtitle" = "Add a short note and it will also appear in your journal.";
 "daily_checkin.reflection_prompt" = "What is affecting your stress or recovery today?";
-"daily_checkin.save" = "Save check-in";
+"daily_checkin.save" = "Save";
 
 // MARK: - Home
 "home.greeting.morning" = "Good morning";
@@ -5211,23 +5211,10 @@
 "calm.reset.cue.ground3" = "3 things you can hear";
 "calm.reset.cue.ground2" = "2 things you can smell";
 "calm.reset.cue.ground1" = "1 thing you can taste";
-"calm.pause.about_to_open" = "You were about to open %@";
-"calm.pause.done" = "Still want to scroll?";
-"calm.pause.stay_calm" = "No, I'm good";
-"calm.pause.open_anyway" = "Open %@";
-"calm.pause.setup.title" = "Breathe before TikTok";
-"calm.pause.setup.subtitle" = "Make TikTok (or Instagram…) open CortiFree first: 30 seconds of breathing, then you decide.";
-"calm.pause.setup.step1" = "Shortcuts → Automation → « + » → App: pick TikTok, tick « Is Opened » and « Run Immediately ».";
-"calm.pause.setup.step2" = "« New Blank Automation » → « Add Action » → search CortiFree → « Breathe before scrolling ».";
-"calm.pause.setup.step3" = "That's it. Next time you open TikTok, Milo gives you 30 seconds of breathing first.";
-"calm.pause.setup.note" = "After a pause, TikTok opens normally for 10 minutes, so you are never stuck in a loop.";
-"calm.pause.setup.open_shortcuts" = "Open Shortcuts";
 "calm.home.pulse" = "Calm check";
 "calm.home.pulse.subtitle" = "Heart rate before / after";
 "calm.home.reset" = "60 s reset";
 "calm.home.reset.subtitle" = "Nervous system";
-"calm.home.pause" = "Breathe before TikTok";
-"calm.home.pause.subtitle" = "Set it up once";
 
 /* Retention: cycles, review, plan reminders */
 "plan.header.cycle_day" = "Cycle %d · Day %d/28";
@@ -5561,16 +5548,6 @@
 "milo.dictation.open_settings" = "Open Settings";
 "milo.dictation.unavailable" = "Dictation isn't available right now.";
 
-/* Breathe before TikTok — Screen Time shield */
-"calm.pause.shield.about_to_open" = "You were about to open an app you chose to slow down";
-"calm.pause.shield.unlock" = "Unlock for 10 min";
-"calm.pause.shield.subtitle" = "Pick TikTok, Instagram… When you open them, CortiFree offers 30 seconds of breathing first. No shortcut to build.";
-"calm.pause.shield.active" = "All set: the apps you picked show « Breathe first » when you open them.";
-"calm.pause.shield.choose_apps" = "Choose apps";
-"calm.pause.shield.change_apps" = "Change apps";
-"calm.pause.shield.turn_off" = "Turn off";
-"calm.pause.shield.use_shortcuts" = "Use Shortcuts instead";
-"calm.pause.shield.denied" = "Screen Time access was denied. You can allow it in Settings → Screen Time, or use Shortcuts.";
 
 /* Onboarding — first name on the avatar card */
 "onboarding_v2.first_name.title" = "Let's go!";
@@ -5627,7 +5604,6 @@
 "milo.dictation.language" = "Dictation language";
 "milo.dictation.language.app" = "App language (%@)";
 "milo.dictation.language.hint" = "Long press to dictate in another language.";
-"profile.v2.more.pause_sub" = "On: change the apps or turn it off";
 
 /* Onboarding: account required after the trial started (auth skipped) */
 "onboarding_v2.auth.required_title" = "Last step: create your account";
@@ -5707,3 +5683,100 @@
 "onboarding_v2.pulse_recap.result_average" = "In 1 minute of slow breathing, the heart goes from %1$d to %2$d BPM on average.";
 "onboarding_v2.pulse_recap.plan_average" = "1 minute of slow breathing lowers the heart rate by %d BPM on average: your plan builds on that reflex every day.";
 "onboarding_v2.pulse_recap.paywall_average" = "In 1 minute, the heart slows by %d BPM on average. Imagine 28 days.";
+
+/* Onboarding: let your own AI answer the habits quiz */
+"onboarding_v2.ai_quiz.choice.message" = "Let's get to know you! Will you answer yourself, or let your AI answer for you?";
+"onboarding_v2.ai_quiz.choice.ai_title" = "My AI answers for me";
+"onboarding_v2.ai_quiz.choice.ai_badge" = "New";
+"onboarding_v2.ai_quiz.choice.ai_subtitle" = "Your AI already knows you: it answers for you and analyzes you.";
+"onboarding_v2.ai_quiz.choice.manual_title" = "I'll answer myself";
+"onboarding_v2.ai_quiz.choice.manual_subtitle" = "10 questions · about 2 minutes";
+"onboarding_v2.ai_quiz.choice.privacy" = "Your conversation stays between you and your AI. CortiFree only keeps your quiz answers, and you check them first.";
+"onboarding_v2.ai_quiz.waiting.title" = "%@ is preparing your answers… Come back here when it's done!";
+"onboarding_v2.ai_quiz.waiting.step1" = "Send the message in %@ (it's already written).";
+"onboarding_v2.ai_quiz.waiting.step1_paste" = "Paste the message in %@ (it's already copied), then send it.";
+"onboarding_v2.ai_quiz.waiting.step2" = "Copy %@'s whole reply.";
+"onboarding_v2.ai_quiz.waiting.step3" = "Come back here and tap Paste.";
+"onboarding_v2.ai_quiz.waiting.reopen" = "Open %@ again";
+"onboarding_v2.ai_quiz.waiting.manual" = "Actually, I'll answer myself";
+"onboarding_v2.ai_quiz.waiting.error" = "I can't find the answers in this text. Copy %@'s whole reply, then try again.";
+"onboarding_v2.ai_quiz.prompt.intro" = "I'm signing up for CortiFree, an app that helps reduce stress. It offers five plans. Based on what you really know about me (our conversations, your memory), which one fits me best? Be honest. If you don't know me well enough to choose, put ? instead of guessing.";
+"onboarding_v2.ai_quiz.prompt.format" = "Reply only with a single code block, exactly in this format. Replace <n> with the plan's number (or ?). After ANALYSIS, write 2 or 3 short sentences in English, speaking to me directly: why this plan fits me, based on what you know about me.";
+"onboarding_v2.ai_quiz.picker.message" = "Great! Which AI do you use the most?";
+"onboarding_v2.ai_quiz.picker.how" = "How it works";
+"onboarding_v2.ai_quiz.picker.step_send" = "Send the message";
+"onboarding_v2.ai_quiz.picker.step_copy" = "Copy the reply";
+"onboarding_v2.ai_quiz.picker.step_paste" = "Paste it here";
+"onboarding_v2.ai_quiz.picker.prefilled" = "Message already written";
+"onboarding_v2.ai_quiz.picker.copied" = "Message to paste";
+"daily_checkin.stress.1" = "Very calm";
+"daily_checkin.stress.2" = "Fairly calm";
+"daily_checkin.stress.3" = "A bit stressed";
+"daily_checkin.stress.4" = "Stressed";
+"daily_checkin.stress.5" = "Very stressed";
+"daily_checkin.sleep.1" = "Very badly";
+"daily_checkin.sleep.2" = "Badly";
+"daily_checkin.sleep.3" = "So-so";
+"daily_checkin.sleep.4" = "Well";
+"daily_checkin.sleep.5" = "Very well";
+"daily_checkin.energy.1" = "Drained";
+"daily_checkin.energy.2" = "Low";
+"daily_checkin.energy.3" = "Medium";
+"daily_checkin.energy.4" = "Good";
+"daily_checkin.energy.5" = "Great";
+"daily_checkin.note_placeholder" = "What weighed on you, what did you good…";
+"daily_meditation.eyebrow" = "Day %d of %d · First steps";
+"daily_meditation.title" = "Your meditation for today";
+"daily_meditation.start" = "Start";
+"onboarding_v2.ai_quiz.picker.other" = "Another AI";
+"onboarding_v2.ai_quiz.app.other" = "your AI";
+"onboarding_v2.ai_quiz.milo.badge" = "CortiFree doesn't keep this conversation";
+"onboarding_v2.ai_quiz.milo.intro_prefilled" = "Let's go! The message for %@ is already written, you just have to send it.";
+"onboarding_v2.ai_quiz.milo.intro_paste" = "Let's go! I copied the message: paste it into %@ and send it.";
+"onboarding_v2.ai_quiz.milo.step" = "When %@ has replied, copy its whole answer and paste it here with the button below.";
+"onboarding_v2.ai_quiz.milo.thanks" = "Thanks! Here's what %@ understood about you:";
+"onboarding_v2.ai_quiz.milo.copy_again" = "Copy the message again";
+"onboarding_v2.ai_quiz.milo.placeholder" = "Write or paste the answer here";
+"onboarding_v2.ai_quiz.milo.help" = "I'm here to read %@'s answer. Copy all of it and paste it here, or answer the quiz yourself if you'd rather.";
+"onboarding_v2.ai_quiz.milo.consent" = "To write your report, I'll send the chosen plan and %@'s analysis to my AI (DeepSeek). Not everything you pasted, and CortiFree keeps nothing. OK?";
+"onboarding_v2.ai_quiz.milo.consent_yes" = "OK";
+"onboarding_v2.ai_quiz.milo.consent_no" = "No thanks";
+"onboarding_v2.ai_quiz.milo.later" = "Later";
+"onboarding_v2.ai_quiz.milo.local_pick" = "To start, try “%@”: %@";
+"onboarding_v2.ai_quiz.milo.declined_chat" = "Without your OK, I can't answer you here. Let's talk in the app!";
+"onboarding_v2.ai_quiz.milo.unavailable" = "I can't answer right now. Try again in a moment.";
+"onboarding_v2.ai_quiz.milo.found_plan" = "Great! According to %@, the plan that fits you best is “%@”.";
+"onboarding_v2.ai_quiz.milo.unknown" = "Looks like %@ doesn't know you well enough yet to choose for you. The most reliable way: answer the quiz yourself, it takes 2 minutes.";
+"onboarding_v2.ai_quiz.milo.unknown_manual" = "Answer myself";
+"onboarding_v2.ai_quiz.milo.unknown_continue" = "Continue anyway";
+"onboarding_v2.ai_quiz.milo.default_plan" = "No problem, let's start with the “%@” plan, the one that helps the most people. It will adapt to you day by day.";
+"live_activity.ai_quiz.title" = "Copy %@'s answer";
+"live_activity.ai_quiz.subtitle" = "Then come back to CortiFree: Milo is preparing your report.";
+"live_activity.ai_quiz.cta" = "Copied it, go back";
+"trial_kickoff.plan.eyebrow_days" = "Your %d trial days";
+"cancel_intercept.title" = "Your access continues until %@";
+"cancel_intercept.subtitle" = "You turned off renewal. You keep everything until then, nothing changes.";
+"cancel_intercept.question" = "What didn't work for you?";
+"cancel_intercept.reason.price" = "It's too expensive";
+"cancel_intercept.reason.time" = "I don't have time";
+"cancel_intercept.reason.not_for_me" = "It's not what I expected";
+"cancel_intercept.reason.avoid_charge" = "Just to avoid being charged";
+"cancel_intercept.reason.other" = "Something else";
+"cancel_intercept.answer.avoid_charge" = "Smart to stay in control. We'll remind you 2 days before the trial ends anyway: you can turn it back on and decide then.";
+"cancel_intercept.answer.default" = "Thanks for telling me. Before you go, I may have something for you.";
+"cancel_intercept.offer" = "See my offer";
+"cancel_intercept.reactivate" = "Turn renewal back on";
+"cancel_intercept.later" = "Later";
+"daily_checkin.day.today" = "Your day today";
+"daily_checkin.day.yesterday" = "Your day yesterday";
+"daily_checkin.q.mood.today" = "How was your day?";
+"daily_checkin.q.mood.yesterday" = "How was your day yesterday?";
+"daily_checkin.q.stress.today" = "Your stress level today?";
+"daily_checkin.q.stress.yesterday" = "Your stress level yesterday?";
+"daily_checkin.q.sleep.today" = "How did you sleep last night?";
+"daily_checkin.q.sleep.yesterday" = "How had you slept before that day?";
+"daily_checkin.q.energy.today" = "Your energy today?";
+"daily_checkin.q.energy.yesterday" = "Your energy yesterday?";
+"daily_checkin.q.note.today" = "A word about your day? (optional)";
+"daily_checkin.q.note.yesterday" = "A word about yesterday? (optional)";
+"home.daily_checkin.subtitle_yesterday" = "You skipped yesterday's check-in: 30 seconds";

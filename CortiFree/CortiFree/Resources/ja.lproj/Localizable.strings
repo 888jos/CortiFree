@@ -317,7 +317,7 @@
 "daily_checkin.reflection_title" = "覚えておきたいことはありますか？";
 "daily_checkin.reflection_subtitle" = "短いメモを残すと、ジャーナルにも表示されます。";
 "daily_checkin.reflection_prompt" = "今日のストレスや回復に影響していることは？";
-"daily_checkin.save" = "チェックインを保存";
+"daily_checkin.save" = "保存";
 
 // MARK: - Home
 "home.greeting.morning" = "おはようございます";
@@ -5214,23 +5214,10 @@
 "calm.reset.cue.ground3" = "聞こえるもの3つ";
 "calm.reset.cue.ground2" = "匂うもの2つ";
 "calm.reset.cue.ground1" = "味わえるもの1つ";
-"calm.pause.about_to_open" = "%@を開こうとしていました";
-"calm.pause.done" = "まだスクロールしたい？";
-"calm.pause.stay_calm" = "ううん、大丈夫";
-"calm.pause.open_anyway" = "%@を開く";
-"calm.pause.setup.title" = "TikTokの前にひと呼吸";
-"calm.pause.setup.subtitle" = "TikTok（やInstagram）を開くと先にCortiFreeが開くように：30秒呼吸してから決めましょう。";
-"calm.pause.setup.step1" = "ショートカット → オートメーション → 「+」 → App：TikTokを選び、「開いている」と「すぐに実行」をオン。";
-"calm.pause.setup.step2" = "「新規の空のオートメーション」 → 「アクションを追加」 → CortiFreeを検索 → 「Breathe before scrolling」。";
-"calm.pause.setup.step3" = "これで完了。次にTikTokを開くと、まずMiloと30秒呼吸します。";
-"calm.pause.setup.note" = "ひと呼吸のあと10分間はTikTokが普通に開くので、ループにはなりません。";
-"calm.pause.setup.open_shortcuts" = "ショートカットを開く";
 "calm.home.pulse" = "Calm check";
 "calm.home.pulse.subtitle" = "心拍 前 / 後";
 "calm.home.reset" = "60秒リセット";
 "calm.home.reset.subtitle" = "神経系";
-"calm.home.pause" = "TikTokの前に呼吸";
-"calm.home.pause.subtitle" = "一度設定するだけ";
 
 /* Retention: cycles, review, plan reminders */
 "plan.header.cycle_day" = "サイクル%d · %d/28日目";
@@ -5564,16 +5551,6 @@
 "milo.dictation.open_settings" = "設定を開く";
 "milo.dictation.unavailable" = "現在、音声入力は利用できません。";
 
-/* Breathe before TikTok — Screen Time shield */
-"calm.pause.shield.about_to_open" = "ブレーキをかけると決めたアプリを開こうとしていました";
-"calm.pause.shield.unlock" = "10分間ロック解除";
-"calm.pause.shield.subtitle" = "TikTokやInstagramなどを選んでください。開くと、CortiFreeがまず30秒の呼吸を提案します。ショートカットの作成は不要です。";
-"calm.pause.shield.active" = "設定完了：選んだアプリを開くと「まず呼吸」が表示されます。";
-"calm.pause.shield.choose_apps" = "アプリを選ぶ";
-"calm.pause.shield.change_apps" = "アプリを変更";
-"calm.pause.shield.turn_off" = "オフにする";
-"calm.pause.shield.use_shortcuts" = "代わりにショートカットを使う";
-"calm.pause.shield.denied" = "スクリーンタイムへのアクセスが拒否されました。設定 → スクリーンタイムで許可するか、ショートカットを使ってください。";
 
 /* Onboarding — first name on the avatar card */
 "onboarding_v2.first_name.title" = "はじめましょう！";
@@ -5630,7 +5607,6 @@
 "milo.dictation.language" = "音声入力の言語";
 "milo.dictation.language.app" = "アプリの言語（%@）";
 "milo.dictation.language.hint" = "長押しで別の言語で音声入力できます。";
-"profile.v2.more.pause_sub" = "オン：アプリの変更やオフはこちら";
 
 /* Onboarding: account required after the trial started (auth skipped) */
 "onboarding_v2.auth.required_title" = "最後のステップ：アカウントを作成";
@@ -5710,3 +5686,100 @@
 "onboarding_v2.pulse_recap.result_average" = "1分間ゆっくり呼吸すると、心拍数は平均で%1$dから%2$d BPMになります。";
 "onboarding_v2.pulse_recap.plan_average" = "1分間のゆっくりした呼吸で心拍数は平均%d BPM下がります。プランでは毎日この反応を活かします。";
 "onboarding_v2.pulse_recap.paywall_average" = "たった1分で心拍数は平均%d BPM下がります。28日間続けたら？";
+
+/* Onboarding: let your own AI answer the habits quiz */
+"onboarding_v2.ai_quiz.choice.message" = "あなたのことを教えてください！自分で答える？それともAIに答えてもらう？";
+"onboarding_v2.ai_quiz.choice.ai_title" = "AIに答えてもらう";
+"onboarding_v2.ai_quiz.choice.ai_badge" = "新機能";
+"onboarding_v2.ai_quiz.choice.ai_subtitle" = "AIはもうあなたを知っています。代わりに答えて分析してくれます。";
+"onboarding_v2.ai_quiz.choice.manual_title" = "自分で答える";
+"onboarding_v2.ai_quiz.choice.manual_subtitle" = "10問・約2分";
+"onboarding_v2.ai_quiz.choice.privacy" = "会話はあなたとAIの間だけのものです。CortiFreeが保存するのはクイズの回答だけで、保存前に確認できます。";
+"onboarding_v2.ai_quiz.waiting.title" = "%@が回答を準備中…終わったらここに戻ってきてね！";
+"onboarding_v2.ai_quiz.waiting.step1" = "%@でメッセージを送信します（入力済みです）。";
+"onboarding_v2.ai_quiz.waiting.step1_paste" = "%@にメッセージを貼り付けて送信します（コピー済みです）。";
+"onboarding_v2.ai_quiz.waiting.step2" = "%@の返答をすべてコピーします。";
+"onboarding_v2.ai_quiz.waiting.step3" = "ここに戻って「ペースト」をタップします。";
+"onboarding_v2.ai_quiz.waiting.reopen" = "%@をもう一度開く";
+"onboarding_v2.ai_quiz.waiting.manual" = "やっぱり自分で答える";
+"onboarding_v2.ai_quiz.waiting.error" = "このテキストに回答が見つかりません。%@の返答をすべてコピーして、もう一度お試しください。";
+"onboarding_v2.ai_quiz.prompt.intro" = "ストレスを減らすアプリ「CortiFree」に登録しています。5つのプランがあります。あなたが私について本当に知っていること（これまでの会話やメモリー）をもとに、どれが一番合っていますか？正直に答えてください。選べるほど私のことを知らない場合は、推測せずに ? と書いてください。";
+"onboarding_v2.ai_quiz.prompt.format" = "コードブロック1つだけで、必ずこの形式で答えてください。<n> をプランの番号（または ?）に置き換えてください。ANALYSIS の後には、日本語で短い文を2〜3つ、私に語りかけるように書いてください：私について知っていることから、なぜこのプランが合っているのか。";
+"onboarding_v2.ai_quiz.picker.message" = "いいね！いちばん使っているAIは？";
+"onboarding_v2.ai_quiz.picker.how" = "使い方";
+"onboarding_v2.ai_quiz.picker.step_send" = "メッセージを送信";
+"onboarding_v2.ai_quiz.picker.step_copy" = "返答をコピー";
+"onboarding_v2.ai_quiz.picker.step_paste" = "ここに貼り付け";
+"onboarding_v2.ai_quiz.picker.prefilled" = "メッセージ入力済み";
+"onboarding_v2.ai_quiz.picker.copied" = "貼り付けるメッセージ";
+"daily_checkin.stress.1" = "とても落ち着いている";
+"daily_checkin.stress.2" = "わりと落ち着いている";
+"daily_checkin.stress.3" = "少しストレス";
+"daily_checkin.stress.4" = "ストレスがある";
+"daily_checkin.stress.5" = "とてもストレス";
+"daily_checkin.sleep.1" = "とても悪い";
+"daily_checkin.sleep.2" = "悪い";
+"daily_checkin.sleep.3" = "ふつう";
+"daily_checkin.sleep.4" = "よい";
+"daily_checkin.sleep.5" = "とてもよい";
+"daily_checkin.energy.1" = "ぐったり";
+"daily_checkin.energy.2" = "低い";
+"daily_checkin.energy.3" = "ふつう";
+"daily_checkin.energy.4" = "よい";
+"daily_checkin.energy.5" = "絶好調";
+"daily_checkin.note_placeholder" = "気になったこと、よかったこと…";
+"daily_meditation.eyebrow" = "%d日目 / %d日・はじめの一歩";
+"daily_meditation.title" = "今日の瞑想";
+"daily_meditation.start" = "はじめる";
+"onboarding_v2.ai_quiz.picker.other" = "ほかのAI";
+"onboarding_v2.ai_quiz.app.other" = "あなたのAI";
+"onboarding_v2.ai_quiz.milo.badge" = "CortiFreeはこの会話を保存しません";
+"onboarding_v2.ai_quiz.milo.intro_prefilled" = "はじめよう！%@へのメッセージはもう入力済み。送信するだけです。";
+"onboarding_v2.ai_quiz.milo.intro_paste" = "はじめよう！メッセージをコピーしました。%@に貼り付けて送信してください。";
+"onboarding_v2.ai_quiz.milo.step" = "%@が答えたら、回答をすべてコピーして、下のボタンでここに貼り付けてね。";
+"onboarding_v2.ai_quiz.milo.thanks" = "ありがとう！%@はあなたをこう理解しています：";
+"onboarding_v2.ai_quiz.milo.copy_again" = "メッセージをもう一度コピー";
+"onboarding_v2.ai_quiz.milo.placeholder" = "ここに回答を入力または貼り付け";
+"onboarding_v2.ai_quiz.milo.help" = "%@の回答を読むためにここにいます。回答をすべてコピーしてここに貼り付けるか、自分でクイズに答えてもOKです。";
+"onboarding_v2.ai_quiz.milo.consent" = "レポートを作るために、選ばれたプランと%@の分析を私のAI（DeepSeek）に送ります。貼り付けた内容すべてではなく、CortiFreeは何も保存しません。いいですか？";
+"onboarding_v2.ai_quiz.milo.consent_yes" = "OK";
+"onboarding_v2.ai_quiz.milo.consent_no" = "やめておく";
+"onboarding_v2.ai_quiz.milo.later" = "あとで";
+"onboarding_v2.ai_quiz.milo.local_pick" = "まずは「%@」を試してみて：%@";
+"onboarding_v2.ai_quiz.milo.declined_chat" = "同意がないとここでは返事ができません。アプリで話そう！";
+"onboarding_v2.ai_quiz.milo.unavailable" = "今は返事ができません。少ししてからもう一度試してね。";
+"onboarding_v2.ai_quiz.milo.found_plan" = "いいですね！%@によると、あなたに一番合うのは「%@」プランです。";
+"onboarding_v2.ai_quiz.milo.unknown" = "%@はまだ、あなたの代わりに選べるほどあなたのことを知らないようです。いちばん確実なのは、自分でクイズに答えること。2分で終わります。";
+"onboarding_v2.ai_quiz.milo.unknown_manual" = "自分で答える";
+"onboarding_v2.ai_quiz.milo.unknown_continue" = "このまま続ける";
+"onboarding_v2.ai_quiz.milo.default_plan" = "大丈夫、いちばん多くの人に役立つ「%@」プランから始めましょう。日々あなたに合わせて変わっていきます。";
+"live_activity.ai_quiz.title" = "%@の回答をコピー";
+"live_activity.ai_quiz.subtitle" = "CortiFreeに戻ってね。Miloがレポートを準備しています。";
+"live_activity.ai_quiz.cta" = "コピーした、戻る";
+"trial_kickoff.plan.eyebrow_days" = "%d日間のお試し";
+"cancel_intercept.title" = "%@までアクセスは続きます";
+"cancel_intercept.subtitle" = "自動更新をオフにしました。それまではすべてそのまま使えます。";
+"cancel_intercept.question" = "何が合わなかったですか？";
+"cancel_intercept.reason.price" = "高すぎる";
+"cancel_intercept.reason.time" = "時間がない";
+"cancel_intercept.reason.not_for_me" = "期待していたものと違った";
+"cancel_intercept.reason.avoid_charge" = "請求を避けたいだけ";
+"cancel_intercept.reason.other" = "その他";
+"cancel_intercept.answer.avoid_charge" = "自分で管理するのは賢い選択です。いずれにしてもお試し終了の2日前にお知らせします。そのときに再開して決められます。";
+"cancel_intercept.answer.default" = "教えてくれてありがとう。その前に、あなたへのご提案があるかもしれません。";
+"cancel_intercept.offer" = "特典を見る";
+"cancel_intercept.reactivate" = "自動更新を再開する";
+"cancel_intercept.later" = "あとで";
+"daily_checkin.day.today" = "今日のあなた";
+"daily_checkin.day.yesterday" = "昨日のあなた";
+"daily_checkin.q.mood.today" = "今日はどんな一日でしたか？";
+"daily_checkin.q.mood.yesterday" = "昨日はどんな一日でしたか？";
+"daily_checkin.q.stress.today" = "今日のストレスの度合いは？";
+"daily_checkin.q.stress.yesterday" = "昨日のストレスの度合いは？";
+"daily_checkin.q.sleep.today" = "昨夜はよく眠れましたか？";
+"daily_checkin.q.sleep.yesterday" = "その前の夜はよく眠れましたか？";
+"daily_checkin.q.energy.today" = "今日のエネルギーは？";
+"daily_checkin.q.energy.yesterday" = "昨日のエネルギーは？";
+"daily_checkin.q.note.today" = "今日のひとこと（任意）";
+"daily_checkin.q.note.yesterday" = "昨日のひとこと（任意）";
+"home.daily_checkin.subtitle_yesterday" = "昨日の振り返りがまだです：30秒";

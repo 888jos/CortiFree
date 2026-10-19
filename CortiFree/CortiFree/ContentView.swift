@@ -17,7 +17,6 @@ struct ContentView: View {
     @State private var isEditingPlan = false
     @State private var scrollTimer: Timer?
     @State private var isAssistantPresented = false
-    @ObservedObject private var breathePause = BreathePauseCenter.shared
     @State private var assistantPulse = false
     @ObservedObject private var bilanCenter = PlanBilanCenter.shared
 
@@ -120,10 +119,6 @@ struct ContentView: View {
             PlanBilanCenter.shared.checkAfterLaunch(source: "app_open")
             // The share extension could not bring the app forward: the user opened it themselves.
             if MiloImportCenter.shared.checkShareInbox() { openMilo() }
-        }
-        // « Breathe before TikTok »: opened by the Shortcuts automation.
-        .fullScreenCover(item: $breathePause.pending) { app in
-            BreathePauseView(app: app)
         }
         // Milo is a fixed full screen: no slide-up, no drag-to-dismiss (it fades in itself).
         .fullScreenCover(isPresented: $isAssistantPresented) {

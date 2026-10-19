@@ -29,6 +29,7 @@ import type * as migration_claim from "../migration/claim.js";
 import type * as migration_importer from "../migration/importer.js";
 import type * as migration_media from "../migration/media.js";
 import type * as migration_transform from "../migration/transform.js";
+import type * as onboardingMilo from "../onboardingMilo.js";
 import type * as plan from "../plan.js";
 import type * as profile from "../profile.js";
 import type * as progress from "../progress.js";
@@ -67,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   "migration/importer": typeof migration_importer;
   "migration/media": typeof migration_media;
   "migration/transform": typeof migration_transform;
+  onboardingMilo: typeof onboardingMilo;
   plan: typeof plan;
   profile: typeof profile;
   progress: typeof progress;

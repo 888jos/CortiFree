@@ -29,7 +29,7 @@ final class WeeklyCheckInService {
     var isDue: Bool {
         guard PersonalPlanStore.shared.plan != nil else { return false }
         FaceScanStore.shared.reload()
-        return FaceScanStore.shared.isDue || WeeklyPulseStore.shared.isDue
+        return (FaceScanStore.isEnabled && FaceScanStore.shared.isDue) || WeeklyPulseStore.shared.isDue
     }
 
     func shouldPresent() -> Bool {

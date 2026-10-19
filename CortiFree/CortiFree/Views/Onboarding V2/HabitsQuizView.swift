@@ -19,6 +19,8 @@ private enum HabitsQuizIntermission {
 
 struct HabitsQuizView: View {
     let onComplete: (HabitsQuizResult) -> Void
+    /// Back from the first question (back to the AI / by hand choice).
+    var onExit: (() -> Void)? = nil
 
     @ObservedObject var languageManager = LanguageManager.shared
     @State private var currentQuestionIndex: Int = 0
@@ -32,10 +34,10 @@ struct HabitsQuizView: View {
 
     private let totalQuestions = 12
 
-    /// Q9 (appearance) came from the removed Glow scan and fed nothing but analytics. It stays
-    /// in the answers array (index 8, answer 0) so every other index keeps its meaning for the
-    /// plan generator and Convex, but it is never shown.
-    private static let skippedQuestionIndexes: Set<Int> = [8]
+    /// Never shown, but kept in the answers array (answer 0) so every other index keeps its
+    /// meaning for the plan generator and Convex. They fed nothing but analytics:
+    /// index 8, appearance (from the removed Glow scan); index 9, other wellbeing apps tried.
+    static let skippedQuestionIndexes: Set<Int> = [8, 9]
 
     private var shownQuestionCount: Int { totalQuestions - Self.skippedQuestionIndexes.count }
 
@@ -122,7 +124,8 @@ struct HabitsQuizView: View {
             )
         case .cortiFreeComparison:
             CortiFreeComparisonView(
-                previousAppExperience: answers[9],
+                // Not asked any more: the generic « structured plan » title.
+                previousAppExperience: -1,
                 onBack: returnToCurrentQuestion,
                 onContinue: continueAfterIntermission
             )
@@ -159,7 +162,9 @@ struct HabitsQuizView: View {
             Button(action: {
                 guard !isTransitioning else { return }
                 HapticManager.light()
-                if currentQuestionIndex > 0 {
+                if currentQuestionIndex == 0 {
+                    onExit?()
+                } else {
                     // Track back button click
                     AnalyticsManager.shared.trackOnboardingQuizBackClicked(
                         fromQuestionNumber: currentQuestionIndex + 1
@@ -180,7 +185,8 @@ struct HabitsQuizView: View {
                     .frame(width: 20, height: 20)
             }
             .padding(.leading, 30)
-            .opacity(currentQuestionIndex > 0 ? 1.0 : 0.0)
+            .opacity(currentQuestionIndex > 0 || onExit != nil ? 1.0 : 0.0)
+            .disabled(currentQuestionIndex == 0 && onExit == nil)
 
             // Progress bar (center)
             OnboardingProgressBar(progress: progress)
@@ -242,7 +248,8 @@ struct HabitsQuizView: View {
                             switch currentQuestionIndex {
                             case 2:
                                 intermission = .breathingIntro
-                            case 9:
+                            // After the last symptom question (it followed « other apps tried », now hidden).
+                            case 7:
                                 intermission = .cortiFreeComparison
                             default:
                                 intermission = nil
@@ -292,11 +299,22 @@ struct HabitsQuizView: View {
     // MARK: - Calculate Scores
 
     private func calculateAndComplete() {
-        let result = HabitsQuizResult(answers: answers)
-        PersonalPlanStore.shared.updateOnboardingDraft { $0.quizAnswers = result.answers }
+        onComplete(Self.finish(answers: answers, startedAt: quizStartTime))
+    }
+
+    /// Saves the answers to the onboarding draft and tracks the completion. Shared by the
+    /// manual quiz and the answers given by the user's AI (`HabitsQuizEntryView`).
+    /// `aiGoal`: the plan the user's own AI picked (the answers are then only a stand-in
+    /// for the screens that show scores, and are not kept for the plan).
+    static func finish(answers: [Int], startedAt: Date?, aiGoal: PlanGoal? = nil) -> HabitsQuizResult {
+        let result = HabitsQuizResult(answers: answers, aiGoal: aiGoal)
+        PersonalPlanStore.shared.updateOnboardingDraft {
+            $0.quizAnswers = aiGoal == nil ? result.answers : nil
+            $0.aiGoal = aiGoal?.rawValue
+        }
 
         // Calculate total time spent on quiz
-        let totalTime = quizStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
+        let totalTime = startedAt.map { Date().timeIntervalSince($0) } ?? 0.0
 
         // Track quiz completion with marketing data
         AnalyticsManager.shared.trackOnboardingHabitsQuizCompleted(
@@ -315,10 +333,10 @@ struct HabitsQuizView: View {
         // Track additional marketing data
         AnalyticsManager.shared.trackOnboardingMarketingData(
             acquisitionChannel: "Unknown", // Acquisition now tracked in Overall quiz
-            previousAppExperience: result.previousAppExperience
+            previousAppExperience: nil
         )
 
-        onComplete(result)
+        return result
     }
 
     // MARK: - Get Question Data
@@ -562,6 +580,25 @@ struct HabitsAnswerButton: View {
 
 struct HabitsQuizResult {
     let answers: [Int]
+    /// The plan picked by the user's own AI (« my AI answers for me »): it decides the plan.
+    var aiGoal: PlanGoal? = nil
+
+    /// Stand-in answers for the AI's plan: middling everywhere, a bit lower on its theme,
+    /// so the screens that show scores stay coherent with it.
+    static func answers(leaningTo goal: PlanGoal) -> [Int] {
+        var answers = [2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 1]
+        let theme: [Int]
+        switch goal {
+        case .stress, .emotional: theme = [0, 3, 5]
+        case .sleep: theme = [2, 6]
+        case .energy: theme = [1, 7]
+        case .focus: theme = [4]
+        }
+        for index in theme { answers[index] = 1 }
+        // Q11, « what would you most like to improve »: sleep, stress, energy, focus, balance.
+        answers[10] = [.sleep: 0, .stress: 1, .energy: 2, .focus: 3, .emotional: 4][goal] ?? 1
+        return answers
+    }
 
     // MARK: - Domain Scores (Q1-Q8)
 

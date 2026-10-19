@@ -237,6 +237,16 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_user_feature_day", ["userId", "feature", "day"]),
 
+  /**
+   * Daily counters of Milo's onboarding replies (onboardingMilo.ts), before any account:
+   * per device (`key` = "device:<id>") and for everyone (`key` = "all"). Counts only, no text.
+   */
+  onboardingAiUsage: defineTable({
+    key: v.string(),
+    day: v.string(),
+    count: v.number(),
+  }).index("by_key_day", ["key", "day"]),
+
   /** Email ownership proof for password accounts (needed to claim legacy data by email). */
   emailVerificationCodes: defineTable({
     userId: v.id("users"),

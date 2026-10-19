@@ -452,13 +452,15 @@ struct PlanItemCard: View {
                             .font(Font.Poppins.custom(.semiBold, size: 16))
                             .foregroundStyle(.white.opacity(isDone ? 0.55 : 1))
                             .strikethrough(isDone, color: .white.opacity(0.4))
-                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.leading)
                         if !display.subtitle.isEmpty {
+                            // Shown in full, on as many lines as it needs.
                             Text(display.subtitle)
                                 .font(Font.Poppins.custom(.regular, size: 12))
                                 .foregroundStyle(PlanPalette.secondaryText)
-                                .lineLimit(1)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.leading)
                         }
                     }
                     Spacer(minLength: 0)

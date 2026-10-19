@@ -212,7 +212,10 @@ struct TrialKickoffView: View {
         Task { await AchievementService.shared.unlockFirstBreathAchievement() }
     }
 
-    // MARK: Plan (7 trial days)
+    // MARK: Plan (the trial days)
+
+    /// The real trial length (from the store); 7 when unknown (restored purchase, no trial).
+    private var trialLength: Int { min(RevenueCatManager.shared.trialLengthDays ?? 7, 14) }
 
     private var planStage: some View {
         VStack(spacing: 0) {
@@ -220,7 +223,8 @@ struct TrialKickoffView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
-                    Text("trial_kickoff.plan.eyebrow".localized)
+                    Text(trialLength == 7 ? "trial_kickoff.plan.eyebrow".localized
+                                          : String(format: "trial_kickoff.plan.eyebrow_days".localized, trialLength))
                         .font(.poppinsSemiBold(12))
                         .tracking(1.4)
                         .textCase(.uppercase)
@@ -271,7 +275,7 @@ struct TrialKickoffView: View {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let firstDay = plan.map { min(max($0.dayIndex(on: Date()), 1), PersonalPlan.length) } ?? 1
-        return (0..<7).map { offset in
+        return (0..<trialLength).map { offset in
             let date = calendar.date(byAdding: .day, value: offset, to: today) ?? today
             let planDay = plan?.day(firstDay + offset)
             if offset == 0 {

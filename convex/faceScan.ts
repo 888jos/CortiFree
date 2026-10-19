@@ -67,7 +67,11 @@ async function requestAnalysis(apiKey: string, model: string, image: string, lan
     }),
   });
 
-  if (!upstream.ok) throw new Error("Face check unavailable");
+  if (!upstream.ok) {
+    // Logged so an empty OpenAI balance (429 insufficient_quota) or a bad key shows in the logs.
+    console.error("faceScan: OpenAI error", upstream.status, (await upstream.text()).slice(0, 300));
+    throw new Error("Face check unavailable");
+  }
   const result: unknown = await upstream.json();
   if (
     typeof result !== "object" ||

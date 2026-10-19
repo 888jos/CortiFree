@@ -3,20 +3,19 @@
 //  CortiFree
 //
 //  Created by Claude on 11/11/2025.
-//  Reassurance screen with animated text (tap to show it all)
+//  Reassurance: Milo's chat, one message per paragraph, read only (tap shows them all)
 //
 
 import SwiftUI
 
 struct ReassuranceView: View {
     let overallData: OverallQuizData?
+    let onBack: (() -> Void)?
     let onStartQuiz: () -> Void
 
-    private let textSpeedMultiplier = 1.875
-
     @ObservedObject var languageManager = LanguageManager.shared
-    @State private var displayedText: String = ""
-    @State private var currentCharacterIndex: Int = 0
+    @State private var shownCount = 0
+    @State private var isTyping = false
     @State private var showButton: Bool = false
     @State private var screenViewTime: Date?
 
@@ -62,147 +61,199 @@ struct ReassuranceView: View {
         return data.ageCode == "under_18" || data.reasonCodes.contains("difficult")
     }
 
-    init(overallData: OverallQuizData? = nil, onStartQuiz: @escaping () -> Void) {
+    /// The answers in Milo's chat, one message per paragraph; the user only reads (no composer).
+    private var messages: [String] {
+        fullText.components(separatedBy: "\n\n").filter { !$0.isEmpty }
+    }
+
+    init(overallData: OverallQuizData? = nil, onBack: (() -> Void)? = nil, onStartQuiz: @escaping () -> Void) {
         self.overallData = overallData
+        self.onBack = onBack
         self.onStartQuiz = onStartQuiz
     }
 
     var body: some View {
         ZStack {
-            GalaxyBackgroundView()
-                .ignoresSafeArea()
+            GalaxyBackgroundView(intensity: 0.85, isAnimated: false).ignoresSafeArea()
 
-            // Dark overlay for readability
-            Color.black.opacity(0.5)
-                .ignoresSafeArea()
+            VStack(spacing: 0) {
+                header
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    LottieView(filename: "sloth_meditate.json", loopMode: .loop)
-                .frame(width: 156, height: 156)
-                        .padding(.bottom, 8)
-
-                    // Animated text at top (centered)
-                    VStack(spacing: 32) {
-                    Text(displayedText)
-                        .font(.custom("Poppins-Regular", size: 18))
-                        .foregroundColor(.white.opacity(0.95))
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(6)
-                        .frame(minHeight: 200, alignment: .top)
-                        .padding(.horizontal, 40)
-                        .contentShape(Rectangle())
-                        .onTapGesture { revealFullText() }
-                        .accessibilityAction(named: Text("common.continue".localized)) { revealFullText() }
-
-                }
-                // Keep the copy visible after the larger mascot artwork.
-                .padding(.top, 20)
-
-                    Spacer(minLength: 48)
-
-                    // Bottom button section (appear after badges)
-                    if showButton {
-                    VStack(spacing: 12) {
-                        Button(action: {
-                            HapticManager.medium()
-
-                            // Track button click with time spent
-                            if let startTime = screenViewTime {
-                                let timeSpent = Date().timeIntervalSince(startTime)
-                                AnalyticsManager.shared.trackOnboardingReassuranceContinue(timeSpent: timeSpent)
+                ScrollViewReader { proxy in
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            ForEach(Array(messages.prefix(shownCount).enumerated()), id: \.offset) { index, text in
+                                miloMessage(text, showsAvatar: index == 0)
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
                             }
-
-                            onStartQuiz()
-                        }) {
-                            HStack(spacing: 12) {
-                                Text("onboarding_v2.reassurance.start_quiz".localized)
-                                    .font(.custom("Poppins-SemiBold", size: 16))
-                                    .foregroundColor(.white)
-
-                                // White arrow in dark circle
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.white.opacity(0.2))
-                                        .frame(width: 32, height: 32)
-
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.white)
+                            if isTyping {
+                                HStack(spacing: 10) {
+                                    avatar(size: 28)
+                                    ReassuranceTypingDots()
                                 }
                             }
-                            .padding(.vertical, 12)
-                            .padding(.leading, 24)
-                            .padding(.trailing, 12)
+                            Color.clear.frame(height: 1).id("bottom")
                         }
-                        .buttonStyle(.glassPrimary)
-
-                        // Time estimate (centered below button)
-                        Text("onboarding_v2.reassurance.time_estimate".localized)
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white.opacity(0.6))
+                        .padding(.horizontal, 20)
+                        .padding(.top, 24)
+                        .padding(.bottom, 12)
                     }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.horizontal, 40)
-                    .padding(.bottom, 32)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .scrollBounceBehavior(.basedOnSize)
+                    .onChange(of: shownCount) { _, _ in
+                        withAnimation { proxy.scrollTo("bottom", anchor: .bottom) }
                     }
                 }
+                // Tapping shows every message at once.
+                .contentShape(Rectangle())
+                .onTapGesture { revealAll() }
+
+                if showButton { startButton.transition(.move(edge: .bottom).combined(with: .opacity)) }
             }
         }
         .onAppear {
-            // Track screen view
+            guard screenViewTime == nil else { return }
             screenViewTime = Date()
             AnalyticsManager.shared.trackOnboardingReassuranceViewed(userName: "")
-
-            startTextAnimation()
+            showNext()
         }
     }
 
-    // MARK: - Text Animation
+    // MARK: Milo chat look (as in the Milo conversation of the app)
 
-    private func startTextAnimation() {
-        // Start animation after short delay (reduced by 50%)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            animateNextCharacter()
+    private var header: some View {
+        HStack(spacing: 10) {
+            if let onBack {
+                Button {
+                    HapticManager.light()
+                    onBack()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .cfGlassCircle(interactive: false)
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+            } else {
+                Color.clear.frame(width: 40, height: 40)
+            }
+            Spacer()
+            HStack(spacing: 8) {
+                avatar(size: 28)
+                Text(verbatim: "Milo")
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            Spacer()
+            Color.clear.frame(width: 40, height: 40)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+        .padding(.bottom, 6)
+    }
+
+    private func avatar(size: CGFloat) -> some View {
+        Image("cortifree_assistant_avatar")
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+    }
+
+    private func miloMessage(_ text: String, showsAvatar: Bool) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Group {
+                if showsAvatar { avatar(size: 28) } else { Color.clear }
+            }
+            .frame(width: 28, height: 28)
+            Text(text)
+                .font(.system(size: 17))
+                .lineSpacing(4)
+                .foregroundStyle(.white.opacity(0.94))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 3)
         }
     }
 
-    /// Tapping the text shows it all at once (the typewriter effect is optional).
-    private func revealFullText() {
-        guard currentCharacterIndex < fullText.count else { return }
-        currentCharacterIndex = fullText.count
-        displayedText = fullText
-        withAnimation(.easeInOut(duration: 0.3)) {
+    private var startButton: some View {
+        VStack(spacing: 10) {
+            Button {
+                HapticManager.medium()
+                if let startTime = screenViewTime {
+                    AnalyticsManager.shared.trackOnboardingReassuranceContinue(timeSpent: Date().timeIntervalSince(startTime))
+                }
+                onStartQuiz()
+            } label: {
+                HStack(spacing: 12) {
+                    Text("onboarding_v2.reassurance.start_quiz".localized)
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 32, height: 32)
+                        .background(Color.white.opacity(0.2), in: Circle())
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.glassPrimary)
+
+            Text("onboarding_v2.reassurance.time_estimate".localized)
+                .font(.custom("Poppins-Regular", size: 14))
+                .foregroundColor(.white.opacity(0.6))
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 20)
+    }
+
+    // MARK: Messages, one after the other
+
+    private func showNext() {
+        guard shownCount < messages.count else {
+            withAnimation(.easeInOut(duration: 0.3)) { showButton = true }
+            return
+        }
+        isTyping = true
+        let text = messages[shownCount]
+        // Short: the message lands as a whole, the dots carry the « Milo is writing ».
+        let delay = min(1.1, 0.4 + Double(text.count) / 220)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard isTyping else { return }
+            withAnimation(.easeOut(duration: 0.25)) {
+                isTyping = false
+                shownCount += 1
+            }
+            HapticManager.light()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { showNext() }
+        }
+    }
+
+    private func revealAll() {
+        guard shownCount < messages.count else { return }
+        withAnimation(.easeOut(duration: 0.25)) {
+            isTyping = false
+            shownCount = messages.count
             showButton = true
         }
     }
+}
 
-    private func animateNextCharacter() {
-        guard currentCharacterIndex < fullText.count else {
-            // Text animation complete, show button after short delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    showButton = true
+private struct ReassuranceTypingDots: View {
+    var body: some View {
+        TimelineView(.animation) { context in
+            let time = context.date.timeIntervalSinceReferenceDate
+            HStack(spacing: 5) {
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 7, height: 7)
+                        .opacity(0.3 + 0.6 * max(0, sin(time * 4 - Double(index) * 0.7)))
                 }
             }
-            return
-        }
-
-        let index = fullText.index(fullText.startIndex, offsetBy: currentCharacterIndex)
-        displayedText.append(fullText[index])
-        currentCharacterIndex += 1
-
-        // Haptic feedback only every 10 characters to avoid rate-limit (32hz)
-        if currentCharacterIndex % 10 == 0 {
-            HapticManager.light()
-        }
-
-        // Reveal the text 1.25x faster than the previous timing.
-        let baseDelay: Double = fullText[index].isWhitespace ? 0.0096 : 0.048
-        let delay = baseDelay / textSpeedMultiplier
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            animateNextCharacter()
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color.white.opacity(0.10), in: Capsule())
         }
     }
 }

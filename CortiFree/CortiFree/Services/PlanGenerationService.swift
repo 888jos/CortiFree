@@ -24,8 +24,10 @@ final class PlanGenerationService {
             durationCode: overallData?.durationCode,
             ageCode: overallData?.ageCode,
             genderCode: overallData?.genderCode,
-            quizAnswers: quizResult.answers,
+            // The AI's plan: its stand-in answers would only blur it.
+            quizAnswers: quizResult.aiGoal == nil ? quizResult.answers : nil,
             symptomIDs: PlanLocalizationLookup.symptomIDs(from: symptoms),
+            aiGoal: quizResult.aiGoal?.rawValue,
             source: "onboarding"
         )
         PersonalPlanStore.shared.createPlanFromOnboarding(profile)

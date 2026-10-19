@@ -182,6 +182,10 @@ enum PersonalPlanGenerator {
         }
         if let quizGoal { weights[quizGoal, default: 0] += 2 }
 
+        // 2b. The plan the user's own AI picked from what it knows of them (onboarding)
+        let aiGoal = profile.aiGoal.flatMap(PlanGoal.init(rawValue:))
+        if let aiGoal { weights[aiGoal, default: 0] += 3 }
+
         // 3. Weakest domains (internal use only)
         let scores = domainScores(answers)
         if let s = scores.stress, s < 60 { weights[.stress, default: 0] += Double(60 - s) / 20 }
@@ -211,7 +215,7 @@ enum PersonalPlanGenerator {
         case .minimal, nil: break
         }
 
-        // Primary goal: user override > reasons > Q11 > weights > stress
+        // Primary goal: user override > the user's AI > reasons > Q11 > weights > stress
         let order = PlanGoal.allCases
         func best(_ candidates: [PlanGoal]) -> PlanGoal? {
             candidates.max { a, b in
@@ -226,6 +230,8 @@ enum PersonalPlanGenerator {
         var origin: PlanAnalysis.GoalOrigin = .fallback
         if let overrideGoal {
             primary = overrideGoal; origin = .user
+        } else if let aiGoal {
+            primary = aiGoal; origin = .quiz
         } else if !reasonGoals.isEmpty, let goal = best(order.filter { reasonGoals[$0] != nil }) {
             primary = goal; origin = .reason
         } else if let quizGoal {
@@ -720,7 +726,7 @@ enum PersonalPlanGenerator {
             profile.symptomIDs.sorted().joined(separator: ","),
             profile.improvementGoal ?? "-",
             profile.availableMinutes.map(String.init) ?? "-"
-        ].joined(separator: "|")
+        ].joined(separator: "|") + (profile.aiGoal.map { "|ai:\($0)" } ?? "")
     }
 }
 
