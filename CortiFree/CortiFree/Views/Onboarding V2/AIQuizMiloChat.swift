@@ -487,7 +487,7 @@ struct AIQuizMiloChat: View {
             return
         }
         HapticManager.success()
-        say([String(format: t("onboarding_v2.ai_quiz.milo.found_plan"), app.name, goal.localizedName),
+        say([String(format: t("onboarding_v2.ai_quiz.milo.found_plan"), goal.localizedName),
              String(format: t("onboarding_v2.ai_quiz.milo.consent"), app.name)]) {
             withAnimation { askingConsent = true }
         }
@@ -542,7 +542,7 @@ struct AIQuizMiloChat: View {
         let pattern = OnboardingMiloService.pattern("coherence") ?? OnboardingMiloService.exercises.first
         var texts = [String]()
         if !reply.analysis.isEmpty {
-            texts.append(String(format: t("onboarding_v2.ai_quiz.milo.thanks"), app.name))
+            texts.append(t("onboarding_v2.ai_quiz.milo.thanks"))
             texts.append(reply.analysis)
         }
         if let pattern {

@@ -19,27 +19,36 @@ struct ReassuranceView: View {
     @State private var showButton: Bool = false
     @State private var screenViewTime: Date?
 
-    /// One hand-written sentence per answer, never the answers pasted back into a template:
-    /// the main reason, then the age (« in your thirties », not « 25–34 »), then how long.
-    private var fullText: String {
-        var paragraphs: [String] = []
+    /// Short on purpose (2–3 bubbles): thanks with the first name when known, one sentence on the
+    /// main reason, one on how long it lasts, then what comes next. Age is not repeated back.
+    private var messages: [String] {
+        let name = OnboardingPersonalization.firstName
+        let thanks = name.isEmpty
+            ? "onboarding_v2.reassurance.brief.thanks".localized
+            : String(format: "onboarding_v2.reassurance.brief.thanks_name".localized, name)
+        var first = thanks
+        if let data = overallData, let reason = Self.mainReason(data.reasonCodes) {
+            let line = brief("reason_\(reason)")
+            first += line.isEmpty ? "" : " " + line
+        }
+        if first == thanks { first += " " + "onboarding_v2.reassurance.brief.default".localized }
+        var result = [first]
         if let data = overallData {
-            if let reason = Self.mainReason(data.reasonCodes) {
-                paragraphs.append(text("reason_\(reason)"))
-            }
-            let context = [text("age_\(data.ageCode)"), text("duration_\(data.durationCode)")]
-                .filter { !$0.isEmpty }
-                .joined(separator: " ")
-            if !context.isEmpty { paragraphs.append(context) }
+            let duration = brief("duration_\(data.durationCode)")
+            if !duration.isEmpty { result.append(duration) }
         }
-        if paragraphs.isEmpty {
-            paragraphs.append("onboarding_v2.reassurance.message_part2".localized)
-        }
-        paragraphs.append(text("next"))
+        result.append("onboarding_v2.reassurance.brief.next".localized)
         if needsSupportMessage {
-            paragraphs.append("onboarding_v2.reassurance.support".localized)
+            result.append("onboarding_v2.reassurance.support".localized)
         }
-        return paragraphs.joined(separator: "\n\n")
+        return result
+    }
+
+    /// Localised short sentence, or "" when an answer has none (unknown code).
+    private func brief(_ key: String) -> String {
+        let fullKey = "onboarding_v2.reassurance.brief.\(key)"
+        let value = fullKey.localized
+        return value == fullKey ? "" : value
     }
 
     /// Several reasons can be ticked: speak to the heaviest one only.
@@ -48,22 +57,10 @@ struct ReassuranceView: View {
         return priority.first(where: codes.contains) ?? codes.first
     }
 
-    /// Localised sentence, or "" when an answer has none (unknown code).
-    private func text(_ key: String) -> String {
-        let fullKey = "onboarding_v2.reassurance.text.\(key)"
-        let value = fullKey.localized
-        return value == fullKey ? "" : value
-    }
-
     /// Minors and people going through a hard time get a pointer to real help.
     private var needsSupportMessage: Bool {
         guard let data = overallData else { return false }
         return data.ageCode == "under_18" || data.reasonCodes.contains("difficult")
-    }
-
-    /// The answers in Milo's chat, one message per paragraph; the user only reads (no composer).
-    private var messages: [String] {
-        fullText.components(separatedBy: "\n\n").filter { !$0.isEmpty }
     }
 
     init(overallData: OverallQuizData? = nil, onBack: (() -> Void)? = nil, onStartQuiz: @escaping () -> Void) {

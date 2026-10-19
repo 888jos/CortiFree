@@ -5701,7 +5701,7 @@
 "onboarding_v2.ai_quiz.waiting.manual" = "Actually, I'll answer myself";
 "onboarding_v2.ai_quiz.waiting.error" = "I can't find the answers in this text. Copy %@'s whole reply, then try again.";
 "onboarding_v2.ai_quiz.prompt.intro" = "I'm signing up for CortiFree, an app that helps reduce stress. It offers five plans. Based on what you really know about me (our conversations, your memory), which one fits me best? Be honest. If you don't know me well enough to choose, put ? instead of guessing.";
-"onboarding_v2.ai_quiz.prompt.format" = "Reply only with a single code block, exactly in this format. Replace <n> with the plan's number (or ?). After ANALYSIS, write 2 or 3 short sentences in English, speaking to me directly: why this plan fits me, based on what you know about me.";
+"onboarding_v2.ai_quiz.prompt.format" = "Reply only with a single code block, exactly in this format. Replace <n> with the plan's number (or ?). After ANALYSIS, write 2 or 3 short sentences in English, speaking to me directly: why this plan fits me, based on what you know about me. Don't mention yourself or our conversations: describe me directly.";
 "onboarding_v2.ai_quiz.picker.message" = "Great! Which AI do you use the most?";
 "onboarding_v2.ai_quiz.picker.how" = "How it works";
 "onboarding_v2.ai_quiz.picker.step_send" = "Send the message";
@@ -5734,7 +5734,7 @@
 "onboarding_v2.ai_quiz.milo.intro_prefilled" = "Let's go! The message for %@ is already written, you just have to send it.";
 "onboarding_v2.ai_quiz.milo.intro_paste" = "Let's go! I copied the message: paste it into %@ and send it.";
 "onboarding_v2.ai_quiz.milo.step" = "When %@ has replied, copy its whole answer and paste it here with the button below.";
-"onboarding_v2.ai_quiz.milo.thanks" = "Thanks! Here's what %@ understood about you:";
+"onboarding_v2.ai_quiz.milo.thanks" = "Thanks! Here's what I understood about you:";
 "onboarding_v2.ai_quiz.milo.copy_again" = "Copy the message again";
 "onboarding_v2.ai_quiz.milo.placeholder" = "Write or paste the answer here";
 "onboarding_v2.ai_quiz.milo.help" = "I'm here to read %@'s answer. Copy all of it and paste it here, or answer the quiz yourself if you'd rather.";
@@ -5745,7 +5745,7 @@
 "onboarding_v2.ai_quiz.milo.local_pick" = "To start, try “%@”: %@";
 "onboarding_v2.ai_quiz.milo.declined_chat" = "Without your OK, I can't answer you here. Let's talk in the app!";
 "onboarding_v2.ai_quiz.milo.unavailable" = "I can't answer right now. Try again in a moment.";
-"onboarding_v2.ai_quiz.milo.found_plan" = "Great! According to %@, the plan that fits you best is “%@”.";
+"onboarding_v2.ai_quiz.milo.found_plan" = "Great! From what I understood about you, the plan that fits you best is “%@”.";
 "onboarding_v2.ai_quiz.milo.unknown" = "Looks like %@ doesn't know you well enough yet to choose for you. The most reliable way: answer the quiz yourself, it takes 2 minutes.";
 "onboarding_v2.ai_quiz.milo.unknown_manual" = "Answer myself";
 "onboarding_v2.ai_quiz.milo.unknown_continue" = "Continue anyway";
@@ -5780,3 +5780,19 @@
 "daily_checkin.q.note.today" = "A word about your day? (optional)";
 "daily_checkin.q.note.yesterday" = "A word about yesterday? (optional)";
 "home.daily_checkin.subtitle_yesterday" = "You skipped yesterday's check-in: 30 seconds";
+"onboarding_v2.reassurance.brief.thanks_name" = "Thanks %@, got it.";
+"onboarding_v2.reassurance.brief.thanks" = "Thanks, got it.";
+"onboarding_v2.reassurance.brief.reason_sleep" = "Poor sleep spills into everything, and sleep can be retrained.";
+"onboarding_v2.reassurance.brief.reason_anxiety" = "Your body has stayed on alert for too long. It can learn to settle again.";
+"onboarding_v2.reassurance.brief.reason_energy" = "Feeling drained for no reason is often a body stuck in stress mode for too long.";
+"onboarding_v2.reassurance.brief.reason_focus" = "A scattered mind is a brain with too much on its plate, not a lack of discipline.";
+"onboarding_v2.reassurance.brief.reason_mental" = "Looking after your mind before it overflows is exactly the right move.";
+"onboarding_v2.reassurance.brief.reason_difficult" = "When everything weighs at once, we'll go gently, one step at a time.";
+"onboarding_v2.reassurance.brief.reason_habits" = "Good habits come from small, easy actions you can repeat, not from motivation.";
+"onboarding_v2.reassurance.brief.duration_weeks" = "You're catching it early: the best time to act.";
+"onboarding_v2.reassurance.brief.duration_2_6_months" = "A few months is enough to weigh on you, not enough to be set in stone.";
+"onboarding_v2.reassurance.brief.duration_6_12_months" = "Almost a year: it can change, at your pace.";
+"onboarding_v2.reassurance.brief.duration_1_year_plus" = "Even what has been there a long time can shift.";
+"onboarding_v2.reassurance.brief.duration_years" = "What built up over time can come undone over time.";
+"onboarding_v2.reassurance.brief.default" = "Your body can learn to settle again, and we'll help.";
+"onboarding_v2.reassurance.brief.next" = "A few quick questions to build your plan. Your answers stay private.";

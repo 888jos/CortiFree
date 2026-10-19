@@ -5704,7 +5704,7 @@
 "onboarding_v2.ai_quiz.waiting.manual" = "やっぱり自分で答える";
 "onboarding_v2.ai_quiz.waiting.error" = "このテキストに回答が見つかりません。%@の返答をすべてコピーして、もう一度お試しください。";
 "onboarding_v2.ai_quiz.prompt.intro" = "ストレスを減らすアプリ「CortiFree」に登録しています。5つのプランがあります。あなたが私について本当に知っていること（これまでの会話やメモリー）をもとに、どれが一番合っていますか？正直に答えてください。選べるほど私のことを知らない場合は、推測せずに ? と書いてください。";
-"onboarding_v2.ai_quiz.prompt.format" = "コードブロック1つだけで、必ずこの形式で答えてください。<n> をプランの番号（または ?）に置き換えてください。ANALYSIS の後には、日本語で短い文を2〜3つ、私に語りかけるように書いてください：私について知っていることから、なぜこのプランが合っているのか。";
+"onboarding_v2.ai_quiz.prompt.format" = "コードブロック1つだけで、必ずこの形式で答えてください。<n> をプランの番号（または ?）に置き換えてください。ANALYSIS の後には、日本語で短い文を2〜3つ、私に語りかけるように書いてください：私について知っていることから、なぜこのプランが合っているのか。自分自身や私たちの会話には触れず、私のことを直接書いてください。";
 "onboarding_v2.ai_quiz.picker.message" = "いいね！いちばん使っているAIは？";
 "onboarding_v2.ai_quiz.picker.how" = "使い方";
 "onboarding_v2.ai_quiz.picker.step_send" = "メッセージを送信";
@@ -5737,7 +5737,7 @@
 "onboarding_v2.ai_quiz.milo.intro_prefilled" = "はじめよう！%@へのメッセージはもう入力済み。送信するだけです。";
 "onboarding_v2.ai_quiz.milo.intro_paste" = "はじめよう！メッセージをコピーしました。%@に貼り付けて送信してください。";
 "onboarding_v2.ai_quiz.milo.step" = "%@が答えたら、回答をすべてコピーして、下のボタンでここに貼り付けてね。";
-"onboarding_v2.ai_quiz.milo.thanks" = "ありがとう！%@はあなたをこう理解しています：";
+"onboarding_v2.ai_quiz.milo.thanks" = "ありがとう！あなたについて、わたしが理解したことです：";
 "onboarding_v2.ai_quiz.milo.copy_again" = "メッセージをもう一度コピー";
 "onboarding_v2.ai_quiz.milo.placeholder" = "ここに回答を入力または貼り付け";
 "onboarding_v2.ai_quiz.milo.help" = "%@の回答を読むためにここにいます。回答をすべてコピーしてここに貼り付けるか、自分でクイズに答えてもOKです。";
@@ -5748,7 +5748,7 @@
 "onboarding_v2.ai_quiz.milo.local_pick" = "まずは「%@」を試してみて：%@";
 "onboarding_v2.ai_quiz.milo.declined_chat" = "同意がないとここでは返事ができません。アプリで話そう！";
 "onboarding_v2.ai_quiz.milo.unavailable" = "今は返事ができません。少ししてからもう一度試してね。";
-"onboarding_v2.ai_quiz.milo.found_plan" = "いいですね！%@によると、あなたに一番合うのは「%@」プランです。";
+"onboarding_v2.ai_quiz.milo.found_plan" = "いいですね！あなたについて理解したことから、いちばん合うプランは「%@」です。";
 "onboarding_v2.ai_quiz.milo.unknown" = "%@はまだ、あなたの代わりに選べるほどあなたのことを知らないようです。いちばん確実なのは、自分でクイズに答えること。2分で終わります。";
 "onboarding_v2.ai_quiz.milo.unknown_manual" = "自分で答える";
 "onboarding_v2.ai_quiz.milo.unknown_continue" = "このまま続ける";
@@ -5783,3 +5783,19 @@
 "daily_checkin.q.note.today" = "今日のひとこと（任意）";
 "daily_checkin.q.note.yesterday" = "昨日のひとこと（任意）";
 "home.daily_checkin.subtitle_yesterday" = "昨日の振り返りがまだです：30秒";
+"onboarding_v2.reassurance.brief.thanks_name" = "%@さん、ありがとう。わかりました。";
+"onboarding_v2.reassurance.brief.thanks" = "ありがとう。わかりました。";
+"onboarding_v2.reassurance.brief.reason_sleep" = "睡眠不足はすべてに響きます。でも睡眠は整え直せます。";
+"onboarding_v2.reassurance.brief.reason_anxiety" = "からだが長く緊張しすぎていました。また落ち着くことを覚えられます。";
+"onboarding_v2.reassurance.brief.reason_energy" = "理由もなくぐったりするのは、からだが長くストレス状態にあるせいかもしれません。";
+"onboarding_v2.reassurance.brief.reason_focus" = "頭が散らかるのは、抱えるものが多すぎるから。意志が弱いせいではありません。";
+"onboarding_v2.reassurance.brief.reason_mental" = "あふれる前に心をいたわるのは、とても良い判断です。";
+"onboarding_v2.reassurance.brief.reason_difficult" = "すべてが重なるときは、ゆっくり一歩ずつ進みましょう。";
+"onboarding_v2.reassurance.brief.reason_habits" = "良い習慣はやる気ではなく、続けやすい小さな行動から生まれます。";
+"onboarding_v2.reassurance.brief.duration_weeks" = "早めに向き合えています。今がいちばんいいタイミングです。";
+"onboarding_v2.reassurance.brief.duration_2_6_months" = "数か月は負担になるには十分ですが、固まるほどではありません。";
+"onboarding_v2.reassurance.brief.duration_6_12_months" = "もうすぐ1年。自分のペースで変えていけます。";
+"onboarding_v2.reassurance.brief.duration_1_year_plus" = "長く続いていることも、変わっていけます。";
+"onboarding_v2.reassurance.brief.duration_years" = "時間をかけて積もったものは、時間をかけてほどけます。";
+"onboarding_v2.reassurance.brief.default" = "からだはまた落ち着くことを覚えられます。一緒に進めましょう。";
+"onboarding_v2.reassurance.brief.next" = "プランを作るために、いくつか簡単な質問をします。回答は非公開です。";

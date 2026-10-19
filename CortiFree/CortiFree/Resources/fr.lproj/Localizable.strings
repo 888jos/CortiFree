@@ -5699,7 +5699,7 @@
 "onboarding_v2.ai_quiz.waiting.manual" = "Finalement, je réponds moi-même";
 "onboarding_v2.ai_quiz.waiting.error" = "Je ne trouve pas les réponses dans ce texte. Copie bien toute la réponse de %@, puis réessaie.";
 "onboarding_v2.ai_quiz.prompt.intro" = "Je m'inscris sur CortiFree, une app qui aide à réduire le stress. Elle propose cinq plans. D'après tout ce que tu sais vraiment de moi (nos conversations, ta mémoire), lequel me correspond le mieux ? Sois honnête. Si tu ne me connais pas assez pour choisir, mets ? au lieu d'inventer.";
-"onboarding_v2.ai_quiz.prompt.format" = "Réponds uniquement avec un seul bloc de code, exactement dans ce format. Remplace <n> par le numéro du plan (ou ?). Après ANALYSIS, écris en français 2 ou 3 phrases courtes en me tutoyant : pourquoi ce plan me correspond, d'après ce que tu sais de moi.";
+"onboarding_v2.ai_quiz.prompt.format" = "Réponds uniquement avec un seul bloc de code, exactement dans ce format. Remplace <n> par le numéro du plan (ou ?). Après ANALYSIS, écris en français 2 ou 3 phrases courtes en me tutoyant : pourquoi ce plan me correspond, d'après ce que tu sais de moi. Ne parle ni de toi ni de nos conversations : décris-moi directement.";
 "onboarding_v2.ai_quiz.picker.message" = "Super ! Quelle IA utilises-tu le plus ?";
 "onboarding_v2.ai_quiz.picker.how" = "Comment ça marche";
 "onboarding_v2.ai_quiz.picker.step_send" = "Envoie le message";
@@ -5732,7 +5732,7 @@
 "onboarding_v2.ai_quiz.milo.intro_prefilled" = "C'est parti ! Le message pour %@ est déjà écrit, tu n'as plus qu'à l'envoyer.";
 "onboarding_v2.ai_quiz.milo.intro_paste" = "C'est parti ! J'ai copié le message : colle-le dans %@ et envoie-le.";
 "onboarding_v2.ai_quiz.milo.step" = "Quand %@ a répondu, copie toute sa réponse et colle-la ici avec le bouton en bas.";
-"onboarding_v2.ai_quiz.milo.thanks" = "Merci ! Voilà ce que %@ a compris de toi :";
+"onboarding_v2.ai_quiz.milo.thanks" = "Merci ! Voilà ce que j'ai compris de toi :";
 "onboarding_v2.ai_quiz.milo.copy_again" = "Recopier le message";
 "onboarding_v2.ai_quiz.milo.placeholder" = "Écris ou colle la réponse ici";
 "onboarding_v2.ai_quiz.milo.help" = "Je suis là pour lire la réponse de %@. Copie-la en entier et colle-la ici, ou réponds toi-même au quiz si tu préfères.";
@@ -5743,7 +5743,7 @@
 "onboarding_v2.ai_quiz.milo.local_pick" = "Pour commencer, essaie « %@ » : %@";
 "onboarding_v2.ai_quiz.milo.declined_chat" = "Sans ton accord, je ne peux pas te répondre ici. On en reparle dans l'app !";
 "onboarding_v2.ai_quiz.milo.unavailable" = "Je n'arrive pas à te répondre pour l'instant. Réessaie dans un moment.";
-"onboarding_v2.ai_quiz.milo.found_plan" = "Super ! D'après %@, le plan qui te correspond le mieux, c'est « %@ ».";
+"onboarding_v2.ai_quiz.milo.found_plan" = "Super ! D'après ce que j'ai compris de toi, le plan qui te correspond le mieux, c'est « %@ ».";
 "onboarding_v2.ai_quiz.milo.unknown" = "On dirait que %@ ne te connaît pas encore assez pour choisir à ta place. Le plus fiable : réponds toi-même au quiz, ça prend 2 minutes.";
 "onboarding_v2.ai_quiz.milo.unknown_manual" = "Répondre moi-même";
 "onboarding_v2.ai_quiz.milo.unknown_continue" = "Continuer quand même";
@@ -5778,3 +5778,19 @@
 "daily_checkin.q.note.today" = "Un mot sur ta journée ? (facultatif)";
 "daily_checkin.q.note.yesterday" = "Un mot sur ta journée d'hier ? (facultatif)";
 "home.daily_checkin.subtitle_yesterday" = "Tu n'as pas fait le bilan d'hier : 30 secondes";
+"onboarding_v2.reassurance.brief.thanks_name" = "Merci %@, c'est noté.";
+"onboarding_v2.reassurance.brief.thanks" = "Merci, c'est noté.";
+"onboarding_v2.reassurance.brief.reason_sleep" = "Mal dormir déteint sur tout, et le sommeil, ça se rééduque.";
+"onboarding_v2.reassurance.brief.reason_anxiety" = "Ton corps est resté en alerte trop longtemps. Il peut réapprendre à se poser.";
+"onboarding_v2.reassurance.brief.reason_energy" = "Être à plat sans raison, c'est souvent un corps en mode stress depuis trop longtemps.";
+"onboarding_v2.reassurance.brief.reason_focus" = "La tête qui part dans tous les sens, c'est un cerveau qui a trop à gérer, pas un manque de discipline.";
+"onboarding_v2.reassurance.brief.reason_mental" = "Prendre soin de ta tête avant que ça déborde, c'est le bon réflexe.";
+"onboarding_v2.reassurance.brief.reason_difficult" = "Quand tout pèse en même temps, on y va doucement, un pas après l'autre.";
+"onboarding_v2.reassurance.brief.reason_habits" = "Les bonnes habitudes tiennent à de petits gestes faciles à refaire, pas à la motivation.";
+"onboarding_v2.reassurance.brief.duration_weeks" = "Tu t'y prends tôt : c'est le meilleur moment.";
+"onboarding_v2.reassurance.brief.duration_2_6_months" = "Quelques mois, c'est assez pour peser, pas pour être figé.";
+"onboarding_v2.reassurance.brief.duration_6_12_months" = "Bientôt un an : ça peut changer, à ton rythme.";
+"onboarding_v2.reassurance.brief.duration_1_year_plus" = "Même ce qui est installé depuis longtemps peut bouger.";
+"onboarding_v2.reassurance.brief.duration_years" = "Ce qui s'est installé avec le temps peut se défaire avec le temps.";
+"onboarding_v2.reassurance.brief.default" = "Ton corps peut réapprendre à se poser, et on va t'y aider.";
+"onboarding_v2.reassurance.brief.next" = "Quelques questions rapides pour construire ton plan. Tes réponses restent privées.";

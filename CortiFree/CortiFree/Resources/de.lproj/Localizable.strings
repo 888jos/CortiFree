@@ -5701,7 +5701,7 @@
 "onboarding_v2.ai_quiz.waiting.manual" = "Ich antworte doch lieber selbst";
 "onboarding_v2.ai_quiz.waiting.error" = "Ich finde die Antworten in diesem Text nicht. Kopiere die ganze Antwort von %@ und versuche es erneut.";
 "onboarding_v2.ai_quiz.prompt.intro" = "Ich melde mich bei CortiFree an, einer App, die hilft, Stress zu reduzieren. Sie bietet fünf Pläne. Welcher passt am besten zu mir, basierend auf dem, was du wirklich über mich weißt (unsere Gespräche, dein Gedächtnis)? Sei ehrlich. Wenn du mich nicht gut genug kennst, um zu wählen, schreib ? statt zu raten.";
-"onboarding_v2.ai_quiz.prompt.format" = "Antworte nur mit einem einzigen Codeblock, genau in diesem Format. Ersetze <n> durch die Nummer des Plans (oder ?). Schreib nach ANALYSIS 2 oder 3 kurze Sätze auf Deutsch und duze mich: warum dieser Plan zu mir passt, nach dem, was du über mich weißt.";
+"onboarding_v2.ai_quiz.prompt.format" = "Antworte nur mit einem einzigen Codeblock, genau in diesem Format. Ersetze <n> durch die Nummer des Plans (oder ?). Schreib nach ANALYSIS 2 oder 3 kurze Sätze auf Deutsch und duze mich: warum dieser Plan zu mir passt, nach dem, was du über mich weißt. Erwähne weder dich noch unsere Gespräche: Beschreibe mich direkt.";
 "onboarding_v2.ai_quiz.picker.message" = "Super! Welche KI nutzt du am meisten?";
 "onboarding_v2.ai_quiz.picker.how" = "So funktioniert's";
 "onboarding_v2.ai_quiz.picker.step_send" = "Nachricht senden";
@@ -5734,7 +5734,7 @@
 "onboarding_v2.ai_quiz.milo.intro_prefilled" = "Los geht's! Die Nachricht für %@ ist schon geschrieben, du musst sie nur senden.";
 "onboarding_v2.ai_quiz.milo.intro_paste" = "Los geht's! Ich habe die Nachricht kopiert: Füge sie in %@ ein und sende sie.";
 "onboarding_v2.ai_quiz.milo.step" = "Wenn %@ geantwortet hat, kopiere die ganze Antwort und füge sie hier mit dem Button unten ein.";
-"onboarding_v2.ai_quiz.milo.thanks" = "Danke! Das hat %@ über dich verstanden:";
+"onboarding_v2.ai_quiz.milo.thanks" = "Danke! Das habe ich von dir verstanden:";
 "onboarding_v2.ai_quiz.milo.copy_again" = "Nachricht erneut kopieren";
 "onboarding_v2.ai_quiz.milo.placeholder" = "Schreib oder füge die Antwort hier ein";
 "onboarding_v2.ai_quiz.milo.help" = "Ich bin hier, um die Antwort von %@ zu lesen. Kopiere sie ganz und füge sie hier ein, oder beantworte das Quiz lieber selbst.";
@@ -5745,7 +5745,7 @@
 "onboarding_v2.ai_quiz.milo.local_pick" = "Probier zum Start „%@“: %@";
 "onboarding_v2.ai_quiz.milo.declined_chat" = "Ohne dein Okay kann ich dir hier nicht antworten. Wir reden in der App!";
 "onboarding_v2.ai_quiz.milo.unavailable" = "Ich kann gerade nicht antworten. Versuch es gleich noch mal.";
-"onboarding_v2.ai_quiz.milo.found_plan" = "Super! Laut %@ passt der Plan „%@“ am besten zu dir.";
+"onboarding_v2.ai_quiz.milo.found_plan" = "Super! Nach dem, was ich von dir verstanden habe, passt der Plan „%@“ am besten zu dir.";
 "onboarding_v2.ai_quiz.milo.unknown" = "Sieht so aus, als würde %@ dich noch nicht gut genug kennen, um für dich zu wählen. Am zuverlässigsten: Beantworte das Quiz selbst, es dauert 2 Minuten.";
 "onboarding_v2.ai_quiz.milo.unknown_manual" = "Selbst antworten";
 "onboarding_v2.ai_quiz.milo.unknown_continue" = "Trotzdem weiter";
@@ -5780,3 +5780,19 @@
 "daily_checkin.q.note.today" = "Ein Wort zu deinem Tag? (optional)";
 "daily_checkin.q.note.yesterday" = "Ein Wort zu gestern? (optional)";
 "home.daily_checkin.subtitle_yesterday" = "Dein Check-in von gestern fehlt: 30 Sekunden";
+"onboarding_v2.reassurance.brief.thanks_name" = "Danke %@, notiert.";
+"onboarding_v2.reassurance.brief.thanks" = "Danke, notiert.";
+"onboarding_v2.reassurance.brief.reason_sleep" = "Schlechter Schlaf wirkt sich auf alles aus, und Schlaf lässt sich neu lernen.";
+"onboarding_v2.reassurance.brief.reason_anxiety" = "Dein Körper war zu lange in Alarmbereitschaft. Er kann wieder zur Ruhe kommen.";
+"onboarding_v2.reassurance.brief.reason_energy" = "Grundlos erschöpft zu sein, heißt oft: Der Körper steckt zu lange im Stressmodus.";
+"onboarding_v2.reassurance.brief.reason_focus" = "Ein zerstreuter Kopf ist ein Gehirn mit zu viel auf einmal, kein Mangel an Disziplin.";
+"onboarding_v2.reassurance.brief.reason_mental" = "Auf deinen Kopf zu achten, bevor es überläuft, ist genau richtig.";
+"onboarding_v2.reassurance.brief.reason_difficult" = "Wenn alles gleichzeitig drückt, gehen wir es sanft an, Schritt für Schritt.";
+"onboarding_v2.reassurance.brief.reason_habits" = "Gute Gewohnheiten entstehen aus kleinen, leicht wiederholbaren Schritten, nicht aus Motivation.";
+"onboarding_v2.reassurance.brief.duration_weeks" = "Du gehst es früh an: der beste Zeitpunkt.";
+"onboarding_v2.reassurance.brief.duration_2_6_months" = "Ein paar Monate reichen, um zu belasten, nicht, um festzustecken.";
+"onboarding_v2.reassurance.brief.duration_6_12_months" = "Fast ein Jahr: Das kann sich ändern, in deinem Tempo.";
+"onboarding_v2.reassurance.brief.duration_1_year_plus" = "Auch was lange da ist, kann sich bewegen.";
+"onboarding_v2.reassurance.brief.duration_years" = "Was mit der Zeit gewachsen ist, kann sich mit der Zeit lösen.";
+"onboarding_v2.reassurance.brief.default" = "Dein Körper kann wieder zur Ruhe kommen, und wir helfen dir dabei.";
+"onboarding_v2.reassurance.brief.next" = "Ein paar kurze Fragen für deinen Plan. Deine Antworten bleiben privat.";

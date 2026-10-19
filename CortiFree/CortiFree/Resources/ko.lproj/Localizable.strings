@@ -5704,7 +5704,7 @@
 "onboarding_v2.ai_quiz.waiting.manual" = "그냥 직접 답할게요";
 "onboarding_v2.ai_quiz.waiting.error" = "이 텍스트에서 답변을 찾을 수 없어요. %@의 답변 전체를 복사한 뒤 다시 시도하세요.";
 "onboarding_v2.ai_quiz.prompt.intro" = "스트레스를 줄여 주는 앱 CortiFree에 가입하고 있어요. 다섯 가지 플랜이 있어. 나에 대해 정말로 알고 있는 것(우리의 대화, 너의 메모리)을 바탕으로, 어떤 플랜이 나에게 가장 잘 맞을까? 솔직하게 답해 줘. 고를 만큼 나를 잘 모르면 추측하지 말고 ? 라고 적어 줘.";
-"onboarding_v2.ai_quiz.prompt.format" = "코드 블록 하나로만, 정확히 이 형식으로 답해 줘. <n>을 플랜 번호(또는 ?)로 바꿔 줘. ANALYSIS 뒤에는 한국어로 나에게 직접 말하듯 짧은 문장 2~3개를 써 줘: 네가 나에 대해 아는 것을 바탕으로, 왜 이 플랜이 나에게 맞는지.";
+"onboarding_v2.ai_quiz.prompt.format" = "코드 블록 하나로만, 정확히 이 형식으로 답해 줘. <n>을 플랜 번호(또는 ?)로 바꿔 줘. ANALYSIS 뒤에는 한국어로 나에게 직접 말하듯 짧은 문장 2~3개를 써 줘: 네가 나에 대해 아는 것을 바탕으로, 왜 이 플랜이 나에게 맞는지. 너 자신이나 우리 대화는 언급하지 말고, 나를 바로 설명해 줘.";
 "onboarding_v2.ai_quiz.picker.message" = "좋아요! 가장 많이 쓰는 AI는?";
 "onboarding_v2.ai_quiz.picker.how" = "이용 방법";
 "onboarding_v2.ai_quiz.picker.step_send" = "메시지 보내기";
@@ -5737,7 +5737,7 @@
 "onboarding_v2.ai_quiz.milo.intro_prefilled" = "시작해요! %@에 보낼 메시지는 이미 입력돼 있어요. 보내기만 하면 돼요.";
 "onboarding_v2.ai_quiz.milo.intro_paste" = "시작해요! 메시지를 복사했어요. %@에 붙여넣고 보내 주세요.";
 "onboarding_v2.ai_quiz.milo.step" = "%@가 답하면 답변 전체를 복사해서 아래 버튼으로 여기에 붙여넣어 주세요.";
-"onboarding_v2.ai_quiz.milo.thanks" = "고마워요! %@가 당신을 이렇게 이해했어요:";
+"onboarding_v2.ai_quiz.milo.thanks" = "고마워요! 내가 이해한 당신은 이래요:";
 "onboarding_v2.ai_quiz.milo.copy_again" = "메시지 다시 복사하기";
 "onboarding_v2.ai_quiz.milo.placeholder" = "여기에 답변을 쓰거나 붙여넣으세요";
 "onboarding_v2.ai_quiz.milo.help" = "%@의 답변을 읽으려고 여기 있어요. 전부 복사해서 여기에 붙여넣거나, 원하면 직접 퀴즈에 답해도 돼요.";
@@ -5748,7 +5748,7 @@
 "onboarding_v2.ai_quiz.milo.local_pick" = "먼저 「%@」를 해 보세요: %@";
 "onboarding_v2.ai_quiz.milo.declined_chat" = "동의 없이는 여기서 답할 수 없어요. 앱에서 이야기해요!";
 "onboarding_v2.ai_quiz.milo.unavailable" = "지금은 답할 수 없어요. 잠시 후 다시 시도해 주세요.";
-"onboarding_v2.ai_quiz.milo.found_plan" = "좋아요! %@에 따르면 가장 잘 맞는 플랜은 「%@」예요.";
+"onboarding_v2.ai_quiz.milo.found_plan" = "좋아요! 내가 이해한 바로는, 당신에게 가장 잘 맞는 플랜은 「%@」예요.";
 "onboarding_v2.ai_quiz.milo.unknown" = "%@가 아직 당신 대신 고를 만큼 당신을 잘 알지 못하는 것 같아요. 가장 확실한 방법은 직접 퀴즈에 답하는 거예요. 2분이면 돼요.";
 "onboarding_v2.ai_quiz.milo.unknown_manual" = "직접 답할게요";
 "onboarding_v2.ai_quiz.milo.unknown_continue" = "그래도 계속";
@@ -5783,3 +5783,19 @@
 "daily_checkin.q.note.today" = "오늘 하루 한마디? (선택)";
 "daily_checkin.q.note.yesterday" = "어제 하루 한마디? (선택)";
 "home.daily_checkin.subtitle_yesterday" = "어제 체크인을 안 했어요: 30초";
+"onboarding_v2.reassurance.brief.thanks_name" = "%@님, 고마워요. 알겠어요.";
+"onboarding_v2.reassurance.brief.thanks" = "고마워요. 알겠어요.";
+"onboarding_v2.reassurance.brief.reason_sleep" = "잠을 못 자면 모든 게 흔들려요. 하지만 수면은 다시 길들일 수 있어요.";
+"onboarding_v2.reassurance.brief.reason_anxiety" = "몸이 너무 오래 긴장 상태였어요. 다시 편안해지는 법을 배울 수 있어요.";
+"onboarding_v2.reassurance.brief.reason_energy" = "이유 없이 지치는 건 몸이 너무 오래 스트레스 모드에 있었기 때문일 때가 많아요.";
+"onboarding_v2.reassurance.brief.reason_focus" = "생각이 흩어지는 건 감당할 게 너무 많아서지, 의지가 약해서가 아니에요.";
+"onboarding_v2.reassurance.brief.reason_mental" = "넘치기 전에 마음을 돌보는 건 아주 좋은 선택이에요.";
+"onboarding_v2.reassurance.brief.reason_difficult" = "모든 게 한꺼번에 무거울 땐, 천천히 한 걸음씩 가요.";
+"onboarding_v2.reassurance.brief.reason_habits" = "좋은 습관은 의지가 아니라 쉽게 반복할 수 있는 작은 행동에서 생겨요.";
+"onboarding_v2.reassurance.brief.duration_weeks" = "일찍 시작했어요. 지금이 가장 좋은 때예요.";
+"onboarding_v2.reassurance.brief.duration_2_6_months" = "몇 달이면 힘들기엔 충분하지만, 굳어지기엔 짧아요.";
+"onboarding_v2.reassurance.brief.duration_6_12_months" = "거의 1년이네요. 내 속도로 바꿀 수 있어요.";
+"onboarding_v2.reassurance.brief.duration_1_year_plus" = "오래된 것도 달라질 수 있어요.";
+"onboarding_v2.reassurance.brief.duration_years" = "시간이 쌓아 온 것은 시간이 풀어 줄 수 있어요.";
+"onboarding_v2.reassurance.brief.default" = "몸은 다시 편안해지는 법을 배울 수 있어요. 함께할게요.";
+"onboarding_v2.reassurance.brief.next" = "플랜을 만들기 위해 간단한 질문 몇 가지를 할게요. 답변은 비공개예요.";
