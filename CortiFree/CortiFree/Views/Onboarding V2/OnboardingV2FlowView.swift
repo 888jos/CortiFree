@@ -263,7 +263,8 @@ struct OnboardingV2FlowView: View {
             overallQuizData = OverallQuizData(restoringFrom: draft)
         }
         if habitsQuizResult == nil, let answers = draft.quizAnswers, answers.count == 12 {
-            habitsQuizResult = HabitsQuizResult(answers: answers)
+            // Keep the AI's plan: its answers are stand-ins, not the user's own (no scores shown).
+            habitsQuizResult = HabitsQuizResult(answers: answers, aiGoal: draft.aiGoal.flatMap(PlanGoal.init(rawValue:)))
         }
         if selectedSymptoms.isEmpty, !draft.symptomIDs.isEmpty {
             selectedSymptoms = Set(draft.symptomIDs.map { "symptom_checker.\($0)".localized })

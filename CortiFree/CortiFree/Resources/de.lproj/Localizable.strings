@@ -5796,3 +5796,9 @@
 "onboarding_v2.reassurance.brief.duration_years" = "Was mit der Zeit gewachsen ist, kann sich mit der Zeit lösen.";
 "onboarding_v2.reassurance.brief.default" = "Dein Körper kann wieder zur Ruhe kommen, und wir helfen dir dabei.";
 "onboarding_v2.reassurance.brief.next" = "Ein paar kurze Fragen für deinen Plan. Deine Antworten bleiben privat.";
+"onboarding_v2.plan_ready.recommended" = "Für dich empfohlen";
+"onboarding_v2.plan_ready.level_low" = "Ausbaufähig";
+"onboarding_v2.plan_ready.level_mid" = "Mittel";
+"onboarding_v2.plan_ready.level_good" = "Gut";
+"onboarding_v2.plan_ready.prev_plan" = "Vorheriger Plan";
+"onboarding_v2.plan_ready.next_plan" = "Nächster Plan";
