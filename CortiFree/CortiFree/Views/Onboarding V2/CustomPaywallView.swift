@@ -27,9 +27,8 @@ struct CustomPaywallView: View {
     @ObservedObject private var planStore = PersonalPlanStore.shared
     @State private var isPurchasing: Bool = false
     @State private var showPurchaseError: Bool = false
-    @State private var showBenefitsFlow: Bool = false
-    /// The feature tour is shown once: after a paywall decline, the button opens the paywall.
-    @AppStorage("onboarding_benefits_tour_seen") private var benefitsTourSeen = false
+    /// The paywall was already opened once (declined): the next taps are re-openings.
+    @State private var didOpenPaywall = false
     @State private var purchaseErrorMessage: String = ""
 
     // End date of the plan
@@ -109,19 +108,6 @@ struct CustomPaywallView: View {
         }
         .onAppear {
             loadUserName()
-        }
-        // Feature tour (localized app screenshots) between the pre-paywall and Superwall.
-        .fullScreenCover(isPresented: $showBenefitsFlow) {
-            OnboardingBenefitsFlowView {
-                benefitsTourSeen = true
-                showBenefitsFlow = false
-                DispatchQueue.main.async {
-                    presentSuperwallPaywall()
-                }
-            }
-            #if DEBUG
-            .onboardingDebugHomeButton()
-            #endif
         }
     }
 
@@ -647,15 +633,14 @@ struct CustomPaywallView: View {
 
     private var floatingCTASection: some View {
         VStack(spacing: 8) {
-            // Main CTA button - Feature tour, then the Superwall paywall
+            // Main CTA button: the Superwall paywall (the feature tour comes before this screen)
             Button(action: {
                 HapticManager.medium()
-                if benefitsTourSeen {
+                if didOpenPaywall {
                     AnalyticsManager.shared.track(event: "onboarding_prepaywall_reopened_paywall")
-                    presentSuperwallPaywall()
-                } else {
-                    showBenefitsFlow = true
                 }
+                didOpenPaywall = true
+                presentSuperwallPaywall()
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.right")

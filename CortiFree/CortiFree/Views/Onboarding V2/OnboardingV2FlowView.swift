@@ -109,6 +109,8 @@ struct OnboardingV2FlowView: View {
         case planDay      // 4-week calendar: week 1 day by day, editable
         case notificationPermissions
         case commitmentPledge
+        /// The app's features (screenshots), just before the pre-paywall.
+        case benefitsTour
         case complete
         /// Auth was skipped before the analysis: an account is mandatory once the trial/payment started.
         case accountRequired
@@ -125,7 +127,7 @@ struct OnboardingV2FlowView: View {
                 return .cortisolScienceHook
             case .authentication, .loading:
                 return .authentication
-            case .notificationPermissions, .planReady, .planDay, .commitmentPledge:
+            case .notificationPermissions, .planReady, .planDay, .commitmentPledge, .benefitsTour:
                 return .planReady
             case .complete:
                 return .complete
@@ -301,7 +303,7 @@ struct OnboardingV2FlowView: View {
 
     /// Bump whenever the onboarding screens change: the analytics dashboard shows the funnel
     /// of the latest version (older versions stay selectable).
-    nonisolated static let analyticsVersion = "2026-10-13"
+    nonisolated static let analyticsVersion = "2026-10-19"
 
     /// The screens a user really goes through, in order. Steps that only redirect
     /// (sixtyDayExplanation, notificationPermissions) and the fallback sign-up after the
@@ -309,7 +311,7 @@ struct OnboardingV2FlowView: View {
     static let funnelSteps: [OnboardingStep] = [
         .welcome, .firstName, .overall, .reassurance, .habitsQuiz, .stressPatternValidation,
         .symptomChecker, .cortisolScienceHook, .scientificPlan, .authentication, .loading,
-        .planReady, .planDay, .commitmentPledge, .complete
+        .planReady, .planDay, .commitmentPledge, .benefitsTour, .complete
     ]
 
     private func trackOnboardingScreen(_ step: OnboardingStep) {
@@ -495,7 +497,14 @@ struct OnboardingV2FlowView: View {
         case .commitmentPledge:
             CommitmentPledgeView(
                 onBack: { currentStep = .planDay },
-                onContinue: { currentStep = .complete }
+                onContinue: { currentStep = .benefitsTour }
+            )
+
+        case .benefitsTour:
+            // Before the pre-paywall, so the pre-paywall leads straight to the paywall.
+            OnboardingBenefitsFlowView(
+                onBack: { currentStep = .commitmentPledge },
+                onContinueToPaywall: { currentStep = .complete }
             )
 
         case .complete:

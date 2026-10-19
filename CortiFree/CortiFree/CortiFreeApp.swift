@@ -41,8 +41,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Configure Superwall with RevenueCat as PurchaseController
         let purchaseController = RCPurchaseController()
         let superwallOptions = SuperwallOptions()
-        let savedLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "en"
-        superwallOptions.localeIdentifier = savedLanguage == "fr" ? "fr_FR" : "en_US"
+        // The app's language (chosen, or detected from the iPhone at first launch): reading only
+        // « selectedLanguage » showed the paywall in English to every new user, since that key is
+        // only written when the language is changed.
+        superwallOptions.localeIdentifier = LanguageManager.shared.currentLanguage.superwallLocaleIdentifier
         Superwall.configure(
             apiKey: APIConfig.shared.superwallAPIKey,
             purchaseController: purchaseController,

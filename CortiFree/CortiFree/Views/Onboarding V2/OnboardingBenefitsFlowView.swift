@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct OnboardingBenefitsFlowView: View {
+    let onBack: () -> Void
+    /// Last page: on to the pre-paywall.
     let onContinueToPaywall: () -> Void
-
-    @Environment(\.dismiss) private var dismiss
     @State private var selectedPage = 0
 
     /// Screenshots captured per language by CortiFreeUITests/BenefitsScreenshotsUITests.
@@ -59,7 +59,7 @@ struct OnboardingBenefitsFlowView: View {
             Button {
                 HapticManager.light()
                 if selectedPage == 0 {
-                    dismiss()
+                    onBack()
                 } else {
                     withAnimation(.easeInOut(duration: 0.25)) {
                         selectedPage -= 1
@@ -180,5 +180,5 @@ private struct BenefitsPage {
 }
 
 #Preview {
-    OnboardingBenefitsFlowView(onContinueToPaywall: {})
+    OnboardingBenefitsFlowView(onBack: {}, onContinueToPaywall: {})
 }

@@ -4278,7 +4278,7 @@
 "onboarding_v2.benefits.meditation_subtitle" = "Des méditations guidées avec ambiance sonore et minuteur de sommeil, pour décrocher où que tu sois.";
 "onboarding_v2.benefits.home_title" = "Ton calme,\nà portée de main";
 "onboarding_v2.benefits.home_subtitle" = "Respiration, méditation, sons et Milo, toujours à un geste depuis l'accueil.";
-"onboarding_v2.benefits.continue_plan" = "Continuer vers mon programme";
+"onboarding_v2.benefits.continue_plan" = "Voir mon plan";
 "paywall_custom.new_badge" = "NOUVEAU";
 "paywall_custom.radar_label_focus" = "Concentration";
 "onboarding_v2.auth.skip" = "Passer →";
