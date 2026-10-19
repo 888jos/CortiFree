@@ -544,13 +544,16 @@ struct AssistantChatView: View {
                 if showsAvatar { avatar(size: 28) } else { Color.clear }
             }
             .frame(width: 28, height: 28)
+            // Milo's messages sit in a violet bubble, the user's in a grey one.
             Text(text)
                 .font(.system(size: 16))
                 .lineSpacing(4)
                 .foregroundStyle(.white.opacity(0.94))
                 .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 3)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(Color(hex: "8B5CF6").opacity(0.22), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            Spacer(minLength: 32)
         }
     }
 
