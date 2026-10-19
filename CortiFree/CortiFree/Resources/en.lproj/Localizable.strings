@@ -5797,8 +5797,6 @@
 "onboarding_v2.reassurance.brief.default" = "Your body can learn to settle again, and we'll help.";
 "onboarding_v2.reassurance.brief.next" = "A few quick questions to build your plan. Your answers stay private.";
 "onboarding_v2.plan_ready.recommended" = "Recommended for you";
-"onboarding_v2.plan_ready.level_low" = "Needs work";
-"onboarding_v2.plan_ready.level_mid" = "Fair";
-"onboarding_v2.plan_ready.level_good" = "Good";
 "onboarding_v2.plan_ready.prev_plan" = "Previous plan";
 "onboarding_v2.plan_ready.next_plan" = "Next plan";
+"onboarding_v2.plan_ready.hold_to_choose" = "Hold to choose “%@”";

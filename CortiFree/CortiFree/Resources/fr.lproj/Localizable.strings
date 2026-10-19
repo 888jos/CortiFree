@@ -5795,8 +5795,6 @@
 "onboarding_v2.reassurance.brief.default" = "Ton corps peut réapprendre à se poser, et on va t'y aider.";
 "onboarding_v2.reassurance.brief.next" = "Quelques questions rapides pour construire ton plan. Tes réponses restent privées.";
 "onboarding_v2.plan_ready.recommended" = "Recommandé pour toi";
-"onboarding_v2.plan_ready.level_low" = "À renforcer";
-"onboarding_v2.plan_ready.level_mid" = "Moyen";
-"onboarding_v2.plan_ready.level_good" = "Bon";
 "onboarding_v2.plan_ready.prev_plan" = "Plan précédent";
 "onboarding_v2.plan_ready.next_plan" = "Plan suivant";
+"onboarding_v2.plan_ready.hold_to_choose" = "Maintiens pour choisir « %@ »";

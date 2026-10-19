@@ -5800,8 +5800,6 @@
 "onboarding_v2.reassurance.brief.default" = "からだはまた落ち着くことを覚えられます。一緒に進めましょう。";
 "onboarding_v2.reassurance.brief.next" = "プランを作るために、いくつか簡単な質問をします。回答は非公開です。";
 "onboarding_v2.plan_ready.recommended" = "あなたへのおすすめ";
-"onboarding_v2.plan_ready.level_low" = "強化したい";
-"onboarding_v2.plan_ready.level_mid" = "ふつう";
-"onboarding_v2.plan_ready.level_good" = "良好";
 "onboarding_v2.plan_ready.prev_plan" = "前のプラン";
 "onboarding_v2.plan_ready.next_plan" = "次のプラン";
+"onboarding_v2.plan_ready.hold_to_choose" = "長押しで「%@」を選ぶ";

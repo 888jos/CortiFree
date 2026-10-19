@@ -5800,8 +5800,6 @@
 "onboarding_v2.reassurance.brief.default" = "몸은 다시 편안해지는 법을 배울 수 있어요. 함께할게요.";
 "onboarding_v2.reassurance.brief.next" = "플랜을 만들기 위해 간단한 질문 몇 가지를 할게요. 답변은 비공개예요.";
 "onboarding_v2.plan_ready.recommended" = "추천 플랜";
-"onboarding_v2.plan_ready.level_low" = "보강 필요";
-"onboarding_v2.plan_ready.level_mid" = "보통";
-"onboarding_v2.plan_ready.level_good" = "좋음";
 "onboarding_v2.plan_ready.prev_plan" = "이전 플랜";
 "onboarding_v2.plan_ready.next_plan" = "다음 플랜";
+"onboarding_v2.plan_ready.hold_to_choose" = "길게 눌러 「%@」 선택";

@@ -110,6 +110,15 @@ struct OnboardingPlanReadyView: View {
     /// The plan the answers picked, kept when the user browses the others.
     @State private var recommended: PlanGoal?
     @State private var selected: PlanGoal?
+    @State private var holding = false
+
+    /// The app's violet (the CTA's): accents, strokes and icons on this screen.
+    private let accent = OnboardingPlanStyle.accent
+    /// The centered plan, when it is not the user's plan yet: it is greyed out until held.
+    private var browsed: PlanGoal? {
+        guard let selected, selected != livePlan.goal else { return nil }
+        return selected
+    }
 
     private var livePlan: PersonalPlan { store.plan ?? plan }
     private var goals: [PlanGoal] { PlanGoal.allCases }
@@ -123,14 +132,14 @@ struct OnboardingPlanReadyView: View {
             .map { $0 }
     }
 
-    /// The user's own quiz scores (0–100, higher is better), only when they answered the quiz
-    /// themself: the « my AI answers for me » path has stand-in answers, not data.
-    private var startingAreas: [(label: String, score: Int)]? {
+    /// The user's own quiz scores, only when they answered the quiz themself: the « my AI
+    /// answers for me » path has stand-in answers, not data.
+    /// Axis order: global, serenity, sleep, energy, focus, balance.
+    private var startingLevels: [Double]? {
         guard let result = habitsQuizResult, result.aiGoal == nil else { return nil }
-        return [("serenity", result.serenityScore), ("sleep", result.sleepScore),
-                ("energy", result.energyScore), ("focus", result.focusScore),
-                ("balance", result.balanceScore)]
-            .map { ("paywall_custom.radar_label_\($0.0)".localized, $0.1) }
+        return [result.globalScore, result.serenityScore, result.sleepScore,
+                result.energyScore, result.focusScore, result.balanceScore]
+            .map { min(0.85, max(0.15, Double($0) / 100)) }
     }
 
     var body: some View {
@@ -139,13 +148,16 @@ struct OnboardingPlanReadyView: View {
                 Text("onboarding_v2.plan_ready.title".localized.uppercased())
                     .font(.custom("Poppins-SemiBold", size: 12))
                     .kerning(1.4)
-                    .foregroundColor(livePlan.goal.accentColor)
-                OnboardingPlanTitle(title: livePlan.localizedTitle, accent: livePlan.goal.accentColor)
+                    .foregroundColor(accent)
+                OnboardingPlanTitle(title: livePlan.localizedTitle, accent: accent)
                     .animation(.easeInOut(duration: 0.2), value: livePlan.goal)
             }
 
-            carousel
-                .padding(.horizontal, -24)
+            VStack(spacing: 14) {
+                carousel
+                    .padding(.horizontal, -24)
+                if let browsed { holdToChoose(browsed) }
+            }
 
             HStack(spacing: 8) {
                 chip(symbol: "calendar", text: "onboarding_v2.plan_ready.length".localized(PersonalPlan.length))
@@ -154,7 +166,7 @@ struct OnboardingPlanReadyView: View {
             }
 
             if !whyLines.isEmpty { whyCard }
-            if let areas = startingAreas { startingPointCard(areas) }
+            if let levels = startingLevels { startingPointCard(levels) }
         }
         // The plan reveal right after the analysis is celebrated (once per appearance).
         .overlay {
@@ -171,7 +183,6 @@ struct OnboardingPlanReadyView: View {
                 HapticManager.success()
             }
         }
-        .onChange(of: selected) { _, goal in choose(goal) }
     }
 
     // MARK: Plans carousel
@@ -179,10 +190,11 @@ struct OnboardingPlanReadyView: View {
     private var carousel: some View {
         VStack(spacing: 12) {
             GeometryReader { geometry in
-            // The centered card takes 64 % of the width; the neighbours peek out on each side.
-            let cardWidth = geometry.size.width * 0.64
+            // The centered card takes 51 % of the width; the neighbours peek out on each side,
+            // well apart from it. Browsing never changes the plan: holding the button does.
+            let cardWidth = geometry.size.width * 0.51
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 14) {
+                LazyHStack(spacing: 24) {
                     ForEach(goals) { goal in
                         planCard(goal)
                             .frame(width: cardWidth)
@@ -192,70 +204,84 @@ struct OnboardingPlanReadyView: View {
                                     .opacity(phase.isIdentity ? 1 : 0.45)
                             }
                             .id(goal)
-                            .onTapGesture { withAnimation(.snappy) { selected = goal } }
+                            .allowsHitTesting(false)
                     }
                 }
                 .scrollTargetLayout()
             }
             .scrollTargetBehavior(.viewAligned)
+            .scrollClipDisabled()   // the plan's glow is not cut by the scroll view's bounds
             .scrollPosition(id: $selected, anchor: .center)
             .contentMargins(.horizontal, (geometry.size.width - cardWidth) / 2, for: .scrollContent)
             .overlay { arrows }
             }
-            .aspectRatio(1 / (0.64 / 0.86), contentMode: .fit)
+            .aspectRatio(1 / (0.51 / 0.86), contentMode: .fit)
 
             // One dot per plan: where the user is among the five.
             HStack(spacing: 6) {
                 ForEach(goals) { goal in
                     Capsule()
-                        .fill(goal == livePlan.goal ? livePlan.goal.accentColor : .white.opacity(0.22))
-                        .frame(width: goal == livePlan.goal ? 18 : 6, height: 6)
+                        .fill(goal == (selected ?? livePlan.goal) ? accent : .white.opacity(0.22))
+                        .frame(width: goal == (selected ?? livePlan.goal) ? 18 : 6, height: 6)
                 }
             }
-            .animation(.snappy, value: livePlan.goal)
+            .animation(.snappy, value: selected)
         }
     }
 
     private func planCard(_ goal: PlanGoal) -> some View {
-        Image(goal.artworkName)
+        let isPlan = goal == livePlan.goal
+        return Image(goal.artworkName)
             .resizable()
             .scaledToFill()
             .frame(maxWidth: .infinity)
             .aspectRatio(0.86, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            // Not the user's plan: grey until it is held.
+            .saturation(isPlan ? 1 : 0.15)
+            .brightness(isPlan ? 0 : -0.08)
             .overlay(alignment: .bottomLeading) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(goal.localizedName)
-                        .font(.custom("Poppins-SemiBold", size: 15))
+                        .font(.custom("Poppins-SemiBold", size: 14))
                         .foregroundColor(.white)
                     Text(goal.localizedPromise)
-                        .font(.custom("Poppins-Regular", size: 11))
+                        .font(.custom("Poppins-Regular", size: 10))
                         .foregroundColor(.white.opacity(0.85))
                         .lineLimit(2)
                 }
-                .padding(14)
+                .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
                     LinearGradient(colors: [.clear, .black.opacity(0.65)], startPoint: .top, endPoint: .bottom),
-                    in: UnevenRoundedRectangle(bottomLeadingRadius: 26, bottomTrailingRadius: 26, style: .continuous)
+                    in: UnevenRoundedRectangle(bottomLeadingRadius: 22, bottomTrailingRadius: 22, style: .continuous)
                 )
             }
             .overlay(alignment: .topLeading) {
                 if goal == recommended {
                     Label("onboarding_v2.plan_ready.recommended".localized, systemImage: "sparkles")
-                        .font(.custom("Poppins-SemiBold", size: 11))
+                        .font(.custom("Poppins-SemiBold", size: 10))
                         .foregroundColor(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 4)
                         .background(goal.accentDeep, in: Capsule())
-                        .padding(12)
+                        .padding(10)
                 }
             }
+            // The user's plan: a gradient outline in the plan's own colours, and a soft glow.
             .overlay {
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .strokeBorder(goal == livePlan.goal ? goal.accentColor : .white.opacity(0.12),
-                                  lineWidth: goal == livePlan.goal ? 2 : 1)
+                if isPlan {
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .strokeBorder(LinearGradient(colors: [goal.accentColor, .white.opacity(0.65), goal.accentDeep],
+                                                     startPoint: .topLeading, endPoint: .bottomTrailing),
+                                      lineWidth: 2)
+                } else {
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .strokeBorder(.white.opacity(0.08), lineWidth: 1)
+                }
             }
+            .shadow(color: isPlan ? goal.accentColor.opacity(0.35) : .clear, radius: 18, y: 6)
+            .animation(.easeInOut(duration: 0.25), value: isPlan)
             .accessibilityLabel(goal.localizedPlanTitle)
     }
 
@@ -289,10 +315,46 @@ struct OnboardingPlanReadyView: View {
         withAnimation(.snappy) { selected = goals[index] }
     }
 
-    /// The centered plan becomes the user's plan.
+    /// « Hold to choose this plan »: fills while pressed, switches the plan when full.
+    private func holdToChoose(_ goal: PlanGoal) -> some View {
+        ZStack(alignment: .leading) {
+            Capsule().fill(Color.white.opacity(0.08))
+            GeometryReader { geometry in
+                Capsule()
+                    .fill(accent.opacity(0.45))
+                    .frame(width: holding ? geometry.size.width : 0)
+            }
+            HStack(spacing: 8) {
+                Image(systemName: "hand.tap.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                Text(String(format: "onboarding_v2.plan_ready.hold_to_choose".localized, goal.localizedName))
+                    .font(.custom("Poppins-SemiBold", size: 13))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+        }
+        .frame(height: 44)
+        .clipShape(Capsule())
+        .overlay(Capsule().strokeBorder(accent.opacity(0.5), lineWidth: 1))
+        .contentShape(Capsule())
+        .onLongPressGesture(minimumDuration: 0.9) {
+            choose(goal)
+        } onPressingChanged: { pressing in
+            if pressing { HapticManager.light() }
+            withAnimation(pressing ? .linear(duration: 0.9) : .easeOut(duration: 0.2)) { holding = pressing }
+        }
+        .transition(.opacity.combined(with: .move(edge: .top)))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { choose(goal) }
+    }
+
+    /// The held plan becomes the user's plan.
     private func choose(_ goal: PlanGoal?) {
         guard let goal, goal != livePlan.goal else { return }
-        HapticManager.light()
+        HapticManager.success()
+        holding = false
         if store.regenerate(goal: goal) {
             AnalyticsManager.shared.track(event: "onboarding_plan_switched", properties: [
                 "from": livePlan.goal.rawValue, "to": goal.rawValue,
@@ -316,9 +378,9 @@ struct OnboardingPlanReadyView: View {
                 HStack(alignment: .top, spacing: 14) {
                     Image(systemName: line.symbol)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(livePlan.goal.accentColor)
+                        .foregroundColor(accent)
                         .frame(width: 34, height: 34)
-                        .background(livePlan.goal.accentColor.opacity(0.16), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .background(accent.opacity(0.16), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     Text(line.text)
                         .font(.custom("Poppins-Regular", size: 14))
                         .foregroundColor(.white.opacity(0.9))
@@ -335,53 +397,34 @@ struct OnboardingPlanReadyView: View {
 
     // MARK: Starting point (real quiz answers only)
 
-    private func startingPointCard(_ areas: [(label: String, score: Int)]) -> some View {
-        let lowest = areas.map(\.score).min()
-        return VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("onboarding_v2.plan_ready.start_title".localized)
-                    .font(.faroSemiBold(17))
-                    .foregroundColor(.white)
-                Text("onboarding_v2.week_progress.start_note".localized)
-                    .font(.custom("Poppins-Regular", size: 12))
-                    .foregroundColor(.white.opacity(0.6))
-                    .fixedSize(horizontal: false, vertical: true)
+    private func startingPointCard(_ levels: [Double]) -> some View {
+        VStack(spacing: 6) {
+            Text("onboarding_v2.plan_ready.start_title".localized)
+                .font(.faroSemiBold(17))
+                .foregroundColor(.white)
+            ZStack {
+                HexagonRadarGrid()
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    .responsiveFrame(width: 165, height: 165)
+                HexagonRadarFill(progress: levels)
+                    .fill(LinearGradient(colors: [accent.opacity(0.7), Color(hex: "8B5CF6").opacity(0.35)],
+                                         startPoint: .top, endPoint: .bottom))
+                    .responsiveFrame(width: 165, height: 165)
+                HexagonRadarFill(progress: levels)
+                    .stroke(accent, lineWidth: 3)
+                    .responsiveFrame(width: 165, height: 165)
+                PaywallRadarLabels(size: ResponsiveLayout.cardWidth(base: 165))
             }
-            ForEach(Array(areas.enumerated()), id: \.offset) { _, area in
-                let isLowest = area.score == lowest
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text(area.label)
-                            .font(.custom("Poppins-Medium", size: 13))
-                            .foregroundColor(.white)
-                        Spacer()
-                        Text(levelName(area.score))
-                            .font(.custom("Poppins-SemiBold", size: 12))
-                            .foregroundColor(isLowest ? livePlan.goal.accentColor : .white.opacity(0.6))
-                    }
-                    GeometryReader { geometry in
-                        ZStack(alignment: .leading) {
-                            Capsule().fill(Color.white.opacity(0.1))
-                            Capsule()
-                                .fill(isLowest ? livePlan.goal.accentColor : Color.white.opacity(0.45))
-                                .frame(width: max(8, geometry.size.width * CGFloat(area.score) / 100))
-                        }
-                    }
-                    .frame(height: 8)
-                }
-            }
+            .responsiveFrame(width: 280, height: 280)
+            Text("onboarding_v2.week_progress.start_note".localized)
+                .font(.custom("Poppins-Regular", size: 12))
+                .foregroundColor(.white.opacity(0.6))
+                .multilineTextAlignment(.center)
+                .balancedLines()
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 18)
+        .frame(maxWidth: .infinity)
         .glassCard(cornerRadius: 20)
-    }
-
-    private func levelName(_ score: Int) -> String {
-        switch score {
-        case ..<40: return "onboarding_v2.plan_ready.level_low".localized
-        case ..<70: return "onboarding_v2.plan_ready.level_mid".localized
-        default: return "onboarding_v2.plan_ready.level_good".localized
-        }
     }
 
     private func chip(symbol: String, text: String) -> some View {
