@@ -94,6 +94,10 @@ struct OnboardingPulseRecap: View {
 enum OnboardingPersonalization {
     /// First name typed in the onboarding, else the account's first name. Empty when unknown.
     static var firstName: String {
+        #if DEBUG
+        // Store screenshots: `-demoFirstName Jade` shows that name everywhere.
+        if let demo = UserDefaults.standard.string(forKey: "demoFirstName"), !demo.isEmpty { return demo }
+        #endif
         if let typed = UserPersistence.userFirstName?.trimmingCharacters(in: .whitespacesAndNewlines), !typed.isEmpty {
             return typed
         }

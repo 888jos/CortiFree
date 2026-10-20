@@ -30,20 +30,12 @@ class MotivationalMessageViewModel: ObservableObject {
     // MARK: - User Data Loading
 
     private func loadUserFirstName() async {
-        guard let user = Auth.auth().currentUser else {
-            firstName = ""
-            return
-        }
-
-        // Get the name from the current Convex profile.
-        if let displayName = user.displayName, !displayName.isEmpty {
-            firstName = displayName.components(separatedBy: " ").first ?? displayName
-            #if DEBUG
-            print("✅ MotivationalMessageViewModel: Loaded firstName = '\(firstName)' from Convex")
-            #endif
-        } else {
-            firstName = ""
-        }
+        // The first name typed in the onboarding, else the account's: an email sign-up has no
+        // account name, and the greeting showed « Sleep well, » with no name.
+        firstName = OnboardingPersonalization.firstName
+        #if DEBUG
+        print("✅ MotivationalMessageViewModel: firstName = '\(firstName)'")
+        #endif
     }
 
     // MARK: - Message Generation

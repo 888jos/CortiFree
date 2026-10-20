@@ -206,6 +206,9 @@ struct AvatarProgressCard: View {
     }
 
     private func getUserFirstName() -> String {
+        #if DEBUG
+        if let demo = UserDefaults.standard.string(forKey: "demoFirstName"), !demo.isEmpty { return demo }
+        #endif
         if let storedName = UserPersistence.userFirstName?.trimmingCharacters(in: .whitespacesAndNewlines), !storedName.isEmpty {
             return storedName
         }
