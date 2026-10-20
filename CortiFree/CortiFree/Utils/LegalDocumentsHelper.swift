@@ -16,11 +16,11 @@ enum LegalDocument {
     var url: URL? {
         switch self {
         case .privacy:
-            return URL(string: "https://cortifreeapp.framer.website/legal-pages/privacy-policy")
+            return URL(string: "https://driftstudio.app/policies/cortifree-privacy")
         case .terms:
-            return URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
+            return URL(string: "https://driftstudio.app/policies/cortifree-terms")
         case .legalNotice:
-            return URL(string: "https://cortifreeapp.framer.website/legal-pages/privacy-policy")
+            return URL(string: "https://driftstudio.app/policies/cortifree")
         }
     }
 
