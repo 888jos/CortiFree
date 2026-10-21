@@ -196,8 +196,16 @@ final class PersonalPlanStore: ObservableObject {
         profile.source = "onboarding"
         saveOnboardingProfile(profile)
         // An onboarding replayed by someone already following a plan (e.g. a sign-in that
-        // brought back a stale « onboarding not completed ») must not wipe their progress.
-        if let current = plan, current.dayIndex() > 1 || current.cycle > 1 { return }
+        // brought back a stale « onboarding not completed ») must not wipe their progress:
+        // past days stay, but the plan follows what this onboarding chose (the user's or
+        // their AI's goal), or the plan screen would contradict it.
+        if let current = plan, current.dayIndex() > 1 || current.cycle > 1 {
+            let chosen = PersonalPlanGenerator.analyze(profile, anxiety: anxiety).primary
+            if chosen != current.goal {
+                regenerate(goal: chosen, source: .adaptation, reason: "onboarding_replayed")
+            }
+            return
+        }
         let newPlan = PersonalPlanGenerator.generate(profile: profile, anxiety: anxiety, startDate: Date())
         apply(newPlan)
     }
