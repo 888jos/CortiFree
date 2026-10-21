@@ -18,6 +18,16 @@ struct HabitsQuizEntryView: View {
     var onBack: (() -> Void)? = nil
     let onComplete: (HabitsQuizResult) -> Void
 
+    /// `resumesAIQuiz`: the app was killed while the user was in their AI; back to Milo's
+    /// conversation with the same AI (and its reply, if it was already pasted).
+    init(onBack: (() -> Void)? = nil, resumesAIQuiz: Bool = false, onComplete: @escaping (HabitsQuizResult) -> Void) {
+        self.onBack = onBack
+        self.onComplete = onComplete
+        if resumesAIQuiz, let app = AIQuizReturnCenter.shared.savedApp {
+            _mode = State(initialValue: .waiting(app))
+        }
+    }
+
     private enum Mode: Equatable {
         case choice
         case pickApp
@@ -45,10 +55,14 @@ struct HabitsQuizEntryView: View {
             case .waiting(let app):
                 AIQuizMiloChat(
                     app: app,
-                    onBack: { mode = .pickApp },
+                    onBack: {
+                        AIQuizReturnCenter.shared.cancelApp()
+                        mode = .pickApp
+                    },
                     onManual: {
                         AnalyticsManager.shared.track(event: "onboarding_quiz_mode_selected",
                                                       properties: ["mode": "manual", "after_ai_app": app.rawValue])
+                        AIQuizReturnCenter.shared.end()
                         mode = .manual
                     },
                     onReply: { reply in complete(reply, app: app) }
@@ -277,21 +291,26 @@ struct HabitsQuizEntryView: View {
     }
 
     /// The message is filled in through the app's `?q=` link when it supports one, and
-    /// always copied too, so it can be pasted when the link doesn't carry it (Gemini).
+    /// copied too, so it can be pasted when the link doesn't carry it (Gemini).
+    /// Something copied since the last message (the AI's reply, e.g. back after an app kill)
+    /// is never overwritten: then only the AIs whose link carries the message open.
     private func ask(_ app: OnboardingAIApp) {
         HapticManager.medium()
         let prompt = AIQuizPrompt.text()
-        UIPasteboard.general.string = prompt
+        let keepsClipboard = AIQuizReturnCenter.shared.clipboardChangedSincePrompt
+        if !keepsClipboard { AIQuizReturnCenter.shared.copyPrompt(prompt) }
         AnalyticsManager.shared.track(event: "onboarding_quiz_mode_selected", properties: ["mode": "ai", "ai_app": app.rawValue])
         startedAt = Date()
+        AIQuizReturnCenter.shared.begin(app)
         mode = .waiting(app)
         app.startReturnLiveActivity()
-        if let url = app.url(prompt: prompt) { openURL(url) }
+        if !keepsClipboard || app.prefillsPrompt, let url = app.url(prompt: prompt) { openURL(url) }
     }
 
     /// The AI's plan (stress & anxiety when it couldn't tell) goes straight to the next step.
     private func complete(_ reply: AIQuizReply, app: OnboardingAIApp) {
         let goal = reply.goal ?? .stress
+        AIQuizReturnCenter.shared.end()
         AnalyticsManager.shared.track(event: "onboarding_ai_quiz_confirmed", properties: [
             "ai_app": app.rawValue,
             "goal": goal.rawValue,
@@ -446,7 +465,7 @@ enum OnboardingAIApp: String, CaseIterable, Identifiable {
 
 // MARK: - Prompt and reply
 
-struct AIQuizReply: Equatable {
+struct AIQuizReply: Equatable, Codable {
     /// The plan the AI picked; nil when it said it doesn't know the user well enough
     /// (or replied without the CORTIFREE block).
     var goal: PlanGoal?

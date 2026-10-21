@@ -94,6 +94,8 @@ struct OnboardingV2FlowView: View {
     @State private var suppressDropOffLiveActivity = false
     @State private var showReturningUserSignIn = false
     @State private var hasGeneratedPlanThisSession = false
+    /// Killed while the user was in their AI (« My AI answers for me »): resume on that step.
+    @State private var resumesAIQuiz = false
     @ObservedObject private var planStore = PersonalPlanStore.shared
 
     private let firebaseManager = FirebaseManager.shared
@@ -250,6 +252,12 @@ struct OnboardingV2FlowView: View {
             print("📍 Resuming from checkpoint: \(step.rawValue)")
             #endif
             currentStep = step.checkpoint
+            // Killed while in their AI: back on the AI step (not Milo's reassurance), so the
+            // reply they copied, or already pasted, isn't lost.
+            if step == .habitsQuiz, AIQuizReturnCenter.shared.savedApp != nil {
+                currentStep = .habitsQuiz
+                resumesAIQuiz = true
+            }
             // Already signed in (killed during the analysis): don't ask to sign up again.
             if currentStep == .authentication, Auth.auth().currentUser != nil {
                 currentStep = .loading
@@ -271,6 +279,9 @@ struct OnboardingV2FlowView: View {
         if habitsQuizResult == nil, let answers = draft.quizAnswers, answers.count == 12 {
             // Keep the AI's plan: its answers are stand-ins, not the user's own (no scores shown).
             habitsQuizResult = HabitsQuizResult(answers: answers, aiGoal: draft.aiGoal.flatMap(PlanGoal.init(rawValue:)))
+        } else if habitsQuizResult == nil, let aiGoal = draft.aiGoal.flatMap(PlanGoal.init(rawValue:)) {
+            // « My AI answers for me » saves no answers, only the plan: rebuild its stand-ins.
+            habitsQuizResult = HabitsQuizResult(answers: HabitsQuizResult.answers(leaningTo: aiGoal), aiGoal: aiGoal)
         }
         if selectedSymptoms.isEmpty, !draft.symptomIDs.isEmpty {
             selectedSymptoms = Set(draft.symptomIDs.map { "symptom_checker.\($0)".localized })
@@ -406,7 +417,7 @@ struct OnboardingV2FlowView: View {
             )
 
         case .habitsQuiz:
-            HabitsQuizEntryView(onBack: { currentStep = .reassurance }, onComplete: { result in
+            HabitsQuizEntryView(onBack: { currentStep = .reassurance }, resumesAIQuiz: resumesAIQuiz, onComplete: { result in
                 habitsQuizResult = result
                 AnalyticsICP.habitsCompleted(result)
                 // « My AI answers for me »: no quiz result screen (its answers are stand-ins).

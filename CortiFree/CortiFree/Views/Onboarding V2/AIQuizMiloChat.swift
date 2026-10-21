@@ -10,7 +10,9 @@
 //     OnboardingMiloService) writes the report and picks one breathing exercise, and the
 //     user can talk to him. Without it, a written report and a default exercise.
 //  3. The exercise (one minute) or « later », then straight on to the next onboarding step.
-//  CortiFree keeps no conversation; analytics only get counts, never text.
+//  CortiFree keeps no conversation; analytics only get counts, never text. Only the plan and
+//  analysis read from the AI's reply stay on the phone until the step ends, so an app kill
+//  doesn't lose them (AIQuizReturnCenter).
 //
 
 import SwiftUI
@@ -70,16 +72,25 @@ struct AIQuizMiloChat: View {
         .onAppear {
             guard !didStart else { return }
             didStart = true
+            // Back after iOS killed the app: the reply pasted before goes on from where it was read.
+            if let saved = returnCenter.savedReply {
+                OnboardingLiveActivityManager.shared.endAIQuizReturn()
+                reply = saved
+                react(to: saved)
+                return
+            }
             let intro = String(format: t(app.prefillsPrompt ? "onboarding_v2.ai_quiz.milo.intro_prefilled"
                                                             : "onboarding_v2.ai_quiz.milo.intro_paste"), app.name)
-            say([intro, String(format: t("onboarding_v2.ai_quiz.milo.step"), app.name)])
+            say([intro, String(format: t("onboarding_v2.ai_quiz.milo.step"), app.name)]) {
+                // The Live Activity's button opened the app before this screen was there (cold launch).
+                if reply == nil, returnCenter.takePendingPaste() { pasteFromLiveActivity() }
+            }
         }
         // « I copied it, come back » in the Live Activity: read the clipboard (iOS asks first).
+        // While Milo is still typing, the intro's end picks it up.
         .onChange(of: returnCenter.pasteRequestedAt) { _, requested in
-            guard requested != nil, reply == nil else { return }
-            returnedFromLiveActivity = true
-            trackReturn("live_activity")
-            if let text = UIPasteboard.general.string { send(text) }
+            guard requested != nil, reply == nil, canType, returnCenter.takePendingPaste() else { return }
+            pasteFromLiveActivity()
         }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
@@ -374,7 +385,7 @@ struct AIQuizMiloChat: View {
                                                : String(format: t("onboarding_v2.ai_quiz.waiting.reopen"), app.name),
                                  icon: app == .other ? "doc.on.doc" : "arrow.up.forward.app") {
                             let prompt = AIQuizPrompt.text()
-                            UIPasteboard.general.string = prompt
+                            AIQuizReturnCenter.shared.copyPrompt(prompt)
                             app.startReturnLiveActivity()
                             if let url = app.url(prompt: prompt) { openURL(url) }
                         }
@@ -506,6 +517,12 @@ struct AIQuizMiloChat: View {
             "length": text.count
         ])
         reply = parsed
+        returnCenter.save(parsed)
+        react(to: parsed)
+    }
+
+    /// The reply is read (just pasted, or kept across an app kill): its plan, or « I can't tell ».
+    private func react(to parsed: AIQuizReply) {
         guard let goal = parsed.goal else {
             HapticManager.warning()
             say([String(format: t("onboarding_v2.ai_quiz.milo.unknown"), app.name)]) {
@@ -638,6 +655,12 @@ struct AIQuizMiloChat: View {
         guard result.count > maxBubbles else { return result.isEmpty ? [text] : result }
         // Too many: the extra ones are joined into the last bubble.
         return Array(result.prefix(maxBubbles - 1)) + [result.dropFirst(maxBubbles - 1).joined(separator: " ")]
+    }
+
+    private func pasteFromLiveActivity() {
+        returnedFromLiveActivity = true
+        trackReturn("live_activity")
+        if let text = UIPasteboard.general.string { send(text) }
     }
 
     private func trackReturn(_ source: String) {
