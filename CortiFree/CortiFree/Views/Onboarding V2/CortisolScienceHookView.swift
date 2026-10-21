@@ -178,17 +178,19 @@ struct CortisolScienceHookView: View {
                             points: healthyCurve,
                             width: w,
                             height: h,
-                            progress: curveProgress
+                            progress: 1
                         )
                         .fill(Color(hex: "4FC3A1").opacity(0.08))
+                        .mask(alignment: .leading) { Rectangle().frame(width: w * curveProgress) }
 
                         // Healthy curve line
                         CortisolCurveShape(
                             points: healthyCurve,
                             width: w,
                             height: h,
-                            progress: curveProgress
+                            progress: 1
                         )
+                        .trim(from: 0, to: curveProgress)
                         .stroke(
                             Color(hex: "4FC3A1"),
                             style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
@@ -199,17 +201,19 @@ struct CortisolScienceHookView: View {
                             points: stressedCurve,
                             width: w,
                             height: h,
-                            progress: curveProgress
+                            progress: 1
                         )
                         .fill(Color(hex: "FF8A80").opacity(0.07))
+                        .mask(alignment: .leading) { Rectangle().frame(width: w * curveProgress) }
 
                         // Stressed curve line
                         CortisolCurveShape(
                             points: stressedCurve,
                             width: w,
                             height: h,
-                            progress: curveProgress
+                            progress: 1
                         )
+                        .trim(from: 0, to: curveProgress)
                         .stroke(
                             LinearGradient(
                                 colors: [Color(hex: "FF8A80"), Color(hex: "FF5252")],
@@ -220,6 +224,7 @@ struct CortisolScienceHookView: View {
                         )
                     }
                     .frame(width: w, height: h)
+                    .drawingGroup()   // one GPU layer: smooth reveal on older iPhones
                 }
                 .frame(height: 160)
                 .padding(.trailing, 30)
@@ -279,7 +284,9 @@ struct CortisolScienceHookView: View {
     // MARK: - Animations
 
     private func startAnimations() {
-        withAnimation(.easeInOut(duration: 1.8).delay(0.3)) {
+        // The whole curve is drawn once and revealed continuously (it used to grow one hour —
+        // one point — at a time, which looked jerky).
+        withAnimation(.timingCurve(0.4, 0, 0.2, 1, duration: 2.0).delay(0.3)) {
             curveProgress = 1.0
         }
     }

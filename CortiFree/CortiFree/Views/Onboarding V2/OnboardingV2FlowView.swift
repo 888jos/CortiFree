@@ -11,7 +11,8 @@
 import SwiftUI
 import UserNotifications
 
-#if DEBUG
+// MARK: - Tester tools (DEBUG and TestFlight builds only, see TesterAccess)
+
 @MainActor
 enum OnboardingDebugNavigation {
     static func goHome() {
@@ -48,20 +49,31 @@ struct OnboardingDebugHomeButton: View {
     }
 }
 
+/// Red house (skip to Home) + purple bell (recovery notifications). Nothing for real users.
+struct OnboardingDebugButtons: View {
+    @ObservedObject private var testerAccess = TesterAccess.shared
+    var beforeNavigation: () -> Void = {}
+
+    var body: some View {
+        if testerAccess.isEnabled {
+            VStack(spacing: 10) {
+                OnboardingDebugHomeButton(beforeNavigation: beforeNavigation)
+                RecoveryDebugButton()
+            }
+            .padding(.top, 54)
+            .padding(.trailing, 12)
+        }
+    }
+}
+
 extension View {
     func onboardingDebugHomeButton() -> some View {
         overlay(alignment: .topTrailing) {
-            VStack(spacing: 10) {
-                OnboardingDebugHomeButton()
-                RecoveryDebugButton()
-            }
-                .padding(.top, 54)
-                .padding(.trailing, 12)
+            OnboardingDebugButtons()
                 .zIndex(10_000)
         }
     }
 }
-#endif
 
 struct OnboardingV2FlowView: View {
     @Environment(\.scenePhase) private var scenePhase
@@ -178,31 +190,25 @@ struct OnboardingV2FlowView: View {
             startDropOffLiveActivity()
             UserDefaults.standard.set(false, forKey: "onboarding_session_active")
         }
-        #if DEBUG
         .overlay(alignment: .topTrailing) {
-            VStack(spacing: 10) {
-                OnboardingDebugHomeButton {
-                    suppressDropOffLiveActivity = true
-                }
-                RecoveryDebugButton()
+            OnboardingDebugButtons {
+                suppressDropOffLiveActivity = true
             }
-            .padding(.top, 54)
-            .padding(.trailing, 12)
             .zIndex(10_000)
         }
-        #endif
     }
 
     // MARK: - Checkpoint Management
 
     private func resumeFromCheckpoint() {
-        #if DEBUG
-        if UserDefaults.standard.bool(forKey: "debugStartOnboardingFromAuth") {
+        // Home tester shortcut « Current Flow From Auth ».
+        if TesterAccess.isEnabledNow, UserDefaults.standard.bool(forKey: "debugStartOnboardingFromAuth") {
             UserDefaults.standard.removeObject(forKey: "debugStartOnboardingFromAuth")
             prepareDebugAuthFlow()
             currentStep = .authentication
             return
         }
+        #if DEBUG
         // Launch argument: open the onboarding straight on the quiz choice (AI or by hand).
         if ProcessInfo.processInfo.arguments.contains("-onboardingStartAtQuiz") {
             currentStep = .habitsQuiz
@@ -271,9 +277,8 @@ struct OnboardingV2FlowView: View {
         }
     }
 
-    #if DEBUG
     /// Recreates the state that normally exists after the quiz so the Home
-    /// debug shortcut exercises the current auth -> analysis flow.
+    /// debug shortcut (testers only) exercises the current auth -> analysis flow.
     private func prepareDebugAuthFlow() {
         let quizResult = HabitsQuizResult(
             answers: [1, 1, 2, 1, 2, 1, 2, 1, 1, 0, 1, 1]
@@ -283,7 +288,6 @@ struct OnboardingV2FlowView: View {
         habitsQuizResult = quizResult
         selectedSymptoms = Set(symptoms)
     }
-    #endif
 
     private func saveCheckpoint(_ step: OnboardingStep) {
         savedCheckpoint = step.rawValue
@@ -314,6 +318,13 @@ struct OnboardingV2FlowView: View {
         .symptomChecker, .cortisolScienceHook, .scientificPlan, .authentication, .loading,
         .planReady, .planDay, .commitmentPledge, .benefitsTour, .complete
     ]
+
+    /// The quiz result shows the user's own answers: not for « my AI answers for me », and not
+    /// when the answers were lost.
+    private var hasQuizResultScreen: Bool {
+        guard let result = habitsQuizResult else { return false }
+        return result.aiGoal == nil
+    }
 
     private func trackOnboardingScreen(_ step: OnboardingStep) {
         guard let index = Self.funnelSteps.firstIndex(of: step) else { return }
@@ -398,7 +409,8 @@ struct OnboardingV2FlowView: View {
             HabitsQuizEntryView(onBack: { currentStep = .reassurance }, onComplete: { result in
                 habitsQuizResult = result
                 AnalyticsICP.habitsCompleted(result)
-                currentStep = .stressPatternValidation
+                // « My AI answers for me »: no quiz result screen (its answers are stand-ins).
+                currentStep = result.aiGoal == nil ? .stressPatternValidation : .symptomChecker
 
                 // Save in background without blocking UI
                 OptimizedFirebaseService.shared.saveQuizDataInBackground(
@@ -408,16 +420,12 @@ struct OnboardingV2FlowView: View {
             })
 
         case .stressPatternValidation:
-            if let result = habitsQuizResult {
+            if !hasQuizResultScreen {
+                // AI answers or no answers left (resumed without a draft): nothing real to show.
+                Color.clear.onAppear { currentStep = .symptomChecker }
+            } else if let result = habitsQuizResult {
                 StressPatternValidationView(
                     habitsQuizResult: result,
-                    onContinue: {
-                        currentStep = .symptomChecker
-                    }
-                )
-            } else {
-                StressPatternValidationView(
-                    habitsQuizResult: HabitsQuizResult(answers: Array(repeating: 0, count: 12)),
                     onContinue: {
                         currentStep = .symptomChecker
                     }
@@ -427,7 +435,7 @@ struct OnboardingV2FlowView: View {
         case .symptomChecker:
             SymptomCheckerView(
                 initialSelection: selectedSymptoms,
-                onBack: { currentStep = .stressPatternValidation },
+                onBack: { currentStep = hasQuizResultScreen ? .stressPatternValidation : .habitsQuiz },
                 onContinue: { symptoms in
                     selectedSymptoms = symptoms
                     AnalyticsICP.symptomsSelected(symptoms)
