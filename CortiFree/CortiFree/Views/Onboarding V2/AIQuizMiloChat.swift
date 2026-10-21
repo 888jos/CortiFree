@@ -47,6 +47,9 @@ struct AIQuizMiloChat: View {
     @State private var usesRealMilo = false
     /// « ? » next to Milo: what is sent to his AI, and what CortiFree keeps (nothing).
     @State private var showInfo = false
+    /// Quick « personalize with AI? » popup before the report (accept → Milo's AI, refuse → local report).
+    @State private var askingConsent = false
+    @State private var declinedAI = false
     /// Turns sent to the real Milo (his replies and what the user typed after the report).
     @State private var history: [(role: String, content: String)] = []
     @State private var recommended: BreathingPattern?
@@ -155,6 +158,12 @@ struct AIQuizMiloChat: View {
                 Button(t("common.ok"), role: .cancel) {}
             } message: {
                 Text(String(format: t("onboarding_v2.ai_quiz.milo.info_body"), app.name))
+            }
+            .alert(t("onboarding_v2.ai_quiz.milo.consent_title"), isPresented: $askingConsent) {
+                Button(t("onboarding_v2.ai_quiz.milo.consent_refuse"), role: .cancel) { consent(false) }
+                Button(t("onboarding_v2.ai_quiz.milo.consent_accept")) { consent(true) }
+            } message: {
+                Text(t("onboarding_v2.ai_quiz.milo.consent_body"))
             }
         }
         .overlay(alignment: .bottom) {
@@ -506,7 +515,7 @@ struct AIQuizMiloChat: View {
         }
         HapticManager.success()
         say([String(format: t("onboarding_v2.ai_quiz.milo.found_plan"), goal.localizedName)]) {
-            startReport()
+            askingConsent = true
         }
     }
 
@@ -518,11 +527,23 @@ struct AIQuizMiloChat: View {
             messages.append(.user(t("onboarding_v2.ai_quiz.milo.unknown_continue")))
         }
         say([String(format: t("onboarding_v2.ai_quiz.milo.default_plan"), PlanGoal.stress.localizedName)]) {
-            startReport()
+            askingConsent = true
         }
     }
 
-    /// The report from the real Milo (what is sent is explained behind « ? »), in short bubbles.
+    /// The popup's answer: accept → the report from Milo's AI; refuse → the report written on the
+    /// phone (the other AI's analysis + cardiac coherence), and the chat stays local.
+    private func consent(_ accepted: Bool) {
+        AnalyticsManager.shared.track(event: "onboarding_milo_consent", properties: ["accepted": accepted])
+        guard accepted, reply != nil else {
+            declinedAI = true
+            if let reply { writtenReport(reply) }
+            return
+        }
+        startReport()
+    }
+
+    /// The report from the real Milo, in short bubbles.
     private func startReport() {
         guard let reply else { return }
         usesRealMilo = true
@@ -566,7 +587,7 @@ struct AIQuizMiloChat: View {
     /// After the report: what the user types goes to the real Milo (if they agreed).
     private func talk(_ text: String) {
         guard usesRealMilo, let reply else {
-            say([t("onboarding_v2.ai_quiz.milo.unavailable")])
+            say([t(declinedAI ? "onboarding_v2.ai_quiz.milo.declined_chat" : "onboarding_v2.ai_quiz.milo.unavailable")])
             return
         }
         history.append((role: "user", content: text))

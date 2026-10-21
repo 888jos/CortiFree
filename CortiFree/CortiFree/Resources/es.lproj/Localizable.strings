@@ -5807,3 +5807,7 @@
 "calm.body.waiting.subtitle" = "Lleva tu reloj esta noche: tu estrés corporal aparecerá aquí mañana por la mañana.";
 "onboarding_v2.ai_quiz.milo.info_title" = "Lo que usa Milo";
 "onboarding_v2.ai_quiz.milo.info_body" = "Para tu informe, Milo envía a su IA (DeepSeek) el plan elegido y el análisis de %@. No todo lo que pegaste. CortiFree no guarda nada de esta conversación.";
+"onboarding_v2.ai_quiz.milo.consent_title" = "¿Un informe solo para ti?";
+"onboarding_v2.ai_quiz.milo.consent_body" = "Milo puede personalizar tu informe a partir de tu plan y del análisis. No se guarda nada y queda entre vosotros.";
+"onboarding_v2.ai_quiz.milo.consent_accept" = "Aceptar";
+"onboarding_v2.ai_quiz.milo.consent_refuse" = "Rechazar";

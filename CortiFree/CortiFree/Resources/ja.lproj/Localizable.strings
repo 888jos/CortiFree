@@ -5746,7 +5746,7 @@
 "onboarding_v2.ai_quiz.milo.consent_no" = "やめておく";
 "onboarding_v2.ai_quiz.milo.later" = "あとで";
 "onboarding_v2.ai_quiz.milo.local_pick" = "まずは「%@」を試してみて：%@";
-"onboarding_v2.ai_quiz.milo.declined_chat" = "同意がないとここでは返事ができません。アプリで話そう！";
+"onboarding_v2.ai_quiz.milo.declined_chat" = "同意がないとここではお返事できません。アプリでまた話そうね！";
 "onboarding_v2.ai_quiz.milo.unavailable" = "今は返事ができません。少ししてからもう一度試してね。";
 "onboarding_v2.ai_quiz.milo.found_plan" = "いいですね！あなたについて理解したことから、いちばん合うプランは「%@」です。";
 "onboarding_v2.ai_quiz.milo.unknown" = "%@はまだ、あなたの代わりに選べるほどあなたのことを知らないようです。いちばん確実なのは、自分でクイズに答えること。2分で終わります。";
@@ -5810,3 +5810,7 @@
 "calm.body.waiting.subtitle" = "今夜ウォッチを着けて寝てください。明日の朝、ここにからだのストレスが表示されます。";
 "onboarding_v2.ai_quiz.milo.info_title" = "Miloが使うもの";
 "onboarding_v2.ai_quiz.milo.info_body" = "レポートのために、Miloは選ばれたプランと%@の分析をAI（DeepSeek）に送ります。貼り付けた内容すべてではありません。CortiFreeはこの会話を一切保存しません。";
+"onboarding_v2.ai_quiz.milo.consent_title" = "あなただけのレポートを作る？";
+"onboarding_v2.ai_quiz.milo.consent_body" = "Miloはあなたのプランと分析をもとにレポートをパーソナライズできます。何も保存されず、ふたりだけの話です。";
+"onboarding_v2.ai_quiz.milo.consent_accept" = "同意する";
+"onboarding_v2.ai_quiz.milo.consent_refuse" = "同意しない";

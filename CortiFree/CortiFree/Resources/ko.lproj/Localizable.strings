@@ -5746,7 +5746,7 @@
 "onboarding_v2.ai_quiz.milo.consent_no" = "괜찮아요";
 "onboarding_v2.ai_quiz.milo.later" = "나중에";
 "onboarding_v2.ai_quiz.milo.local_pick" = "먼저 「%@」를 해 보세요: %@";
-"onboarding_v2.ai_quiz.milo.declined_chat" = "동의 없이는 여기서 답할 수 없어요. 앱에서 이야기해요!";
+"onboarding_v2.ai_quiz.milo.declined_chat" = "동의 없이는 여기서 답할 수 없어요. 앱에서 다시 이야기해요!";
 "onboarding_v2.ai_quiz.milo.unavailable" = "지금은 답할 수 없어요. 잠시 후 다시 시도해 주세요.";
 "onboarding_v2.ai_quiz.milo.found_plan" = "좋아요! 내가 이해한 바로는, 당신에게 가장 잘 맞는 플랜은 「%@」예요.";
 "onboarding_v2.ai_quiz.milo.unknown" = "%@가 아직 당신 대신 고를 만큼 당신을 잘 알지 못하는 것 같아요. 가장 확실한 방법은 직접 퀴즈에 답하는 거예요. 2분이면 돼요.";
@@ -5810,3 +5810,7 @@
 "calm.body.waiting.subtitle" = "오늘 밤 워치를 착용하세요. 내일 아침 여기에 몸의 스트레스가 표시돼요.";
 "onboarding_v2.ai_quiz.milo.info_title" = "Milo가 사용하는 정보";
 "onboarding_v2.ai_quiz.milo.info_body" = "리포트를 위해 Milo는 선택된 플랜과 %@의 분석을 AI(DeepSeek)에 보내요. 붙여넣은 내용 전부는 아니에요. CortiFree는 이 대화를 저장하지 않아요.";
+"onboarding_v2.ai_quiz.milo.consent_title" = "나만을 위한 리포트를 만들까요?";
+"onboarding_v2.ai_quiz.milo.consent_body" = "Milo가 플랜과 분석을 바탕으로 리포트를 맞춤화할 수 있어요. 아무것도 저장되지 않고, 둘만의 이야기로 남아요.";
+"onboarding_v2.ai_quiz.milo.consent_accept" = "동의";
+"onboarding_v2.ai_quiz.milo.consent_refuse" = "거절";

@@ -5743,7 +5743,7 @@
 "onboarding_v2.ai_quiz.milo.consent_no" = "Nein danke";
 "onboarding_v2.ai_quiz.milo.later" = "Später";
 "onboarding_v2.ai_quiz.milo.local_pick" = "Probier zum Start „%@“: %@";
-"onboarding_v2.ai_quiz.milo.declined_chat" = "Ohne dein Okay kann ich dir hier nicht antworten. Wir reden in der App!";
+"onboarding_v2.ai_quiz.milo.declined_chat" = "Ohne dein Okay kann ich dir hier nicht antworten. Wir reden in der App darüber!";
 "onboarding_v2.ai_quiz.milo.unavailable" = "Ich kann gerade nicht antworten. Versuch es gleich noch mal.";
 "onboarding_v2.ai_quiz.milo.found_plan" = "Super! Nach dem, was ich von dir verstanden habe, passt der Plan „%@“ am besten zu dir.";
 "onboarding_v2.ai_quiz.milo.unknown" = "Sieht so aus, als würde %@ dich noch nicht gut genug kennen, um für dich zu wählen. Am zuverlässigsten: Beantworte das Quiz selbst, es dauert 2 Minuten.";
@@ -5807,3 +5807,7 @@
 "calm.body.waiting.subtitle" = "Trage deine Uhr heute Nacht: Dein Körperstress erscheint morgen früh hier.";
 "onboarding_v2.ai_quiz.milo.info_title" = "Was Milo nutzt";
 "onboarding_v2.ai_quiz.milo.info_body" = "Für deinen Bericht schickt Milo seiner KI (DeepSeek) den gewählten Plan und die Analyse von %@. Nicht alles, was du eingefügt hast. CortiFree speichert nichts von diesem Gespräch.";
+"onboarding_v2.ai_quiz.milo.consent_title" = "Ein Bericht nur für dich?";
+"onboarding_v2.ai_quiz.milo.consent_body" = "Milo kann deinen Bericht anhand deines Plans und der Analyse personalisieren. Nichts wird gespeichert, es bleibt unter euch.";
+"onboarding_v2.ai_quiz.milo.consent_accept" = "Annehmen";
+"onboarding_v2.ai_quiz.milo.consent_refuse" = "Ablehnen";
