@@ -195,6 +195,11 @@ final class PersonalPlanStore: ObservableObject {
         var profile = profile
         profile.source = "onboarding"
         saveOnboardingProfile(profile)
+        // Signed in during the onboarding: the in-memory plan may still be the guest's.
+        if loadedForUser != userKey {
+            loadedForUser = userKey
+            plan = loadLocalPlan()
+        }
         // An onboarding replayed by someone already following a plan (e.g. a sign-in that
         // brought back a stale « onboarding not completed ») must not wipe their progress:
         // past days stay, but the plan follows what this onboarding chose (the user's or
@@ -207,7 +212,13 @@ final class PersonalPlanStore: ObservableObject {
             return
         }
         let newPlan = PersonalPlanGenerator.generate(profile: profile, anxiety: anxiety, startDate: Date())
-        apply(newPlan)
+        // Signed in (e.g. a reinstall then sign-in to an existing account): the cloud may hold
+        // the account's plan, which this fresh plan must not overwrite.
+        if Auth.auth().currentUser != nil {
+            resolveWithRemote(newPlan)
+        } else {
+            apply(newPlan)
+        }
     }
 
     /// Onboarding finished without an account (auth skipped), then signed in after the trial:
@@ -220,12 +231,41 @@ final class PersonalPlanStore: ObservableObject {
               guest.days.count == PersonalPlan.length else { return }
         defaults.removeObject(forKey: guestKey)
         loadedForUser = userKey
-        isProvisional = false
-        let claimed = Self.withStartDay(guest)
-        plan = claimed
-        saveLocal(claimed)
-        queueRemoteSave(claimed)
+        // Signed into an existing account: its cloud plan may already be under way.
+        resolveWithRemote(Self.withStartDay(guest))
+    }
+
+    /// A plan built before the account was known (onboarding, guest), now signed in. Shown at
+    /// once as provisional (memory only); then the account's cloud plan wins once started (past
+    /// days and progress kept, following the goal this onboarding chose), and ours only goes to
+    /// the cloud when the account has none or one not started yet. Offline: stays provisional,
+    /// ensurePlan() asks the cloud again.
+    private func resolveWithRemote(_ local: PersonalPlan) {
+        isProvisional = true
+        plan = local
         NotificationCenter.default.post(name: .personalPlanDidChange, object: nil)
+        let key = userKey
+        Task { [weak self] in
+            guard let self else { return }
+            let result = await self.fetchRemotePlan()
+            // Signed out, or the plan changed meanwhile (ensurePlan() resolved it first).
+            guard key == self.userKey, self.plan == local, self.isProvisional else { return }
+            switch result {
+            case .found(let remote) where remote.dayIndex() > 1 || remote.cycle > 1:
+                self.isProvisional = false
+                self.plan = remote
+                self.saveLocal(remote)
+                if remote.goal != local.goal {
+                    self.regenerate(goal: local.goal, source: .adaptation, reason: "onboarding_replayed")
+                } else {
+                    NotificationCenter.default.post(name: .personalPlanDidChange, object: nil)
+                }
+            case .found, .absent:
+                self.apply(local)
+            case .unavailable:
+                break
+            }
+        }
     }
 
     /// Change goal (nil = keep the current goal choice and just rebuild). Past days and the
