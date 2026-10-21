@@ -3559,7 +3559,7 @@
 "auth.success.account_created" = "¡Cuenta creada con éxito!";
 "auth.success.login" = "¡Sesión iniciada con éxito!";
 "auth.success.logout" = "Sesión cerrada correctamente";
-"auth.success.reset_email_sent" = "¡Correo de restablecimiento de contraseña enviado!";
+"auth.success.reset_email_sent" = "Si existe una cuenta con este correo, recibirás un código para restablecerla.";
 
 // MARK: - Error Messages
 "error.auth.not_connected" = "Usuario no conectado";
@@ -4731,7 +4731,7 @@
 "auth.error.token" = "No se pudo obtener el token de inicio de sesión";
 "auth.error.generic" = "Error: %@";
 "auth.default_user_name" = "Usuario";
-"auth.reset.email_sent_title" = "¡Correo enviado!";
+"auth.reset.email_sent_title" = "Revisa tu correo";
 "auth.reset.email_sent_message" = "Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.";
 "auth.reset.instructions" = "Introduce tu correo y te enviaremos un código para restablecer tu contraseña.";
 "auth.reset.send_link" = "Enviar código";

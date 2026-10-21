@@ -3559,7 +3559,7 @@
 "auth.success.account_created" = "Compte créé avec succès !";
 "auth.success.login" = "Connexion réussie !";
 "auth.success.logout" = "Déconnexion réussie";
-"auth.success.reset_email_sent" = "Email de réinitialisation envoyé !";
+"auth.success.reset_email_sent" = "Si un compte existe pour cet e-mail, tu vas recevoir un code de réinitialisation.";
 
 // MARK: - Error Messages
 "error.auth.not_connected" = "Utilisateur non connecté";
@@ -4734,7 +4734,7 @@
 "auth.error.token" = "Impossible de récupérer le token";
 "auth.error.generic" = "Erreur : %@";
 "auth.default_user_name" = "Utilisateur";
-"auth.reset.email_sent_title" = "Email envoyé !";
+"auth.reset.email_sent_title" = "Vérifie ta boîte mail";
 "auth.reset.email_sent_message" = "Vérifiez votre boîte mail et suivez les instructions pour réinitialiser votre mot de passe.";
 "auth.reset.instructions" = "Saisis ton e-mail et nous t'enverrons un code pour réinitialiser ton mot de passe.";
 "auth.reset.send_link" = "Envoyer le code";

@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 @MainActor
 final class AuthModule: ObservableObject {
@@ -12,6 +13,24 @@ final class AuthModule: ObservableObject {
         // A stored session with a cached profile opens the app right away; the
         // session is then refreshed in the background (see CortiFreeApp).
         if let cached = ConvexBackend.cachedUserForLaunch() { apply(cached) }
+        // The server ended the session mid-use: route to sign-in now, as a rejected session does at launch.
+        NotificationCenter.default.addObserver(
+            forName: ConvexBackend.sessionExpiredNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.currentUser = nil
+                self?.isAuthenticated = false
+            }
+        }
+        // Back in the foreground after a while: refresh the token so an ended session shows up at once.
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.isAuthenticated else { return }
+                Task { await self.backend.refreshIfNeeded() }
+            }
+        }
     }
 
     var currentUserId: String? { currentUser?.uid }

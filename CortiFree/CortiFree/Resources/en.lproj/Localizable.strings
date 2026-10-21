@@ -3559,7 +3559,7 @@
 "auth.success.account_created" = "Account created successfully!";
 "auth.success.login" = "Login successful!";
 "auth.success.logout" = "Logged out successfully";
-"auth.success.reset_email_sent" = "Password reset email sent!";
+"auth.success.reset_email_sent" = "If an account exists for this email, you'll receive a reset code.";
 
 // MARK: - Error Messages
 "error.auth.not_connected" = "User not connected";
@@ -4731,7 +4731,7 @@
 "auth.error.token" = "Couldn't retrieve the sign-in token";
 "auth.error.generic" = "Error: %@";
 "auth.default_user_name" = "User";
-"auth.reset.email_sent_title" = "Email sent!";
+"auth.reset.email_sent_title" = "Check your inbox";
 "auth.reset.email_sent_message" = "Check your inbox and follow the instructions to reset your password.";
 "auth.reset.instructions" = "Enter your email and we'll send you a code to reset your password.";
 "auth.reset.send_link" = "Send code";

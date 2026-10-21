@@ -30,6 +30,37 @@ function requireString(value: unknown, field: string): string {
   return value;
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Convex redacts plain `Error` messages in production, so Convex Auth's password
+ * failures (wrong password, existing account, bad reset code…) would all reach the
+ * app as "Server Error". Re-throw them as ConvexError codes the app maps to messages
+ * (AuthFailure in ConvexBackend.swift).
+ */
+function withReadableErrors<P extends object>(provider: P): P {
+  // ConvexCredentials keeps the real `authorize` in its internal `options`.
+  const options = (provider as unknown as {
+    options: { authorize: (params: Record<string, unknown>, ctx: unknown) => Promise<unknown> };
+  }).options;
+  const authorize = options.authorize;
+  options.authorize = async (params, ctx) => {
+    try {
+      return await authorize(params, ctx);
+    } catch (error) {
+      if (error instanceof ConvexError) throw error;
+      const message = error instanceof Error ? error.message : String(error);
+      // An unknown address answers like a sent reset email: no account enumeration.
+      if (params.flow === "reset" && message.includes("InvalidAccountId")) return null;
+      if (message.includes("already exists")) throw new ConvexError("Account already exists");
+      const code = ["InvalidAccountId", "InvalidSecret", "TooManyFailedAttempts", "Invalid credentials", "Invalid code"]
+        .find((known) => message.includes(known));
+      throw code ? new ConvexError(code) : error;
+    }
+  };
+  return provider;
+}
+
 /**
  * Native-app friendly Convex Auth.
  *
@@ -41,8 +72,14 @@ function requireString(value: unknown, field: string): string {
  * See convex/README.md for the exact payloads used by the Swift client.
  */
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+  // Sessions used to end after 30 days even for daily users (the default total duration).
+  // Now they last as long as the app keeps refreshing them at least every 90 days.
+  session: {
+    totalDurationMs: 10 * 365 * DAY_MS,
+    inactiveDurationMs: 90 * DAY_MS,
+  },
   providers: [
-    Password<DataModel>({
+    withReadableErrors(Password<DataModel>({
       profile(params) {
         const email = normalizeEmail(params.email);
         const firstName = optionalName(params.firstName);
@@ -58,7 +95,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         }
       },
       reset: PasswordResetEmail,
-    }),
+    })),
     ConvexCredentials<DataModel>({
       id: "apple-native",
       authorize: async (params, ctx) => {

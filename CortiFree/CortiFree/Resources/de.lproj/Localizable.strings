@@ -3559,7 +3559,7 @@
 "auth.success.account_created" = "Account erfolgreich erstellt!";
 "auth.success.login" = "Login erfolgreich!";
 "auth.success.logout" = "Erfolgreich ausgeloggt";
-"auth.success.reset_email_sent" = "Passwort-Reset-E-Mail verschickt!";
+"auth.success.reset_email_sent" = "Falls es ein Konto mit dieser E-Mail gibt, bekommst du einen Code zum Zurücksetzen.";
 
 // MARK: - Error Messages
 "error.auth.not_connected" = "Benutzer nicht verbunden";
@@ -4731,7 +4731,7 @@
 "auth.error.token" = "Anmeldetoken konnte nicht abgerufen werden";
 "auth.error.generic" = "Fehler: %@";
 "auth.default_user_name" = "Nutzer";
-"auth.reset.email_sent_title" = "E-Mail gesendet!";
+"auth.reset.email_sent_title" = "Schau in dein Postfach";
 "auth.reset.email_sent_message" = "Sieh in deinem Postfach nach und folge den Anweisungen, um dein Passwort zurückzusetzen.";
 "auth.reset.instructions" = "Gib deine E-Mail ein und wir senden dir einen Code, um dein Passwort zurückzusetzen.";
 "auth.reset.send_link" = "Code senden";

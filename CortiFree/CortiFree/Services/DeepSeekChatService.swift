@@ -75,6 +75,8 @@ final class DeepSeekChatService {
             throw DeepSeekChatError.quotaExceeded
         } catch ConvexBackendError.server(let message) where message == "subscription_required" {
             throw DeepSeekChatError.subscriptionRequired
+        } catch ConvexBackendError.signedOut {
+            throw DeepSeekChatError.signedOut
         } catch { throw DeepSeekChatError.unavailable }
     }
 }

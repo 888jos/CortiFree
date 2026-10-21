@@ -18,6 +18,15 @@ enum ConvexBackendError: LocalizedError {
         case .signedOut, .unauthorized: return "Authentication required."
         }
     }
+
+    /// The access token was refused (HTTP 401, or `requireUserId` in convex/lib/session.ts).
+    var isAuthError: Bool {
+        switch self {
+        case .unauthorized: return true
+        case .server(let message): return message == "Authentication required"
+        default: return false
+        }
+    }
 }
 
 /// User-facing reason for an auth failure, derived from Convex Auth's error strings.
@@ -237,6 +246,10 @@ private enum SessionUserCache {
 actor ConvexBackend {
     static let shared = ConvexBackend()
 
+    /// Posted when the server ends the stored session mid-use (refresh token rejected,
+    /// account gone), so the app routes to sign-in right away instead of failing silently.
+    static let sessionExpiredNotification = Notification.Name("ConvexBackend.sessionExpired")
+
     private let session = URLSession(configuration: .default)
     private var tokens = SessionKeychain.load()
     private var refreshTask: Task<AuthTokens, Error>?
@@ -286,7 +299,7 @@ actor ConvexBackend {
     }
 
     /// Emails an 8-digit code (15 min). An unknown address is reported as success so the
-    /// screen never reveals whether an account exists.
+    /// screen never reveals whether an account exists (convex/auth.ts answers it the same way).
     func requestPasswordReset(email: String) async throws {
         do {
             let _: SignInResult = try await call(
@@ -319,7 +332,7 @@ actor ConvexBackend {
         let profile: ProfileResult? = try await call(.query, path: "profile:me")
         guard let profile else {
             // The account no longer exists (deleted on another device).
-            clearSession()
+            expireSession()
             throw ConvexBackendError.signedOut
         }
         let user = profile.user
@@ -345,6 +358,18 @@ actor ConvexBackend {
         tokens = nil
         SessionKeychain.clear()
         SessionUserCache.clear()
+    }
+
+    private func expireSession() {
+        clearSession()
+        NotificationCenter.default.post(name: Self.sessionExpiredNotification, object: nil)
+    }
+
+    /// Refreshes the access token when it is about to expire (app back in the foreground),
+    /// so an ended session is noticed at once rather than at the next failing call.
+    func refreshIfNeeded() async {
+        guard tokens != nil, accessTokenExpiresSoon(tokens?.token) else { return }
+        _ = try? await refreshTokens()
     }
 
     private static func normalized(_ email: String) -> String {
@@ -381,7 +406,7 @@ actor ConvexBackend {
         if accessTokenExpiresSoon(tokens?.token) { _ = try await refreshTokens() }
         do {
             return try await perform(kind, path: path, args: args, accessToken: tokens?.token)
-        } catch ConvexBackendError.unauthorized {
+        } catch let error as ConvexBackendError where error.isAuthError {
             // Token rejected before its expiry (clock skew, key rotation): refresh once and retry.
             let fresh = try await refreshTokens()
             return try await perform(kind, path: path, args: args, accessToken: fresh.token)
@@ -453,8 +478,9 @@ actor ConvexBackend {
             SessionKeychain.save(fresh)
             return fresh
         } catch ConvexBackendError.signedOut {
-            // The server rejected the refresh token: the session is really over.
-            clearSession()
+            // The server rejected the refresh token: the session is really over
+            // (unless a new sign-in replaced it meanwhile).
+            if tokens?.refreshToken == refreshToken { expireSession() }
             throw ConvexBackendError.signedOut
         }
         // Any other failure (offline, timeout) keeps the session for the next attempt.
@@ -475,11 +501,24 @@ actor ConvexBackend {
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw ConvexBackendError.invalidResponse }
         if http.statusCode == 401 { throw ConvexBackendError.unauthorized }
-        guard (200..<300).contains(http.statusCode) else { throw ConvexBackendError.invalidResponse }
+        // 560 = the function threw: the body is a regular `{status: "error", …}` payload.
+        guard (200..<300).contains(http.statusCode) || http.statusCode == 560 else {
+            // Other failures carry `{code, message}`; a bad or expired token must still refresh.
+            let code = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["code"] as? String
+            if code == "Unauthenticated" || code == "InvalidAuthHeader" { throw ConvexBackendError.unauthorized }
+            throw ConvexBackendError.invalidResponse
+        }
         let status = try JSONDecoder().decode(ConvexStatus.self, from: data)
         guard status.status == "success" else {
             // ConvexError payloads carry the readable message in errorData.
-            if case .string(let message)? = status.errorData { throw ConvexBackendError.server(message) }
+            switch status.errorData {
+            case .string(let message)?: throw ConvexBackendError.server(message)
+            case .object(let object)?:
+                if case .string(let message)? = object["code"] ?? object["message"] {
+                    throw ConvexBackendError.server(message)
+                }
+            default: break
+            }
             throw ConvexBackendError.server(status.errorMessage ?? "Convex request failed")
         }
         return try JSONDecoder().decode(ConvexEnvelope<T>.self, from: data).value

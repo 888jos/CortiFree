@@ -3559,7 +3559,7 @@
 "auth.success.account_created" = "アカウントを作成しました！";
 "auth.success.login" = "ログインしました！";
 "auth.success.logout" = "ログアウトしました";
-"auth.success.reset_email_sent" = "パスワード再設定メールを送信しました！";
+"auth.success.reset_email_sent" = "このメールアドレスのアカウントが存在する場合、再設定コードが届きます。";
 
 // MARK: - Error Messages
 "error.auth.not_connected" = "ログインしていません";
@@ -4736,7 +4736,7 @@
 "auth.error.token" = "ログイントークンを取得できませんでした";
 "auth.error.generic" = "エラー：%@";
 "auth.default_user_name" = "ユーザー";
-"auth.reset.email_sent_title" = "メールを送信しました！";
+"auth.reset.email_sent_title" = "メールを確認してください";
 "auth.reset.email_sent_message" = "受信トレイを確認し、案内に沿ってパスワードを再設定してください。";
 "auth.reset.instructions" = "メールアドレスを入力すると、パスワード再設定用のコードをお送りします。";
 "auth.reset.send_link" = "コードを送信";

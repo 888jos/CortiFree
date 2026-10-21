@@ -3559,7 +3559,7 @@
 "auth.success.account_created" = "계정이 만들어졌어요!";
 "auth.success.login" = "로그인되었어요!";
 "auth.success.logout" = "로그아웃되었어요";
-"auth.success.reset_email_sent" = "비밀번호 재설정 이메일을 보냈어요!";
+"auth.success.reset_email_sent" = "이 이메일로 가입된 계정이 있다면 재설정 코드를 받게 돼요.";
 
 // MARK: - Error Messages
 "error.auth.not_connected" = "로그인되어 있지 않아요";
@@ -4736,7 +4736,7 @@
 "auth.error.token" = "로그인 토큰을 가져올 수 없어요";
 "auth.error.generic" = "오류: %@";
 "auth.default_user_name" = "사용자";
-"auth.reset.email_sent_title" = "이메일을 보냈어요!";
+"auth.reset.email_sent_title" = "메일함을 확인해 주세요";
 "auth.reset.email_sent_message" = "받은편지함을 확인하고 안내에 따라 비밀번호를 재설정해 주세요.";
 "auth.reset.instructions" = "이메일을 입력하면 비밀번호 재설정 코드를 보내드려요.";
 "auth.reset.send_link" = "코드 보내기";
