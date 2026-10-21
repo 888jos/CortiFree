@@ -5803,3 +5803,8 @@
 "onboarding_v2.plan_ready.prev_plan" = "前のプラン";
 "onboarding_v2.plan_ready.next_plan" = "次のプラン";
 "onboarding_v2.plan_ready.hold_to_choose" = "長押しで「%@」を選ぶ";
+"profile.v2.more.watch_found" = "ウォッチを検出：最新の心拍数 %d bpm（%@）。毎朝ホームにからだのストレスが表示されます。";
+"profile.v2.more.watch_no_data" = "ヘルスケアにウォッチのデータがありません。ウォッチがペアリングされ、CortiFreeがヘルスケアの心拍数を読めるか確認し、今夜着けて寝てください。";
+"profile.v2.more.watch_unavailable" = "このデバイスではヘルスケアを利用できません。";
+"calm.body.waiting.title" = "ウォッチ接続済み";
+"calm.body.waiting.subtitle" = "今夜ウォッチを着けて寝てください。明日の朝、ここにからだのストレスが表示されます。";

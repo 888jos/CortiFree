@@ -5800,3 +5800,8 @@
 "onboarding_v2.plan_ready.prev_plan" = "Vorheriger Plan";
 "onboarding_v2.plan_ready.next_plan" = "Nächster Plan";
 "onboarding_v2.plan_ready.hold_to_choose" = "Gedrückt halten für „%@“";
+"profile.v2.more.watch_found" = "Uhr gefunden: letzter Puls %d bpm um %@. Dein Körperstress erscheint jeden Morgen auf der Startseite.";
+"profile.v2.more.watch_no_data" = "Keine Uhrdaten in Health. Prüfe, ob deine Uhr gekoppelt ist und CortiFree den Puls in Health lesen darf, und trage sie heute Nacht.";
+"profile.v2.more.watch_unavailable" = "Apple Health ist auf diesem Gerät nicht verfügbar.";
+"calm.body.waiting.title" = "Uhr verbunden";
+"calm.body.waiting.subtitle" = "Trage deine Uhr heute Nacht: Dein Körperstress erscheint morgen früh hier.";

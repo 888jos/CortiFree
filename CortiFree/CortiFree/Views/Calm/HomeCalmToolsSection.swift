@@ -33,6 +33,8 @@ struct HomeCalmToolsSection: View {
         }
         .padding(.horizontal, AppConstants.Layout.paddingLarge)
         .task { await refresh() }
+        // Profile's « Apple Watch » or the debug simulation just connected the watch.
+        .onChange(of: appleWatch) { _, _ in Task { await refresh() } }
         .fullScreenCover(isPresented: $showPulse) { PulseCheckView() }
         .fullScreenCover(isPresented: $showReset) { NervousResetView() }
         .fullScreenCover(isPresented: $showFaceScan) { FaceScanView() }
@@ -77,6 +79,27 @@ struct HomeCalmToolsSection: View {
                         .font(.system(size: 12))
                         .foregroundStyle(AudioPalette.secondaryText)
                         .lineLimit(2)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            .cfGlass(cornerRadius: 20)
+        } else if loaded, health.isEnabled, health.bodySignalsRequested, appleWatch != AppleWatchPreference.no {
+            // Connected, but no score yet: needs a night with the watch (and its usual 30-day baseline).
+            HStack(spacing: 14) {
+                Image(systemName: "applewatch.radiowaves.left.and.right")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(AudioPalette.accent)
+                    .frame(width: 44, height: 44)
+                    .background(AudioPalette.accent.opacity(0.15), in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(t("calm.body.waiting.title"))
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(t("calm.body.waiting.subtitle"))
+                        .font(.system(size: 12))
+                        .foregroundStyle(AudioPalette.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
             }

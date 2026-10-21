@@ -5803,3 +5803,8 @@
 "onboarding_v2.plan_ready.prev_plan" = "이전 플랜";
 "onboarding_v2.plan_ready.next_plan" = "다음 플랜";
 "onboarding_v2.plan_ready.hold_to_choose" = "길게 눌러 「%@」 선택";
+"profile.v2.more.watch_found" = "워치 감지됨: 최근 심박수 %d bpm (%@). 매일 아침 홈에 몸의 스트레스가 표시돼요.";
+"profile.v2.more.watch_no_data" = "건강 앱에 워치 데이터가 없어요. 워치가 페어링되어 있고 CortiFree가 건강 앱의 심박수를 읽을 수 있는지 확인한 뒤, 오늘 밤 착용해 주세요.";
+"profile.v2.more.watch_unavailable" = "이 기기에서는 건강 앱을 사용할 수 없어요.";
+"calm.body.waiting.title" = "워치 연결됨";
+"calm.body.waiting.subtitle" = "오늘 밤 워치를 착용하세요. 내일 아침 여기에 몸의 스트레스가 표시돼요.";

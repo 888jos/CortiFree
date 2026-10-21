@@ -5800,3 +5800,8 @@
 "onboarding_v2.plan_ready.prev_plan" = "Previous plan";
 "onboarding_v2.plan_ready.next_plan" = "Next plan";
 "onboarding_v2.plan_ready.hold_to_choose" = "Hold to choose “%@”";
+"profile.v2.more.watch_found" = "Watch found: last heart rate %d bpm at %@. Your body stress will show on Home every morning.";
+"profile.v2.more.watch_no_data" = "No watch data in Health. Check that your watch is paired, that CortiFree can read heart rate in Health, and wear it tonight.";
+"profile.v2.more.watch_unavailable" = "Apple Health isn't available on this device.";
+"calm.body.waiting.title" = "Watch connected";
+"calm.body.waiting.subtitle" = "Wear your watch tonight: your body stress will show here tomorrow morning.";

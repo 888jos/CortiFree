@@ -5800,3 +5800,8 @@
 "onboarding_v2.plan_ready.prev_plan" = "Plan anterior";
 "onboarding_v2.plan_ready.next_plan" = "Plan siguiente";
 "onboarding_v2.plan_ready.hold_to_choose" = "Mantén pulsado para elegir «%@»";
+"profile.v2.more.watch_found" = "Reloj detectado: último pulso %d lpm a las %@. Tu estrés corporal aparecerá en Inicio cada mañana.";
+"profile.v2.more.watch_no_data" = "No hay datos del reloj en Salud. Comprueba que tu reloj está enlazado, que CortiFree puede leer el pulso en Salud, y llévalo esta noche.";
+"profile.v2.more.watch_unavailable" = "Apple Salud no está disponible en este dispositivo.";
+"calm.body.waiting.title" = "Reloj conectado";
+"calm.body.waiting.subtitle" = "Lleva tu reloj esta noche: tu estrés corporal aparecerá aquí mañana por la mañana.";

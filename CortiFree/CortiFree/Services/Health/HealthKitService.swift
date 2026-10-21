@@ -2,8 +2,9 @@
 //  HealthKitService.swift
 //  CortiFree
 //
-//  Apple Health bridge (opt-in). Health data stays on the device: it is read and written
-//  through HealthKit only, never sent to Firestore, analytics or the assistant.
+//  Apple Health bridge (opt-in). Health data is read and written through HealthKit only and is
+//  never sent to analytics; a short summary (heart rate, HRV, sleep) goes to Milo only when the
+//  user allowed it in Milo's disclosure.
 //
 //  - GAD-7 (anxiety questionnaire): read the latest one taken in Health, to tune the plan
 //  - State of Mind: daily mood from the daily check-in
@@ -152,7 +153,7 @@ final class HealthKitService: ObservableObject {
     func enableBodySignals() async -> Bool {
         guard isAvailable else { return false }
         do {
-            try await store.requestAuthorization(toShare: shareTypes, read: readTypes.union([hrvType, restingHRType, sleepType]))
+            try await store.requestAuthorization(toShare: shareTypes, read: readTypes.union([heartRateType, hrvType, restingHRType, sleepType]))
             setEnabled(true)
             UserDefaults.standard.set(true, forKey: "healthKit.bodySignals.v1")
             AnalyticsManager.shared.track(event: "health_body_signals_connected")
@@ -161,6 +162,67 @@ final class HealthKitService: ObservableObject {
             return false
         }
     }
+
+    /// What « Apple Watch » in Profile found, right after asking for the watch data.
+    enum WatchStatus: Equatable {
+        /// Heart rate saved in Health by a watch: the last one.
+        case found(bpm: Int, date: Date)
+        /// Nothing from a watch in the last 7 days (no watch, or reading declined in Health).
+        case noData
+        /// Health is not available on this device.
+        case unavailable
+    }
+
+    /// « I have an Apple Watch » in Profile: asks for the watch data (heart rate, HRV, resting heart
+    /// rate, sleep) and says what it found. HealthKit never says whether reading was declined, so
+    /// « nothing found » covers both.
+    func connectWatch() async -> WatchStatus {
+        guard isAvailable else { return .unavailable }
+        guard await enableBodySignals() else { return .noData }
+        let start = Date().addingTimeInterval(-7 * 24 * 3600)
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [.quantitySample(type: heartRateType, predicate: HKQuery.predicateForSamples(withStart: start, end: Date()))],
+            sortDescriptors: [SortDescriptor(\.endDate, order: .reverse)],
+            limit: 1
+        )
+        guard let sample = try? await descriptor.result(for: store).first else {
+            AnalyticsManager.shared.track(event: "apple_watch_connect_result", properties: ["result": "no_data"])
+            return .noData
+        }
+        let bpm = Int(sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute())).rounded())
+        AnalyticsManager.shared.track(event: "apple_watch_connect_result", properties: ["result": "found"])
+        _ = await bodySignals()
+        return .found(bpm: bpm, date: sample.endDate)
+    }
+
+    #if DEBUG
+    /// Simulator testing without a watch: writes 30 nights of watch-like data into Health
+    /// (heart rate, HRV, resting heart rate, sleep), last night a bit more stressed than usual.
+    func simulateWatchData() async -> Bool {
+        guard isAvailable else { return false }
+        let types: Set<HKSampleType> = [heartRateType, hrvType, restingHRType, sleepType]
+        do { try await store.requestAuthorization(toShare: types, read: Set(types.map { $0 as HKObjectType })) } catch { return false }
+        let bpmUnit = HKUnit.count().unitDivided(by: .minute())
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        var samples: [HKSample] = []
+        for daysAgo in 0...30 {
+            guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: today) else { continue }
+            let lastNight = daysAgo == 0
+            let wake = day.addingTimeInterval(7 * 3600)
+            let bed = wake.addingTimeInterval(lastNight ? -6.2 * 3600 : -7.4 * 3600)
+            let hrv = lastNight ? 34.0 : Double.random(in: 44...52)
+            let rhr = lastNight ? 63.0 : Double.random(in: 56...59)
+            samples.append(HKQuantitySample(type: hrvType, quantity: HKQuantity(unit: .secondUnit(with: .milli), doubleValue: hrv), start: wake.addingTimeInterval(-3600), end: wake.addingTimeInterval(-3600)))
+            samples.append(HKQuantitySample(type: restingHRType, quantity: HKQuantity(unit: bpmUnit, doubleValue: rhr), start: wake, end: wake))
+            samples.append(HKCategorySample(type: sleepType, value: HKCategoryValueSleepAnalysis.asleepCore.rawValue, start: bed, end: wake))
+        }
+        let now = Date().addingTimeInterval(-10 * 60)
+        samples.append(HKQuantitySample(type: heartRateType, quantity: HKQuantity(unit: bpmUnit, doubleValue: 72), start: now, end: now))
+        do { try await store.save(samples) } catch { return false }
+        return true
+    }
+    #endif
 
     /// Last computed body signals, for Milo's context.
     @Published private(set) var latestBodySignals: BodySignals?

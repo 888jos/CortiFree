@@ -5798,3 +5798,8 @@
 "onboarding_v2.plan_ready.prev_plan" = "Plan précédent";
 "onboarding_v2.plan_ready.next_plan" = "Plan suivant";
 "onboarding_v2.plan_ready.hold_to_choose" = "Maintiens pour choisir « %@ »";
+"profile.v2.more.watch_found" = "Montre détectée : dernier pouls %d bpm à %@. Ton stress du corps s'affichera sur l'accueil chaque matin.";
+"profile.v2.more.watch_no_data" = "Aucune donnée de montre dans Santé. Vérifie que ta montre est jumelée, que CortiFree peut lire le pouls dans Santé, et porte-la cette nuit.";
+"profile.v2.more.watch_unavailable" = "Apple Santé n'est pas disponible sur cet appareil.";
+"calm.body.waiting.title" = "Montre connectée";
+"calm.body.waiting.subtitle" = "Porte ta montre cette nuit : ton stress du corps s'affichera ici demain matin.";

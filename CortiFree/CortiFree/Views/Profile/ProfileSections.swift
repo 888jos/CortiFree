@@ -478,6 +478,12 @@ struct ProfileShortcutsSection: View {
     @Environment(\.openURL) private var openURL
     /// Asked once at the first pulse measure; off = the pulse is always measured with the flash.
     @AppStorage(AppleWatchPreference.storageKey) private var appleWatch = ""
+    /// What turning « Apple Watch » on found in Health (nil while not checked).
+    @State private var watchStatus: HealthKitService.WatchStatus?
+    @State private var checkingWatch = false
+    #if DEBUG
+    @State private var simulatingWatch = false
+    #endif
 
     private static let appStoreURL = URL(string: "https://apps.apple.com/app/id6758314805")!
     private static let reviewURL = URL(string: "https://apps.apple.com/app/id6758314805?action=write-review")!
@@ -521,30 +527,101 @@ struct ProfileShortcutsSection: View {
     }
 
     private var watchRow: some View {
-        HStack(spacing: 14) {
-            Image(systemName: "applewatch")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(PlanPalette.accent)
-                .frame(width: 36, height: 36)
-                .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(PlanPalette.accent.opacity(0.15)))
-            VStack(alignment: .leading, spacing: 2) {
-                Text("profile.v2.more.watch".localized)
-                    .font(.faroSemiBold(15))
-                    .foregroundColor(.white)
-                Text("profile.v2.more.watch_sub".localized)
-                    .font(.faroRegular(12))
-                    .foregroundColor(.white.opacity(0.55))
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 14) {
+                Image(systemName: "applewatch")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(PlanPalette.accent)
+                    .frame(width: 36, height: 36)
+                    .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(PlanPalette.accent.opacity(0.15)))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("profile.v2.more.watch".localized)
+                        .font(.faroSemiBold(15))
+                        .foregroundColor(.white)
+                    Text("profile.v2.more.watch_sub".localized)
+                        .font(.faroRegular(12))
+                        .foregroundColor(.white.opacity(0.55))
+                }
+                Spacer(minLength: 0)
+                if checkingWatch {
+                    ProgressView().tint(.white)
+                }
+                Toggle("", isOn: Binding(
+                    get: { appleWatch == AppleWatchPreference.yes },
+                    set: { on in
+                        appleWatch = on ? AppleWatchPreference.yes : AppleWatchPreference.no
+                        watchStatus = nil
+                        if on { checkWatch() }
+                    }
+                ))
+                .labelsHidden()
+                .tint(PlanPalette.accent)
             }
-            Spacer(minLength: 0)
-            Toggle("", isOn: Binding(
-                get: { appleWatch == AppleWatchPreference.yes },
-                set: { appleWatch = $0 ? AppleWatchPreference.yes : AppleWatchPreference.no }
-            ))
-            .labelsHidden()
-            .tint(PlanPalette.accent)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+
+            if let watchStatus {
+                watchStatusLine(watchStatus)
+                    .padding(.leading, 64)
+                    .padding(.trailing, 14)
+                    .padding(.bottom, 12)
+            }
+            #if DEBUG
+            Button {
+                simulatingWatch = true
+                Task {
+                    _ = await HealthKitService.shared.simulateWatchData()
+                    simulatingWatch = false
+                    appleWatch = AppleWatchPreference.yes
+                    checkWatch()
+                }
+            } label: {
+                Text(simulatingWatch ? "⌚️ …" : "⌚️ Simuler une Apple Watch (debug)")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.5))
+            }
+            .buttonStyle(.plain)
+            .padding(.leading, 64)
+            .padding(.bottom, 12)
+            #endif
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+    }
+
+    /// Turning « Apple Watch » on: asks for the watch data in Health and says what it found.
+    private func checkWatch() {
+        checkingWatch = true
+        Task {
+            let status = await HealthKitService.shared.connectWatch()
+            checkingWatch = false
+            withAnimation(.easeInOut(duration: 0.2)) { watchStatus = status }
+            HapticManager.light()
+        }
+    }
+
+    private func watchStatusLine(_ status: HealthKitService.WatchStatus) -> some View {
+        let found: Bool
+        let text: String
+        switch status {
+        case .found(let bpm, let date):
+            found = true
+            text = String(format: "profile.v2.more.watch_found".localized, bpm,
+                          date.formatted(date: .omitted, time: .shortened))
+        case .noData:
+            found = false
+            text = "profile.v2.more.watch_no_data".localized
+        case .unavailable:
+            found = false
+            text = "profile.v2.more.watch_unavailable".localized
+        }
+        return Label {
+            Text(text)
+                .font(.faroRegular(12))
+                .foregroundColor(.white.opacity(0.75))
+                .fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            Image(systemName: found ? "checkmark.circle.fill" : "exclamationmark.circle")
+                .foregroundColor(found ? Color(hex: "6FE3B4") : Color(hex: "FFB86B"))
+        }
     }
 
     private var separator: some View {
