@@ -4280,8 +4280,8 @@
 "onboarding_v2.benefits.breathing_subtitle" = "파도를 따라 호흡하세요. 가이드 호흡이 마음과 몸을 천천히 가라앉혀 줘요.";
 "onboarding_v2.benefits.meditation_title" = "재생을 누르고\n내려놓아요";
 "onboarding_v2.benefits.meditation_subtitle" = "편안한 배경음과 수면 타이머가 있는 가이드 명상으로 어디서든 긴장을 풀어요.";
-"onboarding_v2.benefits.home_title" = "평온함을\n한 번의 탭으로";
-"onboarding_v2.benefits.home_subtitle" = "호흡, 명상, 사운드, 그리고 Milo까지. 홈 화면에서 언제나 한 번의 탭으로.";
+"onboarding_v2.benefits.home_title" = "스트레스가 몰려와도\n이제 무엇을 할지 알아요";
+"onboarding_v2.benefits.home_subtitle" = "벅찰 때, 몸이 긴장될 때, 잠이 안 올 때, 중요한 일을 앞뒀을 때. 지금 상황을 고르면 도움이 되는 운동을 바로 받아요.";
 "onboarding_v2.benefits.continue_plan" = "내 플랜 보기";
 "paywall_custom.new_badge" = "NEW";
 "paywall_custom.radar_label_focus" = "집중";
