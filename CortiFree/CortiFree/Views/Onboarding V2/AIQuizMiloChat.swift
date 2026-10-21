@@ -41,12 +41,12 @@ struct AIQuizMiloChat: View {
 
     /// The quiz answers read from the AI's reply.
     @State private var reply: AIQuizReply?
-    @State private var askingConsent = false
     /// The AI couldn't pick a plan: answer the quiz, or go on with the default one.
     @State private var askingUnknown = false
     /// The user agreed to talk to the real Milo.
     @State private var usesRealMilo = false
-    @State private var consentGiven = false
+    /// « ? » next to Milo: what is sent to his AI, and what CortiFree keeps (nothing).
+    @State private var showInfo = false
     /// Turns sent to the real Milo (his replies and what the user typed after the report).
     @State private var history: [(role: String, content: String)] = []
     @State private var recommended: BreathingPattern?
@@ -93,7 +93,12 @@ struct AIQuizMiloChat: View {
             }
         }
         .fullScreenCover(item: $runningExercise) { pattern in
-            BreathingDetailFlowView(pattern: pattern, duration: 60, recordsSession: false) {
+            BreathingDetailFlowView(pattern: pattern, duration: 60, recordsSession: false, onSkip: {
+                // Skip: straight on to the next onboarding step, not back to the chat.
+                AnalyticsManager.shared.track(event: "onboarding_milo_exercise", properties: ["action": "skipped_during", "exercise": pattern.key])
+                runningExercise = nil
+                finish()
+            }) {
                 AnalyticsManager.shared.track(event: "onboarding_milo_exercise", properties: ["action": "completed", "exercise": pattern.key])
                 runningExercise = nil
                 finish()
@@ -132,7 +137,25 @@ struct AIQuizMiloChat: View {
                     .foregroundStyle(.white)
             }
             Spacer()
-            Color.clear.frame(width: 40, height: 40)
+            Button {
+                HapticManager.light()
+                AnalyticsManager.shared.track(event: "onboarding_milo_info_opened")
+                showInfo = true
+            } label: {
+                Image(systemName: "questionmark")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .cfGlassCircle(interactive: false)
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(t("onboarding_v2.ai_quiz.milo.info_title"))
+            .alert(t("onboarding_v2.ai_quiz.milo.info_title"), isPresented: $showInfo) {
+                Button(t("common.ok"), role: .cancel) {}
+            } message: {
+                Text(String(format: t("onboarding_v2.ai_quiz.milo.info_body"), app.name))
+            }
         }
         .overlay(alignment: .bottom) {
             Label(t("onboarding_v2.ai_quiz.milo.badge"), systemImage: "lock.fill")
@@ -217,11 +240,6 @@ struct AIQuizMiloChat: View {
                     onManual()
                 }
                 pill(t("onboarding_v2.ai_quiz.milo.unknown_continue"), filled: false) { continueWithoutPlan() }
-            }
-        } else if askingConsent {
-            HStack(spacing: 10) {
-                pill(t("onboarding_v2.ai_quiz.milo.consent_yes"), filled: true) { consent(true) }
-                pill(t("onboarding_v2.ai_quiz.milo.consent_no"), filled: false) { consent(false) }
             }
         } else if let recommended {
             exerciseCard(recommended)
@@ -401,9 +419,9 @@ struct AIQuizMiloChat: View {
         .padding(.bottom, 12)
     }
 
-    private var canType: Bool { !isTyping && !askingConsent && !askingUnknown }
+    private var canType: Bool { !isTyping && !askingUnknown }
 
-    private var actionsState: String { "\(askingUnknown)-\(askingConsent)-\(recommended?.key ?? "")" }
+    private var actionsState: String { "\(askingUnknown)-\(recommended?.key ?? "")" }
 
     private var canSend: Bool {
         canType && !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -487,9 +505,8 @@ struct AIQuizMiloChat: View {
             return
         }
         HapticManager.success()
-        say([String(format: t("onboarding_v2.ai_quiz.milo.found_plan"), goal.localizedName),
-             String(format: t("onboarding_v2.ai_quiz.milo.consent"), app.name)]) {
-            withAnimation { askingConsent = true }
+        say([String(format: t("onboarding_v2.ai_quiz.milo.found_plan"), goal.localizedName)]) {
+            startReport()
         }
     }
 
@@ -500,33 +517,25 @@ struct AIQuizMiloChat: View {
             askingUnknown = false
             messages.append(.user(t("onboarding_v2.ai_quiz.milo.unknown_continue")))
         }
-        say([String(format: t("onboarding_v2.ai_quiz.milo.default_plan"), PlanGoal.stress.localizedName),
-             String(format: t("onboarding_v2.ai_quiz.milo.consent"), app.name)]) {
-            withAnimation { askingConsent = true }
+        say([String(format: t("onboarding_v2.ai_quiz.milo.default_plan"), PlanGoal.stress.localizedName)]) {
+            startReport()
         }
     }
 
-    private func consent(_ accepted: Bool) {
+    /// The report from the real Milo (what is sent is explained behind « ? »), in short bubbles.
+    private func startReport() {
         guard let reply else { return }
-        withAnimation { askingConsent = false }
-        AnalyticsManager.shared.track(event: "onboarding_milo_consent", properties: ["accepted": accepted])
-        withAnimation { messages.append(.user(t(accepted ? "onboarding_v2.ai_quiz.milo.consent_yes" : "onboarding_v2.ai_quiz.milo.consent_no"))) }
-        guard accepted else {
-            writtenReport(reply)
-            return
-        }
         usesRealMilo = true
-        consentGiven = true
         isTyping = true
         Task { @MainActor in
             do {
                 let answer = try await OnboardingMiloService.report(reply: reply, app: app)
                 AnalyticsManager.shared.track(event: "onboarding_milo_report", properties: ["success": true, "exercise": answer.exerciseId ?? "none"])
                 history = [(role: "assistant", content: answer.content)]
-                withAnimation(.easeOut(duration: 0.25)) {
-                    isTyping = false
-                    messages.append(.milo(answer.content))
-                    recommended = OnboardingMiloService.pattern(answer.exerciseId) ?? OnboardingMiloService.exercises.first
+                isTyping = false
+                let pattern = OnboardingMiloService.pattern(answer.exerciseId) ?? OnboardingMiloService.exercises.first
+                say(Self.bubbles(answer.content)) {
+                    withAnimation { recommended = pattern }
                 }
             } catch {
                 AnalyticsManager.shared.track(event: "onboarding_milo_report", properties: ["success": false])
@@ -543,7 +552,7 @@ struct AIQuizMiloChat: View {
         var texts = [String]()
         if !reply.analysis.isEmpty {
             texts.append(t("onboarding_v2.ai_quiz.milo.thanks"))
-            texts.append(reply.analysis)
+            texts.append(contentsOf: Self.bubbles(reply.analysis))
         }
         if let pattern {
             texts.append(String(format: t("onboarding_v2.ai_quiz.milo.local_pick"), pattern.localizedTitle, pattern.localizedBenefit))
@@ -557,7 +566,7 @@ struct AIQuizMiloChat: View {
     /// After the report: what the user types goes to the real Milo (if they agreed).
     private func talk(_ text: String) {
         guard usesRealMilo, let reply else {
-            say([t(consentGiven ? "onboarding_v2.ai_quiz.milo.unavailable" : "onboarding_v2.ai_quiz.milo.declined_chat")])
+            say([t("onboarding_v2.ai_quiz.milo.unavailable")])
             return
         }
         history.append((role: "user", content: text))
@@ -567,11 +576,10 @@ struct AIQuizMiloChat: View {
             do {
                 let answer = try await OnboardingMiloService.chat(reply: reply, app: app, messages: history)
                 history.append((role: "assistant", content: answer.content))
-                withAnimation(.easeOut(duration: 0.25)) {
-                    isTyping = false
-                    messages.append(.milo(answer.content))
+                isTyping = false
+                say(Self.bubbles(answer.content)) {
                     if let other = OnboardingMiloService.pattern(answer.exerciseId), other != recommended {
-                        recommended = other
+                        withAnimation { recommended = other }
                     }
                 }
             } catch {
@@ -580,6 +588,35 @@ struct AIQuizMiloChat: View {
                 say([t("onboarding_v2.ai_quiz.milo.unavailable")])
             }
         }
+    }
+
+    /// A long answer as 2–3 short bubbles (about 4–5 lines each): paragraphs first, then
+    /// sentences grouped up to ~240 characters, never more than 3 bubbles.
+    static func bubbles(_ text: String, limit: Int = 240, maxBubbles: Int = 3) -> [String] {
+        let paragraphs = text.components(separatedBy: "\n\n")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        var result: [String] = []
+        for paragraph in paragraphs {
+            guard paragraph.count > limit else { result.append(paragraph); continue }
+            var sentences: [String] = []
+            paragraph.enumerateSubstrings(in: paragraph.startIndex..., options: .bySentences) { sentence, _, _, _ in
+                if let sentence = sentence?.trimmingCharacters(in: .whitespaces), !sentence.isEmpty { sentences.append(sentence) }
+            }
+            var current = ""
+            for sentence in sentences {
+                if !current.isEmpty, current.count + sentence.count + 1 > limit {
+                    result.append(current)
+                    current = sentence
+                } else {
+                    current = current.isEmpty ? sentence : current + " " + sentence
+                }
+            }
+            if !current.isEmpty { result.append(current) }
+        }
+        guard result.count > maxBubbles else { return result.isEmpty ? [text] : result }
+        // Too many: the extra ones are joined into the last bubble.
+        return Array(result.prefix(maxBubbles - 1)) + [result.dropFirst(maxBubbles - 1).joined(separator: " ")]
     }
 
     private func trackReturn(_ source: String) {

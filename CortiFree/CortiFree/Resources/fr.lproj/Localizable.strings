@@ -5803,3 +5803,5 @@
 "profile.v2.more.watch_unavailable" = "Apple Santé n'est pas disponible sur cet appareil.";
 "calm.body.waiting.title" = "Montre connectée";
 "calm.body.waiting.subtitle" = "Porte ta montre cette nuit : ton stress du corps s'affichera ici demain matin.";
+"onboarding_v2.ai_quiz.milo.info_title" = "Ce que Milo utilise";
+"onboarding_v2.ai_quiz.milo.info_body" = "Pour ton rapport, Milo envoie à son IA (DeepSeek) le plan choisi et l'analyse de %@. Pas tout ce que tu as collé. CortiFree ne garde rien de cette conversation.";

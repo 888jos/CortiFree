@@ -15,6 +15,8 @@ struct BreathingDetailFlowView: View {
     let onComplete: () -> Void
     /// False when the caller records the completion itself (plan items), to avoid counting it twice.
     let recordsSession: Bool
+    /// Onboarding: no close cross, « Skip » on the right instead (the time left moves to the left).
+    let onSkip: (() -> Void)?
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -41,8 +43,10 @@ struct BreathingDetailFlowView: View {
         pattern: BreathingPattern,
         duration: TimeInterval = 180,
         recordsSession: Bool = true,
+        onSkip: (() -> Void)? = nil,
         onComplete: @escaping () -> Void = {}
     ) {
+        self.onSkip = onSkip
         self.pattern = pattern
         self.duration = duration
         self.recordsSession = recordsSession
@@ -250,7 +254,44 @@ struct BreathingDetailFlowView: View {
         .allowsHitTesting(false)
     }
 
+    @ViewBuilder
     private func topBar(remaining: Double) -> some View {
+        if let onSkip {
+            HStack {
+                Text(formatTime(remaining))
+                    .font(.system(size: 15, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(AudioPalette.secondaryText)
+                    .frame(width: 56, alignment: .leading)
+                Spacer()
+                Text(pattern.localizedTitle)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AudioPalette.secondaryText)
+                    .lineLimit(1)
+                Spacer()
+                Button {
+                    HapticManager.light()
+                    voiceOverManager.stop()
+                    dismiss()
+                    onSkip()
+                } label: {
+                    Text(languageManager.localized("common.skip"))
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .frame(height: 36)
+                        .background(Color.white.opacity(0.08), in: Capsule())
+                        .overlay(Capsule().strokeBorder(Color.white.opacity(0.12), lineWidth: 1))
+                }
+                .buttonStyle(PressableCardStyle())
+            }
+            .padding(.top, 8)
+        } else {
+            closeTopBar(remaining: remaining)
+        }
+    }
+
+    private func closeTopBar(remaining: Double) -> some View {
         HStack {
             Button {
                 voiceOverManager.stop()

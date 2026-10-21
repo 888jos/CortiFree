@@ -5808,3 +5808,5 @@
 "profile.v2.more.watch_unavailable" = "이 기기에서는 건강 앱을 사용할 수 없어요.";
 "calm.body.waiting.title" = "워치 연결됨";
 "calm.body.waiting.subtitle" = "오늘 밤 워치를 착용하세요. 내일 아침 여기에 몸의 스트레스가 표시돼요.";
+"onboarding_v2.ai_quiz.milo.info_title" = "Milo가 사용하는 정보";
+"onboarding_v2.ai_quiz.milo.info_body" = "리포트를 위해 Milo는 선택된 플랜과 %@의 분석을 AI(DeepSeek)에 보내요. 붙여넣은 내용 전부는 아니에요. CortiFree는 이 대화를 저장하지 않아요.";

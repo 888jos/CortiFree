@@ -5805,3 +5805,5 @@
 "profile.v2.more.watch_unavailable" = "Apple Health ist auf diesem Gerät nicht verfügbar.";
 "calm.body.waiting.title" = "Uhr verbunden";
 "calm.body.waiting.subtitle" = "Trage deine Uhr heute Nacht: Dein Körperstress erscheint morgen früh hier.";
+"onboarding_v2.ai_quiz.milo.info_title" = "Was Milo nutzt";
+"onboarding_v2.ai_quiz.milo.info_body" = "Für deinen Bericht schickt Milo seiner KI (DeepSeek) den gewählten Plan und die Analyse von %@. Nicht alles, was du eingefügt hast. CortiFree speichert nichts von diesem Gespräch.";

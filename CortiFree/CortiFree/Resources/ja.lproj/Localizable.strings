@@ -5808,3 +5808,5 @@
 "profile.v2.more.watch_unavailable" = "このデバイスではヘルスケアを利用できません。";
 "calm.body.waiting.title" = "ウォッチ接続済み";
 "calm.body.waiting.subtitle" = "今夜ウォッチを着けて寝てください。明日の朝、ここにからだのストレスが表示されます。";
+"onboarding_v2.ai_quiz.milo.info_title" = "Miloが使うもの";
+"onboarding_v2.ai_quiz.milo.info_body" = "レポートのために、Miloは選ばれたプランと%@の分析をAI（DeepSeek）に送ります。貼り付けた内容すべてではありません。CortiFreeはこの会話を一切保存しません。";
