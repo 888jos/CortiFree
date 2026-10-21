@@ -12,7 +12,7 @@ struct MotivationalMessageCard: View {
     @ObservedObject var viewModel: MotivationalMessageViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 10) {
             // Time-based title with gradient text
             Text(viewModel.timeBasedTitle)
                 .font(.faroBold(28))
@@ -36,7 +36,7 @@ struct MotivationalMessageCard: View {
                 .lineSpacing(6)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 24)
+        .padding(.bottom, 12)
         .padding(.horizontal, 24)
     }
 }

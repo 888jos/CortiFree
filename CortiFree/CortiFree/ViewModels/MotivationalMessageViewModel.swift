@@ -74,7 +74,12 @@ class MotivationalMessageViewModel: ObservableObject {
                 .replacingOccurrences(of: "\n%@", with: "")
                 .replacingOccurrences(of: "%@", with: "")
         }
-        return String(format: localizedTitle, firstName)
+        // A first name up to 14 letters stays on the greeting's line; a longer one gets its own line.
+        guard firstName.count <= 14 else { return String(format: localizedTitle, firstName) }
+        let oneLine = localizedTitle
+            .replacingOccurrences(of: "、\n", with: "、")
+            .replacingOccurrences(of: "\n", with: " ")
+        return String(format: oneLine, firstName)
     }
 
     private func generateGreeting() -> String {
