@@ -73,14 +73,19 @@ struct CelebrationBanner: View {
                     .minimumScaleFactor(0.8)
                 Text(subtitle)
                     .font(Font.Poppins.custom(.regular, size: 13))
-                    .foregroundStyle(PlanPalette.secondaryText)
+                    .foregroundStyle(.white.opacity(0.65))
                     .lineLimit(2)
             }
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .planGlass(cornerRadius: 24)
+        // Same panel as the streak / achievement cards: dark violet, no stroke.
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color(hex: "1A1030"))
+                .shadow(color: .black.opacity(0.34), radius: 20, y: 12)
+        )
         .padding(.horizontal, 16)
         .padding(.top, 6)
         .contentShape(Rectangle())
@@ -98,9 +103,9 @@ struct CelebrationBanner: View {
         case .streak:
             badge("flame.fill", foreground: .white, fill: AppConstants.Colors.streakOrange)
         case .dayComplete:
-            badge("checkmark.seal.fill", foreground: PlanPalette.deep, fill: PlanPalette.done)
+            badge("checkmark.seal.fill", foreground: .white, fill: Self.violet)
         case .habitAcquired(let habitID):
-            badge(PlanItem.habitSymbol(habitID), foreground: PlanPalette.deep, fill: PlanPalette.done)
+            badge(PlanItem.habitSymbol(habitID), foreground: .white, fill: Self.violet)
         }
     }
 
@@ -116,6 +121,8 @@ struct CelebrationBanner: View {
             } animation: { _ in .spring(response: 0.3, dampingFraction: 0.5) }
             .accessibilityHidden(true)
     }
+
+    private static let violet = Color(hex: "9333EA")
 
     private var title: String {
         switch kind {
