@@ -2,7 +2,7 @@
 //  BadgeEvolutionView.swift
 //  CortiFree
 //
-//  Célébration quand un badge d'habitude est débloqué
+//  Célébration quand un badge d'habitude est débloqué (même carte que « Succès débloqué »)
 //
 
 import SwiftUI
@@ -11,147 +11,105 @@ struct BadgeEvolutionView: View {
 
     let badge: HabitBadge
     @Binding var isPresented: Bool
+    @State private var appeared = false
     @State private var showBadge = false
-    @State private var showTitle = false
-    @State private var showDescription = false
-    @State private var showConfetti = false
 
     var body: some View {
         ZStack {
-            // Galaxy background
-            GalaxyBackgroundView()
+            // Same backdrop as the streak and achievement cards: the app slightly blurred.
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .opacity(appeared ? 0.55 : 0)
                 .ignoresSafeArea()
 
-            // Confetti over the whole screen
-            if showConfetti {
-                FullScreenConfetti()
-            }
+            FullScreenConfetti()
 
-            VStack(spacing: 24) {
-                Spacer()
-
-                // Large badge with glow
-                ZStack {
-                    // Animated glow
-                    Circle()
-                        .fill(Color(hex: badge.level.color).opacity(0.4))
-                        .frame(width: 180, height: 180)
-                        .blur(radius: 40)
-                        .scaleEffect(showBadge ? 1.2 : 0.8)
-                        .animation(
-                            Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true),
-                            value: showBadge
-                        )
-
-                    BadgeOctagonMark(
-                        icon: HabitBadge.habitIcon(badge.habitId),
-                        number: nil,
-                        isUnlocked: true,
-                        accent: Color(hex: badge.level.color),
-                        size: 140,
-                        assetName: badge.badgeAssetName
-                    )
-                        .scaleEffect(showBadge ? 1 : 0.5)
-                        .opacity(showBadge ? 1 : 0)
-
-                    // Stars around badge (for diamond)
-                    if badge.level == .diamond {
-                        ForEach(0..<8) { index in
-                            Image(systemName: "star.fill")
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.8))
-                                .offset(
-                                    x: cos(Double(index) * .pi / 4) * 100,
-                                    y: sin(Double(index) * .pi / 4) * 100
-                                )
-                                .opacity(showBadge ? 1 : 0)
-                                .animation(.easeOut(duration: 0.6).delay(0.3 + Double(index) * 0.05), value: showBadge)
-                        }
-                    }
-                }
-                .padding(.vertical, 20)
-
-                // Title
-                VStack(spacing: 8) {
-                    Text("achievement.badge_unlocked".localized)
-                        .font(.custom("Poppins-Bold", size: 28))
-                        .foregroundColor(.white)
-                        .opacity(showTitle ? 1 : 0)
-                        .offset(y: showTitle ? 0 : 20)
-
-                    Text("\(HabitBadge.habitDisplayName(badge.habitId)) - \(badge.level.displayName)")
-                        .font(.custom("Poppins-SemiBold", size: 20))
-                        .foregroundColor(Color(hex: badge.level.color))
-                        .opacity(showTitle ? 1 : 0)
-                        .offset(y: showTitle ? 0 : 20)
-                }
-
-                // Description
-                Text(String(format: "achievement.tasks_completed".localized, badge.requirement, HabitBadge.habitDisplayName(badge.habitId)))
-                    .font(.custom("Poppins-Regular", size: 16))
-                    .foregroundColor(.white.opacity(0.8))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .opacity(showDescription ? 1 : 0)
-                    .offset(y: showDescription ? 0 : 20)
-
-                // Level indicator
-                HStack(spacing: 4) {
-                    ForEach(0..<badge.level.starCount, id: \.self) { _ in
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(Color(hex: badge.level.color))
-                    }
-                }
-                .opacity(showDescription ? 1 : 0)
-
-                Spacer()
-
-                // Continue button
-                Button(action: {
-                    withAnimation(.spring(response: 0.3)) {
-                        isPresented = false
-                    }
-                }) {
-                    Text("common.continue".localized)
-                        .font(.custom("Poppins-SemiBold", size: 18))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
-                        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                }
-                .buttonStyle(.glassPrimary(tint: Color(hex: "9333EA"), cornerRadius: 20))
-                .padding(.horizontal, 40)
-                .padding(.bottom, 40)
-                .opacity(showDescription ? 1 : 0)
-            }
+            card
+                .padding(.horizontal, 22)
+                .scaleEffect(appeared ? 1 : 0.94)
+                .opacity(appeared ? 1 : 0)
         }
         .onAppear {
-            // Haptic feedback
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-
-            // Sequence of animations
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
-                showBadge = true
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.easeOut(duration: 0.4)) {
-                    showTitle = true
-                }
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation(.easeOut(duration: 0.4)) {
-                    showDescription = true
-                }
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                showConfetti = true
-            }
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { appeared = true }
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.65).delay(0.15)) { showBadge = true }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityAddTraits(.isModal)
+    }
+
+    /// Same layout as AchievementCelebrationView: title row, the badge beside its name, Continue.
+    private var card: some View {
+        VStack(spacing: 18) {
+            HStack {
+                Text("achievement.badge_unlocked".localized)
+                    .font(.faroSemiBold(19))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer()
+            }
+
+            HStack(spacing: 16) {
+                BadgeOctagonMark(
+                    icon: HabitBadge.habitIcon(badge.habitId),
+                    number: nil,
+                    isUnlocked: true,
+                    accent: Color(hex: badge.level.color),
+                    size: 84,
+                    assetName: badge.badgeAssetName
+                )
+                .shadow(color: Color(hex: badge.level.color).opacity(0.35), radius: 16, y: 6)
+                .scaleEffect(showBadge ? 1 : 0.5)
+                .opacity(showBadge ? 1 : 0)
+                .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(badge.level.displayName)
+                            .font(Font.Poppins.custom(.semiBold, size: 13))
+                        HStack(spacing: 2) {
+                            ForEach(0..<badge.level.starCount, id: \.self) { _ in
+                                Image(systemName: "star.fill").font(.system(size: 10))
+                            }
+                        }
+                    }
+                    .foregroundStyle(Color(hex: badge.level.color))
+                    Text(HabitBadge.habitDisplayName(badge.habitId))
+                        .font(.faroBold(26))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Text(String(format: "achievement.tasks_completed".localized, badge.requirement, HabitBadge.habitDisplayName(badge.habitId)))
+                        .font(Font.Poppins.custom(.regular, size: 14))
+                        .foregroundStyle(.white.opacity(0.65))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+
+            Button {
+                HapticManager.light()
+                withAnimation(.spring(response: 0.3)) { isPresented = false }
+            } label: {
+                Text("common.continue".localized)
+                    .font(Font.Poppins.custom(.semiBold, size: 16))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.glassPrimary(tint: Color(hex: "9333EA")))
+            .padding(.top, 2)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 20)
+        .frame(maxWidth: 400)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color(hex: "1A1030"))
+                .shadow(color: .black.opacity(0.34), radius: 20, y: 12)
+        )
     }
 }
 
