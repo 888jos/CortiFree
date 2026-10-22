@@ -4679,6 +4679,10 @@
 "profile.v2.more.share_message" = "스트레스를 줄이려고 CortiFree를 써요. 한번 써 봐요:";
 
 /* Celebrations */
+"celebration.streak.week_title" = "이번 주 리듬";
+"celebration.streak.plus_one" = "+1 연속";
+"celebration.streak.unit_one" = "일 연속";
+"celebration.streak.unit_other" = "일 연속";
 "celebration.streak.title_first" = "연속 기록 시작!";
 "celebration.streak.title" = "%d일 연속";
 "celebration.streak.subtitle" = "오늘의 첫 운동 완료";

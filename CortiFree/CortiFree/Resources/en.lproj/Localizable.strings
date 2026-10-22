@@ -4672,6 +4672,10 @@
 "profile.v2.more.share_message" = "I use CortiFree to ease my stress, give it a try:";
 
 /* Celebrations */
+"celebration.streak.week_title" = "Your weekly rhythm";
+"celebration.streak.plus_one" = "+1 streak";
+"celebration.streak.unit_one" = "day streak";
+"celebration.streak.unit_other" = "day streak";
 "celebration.streak.title_first" = "Streak started!";
 "celebration.streak.title" = "%d days in a row";
 "celebration.streak.subtitle" = "First exercise of the day done";

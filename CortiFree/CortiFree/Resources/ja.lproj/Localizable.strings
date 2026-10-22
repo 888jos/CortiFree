@@ -4679,6 +4679,10 @@
 "profile.v2.more.share_message" = "ストレスを和らげるためにCortiFreeを使っています。試してみて：";
 
 /* Celebrations */
+"celebration.streak.week_title" = "今週のリズム";
+"celebration.streak.plus_one" = "+1 連続";
+"celebration.streak.unit_one" = "日連続";
+"celebration.streak.unit_other" = "日連続";
 "celebration.streak.title_first" = "連続記録スタート！";
 "celebration.streak.title" = "%d日連続";
 "celebration.streak.subtitle" = "今日最初のエクササイズを完了";

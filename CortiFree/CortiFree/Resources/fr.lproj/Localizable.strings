@@ -4675,6 +4675,10 @@
 "profile.v2.more.share_message" = "J'utilise CortiFree pour apaiser mon stress, essaie-le :";
 
 /* Celebrations */
+"celebration.streak.week_title" = "Ton rythme de la semaine";
+"celebration.streak.plus_one" = "+1 série";
+"celebration.streak.unit_one" = "jour de série";
+"celebration.streak.unit_other" = "jours de série";
 "celebration.streak.title_first" = "Série lancée !";
 "celebration.streak.title" = "%d jours de suite";
 "celebration.streak.subtitle" = "Premier exercice du jour validé";

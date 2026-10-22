@@ -4672,6 +4672,10 @@
 "profile.v2.more.share_message" = "Ich nutze CortiFree gegen Stress, probier es aus:";
 
 /* Celebrations */
+"celebration.streak.week_title" = "Dein Wochenrhythmus";
+"celebration.streak.plus_one" = "+1 Serie";
+"celebration.streak.unit_one" = "Tag in Folge";
+"celebration.streak.unit_other" = "Tage in Folge";
 "celebration.streak.title_first" = "Serie gestartet!";
 "celebration.streak.title" = "%d Tage in Folge";
 "celebration.streak.subtitle" = "Erste Übung des Tages erledigt";
