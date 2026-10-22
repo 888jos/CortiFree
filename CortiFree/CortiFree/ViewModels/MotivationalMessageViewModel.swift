@@ -73,6 +73,7 @@ class MotivationalMessageViewModel: ObservableObject {
             return localizedTitle
                 .replacingOccurrences(of: "\n%@", with: "")
                 .replacingOccurrences(of: "%@", with: "")
+                .trimmingCharacters(in: CharacterSet(charactersIn: " ,、"))
         }
         // A first name up to 14 letters stays on the greeting's line; a longer one gets its own line.
         guard firstName.count <= 14 else { return String(format: localizedTitle, firstName) }

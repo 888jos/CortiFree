@@ -18,7 +18,6 @@ struct ContentView: View {
     @State private var scrollTimer: Timer?
     @State private var isAssistantPresented = false
     @State private var assistantPulse = false
-    @State private var showAntiStress = false
     @ObservedObject private var bilanCenter = PlanBilanCenter.shared
 
     private var isMiniPlayerVisible: Bool {
@@ -77,19 +76,6 @@ struct ContentView: View {
                     .allowsHitTesting(!(isScrolling || isEditingPlan))
                     .animation(.easeInOut(duration: 0.2), value: isEditingPlan)
                 }
-                // Home: the anti-stress button stays reachable above the tab bar, left of Milo.
-                .overlay(alignment: .topLeading) {
-                    if selectedTab == .home {
-                        PinnedAntiStressButton {
-                            HapticManager.medium()
-                            showAntiStress = true
-                        }
-                        .padding(.leading, 24)
-                        .padding(.trailing, 122)
-                        .offset(y: isMiniPlayerVisible ? -171 : -83)
-                        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: isMiniPlayerVisible)
-                    }
-                }
                 .offset(y: isScrolling ? 100 : 0)
                 .animation(.easeInOut(duration: 0.3), value: isScrolling)
 
@@ -109,9 +95,6 @@ struct ContentView: View {
         .overlay(alignment: .top) { CelebrationHost() }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: sessionPlayer.currentSession?.id)
         .ignoresSafeArea(.keyboard)
-        .fullScreenCover(isPresented: $showAntiStress) {
-            AntiStressSituationView()
-        }
         // « Ton bilan des 28 jours », once per cycle (day 28, or the first days of the next cycle).
         .fullScreenCover(item: $bilanCenter.request) { request in
             PlanBilanView(request: request)
@@ -315,35 +298,4 @@ struct TabBarButton: View {
 
 #Preview {
     ContentView()
-}
-
-/// The violet anti-stress button pinned above the tab bar on Home.
-private struct PinnedAntiStressButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        ZStack {
-            Ellipse()
-                .fill(Color(hex: "9333EA").opacity(0.25))
-                .frame(maxHeight: 40)
-                .blur(radius: 28)
-                .offset(y: 16)
-
-            Button(action: action) {
-                HStack(spacing: 10) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 18))
-                    Text(LanguageManager.shared.localizedString(for: StringKeys.Home.antiStressButton))
-                        .font(.custom("Poppins-SemiBold", size: 16))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 14)
-                .frame(maxWidth: .infinity, minHeight: 54)
-                .contentShape(Capsule())
-            }
-            .buttonStyle(.glassPrimary(tint: Color(hex: "9333EA")))
-        }
-    }
 }

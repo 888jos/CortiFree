@@ -137,6 +137,10 @@ struct HomeView: View {
                                     .padding(.top, 20)
                                     .offset(y: scrollOffset * 0.6)
 
+                                // Anti-Stress Button
+                                antiStressButton
+                                    .padding(.top, 20)
+
 
                                 if showCheckInCard {
                                     dailyCheckInCard
@@ -229,7 +233,7 @@ struct HomeView: View {
                                 .padding(.top, 24)
                                 #endif
 
-                                Spacer(minLength: 210)
+                                Spacer(minLength: 150)
                             }
                             .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
                                 handleScroll(offset: value)
@@ -594,6 +598,39 @@ struct HomeView: View {
         withAnimation(.easeInOut(duration: 0.25)) {
             showCheckInCard = DailyCheckInService.shared.shouldShowHomeCard()
         }
+    }
+
+    // MARK: - Anti-Stress Button
+
+    private var antiStressButton: some View {
+        ZStack {
+            // Background violet glow
+            Ellipse()
+                .fill(Color(hex: "9333EA").opacity(0.25))
+                .frame(maxHeight: 40)
+                .blur(radius: 28)
+                .offset(y: 16)
+
+            Button(action: {
+                HapticManager.medium()
+                viewModel.triggerAntiStress()
+            }) {
+                HStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.white)
+
+                    Text(LanguageManager.shared.localizedString(for: StringKeys.Home.antiStressButton))
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity, minHeight: 54)
+                .contentShape(Capsule())
+            }
+            .buttonStyle(.glassPrimary(tint: Color(hex: "9333EA")))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, AppConstants.Layout.paddingLarge)
     }
 
     // MARK: - Program Start Date Initialization
