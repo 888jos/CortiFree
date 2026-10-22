@@ -942,6 +942,7 @@
 // MARK: - Avatar Progress Card
 "avatar.my_progress" = "나의 진행";
 "avatar.days" = "일";
+"avatar.cycle" = "사이클 %d";
 "avatar.motivation.0_10" = "모든 위대한 여정은 첫걸음에서 시작돼요!";
 "avatar.motivation.10_25" = "잘 가고 있어요, 계속 이렇게 해 봐요!";
 "avatar.motivation.25_50" = "벌써 %d%%나 왔어요!";

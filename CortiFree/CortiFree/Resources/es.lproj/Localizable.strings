@@ -942,6 +942,7 @@
 // MARK: - Avatar Progress Card
 "avatar.my_progress" = "Mi progreso";
 "avatar.days" = "días";
+"avatar.cycle" = "Ciclo %d";
 "avatar.motivation.0_10" = "¡Cada gran viaje comienza con un primer paso!";
 "avatar.motivation.10_25" = "¡Estás en el camino correcto, sigue así!";
 "avatar.motivation.25_50" = "¡Ya has recorrido el %d%% del camino!";

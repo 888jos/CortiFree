@@ -942,6 +942,7 @@
 // MARK: - Avatar Progress Card
 "avatar.my_progress" = "わたしの進捗";
 "avatar.days" = "日";
+"avatar.cycle" = "サイクル%d";
 "avatar.motivation.0_10" = "どんな大きな旅も、最初の一歩から始まります！";
 "avatar.motivation.10_25" = "順調です。この調子で続けましょう！";
 "avatar.motivation.25_50" = "もう全体の%d%%を達成しました！";
