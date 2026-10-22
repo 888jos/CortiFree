@@ -34,6 +34,15 @@
 				<string>C617.1</string>
 			</array>
 		</dict>
+		<dict>
+			<!-- MiloDictation reads UITextInputMode.activeInputModes to dictate in the language of the person's keyboard -->
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryActiveKeyboards</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>54BD.1</string>
+			</array>
+		</dict>
 	</array>
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array>

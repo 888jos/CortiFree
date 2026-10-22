@@ -13,7 +13,6 @@ struct CortiFreeWidgetBundle: WidgetBundle {
     var body: some Widget {
         CortiFreeWidget()
         LockScreenWidget()
-        CortiFreeWidgetControl()
         CortiFreeWidgetLiveActivity()
         CortiFreeInsightsWidgets().body
     }
