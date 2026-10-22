@@ -2,9 +2,8 @@
 //  AchievementCelebrationView.swift
 //  CortiFree
 //
-//  Achievement unlocked: a medal card centered over a dimmed backdrop, in a warm gold
-//  palette (not the lavender used everywhere else). Slow light rays turn behind the
-//  medal, a single shine crosses it, full-screen confetti falls behind the card.
+//  Achievement unlocked: a compact card with the streak card's specs over the lightly
+//  blurred app. The gold medal flips in with a single shine, confetti falls behind.
 //
 
 import SwiftUI
@@ -16,7 +15,6 @@ struct AchievementCelebrationView: View {
     @State private var appeared = false
     @State private var medalIn = false
     @State private var shine = false
-    @State private var raysAngle: Double = 0
 
     static let gold = Color(hex: "F6C453")
     static let goldDeep = Color(hex: "C98A1B")
@@ -24,125 +22,100 @@ struct AchievementCelebrationView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(appeared ? 0.6 : 0)
+            // Same backdrop as the streak card: the app stays visible, slightly blurred.
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .opacity(appeared ? 0.55 : 0)
                 .ignoresSafeArea()
 
             FullScreenConfetti()
 
             card
-                .padding(.horizontal, 24)
-                .scaleEffect(appeared ? 1 : 0.88)
+                .padding(.horizontal, 22)
+                .scaleEffect(appeared ? 1 : 0.94)
                 .opacity(appeared ? 1 : 0)
         }
         .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { appeared = true }
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.6).delay(0.15)) { medalIn = true }
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { appeared = true }
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.65).delay(0.15)) { medalIn = true }
             withAnimation(.easeInOut(duration: 1.1).delay(0.7)) { shine = true }
-            withAnimation(.linear(duration: 24).repeatForever(autoreverses: false)) { raysAngle = 360 }
         }
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isModal)
     }
 
+    /// Same specs as the streak card (StreakCelebrationCard): dark violet panel, 24 pt corners,
+    /// a title row with the pill, then the content.
     private var card: some View {
-        VStack(spacing: 0) {
-            medal
-                .padding(.top, 8)
-                .padding(.bottom, 22)
+        VStack(spacing: 18) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("achievement.unlocked".localized)
+                    .font(.faroSemiBold(19))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer()
+            }
 
-            Text("achievement.unlocked".localized)
-                .font(Font.Poppins.custom(.semiBold, size: 12))
-                .tracking(1.6)
-                .textCase(.uppercase)
-                .foregroundStyle(Self.gold)
-                .padding(.bottom, 8)
-
-            Text(achievement.title)
-                .font(.faroBold(28))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.bottom, 8)
-
-            Text(achievement.description)
-                .font(Font.Poppins.custom(.regular, size: 15))
-                .foregroundStyle(.white.opacity(0.68))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 8)
-                .padding(.bottom, 26)
+            HStack(spacing: 16) {
+                medal
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(achievement.title)
+                        .font(.faroBold(26))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(achievement.description)
+                        .font(Font.Poppins.custom(.regular, size: 14))
+                        .foregroundStyle(.white.opacity(0.65))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
 
             Button {
                 HapticManager.light()
                 onContinue()
             } label: {
                 Text("common.continue".localized)
-                    .font(Font.Poppins.custom(.semiBold, size: 17))
-                    .foregroundStyle(Color(hex: "2A1A05"))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 54)
-                    .background(Capsule().fill(LinearGradient(colors: [Self.goldLight, Self.gold],
-                                                              startPoint: .top, endPoint: .bottom)))
-                    .shadow(color: Self.gold.opacity(0.35), radius: 14, y: 6)
+                    .font(Font.Poppins.custom(.semiBold, size: 16))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .contentShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.glassPrimary(tint: Color(hex: "9333EA")))
+            .padding(.top, 2)
 
             ShareLink(item: String(format: "celebration.milestone.share_text".localized, achievement.title)) {
                 Label("celebration.milestone.share".localized, systemImage: "square.and.arrow.up")
-                    .font(Font.Poppins.custom(.medium, size: 15))
-                    .foregroundStyle(.white.opacity(0.7))
-                    .frame(height: 40)
+                    .font(Font.Poppins.custom(.medium, size: 14))
+                    .foregroundStyle(.white.opacity(0.6))
             }
-            .padding(.top, 6)
+            .padding(.top, -4)
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 26)
-        .padding(.bottom, 14)
-        .frame(maxWidth: 380)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 20)
+        .frame(maxWidth: 400)
         .background(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .fill(LinearGradient(colors: [Color(hex: "2B1A3F"), Color(hex: "150D22")],
-                                     startPoint: .top, endPoint: .bottom))
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color(hex: "1A1030"))
+                .shadow(color: .black.opacity(0.34), radius: 20, y: 12)
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .strokeBorder(LinearGradient(colors: [Self.gold.opacity(0.45), .white.opacity(0.04)],
-                                             startPoint: .top, endPoint: .bottom), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.5), radius: 34, y: 18)
     }
 
     // MARK: - Medal
 
     private var medal: some View {
-        ZStack {
-            // Slow turning light rays
-            ForEach(0..<12, id: \.self) { index in
-                Capsule()
-                    .fill(LinearGradient(colors: [Self.gold.opacity(0.32), .clear], startPoint: .bottom, endPoint: .top))
-                    .frame(width: 10, height: 96)
-                    .offset(y: -78)
-                    .rotationEffect(.degrees(Double(index) * 30))
-            }
-            .rotationEffect(.degrees(raysAngle))
-            .opacity(medalIn ? 1 : 0)
-
-            Circle()
-                .fill(RadialGradient(colors: [Self.gold.opacity(0.45), .clear], center: .center, startRadius: 4, endRadius: 90))
-                .frame(width: 180, height: 180)
-
-            Circle()
-                .fill(LinearGradient(colors: [Self.goldLight, Self.gold, Self.goldDeep], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .frame(width: 124, height: 124)
-                .overlay(Circle().strokeBorder(.white.opacity(0.55), lineWidth: 2).padding(5))
-                .overlay(artwork)
-                .overlay(shineSweep.clipShape(Circle()))
-                .shadow(color: Self.goldDeep.opacity(0.6), radius: 18, y: 8)
-                .scaleEffect(medalIn ? 1 : 0.4)
-                .rotation3DEffect(.degrees(medalIn ? 0 : -90), axis: (x: 0, y: 1, z: 0))
-        }
-        .frame(height: 190)
-        .accessibilityHidden(true)
+        Circle()
+            .fill(LinearGradient(colors: [Self.goldLight, Self.gold, Self.goldDeep], startPoint: .topLeading, endPoint: .bottomTrailing))
+            .frame(width: 84, height: 84)
+            .overlay(Circle().strokeBorder(.white.opacity(0.5), lineWidth: 1.5).padding(4))
+            .overlay(artwork)
+            .overlay(shineSweep.clipShape(Circle()))
+            .shadow(color: Self.gold.opacity(0.35), radius: 16, y: 6)
+            .scaleEffect(medalIn ? 1 : 0.5)
+            .rotation3DEffect(.degrees(medalIn ? 0 : -90), axis: (x: 0, y: 1, z: 0))
+            .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -151,10 +124,10 @@ struct AchievementCelebrationView: View {
             Image(name)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 92, height: 92)
+                .frame(width: 62, height: 62)
         } else {
             Image(systemName: achievement.icon)
-                .font(.system(size: 50, weight: .semibold))
+                .font(.system(size: 34, weight: .semibold))
                 .foregroundStyle(Color(hex: "5A3A06"))
         }
     }

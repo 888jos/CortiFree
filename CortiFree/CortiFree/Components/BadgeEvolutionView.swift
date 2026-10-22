@@ -120,7 +120,7 @@ struct BadgeEvolutionView: View {
                         .padding(.vertical, 18)
                         .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 }
-                .buttonStyle(.glassPrimary(tint: Color(hex: badge.level.color), cornerRadius: 20))
+                .buttonStyle(.glassPrimary(tint: Color(hex: "9333EA"), cornerRadius: 20))
                 .padding(.horizontal, 40)
                 .padding(.bottom, 40)
                 .opacity(showDescription ? 1 : 0)
