@@ -171,6 +171,26 @@ class AnalyticsManager {
         AmplitudeManager.shared.setUserProperties(["onboarding_path": path, "onboarding_ai_app": aiApp ?? "none"])
     }
 
+    private let onboardingStartKey = "analytics.onboarding_started_at"
+
+    /// First onboarding screen of this run (kept across app kills, cleared at completion).
+    func markOnboardingStarted() {
+        guard UserDefaults.standard.object(forKey: onboardingStartKey) == nil else { return }
+        UserDefaults.standard.set(Date(), forKey: onboardingStartKey)
+    }
+
+    /// Seconds since markOnboardingStarted, nil when unknown.
+    var onboardingElapsed: Double? {
+        (UserDefaults.standard.object(forKey: onboardingStartKey) as? Date).map { Date().timeIntervalSince($0) }
+    }
+
+    /// The app left during the onboarding: the screen it was on, to see where each path drops off.
+    func trackOnboardingBackgrounded(screenName: String) {
+        var properties: [String: Any] = ["screen_name": screenName, "onboarding_path": onboardingPath]
+        if let elapsed = onboardingElapsed { properties["time_in_onboarding"] = elapsed }
+        track(event: "onboarding_backgrounded", properties: properties)
+    }
+
     func trackOnboardingScreenViewed(screenName: String, stepNumber: Int, totalSteps: Int, version: String) {
         track(event: "onboarding_screen_viewed", properties: [
             "screen_name": screenName,
@@ -513,7 +533,8 @@ class AnalyticsManager {
         gender: String? = nil
     ) {
         var properties: [String: Any] = [:]
-        if let totalTime { properties["total_time_seconds"] = totalTime }
+        if let total = totalTime ?? onboardingElapsed { properties["total_time_seconds"] = total }
+        UserDefaults.standard.removeObject(forKey: onboardingStartKey)
         if let selectedGoalsCount { properties["selected_goals_count"] = selectedGoalsCount }
         if let notificationsEnabled { properties["notifications_enabled"] = notificationsEnabled }
         if let userId { properties["user_id"] = userId }

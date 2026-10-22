@@ -193,7 +193,11 @@ class RevenueCatManager: ObservableObject {
         }
         guard let previousState, previousState != state || previousRenew != pro?.willRenew else { return }
         let properties: [String: Any] = ["product_id": pro?.productIdentifier ?? "", "from": previousState, "to": state]
-        if previousState == "trial", state == "paid" {
+        if state == "trial", previousState != "trial" {
+            var started = properties
+            started["onboarding_path"] = AnalyticsManager.shared.onboardingPath
+            AnalyticsManager.shared.track(event: "trial_started", properties: started)
+        } else if previousState == "trial", state == "paid" {
             AnalyticsManager.shared.track(event: "trial_converted", properties: properties)
         } else if (previousState == "trial" || previousState == "paid" || previousState == "intro"), state == "expired" {
             AnalyticsManager.shared.track(event: previousState == "trial" ? "trial_expired" : "subscription_expired", properties: properties)

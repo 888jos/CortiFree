@@ -705,13 +705,35 @@
       ),
       dailyCard,
       el("div", { class: "grid two" }, pathCompareCard(range), aiPathCard(range)),
-      aiAppCard(range),
+      onboardingTimeCard(range),
+      el("div", { class: "grid two" }, aiAppCard(range), aiReplyCard(range)),
+      el("div", { class: "grid two" }, leftScreenCard(range), leftPathCard(range)),
     );
   }
 
+  const PATH_LABELS = { ai: "Mon IA répond", manual: "Je réponds moi-même", ai_to_manual: "IA puis à la main", undecided: "Avant le choix" };
+
+  /** Simple table of one event split by one of its properties (unique users). */
+  function eventSplitCard({ title, sub, event, prop, label, values = {}, empty }) {
+    return (range) => card({ title, sub, load: async (body) => {
+      const r = await api("/api/breakdown", { event, prop, m: "uniques", i: 30, limit: 20, ...rp(range) });
+      const rows = (r.rows || []).filter((x) => x.value && x.value !== "(none)");
+      if (r.missing || !rows.length) { body.replaceChildren(emptyBox(empty || "Pas encore de données", [event])); return; }
+      const total = rows.reduce((t, x) => t + x.total, 0);
+      body.replaceChildren(table([{ label }, { label: "Utilisateurs", num: true }],
+        rows.map((x) => [values[x.value] || values[x.value.toLowerCase()] || x.value, `${fmtNum(x.total)} · ${fmtPct(total ? x.total / total : null, 0)}`]), { maxHeight: 360 }));
+    }, skeletonKind: "lines" });
+  }
+
+  const aiReplyCard = eventSplitCard({ title: "Réponse de l'IA exploitable ?", sub: "onboarding_ai_quiz_pasted par success (plan trouvé dans la réponse collée)",
+    event: "onboarding_ai_quiz_pasted", prop: "success", label: "Plan trouvé", values: { true: "Oui", false: "Non (l'IA n'a pas suivi le format)" } });
+  const leftScreenCard = eventSplitCard({ title: "Écran quitté", sub: "onboarding_backgrounded : l'app passe en arrière-plan pendant l'onboarding, par écran",
+    event: "onboarding_backgrounded", prop: "screen_name", label: "Écran", empty: "Envoyé par la prochaine build" });
+  const leftPathCard = eventSplitCard({ title: "Sorties de l'app par parcours", sub: "onboarding_backgrounded par onboarding_path (sortir vers son IA est normal sur le parcours IA)",
+    event: "onboarding_backgrounded", prop: "onboarding_path", label: "Parcours", values: PATH_LABELS, empty: "Envoyé par la prochaine build" });
+
   // AI vs manual quiz. The app sends onboarding_path (« ai », « manual », « ai_to_manual ») as a user
   // property from the quiz choice on, so the whole funnel down to the purchase splits by path.
-  const PATH_LABELS = { ai: "Mon IA répond", manual: "Je réponds moi-même", ai_to_manual: "IA puis à la main", undecided: "Avant le choix" };
   function pathCompareCard(range) {
     const steps = [
       { event_type: "onboarding_quiz_mode_selected", label: "Choix du quiz" },
@@ -731,6 +753,20 @@
       const rows = segments.map((sg) => [PATH_LABELS[sg.value] || sg.value,
         fmtNum(sg.counts[0]), ...sg.counts.slice(1).map((c) => `${fmtPct(sg.counts[0] ? c / sg.counts[0] : null, 0)} (${fmtNum(c)})`)]);
       body.replaceChildren(table(headers, rows));
+    }, skeletonKind: "lines" });
+  }
+
+  /** Average onboarding time per path: sum of total_time_seconds ÷ onboarding_completed count. */
+  function onboardingTimeCard(range) {
+    return card({ title: "Temps pour finir l'onboarding", sub: "Moyenne de total_time_seconds sur onboarding_completed, par parcours (du premier écran à la fin, même si l'app a été fermée entre-temps)", load: async (body) => {
+      const counts = await api("/api/breakdown", { event: "onboarding_completed", prop: "onboarding_path", m: "totals", i: 30, limit: 10, ...rp(range) }).catch(() => null);
+      const rows = (counts && counts.rows || []).filter((x) => x.value && x.value !== "(none)");
+      if (!rows.length) { body.replaceChildren(emptyBox("Envoyé par la prochaine build", ["onboarding_completed"])); return; }
+      const sums = await Promise.all(rows.map((x) => api("/api/sums", { event: "onboarding_completed", prop: "total_time_seconds", i: 30,
+        filters: [{ subprop_type: "event", subprop_key: "onboarding_path", subprop_op: "is", subprop_value: [x.value] }], ...rp(range) }).catch(() => null)));
+      const sumOf = Object.fromEntries(rows.map((x, i) => [x.value, sums[i] && !sums[i].missing ? sums[i].total : null]));
+      body.replaceChildren(table([{ label: "Parcours" }, { label: "Onboardings finis", num: true }, { label: "Temps moyen", num: true }],
+        rows.map((x) => [PATH_LABELS[x.value] || x.value, fmtNum(x.total), sumOf[x.value] != null && x.total ? fmtDur(sumOf[x.value] / x.total * 1000) : "—"])));
     }, skeletonKind: "lines" });
   }
 

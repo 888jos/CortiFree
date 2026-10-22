@@ -160,6 +160,7 @@ struct OnboardingV2FlowView: View {
         .animation(.easeInOut(duration: 0.3), value: currentStep)
         .onAppear {
             // Track onboarding start time
+            AnalyticsManager.shared.markOnboardingStarted()
             if onboardingStartTime == nil {
                 onboardingStartTime = Date()
             }
@@ -184,6 +185,9 @@ struct OnboardingV2FlowView: View {
             trackOnboardingScreen(newStep)
         }
         .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background, !isOnboardingComplete {
+                AnalyticsManager.shared.trackOnboardingBackgrounded(screenName: currentStep.rawValue)
+            }
             if newPhase == .inactive || newPhase == .background {
                 startDropOffLiveActivity()
             }

@@ -374,6 +374,8 @@ def api_sums(query):
     if not is_available(event, known_events(refresh)):
         return {"missing": True, "xValues": [], "series": [], "total": 0}
     spec = {"event_type": event, "group_by": [{"type": "event", "value": prop}]}
+    if query.get("filters"):
+        spec["filters"] = json.loads(query["filters"])
     params = {"e": json.dumps(spec, separators=(",", ":")), "start": start, "end": end, "m": "sums", "i": query.get("i", "1")}
     try:
         data = amplitude_get("/api/2/events/segmentation", params, refresh).get("data", {})
