@@ -454,6 +454,13 @@ struct CortiFreeApp: App {
             .onChange(of: authViewModel.isAuthenticated) { _, isAuthenticated in
                 if isAuthenticated { presentDailyCheckInIfNeeded() }
             }
+            // Access known or back (purchase, restore): the day's drawers; access lost: close them.
+            .onReceive(RevenueCatManager.shared.$hasPremiumEntitlement
+                .combineLatest(RevenueCatManager.shared.$isPremiumStatusReady)
+                .map { $0 && $1 }
+                .removeDuplicates()) { hasAccess in
+                if hasAccess { presentDailyCheckInIfNeeded() } else { checkIn = nil }
+            }
             .sheet(item: $checkIn, onDismiss: presentNextDrawer) { drawer in
                 Group {
                     switch drawer {
@@ -502,7 +509,7 @@ struct CortiFreeApp: App {
     /// First app open of the day: the daily check-in drawer, then the meditation of the day
     /// (first week only), then the weekly drawer when due. Each opens when the previous closes.
     private func presentDailyCheckInIfNeeded() {
-        guard checkIn == nil, !TrialKickoff.isPending else { return }
+        guard checkIn == nil, !TrialKickoff.isPending, Self.hasAccess else { return }
         #if DEBUG
         if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_DAILY_CHECKIN"] == "1" {
             checkIn = .daily(DailyCheckInService.shared.pendingDay() ?? Date())
@@ -572,11 +579,19 @@ struct CortiFreeApp: App {
         open(.weekly, delayed: true)
     }
 
+    /// The drawers only open over the app itself: never over the locked screen (trial expired,
+    /// subscription lost) nor before the subscription status is known.
+    private static var hasAccess: Bool {
+        let revenueCat = RevenueCatManager.shared
+        return revenueCat.isPremiumStatusReady && revenueCat.hasPremiumEntitlement
+    }
+
     private func open(_ drawer: CheckInDrawer, delayed: Bool) {
+        guard Self.hasAccess else { return }
         guard delayed else { checkIn = drawer; return }
         // Let the previous drawer finish closing before opening the next one.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            if checkIn == nil { checkIn = drawer }
+            if checkIn == nil, Self.hasAccess { checkIn = drawer }
         }
     }
 
