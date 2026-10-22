@@ -17,11 +17,32 @@ import os
 final class TesterAccess: ObservableObject {
     static let shared = TesterAccess()
 
+    /// Debug tools shown right now: a tester, and not in video mode.
     @Published private(set) var isEnabled: Bool {
         didSet {
             let value = isEnabled
             Self.state.withLock { $0 = value }
         }
+    }
+
+    /// This build may show the debug tools (DEBUG or run from Xcode), video mode or not.
+    @Published private(set) var isTester: Bool {
+        didSet { refresh() }
+    }
+
+    /// « Mode vidéo »: hides every debug tool (Home buttons, onboarding skip buttons, Settings debug
+    /// section…) so creators can film the app as users see it. Kept across launches.
+    @Published var videoMode: Bool = UserDefaults.standard.bool(forKey: TesterAccess.videoModeKey) {
+        didSet {
+            UserDefaults.standard.set(videoMode, forKey: Self.videoModeKey)
+            refresh()
+        }
+    }
+
+    private static let videoModeKey = "tester.video_mode"
+
+    private func refresh() {
+        isEnabled = isTester && !videoMode
     }
 
     /// Same value as `isEnabled`, readable from any thread (non-view code).
@@ -39,10 +60,14 @@ final class TesterAccess: ObservableObject {
 
     private init() {
         #if DEBUG
-        isEnabled = true
+        let tester = true
         #else
-        isEnabled = false
+        let tester = false
         #endif
+        let enabled = tester && !UserDefaults.standard.bool(forKey: Self.videoModeKey)
+        isTester = tester
+        isEnabled = enabled
+        Self.state.withLock { $0 = enabled }
     }
 
     /// Release only: unlocks for TestFlight / Xcode builds. Called once at launch.
@@ -54,7 +79,7 @@ final class TesterAccess: ObservableObject {
               case .verified(let transaction) = result else { return }
         // Not .sandbox: App Review installs builds in the sandbox environment too, and must
         // never see the tester tools (onboarding skip, debug buttons). TestFlight builds stay locked.
-        if transaction.environment == .xcode { isEnabled = true }
+        if transaction.environment == .xcode { isTester = true }
         #endif
     }
 }
