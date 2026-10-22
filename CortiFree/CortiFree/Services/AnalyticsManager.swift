@@ -899,7 +899,59 @@ class AnalyticsManager {
         AmplitudeManager.shared.setUserProperties([name: value])
     }
 
+    // MARK: - Exercises done (to compare trials that cancel, convert or expire)
+
+    /// Finished practice: exercise_completed (ExerciseSessionRecorder, one per session, by category)
+    /// and the anti-stress flow, which doesn't go through the recorder.
+    private static func exerciseKind(_ event: String, _ properties: [String: any Any]?) -> String? {
+        switch event {
+        case "exercise_completed": return properties?["category"] as? String ?? "other"
+        case "anti_stress_session_completed": return "anti_stress"
+        default: return nil
+        }
+    }
+    /// Subscription moments that carry how much the person practised before.
+    private static let subscriptionEvents: Set<String> = [
+        "trial_started", "trial_converted", "trial_expired", "subscription_expired",
+        "subscription_auto_renew_off", "subscription_auto_renew_on", "subscription_purchased",
+    ]
+    private let exercisesKey = "analytics.exercises_completed"
+
+    private var exercisesCompleted: Int { UserDefaults.standard.integer(forKey: exercisesKey) }
+
+    static func exercisesBucket(_ count: Int) -> String {
+        switch count {
+        case 0: return "0"
+        case 1...2: return "1-2"
+        case 3...5: return "3-5"
+        case 6...10: return "6-10"
+        default: return "11+"
+        }
+    }
+
+    private func countExercise(_ kind: String) {
+        let defaults = UserDefaults.standard
+        let total = exercisesCompleted + 1
+        let kindKey = "\(exercisesKey).\(kind)"
+        let kindTotal = defaults.integer(forKey: kindKey) + 1
+        defaults.set(total, forKey: exercisesKey)
+        defaults.set(kindTotal, forKey: kindKey)
+        AmplitudeManager.shared.setUserProperties([
+            "exercises_completed": total,
+            "exercises_bucket": Self.exercisesBucket(total),
+            "exercises_\(kind)": kindTotal,
+        ])
+    }
+
     func track(event: String, properties: [String: any Any]? = nil) {
+        var properties = properties
+        if let kind = Self.exerciseKind(event, properties) { countExercise(kind) }
+        if Self.subscriptionEvents.contains(event) {
+            var extra = properties ?? [:]
+            extra["exercises_completed"] = exercisesCompleted
+            extra["exercises_bucket"] = Self.exercisesBucket(exercisesCompleted)
+            properties = extra
+        }
         // Keep all existing event calls on the single Amplitude destination.
         AmplitudeManager.shared.track(event: event, properties: properties.map { Dictionary(uniqueKeysWithValues: $0.map { ($0.key, $0.value) }) })
 

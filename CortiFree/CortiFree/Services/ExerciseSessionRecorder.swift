@@ -14,6 +14,13 @@ final class ExerciseSessionRecorder {
             source: source,
             userID: userID
         ) else { return }
+        // One event for every finished practice (breathing, meditation, guided audio, sound…).
+        AnalyticsManager.shared.track(event: "exercise_completed", properties: [
+            "exercise_id": exerciseID,
+            "category": category.rawValue,
+            "duration_seconds": durationSeconds,
+            "source": source,
+        ])
         ProgressAnalyticsService.shared.invalidateDashboardCache()
         if category == .breathing || category == .meditation {
             Task { await HealthKitService.shared.saveMindfulSession(durationSeconds: durationSeconds) }

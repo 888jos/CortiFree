@@ -32,6 +32,7 @@
     engagement: { title: "Engagement & rétention", render: renderEngagement },
     notifications: { title: "Notifications", render: renderNotifications },
     checkin: { title: "Daily check-in", render: renderCheckIn },
+    exercises: { title: "Exercices & revenus", render: renderExercises },
     explorer: { title: "Explorateur d'événements", render: renderExplorer },
   };
 
@@ -1024,6 +1025,80 @@
       const c = el("div", { class: "chart" }); body.replaceChildren(c);
       hbarChart(c, rows.map((x) => x.value), [{ label: event, data: rows.map((x) => x.total), color: opts.color }]);
     } });
+  }
+
+  // ------------------------------------------------------------------ Exercises
+  // Practice done in the app, and how it relates to money. Every finished session sends
+  // exercise_completed (category, exercise_id, source); the app counts them and sends that count
+  // (exercises_completed, exercises_bucket) on trial_started / trial_converted / trial_expired /
+  // subscription_auto_renew_off…
+  function renderExercises(root, range) {
+    const DONE = "exercise_completed";
+    const CATS = [["Respirations", "breathing"], ["Méditations", "meditation"], ["Sons", "sounds"], ["Autres", "other"]];
+    const byCat = (c) => ({ event_type: DONE, filters: [{ subprop_type: "event", subprop_key: "category", subprop_op: "is", subprop_value: [c] }] });
+    const BUCKETS = ["0", "1-2", "3-5", "6-10", "11+"];
+    const trialOff = [{ subprop_type: "event", subprop_key: "period_type", subprop_op: "is", subprop_value: ["trial"] }];
+    const OUTCOMES = [
+      { label: "Essai converti", event: "trial_converted" },
+      { label: "Essai annulé", event: "subscription_auto_renew_off", filters: trialOff },
+      { label: "Essai expiré", event: "trial_expired" },
+    ];
+    const tile = (label, evs, m, i, note) => kpi(label, async () => {
+      const [a, b] = await metricWithPrev(evs, m, range);
+      if (a.missing) return { missing: true, missingEvents: evs };
+      return { value: a.total, prev: b.total, spark: a.series, note };
+    }, SERIES[i]);
+
+    const outcomeCard = card({ title: "Exercices faits avant la fin de l'essai", sub: "Pour chaque issue de l'essai : combien d'exercices la personne avait faits (exercises_bucket envoyé avec l'événement)", load: async (body) => {
+      const results = await Promise.all(OUTCOMES.map((o) => has(o.event)
+        ? api("/api/breakdown", { event: o.event, prop: "exercises_bucket", m: "uniques", i: 30, limit: 10, filters: o.filters, ...rp(range) }).catch(() => null) : null));
+      const sums = await Promise.all(OUTCOMES.map((o) => has(o.event)
+        ? api("/api/sums", { event: o.event, prop: "exercises_completed", i: 30, filters: o.filters, ...rp(range) }).catch(() => null) : null));
+      const counts = OUTCOMES.map((o, i) => Object.fromEntries(((results[i] && !results[i].missing && results[i].rows) || []).map((x) => [x.value, x.total])));
+      const totals = counts.map((c) => BUCKETS.reduce((t, b) => t + (c[b] || 0), 0));
+      if (!totals.some(Boolean)) {
+        body.replaceChildren(emptyBox("En attente de exercises_bucket", null, "Envoyé par la prochaine build de l'app avec trial_converted, trial_expired et subscription_auto_renew_off. Les essais déjà finis n'ont pas l'info."));
+        return;
+      }
+      const avg = OUTCOMES.map((o, i) => (sums[i] && !sums[i].missing && totals[i]) ? sums[i].total / totals[i] : null);
+      const headers = [{ label: "Exercices faits" }, ...OUTCOMES.map((o) => ({ label: o.label, num: true })), { label: "% d'annulation", num: true }];
+      const rows = BUCKETS.map((b) => {
+        const conv = counts[0][b] || 0, off = counts[1][b] || 0;
+        return [b, ...counts.map((c) => fmtNum(c[b] || 0)), conv + off ? fmtPct(off / (conv + off), 0) : "—"];
+      });
+      rows.push([el("strong", {}, "Moyenne"), ...avg.map((a) => a == null ? "—" : a.toFixed(1)), ""]);
+      body.replaceChildren(table(headers, rows),
+        el("p", { class: "muted" }, "% d'annulation = essais annulés ÷ (annulés + convertis) dans la tranche. Une personne qui annule puis laisse expirer apparaît dans les deux colonnes."));
+    }, skeletonKind: "lines" });
+
+    const segmentCard = card({ title: "Conversion selon l'usage", sub: "Propriété utilisateur exercises_bucket (valeur actuelle) · essai démarré → converti", load: async (body) => {
+      const r = await api("/api/icp", { prop: "exercises_bucket", steps: [{ event_type: "trial_started", label: "Essai" }, { event_type: "trial_converted", label: "Converti" }], ...rp(range) });
+      if (r.missing || !r.segments.length) { body.replaceChildren(emptyBox("En attente de exercises_bucket", null, "Envoyé par la prochaine build de l'app.")); return; }
+      const segs = r.segments.filter((sg) => sg.value !== "(none)").sort((a, b) => BUCKETS.indexOf(a.value) - BUCKETS.indexOf(b.value));
+      body.replaceChildren(table([{ label: "Exercices faits" }, ...r.steps.map((s) => ({ label: s, num: true }))],
+        segs.map((sg) => [sg.value, fmtNum(sg.counts[0]), ...sg.counts.slice(1).map((c) => `${fmtPct(sg.counts[0] ? c / sg.counts[0] : null, 0)} (${fmtNum(c)})`)])));
+    }, skeletonKind: "lines" });
+
+    const trendCard = card({ title: "Exercices terminés par jour", sub: `${DONE} par catégorie`, load: async (body) => {
+      if (!has(DONE)) { body.replaceChildren(emptyBox(null, [DONE])); return; }
+      const r = await api("/api/series", { events: CATS.map(([label, c]) => ({ ...byCat(c), label })), m: "totals", ...rp(range) });
+      const c = el("div", { class: "chart" }); body.replaceChildren(c);
+      lineChart(c, r.xValues, CATS.map(([label]) => ({ label, data: r.series[label] || [] })));
+    }, skeletonKind: "lines" });
+
+    root.append(
+      el("div", { class: "grid kpis" },
+        tile("Exercices terminés", [DONE], "totals", 0, "séances"),
+        tile("Personnes qui pratiquent", [DONE], "uniques", 2, "utilisateurs uniques"),
+        tile("Éléments du plan faits", ["plan_item_completed"], "totals", 4, "terminés")),
+      el("div", { class: "grid two" }, outcomeCard, segmentCard),
+      trendCard,
+      el("div", { class: "grid two" },
+        breakdownCard("Par catégorie", DONE, "category", range),
+        breakdownCard("Exercices les plus faits", DONE, "exercise_id", range, { limit: 15 }),
+        breakdownCard("D'où ils sont lancés", DONE, "source", range),
+        breakdownCard("Éléments du plan terminés", "plan_item_completed", null, range)),
+    );
   }
 
   // ------------------------------------------------------------------ ICP
