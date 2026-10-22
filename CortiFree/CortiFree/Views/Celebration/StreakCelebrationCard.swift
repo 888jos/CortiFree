@@ -2,7 +2,7 @@
 //  StreakCelebrationCard.swift
 //  CortiFree
 //
-//  First validated item of the day: a compact card over a lightly dimmed backdrop (same
+//  First validated item of the day: a compact card over the lightly blurred app (same
 //  layout as LifeQuest's streak increment). « Ton rythme de la semaine » with a « +1 série »
 //  pill, one flame per weekday (the previous days of the streak lit, today lighting up with
 //  a check), then the streak count.
@@ -28,7 +28,11 @@ struct StreakCelebrationCard: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(appeared ? 0.25 : 0)
+            // No dark veil: the app stays visible behind, just slightly blurred.
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .opacity(appeared ? 0.55 : 0)
                 .ignoresSafeArea()
 
             card

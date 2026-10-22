@@ -129,6 +129,13 @@ struct ContentView: View {
             PlanReminderScheduler.shared.start()
             PlanBilanCenter.shared.checkAfterLaunch(source: "app_open")
             if MiloImportCenter.shared.checkShareInbox() { openMilo() }
+            #if DEBUG
+            // Simulator checks of a celebration over the real app: CORTIFREE_DEMO_CELEBRATION=streak:5,
+            // day, achievement:streak_7, badge:breathing:1 or habit:breathing.
+            if let demo = ProcessInfo.processInfo.environment["CORTIFREE_DEMO_CELEBRATION"] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { Self.enqueueDemoCelebration(demo) }
+            }
+            #endif
             withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
                 assistantPulse = true
             }
@@ -299,3 +306,35 @@ struct TabBarButton: View {
 #Preview {
     ContentView()
 }
+
+#if DEBUG
+extension ContentView {
+    static func enqueueDemoCelebration(_ demo: String) {
+        let parts = demo.split(separator: ":").map(String.init)
+        switch parts.first {
+        case "streak":
+            CelebrationCenter.shared.enqueue(.streak(days: Int(parts.dropFirst().first ?? "") ?? 1))
+        case "day":
+            CelebrationCenter.shared.enqueue(.dayComplete(items: 5, minutes: 18))
+        case "achievement":
+            let id = parts.count > 1 ? parts[1] : "streak_7"
+            guard var achievement = Achievement.allAchievements.first(where: { $0.id == id }) else { return }
+            achievement.progress = achievement.requirement
+            achievement.unlockedAt = Date()
+            CelebrationCenter.shared.enqueue(.achievement(achievement))
+        case "badge":
+            let badges = HabitBadge.badgesForHabit(parts.count > 1 ? parts[1] : "breathing")
+            let level = min(Int(parts.count > 2 ? parts[2] : "") ?? 0, badges.count - 1)
+            guard level >= 0 else { return }
+            var badge = badges[level]
+            badge.progress = badge.requirement
+            badge.unlockedAt = Date()
+            CelebrationCenter.shared.enqueue(.badge(badge))
+        case "habit":
+            CelebrationCenter.shared.enqueue(.habitAcquired(habitID: parts.count > 1 ? parts[1] : "breathing"))
+        default:
+            break
+        }
+    }
+}
+#endif
