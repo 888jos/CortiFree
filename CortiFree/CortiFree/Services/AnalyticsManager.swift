@@ -156,12 +156,28 @@ class AnalyticsManager {
 
     /// Canonical screen-level event for Amplitude funnels. Specific screen
     /// events remain available for backwards-compatible Firebase dashboards.
+    // MARK: - Onboarding path (AI or manual quiz)
+
+    private let onboardingPathKey = "analytics.onboarding_path"
+
+    /// « ai », « manual » or « ai_to_manual » (AI chosen, then answered by hand); « undecided » before
+    /// the quiz choice. Sent on every onboarding screen and on onboarding_completed /
+    /// subscription_purchased, and kept as a user property, so every later event (paywall, trial,
+    /// purchase, retention) can be split by path in Amplitude.
+    var onboardingPath: String { UserDefaults.standard.string(forKey: onboardingPathKey) ?? "undecided" }
+
+    func setOnboardingPath(_ path: String, aiApp: String? = nil) {
+        UserDefaults.standard.set(path, forKey: onboardingPathKey)
+        AmplitudeManager.shared.setUserProperties(["onboarding_path": path, "onboarding_ai_app": aiApp ?? "none"])
+    }
+
     func trackOnboardingScreenViewed(screenName: String, stepNumber: Int, totalSteps: Int, version: String) {
         track(event: "onboarding_screen_viewed", properties: [
             "screen_name": screenName,
             "step_number": stepNumber,
             "total_steps": totalSteps,
-            "onboarding_version": version
+            "onboarding_version": version,
+            "onboarding_path": onboardingPath
         ])
         AmplitudeManager.shared.setUserProperties(["onboarding_version": version])
     }
@@ -506,6 +522,7 @@ class AnalyticsManager {
         if let gender { properties["gender"] = gender }
         properties["current_streak"] = UserPersistence.streakDays
         properties["best_streak"] = UserPersistence.bestStreak
+        properties["onboarding_path"] = onboardingPath
         track(event: "onboarding_completed", properties: properties)
     }
 
@@ -893,7 +910,8 @@ class AnalyticsManager {
             "price": priceDouble,
             "currency": currency,
             "is_trial": isTrial,
-            "timestamp": Date().timeIntervalSince1970
+            "timestamp": Date().timeIntervalSince1970,
+            "onboarding_path": onboardingPath
         ]
 
         track(event: "subscription_purchased", properties: properties)

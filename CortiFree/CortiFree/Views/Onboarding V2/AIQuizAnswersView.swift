@@ -56,12 +56,14 @@ struct HabitsQuizEntryView: View {
                 AIQuizMiloChat(
                     app: app,
                     onBack: {
+                        AnalyticsManager.shared.track(event: "onboarding_ai_quiz_cancelled", properties: ["ai_app": app.rawValue])
                         AIQuizReturnCenter.shared.cancelApp()
                         mode = .pickApp
                     },
                     onManual: {
                         AnalyticsManager.shared.track(event: "onboarding_quiz_mode_selected",
                                                       properties: ["mode": "manual", "after_ai_app": app.rawValue])
+                        AnalyticsManager.shared.setOnboardingPath("ai_to_manual", aiApp: app.rawValue)
                         AIQuizReturnCenter.shared.end()
                         mode = .manual
                     },
@@ -175,6 +177,7 @@ struct HabitsQuizEntryView: View {
         Button {
             HapticManager.light()
             AnalyticsManager.shared.track(event: "onboarding_quiz_mode_selected", properties: ["mode": "manual"])
+            AnalyticsManager.shared.setOnboardingPath("manual")
             mode = .manual
         } label: {
             VStack(spacing: 2) {
@@ -300,6 +303,7 @@ struct HabitsQuizEntryView: View {
         let keepsClipboard = AIQuizReturnCenter.shared.clipboardChangedSincePrompt
         if !keepsClipboard { AIQuizReturnCenter.shared.copyPrompt(prompt) }
         AnalyticsManager.shared.track(event: "onboarding_quiz_mode_selected", properties: ["mode": "ai", "ai_app": app.rawValue])
+        AnalyticsManager.shared.setOnboardingPath("ai", aiApp: app.rawValue)
         startedAt = Date()
         AIQuizReturnCenter.shared.begin(app)
         mode = .waiting(app)

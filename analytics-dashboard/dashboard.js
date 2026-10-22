@@ -704,7 +704,58 @@
         }, skeletonKind: "lines" }),
       ),
       dailyCard,
+      el("div", { class: "grid two" }, pathCompareCard(range), aiPathCard(range)),
+      aiAppCard(range),
     );
+  }
+
+  // AI vs manual quiz. The app sends onboarding_path (« ai », « manual », « ai_to_manual ») as a user
+  // property from the quiz choice on, so the whole funnel down to the purchase splits by path.
+  const PATH_LABELS = { ai: "Mon IA répond", manual: "Je réponds moi-même", ai_to_manual: "IA puis à la main", undecided: "Avant le choix" };
+  function pathCompareCard(range) {
+    const steps = [
+      { event_type: "onboarding_quiz_mode_selected", label: "Choix du quiz" },
+      { event_type: "onboarding_completed", label: "Onboarding fini" },
+      { event_type: "paywall_open", label: "Paywall vu" },
+      { event_type: "trial_started", label: "Essai" },
+      { event_type: "subscription_purchased", label: "Achat" },
+    ];
+    return card({ title: "IA vs manuel", sub: "Conversion par parcours (propriété onboarding_path), de l'écran du choix jusqu'à l'achat · fenêtre 30 j", load: async (body) => {
+      const r = await api("/api/icp", { prop: "onboarding_path", steps: steps, ...rp(range) });
+      if (r.missing || !r.segments.length) {
+        body.replaceChildren(emptyBox("En attente de onboarding_path", null, "Envoyé par la prochaine build de l'app (à partir de l'écran du choix IA / manuel)."));
+        return;
+      }
+      const segments = r.segments.filter((sg) => sg.value !== "(none)");
+      const headers = [{ label: "Parcours" }, ...r.steps.map((s) => ({ label: s, num: true }))];
+      const rows = segments.map((sg) => [PATH_LABELS[sg.value] || sg.value,
+        fmtNum(sg.counts[0]), ...sg.counts.slice(1).map((c) => `${fmtPct(sg.counts[0] ? c / sg.counts[0] : null, 0)} (${fmtNum(c)})`)]);
+      body.replaceChildren(table(headers, rows));
+    }, skeletonKind: "lines" });
+  }
+
+  function aiPathCard(range) {
+    const mode = (m) => ({ event_type: "onboarding_quiz_mode_selected", filters: [{ subprop_type: "event", subprop_key: "mode", subprop_op: "is", subprop_value: [m] }] });
+    return card({ title: "Parcours IA, étape par étape", sub: "Où on perd les gens entre « Mon IA répond » et le plan", load: async (body) => {
+      await amplitudeFunnel(body, [
+        { label: "Clic « Mon IA répond »", spec: mode("ai_picker") },
+        { label: "App IA choisie (prompt copié)", spec: mode("ai") },
+        { label: "Revenu dans CortiFree", events: ["onboarding_ai_quiz_return"] },
+        { label: "Réponse collée", events: ["onboarding_ai_quiz_pasted"] },
+        { label: "Plan confirmé", events: ["onboarding_ai_quiz_confirmed"] },
+      ], range);
+    }, skeletonKind: "lines" });
+  }
+
+  function aiAppCard(range) {
+    return card({ title: "Quelle IA ?", sub: "onboarding_quiz_mode_selected (mode ai) par app · utilisateurs uniques", load: async (body) => {
+      const r = await api("/api/breakdown", { event: "onboarding_quiz_mode_selected", prop: "ai_app", m: "uniques", i: 30, limit: 10, ...rp(range) });
+      const rows = (r.rows || r.segments || []).filter((x) => x.value && x.value !== "(none)");
+      if (!rows.length) { body.replaceChildren(emptyBox("Pas encore de choix d'IA", ["onboarding_quiz_mode_selected"])); return; }
+      const total = rows.reduce((t, x) => t + (x.total ?? x.count ?? 0), 0);
+      body.replaceChildren(table([{ label: "IA" }, { label: "Utilisateurs", num: true }],
+        rows.map((x) => [x.value, `${fmtNum(x.total ?? x.count)} · ${fmtPct(total ? (x.total ?? x.count) / total : null, 0)}`])));
+    }, skeletonKind: "lines" });
   }
 
   // ------------------------------------------------------------------ monetization
