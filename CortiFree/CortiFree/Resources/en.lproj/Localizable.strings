@@ -5486,7 +5486,7 @@
 "milo.pulse.reply.normal" = "%d bpm, a normal resting pace. If you want to slow it a little, breathe out longer than you breathe in: it signals your body to relax.";
 "milo.pulse.reply.elevated" = "%d bpm, a bit above a resting pace. A few minutes of slow, even breathing usually brings it down: try cardiac coherence, then measure again.";
 "milo.pulse.reply.high" = "%d bpm, your heart is going fast. Start with a few physiological sighs: two inhales through the nose, one long exhale. It is the quickest way to slow down. If you feel unwell or have chest pain, call emergency services.";
-"milo.pulse.compare.lower" = "From %1$d to %2$d bpm: %3$d beats less, well done.";
+"milo.pulse.compare.lower" = "Your heart slowed by %3$d bpm (from %1$d to %2$d), well done.";
 "milo.pulse.compare.same" = "From %1$d to %2$d bpm: no drop yet, that happens.";
 "milo.pulse.followup" = "How do you feel? Measure your heart rate again to see the effect.";
 
@@ -5548,6 +5548,7 @@
 /* Milo voice dictation */
 "milo.dictation.start" = "Dictate a message";
 "milo.dictation.stop" = "Stop dictation";
+"milo.dictation.listening" = "Listening…";
 "milo.dictation.denied.title" = "Dictation is off";
 "milo.dictation.denied.message" = "Allow the microphone and speech recognition in Settings to dictate your messages to Milo.";
 "milo.dictation.open_settings" = "Open Settings";

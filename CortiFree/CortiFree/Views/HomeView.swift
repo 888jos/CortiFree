@@ -100,10 +100,8 @@ struct HomeView: View {
             // Galaxy animated background (calmer so glass surfaces read well)
             GalaxyBackgroundView(intensity: 0.75)
 
-            if viewModel.isLoading {
-                ProgressView()
-                    .tint(Color.appTheme)
-            } else {
+            // No spinner: each block loads its own data (the view model's Firebase fetch isn't shown).
+            Group {
                 GeometryReader { _ in
                     VStack(spacing: 0) {
                         // Header Navigation (60px)
@@ -176,10 +174,10 @@ struct HomeView: View {
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
-                                    // App Store review screenshots: annual plan, 7-day trial, one per price.
+                                    // App Store review screenshots: one per plan and price.
                                     ForEach(ReviewPaywallPreview.Price.all) { price in
                                         Button(action: { reviewPaywallPrice = price }) {
-                                            Text("🧾 Review paywall \(price.yearlyText)/yr")
+                                            Text("🧾 Review paywall \(price.amountText)/\(price.period == .year ? "yr" : "wk")")
                                                 .font(.system(size: 13, weight: .medium))
                                                 .foregroundColor(.white.opacity(0.5))
                                         }

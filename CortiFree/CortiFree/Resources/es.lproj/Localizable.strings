@@ -5486,7 +5486,7 @@
 "milo.pulse.reply.normal" = "%d lpm, un ritmo de reposo normal. Para bajarlo un poco, exhala más tiempo del que inhalas: es la señal que relaja el cuerpo.";
 "milo.pulse.reply.elevated" = "%d lpm, algo por encima del ritmo de reposo. Unos minutos de respiración lenta y regular suelen bajarlo: prueba la coherencia cardiaca y vuelve a medir.";
 "milo.pulse.reply.high" = "%d lpm, tu corazón va rápido. Empieza con unos suspiros fisiológicos: dos inhalaciones por la nariz y una exhalación larga. Es la forma más rápida de calmarte. Si te encuentras mal o tienes dolor en el pecho, llama a emergencias.";
-"milo.pulse.compare.lower" = "De %1$d a %2$d lpm: %3$d latidos menos, bien hecho.";
+"milo.pulse.compare.lower" = "Tu corazón bajó %3$d lpm (de %1$d a %2$d), bien hecho.";
 "milo.pulse.compare.same" = "De %1$d a %2$d lpm: todavía no baja, es normal.";
 "milo.pulse.followup" = "¿Cómo te sientes? Vuelve a medir tu pulso para ver el efecto.";
 
@@ -5548,6 +5548,7 @@
 /* Milo voice dictation */
 "milo.dictation.start" = "Dictar un mensaje";
 "milo.dictation.stop" = "Detener el dictado";
+"milo.dictation.listening" = "Te escucho…";
 "milo.dictation.denied.title" = "Dictado desactivado";
 "milo.dictation.denied.message" = "Permite el micrófono y el reconocimiento de voz en Ajustes para dictar tus mensajes a Milo.";
 "milo.dictation.open_settings" = "Abrir Ajustes";

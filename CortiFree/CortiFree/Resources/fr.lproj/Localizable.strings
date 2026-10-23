@@ -5484,7 +5484,7 @@
 "milo.pulse.reply.normal" = "%d bpm, c’est un rythme de repos normal. Pour le ralentir un peu, expire plus longtemps que tu n’inspires : c’est le signal qui détend le corps.";
 "milo.pulse.reply.elevated" = "%d bpm, c’est un peu au-dessus d’un rythme de repos. Quelques minutes de respiration lente et régulière le font souvent baisser : essaie la cohérence cardiaque, puis remesure.";
 "milo.pulse.reply.high" = "%d bpm, ton cœur va vite. Commence par quelques soupirs physiologiques : deux inspirations par le nez, une longue expiration. C’est le moyen le plus rapide de ralentir. Si tu te sens mal ou as une douleur à la poitrine, appelle les urgences.";
-"milo.pulse.compare.lower" = "De %1$d à %2$d bpm : %3$d battements de moins, bien joué.";
+"milo.pulse.compare.lower" = "Ton cœur a ralenti de %3$d bpm (de %1$d à %2$d), bien joué.";
 "milo.pulse.compare.same" = "De %1$d à %2$d bpm : pas encore de baisse, ça arrive.";
 "milo.pulse.followup" = "Comment tu te sens ? Remesure ton pouls pour voir l’effet.";
 
@@ -5546,6 +5546,7 @@
 /* Milo voice dictation */
 "milo.dictation.start" = "Dicter un message";
 "milo.dictation.stop" = "Arrêter la dictée";
+"milo.dictation.listening" = "Je t'écoute…";
 "milo.dictation.denied.title" = "Dictée désactivée";
 "milo.dictation.denied.message" = "Autorise le micro et la reconnaissance vocale dans Réglages pour dicter tes messages à Milo.";
 "milo.dictation.open_settings" = "Ouvrir Réglages";

@@ -2,12 +2,12 @@
 //  MiloDictation.swift
 //  CortiFree
 //
-//  Voice dictation for the Milo composer. Apple's Speech framework streams a live
-//  transcript into the composer while the user speaks. The same audio is recorded, and
-//  when the user stops (and has accepted Milo's AI disclosure), it is sent to the
-//  server, which has OpenAI transcribe it: that more accurate text replaces the live
-//  one. Offline or on any error, Apple's transcript stays. The user still reviews the
-//  text and taps send.
+//  Voice dictation for the Milo composer. Apple's Speech framework listens while the user
+//  speaks, but nothing is written in the composer in real time: the transcript lands once,
+//  when the user stops (or taps send). The same audio is recorded, and when the user stops
+//  (and has accepted Milo's AI disclosure), it is sent to the server, which has OpenAI
+//  transcribe it: that more accurate text replaces Apple's. Offline or on any error,
+//  Apple's transcript stays. Tapping send while dictating sends the final text.
 //
 //  Language: the user may not speak the app's language. The same audio goes to up to three
 //  recognizers (last language detected, app language, iPhone keyboard languages) and the
@@ -53,8 +53,6 @@ final class MiloDictation: ObservableObject {
 
     private let audioEngine = AVAudioEngine()
     private var channels: [Channel] = []
-    /// The channel shown live in the composer (the last language detected, else the app's).
-    private var primary = 0
     private var finishing = false
     private var finishDeadline: Timer?
     private var silenceTimer: Timer?
@@ -67,6 +65,11 @@ final class MiloDictation: ObservableObject {
     private var useCloud = false
     /// Bumped by cancel(): a late server transcript must not refill the composer.
     private var generation = 0
+    /// Runs once the final text is in the composer (the user tapped send while dictating).
+    private var onDone: (() -> Void)?
+
+    /// Recording, or still waiting for the final transcript.
+    var isActive: Bool { isRecording || finishing || isTranscribing }
 
     /// Apple stops a recognition after about a minute; we stop a bit before.
     private let maxDuration: TimeInterval = 55
@@ -104,8 +107,16 @@ final class MiloDictation: ObservableObject {
         finishIfReady()
     }
 
+    /// Send tapped while dictating: stop, then `done` once the final transcript is in the composer.
+    func stop(then done: @escaping () -> Void) {
+        guard isActive else { return done() }
+        onDone = done
+        stop()
+    }
+
     /// Leaving Milo or sending the message: drop everything, late results must not refill the composer.
     func cancel() {
+        onDone = nil
         if isRecording { endRecording() }
         channels.forEach { $0.task?.cancel() }
         generation += 1
@@ -165,7 +176,6 @@ final class MiloDictation: ObservableObject {
         prefix = trimmed.isEmpty ? "" : trimmed + " "
         self.onText = onText
         channels = built
-        primary = 0
         startedAt = Date()
         isRecording = true
         HapticManager.light()
@@ -186,7 +196,8 @@ final class MiloDictation: ObservableObject {
 
                     if self.isRecording {
                         if text != nil { self.armSilenceTimer() }
-                        if index == self.primary, let text { self.onText?(self.prefix + text) }
+                        // No live text in the composer: the transcript lands once, when the dictation
+                        // stops (or when send is tapped), see finish().
                         // Every language gave up (e.g. on-device model missing): stop cleanly.
                         if self.channels.allSatisfy(\.done) { self.stop() }
                     } else if self.finishing {
@@ -230,6 +241,7 @@ final class MiloDictation: ObservableObject {
         recordingFile = nil
         guard let url = recordingURL, Date().timeIntervalSince(startedAt) > 0.8 else {
             discardRecording()
+            completeDone()
             return
         }
         recordingURL = nil
@@ -243,7 +255,14 @@ final class MiloDictation: ObservableObject {
             guard token == self.generation else { return }
             self.isTranscribing = false
             if let text, !text.isEmpty { onText?(prefix + text) }
+            self.completeDone()
         }
+    }
+
+    private func completeDone() {
+        let done = onDone
+        onDone = nil
+        done?()
     }
 
     // MARK: - Recording (server transcript)
@@ -314,7 +333,7 @@ final class MiloDictation: ObservableObject {
         return bestLocale(for: LanguageManager.shared.currentLanguage.rawValue, in: supported)
     }
 
-    /// Language of the last multi-language dictation that won: shown live first next time.
+    /// Language of the last multi-language dictation that won: tried first next time.
     static let lastLanguageKey = "milo.dictation.lastLanguage"
 
     /// The languages to listen for: the picked one only, or the last detected language, the

@@ -17,8 +17,6 @@ struct AvatarProgressCard: View {
     @State private var showBadgesScreen: Bool = false
     @State private var firstName: String = ""
     @State private var didLoadProgress: Bool = false
-    /// Plan days (1...28) with at least one plan item done.
-    @State private var doneDays: Set<Int> = []
 
     private let totalDays = PersonalPlan.length
 
@@ -66,9 +64,6 @@ struct AvatarProgressCard: View {
             // Refresh first name when profile is updated
             firstName = getUserFirstName()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .personalPlanDidChange)) { _ in loadDoneDays() }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskValidated"))) { _ in loadDoneDays() }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TaskSkippedAfterValidation"))) { _ in loadDoneDays() }
         .fullScreenCover(isPresented: $showBadgesScreen) {
             BadgesListView()
         }
@@ -82,7 +77,6 @@ struct AvatarProgressCard: View {
             startDate: startDate,
             currentDay: currentProgramDay,
             streak: currentStreak,
-            doneDays: doneDays,
             cycle: planStore.plan?.cycle
         )
     }
@@ -205,24 +199,11 @@ struct AvatarProgressCard: View {
 
     private func loadProgress() {
         // Le plan est déjà chargé par l'onglet Plan ; on s'assure qu'il existe si l'accueil s'ouvre en premier.
-        Task {
-            await planStore.ensurePlan()
-            loadDoneDays()
-        }
+        Task { await planStore.ensurePlan() }
 
         currentStreak = StreakService.current
         bestStreak = UserDefaults.standard.integer(forKey: "bestStreak")
         firstName = getUserFirstName()
-    }
-
-    /// The grid fills the days actually done (same « active day » as the 28-day review), not the days elapsed.
-    private func loadDoneDays() {
-        guard let plan = planStore.plan else { return }
-        Task {
-            let done = await PlanCompletionLoader.doneKeys(for: plan)
-            guard planStore.plan?.startDate == plan.startDate else { return }
-            doneDays = Set(done.keys)
-        }
     }
 
     private func getUserFirstName() -> String {
@@ -520,8 +501,6 @@ struct AvatarCardFront: View {
     let currentDay: Int
     /// Current streak, shown top left (nil: no pill, e.g. in the onboarding).
     var streak: Int? = nil
-    /// Days done (1...28); nil = every elapsed day counts (onboarding preview).
-    var doneDays: Set<Int>? = nil
     /// Plan cycle, shown next to the start date from the second cycle on.
     var cycle: Int? = nil
 
@@ -610,13 +589,11 @@ struct AvatarCardFront: View {
     }
 
     private func dayColor(for day: Int) -> Color {
-        let isDone = doneDays.map { $0.contains(day + 1) } ?? (day < currentDay - 1)
-        if isDone {
-            return Color(hex: "B794F6")              // done
+        // The cells follow the calendar: every past day is filled, done or not.
+        if day < currentDay - 1 {
+            return Color(hex: "B794F6")              // past
         } else if day == currentDay - 1 {
             return Color(hex: "B794F6").opacity(0.5) // today
-        } else if day < currentDay - 1 {
-            return Color.white.opacity(0.1)          // missed
         } else {
             return Color.white.opacity(0.2)          // to come
         }

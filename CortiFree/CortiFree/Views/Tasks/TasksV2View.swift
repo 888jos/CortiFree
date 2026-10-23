@@ -51,6 +51,8 @@ struct TasksV2View: View {
     @State private var hasLoadedData = false
     /// False after a failed status load (offline): the streak isn't persisted from partial data.
     @State private var statusesReliable = true
+    /// Last statuses shown, per user: the tab shows them at once on return, then refreshes.
+    private static var lastStatuses: (userID: String, statuses: [String: [String: TaskStatus]])?
 
     @State private var isEditing = false
     @State private var swapTarget: PlanItem?
@@ -277,6 +279,11 @@ struct TasksV2View: View {
         .onAppear {
             guard !hasLoadedData else { return }
             hasLoadedData = true
+            // Done items and streak show checked right away, not after the server answers.
+            let userID = Auth.auth().currentUser?.uid ?? UserPersistence.localUserID
+            if let cached = Self.lastStatuses, cached.userID == userID { taskStatuses = cached.statuses }
+            mergeLocalCompletions()
+            globalStreak = StreakService.current
             Task {
                 await store.ensurePlan()
                 await reloadData()
@@ -290,6 +297,9 @@ struct TasksV2View: View {
             isEditing = false
         }
         .onChange(of: isEditing) { _, editing in isEditingPlan = editing }
+        .onChange(of: taskStatuses) { _, statuses in
+            Self.lastStatuses = (Auth.auth().currentUser?.uid ?? UserPersistence.localUserID, statuses)
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ProgramRestarted"))) { _ in
             viewedPlanDay = nil
             Task { await reloadData() }

@@ -2,8 +2,8 @@
 //  ReviewPaywallPreview.swift
 //  CortiFree
 //
-//  Debug only: a static annual-plan paywall at a given price, used for the App Store
-//  review screenshot of each in-app purchase. Nothing is bought from here.
+//  Testers only (DEBUG and TestFlight): a static paywall for one plan at a given price (annual with a 7-day trial,
+//  or weekly with no trial), used for the App Store review screenshot of each in-app purchase. Nothing is bought from here.
 //
 
 #if DEBUG
@@ -11,15 +11,23 @@ import SwiftUI
 
 struct ReviewPaywallPreview: View {
     struct Price: Identifiable {
-        let yearly: Decimal
-        var id: String { "\(yearly)" }
+        enum Period { case year, week }
 
-        static let all: [Price] = [49.99, 59.99, 39.99, 34.99].map { Price(yearly: Decimal($0)) }
+        let amount: Decimal
+        var period: Period = .year
+        var id: String { "\(period)-\(amount)" }
 
-        var yearlyText: String { Self.format(yearly) }
-        /// Per-month equivalent, rounded down to the cent.
+        static let all: [Price] = [Price(amount: Decimal(string: "7.99")!, period: .week)]
+            + ["49.99", "59.99", "39.99", "34.99"].map { Price(amount: Decimal(string: $0)!) }
+
+        /// Annual plans come with a 7-day free trial, the weekly plan has none.
+        var hasTrial: Bool { period == .year }
+        var amountText: String { Self.format(amount) }
+        var unit: String { period == .year ? "year" : "week" }
+        var planName: String { period == .year ? "Annual" : "Weekly" }
+        /// Per-month equivalent of the annual price, rounded down to the cent.
         var monthlyText: String {
-            var monthly = yearly / 12
+            var monthly = amount / 12
             var rounded = Decimal()
             NSDecimalRound(&rounded, &monthly, 2, .down)
             return Self.format(rounded)
@@ -117,29 +125,35 @@ struct ReviewPaywallPreview: View {
     private var planCard: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text("Annual")
+                Text(price.planName)
                     .font(.poppinsSemiBold(17))
                     .foregroundStyle(.white)
                 Spacer()
-                Text("7-DAY FREE TRIAL")
-                    .font(.poppinsSemiBold(11))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 10).padding(.vertical, 5)
-                    .background(Capsule().fill(Color(hex: "8B5CF6")))
+                if price.hasTrial {
+                    Text("7-DAY FREE TRIAL")
+                        .font(.poppinsSemiBold(11))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10).padding(.vertical, 5)
+                        .background(Capsule().fill(Color(hex: "8B5CF6")))
+                }
             }
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text(price.yearlyText)
+                Text(price.amountText)
                     .font(.faroBold(28))
                     .foregroundStyle(.white)
-                Text("/ year")
+                Text("/ \(price.unit)")
                     .font(.poppinsRegular(14))
                     .foregroundStyle(.white.opacity(0.7))
                 Spacer()
-                Text("\(price.monthlyText) / month")
-                    .font(.poppinsRegular(13))
-                    .foregroundStyle(.white.opacity(0.6))
+                if price.period == .year {
+                    Text("\(price.monthlyText) / month")
+                        .font(.poppinsRegular(13))
+                        .foregroundStyle(.white.opacity(0.6))
+                }
             }
-            Text("Free for 7 days, then \(price.yearlyText) per year.")
+            Text(price.hasTrial
+                 ? "Free for 7 days, then \(price.amountText) per year."
+                 : "\(price.amountText) per week. Cancel anytime.")
                 .font(.poppinsRegular(13))
                 .foregroundStyle(Color(hex: "B794F6"))
         }
@@ -151,7 +165,7 @@ struct ReviewPaywallPreview: View {
     private var footer: some View {
         VStack(spacing: 12) {
             Button {} label: {
-                Text("Start my 7-day free trial")
+                Text(price.hasTrial ? "Start my 7-day free trial" : "Subscribe")
                     .font(.poppinsSemiBold(17))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -159,7 +173,9 @@ struct ReviewPaywallPreview: View {
             }
             .buttonStyle(.glassPrimary)
 
-            Text("No payment due now. After the 7-day free trial, your subscription automatically renews at \(price.yearlyText) per year unless canceled at least 24 hours before the end of the trial or the current period. Payment is charged to your Apple ID account. Manage or cancel anytime in your App Store account settings.")
+            Text(price.hasTrial
+                 ? "No payment due now. After the 7-day free trial, your subscription automatically renews at \(price.amountText) per year unless canceled at least 24 hours before the end of the trial or the current period. Payment is charged to your Apple ID account. Manage or cancel anytime in your App Store account settings."
+                 : "Payment of \(price.amountText) is charged to your Apple ID account at confirmation of purchase. Your subscription automatically renews at \(price.amountText) per week unless canceled at least 24 hours before the end of the current period. Manage or cancel anytime in your App Store account settings.")
                 .font(.poppinsRegular(10))
                 .foregroundStyle(.white.opacity(0.5))
                 .multilineTextAlignment(.center)

@@ -627,7 +627,7 @@ struct AssistantChatView: View {
                 .padding(.vertical, 5)
                 .accessibilityLabel(t("milo.pulse.banner.title"))
 
-                TextField(t("assistant.composer.placeholder"), text: $draft, axis: .vertical)
+                TextField(t(dictation.isRecording ? "milo.dictation.listening" : "assistant.composer.placeholder"), text: $draft, axis: .vertical)
                     .font(.system(size: 16))
                     .foregroundStyle(.white)
                     .lineLimit(1...5)
@@ -664,13 +664,18 @@ struct AssistantChatView: View {
         .padding(.bottom, 12)
     }
 
+    /// Also while dictating: tapping send stops the dictation and sends its final text.
     private var canSend: Bool {
-        !isLoading && !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !isLoading && (dictation.isActive || !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
 
     // MARK: - Sending
 
     private func send() {
+        if dictation.isActive {
+            dictation.stop { send() }
+            return
+        }
         dictation.cancel()
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         let intent = pendingIntent
@@ -909,13 +914,20 @@ struct AssistantChatView: View {
     }
 
     /// Milo opens a new conversation from what it learned, so the user can answer right away.
-    private func insightKept(_ insight: MiloInsight) {
+    /// `startNow`: the user tapped « Your first step », so its exercise starts at once.
+    private func insightKept(_ insight: MiloInsight, startNow: Bool) {
+        defer {
+            if startNow, let card = cardsByMessage[0] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { start(card) }
+            }
+        }
         if !messages.isEmpty { newConversation() }
         var text = insight.summary
         if !insight.firstStep.isEmpty { text += " " + insight.firstStep }
         messages.append(DeepSeekChatMessage(role: "assistant", content: text))
         // The card follows the first step Milo suggested, or the main theme, or the time of day.
-        guard store.showsExerciseCards else { return }
+        // Tapping « Your first step » always needs one, even with exercise cards turned off.
+        guard store.showsExerciseCards || startNow else { return }
         let step = insight.firstStep.lowercased()
         let themes = insight.themes.joined(separator: " ").lowercased()
         // A breathing exercise Milo named (« 4-7-8 », « box breathing »…) wins.
@@ -1055,6 +1067,10 @@ struct AssistantChatView: View {
             resolved = .breathing(slow: moment == .night || containsAny(normalized, ["sleep", "dormir", "sommeil", "schlaf", "睡眠", "잠"]))
         } else if let category = sessionCategory(for: normalized) {
             resolved = .session(category)
+        } else if containsAny(normalized, Self.stressMomentTerms) {
+            // A stressful moment with no exercise word (a text, a presentation, a pounding heart):
+            // a breathing exercise to start now, like the videos show.
+            resolved = .breathing(slow: moment == .night)
         } else {
             return nil
         }
@@ -1111,6 +1127,16 @@ struct AssistantChatView: View {
         default: return moment.defaultCategory
         }
     }
+
+    /// Words for an acute stress moment, in the app's languages.
+    private static let stressMomentTerms = [
+        "heart", "pound", "freak", "nervous", "overwhelm", "calm down", "shaking", "can't breathe", "spiral", "overthink",
+        "present", "exam", "interview", "meeting", "a date", "argument", "fight",
+        "cœur", "coeur", "nerveu", "débord", "deborde", "dépass", "calmer", "trembl", "présent", "examen", "entretien", "réunion", "dispute",
+        "corazón", "nervios", "agobi", "calmar", "examen", "entrevista", "reunión",
+        "herz", "nervös", "überfordert", "beruhig", "prüfung", "vorstellungsgespräch", "streit",
+        "心臓", "ドキドキ", "緊張", "パニック", "심장", "긴장", "떨려"
+    ]
 
     private func containsAny(_ text: String, _ terms: [String]) -> Bool {
         terms.contains { text.contains($0) }

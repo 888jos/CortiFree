@@ -5489,7 +5489,7 @@
 "milo.pulse.reply.normal" = "%d bpm, 정상적인 안정 시 심박이에요. 조금 낮추고 싶다면 들이쉬는 것보다 길게 내쉬어 보세요.";
 "milo.pulse.reply.elevated" = "%d bpm, 안정 시보다 조금 높아요. 몇 분간 천천히 고르게 호흡하면 대개 내려가요. 심장 일관성 호흡을 해 보고 다시 측정해 보세요.";
 "milo.pulse.reply.high" = "%d bpm, 심장이 빨리 뛰고 있어요. 생리적 한숨부터 해 보세요: 코로 두 번 들이쉬고 길게 한 번 내쉬어요. 가장 빠르게 진정하는 방법이에요. 몸이 안 좋거나 가슴 통증이 있으면 응급 서비스에 연락하세요.";
-"milo.pulse.compare.lower" = "%1$d에서 %2$d bpm으로: %3$d회 줄었어요. 잘했어요.";
+"milo.pulse.compare.lower" = "심박수가 %3$d bpm 내려갔어요 (%1$d → %2$d). 잘했어요.";
 "milo.pulse.compare.same" = "%1$d에서 %2$d bpm: 아직 내려가지 않았지만 그럴 수 있어요.";
 "milo.pulse.followup" = "기분이 어때요? 심박수를 다시 측정해서 효과를 확인해 보세요.";
 
@@ -5551,6 +5551,7 @@
 /* Milo voice dictation */
 "milo.dictation.start" = "메시지 음성 입력";
 "milo.dictation.stop" = "음성 입력 중지";
+"milo.dictation.listening" = "듣고 있어요…";
 "milo.dictation.denied.title" = "음성 입력이 꺼져 있어요";
 "milo.dictation.denied.message" = "설정에서 마이크와 음성 인식을 허용하면 Milo에게 보낼 메시지를 말로 입력할 수 있어요.";
 "milo.dictation.open_settings" = "설정 열기";

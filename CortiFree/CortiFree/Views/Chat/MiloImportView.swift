@@ -19,8 +19,10 @@ struct MiloImportView: View {
     let isQuotaReached: Bool
     /// One assistant call was spent (counts toward the daily quota).
     let onAnalyzed: () -> Void
-    /// The user kept the insight and wants to talk about it.
-    let onFinish: (MiloInsight) -> Void
+    /// The user kept the insight and wants to talk about it (true: start the first step right away).
+    let onFinish: (MiloInsight, Bool) -> Void
+    /// Something went wrong after the user shared: the sheet closes and Milo says it in a new chat.
+    var onFailure: (String) -> Void = { _ in }
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -370,6 +372,13 @@ struct MiloImportView: View {
                     }
 
                     if !insight.firstStep.isEmpty {
+                        Button {
+                            HapticManager.light()
+                            store.insight = insight
+                            onFinish(insight, true)
+                            dismiss()
+                        } label: {
+                        VStack(alignment: .leading, spacing: 12) {
                         HStack(alignment: .top, spacing: 12) {
                             Image(systemName: "leaf.fill")
                                 .font(.system(size: 15, weight: .semibold))
@@ -383,12 +392,21 @@ struct MiloImportView: View {
                                 Text(insight.firstStep)
                                     .font(.system(size: 15))
                                     .foregroundStyle(.white.opacity(0.92))
+                                    .multilineTextAlignment(.leading)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
+                        }
+                        Label(t("assistant.card.start"), systemImage: "play.fill")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(AudioPalette.backgroundDeep)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .background(AudioPalette.accent, in: Capsule())
                         }
                         .padding(16)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(AudioPalette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        }
+                        .buttonStyle(PressableCardStyle())
                     }
 
                     Text(t("milo.import.result.disclaimer"))
@@ -403,7 +421,7 @@ struct MiloImportView: View {
                 Button {
                     HapticManager.light()
                     store.insight = insight
-                    onFinish(insight)
+                    onFinish(insight, false)
                     dismiss()
                 } label: {
                     Text(t("milo.import.result.keep"))

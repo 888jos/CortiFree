@@ -5486,7 +5486,7 @@
 "milo.pulse.reply.normal" = "%d bpm, ein normaler Ruhepuls. Um ihn etwas zu senken, atme länger aus als ein: Das signalisiert deinem Körper Entspannung.";
 "milo.pulse.reply.elevated" = "%d bpm, etwas über dem Ruhepuls. Ein paar Minuten langsames, gleichmäßiges Atmen senken ihn meist: Probier die Herzkohärenz und miss dann erneut.";
 "milo.pulse.reply.high" = "%d bpm, dein Herz schlägt schnell. Beginne mit ein paar physiologischen Seufzern: zweimal durch die Nase einatmen, einmal lang ausatmen. So beruhigst du dich am schnellsten. Wenn es dir schlecht geht oder du Brustschmerzen hast, ruf den Notruf.";
-"milo.pulse.compare.lower" = "Von %1$d auf %2$d bpm: %3$d Schläge weniger, gut gemacht.";
+"milo.pulse.compare.lower" = "Dein Herz ist um %3$d bpm langsamer geworden (von %1$d auf %2$d), gut gemacht.";
 "milo.pulse.compare.same" = "Von %1$d auf %2$d bpm: noch keine Senkung, das kommt vor.";
 "milo.pulse.followup" = "Wie fühlst du dich? Miss deinen Puls noch einmal, um die Wirkung zu sehen.";
 
@@ -5548,6 +5548,7 @@
 /* Milo voice dictation */
 "milo.dictation.start" = "Nachricht diktieren";
 "milo.dictation.stop" = "Diktat beenden";
+"milo.dictation.listening" = "Ich höre zu…";
 "milo.dictation.denied.title" = "Diktat deaktiviert";
 "milo.dictation.denied.message" = "Erlaube Mikrofon und Spracherkennung in den Einstellungen, um Milo deine Nachrichten zu diktieren.";
 "milo.dictation.open_settings" = "Einstellungen öffnen";

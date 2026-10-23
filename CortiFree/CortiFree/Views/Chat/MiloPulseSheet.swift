@@ -142,7 +142,8 @@ struct MiloPulseSheet: View {
 
     private func watchResult(bpm: Int, date: Date) -> some View {
         let fresh = Date().timeIntervalSince(date) < Self.freshness
-        let ago = date.formatted(.relative(presentation: .named, unitsStyle: .wide))
+        // In the app's language, not the device's (an English app on a French iPhone said « il y a 4 heures »).
+        let ago = date.formatted(.relative(presentation: .named, unitsStyle: .wide).locale(LanguageManager.shared.currentLanguage.locale))
         return result(bpm: bpm, caption: String(format: t("milo.pulse.watch.measured"), ago)) {
             if !fresh {
                 Text(t("milo.pulse.watch.stale"))
@@ -151,8 +152,10 @@ struct MiloPulseSheet: View {
                     .multilineTextAlignment(.center)
             }
             primary(t("milo.pulse.send"), icon: "arrow.up") { finish(bpm, .watch) }
-            secondary(fresh ? t("milo.pulse.use_camera") : t("milo.pulse.watch.refresh")) {
-                fresh ? startCamera() : readWatch()
+            // The flash is always offered, so a fresh reading is one tap away even with an old watch sample.
+            secondary(t("milo.pulse.use_camera")) { startCamera() }
+            if !fresh {
+                secondary(t("milo.pulse.watch.refresh")) { readWatch() }
             }
         }
     }

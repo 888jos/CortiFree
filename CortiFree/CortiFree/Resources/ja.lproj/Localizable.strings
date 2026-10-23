@@ -5489,7 +5489,7 @@
 "milo.pulse.reply.normal" = "%d bpm、普通の安静時のペースです。少し下げたいなら、吸うより長く吐きましょう。体をリラックスさせる合図になります。";
 "milo.pulse.reply.elevated" = "%d bpm、安静時より少し高めです。ゆっくり一定のリズムで数分呼吸すると下がることが多いです。コヒーレンス呼吸を試して、もう一度測りましょう。";
 "milo.pulse.reply.high" = "%d bpm、心拍が速めです。まずは生理的ため息を数回：鼻から2回吸って、長く1回吐きます。最も早く落ち着く方法です。気分が悪い、または胸が痛む場合は救急に連絡してください。";
-"milo.pulse.compare.lower" = "%1$dから%2$d bpmへ：%3$d拍下がりました。よくできました。";
+"milo.pulse.compare.lower" = "心拍が%3$d bpm下がりました（%1$d→%2$d）。よくできました。";
 "milo.pulse.compare.same" = "%1$dから%2$d bpm：まだ下がっていませんが、よくあることです。";
 "milo.pulse.followup" = "気分はどうですか？もう一度心拍数を測って効果を確かめましょう。";
 
@@ -5551,6 +5551,7 @@
 /* Milo voice dictation */
 "milo.dictation.start" = "メッセージを音声入力";
 "milo.dictation.stop" = "音声入力を停止";
+"milo.dictation.listening" = "聞いています…";
 "milo.dictation.denied.title" = "音声入力がオフです";
 "milo.dictation.denied.message" = "設定でマイクと音声認識を許可すると、Miloへのメッセージを音声で入力できます。";
 "milo.dictation.open_settings" = "設定を開く";
