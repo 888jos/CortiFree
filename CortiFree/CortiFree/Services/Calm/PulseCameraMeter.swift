@@ -94,6 +94,10 @@ final class PulseCameraMeter: NSObject, ObservableObject {
     private var lastCheck: TimeInterval = 0
     private var lastUIUpdate: TimeInterval = 0
     private var diagnostics = Diagnostics()
+    /// Testers only (TesterPulseOverride): the preset picked before the measure and the number
+    /// it will end on. Read when the measure begins, so a choice made while waiting counts.
+    private var forcedPreset: Int?
+    private var forcedBPM: Int?
     #if targetEnvironment(simulator)
     private var simulationTimer: Timer?
     /// Synthetic heart rate played by the simulator.
@@ -118,6 +122,8 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         lastCheck = 0
         lastUIUpdate = 0
         diagnostics = Diagnostics()
+        forcedPreset = nil
+        forcedBPM = nil
         state = .waitingForFinger
 
         #if targetEnvironment(simulator)
@@ -240,6 +246,8 @@ final class PulseCameraMeter: NSObject, ObservableObject {
             let waitedLong = time - (waitStart ?? time) > 6
             guard fingerOn || waitedLong else { return }
             if !fingerOn { diagnostics.startedWithoutFinger = true }
+            forcedPreset = TesterPulseOverride.preset
+            forcedBPM = forcedPreset.map(TesterPulseOverride.finalBPM(around:))
             state = .measuring
             HapticManager.light()
         } else if let last = lastFingerTime, time - last > 2.5, measureStart.map({ time - $0 < 6 }) ?? true {
@@ -285,10 +293,18 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         if time - lastLiveUpdate > 1, elapsed > 5 {
             lastLiveUpdate = time
             // Keep the last good value while the signal is unclear for a moment.
-            if let estimate = PulseSignal.estimate(samples) {
+            if let forcedBPM {
+                liveBPM = TesterPulseOverride.liveBPM(around: forcedBPM)
+            } else if let estimate = PulseSignal.estimate(samples) {
                 liveBPM = estimate.bpm
                 diagnostics.best = estimate
             }
+        }
+
+        if let forcedBPM, elapsed >= Self.measureDuration {
+            // Tester demo: same screens and duration, the preset's number as a clean reading.
+            finish(with: Reading(bpm: forcedBPM, reliable: true), elapsed: elapsed)
+            return
         }
 
         if elapsed >= Self.measureDuration, time - lastCheck >= Self.checkInterval {
@@ -417,6 +433,8 @@ final class PulseCameraMeter: NSObject, ObservableObject {
             properties["bpm"] = reading.bpm
             properties["reliable"] = reading.reliable
         }
+        // Tester demo measure: lets these events be filtered out of the field data.
+        if let forcedPreset { properties["tester_forced_bpm"] = forcedPreset }
         if let best = d.best {
             properties["periodicity"] = rounded(best.periodicity)
             properties["estimate_bpm"] = best.bpm

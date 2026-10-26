@@ -166,7 +166,11 @@ struct MiloPulseSheet: View {
         meter.stop()
         step = .watchLoading
         Task {
-            if let sample = await HealthKitService.shared.latestHeartRate() {
+            let sample = await HealthKitService.shared.latestHeartRate()
+            if let preset = TesterPulseOverride.preset {
+                // Tester demo: the preset's number instead of the watch's (works without a watch).
+                step = .watchResult(bpm: TesterPulseOverride.finalBPM(around: preset), date: sample?.date ?? Date())
+            } else if let sample {
                 step = .watchResult(bpm: sample.bpm, date: sample.date)
             } else {
                 step = .watchEmpty

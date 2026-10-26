@@ -12,6 +12,8 @@ struct SettingsView: View {
     @ObservedObject private var revenueCatManager = RevenueCatManager.shared
     @ObservedObject private var languageManager = LanguageManager.shared
     @ObservedObject private var health = HealthKitService.shared
+    /// Debug section: DEBUG and TestFlight builds only.
+    @ObservedObject private var testerAccess = TesterAccess.shared
 
     // ViewModel for settings management
     @StateObject private var viewModel = SettingsViewModel()
@@ -113,8 +115,7 @@ struct SettingsView: View {
         } message: {
             Text(LanguageManager.shared.localizedString(for: "settings.alert.language_restart.message"))
         }
-        // Debug-only actions (resetUserDefaults / clearAllData exist only in DEBUG builds).
-        #if DEBUG
+        // Tester-only actions (Debug section, DEBUG and TestFlight builds).
         .alert(LanguageManager.shared.localizedString(for: "settings.alert.reset_defaults.title"), isPresented: $showResetUserDefaultsAlert) {
             Button(LanguageManager.shared.localizedString(for: "common.cancel"), role: .cancel) { }
             Button(LanguageManager.shared.localizedString(for: "settings.alert.reset_defaults.button"), role: .destructive) {
@@ -131,7 +132,6 @@ struct SettingsView: View {
         } message: {
             Text(LanguageManager.shared.localizedString(for: "settings.alert.clear_data.message"))
         }
-        #endif
         .alert(
             LanguageManager.shared.localizedString(for: "inline.settingsview.language.00"),
             isPresented: $showReauthAlert
@@ -253,11 +253,13 @@ struct SettingsView: View {
                 privacySecuritySection
                 aboutSupportSection
 
-                #if DEBUG
-                if showDebugSection {
+                if testerAccess.canForceBPM && showDebugSection {
+                    filmingSection
+                }
+
+                if testerAccess.isEnabled && showDebugSection {
                     debugSection
                 }
-                #endif
 
                 Spacer()
                     .frame(height: 100)
@@ -443,11 +445,14 @@ struct SettingsView: View {
         settingsSection(title: LanguageManager.shared.localizedString(for: "settings.section.about"), icon: "info.circle.fill") {
             VStack(spacing: 0) {
                 Button(action: {
-                    #if DEBUG
+                    // Tap 3 times: Filming section (testers and TestFlight creators), plus the Debug
+                    // section for testers (leaving video mode).
+                    guard testerAccess.canForceBPM else { return }
                     HapticManager.light()
                     versionTapCount += 1
                     if versionTapCount >= 3 {
                         withAnimation(.spring(response: 0.3)) {
+                            if testerAccess.isTester { testerAccess.videoMode = false }
                             showDebugSection = true
                         }
                         versionTapCount = 0
@@ -455,7 +460,6 @@ struct SettingsView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         versionTapCount = 0
                     }
-                    #endif
                 }) {
                     settingsRowContent(icon: "app.badge.fill", title: LanguageManager.shared.localizedString(for: "settings.about.version"), subtitle: appVersionString, showChevron: false, isDestructive: false)
                 }
@@ -495,11 +499,20 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Debug Section
-    #if DEBUG
+    // MARK: - Debug Section (testers only)
     private var debugSection: some View {
         settingsSection(title: "🐛 Debug", icon: "ladybug.fill") {
             VStack(spacing: 0) {
+                // Hides every debug tool for filming; 3 taps on « Version » bring them back.
+                settingsRow(icon: "video.fill", title: "Mode vidéo (cacher le debug)", subtitle: "3 taps sur Version pour revenir", showChevron: false) {
+                    HapticManager.medium()
+                    withAnimation(.spring(response: 0.3)) {
+                        showDebugSection = false
+                        testerAccess.videoMode = true
+                    }
+                }
+                Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+
                 settingsRow(icon: "hammer.fill", title: "Reset UserDefaults", subtitle: nil, showChevron: false) {
                     HapticManager.medium()
                     showResetUserDefaultsAlert = true
@@ -520,7 +533,35 @@ struct SettingsView: View {
         }
         .transition(.opacity.combined(with: .scale(scale: 0.9)))
     }
-    #endif
+
+    // MARK: - Filming Section (testers and TestFlight)
+    /// UGC creators film from TestFlight, where the Debug section stays locked: only the forced BPM
+    /// lives here. English on purpose (creators), not localized.
+    private var filmingSection: some View {
+        settingsSection(title: "Filming", icon: "video.fill") {
+            // Forced BPM for every pulse check (pulse screen, Milo sheet). Set here only, not on those screens.
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.white)
+                    .frame(width: 20, height: 20)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(verbatim: "Heart rate result")
+                        .font(.custom("Poppins-Regular", size: 16))
+                        .foregroundColor(.white)
+                    TesterBPMPicker()
+                    Text(verbatim: "Every heart rate check ends near this number. Set back to Real when you're done filming.")
+                        .font(.custom("Poppins-Regular", size: 13))
+                        .foregroundColor(.white.opacity(0.5))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+        }
+        .transition(.opacity.combined(with: .scale(scale: 0.9)))
+    }
 
     // MARK: - Section Builder
     @ViewBuilder
@@ -918,7 +959,7 @@ struct SettingsView: View {
         }
     }
 
-    #if DEBUG
+    // Tester-only (Debug section).
     private func resetUserDefaults() {
         HapticManager.success()
 
@@ -952,7 +993,6 @@ struct SettingsView: View {
         viewModel.loadSettings()
         viewModel.calculateLocalDataSize()
     }
-    #endif
 
 }
 
