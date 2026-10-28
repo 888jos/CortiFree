@@ -15,6 +15,8 @@ enum MiloPulseSource: String {
 
 struct MiloPulseSheet: View {
     let onResult: (Int, MiloPulseSource) -> Void
+    /// The chat's previous reading (last 2 h): a forced drop (Settings → Filming) ends below it.
+    var baselineBPM: Int?
 
     @Environment(\.dismiss) private var dismiss
     @StateObject private var meter = PulseCameraMeter(source: "milo")
@@ -167,7 +169,10 @@ struct MiloPulseSheet: View {
         step = .watchLoading
         Task {
             let sample = await HealthKitService.shared.latestHeartRate()
-            if let preset = TesterPulseOverride.preset {
+            if let forced = baselineBPM.flatMap(TesterPulseOverride.afterBPM(before:)) {
+                // Tester demo, second measure: the forced drop below the previous reading.
+                step = .watchResult(bpm: forced, date: sample?.date ?? Date())
+            } else if let preset = TesterPulseOverride.preset {
                 // Tester demo: the preset's number instead of the watch's (works without a watch).
                 step = .watchResult(bpm: TesterPulseOverride.finalBPM(around: preset), date: sample?.date ?? Date())
             } else if let sample {
@@ -180,6 +185,7 @@ struct MiloPulseSheet: View {
 
     private func startCamera() {
         step = .camera
+        meter.baselineBPM = baselineBPM
         meter.start()
     }
 

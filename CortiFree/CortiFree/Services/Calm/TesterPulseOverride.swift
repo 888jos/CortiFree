@@ -5,7 +5,8 @@
 //  Testers and TestFlight builds only (TesterAccess.canForceBPM): « forced BPM » for the pulse checks,
 //  so creators filming a demo get a predictable result. The measure keeps its normal screens,
 //  ring and duration; only the number is replaced (preset ± 5, live readout ± 3 around it).
-//  Real users never see the selector and `preset` is always nil for them.
+//  « Forced drop »: the second measure of a before/after ends exactly N bpm below the first.
+//  Real users never see the selectors and `preset` / `drop` are always nil for them.
 //
 
 import SwiftUI
@@ -26,6 +27,22 @@ enum TesterPulseOverride {
     /// Final number of a forced measure.
     static func finalBPM(around preset: Int) -> Int {
         preset + Int.random(in: -5...5)
+    }
+
+    /// Forced drop of the second measure (« Your heart slowed by N bpm »), 0 = real.
+    static let drops = [6, 10, 14]
+    static let dropStorageKey = "tester.pulse.forcedDrop"
+
+    /// The chosen drop, nil for a real second measure (always nil without access).
+    static var drop: Int? {
+        guard TesterAccess.canForceBPMNow else { return nil }
+        let value = UserDefaults.standard.integer(forKey: dropStorageKey)
+        return drops.contains(value) ? value : nil
+    }
+
+    /// Final number of a forced second measure: exactly `drop` below the first one.
+    static func afterBPM(before: Int) -> Int? {
+        drop.map { max(45, before - $0) }
     }
 
     /// Live readout while a forced measure runs: hovers around the final number.

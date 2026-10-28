@@ -144,6 +144,8 @@ final class PersonalPlanStore: ObservableObject {
 
     /// Loads (or creates) the plan. Safe to call repeatedly; never throws.
     func ensurePlan() async {
+        // Filming replay: the plan stays the replay's, in memory.
+        guard replayBackup == nil else { return }
         // Account switch: reload the cache for the signed-in user.
         if loadedForUser != userKey {
             loadedForUser = userKey
@@ -195,6 +197,13 @@ final class PersonalPlanStore: ObservableObject {
         var profile = profile
         profile.source = "onboarding"
         saveOnboardingProfile(profile)
+        // Filming replay: a fresh plan from the replayed answers (or the plan picked in Settings →
+        // Filming), never merged with the real one.
+        if replayBackup != nil {
+            apply(PersonalPlanGenerator.generate(profile: profile, overrideGoal: FilmingOverride.planGoal,
+                                                 anxiety: anxiety, startDate: Date()))
+            return
+        }
         // Signed in during the onboarding: the in-memory plan may still be the guest's.
         if loadedForUser != userKey {
             loadedForUser = userKey
@@ -600,6 +609,28 @@ final class PersonalPlanStore: ObservableObject {
         }
     }
 
+    // MARK: - Filming replay (OnboardingReplay)
+
+    /// The real plan while an onboarding replay runs (`.some(nil)`: there was none). Non-nil means
+    /// a replay is running: plans are then built and changed in memory only, never saved or sent.
+    private var replayBackup: PersonalPlan??
+
+    func beginReplay() {
+        guard replayBackup == nil else { return }
+        replayBackup = .some(plan)
+        // The replay starts with no plan, as a new user does: the analysis builds one.
+        plan = nil
+    }
+
+    func endReplay() {
+        guard let backup = replayBackup else { return }
+        replayBackup = nil
+        isProvisional = false
+        undoSnapshot = nil
+        plan = backup
+        NotificationCenter.default.post(name: .personalPlanDidChange, object: nil)
+    }
+
     // MARK: - Onboarding profile
 
     func saveOnboardingProfile(_ profile: PlanProfile) {
@@ -627,6 +658,12 @@ final class PersonalPlanStore: ObservableObject {
     private func apply(_ newPlan: PersonalPlan) {
         var newPlan = newPlan
         newPlan.updatedAt = Date()
+        // Filming replay: memory only, the real plan comes back at the end.
+        if replayBackup != nil {
+            newPlan.startDay = newPlan.startDay ?? PersonalPlan.dayString(newPlan.startDate)
+            plan = newPlan
+            return
+        }
         if newPlan.startDay == nil {
             // A rebuild of the same plan keeps its day; a new plan starts today, here.
             newPlan.startDay = plan?.startDate == newPlan.startDate ? plan?.startDay : nil

@@ -17,6 +17,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
+        // Filming replay of the onboarding killed mid-way: its UserDefaults are undone first.
+        OnboardingReplay.restoreIfInterrupted()
+
         // Set notification delegate
         UNUserNotificationCenter.current().delegate = self
 
@@ -396,6 +399,8 @@ struct CortiFreeApp: App {
     #if DEBUG
     @AppStorage("debugSkipOnboardingToHome") private var debugSkipOnboardingToHome: Bool = false
     #endif
+    /// Settings → Filming → « Replay onboarding » (testers and TestFlight creators).
+    @ObservedObject private var onboardingReplay = OnboardingReplay.shared
 
     // DEBUG: Set to true to skip onboarding and go directly to HomeView
     #if DEBUG
@@ -408,7 +413,11 @@ struct CortiFreeApp: App {
         WindowGroup {
             Group {
             #if DEBUG
-            if debugSkipOnboardingToHome {
+            if onboardingReplay.isActive {
+                // Creator filming the onboarding again: nothing saved, no paywall (OnboardingReplay).
+                OnboardingV2FlowView(isReplay: true)
+                    .environmentObject(authViewModel)
+            } else if debugSkipOnboardingToHome {
                 ContentView()
                     .environmentObject(authViewModel)
             } else if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
@@ -423,7 +432,11 @@ struct CortiFreeApp: App {
             #else
             // First launch: check if onboarding is completed
             // IMPORTANT: Use @AppStorage variable for reactive updates
-            if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
+            if onboardingReplay.isActive {
+                // Creator filming the onboarding again: nothing saved, no paywall (OnboardingReplay).
+                OnboardingV2FlowView(isReplay: true)
+                    .environmentObject(authViewModel)
+            } else if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
                 // First time user - show onboarding
                 OnboardingV2FlowView()
                     .environmentObject(authViewModel)
@@ -509,7 +522,7 @@ struct CortiFreeApp: App {
     /// First app open of the day: the daily check-in drawer, then the meditation of the day
     /// (first week only), then the weekly drawer when due. Each opens when the previous closes.
     private func presentDailyCheckInIfNeeded() {
-        guard checkIn == nil, !TrialKickoff.isPending, Self.hasAccess else { return }
+        guard checkIn == nil, !TrialKickoff.isPending, !OnboardingReplay.shared.isActive, Self.hasAccess else { return }
         #if DEBUG
         if ProcessInfo.processInfo.environment["CORTIFREE_DEBUG_DAILY_CHECKIN"] == "1" {
             checkIn = .daily(DailyCheckInService.shared.pendingDay() ?? Date())

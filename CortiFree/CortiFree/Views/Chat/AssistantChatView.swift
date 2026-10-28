@@ -182,7 +182,8 @@ struct AssistantChatView: View {
             }
         }
         .sheet(isPresented: $showPulse) {
-            MiloPulseSheet(onResult: handlePulse)
+            MiloPulseSheet(onResult: handlePulse,
+                           baselineBPM: lastPulse.flatMap { Date().timeIntervalSince($0.date) < 2 * 3600 ? $0.bpm : nil })
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }

@@ -182,6 +182,8 @@ struct PulseCheckView: View {
         #if targetEnvironment(simulator)
         if case .measureAfter(let before, _) = next { meter.simulatedBPM = Double(max(58, before - 14)) }
         #endif
+        // A forced drop (Settings → Filming) applies to the second measure only.
+        if case .measureAfter(let before, _) = next { meter.baselineBPM = before } else { meter.baselineBPM = nil }
         phase = next
         meter.start()
     }

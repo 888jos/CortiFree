@@ -98,6 +98,9 @@ final class PulseCameraMeter: NSObject, ObservableObject {
     /// it will end on. Read when the measure begins, so a choice made while waiting counts.
     private var forcedPreset: Int?
     private var forcedBPM: Int?
+    /// Second measure of a before/after (after an exercise): the first reading. With a forced drop
+    /// (TesterPulseOverride), this measure ends that many bpm below it. Set by the screen before start().
+    var baselineBPM: Int?
     #if targetEnvironment(simulator)
     private var simulationTimer: Timer?
     /// Synthetic heart rate played by the simulator.
@@ -247,7 +250,8 @@ final class PulseCameraMeter: NSObject, ObservableObject {
             guard fingerOn || waitedLong else { return }
             if !fingerOn { diagnostics.startedWithoutFinger = true }
             forcedPreset = TesterPulseOverride.preset
-            forcedBPM = forcedPreset.map(TesterPulseOverride.finalBPM(around:))
+            forcedBPM = baselineBPM.flatMap(TesterPulseOverride.afterBPM(before:))
+                ?? forcedPreset.map(TesterPulseOverride.finalBPM(around:))
             state = .measuring
             HapticManager.light()
         } else if let last = lastFingerTime, time - last > 2.5, measureStart.map({ time - $0 < 6 }) ?? true {
@@ -435,6 +439,7 @@ final class PulseCameraMeter: NSObject, ObservableObject {
         }
         // Tester demo measure: lets these events be filtered out of the field data.
         if let forcedPreset { properties["tester_forced_bpm"] = forcedPreset }
+        if baselineBPM != nil, let drop = TesterPulseOverride.drop { properties["tester_forced_drop"] = drop }
         if let best = d.best {
             properties["periodicity"] = rounded(best.periodicity)
             properties["estimate_bpm"] = best.bpm

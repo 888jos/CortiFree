@@ -79,6 +79,9 @@ struct OnboardingV2FlowView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     private let enablesLiveActivityWhenAlreadyCompleted: Bool
+    /// Settings → Filming → « Replay onboarding »: the same screens, nothing saved or sent, no
+    /// sign-in, and it ends after the feature tour instead of the paywall (OnboardingReplay).
+    private let isReplay: Bool
 
     @State private var currentStep: OnboardingStep = .welcome
     @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
@@ -100,8 +103,9 @@ struct OnboardingV2FlowView: View {
 
     private let firebaseManager = FirebaseManager.shared
 
-    init(enablesLiveActivityWhenAlreadyCompleted: Bool = false) {
+    init(enablesLiveActivityWhenAlreadyCompleted: Bool = false, isReplay: Bool = false) {
         self.enablesLiveActivityWhenAlreadyCompleted = enablesLiveActivityWhenAlreadyCompleted
+        self.isReplay = isReplay
     }
 
     // MARK: - Onboarding Steps
@@ -159,6 +163,8 @@ struct OnboardingV2FlowView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: currentStep)
         .onAppear {
+            // Filming replay: from the first screen, no checkpoint, tracking or notification.
+            guard !isReplay else { return }
             // Track onboarding start time
             AnalyticsManager.shared.markOnboardingStarted()
             if onboardingStartTime == nil {
@@ -179,12 +185,14 @@ struct OnboardingV2FlowView: View {
             trackOnboardingScreen(currentStep)
         }
         .onChange(of: currentStep) { _, newStep in
+            guard !isReplay else { return }
             // Save checkpoint when step changes
             saveCheckpoint(newStep)
             persistLiveActivityProgress(newStep)
             trackOnboardingScreen(newStep)
         }
         .onChange(of: scenePhase) { _, newPhase in
+            guard !isReplay else { return }
             if newPhase == .background, !isOnboardingComplete {
                 AnalyticsManager.shared.trackOnboardingBackgrounded(screenName: currentStep.rawValue)
             }
@@ -193,14 +201,17 @@ struct OnboardingV2FlowView: View {
             }
         }
         .onDisappear {
+            guard !isReplay else { return }
             startDropOffLiveActivity()
             UserDefaults.standard.set(false, forKey: "onboarding_session_active")
         }
         .overlay(alignment: .topTrailing) {
-            OnboardingDebugButtons {
-                suppressDropOffLiveActivity = true
+            if !isReplay {
+                OnboardingDebugButtons {
+                    suppressDropOffLiveActivity = true
+                }
+                .zIndex(10_000)
             }
-            .zIndex(10_000)
         }
     }
 
@@ -387,7 +398,7 @@ struct OnboardingV2FlowView: View {
         case .welcome:
             FirstLaunchWelcomeView(
                 onContinue: { currentStep = .firstName },
-                onSignIn: { showReturningUserSignIn = true }
+                onSignIn: { if !isReplay { showReturningUserSignIn = true } }
             )
             .fullScreenCover(isPresented: $showReturningUserSignIn) {
                 // Returning user: a finished onboarding on the account sets onboardingV2Completed
@@ -428,6 +439,7 @@ struct OnboardingV2FlowView: View {
                 currentStep = result.aiGoal == nil ? .stressPatternValidation : .symptomChecker
 
                 // Save in background without blocking UI
+                guard !isReplay else { return }
                 OptimizedFirebaseService.shared.saveQuizDataInBackground(
                     result,
                     overallData: overallQuizData
@@ -472,7 +484,8 @@ struct OnboardingV2FlowView: View {
         case .scientificPlan:
             ScientificPlanView(
                 onBack: { currentStep = .cortisolScienceHook },
-                onContinue: { currentStep = .authentication }
+                // Filming replay: the creator's account is already there, no sign-in screen.
+                onContinue: { currentStep = isReplay ? .loading : .authentication }
             )
 
         case .authentication:
@@ -528,8 +541,14 @@ struct OnboardingV2FlowView: View {
             // Before the pre-paywall, so the pre-paywall leads straight to the paywall.
             OnboardingBenefitsFlowView(
                 onBack: { currentStep = .commitmentPledge },
-                onContinueToPaywall: { currentStep = .complete }
+                // Filming replay: back to the app, never the paywall.
+                onContinueToPaywall: {
+                    if isReplay { OnboardingReplay.shared.finish() } else { currentStep = .complete }
+                }
             )
+
+        case .complete where isReplay, .accountRequired where isReplay:
+            Color.clear.onAppear { OnboardingReplay.shared.finish() }
 
         case .complete:
             OnboardingCompletionView(
@@ -654,6 +673,9 @@ struct OnboardingV2FlowView: View {
             overallData: overallQuizData,
             symptoms: selectedSymptoms
         )
+
+        // Filming replay: the plan is built in memory only, nothing goes to the server.
+        guard !isReplay else { return }
 
         // The user is signed in now: send the baseline queued at the habits quiz (if it failed).
         OnboardingSync.flush()
@@ -843,10 +865,12 @@ struct OnboardingBreathingIntroView: View {
             isAfter: true,
             onFinish: finishAfterMeasure,
             onUnclear: unclearAfterMeasure,
+            baselineBPM: pulseBefore?.bpm,
             simulatedBPM: Double(max(58, (pulseBefore?.bpm ?? 80) - 9))
         )
         #else
-        OnboardingPulseMeasureView(meter: pulseMeter, isAfter: true, onFinish: finishAfterMeasure, onUnclear: unclearAfterMeasure)
+        OnboardingPulseMeasureView(meter: pulseMeter, isAfter: true, onFinish: finishAfterMeasure, onUnclear: unclearAfterMeasure,
+                                   baselineBPM: pulseBefore?.bpm)
         #endif
     }
 

@@ -22,7 +22,9 @@ struct StressPatternValidationView: View {
     // (globalScore is 100 when every answer is the calmest one). It is not a cortisol
     // measurement, and the screen says so.
     private var stressLoad: Int {
-        max(0, min(100, 100 - habitsQuizResult.globalScore))
+        // Testers / TestFlight creators: the score picked in Settings → Filming.
+        if let forced = FilmingOverride.quizScore { return forced }
+        return max(0, min(100, 100 - habitsQuizResult.globalScore))
     }
 
     /// Load of someone who mostly picks the calm side of each answer ("rarely", "often relaxed").

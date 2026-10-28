@@ -36,7 +36,8 @@ final class AmplitudeManager {
     }
 
     func setUserProperties(_ properties: [String: Any]) {
-        guard !properties.isEmpty else { return }
+        // A creator replaying the onboarding to film it is not a new user.
+        guard !properties.isEmpty, !OnboardingReplay.isActiveNow else { return }
         let identify = Identify()
         for (key, value) in properties {
             identify.set(property: key, value: value)
@@ -45,7 +46,7 @@ final class AmplitudeManager {
     }
 
     func track(event: String, properties: [String: Any]?) {
-        guard let amplitude else { return }
+        guard let amplitude, !OnboardingReplay.isActiveNow else { return }
         amplitude.track(eventType: event, eventProperties: properties)
     }
 

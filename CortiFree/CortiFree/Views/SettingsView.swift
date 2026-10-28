@@ -40,6 +40,10 @@ struct SettingsView: View {
     @State private var isRestoringPurchases: Bool = false
     @State private var infoAlertMessage: String?
     @State private var showWidgetGallery: Bool = false
+    /// Settings → Filming (testers and TestFlight creators), see FilmingOverride / TesterPulseOverride.
+    @AppStorage(FilmingOverride.quizScoreKey) private var filmingQuizScore = 0
+    @AppStorage(FilmingOverride.planGoalKey) private var filmingPlanGoal = ""
+    @AppStorage(TesterPulseOverride.dropStorageKey) private var filmingPulseDrop = 0
 
     /// Opens straight on the delete-account confirmation (from the subscription locked screen).
     private let promptsAccountDeletion: Bool
@@ -535,32 +539,80 @@ struct SettingsView: View {
     }
 
     // MARK: - Filming Section (testers and TestFlight)
-    /// UGC creators film from TestFlight, where the Debug section stays locked: only the forced BPM
-    /// lives here. English on purpose (creators), not localized.
+    /// UGC creators film from TestFlight, where the Debug section stays locked: the filming aids
+    /// live here (forced numbers, onboarding replay). English on purpose (creators), not localized.
     private var filmingSection: some View {
         settingsSection(title: "Filming", icon: "video.fill") {
-            // Forced BPM for every pulse check (pulse screen, Milo sheet). Set here only, not on those screens.
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "heart.fill")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.white)
-                    .frame(width: 20, height: 20)
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(verbatim: "Heart rate result")
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.white)
-                    TesterBPMPicker()
-                    Text(verbatim: "Every heart rate check ends near this number. Set back to Real when you're done filming.")
-                        .font(.custom("Poppins-Regular", size: 13))
-                        .foregroundColor(.white.opacity(0.5))
-                        .fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 0) {
+                // The whole onboarding again, nothing saved, no paywall (OnboardingReplay).
+                settingsRow(icon: "play.rectangle.fill", title: "Replay onboarding",
+                            subtitle: "Quiz → result → plan, then back here. No paywall, your data stays as it is.",
+                            showChevron: true) {
+                    HapticManager.medium()
+                    dismiss()
+                    // After the Settings sheet is gone, so the onboarding replaces the whole app.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        OnboardingReplay.shared.start()
+                    }
                 }
-                Spacer(minLength: 0)
+                filmingDivider
+
+                // Forced BPM for every pulse check (pulse screen, Milo sheet). Set here only, not on those screens.
+                filmingRow(icon: "heart.fill", title: "Heart rate result",
+                           note: "Every heart rate check ends near this number. Set back to Real when you're done filming.") {
+                    TesterBPMPicker()
+                }
+                filmingDivider
+
+                filmingRow(icon: "arrow.down.heart.fill", title: "Heart rate drop after an exercise",
+                           note: "The second check (after breathing) ends this many bpm below the first: « Your heart slowed by N bpm ».") {
+                    FilmingOptionPicker(selection: $filmingPulseDrop,
+                                        options: [(0, "Real")] + TesterPulseOverride.drops.map { ($0, "−\($0)") })
+                }
+                filmingDivider
+
+                filmingRow(icon: "chart.bar.fill", title: "Quiz result score",
+                           note: "The score on « Your quiz result » (out of 100, calm profile 30).") {
+                    FilmingOptionPicker(selection: $filmingQuizScore,
+                                        options: [(0, "Real")] + FilmingOverride.quizScores.map { ($0, "\($0)") })
+                }
+                filmingDivider
+
+                filmingRow(icon: "sparkles", title: "Plan on « Your plan is ready »",
+                           note: "Replay onboarding only. Real = the plan your answers pick.") {
+                    FilmingOptionPicker(selection: $filmingPlanGoal,
+                                        options: [("", "Real")] + PlanGoal.allCases.map { ($0.rawValue, FilmingOverride.label(for: $0)) })
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.9)))
+    }
+
+    private var filmingDivider: some View {
+        Divider().background(Color.white.opacity(0.1)).padding(.leading, 48)
+    }
+
+    private func filmingRow<Picker: View>(icon: String, title: String, note: String,
+                                         @ViewBuilder picker: () -> Picker) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.white)
+                .frame(width: 20, height: 20)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(verbatim: title)
+                    .font(.custom("Poppins-Regular", size: 16))
+                    .foregroundColor(.white)
+                picker()
+                Text(verbatim: note)
+                    .font(.custom("Poppins-Regular", size: 13))
+                    .foregroundColor(.white.opacity(0.5))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
 
     // MARK: - Section Builder

@@ -37,6 +37,8 @@ struct OnboardingPulseMeasureView: View {
     /// When set, an implausible reading never shows the "measure again" screen: the flow
     /// simply carries on without a number (the onboarding must never feel like an error).
     var onUnclear: (() -> Void)?
+    /// Second measure: the first reading (a forced drop in Settings → Filming ends below it).
+    var baselineBPM: Int?
     #if targetEnvironment(simulator)
     var simulatedBPM: Double = 84
     #endif
@@ -106,6 +108,7 @@ struct OnboardingPulseMeasureView: View {
         #if targetEnvironment(simulator)
         meter.simulatedBPM = simulatedBPM
         #endif
+        meter.baselineBPM = isAfter ? baselineBPM : nil
         phase = .measuring
         meter.start()
     }
