@@ -11,6 +11,7 @@
 		8021AECC2ED91A0100541E54 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8021AECB2ED91A0100541E54 /* GoogleSignInSwift */; };
 		802C49B12EBBB2340084B356 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 802C49B02EBBB2340084B356 /* Lottie */; };
 		803AC4DE2F40CED0007B3B5A /* TikTokBusinessSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */; };
+		FB0A10032F60000000C0FFEE /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = FB0A10022F60000000C0FFEE /* FacebookCore */; };
 		804F1D882F4CF13600374D9D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804F1D872F4CF13600374D9D /* WidgetKit.framework */; };
 		804F1D8A2F4CF13600374D9D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804F1D892F4CF13600374D9D /* SwiftUI.framework */; };
 		804F1D9B2F4CF13700374D9D /* CortiFreeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 804F1D852F4CF13600374D9D /* CortiFreeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -172,6 +173,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				803AC4DE2F40CED0007B3B5A /* TikTokBusinessSDK in Frameworks */,
+				FB0A10032F60000000C0FFEE /* FacebookCore in Frameworks */,
 				80F600D72E85EAA9008F58FB /* SuperwallKit in Frameworks */,
 				8021AECA2ED91A0100541E54 /* GoogleSignIn in Frameworks */,
 				80A000012F4BC34E002841B9 /* AmplitudeSwift in Frameworks */,
@@ -306,6 +308,7 @@
 				8021AECB2ED91A0100541E54 /* GoogleSignInSwift */,
 				80622A4B2F1701B9000C459F /* RevenueCat */,
 				803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */,
+				FB0A10022F60000000C0FFEE /* FacebookCore */,
 				80A000022F4BC34E002841B9 /* AmplitudeSwift */,
 			);
 			productName = CortiFree;
@@ -403,6 +406,7 @@
 				8021AEC82ED91A0100541E54 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				80622A482F1701B9000C459F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				803AC4DC2F40CED0007B3B5A /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */,
+				FB0A10012F60000000C0FFEE /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 				80A000032F4BC34E002841B9 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -995,6 +999,14 @@
 				minimumVersion = 4.5.2;
 			};
 		};
+		FB0A10012F60000000C0FFEE /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 18.1.1;
+			};
+		};
 		803AC4DC2F40CED0007B3B5A /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tiktok/tiktok-business-ios-sdk";
@@ -1044,6 +1056,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 802C49AF2EBBB2340084B356 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		FB0A10022F60000000C0FFEE /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB0A10012F60000000C0FFEE /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
 		};
 		803AC4DD2F40CED0007B3B5A /* TikTokBusinessSDK */ = {
 			isa = XCSwiftPackageProductDependency;

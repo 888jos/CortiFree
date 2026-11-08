@@ -38,8 +38,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Initialize TikTok App Events SDK
         TikTokManager.shared.initialize()
 
+        // Initialize Meta App Events SDK (Facebook / Instagram ads)
+        MetaManager.shared.initialize(application: application, launchOptions: launchOptions)
+
         // Configure RevenueCat SDK
         RevenueCatManager.shared.configure()
+        MetaManager.shared.linkRevenueCat()
 
         // Configure Superwall with RevenueCat as PurchaseController
         let purchaseController = RCPurchaseController()

@@ -90,6 +90,7 @@ final class AccountDeletionService {
     static func resetThirdPartyIdentities() {
         AnalyticsManager.shared.reset()
         TikTokManager.shared.logout()
+        MetaManager.shared.logout()
         Superwall.shared.reset()
     }
 

@@ -371,6 +371,8 @@ class AnalyticsManager {
         // TikTok: Identify user then CompleteRegistration
         TikTokManager.shared.identify(userId: userId)
         TikTokManager.shared.trackCompleteRegistration(method: authMethod)
+        MetaManager.shared.identify(userId: userId)
+        MetaManager.shared.trackCompleteRegistration(method: authMethod)
     }
 
     func trackOnboardingAuthenticationFailed(error: String, authMethod: String) {
@@ -517,6 +519,7 @@ class AnalyticsManager {
         track(event: "onboarding_prepaywall_viewed", properties: properties)
         // TikTok: ViewContent (paywall seen)
         TikTokManager.shared.trackViewContent()
+        MetaManager.shared.trackViewContent()
     }
 
     func trackOnboardingViewPlanClicked() {
@@ -992,9 +995,11 @@ class AnalyticsManager {
         if isTrial {
             // Trial gratuit commencé → StartTrial (valeur 0, pas de paiement réel)
             TikTokManager.shared.trackStartTrial(productId: productId)
+            MetaManager.shared.trackStartTrial(productId: productId, currency: currency)
         } else {
             // Vrai paiement → Subscribe
             TikTokManager.shared.trackSubscribe(productId: productId, price: priceDouble, currency: currency)
+            MetaManager.shared.trackSubscribe(productId: productId, price: priceDouble, currency: currency)
         }
     }
 

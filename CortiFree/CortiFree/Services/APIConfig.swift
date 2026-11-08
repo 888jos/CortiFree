@@ -91,6 +91,13 @@ final class APIConfig {
     /// TikTok App ID (the longer TikTok-specific ID)
     let tiktokAppId: String = "7613749779029295122"
 
+    /// Meta App ID (developers.facebook.com → the CortiFree app → Settings → Basic → App ID).
+    /// Empty = Meta SDK not started.
+    let metaAppId: String = "1121995017467185"
+
+    /// Meta client token (same app → Settings → Advanced → Security → Client token).
+    let metaClientToken: String = "5d7512391d5a417512a9ffdd6ac3345c"
+
     /// TikTok Access Token
     /// Add TIKTOK_ACCESS_TOKEN to Info.plist
     var tiktokAccessToken: String {
