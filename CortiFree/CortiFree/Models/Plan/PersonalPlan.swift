@@ -146,6 +146,8 @@ struct PlanProfile: Codable, Equatable {
     var durationCode: String?
     var ageCode: String?
     var genderCode: String?
+    /// OverallQuiz daily life: parent / worker / student / retired / other (OnboardingLifeStage).
+    var lifeCode: String?
     /// HabitsQuiz raw answers (12 indexes). Scores are derived internally only.
     var quizAnswers: [Int]?
     /// Symptom ids ("mental.1", "physical.4", "social.2", ...).

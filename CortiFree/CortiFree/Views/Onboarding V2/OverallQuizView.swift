@@ -18,12 +18,13 @@ struct OverallQuizView: View {
     @State private var selectedAge: Int? = nil
     @State private var selectedReasons: Set<Int> = []
     @State private var selectedDuration: Int? = nil
+    @State private var selectedLife: Int? = nil
     @State private var isGoingBack: Bool = false
     @State private var isTransitioning: Bool = false
     @State private var quizStartTime: Date?
     @State private var questionStartTime: Date?
 
-    private let totalQuestions = 4
+    private let totalQuestions = 5
 
     private var progress: Double {
         Double(currentQuestionIndex + 1) / Double(totalQuestions)
@@ -81,6 +82,13 @@ struct OverallQuizView: View {
                                 insertion: .move(edge: isGoingBack ? .leading : .trailing),
                                 removal: .move(edge: isGoingBack ? .trailing : .leading)
                             ))
+                    } else if currentQuestionIndex == 4 {
+                        lifeQuestion
+                            .id(4)
+                            .transition(.asymmetric(
+                                insertion: .move(edge: isGoingBack ? .leading : .trailing),
+                                removal: .move(edge: isGoingBack ? .trailing : .leading)
+                            ))
                     }
                 }
 
@@ -107,7 +115,8 @@ struct OverallQuizView: View {
         case 0: return "onboarding_v2.overall.reason_question".localized
         case 1: return "onboarding_v2.overall.duration_question".localized
         case 2: return "onboarding_v2.overall.gender_question".localized
-        default: return "onboarding_v2.overall.age_question".localized
+        case 3: return "onboarding_v2.overall.age_question".localized
+        default: return "onboarding_v2.overall.life_question".localized
         }
     }
 
@@ -130,7 +139,8 @@ struct OverallQuizView: View {
             "Stress reasons",
             "Stress duration",
             "Gender",
-            "Age"
+            "Age",
+            "Daily life"
         ]
         AnalyticsManager.shared.trackOnboardingQuizQuestionViewed(
             questionNumber: index + 1,
@@ -144,7 +154,8 @@ struct OverallQuizView: View {
             "Stress reasons",
             "Stress duration",
             "Gender",
-            "Age"
+            "Age",
+            "Daily life"
         ]
         let timeToAnswer = questionStartTime.map { Date().timeIntervalSince($0) } ?? 0.0
         AnalyticsManager.shared.trackOnboardingQuizQuestionAnswered(
@@ -262,6 +273,34 @@ struct OverallQuizView: View {
                             trackQuestionAnswered(3, answerIndex: index, answerText: ageTexts[index])
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 selectedAge = index
+                            }
+                            advance()
+                        }
+                    )
+                }
+            }
+            .disabled(isTransitioning)
+            .padding(.horizontal, 34)
+            .padding(.bottom, 40)
+        }
+    }
+
+    // MARK: - Question 5: Daily life (who the onboarding speaks to, see OnboardingAudience)
+
+    private var lifeQuestion: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(spacing: 22) {
+                ForEach(Array(OnboardingLifeStage.allCases.enumerated()), id: \.offset) { index, stage in
+                    let text = stage.titleKey.localized
+                    OverallAnswerButton(
+                        number: index + 1,
+                        text: text,
+                        isSelected: selectedLife == index,
+                        onTap: {
+                            HapticManager.light()
+                            trackQuestionAnswered(4, answerIndex: index, answerText: text)
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                selectedLife = index
                             }
                             guard !isTransitioning else { return }
                             isTransitioning = true
@@ -490,6 +529,7 @@ struct OverallQuizView: View {
         persistGender(genderCode)
 
         let selectedReasonTexts = selectedReasons.sorted().map { reasonOptions[$0] }
+        let lifeCode = selectedLife.flatMap { OnboardingLifeStage.allCases[safe: $0]?.rawValue }
         let data = OverallQuizData(
             gender: genderOptions[genderIndex],
             genderCode: genderCode,
@@ -499,13 +539,17 @@ struct OverallQuizView: View {
             reasons: selectedReasonTexts,
             reasonCodes: selectedReasons.sorted().map { reasonCodes[$0] },
             duration: durationOptions[selectedDuration ?? 0],
-            durationCode: durationCodes[selectedDuration ?? 0]
+            durationCode: durationCodes[selectedDuration ?? 0],
+            lifeCode: lifeCode
         )
+        OnboardingAudience.save(ageCode: data.ageCode, lifeCode: lifeCode)
+        OnboardingAudience.publish()
         PersonalPlanStore.shared.updateOnboardingDraft { profile in
             profile.reasonCodes = data.reasonCodes
             profile.durationCode = data.durationCode
             profile.ageCode = data.ageCode
             profile.genderCode = data.genderCode
+            profile.lifeCode = lifeCode
         }
 
         // Track quiz completion
@@ -671,6 +715,8 @@ struct OverallQuizData {
     let reasonCodes: [String]
     let duration: String
     let durationCode: String
+    /// Daily life (OnboardingLifeStage raw value); nil for profiles saved before the question.
+    var lifeCode: String? = nil
 }
 
 // MARK: - Preview

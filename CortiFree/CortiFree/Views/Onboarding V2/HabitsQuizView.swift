@@ -364,7 +364,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q1 - STRESS: Détente après le travail
         HabitsQuestion(
-            text: "onboarding_v2.habits.q1".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q1"),
             options: [
                 "onboarding_v2.habits.q1_opt1".localized,
                 "onboarding_v2.habits.q1_opt2".localized,
@@ -376,7 +376,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q2 - ÉNERGIE: Impact sur la vie sociale
         HabitsQuestion(
-            text: "onboarding_v2.habits.q2".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q2"),
             options: [
                 "onboarding_v2.habits.q2_opt1".localized,
                 "onboarding_v2.habits.q2_opt2".localized,
@@ -388,7 +388,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q3 - SOMMEIL: Réveils nocturnes
         HabitsQuestion(
-            text: "onboarding_v2.habits.q3".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q3"),
             options: [
                 "onboarding_v2.habits.q3_opt1".localized,
                 "onboarding_v2.habits.q3_opt2".localized,
@@ -400,7 +400,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q4 - STRESS PHYSIQUE: Tensions corporelles
         HabitsQuestion(
-            text: "onboarding_v2.habits.q4".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q4"),
             options: [
                 "onboarding_v2.habits.q4_opt1".localized,
                 "onboarding_v2.habits.q4_opt2".localized,
@@ -412,7 +412,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q5 - FOCUS: Capacité de concentration
         HabitsQuestion(
-            text: "onboarding_v2.habits.q5".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q5"),
             options: [
                 "onboarding_v2.habits.q5_opt1".localized,
                 "onboarding_v2.habits.q5_opt2".localized,
@@ -424,7 +424,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q6 - CHARGE MENTALE: Se sentir submergé
         HabitsQuestion(
-            text: "onboarding_v2.habits.q6".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q6"),
             options: [
                 "onboarding_v2.habits.q6_opt1".localized,
                 "onboarding_v2.habits.q6_opt2".localized,
@@ -436,7 +436,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q7 - DIGITAL/SOMMEIL: Déconnexion écrans
         HabitsQuestion(
-            text: "onboarding_v2.habits.q7".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q7"),
             options: [
                 "onboarding_v2.habits.q7_opt1".localized,
                 "onboarding_v2.habits.q7_opt2".localized,
@@ -448,7 +448,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q8 - ÉNERGIE: Niveau fin de journée
         HabitsQuestion(
-            text: "onboarding_v2.habits.q8".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q8"),
             options: [
                 "onboarding_v2.habits.q8_opt1".localized,
                 "onboarding_v2.habits.q8_opt2".localized,
@@ -463,7 +463,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q9 - APPARENCE: Impact physique du stress
         HabitsQuestion(
-            text: "onboarding_v2.habits.q9".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q9"),
             options: [
                 "onboarding_v2.habits.q9_opt1".localized,
                 "onboarding_v2.habits.q9_opt2".localized,
@@ -479,7 +479,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q10 - EXPÉRIENCE: Apps similaires (ex-Q11)
         HabitsQuestion(
-            text: "onboarding_v2.habits.q11".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q11"),
             options: [
                 "onboarding_v2.habits.q11_opt1".localized,
                 "onboarding_v2.habits.q11_opt2".localized,
@@ -493,7 +493,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q11 - OBJECTIF: Ce qu'ils veulent améliorer (ex-Q12)
         HabitsQuestion(
-            text: "onboarding_v2.habits.q12".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q12"),
             options: [
                 "onboarding_v2.habits.q12_opt1".localized,
                 "onboarding_v2.habits.q12_opt2".localized,
@@ -506,7 +506,7 @@ func getAllHabitsQuestions() -> [HabitsQuestion] {
 
         // Q12 - TEMPS: Disponibilité quotidienne (ex-Q13)
         HabitsQuestion(
-            text: "onboarding_v2.habits.q13".localized,
+            text: OnboardingAudience.text("onboarding_v2.habits.q13"),
             options: [
                 "onboarding_v2.habits.q13_opt1".localized,
                 "onboarding_v2.habits.q13_opt2".localized,

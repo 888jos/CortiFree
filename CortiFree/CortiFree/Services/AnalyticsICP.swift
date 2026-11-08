@@ -19,7 +19,8 @@ enum AnalyticsICP {
             "icp_stress_reasons": data.reasonCodes,
             "icp_main_reason": data.reasonCodes.first ?? "none",
             "icp_reason_count": data.reasonCodes.count,
-            "icp_stress_duration": data.durationCode
+            "icp_stress_duration": data.durationCode,
+            "icp_life": data.lifeCode ?? "unknown"
         ]
         send("onboarding_profile_completed", properties)
     }

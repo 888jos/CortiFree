@@ -5820,3 +5820,11 @@
 "onboarding_v2.ai_quiz.milo.consent_body" = "Miloはあなたのプランと分析をもとにレポートをパーソナライズできます。何も保存されず、ふたりだけの話です。";
 "onboarding_v2.ai_quiz.milo.consent_accept" = "同意する";
 "onboarding_v2.ai_quiz.milo.consent_refuse" = "同意しない";
+
+/* Onboarding profile quiz: daily life (OnboardingAudience) */
+"onboarding_v2.overall.life_question" = "あなたの毎日にいちばん近いのは？";
+"onboarding_v2.overall.life_parent" = "仕事をしていて子どもがいる";
+"onboarding_v2.overall.life_worker" = "仕事をしている（家に子どもはいない）";
+"onboarding_v2.overall.life_student" = "学生";
+"onboarding_v2.overall.life_retired" = "退職している";
+"onboarding_v2.overall.life_other" = "その他";

@@ -5817,3 +5817,11 @@
 "onboarding_v2.ai_quiz.milo.consent_body" = "Milo puede personalizar tu informe a partir de tu plan y del análisis. No se guarda nada y queda entre vosotros.";
 "onboarding_v2.ai_quiz.milo.consent_accept" = "Aceptar";
 "onboarding_v2.ai_quiz.milo.consent_refuse" = "Rechazar";
+
+/* Onboarding profile quiz: daily life (OnboardingAudience) */
+"onboarding_v2.overall.life_question" = "¿Qué describe mejor tu día a día?";
+"onboarding_v2.overall.life_parent" = "Trabajo y tengo hijos";
+"onboarding_v2.overall.life_worker" = "Trabajo, sin hijos en casa";
+"onboarding_v2.overall.life_student" = "Estudio";
+"onboarding_v2.overall.life_retired" = "Estoy jubilado/a";
+"onboarding_v2.overall.life_other" = "Otra situación";

@@ -5817,3 +5817,34 @@
 "onboarding_v2.ai_quiz.milo.consent_body" = "Milo can personalize your report from your plan and the analysis. Nothing is kept, and it stays between you.";
 "onboarding_v2.ai_quiz.milo.consent_accept" = "Accept";
 "onboarding_v2.ai_quiz.milo.consent_refuse" = "Decline";
+
+/* Onboarding profile quiz: daily life (OnboardingAudience) */
+"onboarding_v2.overall.life_question" = "What best describes your day-to-day?";
+"onboarding_v2.overall.life_parent" = "I work and have kids";
+"onboarding_v2.overall.life_worker" = "I work, no kids at home";
+"onboarding_v2.overall.life_student" = "I'm a student";
+"onboarding_v2.overall.life_retired" = "I'm retired";
+"onboarding_v2.overall.life_other" = "Something else";
+/* Habit questions and reassurance worded for the user's segment (personalized half only) */
+"onboarding_v2.habits.q1.parent" = "In the evening, once the kids are in bed, do you struggle to unwind?";
+"onboarding_v2.habits.q1.worker" = "When you get home from work, do you struggle to switch off and unwind?";
+"onboarding_v2.habits.q1.young_adult" = "In the evening, after class or work, do you struggle to unwind?";
+"onboarding_v2.habits.q1.senior" = "At the end of the day, do you struggle to unwind?";
+"onboarding_v2.habits.q2.parent" = "Do you skip time for yourself or with loved ones because you're out of energy?";
+"onboarding_v2.habits.q2.young_adult" = "Have you ever canceled a night out with friends because of fatigue or stress?";
+"onboarding_v2.habits.q2.senior" = "Do you cancel an outing or a visit because of fatigue or stress?";
+"onboarding_v2.habits.q3.parent" = "Do you wake up at night thinking about everything you have to handle tomorrow?";
+"onboarding_v2.habits.q3.worker" = "Do you wake up at night thinking about tomorrow's work?";
+"onboarding_v2.habits.q3.young_adult" = "Do you wake up at night thinking about classes, exams or work?";
+"onboarding_v2.habits.q6.parent" = "How often do you feel overwhelmed between work, home and the kids?";
+"onboarding_v2.habits.q6.worker" = "How often do you feel overwhelmed by work and everything around it?";
+"onboarding_v2.habits.q6.young_adult" = "How often do you feel overwhelmed by school, work or everything expected of you?";
+"onboarding_v2.habits.q6.senior" = "How often do you feel overwhelmed by what you have to handle?";
+"onboarding_v2.habits.q7.parent" = "Once the house is quiet, do you have trouble putting your phone down?";
+"onboarding_v2.habits.q8.parent" = "What's your energy level once the day and the kids are taken care of?";
+"onboarding_v2.habits.q8.worker" = "What's your energy level when you leave work?";
+"onboarding_v2.habits.q8.senior" = "What's your energy level in the late afternoon?";
+"onboarding_v2.reassurance.brief.life.parent" = "Between work, home and the kids, there's rarely a minute left for you. We'll find you a few.";
+"onboarding_v2.reassurance.brief.life.worker" = "When work takes up all the space, the pressure doesn't stop when you leave. We'll help you really switch off.";
+"onboarding_v2.reassurance.brief.life.young_adult" = "Between school, work and everything expected of you, pressure builds fast. We'll help you bring it down.";
+"onboarding_v2.reassurance.brief.life.senior" = "We'll go at your pace, with short and simple exercises.";

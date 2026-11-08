@@ -25,6 +25,9 @@ struct HabitsQuizEntryView: View {
         self.onComplete = onComplete
         if resumesAIQuiz, let app = AIQuizReturnCenter.shared.savedApp {
             _mode = State(initialValue: .waiting(app))
+        } else if !OnboardingAudience.showsAIQuizChoice {
+            // 55+: no « my AI answers » choice, straight to the questions.
+            _mode = State(initialValue: .manual)
         }
     }
 
@@ -51,7 +54,10 @@ struct HabitsQuizEntryView: View {
             case .pickApp:
                 appPicker.transition(.opacity.combined(with: .move(edge: .trailing)))
             case .manual:
-                HabitsQuizView(onComplete: onComplete, onExit: { mode = .choice }).transition(.opacity)
+                HabitsQuizView(onComplete: onComplete, onExit: {
+                    if OnboardingAudience.showsAIQuizChoice { mode = .choice } else { onBack?() }
+                })
+                .transition(.opacity)
             case .waiting(let app):
                 AIQuizMiloChat(
                     app: app,
@@ -74,7 +80,12 @@ struct HabitsQuizEntryView: View {
         }
         .animation(.easeInOut(duration: 0.35), value: mode)
         .onAppear {
-            AnalyticsManager.shared.track(event: "onboarding_quiz_mode_viewed")
+            if OnboardingAudience.showsAIQuizChoice {
+                AnalyticsManager.shared.track(event: "onboarding_quiz_mode_viewed")
+            } else {
+                AnalyticsManager.shared.track(event: "onboarding_quiz_mode_selected",
+                                              properties: ["mode": "manual", "reason": "ai_choice_hidden_55_plus"])
+            }
         }
     }
 

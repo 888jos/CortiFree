@@ -1047,7 +1047,9 @@ extension OverallQuizData {
             reasons: draft.reasonCodes.map { "onboarding_v2.overall.reason_\($0)".localized },
             reasonCodes: draft.reasonCodes,
             duration: "onboarding_v2.overall.duration_\(durationCode)".localized,
-            durationCode: durationCode
+            durationCode: durationCode,
+            lifeCode: draft.lifeCode
         )
+        OnboardingAudience.save(ageCode: ageCode, lifeCode: draft.lifeCode)
     }
 }

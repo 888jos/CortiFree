@@ -33,6 +33,9 @@ struct ReassuranceView: View {
         }
         if first == thanks { first += " " + "onboarding_v2.reassurance.brief.default".localized }
         var result = [first]
+        // A sentence about their daily life (parent, worker, student, senior), personalized half only.
+        let life = OnboardingAudience.optionalText("onboarding_v2.reassurance.brief.life")
+        if !life.isEmpty { result.append(life) }
         if let data = overallData {
             let duration = brief("duration_\(data.durationCode)")
             if !duration.isEmpty { result.append(duration) }

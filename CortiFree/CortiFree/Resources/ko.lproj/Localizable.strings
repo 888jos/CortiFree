@@ -5820,3 +5820,11 @@
 "onboarding_v2.ai_quiz.milo.consent_body" = "Milo가 플랜과 분석을 바탕으로 리포트를 맞춤화할 수 있어요. 아무것도 저장되지 않고, 둘만의 이야기로 남아요.";
 "onboarding_v2.ai_quiz.milo.consent_accept" = "동의";
 "onboarding_v2.ai_quiz.milo.consent_refuse" = "거절";
+
+/* Onboarding profile quiz: daily life (OnboardingAudience) */
+"onboarding_v2.overall.life_question" = "당신의 일상을 가장 잘 설명하는 것은?";
+"onboarding_v2.overall.life_parent" = "일하면서 아이를 키우고 있어요";
+"onboarding_v2.overall.life_worker" = "일하고 있어요 (집에 아이는 없어요)";
+"onboarding_v2.overall.life_student" = "학생이에요";
+"onboarding_v2.overall.life_retired" = "은퇴했어요";
+"onboarding_v2.overall.life_other" = "기타";

@@ -5815,3 +5815,34 @@
 "onboarding_v2.ai_quiz.milo.consent_body" = "Milo peut personnaliser ton rapport à partir de ton plan et de l'analyse. Rien n'est gardé, et ça reste entre vous.";
 "onboarding_v2.ai_quiz.milo.consent_accept" = "Accepter";
 "onboarding_v2.ai_quiz.milo.consent_refuse" = "Refuser";
+
+/* Onboarding profile quiz: daily life (OnboardingAudience) */
+"onboarding_v2.overall.life_question" = "Qu'est-ce qui décrit le mieux ton quotidien ?";
+"onboarding_v2.overall.life_parent" = "Je travaille et j'ai des enfants";
+"onboarding_v2.overall.life_worker" = "Je travaille, sans enfants à la maison";
+"onboarding_v2.overall.life_student" = "Je fais des études";
+"onboarding_v2.overall.life_retired" = "Je suis à la retraite";
+"onboarding_v2.overall.life_other" = "Autre situation";
+/* Habit questions and reassurance worded for the user's segment (personalized half only) */
+"onboarding_v2.habits.q1.parent" = "Le soir, une fois les enfants couchés, as-tu du mal à te détendre ?";
+"onboarding_v2.habits.q1.worker" = "Quand tu rentres du travail, as-tu du mal à décrocher et à te détendre ?";
+"onboarding_v2.habits.q1.young_adult" = "Le soir, après les cours ou le boulot, as-tu du mal à te détendre ?";
+"onboarding_v2.habits.q1.senior" = "En fin de journée, as-tu du mal à te détendre ?";
+"onboarding_v2.habits.q2.parent" = "T'arrive-t-il de renoncer à un moment pour toi ou avec tes proches, faute d'énergie ?";
+"onboarding_v2.habits.q2.young_adult" = "As-tu déjà annulé une soirée avec tes amis à cause de la fatigue ou du stress ?";
+"onboarding_v2.habits.q2.senior" = "T'arrive-t-il d'annuler une sortie ou une visite à cause de la fatigue ou du stress ?";
+"onboarding_v2.habits.q3.parent" = "Te réveilles-tu la nuit en pensant à tout ce qu'il faut gérer le lendemain ?";
+"onboarding_v2.habits.q3.worker" = "Te réveilles-tu la nuit en pensant au travail du lendemain ?";
+"onboarding_v2.habits.q3.young_adult" = "Te réveilles-tu la nuit en pensant à tes cours, tes examens ou ton boulot ?";
+"onboarding_v2.habits.q6.parent" = "À quelle fréquence te sens-tu submergé(e) entre le travail, la maison et les enfants ?";
+"onboarding_v2.habits.q6.worker" = "À quelle fréquence te sens-tu submergé(e) par le travail et tout ce qu'il y a autour ?";
+"onboarding_v2.habits.q6.young_adult" = "À quelle fréquence te sens-tu submergé(e) par tes études, ton travail ou tout ce qu'on attend de toi ?";
+"onboarding_v2.habits.q6.senior" = "À quelle fréquence te sens-tu dépassé(e) par ce que tu as à gérer ?";
+"onboarding_v2.habits.q7.parent" = "Une fois la maison calme, as-tu du mal à lâcher ton téléphone ?";
+"onboarding_v2.habits.q8.parent" = "Quel est ton niveau d'énergie une fois la journée et les enfants gérés ?";
+"onboarding_v2.habits.q8.worker" = "Quel est ton niveau d'énergie en sortant du travail ?";
+"onboarding_v2.habits.q8.senior" = "Quel est ton niveau d'énergie en fin d'après-midi ?";
+"onboarding_v2.reassurance.brief.life.parent" = "Entre le travail, la maison et les enfants, il reste rarement une minute pour toi. On va en trouver quelques-unes.";
+"onboarding_v2.reassurance.brief.life.worker" = "Quand le travail prend toute la place, la pression ne s'arrête pas en sortant du bureau. On va t'aider à vraiment décrocher.";
+"onboarding_v2.reassurance.brief.life.young_adult" = "Entre les études, le boulot et tout ce qu'on attend de toi, la pression monte vite. On va t'aider à la faire redescendre.";
+"onboarding_v2.reassurance.brief.life.senior" = "On va y aller à ton rythme, avec des exercices simples et courts.";
