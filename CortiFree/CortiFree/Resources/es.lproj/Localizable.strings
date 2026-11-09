@@ -3222,12 +3222,12 @@
 "onboarding_v2.insight.profile.priority.sleep" = "El sueño destaca como tu primera oportunidad de progreso.";
 "onboarding_v2.insight.profile.priority.energy" = "Construir una energía más estable destaca como tu primera prioridad.";
 "onboarding_v2.insight.profile.priority.focus" = "La concentración destaca como la primera área a fortalecer.";
-"onboarding_v2.habits.q12" = "¿Qué te gustaría mejorar más?";
+"onboarding_v2.habits.q12" = "¿En qué debería centrarse tu plan de 4 semanas?";
 "onboarding_v2.habits.q12_opt1" = "Dormir mejor";
-"onboarding_v2.habits.q12_opt2" = "Reducir mi estrés";
+"onboarding_v2.habits.q12_opt2" = "Calmar mi estrés y mi ansiedad";
 "onboarding_v2.habits.q12_opt3" = "Tener más energía";
 "onboarding_v2.habits.q12_opt4" = "Concentrarme mejor";
-"onboarding_v2.habits.q12_opt5" = "Mejor equilibrio general";
+"onboarding_v2.habits.q12_opt5" = "Encontrar mi equilibrio emocional";
 "onboarding_v2.habits.q13" = "¿Cuánto tiempo puedes dedicar diariamente a tu bienestar?";
 "onboarding_v2.habits.q13_opt1" = "0 a 5 minutos";
 "onboarding_v2.habits.q13_opt2" = "5 a 10 minutos";
@@ -4897,6 +4897,10 @@
 "milo.import.error.unreadable" = "Milo no pudo leer este archivo. Prueba con un PDF o un archivo de texto.";
 "milo.import.error.empty" = "No hay suficiente texto para que Milo aprenda algo sobre ti.";
 "milo.import.error.not_personal" = "Milo no encontró nada sobre ti en este documento. Prueba con una conversación en la que hables de ti.";
+"milo.import.failed.not_personal" = "Leí lo que compartiste, pero no te encontré en ello: nada sobre cómo te sientes ni por lo que estás pasando. Una conversación en la que hables de ti funciona mejor. Lo más rápido: abre «Cuéntale tu historia a Milo», copia la pregunta para tu IA y comparte su respuesta. Si tu IA dice que aún no te conoce, cuéntale primero un poco de tu semana y vuelve a preguntar. Con una captura de pantalla, asegúrate de que el texto se vea nítido y completo.";
+"milo.import.failed.empty" = "No había suficiente texto para leer. Comparte una conversación más larga, unos párrafos o una captura más nítida y lo intento de nuevo.";
+"milo.import.failed.unreadable" = "No pude leer este archivo. Un PDF, un archivo de texto o una captura clara funciona mejor. También puedes copiar el texto y pegármelo.";
+"milo.import.failed.link" = "No pude abrir este enlace. En la app, selecciona la conversación, cópiala y pégala en «Cuéntale tu historia a Milo».";
 "milo.import.reading.title" = "Milo está leyendo…";
 "milo.import.reading.step.read" = "Leyendo tu conversación";
 "milo.import.reading.step.health" = "Leyendo tu exportación de Salud";

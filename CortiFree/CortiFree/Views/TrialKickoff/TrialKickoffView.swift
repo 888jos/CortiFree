@@ -434,12 +434,11 @@ struct TrialKickoffView: View {
     }
 
     private func track(_ event: String, _ properties: [String: Any] = [:]) {
-        #if DEBUG
+        // Preview (testers only, from Home): no analytics.
         if isPreview {
             print("[TrialKickoff preview] \(event) \(properties)")
             return
         }
-        #endif
         AnalyticsManager.shared.track(event: event, properties: properties)
     }
 
@@ -501,13 +500,11 @@ private struct TrialKickoffBreathingView: View {
         VStack(spacing: 0) {
             HStack {
                 Spacer()
-                #if DEBUG
                 if isPreview {
                     Button("⏩ fin") { complete() }
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.6))
                 }
-                #endif
             }
             .frame(height: 44)
             .padding(.horizontal, 20)

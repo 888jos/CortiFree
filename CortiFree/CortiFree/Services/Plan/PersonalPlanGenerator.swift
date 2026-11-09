@@ -177,7 +177,7 @@ enum PersonalPlanGenerator {
         case "stress": quizGoal = .stress
         case "energy": quizGoal = .energy
         case "focus": quizGoal = .focus
-        case "balance": weights[.stress, default: 0] += 1; weights[.emotional, default: 0] += 1
+        case "balance": quizGoal = .emotional   // « Find my emotional balance »
         default: break
         }
         if let quizGoal { weights[quizGoal, default: 0] += 2 }
@@ -215,7 +215,8 @@ enum PersonalPlanGenerator {
         case .minimal, nil: break
         }
 
-        // Primary goal: user override > the user's AI > reasons > Q11 > weights > stress
+        // Primary goal: user override > the user's AI > the plan picked in the quiz (Q11, the five answers
+        // are the five plans) > reasons > weights > stress. The reasons then still shape the second plan.
         let order = PlanGoal.allCases
         func best(_ candidates: [PlanGoal]) -> PlanGoal? {
             candidates.max { a, b in
@@ -232,10 +233,10 @@ enum PersonalPlanGenerator {
             primary = overrideGoal; origin = .user
         } else if let aiGoal {
             primary = aiGoal; origin = .quiz
-        } else if !reasonGoals.isEmpty, let goal = best(order.filter { reasonGoals[$0] != nil }) {
-            primary = goal; origin = .reason
         } else if let quizGoal {
             primary = quizGoal; origin = .quiz
+        } else if !reasonGoals.isEmpty, let goal = best(order.filter { reasonGoals[$0] != nil }) {
+            primary = goal; origin = .reason
         } else if let goal = best(order), (weights[goal] ?? 0) > 0 {
             primary = goal; origin = .answers
         }
@@ -413,7 +414,14 @@ enum PersonalPlanGenerator {
 
         let cap = audioCap(week: week, analysis: analysis, cycle: cycle)
         let catalog = GuidedSessionCatalog.all.filter { !analysis.excluded.contains($0.id) }.sorted { $0.id < $1.id }
-        var fitting = catalog.filter { $0.durationMinutes <= cap && $0.id != excluding && (weights[$0.category] ?? 0) > 0 }
+        // First week of the first cycle: only six sessions in the whole catalogue last 5 minutes or less, almost all
+        // « stress SOS », so every goal ended up with the same sessions. The categories that define the goal (weight
+        // ≥ 2.5: focus, morning, self-compassion, body…) may go 3 minutes past the cap, so each goal gets its own.
+        let reach = analysis.cycleTheme == .soothe && week == 1 ? cap + 3 : cap
+        var fitting = catalog.filter { session in
+            guard session.id != excluding, let weight = weights[session.category], weight > 0 else { return false }
+            return session.durationMinutes <= cap || (weight >= 2.5 && session.durationMinutes <= reach)
+        }
         if fitting.isEmpty {
             fitting = catalog.filter { $0.id != excluding && (weights[$0.category] ?? 0) > 0 }
                 .sorted { $0.durationMinutes < $1.durationMinutes }

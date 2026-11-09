@@ -3222,12 +3222,12 @@
 "onboarding_v2.insight.profile.priority.sleep" = "Sleep stands out as your first opportunity for progress.";
 "onboarding_v2.insight.profile.priority.energy" = "Building steadier energy stands out as your first priority.";
 "onboarding_v2.insight.profile.priority.focus" = "Focus stands out as the first area to strengthen.";
-"onboarding_v2.habits.q12" = "What would you most like to improve?";
+"onboarding_v2.habits.q12" = "What should your 4-week plan focus on?";
 "onboarding_v2.habits.q12_opt1" = "Sleep better";
-"onboarding_v2.habits.q12_opt2" = "Reduce my stress";
+"onboarding_v2.habits.q12_opt2" = "Calm my stress and anxiety";
 "onboarding_v2.habits.q12_opt3" = "Have more energy";
 "onboarding_v2.habits.q12_opt4" = "Focus better";
-"onboarding_v2.habits.q12_opt5" = "Better overall balance";
+"onboarding_v2.habits.q12_opt5" = "Find my emotional balance";
 "onboarding_v2.habits.q13" = "How much time can you dedicate daily to your wellbeing?";
 "onboarding_v2.habits.q13_opt1" = "0-5 minutes";
 "onboarding_v2.habits.q13_opt2" = "5-10 minutes";
@@ -4897,6 +4897,10 @@
 "milo.import.error.unreadable" = "Milo couldn't read this file. Try a PDF or a text file.";
 "milo.import.error.empty" = "There isn't enough text here for Milo to learn something about you.";
 "milo.import.error.not_personal" = "Milo didn't find anything about you in this document. Try a conversation where you talk about yourself.";
+"milo.import.failed.not_personal" = "I read what you shared, but I couldn’t find you in it: nothing about how you feel or what you’re going through. A conversation where you talk about yourself works best. The quickest way: open “Bring your story to Milo”, copy the question for your AI and share its answer. If your AI says it doesn’t know you yet, tell it a bit about your week first, then ask again. With a screenshot, make sure the text is sharp and fully visible.";
+"milo.import.failed.empty" = "There wasn’t enough text for me to read. Share a longer conversation, a few paragraphs or a sharper screenshot and I’ll try again.";
+"milo.import.failed.unreadable" = "I couldn’t read this file. A PDF, a text file or a clear screenshot works best. You can also copy the text and paste it to me.";
+"milo.import.failed.link" = "I couldn’t open this link. In the app, select the conversation, copy it, then paste it in “Bring your story to Milo”.";
 "milo.import.reading.title" = "Milo is reading…";
 "milo.import.reading.step.read" = "Reading your conversation";
 "milo.import.reading.step.health" = "Reading your Health export";

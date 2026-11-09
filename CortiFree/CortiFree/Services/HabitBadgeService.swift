@@ -210,8 +210,7 @@ class HabitBadgeService: ObservableObject {
         return Double(unlockedBadgesCount) / Double(totalBadgesCount)
     }
 
-    #if DEBUG
-    /// Debug-only gallery control. It stays in memory and is never synced remotely.
+    /// Tester-only gallery control (DEBUG and TestFlight). It stays in memory and is never synced remotely.
     func setAllUnlockedForDebug(_ unlocked: Bool) {
         habitBadges = habitBadges.map { badge in
             var updated = badge
@@ -220,5 +219,4 @@ class HabitBadgeService: ObservableObject {
             return updated
         }
     }
-    #endif
 }

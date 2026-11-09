@@ -51,6 +51,23 @@ enum MiloImportError: LocalizedError {
     }
 }
 
+extension MiloImportError {
+    /// What Milo says in the chat when an import fails: his own words and what to try next,
+    /// not a system error. Other errors (offline, quota, server) keep their usual sentence.
+    static func chatMessage(for error: Error) -> String {
+        let key: String?
+        switch error as? MiloImportError {
+        case .notPersonal: key = "milo.import.failed.not_personal"
+        case .empty: key = "milo.import.failed.empty"
+        case .unreadable: key = "milo.import.failed.unreadable"
+        case .linkUnreadable: key = "milo.import.failed.link"
+        default: key = nil
+        }
+        if let key { return LanguageManager.shared.localizedString(for: key) }
+        return (error as? LocalizedError)?.errorDescription ?? LanguageManager.shared.localizedString(for: "assistant.error.unavailable")
+    }
+}
+
 /// A document ready to analyse: its text and where it came from.
 struct MiloImportDocument: Equatable {
     var text: String

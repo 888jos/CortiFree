@@ -260,8 +260,7 @@ class AchievementService: ObservableObject {
         return Double(unlockedCount) / Double(totalCount)
     }
 
-    #if DEBUG
-    /// Debug-only gallery control. It stays in memory and never changes real data.
+    /// Tester-only gallery control (DEBUG and TestFlight). It stays in memory and never changes real data.
     func setAllUnlockedForDebug(_ unlocked: Bool) {
         achievements = achievements.map { achievement in
             var updated = achievement
@@ -270,5 +269,4 @@ class AchievementService: ObservableObject {
             return updated
         }
     }
-    #endif
 }

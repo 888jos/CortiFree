@@ -2,11 +2,10 @@
 //  CelebrationsGalleryView.swift
 //  CortiFree
 //
-//  DEBUG only: shows every celebration / reward screen of the app with sample data,
+//  Testers only (DEBUG and TestFlight): shows every celebration / reward screen of the app with sample data,
 //  to review them side by side (Home → "🎉 Celebrations gallery").
 //
 
-#if DEBUG
 import SwiftUI
 
 struct CelebrationsGalleryView: View {
@@ -390,4 +389,3 @@ private struct ReplayButton: View {
         }
     }
 }
-#endif

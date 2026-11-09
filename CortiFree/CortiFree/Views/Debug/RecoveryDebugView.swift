@@ -2,11 +2,10 @@
 //  RecoveryDebugView.swift
 //  CortiFree
 //
-//  DEBUG only: test the trial recovery notifications and the recovery paywalls
+//  Testers only (DEBUG and TestFlight): test the trial recovery notifications and the recovery paywalls
 //  without waiting for the real delays.
 //
 
-#if DEBUG
 import SwiftUI
 import SuperwallKit
 import UserNotifications
@@ -231,4 +230,3 @@ struct RecoveryDebugView: View {
             .sorted()
     }
 }
-#endif

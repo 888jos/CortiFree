@@ -65,9 +65,9 @@ struct MiloImportView: View {
         .fileImporter(isPresented: $showFilePicker, allowedContentTypes: MiloImportReader.fileTypes) { result in
             switch result {
             case .success(let url):
-                do { start(try MiloImportReader.read(url)) } catch { errorMessage = error.localizedDescription }
+                do { start(try MiloImportReader.read(url)) } catch { fail(error) }
             case .failure:
-                errorMessage = t("milo.import.error.unreadable")
+                fail(MiloImportError.unreadable)
             }
         }
         .onAppear {
@@ -79,10 +79,10 @@ struct MiloImportView: View {
             screenshot = nil
             Task { @MainActor in
                 guard let data = try? await item.loadTransferable(type: Data.self) else {
-                    errorMessage = t("milo.import.error.unreadable")
+                    fail(MiloImportError.unreadable)
                     return
                 }
-                do { start(try MiloImportReader.image(data)) } catch { errorMessage = error.localizedDescription }
+                do { start(try MiloImportReader.image(data)) } catch { fail(error) }
             }
         }
         .onDisappear { analysisTask?.cancel() }
@@ -236,7 +236,7 @@ struct MiloImportView: View {
         PasteButton(payloadType: String.self) { strings in
             let text = strings.joined(separator: "\n")
             Task { @MainActor in
-                do { start(try MiloImportReader.pasted(text)) } catch { errorMessage = error.localizedDescription }
+                do { start(try MiloImportReader.pasted(text)) } catch { fail(error) }
             }
         }
         .labelStyle(.titleAndIcon)
@@ -305,8 +305,7 @@ struct MiloImportView: View {
                 start(document)
             } catch {
                 guard !Task.isCancelled else { return }
-                errorMessage = MiloImportError.linkUnreadable.errorDescription
-                phase = .choose
+                fail(MiloImportError.linkUnreadable)
             }
         }
     }
@@ -329,10 +328,17 @@ struct MiloImportView: View {
                 await minimumShow
                 guard !Task.isCancelled else { return }
                 if case DeepSeekChatError.quotaExceeded = error { onAnalyzed() }
-                errorMessage = (error as? LocalizedError)?.errorDescription ?? t("assistant.error.unavailable")
-                phase = .choose
+                fail(error)
             }
         }
+    }
+
+    /// Once something was shared, a failure is not a red line in the sheet: the sheet closes and
+    /// Milo opens a new chat and explains what happened and what to try.
+    private func fail(_ error: Error) {
+        HapticManager.light()
+        onFailure(MiloImportError.chatMessage(for: error))
+        dismiss()
     }
 
     // MARK: - Result

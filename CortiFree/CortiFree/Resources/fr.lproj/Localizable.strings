@@ -3222,12 +3222,12 @@
 "onboarding_v2.insight.profile.priority.sleep" = "Le sommeil ressort comme ton premier levier de progression.";
 "onboarding_v2.insight.profile.priority.energy" = "Retrouver une énergie plus stable ressort comme ta première priorité.";
 "onboarding_v2.insight.profile.priority.focus" = "La concentration ressort comme le premier domaine à renforcer.";
-"onboarding_v2.habits.q12" = "Qu'est-ce que tu aimerais le plus améliorer ?";
+"onboarding_v2.habits.q12" = "Sur quoi ton plan de 4 semaines doit-il se concentrer ?";
 "onboarding_v2.habits.q12_opt1" = "Mieux dormir";
-"onboarding_v2.habits.q12_opt2" = "Réduire mon stress";
+"onboarding_v2.habits.q12_opt2" = "Apaiser mon stress et mon anxiété";
 "onboarding_v2.habits.q12_opt3" = "Avoir plus d'énergie";
 "onboarding_v2.habits.q12_opt4" = "Mieux me concentrer";
-"onboarding_v2.habits.q12_opt5" = "Un meilleur équilibre global";
+"onboarding_v2.habits.q12_opt5" = "Retrouver mon équilibre émotionnel";
 "onboarding_v2.habits.q13" = "Combien de temps peux-tu consacrer par jour à ton bien-être ?";
 "onboarding_v2.habits.q13_opt1" = "0 à 5 minutes";
 "onboarding_v2.habits.q13_opt2" = "5 à 10 minutes";
@@ -4895,6 +4895,10 @@
 "milo.import.error.unreadable" = "Milo n'a pas pu lire ce fichier. Essaie un PDF ou un fichier texte.";
 "milo.import.error.empty" = "Il n'y a pas assez de texte pour que Milo apprenne quelque chose sur toi.";
 "milo.import.error.not_personal" = "Milo n'a rien trouvé sur toi dans ce document. Essaie une conversation où tu parles de toi.";
+"milo.import.failed.not_personal" = "J’ai lu ce que tu as partagé, mais je ne t’y ai pas trouvé : rien sur ce que tu ressens ni sur ce que tu traverses. Une conversation où tu parles de toi fonctionne mieux. Le plus simple : ouvre « Raconte ton histoire à Milo », copie la question pour ton IA et partage sa réponse. Si ton IA dit qu’elle ne te connaît pas encore, raconte-lui d’abord un peu ta semaine, puis repose la question. Avec une capture d’écran, vérifie que le texte est net et entièrement visible.";
+"milo.import.failed.empty" = "Il n’y avait pas assez de texte pour que je puisse lire. Partage une conversation plus longue, quelques paragraphes ou une capture plus nette, et je réessaie.";
+"milo.import.failed.unreadable" = "Je n’ai pas pu lire ce fichier. Un PDF, un fichier texte ou une capture d’écran bien nette fonctionne mieux. Tu peux aussi copier le texte et me le coller.";
+"milo.import.failed.link" = "Je n’ai pas pu ouvrir ce lien. Dans l’app, sélectionne la conversation, copie-la puis colle-la dans « Raconte ton histoire à Milo ».";
 "milo.import.reading.title" = "Milo lit…";
 "milo.import.reading.step.read" = "Lecture de ta conversation";
 "milo.import.reading.step.health" = "Lecture de ton export Santé";

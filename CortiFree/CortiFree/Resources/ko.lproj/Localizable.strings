@@ -3222,12 +3222,12 @@
 "onboarding_v2.insight.profile.priority.sleep" = "수면이 가장 먼저 개선할 수 있는 영역으로 보여요.";
 "onboarding_v2.insight.profile.priority.energy" = "더 안정적인 에너지를 만드는 것이 첫 번째 우선순위로 보여요.";
 "onboarding_v2.insight.profile.priority.focus" = "집중력이 가장 먼저 강화할 영역으로 보여요.";
-"onboarding_v2.habits.q12" = "가장 개선하고 싶은 것은 무엇인가요?";
+"onboarding_v2.habits.q12" = "4주 플랜에서 무엇에 집중하고 싶나요?";
 "onboarding_v2.habits.q12_opt1" = "더 잘 자기";
-"onboarding_v2.habits.q12_opt2" = "스트레스 줄이기";
+"onboarding_v2.habits.q12_opt2" = "스트레스와 불안 가라앉히기";
 "onboarding_v2.habits.q12_opt3" = "더 많은 에너지";
 "onboarding_v2.habits.q12_opt4" = "더 잘 집중하기";
-"onboarding_v2.habits.q12_opt5" = "전반적인 균형";
+"onboarding_v2.habits.q12_opt5" = "감정의 균형 찾기";
 "onboarding_v2.habits.q13" = "하루에 웰빙을 위해 얼마나 시간을 낼 수 있나요?";
 "onboarding_v2.habits.q13_opt1" = "0~5분";
 "onboarding_v2.habits.q13_opt2" = "5~10분";
@@ -4900,6 +4900,10 @@
 "milo.import.error.unreadable" = "이 파일을 읽을 수 없어요. PDF나 텍스트 파일로 시도해 보세요.";
 "milo.import.error.empty" = "Milo가 당신에 대해 알기에는 텍스트가 부족해요.";
 "milo.import.error.not_personal" = "이 문서에서 당신에 대한 내용을 찾지 못했어요. 자신에 대해 이야기한 대화로 시도해 보세요.";
+"milo.import.failed.not_personal" = "공유해 주신 내용을 읽었지만 그 안에서 당신에 대한 이야기를 찾지 못했어요. 기분이나 요즘 겪는 일에 대한 내용이 없었어요. 자신에 대해 이야기한 대화가 가장 잘 맞아요. 가장 빠른 방법은 “Milo에게 당신의 이야기를 들려주세요”를 열고, AI에게 할 질문을 복사해 그 답변을 공유하는 거예요. AI가 아직 당신을 잘 모른다고 하면 먼저 이번 주 이야기를 조금 들려준 뒤 다시 물어보세요. 스크린샷이라면 글자가 선명하고 전부 보이는지 확인해 주세요.";
+"milo.import.failed.empty" = "읽을 텍스트가 부족했어요. 더 긴 대화나 몇 문단의 글, 더 선명한 스크린샷을 공유해 주시면 다시 해볼게요.";
+"milo.import.failed.unreadable" = "이 파일을 읽을 수 없었어요. PDF, 텍스트 파일 또는 선명한 스크린샷이 가장 잘 돼요. 텍스트를 복사해서 붙여 넣어 주셔도 돼요.";
+"milo.import.failed.link" = "이 링크를 열 수 없었어요. 앱에서 대화를 선택해 복사한 뒤 “Milo에게 당신의 이야기를 들려주세요”에 붙여 넣어 주세요.";
 "milo.import.reading.title" = "Milo가 읽는 중…";
 "milo.import.reading.step.read" = "대화를 읽는 중";
 "milo.import.reading.step.health" = "건강 내보내기를 읽는 중";

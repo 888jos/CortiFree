@@ -6,7 +6,6 @@
 //  or weekly with no trial), used for the App Store review screenshot of each in-app purchase. Nothing is bought from here.
 //
 
-#if DEBUG
 import SwiftUI
 
 struct ReviewPaywallPreview: View {
@@ -199,4 +198,3 @@ struct ReviewPaywallPreview: View {
 #Preview {
     ReviewPaywallPreview(price: ReviewPaywallPreview.Price.all[0])
 }
-#endif

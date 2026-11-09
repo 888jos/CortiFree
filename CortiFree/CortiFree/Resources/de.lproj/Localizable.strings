@@ -3222,12 +3222,12 @@
 "onboarding_v2.insight.profile.priority.sleep" = "Schlaf ist dein erster Hebel für Fortschritte.";
 "onboarding_v2.insight.profile.priority.energy" = "Stabilere Energie wiederzufinden ist deine erste Priorität.";
 "onboarding_v2.insight.profile.priority.focus" = "Der Fokus ist der erste Bereich, den es zu stärken gilt.";
-"onboarding_v2.habits.q12" = "Was möchtest du am liebsten verbessern?";
+"onboarding_v2.habits.q12" = "Worauf soll sich dein 4-Wochen-Plan konzentrieren?";
 "onboarding_v2.habits.q12_opt1" = "Besser schlafen";
-"onboarding_v2.habits.q12_opt2" = "Meinen Stress reduzieren";
+"onboarding_v2.habits.q12_opt2" = "Meinen Stress und meine Angst lindern";
 "onboarding_v2.habits.q12_opt3" = "Mehr Energie haben";
 "onboarding_v2.habits.q12_opt4" = "Mich besser konzentrieren";
-"onboarding_v2.habits.q12_opt5" = "Insgesamt mehr Gleichgewicht";
+"onboarding_v2.habits.q12_opt5" = "Mein emotionales Gleichgewicht finden";
 "onboarding_v2.habits.q13" = "Wie viel Zeit kannst du täglich deinem Wohlbefinden widmen?";
 "onboarding_v2.habits.q13_opt1" = "0-5 Minuten";
 "onboarding_v2.habits.q13_opt2" = "5-10 Minuten";
@@ -4897,6 +4897,10 @@
 "milo.import.error.unreadable" = "Milo konnte diese Datei nicht lesen. Versuch es mit einem PDF oder einer Textdatei.";
 "milo.import.error.empty" = "Hier steht nicht genug Text, damit Milo etwas über dich lernen kann.";
 "milo.import.error.not_personal" = "Milo hat in diesem Dokument nichts über dich gefunden. Versuch es mit einem Gespräch, in dem du von dir erzählst.";
+"milo.import.failed.not_personal" = "Ich habe gelesen, was du geteilt hast, aber ich habe dich darin nicht gefunden: nichts darüber, wie es dir geht oder was du gerade durchmachst. Ein Gespräch, in dem du von dir erzählst, funktioniert am besten. Am schnellsten geht es so: Öffne „Erzähl Milo deine Geschichte“, kopiere die Frage für deine KI und teile ihre Antwort. Sagt deine KI, dass sie dich noch nicht kennt, erzähl ihr zuerst ein bisschen von deiner Woche und frag dann noch einmal. Bei einem Screenshot sollte der Text scharf und vollständig zu sehen sein.";
+"milo.import.failed.empty" = "Es war nicht genug Text zum Lesen da. Teile ein längeres Gespräch, ein paar Absätze oder einen schärferen Screenshot, dann versuche ich es noch einmal.";
+"milo.import.failed.unreadable" = "Ich konnte diese Datei nicht lesen. Ein PDF, eine Textdatei oder ein klarer Screenshot funktioniert am besten. Du kannst den Text auch kopieren und mir einfügen.";
+"milo.import.failed.link" = "Ich konnte diesen Link nicht öffnen. Markiere das Gespräch in der App, kopiere es und füge es bei „Erzähl Milo deine Geschichte“ ein.";
 "milo.import.reading.title" = "Milo liest…";
 "milo.import.reading.step.read" = "Dein Gespräch wird gelesen";
 "milo.import.reading.step.health" = "Dein Health-Export wird gelesen";

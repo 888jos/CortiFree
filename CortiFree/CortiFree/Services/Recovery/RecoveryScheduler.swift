@@ -456,8 +456,7 @@ final class RecoveryScheduler {
     }
 }
 
-#if DEBUG
-// MARK: - Debug (RecoveryDebugView)
+// MARK: - Debug (RecoveryDebugView, testers only)
 
 extension RecoveryScheduler {
     struct DebugState {
@@ -502,4 +501,3 @@ extension RecoveryScheduler {
         }
     }
 }
-#endif

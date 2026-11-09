@@ -43,6 +43,59 @@ struct PlanCycleGeneratorTests {
         #expect(freshShare >= 0.5)
     }
 
+    /// « What should your 4-week plan focus on? »: the five answers are the five plans, and the answer
+    /// decides the plan whatever reasons were ticked before (the reasons only shape the second plan).
+    @Test func theQuizChoiceDecidesThePlan() {
+        let choices: [(String, PlanGoal)] = [("sleep", .sleep), ("stress", .stress), ("energy", .energy), ("focus", .focus), ("balance", .emotional)]
+        let reasonSets: [[String]] = [["anxiety"], ["sleep"], ["energy", "difficult"], ["mental", "habits"], ["sleep", "anxiety", "energy", "difficult"]]
+        for (code, goal) in choices {
+            for reasons in reasonSets {
+                let profile = PlanProfile(reasonCodes: reasons, durationCode: "2_6_months", improvementGoal: code)
+                let analysis = PersonalPlanGenerator.analyze(profile)
+                #expect(analysis.primary == goal, "answer \(code) with reasons \(reasons) gave \(analysis.primary.rawValue)")
+                #expect(analysis.primaryOrigin == .quiz)
+                #expect(PersonalPlanGenerator.generate(profile: profile, startDate: start).goal == goal)
+            }
+        }
+        // The quiz answers (index 10) decide too, like the improvement goal does without raw answers.
+        var answers = [Int](repeating: 1, count: 12)
+        answers[10] = 3
+        let withAnswers = PlanProfile(reasonCodes: ["anxiety"], quizAnswers: answers)
+        #expect(PersonalPlanGenerator.analyze(withAnswers).primary == .focus)
+        // Nothing picked: the reasons decide as before.
+        #expect(PersonalPlanGenerator.analyze(PlanProfile(reasonCodes: ["sleep"])).primary == .sleep)
+        // The user's own AI and an explicit change of plan still win.
+        let ai = PlanProfile(reasonCodes: ["anxiety"], improvementGoal: "sleep", aiGoal: PlanGoal.energy.rawValue)
+        #expect(PersonalPlanGenerator.analyze(ai).primary == .energy)
+        #expect(PersonalPlanGenerator.analyze(PlanProfile(improvementGoal: "sleep"), overrideGoal: .focus).primary == .focus)
+    }
+
+    /// Changing the goal in the onboarding must change the exercises: week 1 differs for each of the 5 goals.
+    @Test func everyGoalHasItsOwnFirstWeek() {
+        func firstWeekSessions(_ goal: PlanGoal) -> Set<String> {
+            Set(generate(cycle: 1, goal: goal).days.prefix(7).flatMap { $0.items.filter { $0.kind == .audio || $0.kind == .evening }.map(\.refID) })
+        }
+        func firstWeekBreathing(_ goal: PlanGoal) -> Set<String> {
+            Set(generate(cycle: 1, goal: goal).days.prefix(7).flatMap { $0.items.filter { $0.kind == .breathing }.map(\.refID) })
+        }
+        let goals = PlanGoal.allCases
+        for (index, a) in goals.enumerated() {
+            for b in goals[(index + 1)...] {
+                let sessions = firstWeekSessions(a).symmetricDifference(firstWeekSessions(b)).count
+                let breathing = firstWeekBreathing(a).symmetricDifference(firstWeekBreathing(b)).count
+                #expect(sessions + breathing >= 3, "\(a.rawValue) and \(b.rawValue) have nearly the same first week")
+                #expect(sessions >= 1, "\(a.rawValue) and \(b.rawValue) have the same guided sessions in week 1")
+            }
+        }
+        // The goal's own sessions show up: focus gets focus sessions, energy gets morning ones.
+        func categories(_ goal: PlanGoal) -> Set<AudioSessionCategory> {
+            Set(firstWeekSessions(goal).compactMap { GuidedSessionCatalog.session(id: $0)?.category })
+        }
+        #expect(categories(.focus).contains(.focus))
+        #expect(categories(.energy).contains(.morning))
+        #expect(categories(.emotional).contains(.selfCompassion))
+    }
+
     @Test func anchorCycleHasLongerSessionsThanTheFirst() {
         func avgAudio(_ p: PersonalPlan) -> Double {
             let minutes = p.days.compactMap { $0.items.first { $0.kind == .audio }?.minutes }

@@ -14,9 +14,9 @@ struct AchievementsView: View {
 
     @State private var selectedAchievement: Achievement? = nil
     @State private var selectedHabitBadge: HabitBadge? = nil
-    #if DEBUG
+    /// « Show all unlocked » toggle: DEBUG and TestFlight builds only.
+    @ObservedObject private var testerAccess = TesterAccess.shared
     @State private var debugAllBadgesUnlocked = false
-    #endif
 
     var body: some View {
         ZStack {
@@ -88,29 +88,29 @@ struct AchievementsView: View {
                             }
                         }
 
-                        #if DEBUG
-                        Button {
-                            HapticManager.light()
-                            debugAllBadgesUnlocked.toggle()
-                            achievementService.setAllUnlockedForDebug(debugAllBadgesUnlocked)
-                            habitBadgeService.setAllUnlockedForDebug(debugAllBadgesUnlocked)
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: debugAllBadgesUnlocked ? "lock.fill" : "checkmark.seal.fill")
-                                    .font(.system(size: 14, weight: .semibold))
-                                Text(
-                                    debugAllBadgesUnlocked
-                                        ? "Show all locked"
-                                        : "Show all unlocked"
-                                )
-                                .font(.faroSemiBold(13))
+                        if testerAccess.isEnabled {
+                            Button {
+                                HapticManager.light()
+                                debugAllBadgesUnlocked.toggle()
+                                achievementService.setAllUnlockedForDebug(debugAllBadgesUnlocked)
+                                habitBadgeService.setAllUnlockedForDebug(debugAllBadgesUnlocked)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: debugAllBadgesUnlocked ? "lock.fill" : "checkmark.seal.fill")
+                                        .font(.system(size: 14, weight: .semibold))
+                                    Text(
+                                        debugAllBadgesUnlocked
+                                            ? "Show all locked"
+                                            : "Show all unlocked"
+                                    )
+                                    .font(.faroSemiBold(13))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 46)
                             }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 46)
+                            .buttonStyle(.glassSecondary(cornerRadius: 14))
                         }
-                        .buttonStyle(.glassSecondary(cornerRadius: 14))
-                        #endif
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 36)

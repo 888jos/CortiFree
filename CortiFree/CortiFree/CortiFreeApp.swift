@@ -400,9 +400,9 @@ struct CortiFreeApp: App {
 
     // IMPORTANT: Use @AppStorage to make onboarding completion reactive
     @AppStorage("onboardingV2Completed") private var isOnboardingComplete: Bool = false
-    #if DEBUG
+    /// Debug / TestFlight builds only (see TesterAccess).
+    @ObservedObject private var testerAccess = TesterAccess.shared
     @AppStorage("debugSkipOnboardingToHome") private var debugSkipOnboardingToHome: Bool = false
-    #endif
     /// Settings → Filming → « Replay onboarding » (testers and TestFlight creators).
     @ObservedObject private var onboardingReplay = OnboardingReplay.shared
 
@@ -416,29 +416,15 @@ struct CortiFreeApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-            #if DEBUG
-            if onboardingReplay.isActive {
-                // Creator filming the onboarding again: nothing saved, no paywall (OnboardingReplay).
-                OnboardingV2FlowView(isReplay: true)
-                    .environmentObject(authViewModel)
-            } else if debugSkipOnboardingToHome {
-                ContentView()
-                    .environmentObject(authViewModel)
-            } else if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
-                OnboardingV2FlowView()
-                    .environmentObject(authViewModel)
-            } else if authViewModel.isAuthenticated {
-                AuthenticatedAppRootView(authViewModel: authViewModel)
-            } else {
-                AuthView()
-                    .environmentObject(authViewModel)
-            }
-            #else
             // First launch: check if onboarding is completed
             // IMPORTANT: Use @AppStorage variable for reactive updates
             if onboardingReplay.isActive {
                 // Creator filming the onboarding again: nothing saved, no paywall (OnboardingReplay).
                 OnboardingV2FlowView(isReplay: true)
+                    .environmentObject(authViewModel)
+            } else if testerAccess.isEnabled && debugSkipOnboardingToHome {
+                // Tester skipped the onboarding (red house button)
+                ContentView()
                     .environmentObject(authViewModel)
             } else if !skipOnboardingForTesting && !isOnboardingComplete && !authViewModel.hasCompletedOnboarding {
                 // First time user - show onboarding
@@ -452,8 +438,8 @@ struct CortiFreeApp: App {
                 AuthView()
                     .environmentObject(authViewModel)
             }
-            #endif
             }
+            .task { await testerAccess.resolve() }
             .onOpenURL(perform: handleIncomingURL)
             .onReceive(NotificationRouter.shared.$pendingURL.compactMap { $0 }) { url in
                 NotificationRouter.shared.pendingURL = nil

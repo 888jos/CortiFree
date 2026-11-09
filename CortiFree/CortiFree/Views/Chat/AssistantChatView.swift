@@ -37,7 +37,8 @@ struct AssistantChatView: View {
     @State private var pendingIntent: MiloIntent?
     @AppStorage("assistant.daily.date") private var assistantDailyDate = ""
     @AppStorage("assistant.daily.usage") private var assistantDailyUsage = 0
-    @AppStorage("assistant.recommendation.rotation") private var recommendationRotation = 0
+    /// Cards Milo proposed lately (ids, oldest first), so the same exercise does not come back every time.
+    @AppStorage("assistant.recommendation.recent") private var recentRecommendations = ""
     @AppStorage(MiloConsent.storageKey) private var consentStore = ""
     @State private var showConsent = false
     @State private var pendingConsentText: String?
@@ -169,7 +170,8 @@ struct AssistantChatView: View {
                 initialLink: request.link,
                 isQuotaReached: assistantDailyUsage >= dailyLimit,
                 onAnalyzed: syncDailyUsageFromServer,
-                onFinish: insightKept
+                onFinish: insightKept,
+                onFailure: importFailed
             )
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
@@ -914,6 +916,13 @@ struct AssistantChatView: View {
         messages.append(DeepSeekChatMessage(role: "assistant", content: text))
     }
 
+    /// The import did not work out: Milo opens a new conversation and tells the user himself,
+    /// with what to try next.
+    private func importFailed(_ message: String) {
+        if !messages.isEmpty { newConversation() }
+        messages.append(DeepSeekChatMessage(role: "assistant", content: message))
+    }
+
     /// Milo opens a new conversation from what it learned, so the user can answer right away.
     /// `startNow`: the user tapped « Your first step », so its exercise starts at once.
     private func insightKept(_ insight: MiloInsight, startNow: Bool) {
@@ -1057,7 +1066,6 @@ struct AssistantChatView: View {
     /// The exercise card for a message: from the tapped suggestion, or from what the user wrote.
     /// Returns nil for small talk, so not every reply ends with an exercise.
     private func recommendation(for text: String, intent: MiloIntent?) -> AssistantRecommendation? {
-        let index = recommendationRotation
         let normalized = text.lowercased()
         let resolved: MiloIntent
         if let intent {
@@ -1075,35 +1083,38 @@ struct AssistantChatView: View {
         } else {
             return nil
         }
-        recommendationRotation += 1
 
+        // Every list below is ordered best fit first; Milo proposes the first one not proposed recently.
+        let recent = MiloRecommendationHistory.decode(recentRecommendations)
+        let card: AssistantRecommendation?
         switch resolved {
         case .sound:
             let sounds = moment == .night ? Exercise.sounds.filter { ["rain", "ocean", "night", "whitenoise"].contains($0.id) } : Exercise.sounds
-            guard let sound = sounds[safe: index % max(1, sounds.count)] else { return nil }
-            return .init(kind: .sound(sound))
+            card = MiloRecommendationHistory.freshest(sounds.map { AssistantRecommendation(kind: .sound($0)) }, recent: recent, id: \.id)
         case .breathing(let slow):
-            // Techniques the user rated badly (average < 2) are never proposed first.
+            // Techniques the user rated badly are never proposed first. Stimulating ones (energy) are not
+            // offered to someone who is stressed or trying to sleep: only calm, SOS and focus techniques.
             let all = BreathingPattern.allPatterns
             let liked = all.filter { !SessionRatingStore.isDisliked(.breathing, id: $0.key) }
             let patterns = liked.isEmpty ? all : liked
-            let pattern = slow
-                ? patterns.first { $0.name.lowercased().contains("slow") || $0.category == .sleep }
-                : patterns[safe: index % max(1, patterns.count)]
-            guard let pattern = pattern ?? patterns.first else { return nil }
-            return .init(kind: .breathing(pattern))
+            // Sleep: the slow techniques. Otherwise: SOS first (fastest relief), then calm, then focus.
+            let order: [BreathingCategory] = slow ? [.sleep] : [.sos, .calm, .focus]
+            let pool = order.flatMap { category in patterns.filter { $0.category == category } }
+            card = MiloRecommendationHistory.freshest((pool.isEmpty ? patterns : pool).map { AssistantRecommendation(kind: .breathing($0)) },
+                                                      recent: recent, id: \.id)
         case .session(let category):
-            // Badly rated sessions last, then sessions not finished yet first, then the shortest,
-            // rotating between replies.
+            // Badly rated sessions last, then sessions not finished yet first, then the shortest. The whole
+            // category is used: Milo walks down this list instead of repeating the first three.
             let sessions = GuidedSessionCatalog.sessions(in: category).sorted { lhs, rhs in
                 let ld = SessionRatingStore.isDisliked(.meditation, id: lhs.id), rd = SessionRatingStore.isDisliked(.meditation, id: rhs.id)
                 if ld != rd { return !ld }
                 let l = GuidedSessionProgressStore.isCompleted(lhs.id), r = GuidedSessionProgressStore.isCompleted(rhs.id)
                 return l == r ? lhs.durationMinutes < rhs.durationMinutes : !l
             }
-            guard let session = sessions[safe: index % max(1, min(3, sessions.count))] else { return nil }
-            return .init(kind: .session(session))
+            card = MiloRecommendationHistory.freshest(sessions.map { AssistantRecommendation(kind: .session($0)) }, recent: recent, id: \.id)
         }
+        if let card { recentRecommendations = MiloRecommendationHistory.encode(MiloRecommendationHistory.remembering(card.id, in: recent)) }
+        return card
     }
 
     /// Guided-session category matching the request, or the plan goal for a generic meditation request.

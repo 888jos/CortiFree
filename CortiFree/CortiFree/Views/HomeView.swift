@@ -19,22 +19,18 @@ struct HomeView: View {
     @State private var showMeditationList = false
     @State private var showSoundsList = false
     @State private var showJournal = false
-    #if DEBUG
+    /// Debug buttons: DEBUG and TestFlight builds only.
+    @ObservedObject private var testerAccess = TesterAccess.shared
     @State private var showDailyCheckIn = false
-    #endif
-    #if DEBUG
     @State private var showDailyMeditationDebug = false
     @State private var showCancelInterceptDebug = false
-    #endif
     /// « Not now » (or swiped away): the check-in waits on Home until it is done.
     @State private var showCheckInCard = false
     @State private var homeCheckIn: HomeCheckInDay?
     @State private var showSettings = false
     @State private var showOnboarding = false
     @State private var showCustomPaywall = false
-    #if DEBUG
     @State private var reviewPaywallPrice: ReviewPaywallPreview.Price?
-    #endif
     @State private var showRatingSocialProofDebug = false
     @State private var showCelebrationsGalleryDebug = false
     @State private var showTrialKickoffDebug = false
@@ -150,86 +146,86 @@ struct HomeView: View {
                                 HomeCalmToolsSection()
                                     .padding(.top, 18)
 
-                                #if DEBUG
-                                VStack(spacing: 12) {
-                                    Button(action: { showOnboarding = true }) {
-                                        Text("🛠 Preview Onboarding")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: restartOnboardingFromBeginning) {
-                                        Text("↻ Restart Onboarding From Start")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: {
-                                        launchOnboardingFromAuthDebug()
-                                    }) {
-                                        Text("🛠 Current Flow From Auth")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: { showCustomPaywall = true }) {
-                                        Text("💳 Custom Paywall")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    // App Store review screenshots: one per plan and price.
-                                    ForEach(ReviewPaywallPreview.Price.all) { price in
-                                        Button(action: { reviewPaywallPrice = price }) {
-                                            Text("🧾 Review paywall \(price.amountText)/\(price.period == .year ? "yr" : "wk")")
+                                if testerAccess.isEnabled {
+                                    VStack(spacing: 12) {
+                                        Button(action: { showOnboarding = true }) {
+                                            Text("🛠 Preview Onboarding")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: restartOnboardingFromBeginning) {
+                                            Text("↻ Restart Onboarding From Start")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: {
+                                            launchOnboardingFromAuthDebug()
+                                        }) {
+                                            Text("🛠 Current Flow From Auth")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: { showCustomPaywall = true }) {
+                                            Text("💳 Custom Paywall")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        // App Store review screenshots: weekly plan (no trial), then annual plans (7-day trial), one per price.
+                                        ForEach(ReviewPaywallPreview.Price.all) { price in
+                                            Button(action: { reviewPaywallPrice = price }) {
+                                                Text("🧾 Review paywall \(price.amountText)/\(price.period == .year ? "yr" : "wk")")
+                                                    .font(.system(size: 13, weight: .medium))
+                                                    .foregroundColor(.white.opacity(0.5))
+                                            }
+                                        }
+                                        // The drawers that open by themselves at the first app open of the day.
+                                        Button(action: { showDailyCheckIn = true }) {
+                                            Text("📝 Daily check-in")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: { showDailyMeditationDebug = true }) {
+                                            Text("🧘 Méditation du jour (jour 1-7)")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: { showCancelInterceptDebug = true }) {
+                                            Text("🚫 Renouvellement coupé (rattrapage)")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: { showTrialKickoffDebug = true }) {
+                                            Text("🌱 Post-trial kickoff (preview)")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: { showCelebrationsGalleryDebug = true }) {
+                                            Text("🎉 Celebrations gallery")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: { showRatingSocialProofDebug = true }) {
+                                            Text("⭐ Rating Social Proof")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: {
+                                            triggerSuperwallDebugPlacement("campaign_trigger")
+                                        }) {
+                                            Text("🚀 Superwall campaign_trigger")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                        Button(action: {
+                                            triggerSuperwallDebugPlacement("winback_cancelled_trial")
+                                        }) {
+                                            Text("↩️ Superwall winback_cancelled_trial")
                                                 .font(.system(size: 13, weight: .medium))
                                                 .foregroundColor(.white.opacity(0.5))
                                         }
                                     }
-                                    // The drawers that open by themselves at the first app open of the day.
-                                    Button(action: { showDailyCheckIn = true }) {
-                                        Text("📝 Daily check-in")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: { showDailyMeditationDebug = true }) {
-                                        Text("🧘 Méditation du jour (jour 1-7)")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: { showCancelInterceptDebug = true }) {
-                                        Text("🚫 Renouvellement coupé (rattrapage)")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: { showTrialKickoffDebug = true }) {
-                                        Text("🌱 Post-trial kickoff (preview)")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: { showCelebrationsGalleryDebug = true }) {
-                                        Text("🎉 Celebrations gallery")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: { showRatingSocialProofDebug = true }) {
-                                        Text("⭐ Rating Social Proof")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: {
-                                        triggerSuperwallDebugPlacement("campaign_trigger")
-                                    }) {
-                                        Text("🚀 Superwall campaign_trigger")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
-                                    Button(action: {
-                                        triggerSuperwallDebugPlacement("winback_cancelled_trial")
-                                    }) {
-                                        Text("↩️ Superwall winback_cancelled_trial")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.5))
-                                    }
+                                    .padding(.top, 24)
                                 }
-                                .padding(.top, 24)
-                                #endif
 
                                 Spacer(minLength: 150)
                             }
@@ -264,7 +260,7 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("DailyCheckInSaved"))) { _ in refreshCheckInCard() }
         .onReceive(NotificationCenter.default.publisher(for: DailyCheckInService.stateChanged)) { _ in refreshCheckInCard() }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in refreshCheckInCard() }
-        #if DEBUG
+        // Tester-only drawers: only opened from the debug buttons above.
         .sheet(isPresented: $showDailyCheckIn) {
             DailyCheckInView(targetDate: Date())
                 .dailyDrawerPresentation()
@@ -276,7 +272,6 @@ struct HomeView: View {
             DailyMeditationDrawer(day: DailyMeditationService.shared.dayIndex ?? 0, onStart: {})
                 .dailyDrawerPresentation()
         }
-        #endif
         .fullScreenCover(isPresented: $showSettings) {
             SettingsView()
         }
@@ -292,8 +287,7 @@ struct HomeView: View {
                 }
             )
         }
-        #if DEBUG
-        // Debug-only: Onboarding preview (excluded from production builds)
+        // Tester-only: Onboarding preview (opened only from the debug buttons)
         .fullScreenCover(item: $reviewPaywallPrice) { price in
             ReviewPaywallPreview(price: price)
         }
@@ -311,7 +305,6 @@ struct HomeView: View {
                 showRatingSocialProofDebug = false
             }
         }
-        #endif
         .onAppear {
             // Refresh motivational message to pick up any name changes from profile edit
             motivationalVM.refreshMessage()
@@ -368,7 +361,8 @@ struct HomeView: View {
         }
     }
 
-    #if DEBUG
+    // MARK: - Tester tools (debug buttons)
+
     private func triggerSuperwallDebugPlacement(_ placement: String) {
         print("🧪 Triggering Superwall debug placement: \(placement)")
         Superwall.shared.register(placement: placement)
@@ -396,7 +390,6 @@ struct HomeView: View {
         OnboardingLiveActivityManager.shared.end()
         showOnboarding = true
     }
-    #endif
 
     // MARK: - Header Navigation
 

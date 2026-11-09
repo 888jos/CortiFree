@@ -254,9 +254,7 @@ struct AuthenticationView: View {
 
                 onComplete()
             })
-            #if DEBUG
             .onboardingDebugHomeButton()
-            #endif
         }
         .onAppear {
             // Track authentication screen view
@@ -622,9 +620,7 @@ struct EmailAuthView: View {
                 showAppleAuth = false
                 onComplete()
             })
-            #if DEBUG
             .onboardingDebugHomeButton()
-            #endif
         }
         .sheet(isPresented: $showResetPassword) {
             ResetPasswordView(initialEmail: email) { user in
@@ -865,9 +861,7 @@ struct AppleAuthView: View {
                 showEmailAuth = false
                 onComplete()
             })
-            #if DEBUG
             .onboardingDebugHomeButton()
-            #endif
         }
     }
 

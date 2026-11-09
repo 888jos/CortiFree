@@ -7,7 +7,8 @@
 //  only for a build run from Xcode. TestFlight and App Review (both .sandbox), App Store builds
 //  (.production), and any failure or unverified receipt, stay locked.
 //  One exception, the filming aid for UGC creators (forced BPM, `canForceBPM`): also unlocked in
-//  TestFlight (.sandbox), App Review included (accepted: hidden behind the Version taps, no debug tool).
+//  TestFlight (.sandbox or a sandbox receipt), App Review included (accepted: hidden behind the
+//  Version taps, no debug tool).
 //  Never persisted: resolved again at each launch, false until then.
 //
 
@@ -94,6 +95,9 @@ final class TesterAccess: ObservableObject {
         #if !DEBUG
         guard !didResolve else { return }
         didResolve = true
+        // TestFlight builds carry a sandbox receipt: enough for the forced BPM, even when
+        // AppTransaction can't be read or verified (seen on build 34).
+        if Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt" { canForceBPM = true }
         guard let result = try? await AppTransaction.shared,
               case .verified(let transaction) = result else { return }
         // Not .sandbox: App Review installs builds in the sandbox environment too, and must

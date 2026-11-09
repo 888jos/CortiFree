@@ -57,10 +57,8 @@ final class CelebrationCenter: ObservableObject {
         return momentDuration
     }
 
-    #if DEBUG
-    /// Celebrations gallery: keep banners on screen until tapped, to inspect them.
+    /// Celebrations gallery (testers only): keep banners on screen until tapped, to inspect them.
     var holdsMomentsForPreview = false
-    #endif
 
     private init() {}
 
@@ -93,9 +91,7 @@ final class CelebrationCenter: ObservableObject {
             HapticManager.success()
         } else {
             HapticManager.light()
-            #if DEBUG
             if holdsMomentsForPreview { return }
-            #endif
             autoDismissTask = Task {
                 try? await Task.sleep(for: Self.duration(of: next))
                 guard !Task.isCancelled else { return }
