@@ -776,7 +776,7 @@
 		80F600C22E85D4A0008F58FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				AMPLITUDE_API_KEY = cea46c8db502b00ad059927287d88b08;
+				AMPLITUDE_API_KEY = 26c8b2c45985ddf23a0cd207d84fa0e8;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
@@ -813,7 +813,7 @@
 		80F600C32E85D4A0008F58FB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				AMPLITUDE_API_KEY = cea46c8db502b00ad059927287d88b08;
+				AMPLITUDE_API_KEY = 26c8b2c45985ddf23a0cd207d84fa0e8;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CortiFree/CortiFree.entitlements;
