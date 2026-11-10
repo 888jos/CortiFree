@@ -16,6 +16,11 @@ describe("oneSignalTags", () => {
     expect(tags.main_symptom).toBe("poor sleep");
   });
 
+  test("stays within the OneSignal Free limit of 6 data tags", () => {
+    const tags = oneSignalTags(user({ firstName: "Ana", recovery: { step: "complete", paywallSeenAt: 1, goal: "sleep", offersOptIn: true, updatedAt: 1 } }));
+    expect(Object.keys(tags).length).toBeLessThanOrEqual(6);
+  });
+
   test("never eligible without consent, when subscribed, in the holdout or without email", () => {
     const base = { step: "loading", goal: "focus", offersOptIn: true, updatedAt: 1 };
     expect(oneSignalTags(user({ recovery: { ...base, offersOptIn: false } })).email_recovery_eligible).toBe("false");

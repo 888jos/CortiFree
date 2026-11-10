@@ -79,16 +79,14 @@ export function oneSignalTags(user: Doc<"users">): Record<string, string> {
     // onboardingCompleted is only set after a purchase: lapsed users get the winback flow instead.
     user.onboardingCompleted !== true;
   const segment = sawPaywall ? "B" : PLAN_READY_STEPS.has(recovery?.step ?? "") ? "A2" : "A1";
+  // OneSignal Free allows 6 data tags per user. paywall_seen / is_subscribed / onboarding_step are
+  // implied by recovery_segment and email_recovery_eligible; goal is the raw key behind selected_goal.
   return {
     email_recovery_eligible: String(eligible),
     recovery_segment: segment,
-    onboarding_step: recovery?.step ?? "",
-    paywall_seen: String(sawPaywall),
     paywall_seen_at: sawPaywall ? String(Math.floor(recovery!.paywallSeenAt! / 1000)) : "",
-    is_subscribed: String(isPaid),
     selected_goal: copy.goal,
     main_symptom: copy.symptom,
-    goal: recovery?.goal ?? "",
     first_name: user.firstName ?? "",
   };
 }
